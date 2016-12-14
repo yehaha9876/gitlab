@@ -24,7 +24,7 @@ feature 'Projects > Members > Member leaves project', feature: true do
 
     context 'user leaves project' do
       it "removes the user's branch permissions" do
-        click_link 'Leave Project'
+        click_link 'Leave project'
 
         expect(current_path).to eq(dashboard_projects_path)
         expect(matching_protected_branch.push_access_levels.where(user: user)).not_to exist
