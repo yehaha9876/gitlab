@@ -58,6 +58,7 @@ module Gitlab
     # - Sentry DSN (:sentry_dsn)
     # - Deploy keys (:key)
     config.filter_parameters += %i(
+      authentication_token
       certificate
       encrypted_key
       hook
