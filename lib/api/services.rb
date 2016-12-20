@@ -472,7 +472,7 @@ module API
           desc: 'The description of the tracker'
         }
       ],
-      'slack-notification' => [
+      'slack' => [
         {
           required: true,
           name: :webhook,
@@ -490,14 +490,6 @@ module API
           name: :channel,
           type: String,
           desc: 'The channel name'
-        }
-      ],
-      'mattermost-notification' => [
-        {
-          required: true,
-          name: :webhook,
-          type: String,
-          desc: 'The Mattermost webhook. e.g. http://mattermost_host/hooks/...'
         }
       ],
       'teamcity' => [
