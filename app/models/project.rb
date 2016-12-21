@@ -90,6 +90,7 @@ class Project < ActiveRecord::Base
   has_one :gemnasium_service, dependent: :destroy
   has_one :mattermost_slash_commands_service, dependent: :destroy
   has_one :mattermost_service, dependent: :destroy
+  has_one :slack_slash_commands_service, dependent: :destroy
   has_one :slack_service, dependent: :destroy
   has_one :jenkins_service, dependent: :destroy
   has_one :jenkins_deprecated_service, dependent: :destroy
@@ -627,6 +628,10 @@ class Project < ActiveRecord::Base
 
   def gitlab_project_import?
     import_type == 'gitlab_project'
+  end
+
+  def gitea_import?
+    import_type == 'gitea'
   end
 
   def check_limit

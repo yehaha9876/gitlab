@@ -82,6 +82,8 @@ constraints(ProjectUrlConstrainer.new) do
         end
       end
 
+      resource :mattermost, only: [:new, :create]
+
       resources :deploy_keys, constraints: { id: /\d+/ }, only: [:index, :new, :create] do
         member do
           put :enable
@@ -179,6 +181,7 @@ constraints(ProjectUrlConstrainer.new) do
         end
 
         member do
+          get :stage
           post :cancel
           post :retry
           get :builds
@@ -188,6 +191,8 @@ constraints(ProjectUrlConstrainer.new) do
       resources :environments, except: [:destroy] do
         member do
           post :stop
+          get :terminal
+          get '/terminal.ws/authorize', to: 'environments#terminal_websocket_authorize', constraints: { format: nil }
         end
       end
 
