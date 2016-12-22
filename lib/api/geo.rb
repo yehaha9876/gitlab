@@ -9,6 +9,8 @@ module API
       post 'refresh_wikis' do
         authenticated_as_admin!
         required_attributes! [:projects]
+        forbidden! 'Node is disabled.' unless Gitlab::Geo.current_node.enabled?
+
         ::Geo::ScheduleWikiRepoUpdateService.new(params[:projects]).execute
       end
 
@@ -19,6 +21,8 @@ module API
       post 'receive_events' do
         authenticate_by_gitlab_geo_token!
         required_attributes! %w(event_name)
+
+        forbidden! 'Node is disabled.' unless Gitlab::Geo.current_node.enabled?
 
         case params['event_name']
         when 'key_create', 'key_destroy'
@@ -39,6 +43,9 @@ module API
         when 'project_transfer'
           required_attributes! %w(event_name project_id path_with_namespace old_path_with_namespace)
           ::Geo::ScheduleRepoMoveService.new(params).execute
+        when 'retrieve_ssh_config'
+          required_attributes! %w(event_name)
+          Gitlab.config.gitlab_shell.ssh_path_prefix
         end
       end
     end

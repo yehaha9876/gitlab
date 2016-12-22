@@ -1,24 +1,21 @@
 module Geo
   class RepositoryBackfillService
-    attr_reader :project, :geo_node
+    attr_accessor :project
 
-    def initialize(project, geo_node)
+    def initialize(project)
       @project = project
-      @geo_node = geo_node
     end
 
     def execute
-      geo_node.system_hook.execute(hook_data, 'system_hooks')
+      project.create_repository unless project.repository_exists?
+      project.repository.after_create if project.empty_repo?
+      project.repository.fetch_geo_mirror(geo_primary_project_ssh_url)
     end
 
     private
 
-    def hook_data
-      {
-        event_name: 'push',
-        project_id: project.id,
-        project: project.hook_attrs
-      }
+    def geo_primary_project_ssh_url
+      "#{Gitlab::Geo.primary_ssh_config}#{project.path_with_namespace}.git"
     end
   end
 end

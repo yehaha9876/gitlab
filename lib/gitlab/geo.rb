@@ -42,8 +42,20 @@ module Gitlab
       ::Geo::EnqueueWikiUpdateService.new(project).execute
     end
 
+    def self.primary_ssh_config
+      RequestStore.store[:geo_primary_ssh_config] ||=
+        begin
+          _, result = Gitlab::Geo.primary_node.system_hook.execute({ event_name: 'retrieve_ssh_config' }, 'system_hooks')
+          result
+        end
+    end
+
     def self.bulk_notify_job
       Sidekiq::Cron::Job.find('geo_bulk_notify_worker')
+    end
+
+    def self.backfill_job
+      Sidekiq::Cron::Job.find('geo_schedule_backfill_worker')
     end
 
     def self.oauth_authentication

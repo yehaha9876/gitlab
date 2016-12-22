@@ -114,7 +114,8 @@ namespace :admin do
   resources :geo_nodes, only: [:index, :create, :destroy] do
     member do
       post :repair
-      post :backfill_repositories
+      post :enable
+      post :disable
     end
   end
   ## EE-specific

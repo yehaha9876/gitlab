@@ -1,27 +1,63 @@
 require 'spec_helper'
 
 describe Geo::RepositoryBackfillService, services: true do
-  SYSTEM_HOOKS_HEADER = { 'Content-Type' => 'application/json', 'X-Gitlab-Event' => 'System Hook' }
-
-  let(:project) { create(:project) }
-  let(:geo_node) { create(:geo_node) }
-
-  subject { Geo::RepositoryBackfillService.new(project, geo_node) }
+  let(:project) { create(:empty_project) }
+  let(:subject) { described_class.new(project) }
 
   describe '#execute' do
-    it 'calls upon the system hook of the Geo Node' do
-      WebMock.stub_request(:post, geo_node.geo_events_url)
+    before do
+      allow_any_instance_of(described_class).to receive(:geo_primary_project_ssh_url)
+      allow(project.repository).to receive(:fetch_geo_mirror)
+    end
 
-      subject.execute
+    context 'when no repository exists' do
+      before do
+        allow(project).to receive(:repository_exists?) { false }
+        allow(project).to receive(:empty_repo?) { true }
+      end
 
-      expect(WebMock).to have_requested(:post, geo_node.geo_events_url).with(
-        headers: SYSTEM_HOOKS_HEADER,
-        body: {
-          event_name: 'push',
-          project_id: project.id,
-          project: project.hook_attrs
-        }
-      ).once
+      it 'creates a new repository' do
+        expect(project).to receive(:create_repository)
+
+        subject.execute
+      end
+
+      it 'executes after_create hook' do
+        expect(project.repository).to receive(:after_create).at_least(:once)
+
+        subject.execute
+      end
+
+      it 'fetches the Geo mirror' do
+        expect(project.repository).to receive(:fetch_geo_mirror)
+
+        subject.execute
+      end
+    end
+
+    context 'when repository exists' do
+      before do
+        allow(project).to receive(:repository_exists?) { true }
+        allow(project).to receive(:empty_repo?) { false }
+      end
+
+      it 'does not create a new repository' do
+        expect(project).not_to receive(:create_repository)
+
+        subject.execute
+      end
+
+      it 'does not execute after_create hook' do
+        expect(project.repository).not_to receive(:after_create)
+
+        subject.execute
+      end
+
+      it 'fetches the Geo mirror' do
+        expect(project.repository).to receive(:fetch_geo_mirror)
+
+        subject.execute
+      end
     end
   end
 end

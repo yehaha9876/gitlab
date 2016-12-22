@@ -79,12 +79,11 @@ describe API::Geo, api: true do
       expect(response.status).to eq 201
     end
 
-    it 'can start a refresh process from the backfill service' do
-      project = create(:project)
-      backfill = Geo::RepositoryBackfillService.new(project, geo_node)
-      post api('/geo/receive_events'), backfill.send(:hook_data), geo_token_header
+    it 'can retrieve SSH config' do
+      post api('/geo/receive_events'), { event_name: 'retrieve_ssh_config' }, geo_token_header
 
       expect(response.status).to eq 201
+      expect(response.body).to include Gitlab.config.gitlab_shell.ssh_path_prefix.to_s
     end
   end
 

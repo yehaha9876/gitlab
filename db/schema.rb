@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161221140236) do
+ActiveRecord::Schema.define(version: 20161222164339) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -510,6 +510,7 @@ ActiveRecord::Schema.define(version: 20161221140236) do
     t.integer "geo_node_key_id"
     t.integer "oauth_application_id"
     t.integer "system_hook_id"
+    t.boolean "enabled", default: true
   end
 
   add_index "geo_nodes", ["host"], name: "index_geo_nodes_on_host", using: :btree

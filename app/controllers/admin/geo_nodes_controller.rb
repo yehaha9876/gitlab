@@ -1,6 +1,6 @@
 class Admin::GeoNodesController < Admin::ApplicationController
   before_action :check_license, except: [:index, :destroy]
-  before_action :load_node, only: [:destroy, :repair, :backfill_repositories]
+  before_action :load_node, only: [:destroy, :repair, :enable, :disable]
 
   def index
     @nodes = GeoNode.all
@@ -40,13 +40,21 @@ class Admin::GeoNodesController < Admin::ApplicationController
     redirect_to admin_geo_nodes_path
   end
 
-  def backfill_repositories
-    if @node.primary?
-      redirect_to admin_geo_nodes_path, notice: 'This is the primary node. Please run this action with a secondary node.'
+  def enable
+    if !@node.primary? && @node.update_attribute(:enabled, true)
+      redirect_to admin_geo_nodes_path, notice: 'Node was successfully updated.'
     else
-      @node.backfill_repositories
+      flash[:alert] = 'There was a problem updating the node.'
+      redirect_to admin_geo_nodes_path
+    end
+  end
 
-      redirect_to admin_geo_nodes_path, notice: 'Backfill scheduled successfully.'
+  def disable
+    if !@node.primary? && @node.update_attribute(:enabled, false)
+      redirect_to admin_geo_nodes_path, notice: 'Node was successfully updated.'
+    else
+      flash[:alert] = 'There was a problem updating the node.'
+      redirect_to admin_geo_nodes_path
     end
   end
 

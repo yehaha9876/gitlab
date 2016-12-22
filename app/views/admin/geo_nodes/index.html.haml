@@ -21,6 +21,7 @@
             %span
               = node.primary ? icon('star fw') : icon('globe fw')
             %strong= node.url
+            = node_status_icon(node) unless node.primary?
             %p
               %span.help-block #{node.primary ? 'Primary node' : 'Secondary node'}
 
@@ -31,9 +32,7 @@
                   = icon('exclamation-triangle fw')
                   Repair authentication
               - unless node.primary?
-                = link_to backfill_repositories_admin_geo_node_path(node), method: :post, class: 'btn btn-primary btn-sm prepend-left-10' do
-                  = icon 'map-signs'
-                  Backfill all repositories
+                = enable_disable_node_button(node)
             = link_to admin_geo_node_path(node), data: { confirm: 'Are you sure?' }, method: :delete, class: 'btn btn-remove btn-sm prepend-left-10' do
               = icon 'trash'
               Remove
