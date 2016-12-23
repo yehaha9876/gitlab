@@ -63,8 +63,15 @@ class Admin::LicensesController < Admin::ApplicationController
   end
 
   def license_params
-    license_params = params.require(:license).permit(:data_file, :data)
-    license_params.delete(:data) if license_params[:data_file]
+    license_params = params.require(:license).permit(:data)
+
+    # Wiggle around StrongParameters because data_file is an ::UploadedFile
+    data_file = params[:license][:data_file]
+    if license_params.permitted? && data_file.present?
+      license_params.delete(:data)
+      license_params[:data_file] = data_file
+    end
+
     license_params
   end
 end
