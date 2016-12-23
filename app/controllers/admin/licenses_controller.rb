@@ -17,7 +17,7 @@ class Admin::LicensesController < Admin::ApplicationController
   end
 
   def create
-    unless params[:license]
+    unless license_params.values_at(:data, :data_file).any?(&:present?)
       flash.now[:alert] = "No license was selected."
 
       @license = License.new
