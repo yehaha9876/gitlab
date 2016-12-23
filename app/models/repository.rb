@@ -517,6 +517,14 @@ class Repository
     repository_event(:push_branch)
   end
 
+  # Expire certain caches after a geo mirror fetch
+  def after_geo_mirror_fetch
+    expire_statistics_caches
+    expire_content_cache
+    expire_tags_cache
+    expire_branches_cache
+  end
+
   # Runs code before removing an existing branch.
   def before_remove_branch
     expire_branches_cache

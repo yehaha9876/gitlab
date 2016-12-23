@@ -231,6 +231,10 @@ module API
       render_api_error!('204 No Content', 204)
     end
 
+    def validate_geo_node!
+      forbidden! 'Node is disabled.' unless Gitlab::Geo.current_node.enabled?
+    end
+
     def render_validation_error!(model)
       if model.errors.any?
         render_api_error!(model.errors.messages || '400 Bad Request', 400)

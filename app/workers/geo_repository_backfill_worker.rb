@@ -6,7 +6,7 @@ class GeoRepositoryBackfillWorker
   sidekiq_options retry: false
 
   def perform(project_id)
-    return unless Gitlab::Geo.current_node.enabled?
+    return unless Gitlab::Geo.secondary? && Gitlab::Geo.current_node.enabled?
 
     project = Project.find(project_id)
 

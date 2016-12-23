@@ -45,8 +45,11 @@ module Gitlab
     def self.primary_ssh_config
       RequestStore.store[:geo_primary_ssh_config] ||=
         begin
-          _, result = Gitlab::Geo.primary_node.system_hook.execute({ event_name: 'retrieve_ssh_config' }, 'system_hooks')
-          result
+          return Gitlab.config.gitlab_shell.ssh_path_prefix if self.current_node.primary?
+
+          status, result = Gitlab::Geo.primary_node.system_hook.execute({ event_name: 'retrieve_ssh_config' }, 'system_hooks')
+
+          status ? result : nil
         end
     end
 

@@ -42,18 +42,18 @@ class Admin::GeoNodesController < Admin::ApplicationController
 
   def enable
     if !@node.primary? && @node.update_attribute(:enabled, true)
-      redirect_to admin_geo_nodes_path, notice: 'Node was successfully updated.'
+      redirect_to admin_geo_nodes_path, notice: 'Node was successfully enabled.'
     else
-      flash[:alert] = 'There was a problem updating the node.'
+      flash[:alert] = 'There was a problem enabling the node.'
       redirect_to admin_geo_nodes_path
     end
   end
 
   def disable
     if !@node.primary? && @node.update_attribute(:enabled, false)
-      redirect_to admin_geo_nodes_path, notice: 'Node was successfully updated.'
+      redirect_to admin_geo_nodes_path, notice: 'Node was successfully disabled.'
     else
-      flash[:alert] = 'There was a problem updating the node.'
+      flash[:alert] = 'There was a problem disabling the node.'
       redirect_to admin_geo_nodes_path
     end
   end
