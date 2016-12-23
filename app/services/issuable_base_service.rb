@@ -208,6 +208,7 @@ class IssuableBaseService < BaseService
     change_todo(issuable)
     time_spent = change_time_spent(issuable)
     filter_params(issuable)
+    time_spent = change_time_spent(issuable)
     old_labels = issuable.labels.to_a
     old_mentioned_users = issuable.mentioned_users.to_a
 
