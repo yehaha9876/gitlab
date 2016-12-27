@@ -424,20 +424,18 @@ describe Ci::Pipeline, models: true do
     context 'when no ref is specified' do
       let(:pipelines) { described_class.latest.all }
 
-      it 'returns the latest pipeline for the same ref and different sha' do
-        expect(pipelines.map(&:sha)).to contain_exactly('A', 'B', 'C')
-        expect(pipelines.map(&:status)).
-          to contain_exactly('success', 'failed', 'skipped')
+      it 'gives the latest pipelines for the same ref and different sha in reverse chronological order' do
+        expect(pipelines.map(&:sha)).to eq(%w[C B A])
+        expect(pipelines.map(&:status)).to eq(%w[skipped failed success])
       end
     end
 
     context 'when ref is specified' do
       let(:pipelines) { described_class.latest('ref').all }
 
-      it 'returns the latest pipeline for ref and different sha' do
-        expect(pipelines.map(&:sha)).to contain_exactly('A', 'B')
-        expect(pipelines.map(&:status)).
-          to contain_exactly('success', 'failed')
+      it 'gives the latest pipelines for ref and different sha in reverse chronological order' do
+        expect(pipelines.map(&:sha)).to eq(%w[B A])
+        expect(pipelines.map(&:status)).to eq(%w[failed success])
       end
     end
   end
@@ -461,6 +459,19 @@ describe Ci::Pipeline, models: true do
         expect(latest_status).to eq(described_class.latest_status('ref'))
         expect(latest_status).to eq('failed')
       end
+    end
+  end
+
+  describe '.latest_successful_for' do
+    include_context 'with some outdated pipelines'
+
+    let!(:latest_successful_pipeline) do
+      create_pipeline(:success, 'ref', 'D')
+    end
+
+    it 'returns the latest successful pipeline' do
+      expect(described_class.latest_successful_for('ref')).
+        to eq(latest_successful_pipeline)
     end
   end
 
