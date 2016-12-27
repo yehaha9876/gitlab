@@ -84,6 +84,7 @@ module API
     mount ::API::Namespaces
     mount ::API::Notes
     mount ::API::NotificationSettings
+    mount ::API::PersonalAccessTokens
     mount ::API::Pipelines
     mount ::API::ProjectGitHook # TODO: Should be removed after 8.11 is released
     mount ::API::ProjectHooks
