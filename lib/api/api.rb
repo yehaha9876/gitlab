@@ -43,6 +43,7 @@ module API
     mount ::API::Deployments
     mount ::API::Environments
     mount ::API::Files
+    mount ::API::GroupHooks
     mount ::API::Groups
     mount ::API::Geo
     mount ::API::Internal
