@@ -107,8 +107,8 @@ ID_FROM=1001 ID_TO=2000 sudo gitlab-rake gitlab:elastic:index_repositories
 ID_FROM=2001 sudo gitlab-rake gitlab:elastic:index_repositories
 ```
 
-If you need to update any outdated indexes, you can use
-the `UPDATE_INDEX` parameter:
+If you need to update any outdated indexes or generate the initial indexes for
+repositories, you need to use the `UPDATE_INDEX` parameter:
 
 ```
 UPDATE_INDEX=true ID_TO=1000 sudo gitlab-rake gitlab:elastic:index_repositories
