@@ -70,6 +70,9 @@
         formData[`${accessLevelName}_attributes`] = this[`${accessLevelName}_dropdown`].getInputData(accessLevelName);
       }
 
+      this.$allowedToMergeDropdown.disable();
+      this.$allowedToPushDropdown.disable();
+
       return $.ajax({
         type: 'POST',
         url: this.$wrap.data('url'),
@@ -79,7 +82,6 @@
           protected_branch: formData
         },
         success: (response) => {
-          this.$wrap.effect('highlight');
           this.hasChanges = false;
 
           for (const ACCESS_LEVEL in ACCESS_LEVELS) {
@@ -93,6 +95,9 @@
           $.scrollTo(0);
           new Flash('Failed to update branch!');
         }
+      }).always(() => {
+        this.$allowedToMergeDropdown.enable();
+        this.$allowedToPushDropdown.enable();
       });
     }
 

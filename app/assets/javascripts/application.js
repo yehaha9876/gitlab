@@ -7,9 +7,7 @@
 /* global Aside */
 
 window.$ = window.jQuery = require('jquery');
-require('jquery-ui/ui/autocomplete');
 require('jquery-ui/ui/draggable');
-require('jquery-ui/ui/effect-highlight');
 require('jquery-ui/ui/sortable');
 require('jquery-ujs');
 require('vendor/jquery.endless-scroll');
