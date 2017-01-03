@@ -110,6 +110,7 @@
           break;
         case 'projects:milestones:new':
         case 'projects:milestones:edit':
+        case 'projects:milestones:update':
           new ZenMode();
           new gl.DueDateSelectors();
           new GLForm($('.milestone-form'));

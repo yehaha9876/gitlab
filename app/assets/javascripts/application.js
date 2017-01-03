@@ -14,7 +14,6 @@
 //
 /*= require jquery2 */
 /*= require jquery-ui/autocomplete */
-/*= require jquery-ui/datepicker */
 /*= require jquery-ui/draggable */
 /*= require jquery-ui/effect-highlight */
 /*= require jquery-ui/sortable */
@@ -26,6 +25,7 @@
 /*= require jquery.scrollTo */
 /*= require jquery.turbolinks */
 /*= require jquery.tablesorter */
+/*= require pikaday */
 /*= require js.cookie */
 /*= require turbolinks */
 /*= require autosave */
