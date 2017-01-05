@@ -129,7 +129,7 @@ module Gitlab
       def update_email
         return false unless ldap_user.try(:email)
 
-        ldap_email = ldap_user.email.last.to_s.downcase
+        ldap_email = ldap_user.email.to_s.downcase
 
         return false if user.email == ldap_email
 

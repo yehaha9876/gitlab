@@ -236,10 +236,12 @@ describe Gitlab::LDAP::Access, lib: true do
     let(:entry) { Net::LDAP::Entry.new }
 
     before do
+      allow_any_instance_of(Gitlab::LDAP::Config).to receive_messages(attributes: { email: ['mail', 'email', 'userPrincipalName']})
       allow(access).to receive_messages(ldap_user: Gitlab::LDAP::Person.new(entry, user.ldap_identity.provider))
     end
 
     it "does not update email if email attribute is not set" do
+      allow_any_instance_of(Gitlab::LDAP::Config).to receive_messages(attributes: { email: nil })
       expect{ access.update_email }.not_to change(user, :email)
     end
 
