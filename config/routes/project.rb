@@ -358,7 +358,7 @@ constraints(ProjectUrlConstrainer.new) do
 
       namespace :settings do
         resource :members, only: [:show]
-        resource :pipelines, only: [:show]
+        resource :ci_cd_pipelines, only: [:show]
       end
 
       # Since both wiki and repository routing contains wildcard characters
