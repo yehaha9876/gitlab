@@ -1,4 +1,4 @@
-class Projects::MergeRequestsController < Projects::ApplicationController
+ Projects::MergeRequestsController < Projects::ApplicationController
   include ToggleSubscriptionAction
   include DiffForPath
   include DiffHelper
@@ -315,7 +315,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
           render :edit
         end
       end
-      
+
       format.json do
         render json: @merge_request.to_json(include: { milestone: {}, assignee: { methods: :avatar_url }, labels: { methods: :text_color } }, methods: [:task_status, :task_status_short])
       end
