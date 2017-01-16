@@ -16,6 +16,7 @@ feature 'Protected Branches', feature: true, js: true do
     Array(option).each { |opt| click_on(opt) }
 
     find(".js-allowed-to-#{operation}").click # needed to submit form in some cases
+    wait_for_ajax
   end
 
   def set_protected_branch_name(branch_name)
