@@ -35,8 +35,7 @@ stages:
 # Predefined scopes
 .dedicated-runner: &dedicated-runner
   tags:
-    - gitlab-org
-    - 2gb
+    - gce
 
 .knapsack-state: &knapsack-state
   services: []
