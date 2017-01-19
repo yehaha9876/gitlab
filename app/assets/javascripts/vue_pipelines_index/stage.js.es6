@@ -5,23 +5,12 @@
   gl.VueStage = Vue.extend({
     data() {
       return {
-<<<<<<< HEAD
-        count: 0,
-=======
->>>>>>> gitlab-ce/8-16-stable
         builds: '',
         spinner: '<span class="fa fa-spinner fa-spin"></span>',
       };
     },
     props: ['stage', 'svgs', 'match'],
     methods: {
-<<<<<<< HEAD
-      fetchBuilds() {
-        if (this.count > 0) return null;
-        return this.$http.get(this.stage.dropdown_path)
-          .then((response) => {
-            this.count += 1;
-=======
       fetchBuilds(e) {
         const areaExpanded = e.currentTarget.attributes['aria-expanded'];
 
@@ -29,7 +18,6 @@
 
         return this.$http.get(this.stage.dropdown_path)
           .then((response) => {
->>>>>>> gitlab-ce/8-16-stable
             this.builds = JSON.parse(response.body).html;
           }, () => {
             const flash = new Flash('Something went wrong on our end.');
@@ -63,11 +51,7 @@
     template: `
       <div>
         <button
-<<<<<<< HEAD
-          @click='fetchBuilds'
-=======
           @click='fetchBuilds($event)'
->>>>>>> gitlab-ce/8-16-stable
           :class="triggerButtonClass"
           :title='stage.title'
           data-placement="top"
