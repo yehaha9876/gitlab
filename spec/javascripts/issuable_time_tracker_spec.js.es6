@@ -4,7 +4,11 @@
 //= require issuable/time_tracking/components/time_tracker
 
 function initTimeTrackingComponent(opts) {
+<<<<<<< HEAD
   setFixtures(`
+=======
+  fixture.set(`
+>>>>>>> gitlab-ce/8-16-stable
     <div>
       <div id="mock-container"></div>
     </div>
