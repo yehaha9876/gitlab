@@ -815,6 +815,12 @@ describe API::MergeRequests, api: true  do
     include_examples 'time tracking endpoints', 'merge_request'
   end
 
+  describe 'Time tracking' do
+    let(:issuable) { merge_request }
+
+    include_examples 'time tracking endpoints', 'merge_request'
+  end
+
   def mr_with_later_created_and_updated_at_time
     merge_request
     merge_request.created_at += 1.hour
