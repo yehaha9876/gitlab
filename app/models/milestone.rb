@@ -148,6 +148,7 @@ class Milestone < ActiveRecord::Base
         "expires on #{due_date.to_s(:medium)}"
       end
     end
+  end
 
   def milestoneish_ids
     id
