@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 8.14.8 (2017-01-25)
+
+- No changes.
+
 ## 8.14.7 (2017-01-21)
 
 - No changes.
