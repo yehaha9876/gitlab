@@ -71,7 +71,7 @@
             </div>
           </div>
           <div class="cancel-retry-btns inline">
-            <button
+            <a
               v-if='pipeline.flags.retryable'
               class="btn has-tooltip"
               title="Retry"
@@ -83,7 +83,7 @@
               aria-label="Retry">
               <i class="fa fa-repeat" aria-hidden="true"></i>
             </a>
-            <button
+            <a
               v-if='pipeline.flags.cancelable'
               class="btn btn-remove has-tooltip"
               title="Cancel"
