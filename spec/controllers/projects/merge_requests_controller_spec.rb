@@ -214,6 +214,16 @@ describe Projects::MergeRequestsController do
         expect(json_response['suggested_approvers'].size).to eq 2
       end
     end
+
+    def submit_new_merge_request(format: :html)
+      get :new,
+          namespace_id: fork_project.namespace.to_param,
+          project_id: fork_project.to_param,
+          merge_request: {
+            source_branch: 'remove-submodule',
+            target_branch: 'master' },
+          format: format
+    end
   end
 
   shared_examples "loads labels" do |action|
