@@ -1,5 +1,4 @@
 window.Vue = require('vue');
-
 require('./stores/environments_store');
 require('./components/environment');
 require('../vue_shared/vue_resource_interceptor');
