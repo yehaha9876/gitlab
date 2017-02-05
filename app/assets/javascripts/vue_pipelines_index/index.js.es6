@@ -1,18 +1,7 @@
 /* eslint-disable no-param-reassign */
 /* global Vue, VueResource, gl */
 
-window.Vue = require('vue');
-window.Vue.use(require('vue-resource'));
-require('../vue_shared/components/commit');
-require('../vue_pagination/index');
 require('../vue_shared/vue_resource_interceptor');
-require('./status');
-require('./store');
-require('./pipeline_url');
-require('./stage');
-require('./stages');
-require('./pipeline_actions');
-require('./time_ago');
 require('./pipelines');
 
 $(() => new Vue({
