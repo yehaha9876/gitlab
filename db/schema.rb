@@ -119,6 +119,7 @@ ActiveRecord::Schema.define(version: 20170130204620) do
     t.boolean "plantuml_enabled"
     t.integer "shared_runners_minutes", default: 0, null: false
     t.integer "repository_size_limit", limit: 8, default: 0
+    t.integer "terminal_max_session_time", default: 0, null: false
   end
 
   create_table "approvals", force: :cascade do |t|
