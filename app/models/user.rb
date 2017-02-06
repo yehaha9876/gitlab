@@ -197,8 +197,6 @@ class User < ActiveRecord::Base
           "administrator if you think this is an error."
       end
     end
-
-    state :ghost
   end
 
   mount_uploader :avatar, AvatarUploader

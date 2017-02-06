@@ -220,14 +220,12 @@ describe User, models: true do
       it 'does not allow a non-blocked ghost user' do
         user = build(:user, :ghost)
         user.state = 'active'
-
         expect(user).to be_invalid
       end
 
       it 'allows a blocked ghost user' do
         user = build(:user, :ghost)
         user.state = 'blocked'
-
         expect(user).to be_valid
       end
     end
