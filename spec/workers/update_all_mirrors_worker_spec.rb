@@ -27,7 +27,7 @@ describe UpdateAllMirrorsWorker do
     project_count_with_time.each do |time, project_count|
       describe "at #{time}" do
         let!(:mirror4) { create(:empty_project, :mirror, sync_time: Gitlab::Mirror::DAILY, mirror_last_successful_update_at: time - ((Gitlab::Mirror::DAILY + 5) * 60).seconds) }
-        let(:mirrors) { Project.mirror.where("? >= mirror_last_successful_update_at + sync_time * interval '1 minute' OR sync_time IN (?)", time, Gitlab::Mirror.sync_times) }
+        let(:mirrors) { Project.mirror.where("? >= mirror_last_successful_update_at + #{Gitlab::Database.minute_interval('sync_time')} OR sync_time IN (?)", time, Gitlab::Mirror.sync_times) }
 
         before do
           allow(DateTime).to receive(:now).and_return(time)

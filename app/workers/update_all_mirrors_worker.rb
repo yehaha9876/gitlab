@@ -27,7 +27,7 @@ class UpdateAllMirrorsWorker
   private
 
   def mirrors_to_sync
-    Project.mirror.where("? >= mirror_last_successful_update_at + sync_time * interval '1 minute' OR sync_time IN (?)", DateTime.now, Gitlab::Mirror.sync_times)
+    Project.mirror.where("? >= mirror_last_successful_update_at + #{Gitlab::Database.minute_interval('sync_time')} OR sync_time IN (?)", DateTime.now, Gitlab::Mirror.sync_times)
   end
 
   def try_obtain_lease
