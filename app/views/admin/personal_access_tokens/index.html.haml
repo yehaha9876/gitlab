@@ -9,7 +9,7 @@
     %p.profile-settings-content
       Pick a name for the application, and we'll give you a unique token.
 
-    = render "form", personal_access_token: @personal_access_token, scopes: @scopes
+    = render "profiles/personal_access_tokens/form", user: :admin_user, personal_access_token: @personal_access_token, scopes: @scopes
 
     %hr
 
@@ -72,9 +72,15 @@
 
 
 :javascript
-  var date = $('#personal_access_token_expires_at').val();
+  var $dateField = $('#personal_access_token_expires_at');
+  var date = $dateField.val();
 
-  var datepicker = $(".datepicker").datepicker({
-    dateFormat: "yy-mm-dd",
-    minDate: 0
+  new Pikaday({
+    field: $dateField.get(0),
+    theme: 'gitlab-theme',
+    format: 'YYYY-MM-DD',
+    minDate: new Date(),
+    onSelect: function(dateText) {
+      $dateField.val(dateFormat(new Date(dateText), 'yyyy-mm-dd'));
+    }
   });

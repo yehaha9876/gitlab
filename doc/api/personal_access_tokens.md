@@ -14,13 +14,13 @@ An example:
     "name": "mytoken",
     "revoked": false,
     "expires_at": "2017-01-04",
-    "scopes": ['api'],
+    "scopes": ["api"],
     "active": true
   }
 ]
 ```
 
-In addition, you can filter users based on state: `all`, `active` and `inactive`
+In addition, you can filter tokens based on state: `all`, `active` and `inactive`
 
 ```
 GET /personal_access_tokens?state=all

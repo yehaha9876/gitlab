@@ -917,7 +917,7 @@ An example:
 ]
 ```
 
-In addition, you can filter users based on state: `all`, `active` and `inactive`
+In addition, you can filter tokens based on state: `all`, `active` and `inactive`
 
 ```
 GET /users/:user_id/personal_access_tokens?state=all
@@ -940,9 +940,9 @@ GET /users/:user_id/personal_access_tokens?impersonation=true
 ## Create a personal access token
 
 It creates a new personal access token. Note that only administrators can do this.
-If you set the impersonation flag to true, you can impersonate the user and
-performing both API calls and Git reads and writes. The user will not see these
-tokens in his profile settings.
+You are only able to create impersonation tokens to impersonate the user and perform
+both API calls and Git reads and writes. The user will not see these tokens in his profile
+settings page.
 
 ```
 POST /users/:user_id/personal_access_tokens

@@ -35,14 +35,12 @@ describe 'Admin > Users > Personal Access Tokens', feature: true, js: true do
 
       # Set date to 1st of next month
       find_field("Expires at").trigger('focus')
-      find("a[title='Next']").click
+      find(".pika-next").click
       click_on "1"
 
       # Scopes
       check "api"
       check "read_user"
-
-      check "You can impersonate the user"
 
       click_on "Create Personal Access Token"
       expect(active_personal_access_tokens).to have_text(name)
