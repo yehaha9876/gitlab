@@ -1,4 +1,6 @@
 class CreateHistoricalData < ActiveRecord::Migration
+  DOWNTIME = false
+
   def change
     create_table :historical_data do |t|
       t.date :date, null: false

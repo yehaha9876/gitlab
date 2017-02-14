@@ -1,4 +1,6 @@
 class AddApproversTable < ActiveRecord::Migration
+  DOWNTIME = false
+
   def change
     create_table :approvers do |t|
       t.integer :target_id, null: false

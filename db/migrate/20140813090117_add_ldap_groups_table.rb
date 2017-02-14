@@ -1,4 +1,6 @@
 class AddLdapGroupsTable < ActiveRecord::Migration
+  DOWNTIME = false
+
   def up
     create_table :ldap_groups do |t|
       t.string :cn, null: false

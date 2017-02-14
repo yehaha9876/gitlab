@@ -1,4 +1,6 @@
 class CreateApproves < ActiveRecord::Migration
+  DOWNTIME = false
+
   def change
     create_table :approvals do |t|
       t.integer :merge_request_id, null: false
