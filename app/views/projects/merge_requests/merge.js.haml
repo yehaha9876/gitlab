@@ -11,7 +11,7 @@
     $('.mr-widget-body').html("#{escape_javascript(render('projects/merge_requests/widget/open/error'))}");
 - when :sha_mismatch
   :plain
-    $('.mr-widget-body').html("#{escape_javascript(render('projects/merge_requests/widget/open/sha_mismatch'))}");
+    $('.mr-widget-body:eq(0)').html("#{escape_javascript(render('projects/merge_requests/widget/open/sha_mismatch'))}");
 - else
   :plain
-    $('.mr-widget-body').html("#{escape_javascript(render('projects/merge_requests/widget/open/reload'))}");
+    $('.mr-widget-body:eq(0)').html("#{escape_javascript(render('projects/merge_requests/widget/open/reload'))}");

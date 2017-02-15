@@ -77,10 +77,12 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
   def show
     respond_to do |format|
-      format.html { define_discussion_vars }
+      format.html do
+        define_discussion_vars
+      end
 
       format.json do
-        render json: MergeRequestSerializer.new.represent(@merge_request, type: :full)
+        render json: @merge_request_json
       end
 
       format.patch  do
@@ -236,7 +238,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
       format.json do
         render json: PipelineSerializer
-          .new(project: @project, user: @current_user)
+          .new(project: @project, current_user: @current_user)
           .represent(@pipelines)
       end
     end
@@ -250,7 +252,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
         render json: {
           pipelines: PipelineSerializer
-          .new(project: @project, user: @current_user)
+          .new(project: @project, current_user: @current_user)
           .represent(@pipelines)
         }
       end
@@ -327,17 +329,37 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   end
 
   def remove_wip
-    MergeRequests::UpdateService.new(project, current_user, wip_event: 'unwip').execute(@merge_request)
+    @merge_request = MergeRequests::UpdateService
+      .new(project, current_user, wip_event: 'unwip')
+      .execute(@merge_request)
 
-    redirect_to namespace_project_merge_request_path(@project.namespace, @project, @merge_request),
-      notice: "The merge request can now be merged."
+    # TODO: @oswaldo - Handle only JSON after deleting existing MR widget.
+    respond_to do |format|
+      format.json do
+        render json: serializer.represent(@merge_request).to_json
+      end
+
+      format.html do
+        redirect_to namespace_project_merge_request_path(@project.namespace, @project, @merge_request),
+          notice: "The merge request can now be merged."
+
+      end
+    end
   end
 
   def merge_check
     @merge_request.check_if_can_be_merged
     @pipelines = @merge_request.all_pipelines
 
-    render partial: "projects/merge_requests/widget/show.html.haml", layout: false
+    respond_to do |format|
+      format.js do
+        render partial: "projects/merge_requests/widget/show.html.haml", layout: false
+      end
+
+      format.json do
+        render json: serializer.represent(@merge_request).to_json
+      end
+    end
   end
 
   def cancel_merge_when_pipeline_succeeds
@@ -348,56 +370,63 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     MergeRequests::MergeWhenPipelineSucceedsService
       .new(@project, current_user)
       .cancel(@merge_request)
+
+    # TODO: @oswaldo - Handle only JSON after deleting existing MR widget.
+    respond_to do |format|
+      format.json do
+        render json: serializer.represent(@merge_request.reload).to_json
+      end
+
+      format.js
+    end
   end
 
   def merge
     return access_denied! unless @merge_request.can_be_merged_by?(current_user)
     return render_404 unless @merge_request.approved?
 
+    @status = merge!
+
+    # TODO: @oswaldo - Handle only JSON after deleting existing MR widget.
+    respond_to do |format|
+      format.json { render json: { status: @status } }
+      format.js
+    end
+  end
+
+  def merge!
     # Disable the CI check if merge_when_pipeline_succeeds is enabled since we have
     # to wait until CI completes to know
     unless @merge_request.mergeable?(skip_ci_check: merge_when_pipeline_succeeds_active?)
-      @status = :failed
-      return
+      return :failed
     end
 
-    merge_request_service = MergeRequests::MergeService.new(@project, current_user, merge_params)
-
-    unless merge_request_service.hooks_validation_pass?(@merge_request)
-      @status = :hook_validation_error
-      return
-    end
-
-    if params[:sha] != @merge_request.diff_head_sha
-      @status = :sha_mismatch
-      return
-    end
+    return :sha_mismatch if params[:sha] != @merge_request.diff_head_sha
 
     @merge_request.update(merge_error: nil, squash: merge_params[:squash])
 
     if params[:merge_when_pipeline_succeeds].present?
-      unless @merge_request.head_pipeline
-        @status = :failed
-        return
-      end
+      return :failed unless @merge_request.head_pipeline
 
       if @merge_request.head_pipeline.active?
         MergeRequests::MergeWhenPipelineSucceedsService
           .new(@project, current_user, merge_params)
           .execute(@merge_request)
 
-        @status = :merge_when_pipeline_succeeds
+        :merge_when_pipeline_succeeds
       elsif @merge_request.head_pipeline.success?
         # This can be triggered when a user clicks the auto merge button while
         # the tests finish at about the same time
         MergeWorker.perform_async(@merge_request.id, current_user.id, params)
-        @status = :success
+
+        :success
       else
-        @status = :failed
+        :failed
       end
     else
       MergeWorker.perform_async(@merge_request.id, current_user.id, params)
-      @status = :success
+
+      :success
     end
   end
 
@@ -471,6 +500,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     end
   end
 
+  # TODO: @oswaldo - remove it when deleting old widget parts
   def ci_status
     pipeline = @merge_request.head_pipeline
     @pipelines = @merge_request.all_pipelines
@@ -492,8 +522,11 @@ class Projects::MergeRequestsController < Projects::ApplicationController
       sha: (merge_request.diff_head_commit.short_id if merge_request.diff_head_sha),
       status: status,
       coverage: coverage,
+      has_ci: @merge_request.has_ci?,
       pipeline: pipeline.try(:id),
-      has_ci: @merge_request.has_ci?
+      stages: PipelineSerializer
+        .new(project: @project, current_user: @current_user)
+        .represent_stages(pipeline)
     }
 
     render json: response
@@ -501,7 +534,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
   def pipeline_status
     render json: PipelineSerializer
-      .new(project: @project, user: @current_user)
+      .new(project: @project, current_user: @current_user)
       .represent_status(@merge_request.head_pipeline)
   end
 
@@ -621,6 +654,8 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
     labels
     define_pipelines_vars
+
+    @merge_request_json = serializer.represent(@merge_request).to_json
   end
 
   # Discussion tab data is rendered on html responses of actions
@@ -801,6 +836,14 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   def close_merge_request_without_source_project
     if !@merge_request.source_project && @merge_request.open?
       @merge_request.close
+    end
+  end
+
+  def serializer
+    if params[:basic]
+      MergeRequestBasicSerializer.new
+    else
+      MergeRequestSerializer.new(current_user: current_user, project: merge_request.project)
     end
   end
 end
