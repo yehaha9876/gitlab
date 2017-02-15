@@ -1,7 +1,8 @@
 /* eslint-disable object-shorthand, func-names, space-before-function-paren, comma-dangle, no-else-return, quotes, max-len */
-/* global Vue */
 /* global CommentsStore */
 /* global ResolveService */
+const Vue = require('vue');
+
 const Vue = require('vue');
 
 (() => {
@@ -9,12 +10,10 @@ const Vue = require('vue');
     props: {
       discussionId: String,
       mergeRequestId: Number,
-      projectPath: String,
       canResolve: Boolean,
     },
     data: function() {
       return {
-        discussions: CommentsStore.state,
         discussion: {},
       };
     },
@@ -50,13 +49,13 @@ const Vue = require('vue');
     },
     methods: {
       resolve: function () {
-        ResolveService.toggleResolveForDiscussion(this.projectPath, this.mergeRequestId, this.discussionId);
+        ResolveService.toggleResolveForDiscussion(this.mergeRequestId, this.discussionId);
       }
     },
     created: function () {
       CommentsStore.createDiscussion(this.discussionId, this.canResolve);
 
-      this.discussion = this.discussions[this.discussionId];
+      this.discussion = CommentsStore.state[this.discussionId];
     }
   });
 
