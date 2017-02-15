@@ -70,5 +70,5 @@ the group.
 
 ![Group pipelines quota](img/group_pipelines_quota.png)
 
-[art-yml]: ../../../administration/job_artifacts.md
-[ee-1078]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1078
+[art-yml]: ../../../administration/build_artifacts
+[duration-syntax]: ../../../ci/yaml/README#artifactsexpire_in
