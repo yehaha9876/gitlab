@@ -128,6 +128,10 @@ class ApplicationSetting < ActiveRecord::Base
             presence: true,
             numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
+  validates :minimum_mirror_sync_time,
+            presence: true,
+            inclusion: { in: Gitlab::Mirror::SYNC_TIME_OPTIONS.values }
+
   validates_each :restricted_visibility_levels do |record, attr, value|
     unless value.nil?
       value.each do |level|
@@ -160,6 +164,8 @@ class ApplicationSetting < ActiveRecord::Base
 
   before_save :ensure_runners_registration_token
   before_save :ensure_health_check_access_token
+
+  after_update :update_mirror_cron_jobs, if: :minimum_mirror_sync_time_changed?
 
   after_commit do
     Rails.cache.write(CACHE_KEY, self)
@@ -230,7 +236,8 @@ class ApplicationSetting < ActiveRecord::Base
     {
       elasticsearch_host: ENV['ELASTIC_HOST'] || 'localhost',
       elasticsearch_port: ENV['ELASTIC_PORT'] || '9200',
-      usage_ping_enabled: true
+      usage_ping_enabled: true,
+      minimum_mirror_sync_time: Gitlab::Mirror::FIFTEEN
     }
   end
 
@@ -240,6 +247,15 @@ class ApplicationSetting < ActiveRecord::Base
 
   def self.create_from_defaults
     create(defaults)
+  end
+
+  def update_mirror_cron_jobs
+    Project.mirror.where('sync_time < ?', minimum_mirror_sync_time).
+      update_all(sync_time: minimum_mirror_sync_time)
+    RemoteMirror.where('sync_time < ?', minimum_mirror_sync_time).
+      update_all(sync_time: minimum_mirror_sync_time)
+
+    Gitlab::Mirror.configure_cron_jobs!
   end
 
   def elasticsearch_host
