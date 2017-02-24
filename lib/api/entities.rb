@@ -18,6 +18,11 @@ module API
       expose :bio, :location, :skype, :linkedin, :twitter, :website_url, :organization
     end
 
+    class UserActivity < Grape::Entity
+      expose :username
+      expose :last_activity_at
+    end
+
     class Identity < Grape::Entity
       expose :provider, :extern_uid
     end
@@ -26,7 +31,7 @@ module API
       expose :last_sign_in_at
       expose :confirmed_at
       expose :email
-      expose :theme_id, :color_scheme_id, :projects_limit, :current_sign_in_at
+      expose :color_scheme_id, :projects_limit, :current_sign_in_at
       expose :identities, using: Entities::Identity
       expose :can_create_group?, as: :can_create_group
       expose :can_create_project?, as: :can_create_project
@@ -50,6 +55,13 @@ module API
     class ProjectHook < Hook
       expose :project_id, :issues_events, :merge_requests_events
       expose :note_events, :build_events, :pipeline_events, :wiki_page_events
+    end
+
+    class ProjectPushRule < Grape::Entity
+      expose :id, :project_id, :created_at
+      expose :commit_message_regex, :deny_delete_tag
+      expose :member_check, :prevent_secrets, :author_email_regex
+      expose :file_name_regex, :max_file_size
     end
 
     class BasicProjectDetails < Grape::Entity
@@ -98,9 +110,11 @@ module API
       expose :shared_with_groups do |project, options|
         SharedGroup.represent(project.project_group_links.all, options)
       end
+      expose :repository_storage, if: lambda { |_project, options| options[:user].try(:admin?) }
       expose :only_allow_merge_if_build_succeeds
       expose :request_access_enabled
       expose :only_allow_merge_if_all_discussions_are_resolved
+      expose :approvals_before_merge
 
       expose :statistics, using: 'API::Entities::ProjectStatistics', if: :statistics
     end
@@ -131,12 +145,24 @@ module API
       end
     end
 
+    class LdapGroupLink < Grape::Entity
+      expose :cn, :group_access, :provider
+    end
+
     class Group < Grape::Entity
       expose :id, :name, :path, :description, :visibility_level
+
+      expose :ldap_cn, :ldap_access
+      expose :ldap_group_links,
+        using: Entities::LdapGroupLink,
+        if: lambda { |group, options| group.ldap_group_links.any? }
+
       expose :lfs_enabled?, as: :lfs_enabled
       expose :avatar_url
       expose :web_url
       expose :request_access_enabled
+      expose :full_name, :full_path
+      expose :parent_id
 
       expose :statistics, if: :statistics do
         with_options format_with: -> (value) { value.to_i } do
@@ -153,10 +179,27 @@ module API
       expose :shared_projects, using: Entities::Project
     end
 
+    class RepoCommit < Grape::Entity
+      expose :id, :short_id, :title, :created_at
+      expose :parent_ids
+      expose :safe_message, as: :message
+      expose :author_name, :author_email, :authored_date
+      expose :committer_name, :committer_email, :committed_date
+    end
+
+    class RepoCommitStats < Grape::Entity
+      expose :additions, :deletions, :total
+    end
+
+    class RepoCommitDetail < RepoCommit
+      expose :stats, using: Entities::RepoCommitStats
+      expose :status
+    end
+
     class RepoBranch < Grape::Entity
       expose :name
 
-      expose :commit do |repo_branch, options|
+      expose :commit, using: Entities::RepoCommit do |repo_branch, options|
         options[:project].repository.commit(repo_branch.dereferenced_target)
       end
 
@@ -191,29 +234,10 @@ module API
       end
     end
 
-    class RepoCommit < Grape::Entity
-      expose :id, :short_id, :title, :author_name, :author_email, :created_at
-      expose :committer_name, :committer_email
-      expose :safe_message, as: :message
-    end
-
-    class RepoCommitStats < Grape::Entity
-      expose :additions, :deletions, :total
-    end
-
-    class RepoCommitDetail < RepoCommit
-      expose :parent_ids, :committed_date, :authored_date
-      expose :stats, using: Entities::RepoCommitStats
-      expose :status
-    end
-
     class ProjectSnippet < Grape::Entity
       expose :id, :title, :file_name
       expose :author, using: Entities::UserBasic
       expose :updated_at, :created_at
-
-      # TODO (rspeicher): Deprecated; remove in 9.0
-      expose(:expires_at) { |snippet| nil }
 
       expose :web_url do |snippet, options|
         Gitlab::UrlBuilder.build(snippet)
@@ -262,6 +286,7 @@ module API
       expose :upvotes, :downvotes
       expose :due_date
       expose :confidential
+      expose :weight
 
       expose :web_url do |issue, options|
         Gitlab::UrlBuilder.build(issue)
@@ -292,12 +317,16 @@ module API
       expose :merge_status
       expose :diff_head_sha, as: :sha
       expose :merge_commit_sha
+
       expose :subscribed do |merge_request, options|
         merge_request.subscribed?(options[:current_user], options[:project])
       end
+
       expose :user_notes_count
+      expose :approvals_before_merge
       expose :should_remove_source_branch?, as: :should_remove_source_branch
       expose :force_remove_source_branch?, as: :force_remove_source_branch
+      expose :squash
 
       expose :web_url do |merge_request, options|
         Gitlab::UrlBuilder.build(merge_request)
@@ -307,6 +336,26 @@ module API
     class MergeRequestChanges < MergeRequest
       expose :diffs, as: :changes, using: Entities::RepoDiff do |compare, _|
         compare.raw_diffs(all_diffs: true).to_a
+      end
+    end
+
+    class Approvals < Grape::Entity
+      expose :user, using: Entities::UserBasic
+    end
+
+    class MergeRequestApprovals < ProjectEntity
+      expose :merge_status
+      expose :approvals_required
+      expose :approvals_left
+      expose :approvals, as: :approved_by, using: Entities::Approvals
+      expose :approvers_left, as: :suggested_approvers, using: Entities::UserBasic
+
+      expose :user_has_approved do |merge_request, options|
+        merge_request.has_approved?(options[:current_user])
+      end
+
+      expose :user_can_approve do |merge_request, options|
+        merge_request.can_approve?(options[:current_user])
       end
     end
 
@@ -339,9 +388,6 @@ module API
       expose :created_at, :updated_at
       expose :system?, as: :system
       expose :noteable_id, :noteable_type
-      # upvote? and downvote? are deprecated, always return false
-      expose(:upvote?)    { |note| false }
-      expose(:downvote?)  { |note| false }
     end
 
     class AwardEmoji < Grape::Entity
@@ -368,7 +414,7 @@ module API
 
     class CommitStatus < Grape::Entity
       expose :id, :sha, :ref, :status, :name, :target_url, :description,
-             :created_at, :started_at, :finished_at, :allow_failure
+             :created_at, :started_at, :finished_at, :allow_failure, :coverage
       expose :author, using: Entities::UserBasic
     end
 
@@ -381,10 +427,12 @@ module API
       expose :author, using: Entities::UserBasic, if: ->(event, options) { event.author }
 
       expose :author_username do |event, options|
-        if event.author
-          event.author.username
-        end
+        event.author&.username
       end
+    end
+
+    class LdapGroup < Grape::Entity
+      expose :cn
     end
 
     class ProjectGroupLink < Grape::Entity
@@ -417,7 +465,7 @@ module API
     end
 
     class Namespace < Grape::Entity
-      expose :id, :name, :path, :kind
+      expose :id, :name, :path, :kind, :full_path
     end
 
     class MemberAccess < Grape::Entity
@@ -574,6 +622,7 @@ module API
       expose :koding_url
       expose :plantuml_enabled
       expose :plantuml_url
+      expose :terminal_max_session_time
     end
 
     class Release < Grape::Entity
@@ -590,6 +639,18 @@ module API
 
       expose :release, using: Entities::Release do |repo_tag, options|
         options[:project].releases.find_by(tag: repo_tag.name)
+      end
+    end
+
+    class License < Grape::Entity
+      expose :starts_at, :expires_at, :licensee, :add_ons
+
+      expose :user_limit do |license, options|
+        license.restricted?(:active_user_count) ? license.restrictions[:active_user_count] : 0
+      end
+
+      expose :active_users do |license, options|
+        ::User.active.count
       end
     end
 

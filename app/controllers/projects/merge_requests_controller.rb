@@ -10,7 +10,9 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   before_action :module_enabled
   before_action :merge_request, only: [
     :edit, :update, :show, :diffs, :commits, :conflicts, :conflict_for_path, :pipelines, :merge, :merge_check,
-    :ci_status, :ci_environments_status, :toggle_subscription, :cancel_merge_when_build_succeeds, :remove_wip, :resolve_conflicts, :assign_related_issues
+    :ci_status, :ci_environments_status, :toggle_subscription, :cancel_merge_when_build_succeeds, :remove_wip, :resolve_conflicts, :assign_related_issues,
+    # EE
+    :approve, :approvals, :unapprove, :rebase
   ]
   before_action :validates_merge_request, only: [:show, :diffs, :commits, :pipelines]
   before_action :define_show_vars, only: [:show, :diffs, :commits, :conflicts, :conflict_for_path, :builds, :pipelines]
@@ -21,6 +23,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   before_action :close_merge_request_without_source_project, only: [:show, :diffs, :commits, :builds, :pipelines]
   before_action :apply_diff_view_cookie!, only: [:new_diffs]
   before_action :build_merge_request, only: [:new, :new_diffs]
+  before_action :set_suggested_approvers, only: [:new, :new_diffs, :edit]
 
   # Allow read any merge_request
   before_action :authorize_read_merge_request!
@@ -36,8 +39,11 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   before_action :authorize_can_resolve_conflicts!, only: [:conflicts, :conflict_for_path, :resolve_conflicts]
 
   def index
-    @merge_requests = merge_requests_collection
-    @merge_requests = @merge_requests.page(params[:page])
+    @collection_type    = "MergeRequest"
+    @merge_requests     = merge_requests_collection
+    @merge_requests     = @merge_requests.page(params[:page])
+    @issuable_meta_data = issuable_meta_data(@merge_requests, @collection_type)
+
     if @merge_requests.out_of_range? && @merge_requests.total_pages != 0
       return redirect_to url_for(params.merge(page: @merge_requests.total_pages))
     end
@@ -45,6 +51,17 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     if params[:label_name].present?
       labels_params = { project_id: @project.id, title: params[:label_name] }
       @labels = LabelsFinder.new(current_user, labels_params).execute
+    end
+
+    @users = []
+    if params[:assignee_id].present?
+      assignee = User.find_by_id(params[:assignee_id])
+      @users.push(assignee) if assignee
+    end
+
+    if params[:author_id].present?
+      author = User.find_by_id(params[:author_id])
+      @users.push(author) if author
     end
 
     respond_to do |format|
@@ -63,7 +80,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
       format.html { define_discussion_vars }
 
       format.json do
-        render json: MergeRequestSerializer.new.represent(@merge_request)
+        render json: MergeRequestSerializer.new.represent(@merge_request, type: :full)
       end
 
       format.patch  do
@@ -102,6 +119,8 @@ class Projects::MergeRequestsController < Projects::ApplicationController
         @start_version = @merge_request_diff
       end
     end
+
+    @environment = @merge_request.environments_for(current_user).last
 
     respond_to do |format|
       format.html { define_discussion_vars }
@@ -214,18 +233,33 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
         render 'show'
       end
-      format.json { render json: { html: view_to_html_string('projects/merge_requests/show/_pipelines') } }
+
+      format.json do
+        render json: PipelineSerializer
+          .new(project: @project, user: @current_user)
+          .represent(@pipelines)
+      end
     end
   end
 
   def new
-    define_new_vars
+    respond_to do |format|
+      format.html { define_new_vars }
+      format.json do
+        define_pipelines_vars
+
+        render json: PipelineSerializer
+          .new(project: @project, user: @current_user)
+          .represent(@pipelines)
+      end
+    end
   end
 
   def new_diffs
     respond_to do |format|
       format.html do
         define_new_vars
+        @show_changes_tab = true
         render "new"
       end
       format.json do
@@ -236,20 +270,26 @@ class Projects::MergeRequestsController < Projects::ApplicationController
                  end
         @diff_notes_disabled = true
 
-        render json: { html: view_to_html_string('projects/merge_requests/_new_diffs', diffs: @diffs) }
+        @environment = @merge_request.environments_for(current_user).last
+
+        render json: { html: view_to_html_string('projects/merge_requests/_new_diffs', diffs: @diffs, environment: @environment) }
       end
     end
   end
 
   def create
     @target_branches ||= []
-    @merge_request = MergeRequests::CreateService.new(project, current_user, merge_request_params).execute
+    create_params = clamp_approvals_before_merge(merge_request_params)
+
+    @merge_request = MergeRequests::CreateService.new(project, current_user, create_params).execute
 
     if @merge_request.valid?
       redirect_to(merge_request_path(@merge_request))
     else
       @source_project = @merge_request.source_project
       @target_project = @merge_request.target_project
+      set_suggested_approvers
+
       render action: "new"
     end
   end
@@ -261,7 +301,9 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   end
 
   def update
-    @merge_request = MergeRequests::UpdateService.new(project, current_user, merge_request_params).execute(@merge_request)
+    update_params = clamp_approvals_before_merge(merge_request_params)
+
+    @merge_request = MergeRequests::UpdateService.new(project, current_user, update_params).execute(@merge_request)
 
     if @merge_request.valid?
       respond_to do |format|
@@ -274,6 +316,8 @@ class Projects::MergeRequestsController < Projects::ApplicationController
         end
       end
     else
+      set_suggested_approvers
+
       render "edit"
     end
   rescue ActiveRecord::StaleObjectError
@@ -306,6 +350,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
   def merge
     return access_denied! unless @merge_request.can_be_merged_by?(current_user)
+    return render_404 unless @merge_request.approved?
 
     # Disable the CI check if merge_when_build_succeeds is enabled since we have
     # to wait until CI completes to know
@@ -314,12 +359,19 @@ class Projects::MergeRequestsController < Projects::ApplicationController
       return
     end
 
+    merge_request_service = MergeRequests::MergeService.new(@project, current_user, merge_params)
+
+    unless merge_request_service.hooks_validation_pass?(@merge_request)
+      @status = :hook_validation_error
+      return
+    end
+
     if params[:sha] != @merge_request.diff_head_sha
       @status = :sha_mismatch
       return
     end
 
-    @merge_request.update(merge_error: nil)
+    @merge_request.update(merge_error: nil, squash: merge_params[:squash])
 
     if params[:merge_when_build_succeeds].present?
       unless @merge_request.head_pipeline
@@ -347,12 +399,23 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     end
   end
 
+  def rebase
+    return access_denied! unless @merge_request.can_be_merged_by?(current_user)
+    return render_404 unless @merge_request.approved?
+
+    RebaseWorker.perform_async(@merge_request.id, current_user.id)
+  end
+
   def merge_widget_refresh
-    if merge_request.in_progress_merge_commit_sha || merge_request.state == 'merged'
-      @status = :success
-    elsif merge_request.merge_when_build_succeeds
-      @status = :merge_when_build_succeeds
-    end
+    @status =
+      if merge_request.merge_when_build_succeeds
+        :merge_when_build_succeeds
+      else
+        # Only MRs that can be merged end in this action
+        # MR can be already picked up for merge / merged already or can be waiting for worker to be picked up
+        # in last case it does not have any special status. Possible error is handled inside widget js function
+        :success
+      end
 
     render 'merge'
   end
@@ -425,7 +488,8 @@ class Projects::MergeRequestsController < Projects::ApplicationController
       title: merge_request.title,
       sha: (merge_request.diff_head_commit.short_id if merge_request.diff_head_sha),
       status: status,
-      coverage: coverage
+      coverage: coverage,
+      pipeline: pipeline.try(:id)
     }
 
     render json: response
@@ -434,14 +498,12 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   def ci_environments_status
     environments =
       begin
-        @merge_request.environments.map do |environment|
-          next unless can?(current_user, :read_environment, environment)
-
+        @merge_request.environments_for(current_user).map do |environment|
           project = environment.project
           deployment = environment.first_deployment_for(@merge_request.diff_head_commit)
 
           stop_url =
-            if environment.stoppable? && can?(current_user, :create_deployment, environment)
+            if environment.stop_action? && can?(current_user, :create_deployment, environment)
               stop_namespace_project_environment_path(project.namespace, project, environment)
             end
 
@@ -461,7 +523,42 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     render json: environments
   end
 
+  def approve
+    unless @merge_request.can_approve?(current_user)
+      return render_404
+    end
+
+    ::MergeRequests::ApprovalService
+      .new(project, current_user)
+      .execute(@merge_request)
+
+    render_approvals_json
+  end
+
+  def approvals
+    render_approvals_json
+  end
+
+  def unapprove
+    if @merge_request.has_approved?(current_user)
+      ::MergeRequests::RemoveApprovalService
+        .new(project, current_user)
+        .execute(@merge_request)
+    end
+
+    render_approvals_json
+  end
+
   protected
+
+  def render_approvals_json
+    respond_to do |format|
+      format.json do
+        entity = API::Entities::MergeRequestApprovals.new(@merge_request, current_user: current_user)
+        render json: entity
+      end
+    end
+  end
 
   def selected_target_project
     if @project.id.to_s == params[:target_project_id] || @project.forked_project_link.nil?
@@ -593,6 +690,8 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
     @labels = LabelsFinder.new(current_user, project_id: @project.id).execute
 
+    @show_changes_tab = params[:show_changes].present?
+
     define_pipelines_vars
   end
 
@@ -601,9 +700,17 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     render 'invalid'
   end
 
+  def set_suggested_approvers
+    if @merge_request.requires_approve?
+      @suggested_approvers = Gitlab::AuthorityAnalyzer.new(
+        @merge_request
+      ).calculate(@merge_request.approvals_required)
+    end
+  end
+
   def merge_request_params
     params.require(:merge_request)
-      .permit(merge_request_params_ce)
+      .permit(merge_request_params_ce << merge_request_params_ee)
   end
 
   def merge_request_params_ce
@@ -625,8 +732,30 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     ]
   end
 
+  def merge_request_params_ee
+    %i[
+      approvals_before_merge
+      approver_group_ids
+      approver_ids
+      squash
+    ]
+  end
+
+  def clamp_approvals_before_merge(mr_params)
+    target_project = @project.forked_from_project if @project.id.to_s != mr_params[:target_project_id]
+    target_project ||= @project
+
+    # If the number of approvals is not greater than the project default, set to nil,
+    # so that we fall back to the project default.
+    if mr_params[:approvals_before_merge].to_i <= target_project.approvals_before_merge
+      mr_params[:approvals_before_merge] = nil
+    end
+
+    mr_params
+  end
+
   def merge_params
-    params.permit(:should_remove_source_branch, :commit_message)
+    params.permit(:should_remove_source_branch, :commit_message, :squash)
   end
 
   # Make sure merge requests created before 8.0

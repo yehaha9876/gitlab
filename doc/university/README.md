@@ -5,7 +5,7 @@ GitLab University is the best place to learn about **Version Control with Git an
 It doesn't replace, but accompanies our great [Documentation](https://docs.gitlab.com)
 and [Blog Articles](https://about.gitlab.com/blog/).
 
-Would you like to contribute to GitLab University? Then please take a look at our contribution [process](process) for more information.
+Would you like to contribute to GitLab University? Then please take a look at our contribution [process](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/PROCESS.md) for more information.
 
 ## Gitlab University Curriculum
 
@@ -91,7 +91,7 @@ The curriculum is composed of GitLab videos, screencasts, presentations, project
 
 1. [Using any Static Site Generator with GitLab Pages](https://about.gitlab.com/2016/06/17/ssg-overview-gitlab-pages-part-3-examples-ci/)
 1. [Securing GitLab Pages with SSL](https://about.gitlab.com/2016/06/24/secure-gitlab-pages-with-startssl/)
-1. [GitLab Pages Documentation](https://docs.gitlab.com/ee/pages/README.html)
+1. [GitLab Pages Documentation](https://docs.gitlab.com/ce/user/project/pages/)
 
 #### 2.2. GitLab Issues
 
@@ -130,6 +130,7 @@ The curriculum is composed of GitLab videos, screencasts, presentations, project
 1. [GitLab Flow Overview](https://about.gitlab.com/2014/09/29/gitlab-flow/)
 1. [Always Start with an Issue](https://about.gitlab.com/2016/03/03/start-with-an-issue/)
 1. [GitLab Flow Documentation](https://docs.gitlab.com/ee/workflow/gitlab_flow.html)
+1. [Git-Annex to Git-LFS Migration Guide](https://docs.gitlab.com/ee/workflow/lfs/migrate_from_git-annex_to_git-lfs.html)
 
 #### 2.5. GitLab Comparisons
 
@@ -189,10 +190,10 @@ The curriculum is composed of GitLab videos, screencasts, presentations, project
 #### 3.9. Integrations
 
 1. [How to Integrate JIRA and Jenkins with GitLab - Video](https://gitlabmeetings.webex.com/gitlabmeetings/ldr.php?RCID=44b548147a67ab4d8a62274047146415)
-1. [How to Integrate Jira with GitLab](https://docs.gitlab.com/ee/integration/jira.html)
+1. [How to Integrate Jira with GitLab](https://docs.gitlab.com/ce/user/project/integrations/jira.html)
 1. [How to Integrate Jenkins with GitLab](https://docs.gitlab.com/ee/integration/jenkins.html)
-1. [How to Integrate Bamboo with GitLab](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/project_services/bamboo.md)
-1. [How to Integrate Slack with GitLab](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/integration/slack.md)
+1. [How to Integrate Bamboo with GitLab](https://docs.gitlab.com/ce/user/project/integrations/bamboo.html)
+1. [How to Integrate Slack with GitLab](https://docs.gitlab.com/ce/user/project/integrations/slack.html)
 1. [How to Integrate Convox with GitLab](https://about.gitlab.com/2016/06/09/continuous-delivery-with-gitlab-and-convox/)
 1. [Getting Started with GitLab and Shippable CI](https://about.gitlab.com/2016/05/05/getting-started-gitlab-and-shippable/)
 

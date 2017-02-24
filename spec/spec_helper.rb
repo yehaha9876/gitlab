@@ -7,8 +7,11 @@ ENV["IN_MEMORY_APPLICATION_SETTINGS"] = 'true'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'shoulda/matchers'
-require 'sidekiq/testing/inline'
 require 'rspec/retry'
+
+if ENV['RSPEC_PROFILING_POSTGRES_URL'] || ENV['RSPEC_PROFILING']
+  require 'rspec_profiling/rspec'
+end
 
 if ENV['CI'] && !ENV['NO_KNAPSACK']
   require 'knapsack'
@@ -32,6 +35,7 @@ RSpec.configure do |config|
   config.include Warden::Test::Helpers, type: :request
   config.include LoginHelpers, type: :feature
   config.include SearchHelpers, type: :feature
+  config.include WaitForAjax, type: :feature
   config.include StubConfiguration
   config.include EmailHelpers, type: :mailer
   config.include TestEnv
@@ -39,12 +43,18 @@ RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
   config.include StubGitlabCalls
   config.include StubGitlabData
+  config.include Rails.application.routes.url_helpers, type: :routing
 
   config.infer_spec_type_from_file_location!
   config.raise_errors_for_deprecations!
 
   config.before(:suite) do
     TestEnv.init
+  end
+
+  config.before(:all) do
+    License.destroy_all
+    TestLicense.init
   end
 
   config.around(:each, :caching) do |example|

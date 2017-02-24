@@ -14,6 +14,7 @@ module TestEnv
     'feature_conflict'                   => 'bb5206f',
     'fix'                                => '48f0be4',
     'improve/awesome'                    => '5937ac0',
+    'merged-target'                      => '21751bf',
     'markdown'                           => '0ed8c6c',
     'lfs'                                => 'be93687',
     'master'                             => 'b83d6e3',
@@ -36,8 +37,10 @@ module TestEnv
     'conflict-non-utf8'                  => 'd0a293c',
     'conflict-too-large'                 => '39fa04f',
     'deleted-image-test'                 => '6c17798',
-    'wip'                                => 'b9238ee'
-  }
+    'wip'                                => 'b9238ee',
+    'csv'                                => '3dd0896',
+    'squash-large-files'                 => '54cec52'
+  }.freeze
 
   # gitlab-test-fork is a fork of gitlab-fork, but we don't necessarily
   # need to keep all the branches in sync.
@@ -47,7 +50,7 @@ module TestEnv
     'master'                     => '5937ac0',
     'remove-submodule'           => '2a33e0c',
     'conflict-resolvable-fork'   => '404fa3f'
-  }
+  }.freeze
 
   # Test environment
   #

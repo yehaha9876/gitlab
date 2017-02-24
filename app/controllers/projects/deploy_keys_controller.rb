@@ -20,6 +20,8 @@ class Projects::DeployKeysController < Projects::ApplicationController
     set_index_vars
 
     if @key.valid? && @project.deploy_keys << @key
+      log_audit_event(@key.title, action: :create)
+
       redirect_to namespace_project_deploy_keys_path(@project.namespace, @project)
     else
       render "index"
@@ -27,13 +29,17 @@ class Projects::DeployKeysController < Projects::ApplicationController
   end
 
   def enable
+    load_key
     Projects::EnableDeployKeyService.new(@project, current_user, params).execute
+    log_audit_event(@key.title, action: :create)
 
     redirect_to namespace_project_deploy_keys_path(@project.namespace, @project)
   end
 
   def disable
+    load_key
     @project.deploy_keys_projects.find_by(deploy_key_id: params[:id]).destroy
+    log_audit_event(@key.title, action: :destroy)
 
     redirect_back_or_default(default: { action: 'index' })
   end
@@ -54,5 +60,14 @@ class Projects::DeployKeysController < Projects::ApplicationController
 
   def deploy_key_params
     params.require(:deploy_key).permit(:key, :title, :can_push)
+  end
+
+  def log_audit_event(key_title, options = {})
+    AuditEventService.new(current_user, @project, options)
+      .for_deploy_key(key_title).security_event
+  end
+
+  def load_key
+    @key ||= current_user.accessible_deploy_keys.find(params[:id])
   end
 end

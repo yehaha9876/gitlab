@@ -2,9 +2,22 @@
 /* global Cookies */
 /* global Flash */
 
-//= require vue
-//= require_tree ./svg
-//= require_tree .
+window.Vue = require('vue');
+window.Cookies = require('js-cookie');
+require('./svg/icon_branch');
+require('./svg/icon_build_status');
+require('./svg/icon_commit');
+require('./components/stage_code_component');
+require('./components/stage_issue_component');
+require('./components/stage_plan_component');
+require('./components/stage_production_component');
+require('./components/stage_review_component');
+require('./components/stage_staging_component');
+require('./components/stage_test_component');
+require('./components/total_time_component');
+require('./cycle_analytics_service');
+require('./cycle_analytics_store');
+require('./default_event_objects');
 
 $(() => {
   const OVERVIEW_DIALOG_COOKIE = 'cycle_analytics_help_dismissed';
@@ -94,7 +107,7 @@ $(() => {
         }
 
         this.isLoadingStage = true;
-        cycleAnalyticsStore.setStageEvents([]);
+        cycleAnalyticsStore.setStageEvents([], stage);
         cycleAnalyticsStore.setActiveStage(stage);
 
         cycleAnalyticsService
@@ -104,7 +117,7 @@ $(() => {
           })
           .done((response) => {
             this.isEmptyStage = !response.events.length;
-            cycleAnalyticsStore.setStageEvents(response.events);
+            cycleAnalyticsStore.setStageEvents(response.events, stage);
           })
           .error(() => {
             this.isEmptyStage = true;

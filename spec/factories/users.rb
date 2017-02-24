@@ -14,6 +14,18 @@ FactoryGirl.define do
       admin true
     end
 
+    trait :auditor do
+      auditor true
+    end
+
+    trait :blocked do
+      after(:build) { |user, _| user.block! }
+    end
+
+    trait :external do
+      external true
+    end
+
     trait :two_factor do
       two_factor_via_otp
     end
@@ -51,5 +63,6 @@ FactoryGirl.define do
     end
 
     factory :admin, traits: [:admin]
+    factory :external_user, traits: [:external]
   end
 end

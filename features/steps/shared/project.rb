@@ -7,6 +7,12 @@ module SharedProject
     @project.team << [@user, :master]
   end
 
+  step "I own a project in some group namespace" do
+    @group = create(:group, name: 'some group')
+    @project = create(:project, namespace: @group)
+    @project.team << [@user, :master]
+  end
+
   step "project exists in some group namespace" do
     @group = create(:group, name: 'some group')
     @project = create(:project, :repository, namespace: @group, public_builds: false)
@@ -15,7 +21,7 @@ module SharedProject
   # Create a specific project called "Shop"
   step 'I own project "Shop"' do
     @project = Project.find_by(name: "Shop")
-    @project ||= create(:project, :repository, name: "Shop", namespace: @user.namespace)
+    @project ||= create(:project, :repository, name: "Shop", namespace: @user.namespace, issues_template: "This issue should contain the following.", merge_requests_template: "This merge request should contain the following.")
     @project.team << [@user, :master]
   end
 

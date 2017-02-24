@@ -51,7 +51,7 @@ class Projects::NotesController < Projects::ApplicationController
 
   def destroy
     if note.editable?
-      Notes::DeleteService.new(project, current_user).execute(note)
+      Notes::DestroyService.new(project, current_user).execute(note)
     end
 
     respond_to do |format|
@@ -199,6 +199,7 @@ class Projects::NotesController < Projects::ApplicationController
     end
 
     attrs[:commands_changes] = note.commands_changes unless attrs[:award]
+
     attrs
   end
 

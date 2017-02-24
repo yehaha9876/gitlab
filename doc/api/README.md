@@ -26,12 +26,13 @@ following locations:
 - [Issue Boards](boards.md)
 - [Keys](keys.md)
 - [Labels](labels.md)
+- [License](license.md)
 - [Merge Requests](merge_requests.md)
 - [Milestones](milestones.md)
-- [Open source license templates](templates/licenses.md)
 - [Namespaces](namespaces.md)
 - [Notes](notes.md) (comments)
 - [Notification settings](notification_settings.md)
+- [Open source license templates](templates/licenses.md)
 - [Pipelines](pipelines.md)
 - [Projects](projects.md) including setting Webhooks
 - [Project Access Requests](access_requests.md)
@@ -49,6 +50,7 @@ following locations:
 - [Todos](todos.md)
 - [Users](users.md)
 - [Validate CI configuration](ci/lint.md)
+- [V3 to V4](v3_to_v4.md)
 - [Version](version.md)
 
 ### Internal CI API

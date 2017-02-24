@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 feature 'Create New Merge Request', feature: true, js: true do
+  include WaitForVueResource
+
   let(:user) { create(:user) }
   let(:project) { create(:project, :public) }
 
@@ -32,6 +34,35 @@ feature 'Create New Merge Request', feature: true, js: true do
     click_link "Check out branch"
 
     expect(page).to have_content 'git checkout -b orphaned-branch origin/orphaned-branch'
+  end
+
+  context 'when approvals are disabled for the target project' do
+    it 'does not show approval settings' do
+      visit new_namespace_project_merge_request_path(project.namespace, project, merge_request: { target_branch: 'master', source_branch: 'feature_conflict' })
+
+      expect(page).not_to have_content('Approvers')
+    end
+  end
+
+  context 'when approvals are enabled for the target project' do
+    before do
+      project.update_attributes(approvals_before_merge: 1)
+
+      visit new_namespace_project_merge_request_path(project.namespace, project, merge_request: { target_branch: 'master', source_branch: 'feature_conflict' })
+    end
+
+    it 'shows approval settings' do
+      expect(page).to have_content('Approvers')
+    end
+
+    context 'saving the MR' do
+      it 'shows the saved MR' do
+        fill_in 'merge_request_title', with: 'Test'
+        click_button 'Submit merge request'
+
+        expect(page).to have_link('Close merge request')
+      end
+    end
   end
 
   context 'when target project cannot be viewed by the current user' do
@@ -83,5 +114,26 @@ feature 'Create New Merge Request', feature: true, js: true do
     visit new_namespace_project_merge_request_path(project.namespace, project)
     expect(page).not_to have_selector('#error_explanation')
     expect(page).not_to have_content('The form contains the following error')
+  end
+
+  context 'when a new merge request has a pipeline' do
+    let!(:pipeline) do
+      create(:ci_pipeline, sha: project.commit('fix').id,
+                           ref: 'fix',
+                           project: project)
+    end
+
+    it 'shows pipelines for a new merge request' do
+      visit new_namespace_project_merge_request_path(
+        project.namespace, project,
+        merge_request: { target_branch: 'master', source_branch: 'fix' })
+
+      page.within('.merge-request') do
+        click_link 'Pipelines'
+        wait_for_vue_resource
+
+        expect(page).to have_content "##{pipeline.id}"
+      end
+    end
   end
 end

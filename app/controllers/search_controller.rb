@@ -1,5 +1,5 @@
 class SearchController < ApplicationController
-  skip_before_action :authenticate_user!, :reject_blocked!
+  skip_before_action :authenticate_user!
 
   include SearchHelper
 
@@ -38,9 +38,10 @@ class SearchController < ApplicationController
 
         Search::SnippetService.new(current_user, params).execute
       else
-        unless %w(projects issues merge_requests milestones).include?(@scope)
+        unless %w(projects issues merge_requests milestones blobs commits).include?(@scope)
           @scope = 'projects'
         end
+
         Search::GlobalService.new(current_user, params).execute
       end
 

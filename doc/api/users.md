@@ -2,6 +2,8 @@
 
 ## List users
 
+Active users = Total accounts - Blocked users
+
 Get a list of users.
 
 This function takes pagination parameters `page` and `per_page` to restrict the list of users.
@@ -72,7 +74,6 @@ GET /users
     "organization": "",
     "last_sign_in_at": "2012-06-01T11:41:01Z",
     "confirmed_at": "2012-05-23T09:05:22Z",
-    "theme_id": 1,
     "color_scheme_id": 2,
     "projects_limit": 100,
     "current_sign_in_at": "2012-06-02T06:36:55Z",
@@ -105,7 +106,6 @@ GET /users
     "organization": "",
     "last_sign_in_at": null,
     "confirmed_at": "2012-05-30T16:53:06.148Z",
-    "theme_id": 1,
     "color_scheme_id": 3,
     "projects_limit": 100,
     "current_sign_in_at": "2014-03-19T17:54:13Z",
@@ -198,7 +198,6 @@ Parameters:
   "organization": "",
   "last_sign_in_at": "2012-06-01T11:41:01Z",
   "confirmed_at": "2012-05-23T09:05:22Z",
-  "theme_id": 1,
   "color_scheme_id": 2,
   "projects_limit": 100,
   "current_sign_in_at": "2012-06-02T06:36:55Z",
@@ -216,7 +215,7 @@ Parameters:
 
 ## User creation
 
-Creates a new user. Note only administrators can create new users.
+Creates a new user. Note only administrators can create new users. Either `password` or `reset_password` should be specified (`reset_password` takes priority).
 
 ```
 POST /users
@@ -225,7 +224,8 @@ POST /users
 Parameters:
 
 - `email` (required)            - Email
-- `password` (required)         - Password
+- `password` (optional)         - Password
+- `reset_password` (optional)   - Send user password reset link - true or false(default)
 - `username` (required)         - Username
 - `name` (required)             - Name
 - `skype` (optional)            - Skype ID
@@ -271,6 +271,7 @@ Parameters:
 - `can_create_group` (optional) - User can create groups - true or false
 - `external` (optional)         - Flags the user as external - true or false(default)
 
+On password update, user will be forced to change it upon next login.
 Note, at the moment this method does only return a `404` error,
 even in cases where a `409` (Conflict) would be more appropriate,
 e.g. when renaming the email address to some existing one.
@@ -321,7 +322,6 @@ GET /user
   "organization": "",
   "last_sign_in_at": "2012-06-01T11:41:01Z",
   "confirmed_at": "2012-05-23T09:05:22Z",
-  "theme_id": 1,
   "color_scheme_id": 2,
   "projects_limit": 100,
   "current_sign_in_at": "2012-06-02T06:36:55Z",
@@ -367,7 +367,6 @@ GET /user
   "organization": "",
   "last_sign_in_at": "2012-06-01T11:41:01Z",
   "confirmed_at": "2012-05-23T09:05:22Z",
-  "theme_id": 1,
   "color_scheme_id": 2,
   "projects_limit": 100,
   "current_sign_in_at": "2012-06-02T06:36:55Z",
@@ -662,14 +661,14 @@ Will return `200 OK` on success, or `404 Not found` if either user or email cann
 Blocks the specified user.  Available only for admin.
 
 ```
-PUT /users/:id/block
+POST /users/:id/block
 ```
 
 Parameters:
 
 - `id` (required) - id of specified user
 
-Will return `200 OK` on success, `404 User Not Found` is user cannot be found or
+Will return `201 OK` on success, `404 User Not Found` is user cannot be found or
 `403 Forbidden` when trying to block an already blocked user by LDAP synchronization.
 
 ## Unblock user
@@ -677,14 +676,14 @@ Will return `200 OK` on success, `404 User Not Found` is user cannot be found or
 Unblocks the specified user.  Available only for admin.
 
 ```
-PUT /users/:id/unblock
+POST /users/:id/unblock
 ```
 
 Parameters:
 
 - `id` (required) - id of specified user
 
-Will return `200 OK` on success, `404 User Not Found` is user cannot be found or
+Will return `201 OK` on success, `404 User Not Found` is user cannot be found or
 `403 Forbidden` when trying to unblock a user blocked by LDAP synchronization.
 
 ### Get user contribution events
@@ -815,8 +814,6 @@ Example response:
       },
       "created_at": "2015-12-04T10:33:56.698Z",
       "system": false,
-      "upvote": false,
-      "downvote": false,
       "noteable_id": 377,
       "noteable_type": "Issue"
     },
@@ -829,6 +826,61 @@ Example response:
       "web_url": "http://localhost:3000/root"
     },
     "author_username": "root"
+  }
+]
+```
+
+### Get user activities (admin only)
+
+>**Note:** This API endpoint is only available on 8.15 EE and above.
+
+
+Get the last activity date for all users, sorted from oldest to newest.
+
+The activities that update the timestamp are:
+
+  - Git HTTP/SSH activities (such as clone, push)
+  - User logging in into GitLab
+
+The data is stored in Redis and it depends on it for being recorded and displayed
+over time. This means that we will lose the data if Redis gets flushed, or a custom
+TTL is reached.
+
+By default, it shows the activity for all users in the last 6 months, but this can be
+amended by using the `from` parameter.
+
+This function takes pagination parameters `page` and `per_page` to restrict the list of users.
+
+
+```
+GET /user/activities
+```
+
+Parameters:
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `from` | string | no | Date string in the format YEAR-MONTH-DAY, e.g. `2016-03-11`. Defaults to 6 months ago. |
+
+```bash
+curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v3/user/activities
+```
+
+Example response:
+
+```json
+[
+  {
+    "username": "user1",
+    "last_activity_at": "2015-12-14 01:00:00"
+  },
+  {
+    "username": "user2",
+    "last_activity_at": "2015-12-15 01:00:00"
+  },
+  {
+    "username": "user3",
+    "last_activity_at": "2015-12-16 01:00:00"
   }
 ]
 ```

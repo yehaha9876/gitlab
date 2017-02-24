@@ -51,10 +51,11 @@ describe API::Boards, api: true  do
     end
 
     context "when authenticated" do
-      it "returns the project issue board" do
+      it "returns the project issue boards" do
         get api(base_url, user)
 
         expect(response).to have_http_status(200)
+        expect(response).to include_pagination_headers
         expect(json_response).to be_an Array
         expect(json_response.length).to eq(1)
         expect(json_response.first['id']).to eq(board.id)
@@ -72,6 +73,7 @@ describe API::Boards, api: true  do
       get api(base_url, user)
 
       expect(response).to have_http_status(200)
+      expect(response).to include_pagination_headers
       expect(json_response).to be_an Array
       expect(json_response.length).to eq(2)
       expect(json_response.first['label']['name']).to eq(dev_label.title)

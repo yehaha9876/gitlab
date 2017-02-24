@@ -47,7 +47,10 @@
         $('.js-rebase-button').html("<i class='fa fa-spinner fa-spin'></i> Rebase in progress");
       });
     } else {
-      merge_request_widget.getMergeStatus();
+      // getMergeStatus replaces the MR widget with new, updated HTML, which means any persistent
+      // event management gets clobbered. When the MR is approvable, MR status is already managed
+      // and breaks when the DOM is clobbered.
+      setTimeout(() => merge_request_widget.getMergeStatus(), 200);
     }
   });
 })();

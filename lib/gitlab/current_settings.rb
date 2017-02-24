@@ -25,12 +25,10 @@ module Gitlab
       settings || in_memory_application_settings
     end
 
-    def sidekiq_throttling_enabled?
-      current_application_settings.sidekiq_throttling_enabled?
-    end
+    delegate :sidekiq_throttling_enabled?, to: :current_application_settings
 
     def in_memory_application_settings
-      @in_memory_application_settings ||= ::ApplicationSetting.new(::ApplicationSetting::DEFAULTS)
+      @in_memory_application_settings ||= ::ApplicationSetting.new(::ApplicationSetting.defaults)
     # In case migrations the application_settings table is not created yet,
     # we fallback to a simple OpenStruct
     rescue ActiveRecord::StatementInvalid, ActiveRecord::UnknownAttributeError
@@ -38,7 +36,7 @@ module Gitlab
     end
 
     def fake_application_settings
-      OpenStruct.new(::ApplicationSetting::DEFAULTS)
+      OpenStruct.new(::ApplicationSetting.defaults)
     end
 
     private

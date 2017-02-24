@@ -64,8 +64,10 @@ module API
                                     desc: 'The visibility level of the snippet'
       end
       post do
-        attrs = declared_params(include_missing: false)
+        attrs = declared_params(include_missing: false).merge(request: request, api: true)
         snippet = CreateSnippetService.new(nil, current_user, attrs).execute
+
+        render_spam_error! if snippet.spam?
 
         if snippet.persisted?
           present snippet, with: Entities::PersonalSnippet
@@ -93,9 +95,12 @@ module API
         return not_found!('Snippet') unless snippet
         authorize! :update_personal_snippet, snippet
 
-        attrs = declared_params(include_missing: false)
+        attrs = declared_params(include_missing: false).merge(request: request, api: true)
 
         UpdateSnippetService.new(nil, current_user, snippet, attrs).execute
+
+        render_spam_error! if snippet.spam?
+
         if snippet.persisted?
           present snippet, with: Entities::PersonalSnippet
         else

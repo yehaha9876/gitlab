@@ -1,4 +1,4 @@
-/*= require filtered_search/filtered_search_dropdown */
+require('./filtered_search_dropdown');
 
 /* global droplabFilter */
 
@@ -37,23 +37,18 @@
     }
 
     renderContent() {
-      const dropdownData = [{
-        icon: 'fa-pencil',
-        hint: 'author:',
-        tag: '&lt;@author&gt;',
-      }, {
-        icon: 'fa-user',
-        hint: 'assignee:',
-        tag: '&lt;@assignee&gt;',
-      }, {
-        icon: 'fa-clock-o',
-        hint: 'milestone:',
-        tag: '&lt;%milestone&gt;',
-      }, {
-        icon: 'fa-tag',
-        hint: 'label:',
-        tag: '&lt;~label&gt;',
-      }];
+      const dropdownData = [];
+
+      [].forEach.call(this.input.parentElement.querySelectorAll('.dropdown-menu'), (dropdownMenu) => {
+        const { icon, hint, tag } = dropdownMenu.dataset;
+        if (icon && hint && tag) {
+          dropdownData.push({
+            icon: `fa-${icon}`,
+            hint,
+            tag: `&lt;${tag}&gt;`,
+          });
+        }
+      });
 
       this.droplab.changeHookList(this.hookId, this.dropdown, [droplabFilter], this.config);
       this.droplab.setData(this.hookId, dropdownData);

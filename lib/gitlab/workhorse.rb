@@ -4,10 +4,10 @@ require 'securerandom'
 
 module Gitlab
   class Workhorse
-    SEND_DATA_HEADER = 'Gitlab-Workhorse-Send-Data'
-    VERSION_FILE = 'GITLAB_WORKHORSE_VERSION'
-    INTERNAL_API_CONTENT_TYPE = 'application/vnd.gitlab-workhorse+json'
-    INTERNAL_API_REQUEST_HEADER = 'Gitlab-Workhorse-Api-Request'
+    SEND_DATA_HEADER = 'Gitlab-Workhorse-Send-Data'.freeze
+    VERSION_FILE = 'GITLAB_WORKHORSE_VERSION'.freeze
+    INTERNAL_API_CONTENT_TYPE = 'application/vnd.gitlab-workhorse+json'.freeze
+    INTERNAL_API_REQUEST_HEADER = 'Gitlab-Workhorse-Api-Request'.freeze
 
     # Supposedly the effective key size for HMAC-SHA256 is 256 bits, i.e. 32
     # bytes https://tools.ietf.org/html/rfc4868#section-2.6
@@ -107,7 +107,8 @@ module Gitlab
           'Terminal' => {
             'Subprotocols' => terminal[:subprotocols],
             'Url' => terminal[:url],
-            'Header' => terminal[:headers]
+            'Header' => terminal[:headers],
+            'MaxSessionTime' => terminal[:max_session_time],
           }
         }
         details['Terminal']['CAPem'] = terminal[:ca_pem] if terminal.has_key?(:ca_pem)

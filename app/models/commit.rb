@@ -22,12 +22,12 @@ class Commit
   DIFF_HARD_LIMIT_LINES = 50000
 
   # The SHA can be between 7 and 40 hex characters.
-  COMMIT_SHA_PATTERN = '\h{7,40}'
+  COMMIT_SHA_PATTERN = '\h{7,40}'.freeze
 
   class << self
     def decorate(commits, project)
       commits.map do |commit|
-        if commit.kind_of?(Commit)
+        if commit.is_a?(Commit)
           commit
         else
           self.new(commit, project)
@@ -100,12 +100,12 @@ class Commit
     commit_reference(from_project, id, full: full)
   end
 
-  def reference_link_text(from_project = nil)
-    commit_reference(from_project, short_id)
+  def reference_link_text(from_project = nil, full: false)
+    commit_reference(from_project, short_id, full: full)
   end
 
   def diff_line_count
-    @diff_line_count ||= Commit::diff_line_count(raw_diffs)
+    @diff_line_count ||= Commit.diff_line_count(raw_diffs)
     @diff_line_count
   end
 
@@ -122,11 +122,12 @@ class Commit
   def full_title
     return @full_title if @full_title
 
-    if safe_message.blank?
-      @full_title = no_commit_message
-    else
-      @full_title = safe_message.split("\n", 2).first
-    end
+    @full_title =
+      if safe_message.blank?
+        no_commit_message
+      else
+        safe_message.split("\n", 2).first
+      end
   end
 
   # Returns the commits description

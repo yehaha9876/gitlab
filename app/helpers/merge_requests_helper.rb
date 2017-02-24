@@ -20,8 +20,8 @@ module MergeRequestsHelper
   end
 
   def mr_widget_refresh_url(mr)
-    if mr && mr.source_project
-      merge_widget_refresh_namespace_project_merge_request_url(mr.source_project.namespace, mr.source_project, mr)
+    if mr && mr.target_project
+      merge_widget_refresh_namespace_project_merge_request_url(mr.target_project.namespace, mr.target_project, mr)
     else
       ''
     end
@@ -64,24 +64,63 @@ module MergeRequestsHelper
   end
 
   def mr_closes_issues
-    @mr_closes_issues ||= @merge_request.closes_issues
+    @mr_closes_issues ||= @merge_request.closes_issues(current_user)
   end
 
   def mr_issues_mentioned_but_not_closing
-    @mr_issues_mentioned_but_not_closing ||= @merge_request.issues_mentioned_but_not_closing
+    @mr_issues_mentioned_but_not_closing ||= @merge_request.issues_mentioned_but_not_closing(current_user)
   end
 
   def mr_change_branches_path(merge_request)
     new_namespace_project_merge_request_path(
       @project.namespace, @project,
       merge_request: {
-        source_project_id: @merge_request.source_project_id,
-        target_project_id: @merge_request.target_project_id,
-        source_branch: @merge_request.source_branch,
-        target_branch: @merge_request.target_branch,
+        source_project_id: merge_request.source_project_id,
+        target_project_id: merge_request.target_project_id,
+        source_branch: merge_request.source_branch,
+        target_branch: merge_request.target_branch,
       },
       change_branches: true
     )
+  end
+
+  def render_items_list(items, separator = "and")
+    items_cnt = items.size
+
+    case items_cnt
+    when 1
+      items.first
+    when 2
+      "#{items.first} #{separator} #{items.last}"
+    else
+      last_item = items.pop
+      "#{items.join(", ")} #{separator} #{last_item}"
+    end
+  end
+
+  # This may be able to be removed with associated specs
+  def render_require_section(merge_request)
+    str = if merge_request.approvals_left == 1
+            "Requires one more approval"
+          else
+            "Requires #{merge_request.approvals_left} more approvals"
+          end
+
+    if merge_request.approvers_left.any?
+      more_approvals = merge_request.approvals_left - merge_request.approvers_left.count
+      approvers_names = merge_request.approvers_left.map(&:name)
+
+      str <<
+        if more_approvals > 0
+          " (from #{render_items_list(approvers_names + ["#{more_approvals} more"])})"
+        elsif more_approvals < 0
+          " (from #{render_items_list(approvers_names, "or")})"
+        else
+          " (from #{render_items_list(approvers_names)})"
+        end
+    end
+
+    str
   end
 
   def mr_assign_issues_link
@@ -142,5 +181,17 @@ module MergeRequestsHelper
 
   def different_base?(version1, version2)
     version1 && version2 && version1.base_commit_sha != version2.base_commit_sha
+  end
+
+  def merge_params(merge_request)
+    {
+      merge_when_build_succeeds: true,
+      should_remove_source_branch: true,
+      sha: merge_request.diff_head_sha
+    }.merge(merge_params_ee(merge_request))
+  end
+
+  def merge_params_ee(merge_request)
+    { squash: merge_request.squash }
   end
 end

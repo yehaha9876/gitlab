@@ -267,6 +267,23 @@ describe SlashCommands::InterpretService, services: true do
       end
     end
 
+    shared_examples 'weight command' do
+      it 'populates weight: 5 if content contains /weight 5' do
+        _, updates = service.execute(content, issuable)
+
+        expect(updates).to eq(weight: 5)
+      end
+    end
+
+    shared_examples 'clear weight command' do
+      it 'populates weight: nil if content contains /clear_weight' do
+        issuable.update(weight: 5)
+        _, updates = service.execute(content, issuable)
+
+        expect(updates).to eq(weight: nil)
+      end
+    end
+
     it_behaves_like 'reopen command' do
       let(:content) { '/reopen' }
       let(:issuable) { issue }
@@ -603,6 +620,16 @@ describe SlashCommands::InterpretService, services: true do
       let(:issuable) { issue }
     end
 
+    it_behaves_like 'weight command' do
+      let(:content) { '/weight 5'}
+      let(:issuable) { issue }
+    end
+
+    it_behaves_like 'clear weight command' do
+      let(:content) { '/clear_weight' }
+      let(:issuable) { issue }
+    end
+
     context 'when current_user cannot :admin_issue' do
       let(:visitor) { create(:user) }
       let(:issue) { create(:issue, project: project, author: visitor) }
@@ -651,6 +678,38 @@ describe SlashCommands::InterpretService, services: true do
       it_behaves_like 'empty command' do
         let(:content) { '/remove_due_date' }
         let(:issuable) { issue }
+      end
+    end
+
+    context '/target_branch command' do
+      let(:non_empty_project) { create(:project) }
+      let(:another_merge_request) { create(:merge_request, author: developer, source_project: non_empty_project) }
+      let(:service) { described_class.new(non_empty_project, developer)}
+
+      it 'updates target_branch if /target_branch command is executed' do
+        _, updates = service.execute('/target_branch merge-test', merge_request)
+
+        expect(updates).to eq(target_branch: 'merge-test')
+      end
+
+      it 'handles blanks around param' do
+        _, updates = service.execute('/target_branch  merge-test     ', merge_request)
+
+        expect(updates).to eq(target_branch: 'merge-test')
+      end
+
+      context 'ignores command with no argument' do
+        it_behaves_like 'empty command' do
+          let(:content) { '/target_branch' }
+          let(:issuable) { another_merge_request }
+        end
+      end
+
+      context 'ignores non-existing target branch' do
+        it_behaves_like 'empty command' do
+          let(:content) { '/target_branch totally_non_existing_branch' }
+          let(:issuable) { another_merge_request }
+        end
       end
     end
   end

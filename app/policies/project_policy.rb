@@ -1,4 +1,6 @@
 class ProjectPolicy < BasePolicy
+  prepend EE::ProjectPolicy
+
   def rules
     team_access!(user)
 
@@ -6,6 +8,7 @@ class ProjectPolicy < BasePolicy
       (project.group && project.group.has_owner?(user))
 
     owner_access! if user.admin? || owner
+    auditor_access! if user.auditor?
     team_member_owner_access! if owner
 
     if project.public? || (project.internal? && !user.external?)
@@ -19,6 +22,9 @@ class ProjectPolicy < BasePolicy
     end
 
     archived_access! if project.archived?
+
+    # EE-only
+    can! :change_repository_storage if user.admin?
 
     disabled_features!
   end
@@ -58,6 +64,7 @@ class ProjectPolicy < BasePolicy
     can! :update_issue
     can! :admin_issue
     can! :admin_label
+    can! :admin_board
     can! :admin_list
     can! :read_commit_status
     can! :read_build
@@ -91,6 +98,7 @@ class ProjectPolicy < BasePolicy
     can! :update_container_image
     can! :create_environment
     can! :create_deployment
+    can! :admin_board
   end
 
   def master_access!
@@ -110,6 +118,12 @@ class ProjectPolicy < BasePolicy
     can! :admin_pipeline
     can! :admin_environment
     can! :admin_deployment
+    can! :admin_pages
+    can! :read_pages
+    can! :update_pages
+
+    # EE-only
+    can! :admin_path_locks
   end
 
   def public_access!
@@ -136,6 +150,7 @@ class ProjectPolicy < BasePolicy
     can! :remove_fork_project
     can! :destroy_merge_request
     can! :destroy_issue
+    can! :remove_pages
   end
 
   def team_member_owner_access!
@@ -166,6 +181,16 @@ class ProjectPolicy < BasePolicy
     cannot! :push_code_to_protected_branches
     cannot! :update_merge_request
     cannot! :admin_merge_request
+  end
+
+  # An auditor user has read-only access to all projects
+  def auditor_access!
+    base_readonly_access!
+
+    can! :read_build
+    can! :read_environment
+    can! :read_deployment
+    can! :read_pages
   end
 
   def disabled_features!
@@ -214,25 +239,7 @@ class ProjectPolicy < BasePolicy
   def anonymous_rules
     return unless project.public?
 
-    can! :read_project
-    can! :read_board
-    can! :read_list
-    can! :read_wiki
-    can! :read_label
-    can! :read_milestone
-    can! :read_project_snippet
-    can! :read_project_member
-    can! :read_merge_request
-    can! :read_note
-    can! :read_pipeline
-    can! :read_commit_status
-    can! :read_container_image
-    can! :download_code
-    can! :download_wiki_code
-    can! :read_cycle_analytics
-
-    # NOTE: may be overridden by IssuePolicy
-    can! :read_issue
+    base_readonly_access!
 
     # Allow to read builds by anonymous user if guests are allowed
     can! :read_build if project.public_builds?
@@ -264,5 +271,32 @@ class ProjectPolicy < BasePolicy
       :"update_#{name}",
       :"admin_#{name}"
     ]
+  end
+
+  private
+
+  # A base set of abilities for read-only users, which
+  # is then augmented as necessary for anonymous and other
+  # read-only users.
+  def base_readonly_access!
+    can! :read_project
+    can! :read_board
+    can! :read_list
+    can! :read_wiki
+    can! :read_label
+    can! :read_milestone
+    can! :read_project_snippet
+    can! :read_project_member
+    can! :read_merge_request
+    can! :read_note
+    can! :read_pipeline
+    can! :read_commit_status
+    can! :read_container_image
+    can! :download_code
+    can! :download_wiki_code
+    can! :read_cycle_analytics
+
+    # NOTE: may be overridden by IssuePolicy
+    can! :read_issue
   end
 end

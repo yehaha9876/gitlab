@@ -24,14 +24,22 @@ module SearchHelper
     return unless collection.count > 0
 
     from = collection.offset_value + 1
-    to = collection.offset_value + collection.length
+    to = collection.offset_value + collection.count
     count = collection.total_count
 
     "Showing #{from} - #{to} of #{count} #{scope.humanize(capitalize: false)} for \"#{term}\""
   end
 
   def parse_search_result(result)
-    Gitlab::ProjectSearchResults.parse_search_result(result)
+    if result.is_a?(String)
+      Gitlab::ProjectSearchResults.parse_search_result(result)
+    else
+      Gitlab::Elastic::SearchResults.parse_search_result(result)
+    end
+  end
+
+  def find_project_for_blob(blob)
+    Project.find(blob['_parent'])
   end
 
   private
@@ -56,7 +64,7 @@ module SearchHelper
       { category: "Help", label: "Rake Tasks Help",    url: help_page_path("raketasks/README") },
       { category: "Help", label: "SSH Keys Help",      url: help_page_path("ssh/README") },
       { category: "Help", label: "System Hooks Help",  url: help_page_path("system_hooks/system_hooks") },
-      { category: "Help", label: "Webhooks Help",      url: help_page_path("web_hooks/web_hooks") },
+      { category: "Help", label: "Webhooks Help",      url: help_page_path("user/project/integrations/webhooks") },
       { category: "Help", label: "Workflow Help",      url: help_page_path("workflow/README") },
     ]
   end
@@ -89,7 +97,7 @@ module SearchHelper
       {
         category: "Groups",
         id: group.id,
-        label: "#{search_result_sanitize(group.name)}",
+        label: "#{search_result_sanitize(group.full_name)}",
         url: group_path(group)
       }
     end

@@ -1,18 +1,28 @@
-/* eslint-disable func-names, comma-dangle, new-cap, no-new */
+/* eslint-disable func-names, comma-dangle, new-cap, no-new, max-len */
 /* global Vue */
 /* global ResolveCount */
+/* global ResolveServiceClass */
 
-//= require_directory ./models
-//= require_directory ./stores
-//= require_directory ./services
-//= require_directory ./mixins
-//= require_directory ./components
+const Vue = require('vue');
+require('./models/discussion');
+require('./models/note');
+require('./stores/comments');
+require('./services/resolve');
+require('./mixins/discussion');
+require('./components/comment_resolve_btn');
+require('./components/jump_to_discussion');
+require('./components/resolve_btn');
+require('./components/resolve_count');
+require('./components/resolve_discussion_btn');
 
 $(() => {
+  const projectPath = document.querySelector('.merge-request').dataset.projectPath;
   const COMPONENT_SELECTOR = 'resolve-btn, resolve-discussion-btn, jump-to-discussion, comment-and-resolve-btn';
 
   window.gl = window.gl || {};
   window.gl.diffNoteApps = {};
+
+  window.ResolveService = new gl.DiffNotesResolveServiceClass(projectPath);
 
   gl.diffNotesCompileComponents = () => {
     const $components = $(COMPONENT_SELECTOR).filter(function () {
@@ -43,6 +53,6 @@ $(() => {
     el: '#resolve-count-app',
     components: {
       'resolve-count': ResolveCount
-    }
+    },
   });
 });

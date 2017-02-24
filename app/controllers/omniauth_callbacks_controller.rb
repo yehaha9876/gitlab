@@ -78,6 +78,24 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     handle_omniauth
   end
 
+  def kerberos_spnego
+    # The internal kerberos_spnego provider is a replacement for
+    # omniauth-kerberos. Here we re-use the 'kerberos' provider name to ease
+    # the transition. In time (in GitLab 9.0?) we should remove the
+    # omniauth-kerberos gem and rename the internal 'kerberos_spnego'
+    # provider to plain 'kerberos' and remove this special method.
+    oauth['provider'] = 'kerberos'
+    handle_omniauth
+  end
+
+  def authentiq
+    if params['sid']
+      handle_service_ticket oauth['provider'], params['sid']
+    end
+
+    handle_omniauth
+  end
+
   private
 
   def handle_omniauth
@@ -115,7 +133,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     else
       error_message = @user.errors.full_messages.to_sentence
 
-      redirect_to omniauth_error_path(oauth['provider'], error: error_message) and return
+      return redirect_to omniauth_error_path(oauth['provider'], error: error_message)
     end
   end
 

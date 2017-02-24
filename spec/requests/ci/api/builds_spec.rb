@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Ci::API::Builds do
   include ApiHelpers
 
-  let(:runner) { FactoryGirl.create(:ci_runner, tag_list: ["mysql", "ruby"]) }
+  let(:runner) { FactoryGirl.create(:ci_runner, tag_list: %w(mysql ruby)) }
   let(:project) { FactoryGirl.create(:empty_project, shared_runners_enabled: false) }
   let(:last_update) { nil }
 
@@ -288,7 +288,7 @@ describe Ci::API::Builds do
         expect(build.reload.trace).to eq 'BUILD TRACE'
       end
 
-      context 'build has been erased' do
+      context 'job has been erased' do
         let(:build) { create(:ci_build, runner_id: runner.id, erased_at: Time.now) }
 
         it 'responds with forbidden' do
@@ -458,7 +458,7 @@ describe Ci::API::Builds do
       before { build.run! }
 
       describe "POST /builds/:id/artifacts/authorize" do
-        context "should authorize posting artifact to running build" do
+        context "authorizes posting artifact to running build" do
           it "using token as parameter" do
             post authorize_url, { token: build.token }, headers
 
@@ -492,7 +492,7 @@ describe Ci::API::Builds do
           end
         end
 
-        context "should fail to post too large artifact" do
+        context "fails to post too large artifact" do
           it "using token as parameter" do
             stub_application_setting(max_artifacts_size: 0)
 

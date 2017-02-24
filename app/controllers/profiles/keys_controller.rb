@@ -28,7 +28,7 @@ class Profiles::KeysController < Profiles::ApplicationController
 
   def destroy
     @key = current_user.keys.find(params[:id])
-    @key.destroy
+    @key.destroy unless @key.is_a? LDAPKey
 
     respond_to do |format|
       format.html { redirect_to profile_keys_url }
@@ -45,13 +45,13 @@ class Profiles::KeysController < Profiles::ApplicationController
         if user.present?
           render text: user.all_ssh_keys.join("\n"), content_type: "text/plain"
         else
-          render_404 and return
+          return render_404
         end
       rescue => e
         render text: e.message
       end
     else
-      render_404 and return
+      return render_404
     end
   end
 

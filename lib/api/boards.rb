@@ -1,6 +1,7 @@
 module API
-  # Boards API
   class Boards < Grape::API
+    include PaginationParams
+
     before { authenticate! }
 
     params do
@@ -11,9 +12,12 @@ module API
         detail 'This feature was introduced in 8.13'
         success Entities::Board
       end
+      params do
+        use :pagination
+      end
       get ':id/boards' do
         authorize!(:read_board, user_project)
-        present user_project.boards, with: Entities::Board
+        present paginate(user_project.boards), with: Entities::Board
       end
 
       params do
@@ -22,13 +26,7 @@ module API
       segment ':id/boards/:board_id' do
         helpers do
           def project_board
-            board = user_project.boards.first
-
-            if params[:board_id] == board.id
-              board
-            else
-              not_found!('Board')
-            end
+            user_project.boards.find(params[:board_id])
           end
 
           def board_lists
@@ -37,12 +35,15 @@ module API
         end
 
         desc 'Get the lists of a project board' do
-          detail 'Does not include `backlog` and `done` lists. This feature was introduced in 8.13'
+          detail 'Does not include `done` list. This feature was introduced in 8.13'
           success Entities::List
+        end
+        params do
+          use :pagination
         end
         get '/lists' do
           authorize!(:read_board, user_project)
-          present board_lists, with: Entities::List
+          present paginate(board_lists), with: Entities::List
         end
 
         desc 'Get a list of a project board' do
@@ -92,12 +93,12 @@ module API
           requires :position, type: Integer, desc: 'The position of the list'
         end
         put '/lists/:list_id' do
-          list = project_board.lists.movable.find(params[:list_id])
+          list = board_lists.find(params[:list_id])
 
           authorize!(:admin_list, user_project)
 
           service = ::Boards::Lists::MoveService.new(user_project, current_user,
-              { position: params[:position] })
+              { position: params[:position].to_i })
 
           if service.execute(list)
             present list, with: Entities::List

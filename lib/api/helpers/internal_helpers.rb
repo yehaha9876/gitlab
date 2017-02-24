@@ -30,7 +30,7 @@ module API
 
       def wiki?
         @wiki ||= project_path.end_with?('.wiki') &&
-          !Project.find_with_namespace(project_path)
+          !Project.find_by_full_path(project_path)
       end
 
       def project
@@ -41,7 +41,7 @@ module API
           # the wiki repository as well.
           project_path.chomp!('.wiki') if wiki?
 
-          Project.find_with_namespace(project_path)
+          Project.find_by_full_path(project_path)
         end
       end
 
@@ -51,6 +51,13 @@ module API
           :download_code,
           :push_code
         ]
+      end
+
+      def log_user_activity(actor)
+        commands = Gitlab::GitAccess::DOWNLOAD_COMMANDS +
+          Gitlab::GitAccess::GIT_ANNEX_COMMANDS
+
+        ::Users::ActivityService.new(actor, 'Git SSH').execute if commands.include?(params[:action])
       end
 
       def parse_allowed_environment_variables

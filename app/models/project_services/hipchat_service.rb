@@ -6,7 +6,7 @@ class HipchatService < Service
     a b i strong em br img pre code
     table th tr td caption colgroup col thead tbody tfoot
     ul ol li dl dt dd
-  ]
+  ].freeze
 
   prop_accessor :token, :room, :server, :color, :api_version
   boolean_accessor :notify_only_broken_builds, :notify
@@ -36,7 +36,7 @@ class HipchatService < Service
       { type: 'text', name: 'token',     placeholder: 'Room token' },
       { type: 'text', name: 'room',      placeholder: 'Room name or ID' },
       { type: 'checkbox', name: 'notify' },
-      { type: 'select', name: 'color', choices: ['yellow', 'red', 'green', 'purple', 'gray', 'random'] },
+      { type: 'select', name: 'color', choices: %w(yellow red green purple gray random) },
       { type: 'text', name: 'api_version',
         placeholder: 'Leave blank for default (v2)' },
       { type: 'text', name: 'server',
@@ -174,14 +174,15 @@ class HipchatService < Service
 
     obj_attr = data[:object_attributes]
     obj_attr = HashWithIndifferentAccess.new(obj_attr)
-    merge_request_id = obj_attr[:iid]
+    merge_request_iid = obj_attr[:iid]
     state = obj_attr[:state]
     description = obj_attr[:description]
     title = render_line(obj_attr[:title])
-
-    merge_request_url = "#{project_url}/merge_requests/#{merge_request_id}"
-    merge_request_link = "<a href=\"#{merge_request_url}\">merge request !#{merge_request_id}</a>"
-    message = "#{user_name} #{state} #{merge_request_link} in " \
+    action = obj_attr[:action]
+    state_or_action_text = (action == 'approved') ? action : state
+    merge_request_url = "#{project_url}/merge_requests/#{merge_request_iid}"
+    merge_request_link = "<a href=\"#{merge_request_url}\">merge request !#{merge_request_iid}</a>"
+    message = "#{user_name} #{state_or_action_text} #{merge_request_link} in " \
       "#{project_link}: <b>#{title}</b>"
 
     message << "<pre>#{markdown(description)}</pre>"

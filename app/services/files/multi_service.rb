@@ -5,11 +5,13 @@ module Files
     def commit
       repository.multi_action(
         user: current_user,
-        branch: @target_branch,
         message: @commit_message,
+        branch_name: @target_branch,
         actions: params[:actions],
         author_email: @author_email,
-        author_name: @author_name
+        author_name: @author_name,
+        start_project: @start_project,
+        start_branch_name: @start_branch
       )
     end
 
@@ -53,7 +55,7 @@ module Files
       file_path = action[:file_path]
       file_path = action[:previous_path] if action[:action] == :move
 
-      blob = repository.blob_at_branch(params[:branch_name], file_path)
+      blob = repository.blob_at_branch(params[:branch], file_path)
 
       unless blob
         raise_error("File to be #{action[:action]}d `#{file_path}` does not exist.")
@@ -61,7 +63,7 @@ module Files
     end
 
     def last_commit
-      Gitlab::Git::Commit.last_for_path(repository, @source_branch, @file_path)
+      Gitlab::Git::Commit.last_for_path(repository, @start_branch, @file_path)
     end
 
     def regex_check(file)
@@ -87,7 +89,7 @@ module Files
     def validate_create(action)
       return if project.empty_repo?
 
-      if repository.blob_at_branch(params[:branch_name], action[:file_path])
+      if repository.blob_at_branch(params[:branch], action[:file_path])
         raise_error("Your changes could not be committed because a file with the name `#{action[:file_path]}` already exists.")
       end
     end
@@ -100,14 +102,14 @@ module Files
         raise_error("You must supply the original file path when moving file `#{action[:file_path]}`.")
       end
 
-      blob = repository.blob_at_branch(params[:branch_name], action[:file_path])
+      blob = repository.blob_at_branch(params[:branch], action[:file_path])
 
       if blob
         raise_error("Move destination `#{action[:file_path]}` already exists.")
       end
 
       if action[:content].nil?
-        blob = repository.blob_at_branch(params[:branch_name], action[:previous_path])
+        blob = repository.blob_at_branch(params[:branch], action[:previous_path])
         blob.load_all_data!(repository) if blob.truncated?
         params[:actions][index][:content] = blob.data
       end

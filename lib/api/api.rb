@@ -1,7 +1,32 @@
 module API
   class API < Grape::API
     include APIGuard
-    version 'v3', using: :path
+
+    version %w(v3 v4), using: :path
+
+    version 'v3', using: :path do
+      mount ::API::V3::Boards
+      mount ::API::V3::Branches
+      mount ::API::V3::Commits
+      mount ::API::V3::DeployKeys
+      mount ::API::V3::Files
+      mount ::API::V3::Issues
+      mount ::API::V3::Labels
+      mount ::API::V3::Members
+      mount ::API::V3::MergeRequestDiffs
+      mount ::API::V3::MergeRequests
+      mount ::API::V3::Notes
+      mount ::API::V3::ProjectHooks
+      mount ::API::V3::Projects
+      mount ::API::V3::ProjectSnippets
+      mount ::API::V3::Repositories
+      mount ::API::V3::Subscriptions
+      mount ::API::V3::SystemHooks
+      mount ::API::V3::Tags
+      mount ::API::V3::Todos
+      mount ::API::V3::Templates
+      mount ::API::V3::Users
+    end
 
     before { allow_access_with_scope :api }
 
@@ -48,10 +73,14 @@ module API
     mount ::API::Environments
     mount ::API::Files
     mount ::API::Groups
+    mount ::API::Geo
     mount ::API::Internal
     mount ::API::Issues
     mount ::API::Keys
     mount ::API::Labels
+    mount ::API::Ldap
+    mount ::API::LdapGroupLinks
+    mount ::API::License
     mount ::API::Lint
     mount ::API::Members
     mount ::API::MergeRequestDiffs
@@ -61,7 +90,9 @@ module API
     mount ::API::Notes
     mount ::API::NotificationSettings
     mount ::API::Pipelines
+    mount ::API::ProjectGitHook # TODO: Should be removed after 8.11 is released
     mount ::API::ProjectHooks
+    mount ::API::ProjectPushRule
     mount ::API::Projects
     mount ::API::ProjectSnippets
     mount ::API::Repositories

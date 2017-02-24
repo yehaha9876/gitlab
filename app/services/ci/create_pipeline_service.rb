@@ -2,7 +2,7 @@ module Ci
   class CreatePipelineService < BaseService
     attr_reader :pipeline
 
-    def execute(ignore_skip_ci: false, save_on_errors: true, trigger_request: nil)
+    def execute(ignore_skip_ci: false, save_on_errors: true, trigger_request: nil, mirror_update: false)
       @pipeline = Ci::Pipeline.new(
         project: project,
         ref: ref,
@@ -15,6 +15,10 @@ module Ci
 
       unless project.builds_enabled?
         return error('Pipeline is disabled')
+      end
+
+      unless project.mirror_trigger_builds?
+        return error('Pipeline is disabled for mirror updates') if mirror_update
       end
 
       unless trigger_request || can?(current_user, :create_pipeline, project)
@@ -59,7 +63,8 @@ module Ci
     private
 
     def skip_ci?
-      pipeline.git_commit_message =~ /\[(ci skip|skip ci)\]/i if pipeline.git_commit_message
+      return false unless pipeline.git_commit_message
+      pipeline.git_commit_message =~ /\[(ci[ _-]skip|skip[ _-]ci)\]/i
     end
 
     def commit

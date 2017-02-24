@@ -1,6 +1,7 @@
 class Notify < BaseMailer
   include ActionDispatch::Routing::PolymorphicRoutes
 
+  include Emails::AdminNotification
   include Emails::Issues
   include Emails::MergeRequests
   include Emails::Notes
@@ -151,7 +152,7 @@ class Notify < BaseMailer
     headers['In-Reply-To'] = message_id(model)
     headers['References'] = message_id(model)
 
-    headers[:subject].prepend('Re: ') if headers[:subject]
+    headers[:subject]&.prepend('Re: ')
 
     mail_thread(model, headers)
   end

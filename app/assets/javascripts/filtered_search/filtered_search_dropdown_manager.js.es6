@@ -2,14 +2,21 @@
 
 (() => {
   class FilteredSearchDropdownManager {
-    constructor() {
+    constructor(baseEndpoint = '', page) {
+      this.baseEndpoint = baseEndpoint.replace(/\/$/, '');
       this.tokenizer = gl.FilteredSearchTokenizer;
+      this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeys;
       this.filteredSearchInput = document.querySelector('.filtered-search');
+      this.page = page;
+
+      if (this.page === 'issues') {
+        this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeysWithWeights;
+      }
 
       this.setupMapping();
 
       this.cleanupWrapper = this.cleanup.bind(this);
-      document.addEventListener('page:fetch', this.cleanupWrapper);
+      document.addEventListener('beforeunload', this.cleanupWrapper);
     }
 
     cleanup() {
@@ -20,7 +27,7 @@
 
       this.setupMapping();
 
-      document.removeEventListener('page:fetch', this.cleanupWrapper);
+      document.removeEventListener('beforeunload', this.cleanupWrapper);
     }
 
     setupMapping() {
@@ -38,13 +45,13 @@
         milestone: {
           reference: null,
           gl: 'DropdownNonUser',
-          extraArguments: ['milestones.json', '%'],
+          extraArguments: [`${this.baseEndpoint}/milestones.json`, '%'],
           element: document.querySelector('#js-dropdown-milestone'),
         },
         label: {
           reference: null,
           gl: 'DropdownNonUser',
-          extraArguments: ['labels.json', '~'],
+          extraArguments: [`${this.baseEndpoint}/labels.json`, '~'],
           element: document.querySelector('#js-dropdown-label'),
         },
         hint: {
@@ -53,6 +60,14 @@
           element: document.querySelector('#js-dropdown-hint'),
         },
       };
+
+      if (this.page === 'issues') {
+        this.mapping.weight = {
+          reference: null,
+          gl: 'DropdownNonUser',
+          element: document.querySelector('#js-dropdown-weight'),
+        };
+      }
     }
 
     static addWordToInput(tokenName, tokenValue = '') {
@@ -149,7 +164,7 @@
         this.droplab = new DropLab();
       }
 
-      const match = gl.FilteredSearchTokenKeys.searchByKey(dropdownName.toLowerCase());
+      const match = this.filteredSearchTokenKeys.searchByKey(dropdownName.toLowerCase());
       const shouldOpenFilterDropdown = match && this.currentDropdown !== match.key
         && this.mapping[match.key];
       const shouldOpenHintDropdown = !match && this.currentDropdown !== 'hint';

@@ -44,12 +44,20 @@ describe 'New/edit issue', feature: true, js: true do
       page.within '.dropdown-menu-labels' do
         click_link label.title
         click_link label2.title
+
+        find('.dropdown-menu-close').click
       end
       page.within '.js-label-select' do
         expect(page).to have_content label.title
       end
       expect(page.all('input[name="issue[label_ids][]"]', visible: false)[1].value).to match(label.id.to_s)
       expect(page.all('input[name="issue[label_ids][]"]', visible: false)[2].value).to match(label2.id.to_s)
+
+      click_button 'Weight'
+
+      page.within '.dropdown-menu-weight' do
+        click_link '1'
+      end
 
       click_button 'Submit issue'
 
@@ -66,7 +74,27 @@ describe 'New/edit issue', feature: true, js: true do
           expect(page).to have_content label.title
           expect(page).to have_content label2.title
         end
+
+        page.within '.weight' do
+          expect(page).to have_content '1'
+        end
       end
+    end
+
+    it 'correctly updates the dropdown toggle when removing a label' do
+      click_button 'Labels'
+
+      page.within '.dropdown-menu-labels' do
+        click_link label.title
+      end
+
+      expect(find('.js-label-select')).to have_content(label.title)
+
+      page.within '.dropdown-menu-labels' do
+        click_link label.title
+      end
+
+      expect(find('.js-label-select')).to have_content('Labels')
     end
   end
 

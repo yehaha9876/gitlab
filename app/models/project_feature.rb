@@ -18,7 +18,7 @@ class ProjectFeature < ActiveRecord::Base
   PRIVATE  = 10
   ENABLED  = 20
 
-  FEATURES = %i(issues merge_requests wiki snippets builds repository)
+  FEATURES = %i(issues merge_requests wiki snippets builds repository).freeze
 
   class << self
     def access_level_attribute(feature)
@@ -83,7 +83,7 @@ class ProjectFeature < ActiveRecord::Base
     when DISABLED
       false
     when PRIVATE
-      user && (project.team.member?(user) || user.admin?)
+      user && (project.team.member?(user) || user.admin_or_auditor?)
     when ENABLED
       true
     else

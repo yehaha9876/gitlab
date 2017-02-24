@@ -4,7 +4,6 @@ SimpleCovEnv.start!
 ENV['RAILS_ENV'] = 'test'
 require './config/environment'
 require 'rspec/expectations'
-require 'sidekiq/testing/inline'
 
 require_relative 'capybara'
 require_relative 'db_cleaner'
@@ -15,7 +14,7 @@ if ENV['CI']
   Knapsack::Adapters::SpinachAdapter.bind
 end
 
-%w(select2_helper test_env repo_helpers wait_for_ajax).each do |f|
+%w(select2_helper test_env repo_helpers license wait_for_ajax sidekiq).each do |f|
   require Rails.root.join('spec', 'support', f)
 end
 
@@ -25,8 +24,11 @@ WebMock.allow_net_connect!
 
 Spinach.hooks.before_run do
   include RSpec::Mocks::ExampleMethods
+  include ActiveJob::TestHelper
   RSpec::Mocks.setup
   TestEnv.init(mailer: false)
+  License.destroy_all
+  TestLicense.init
 
   # skip pre-receive hook check so we can use
   # web editor and merge

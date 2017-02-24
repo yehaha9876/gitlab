@@ -2,7 +2,7 @@
 /* global EditBlob */
 /* global NewCommitForm */
 
-/*= require_tree . */
+require('./edit_blob');
 
 (function() {
   $(function() {
@@ -12,4 +12,4 @@
     var blob = new EditBlob(url, $('.js-edit-blob-form').data('blob-language'));
     new NewCommitForm($('.js-edit-blob-form'));
   });
-}).call(this);
+}).call(window);

@@ -1,24 +1,19 @@
-/* globals Vue */
-/* eslint-disable no-unused-vars, no-param-reassign */
+const Vue = require('vue');
+
 class EnvironmentsService {
+  constructor(endpoint) {
+    this.environments = Vue.resource(endpoint);
 
-  constructor(root) {
-    Vue.http.options.root = root;
-
-    this.environments = Vue.resource(root);
-
-    Vue.http.interceptors.push((request, next) => {
-      // needed in order to not break the tests.
-      if ($.rails) {
-        request.headers['X-CSRF-Token'] = $.rails.csrfToken();
-      }
-      next();
-    });
+    this.deployBoard = Vue.resource('environments/{id}/status.json');
   }
 
   all() {
     return this.environments.get();
   }
+
+  getDeployBoard(environmentID) {
+    return this.deployBoard.get({ id: environmentID });
+  }
 }
 
-window.EnvironmentsService = EnvironmentsService;
+module.exports = EnvironmentsService;

@@ -1,27 +1,30 @@
-/* global Turbolinks */
-
 (() => {
   class FilteredSearchManager {
-    constructor() {
+    constructor(page) {
       this.filteredSearchInput = document.querySelector('.filtered-search');
       this.clearSearchButton = document.querySelector('.clear-search');
+      this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeys;
+
+      if (page === 'issues') {
+        this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeysWithWeights;
+      }
 
       if (this.filteredSearchInput) {
         this.tokenizer = gl.FilteredSearchTokenizer;
-        this.dropdownManager = new gl.FilteredSearchDropdownManager();
+        this.dropdownManager = new gl.FilteredSearchDropdownManager(this.filteredSearchInput.getAttribute('data-base-endpoint') || '', page);
 
         this.bindEvents();
         this.loadSearchParamsFromURL();
         this.dropdownManager.setDropdown();
 
         this.cleanupWrapper = this.cleanup.bind(this);
-        document.addEventListener('page:fetch', this.cleanupWrapper);
+        document.addEventListener('beforeunload', this.cleanupWrapper);
       }
     }
 
     cleanup() {
       this.unbindEvents();
-      document.removeEventListener('page:fetch', this.cleanupWrapper);
+      document.removeEventListener('beforeunload', this.cleanupWrapper);
     }
 
     bindEvents() {
@@ -119,8 +122,8 @@
         const keyParam = decodeURIComponent(split[0]);
         const value = split[1];
 
-        // Check if it matches edge conditions listed in gl.FilteredSearchTokenKeys
-        const condition = gl.FilteredSearchTokenKeys.searchByConditionUrl(p);
+        // Check if it matches edge conditions listed in this.filteredSearchTokenKeys
+        const condition = this.filteredSearchTokenKeys.searchByConditionUrl(p);
 
         if (condition) {
           inputValues.push(`${condition.tokenKey}:${condition.value}`);
@@ -128,7 +131,7 @@
           // Sanitize value since URL converts spaces into +
           // Replace before decode so that we know what was originally + versus the encoded +
           const sanitizedValue = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : value;
-          const match = gl.FilteredSearchTokenKeys.searchByKeyParam(keyParam);
+          const match = this.filteredSearchTokenKeys.searchByKeyParam(keyParam);
 
           if (match) {
             const indexOf = keyParam.indexOf('_');
@@ -173,9 +176,9 @@
       paths.push(`state=${currentState}`);
 
       tokens.forEach((token) => {
-        const condition = gl.FilteredSearchTokenKeys
+        const condition = this.filteredSearchTokenKeys
           .searchByConditionKeyValue(token.key, token.value.toLowerCase());
-        const { param } = gl.FilteredSearchTokenKeys.searchByKey(token.key);
+        const { param } = this.filteredSearchTokenKeys.searchByKey(token.key) || {};
         const keyParam = param ? `${token.key}_${param}` : token.key;
         let tokenPath = '';
 
@@ -196,10 +199,13 @@
       });
 
       if (searchToken) {
-        paths.push(`search=${encodeURIComponent(searchToken)}`);
+        const sanitized = searchToken.split(' ').map(t => encodeURIComponent(t)).join('+');
+        paths.push(`search=${sanitized}`);
       }
 
-      Turbolinks.visit(`?scope=all&utf8=✓&${paths.join('&')}`);
+      const parameterizedUrl = `?scope=all&utf8=✓&${paths.join('&')}`;
+
+      gl.utils.visitUrl(parameterizedUrl);
     }
 
     getUsernameParams() {

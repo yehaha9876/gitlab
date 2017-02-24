@@ -1,8 +1,14 @@
-/* eslint-disable space-before-function-paren, comma-dangle, no-param-reassign, camelcase, max-len, no-unused-vars */
+/* eslint-disable space-before-function-paren, comma-dangle, no-param-reassign, camelcase, max-len, no-unused-vars, no-else-return */
 /* global Vue */
 
 class BoardService {
-  constructor (root, boardId) {
+  constructor (root, bulkUpdatePath, boardId) {
+    this.boards = Vue.resource(`${root}{/id}.json`, {}, {
+      issues: {
+        method: 'GET',
+        url: `${root}/${boardId}/issues.json`
+      }
+    });
     this.lists = Vue.resource(`${root}/${boardId}/lists{/id}`, {}, {
       generate: {
         method: 'POST',
@@ -10,12 +16,29 @@ class BoardService {
       }
     });
     this.issue = Vue.resource(`${root}/${boardId}/issues{/id}`, {});
-    this.issues = Vue.resource(`${root}/${boardId}/lists{/id}/issues`, {});
+    this.issues = Vue.resource(`${root}/${boardId}/lists{/id}/issues`, {}, {
+      bulkUpdate: {
+        method: 'POST',
+        url: bulkUpdatePath,
+      },
+    });
 
     Vue.http.interceptors.push((request, next) => {
       request.headers['X-CSRF-Token'] = $.rails.csrfToken();
       next();
     });
+  }
+
+  allBoards () {
+    return this.boards.get();
+  }
+
+  createBoard (board) {
+    if (board.id) {
+      return this.boards.update({ id: board.id }, board);
+    } else {
+      return this.boards.save({}, board);
+    }
   }
 
   all () {
@@ -64,6 +87,20 @@ class BoardService {
     return this.issues.save({ id }, {
       issue
     });
+  }
+
+  getBacklog(data) {
+    return this.boards.issues(data);
+  }
+
+  bulkUpdate(issueIds, extraData = {}) {
+    const data = {
+      update: Object.assign(extraData, {
+        issuable_ids: issueIds.join(','),
+      }),
+    };
+
+    return this.issues.bulkUpdate(data);
   }
 }
 

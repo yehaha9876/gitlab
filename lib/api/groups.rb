@@ -10,6 +10,14 @@ module API
         optional :visibility_level, type: Integer, desc: 'The visibility level of the group'
         optional :lfs_enabled, type: Boolean, desc: 'Enable/disable LFS for the projects in this group'
         optional :request_access_enabled, type: Boolean, desc: 'Allow users to request member access'
+        optional :membership_lock, type: Boolean, desc: 'Prevent adding new members to project membership within this group'
+        optional :share_with_group_lock, type: Boolean, desc: 'Prevent sharing a project with another group within this group'
+      end
+
+      params :optional_params_ee do
+        optional :ldap_cn, type: String, desc: 'LDAP Common Name'
+        optional :ldap_access, type: Integer, desc: 'A valid access level'
+        all_or_none_of :ldap_cn, :ldap_access
       end
 
       params :statistics_params do
@@ -73,14 +81,29 @@ module API
       params do
         requires :name, type: String, desc: 'The name of the group'
         requires :path, type: String, desc: 'The path of the group'
+        optional :parent_id, type: Integer, desc: 'The parent group id for creating nested group'
         use :optional_params
+        use :optional_params_ee
       end
       post do
         authorize! :create_group
 
+        ldap_link_attrs = {
+          cn: params.delete(:ldap_cn),
+          group_access: params.delete(:ldap_access)
+        }
+
         group = ::Groups::CreateService.new(current_user, declared_params(include_missing: false)).execute
 
         if group.persisted?
+          # NOTE: add backwards compatibility for single ldap link
+          if ldap_link_attrs[:cn].present?
+            group.ldap_group_links.create(
+              cn: ldap_link_attrs[:cn],
+              group_access: ldap_link_attrs[:group_access]
+            )
+          end
+
           present group, with: Entities::Group, current_user: current_user
         else
           render_api_error!("Failed to save group #{group.errors.messages}", 400)
@@ -125,7 +148,7 @@ module API
       delete ":id" do
         group = find_group!(params[:id])
         authorize! :admin_group, group
-        DestroyGroupService.new(group, current_user).execute
+        ::Groups::DestroyService.new(group, current_user).execute
       end
 
       desc 'Get a list of projects in this group.' do
@@ -142,6 +165,9 @@ module API
                         desc: 'Return projects sorted in ascending and descending order'
         optional :simple, type: Boolean, default: false,
                           desc: 'Return only the ID, URL, name, and path of each project'
+        optional :owned, type: Boolean, default: false, desc: 'Limit by owned by authenticated user'
+        optional :starred, type: Boolean, default: false, desc: 'Limit by starred status'
+
         use :pagination
       end
       get ":id/projects" do

@@ -9,6 +9,8 @@ class User < ActiveRecord::Base
   include Sortable
   include CaseSensitivity
   include TokenAuthenticatable
+  prepend EE::GeoAwareAvatar
+  prepend EE::User
 
   DEFAULT_NOTIFICATION_LEVEL = :participating
 
@@ -21,7 +23,6 @@ class User < ActiveRecord::Base
   default_value_for :can_create_team, false
   default_value_for :hide_no_ssh_key, false
   default_value_for :hide_no_password, false
-  default_value_for :theme_id, gitlab_config.default_theme
 
   attr_encrypted :otp_secret,
     key:       Gitlab::Application.secrets.otp_key_base,
@@ -51,7 +52,12 @@ class User < ActiveRecord::Base
   has_one :namespace, -> { where type: nil }, dependent: :destroy, foreign_key: :owner_id
 
   # Profile
-  has_many :keys, dependent: :destroy
+  has_many :keys, -> do
+    type = Key.arel_table[:type]
+    where(type.not_eq('DeployKey').or(type.eq(nil)))
+  end, dependent: :destroy
+  has_many :deploy_keys, -> { where(type: 'DeployKey') }, dependent: :destroy
+
   has_many :emails, dependent: :destroy
   has_many :personal_access_tokens, dependent: :destroy
   has_many :identities, dependent: :destroy, autosave: true
@@ -85,7 +91,9 @@ class User < ActiveRecord::Base
   has_many :recent_events, -> { order "id DESC" }, foreign_key: :author_id,   class_name: "Event"
   has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: "Issue"
   has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: "MergeRequest"
-  has_many :oauth_applications, class_name: 'Doorkeeper::Application', as: :owner, dependent: :destroy
+  has_many :oauth_applications,       class_name: 'Doorkeeper::Application', as: :owner, dependent: :destroy
+  has_many :approvals,                dependent: :destroy
+  has_many :approvers,                dependent: :destroy
   has_one  :abuse_report,             dependent: :destroy
   has_many :spam_logs,                dependent: :destroy
   has_many :builds,                   dependent: :nullify, class_name: 'Ci::Build'
@@ -93,13 +101,21 @@ class User < ActiveRecord::Base
   has_many :todos,                    dependent: :destroy
   has_many :notification_settings,    dependent: :destroy
   has_many :award_emoji,              dependent: :destroy
+  has_many :path_locks,               dependent: :destroy
+
+  # Protected Branch Access
+  has_many :protected_branch_merge_access_levels, dependent: :destroy, class_name: ProtectedBranch::MergeAccessLevel
+  has_many :protected_branch_push_access_levels, dependent: :destroy, class_name: ProtectedBranch::PushAccessLevel
+
+  has_many :assigned_issues,          dependent: :nullify, foreign_key: :assignee_id, class_name: "Issue"
+  has_many :assigned_merge_requests,  dependent: :nullify, foreign_key: :assignee_id, class_name: "MergeRequest"
 
   #
   # Validations
   #
   # Note: devise :validatable above adds validations for :email and :password
   validates :name, presence: true
-  validates_confirmation_of :email
+  validates :email, confirmation: true
   validates :notification_email, presence: true
   validates :notification_email, email: true, if: ->(user) { user.notification_email != user.email }
   validates :public_email, presence: true, uniqueness: true, email: true, allow_blank: true
@@ -118,7 +134,7 @@ class User < ActiveRecord::Base
   validates :avatar, file_size: { maximum: 200.kilobytes.to_i }
 
   before_validation :generate_password, on: :create
-  before_validation :signup_domain_valid?, on: :create
+  before_validation :signup_domain_valid?, on: :create, if: ->(user) { !user.created_by_id }
   before_validation :sanitize_attrs
   before_validation :set_notification_email, if: ->(user) { user.email_changed? }
   before_validation :set_public_email, if: ->(user) { user.public_email_changed? }
@@ -166,6 +182,15 @@ class User < ActiveRecord::Base
       def blocked?
         true
       end
+
+      def active_for_authentication?
+        false
+      end
+
+      def inactive_message
+        "Your account has been blocked. Please contact your GitLab " \
+          "administrator if you think this is an error."
+      end
     end
   end
 
@@ -178,6 +203,11 @@ class User < ActiveRecord::Base
   scope :active, -> { with_state(:active) }
   scope :not_in_project, ->(project) { project.users.present? ? where("id not in (:ids)", ids: project.users.map(&:id) ) : all }
   scope :without_projects, -> { where('id NOT IN (SELECT DISTINCT(user_id) FROM members WHERE user_id IS NOT NULL AND requested_at IS NULL)') }
+  scope :subscribed_for_admin_email, -> { where(admin_email_unsubscribed_at: nil) }
+  scope :ldap, -> { joins(:identities).where('identities.provider LIKE ?', 'ldap%') }
+  scope :with_provider, ->(provider) do
+    joins(:identities).where(identities: { provider: provider })
+  end
   scope :todo_authors, ->(user_id, state) { where(id: Todo.where(user_id: user_id, state: state).select(:author_id)) }
   scope :order_recent_sign_in, -> { reorder(Gitlab::Database.nulls_last_order('last_sign_in_at', 'DESC')) }
   scope :order_oldest_sign_in, -> { reorder(Gitlab::Database.nulls_last_order('last_sign_in_at', 'ASC')) }
@@ -227,6 +257,10 @@ class User < ActiveRecord::Base
       LIMIT 1;'
 
       User.find_by_sql([sql, { email: email }]).first
+    end
+
+    def existing_member?(email)
+      User.where(email: email).any? || Email.where(email: email).any?
     end
 
     def filter(filter_name)
@@ -304,12 +338,17 @@ class User < ActiveRecord::Base
 
     def find_by_personal_access_token(token_string)
       personal_access_token = PersonalAccessToken.active.find_by_token(token_string) if token_string
-      personal_access_token.user if personal_access_token
+      personal_access_token&.user
     end
 
     # Returns a user for the given SSH key.
     def find_by_ssh_key_id(key_id)
       find_by(id: Key.unscoped.select(:user_id).where(id: key_id))
+    end
+
+    def non_ldap
+      joins('LEFT JOIN identities ON identities.user_id = users.id')
+        .where('identities.provider IS NULL OR identities.provider NOT LIKE ?', 'ldap%')
     end
 
     def reference_prefix
@@ -320,7 +359,7 @@ class User < ActiveRecord::Base
     def reference_pattern
       %r{
         #{Regexp.escape(reference_prefix)}
-        (?<user>#{Gitlab::Regex::NAMESPACE_REGEX_STR})
+        (?<user>#{Gitlab::Regex::NAMESPACE_REF_REGEX_STR})
       }x
     end
   end
@@ -566,8 +605,8 @@ class User < ActiveRecord::Base
 
       if project.repository.branch_exists?(event.branch_name)
         merge_requests = MergeRequest.where("created_at >= ?", event.created_at).
-            where(source_project_id: project.id,
-                  source_branch: event.branch_name)
+          where(source_project_id: project.id,
+                source_branch: event.branch_name)
         merge_requests.empty?
       end
     end
@@ -668,7 +707,7 @@ class User < ActiveRecord::Base
     if !Gitlab.config.ldap.enabled
       false
     elsif ldap_user?
-      !last_credential_check_at || (last_credential_check_at + 1.hour) < Time.now
+      !last_credential_check_at || (last_credential_check_at + Gitlab.config.ldap['sync_time']) < Time.now
     else
       false
     end
@@ -771,6 +810,10 @@ class User < ActiveRecord::Base
 
   def system_hook_service
     SystemHooksService.new
+  end
+
+  def admin_unsubscribe!
+    update_column :admin_email_unsubscribed_at, Time.now
   end
 
   def starred?(project)
@@ -901,6 +944,28 @@ class User < ActiveRecord::Base
     else
       save(validate: false)
     end
+  end
+
+  def record_activity
+    Gitlab::UserActivities::ActivitySet.record(self)
+  end
+
+  def access_level
+    if admin?
+      :admin
+    elsif auditor?
+      :auditor
+    else
+      :regular
+    end
+  end
+
+  def access_level=(new_level)
+    new_level = new_level.to_s
+    return unless %w(admin auditor regular).include?(new_level)
+
+    self.admin = (new_level == 'admin')
+    self.auditor = (new_level == 'auditor')
   end
 
   private

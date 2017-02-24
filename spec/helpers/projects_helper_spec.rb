@@ -10,7 +10,7 @@ describe ProjectsHelper do
   end
 
   describe "can_change_visibility_level?" do
-    let(:project) { create(:project) }
+    let(:project) { create(:project, :repository) }
     let(:user) { create(:project_member, :reporter, user: create(:user), project: project).user }
     let(:fork_project) { Projects::ForkService.new(project, user).execute }
 
@@ -94,10 +94,19 @@ describe ProjectsHelper do
         expect(helper.send(:default_clone_protocol)).to eq('https')
       end
     end
+
+    context 'when gitlab.config.kerberos is enabled and user is logged in' do
+      it 'returns krb5 as default protocol' do
+        allow(Gitlab.config.kerberos).to receive(:enabled).and_return(true)
+        allow(helper).to receive(:current_user).and_return(double)
+
+        expect(helper.send(:default_clone_protocol)).to eq('krb5')
+      end
+    end
   end
 
   describe '#license_short_name' do
-    let(:project) { create(:project) }
+    let(:project) { create(:empty_project) }
 
     context 'when project.repository has a license_key' do
       it 'returns the nickname of the license if present' do
@@ -203,7 +212,6 @@ describe ProjectsHelper do
 
     context "when project moves from public to private" do
       before do
-        project.project_feature.update_attributes(issues_access_level: ProjectFeature::ENABLED)
         project.update_attributes(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
       end
 

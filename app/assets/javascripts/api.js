@@ -11,7 +11,8 @@
     licensePath: "/api/:version/templates/licenses/:key",
     gitignorePath: "/api/:version/templates/gitignores/:key",
     gitlabCiYmlPath: "/api/:version/templates/gitlab_ci_ymls/:key",
-    dockerfilePath: "/api/:version/dockerfiles/:key",
+    ldapGroupsPath: "/api/:version/ldap/:provider/groups.json",
+    dockerfilePath: "/api/:version/templates/dockerfiles/:key",
     issuableTemplatePath: "/:namespace_path/:project_path/templates/:type/:key",
     group: function(group_id, callback) {
       var url = Api.buildUrl(Api.groupPath)
@@ -143,8 +144,25 @@
         url = gon.relative_url_root + url;
       }
       return url.replace(':version', gon.api_version);
+    },
+    ldap_groups: function(query, provider, callback) {
+      var url;
+      url = Api.buildUrl(Api.ldapGroupsPath);
+      url = url.replace(':provider', provider);
+      return $.ajax({
+        url: url,
+        data: {
+          private_token: gon.api_token,
+          search: query,
+          per_page: 20,
+          active: true
+        },
+        dataType: "json"
+      }).done(function(groups) {
+        return callback(groups);
+      });
     }
   };
 
   window.Api = Api;
-}).call(this);
+}).call(window);

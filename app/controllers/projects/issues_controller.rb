@@ -23,8 +23,11 @@ class Projects::IssuesController < Projects::ApplicationController
   respond_to :html
 
   def index
-    @issues = issues_collection
-    @issues = @issues.page(params[:page])
+    @collection_type    = "Issue"
+    @issues             = issues_collection
+    @issues             = @issues.page(params[:page])
+    @issuable_meta_data = issuable_meta_data(@issues, @collection_type)
+
     if @issues.out_of_range? && @issues.total_pages != 0
       return redirect_to url_for(params.merge(page: @issues.total_pages))
     end
@@ -64,6 +67,11 @@ class Projects::IssuesController < Projects::ApplicationController
     build_params = issue_params.merge(merge_request_for_resolving_discussions: merge_request_for_resolving_discussions)
     @issue = @noteable = Issues::BuildService.new(project, current_user, build_params).execute
 
+    # Set Issue description based on project template
+    if @project.issues_template.present?
+      @issue.description = @project.issues_template
+    end
+
     respond_with(@issue)
   end
 
@@ -91,17 +99,15 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def create
-    extra_params = { request: request,
-                     merge_request_for_resolving_discussions: merge_request_for_resolving_discussions }
-    @issue = Issues::CreateService.new(project, current_user, issue_params.merge(extra_params)).execute
+    create_params = issue_params
+      .merge(merge_request_for_resolving_discussions: merge_request_for_resolving_discussions)
+      .merge(spammable_params)
+
+    @issue = Issues::CreateService.new(project, current_user, create_params).execute
 
     respond_to do |format|
       format.html do
-        if @issue.valid?
-          redirect_to issue_path(@issue)
-        else
-          render :new
-        end
+        recaptcha_check_with_fallback { render :new }
       end
       format.js do
         @link = @issue.attachment.url.to_js
@@ -110,7 +116,9 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def update
-    @issue = Issues::UpdateService.new(project, current_user, issue_params).execute(issue)
+    update_params = issue_params.merge(spammable_params)
+
+    @issue = Issues::UpdateService.new(project, current_user, update_params).execute(issue)
 
     if params[:move_to_project_id].to_i > 0
       new_project = Project.find(params[:move_to_project_id])
@@ -122,11 +130,7 @@ class Projects::IssuesController < Projects::ApplicationController
 
     respond_to do |format|
       format.html do
-        if @issue.valid?
-          redirect_to issue_path(@issue)
-        else
-          render :edit
-        end
+        recaptcha_check_with_fallback { render :edit }
       end
 
       format.json do
@@ -240,7 +244,7 @@ class Projects::IssuesController < Projects::ApplicationController
 
   def issue_params
     params.require(:issue).permit(
-      :title, :assignee_id, :position, :description, :confidential,
+      :title, :assignee_id, :position, :description, :confidential, :weight,
       :milestone_id, :due_date, :state_event, :task_num, :lock_version, label_ids: []
     )
   end

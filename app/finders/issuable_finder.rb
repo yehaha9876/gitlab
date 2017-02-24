@@ -16,9 +16,10 @@
 #     label_name: string
 #     sort: string
 #     non_archived: boolean
+#     iids: integer[]
 #
 class IssuableFinder
-  NONE = '0'
+  NONE = '0'.freeze
 
   attr_accessor :current_user, :params
 
@@ -38,8 +39,10 @@ class IssuableFinder
     items = by_assignee(items)
     items = by_author(items)
     items = by_label(items)
+    items = by_weight(items)
     items = by_due_date(items)
     items = by_non_archived(items)
+    items = by_iids(items)
     sort(items)
   end
 
@@ -266,16 +269,11 @@ class IssuableFinder
   end
 
   def by_search(items)
-    if search
-      items =
-        if search =~ iid_pattern
-          items.where(iid: $~[:iid])
-        else
-          items.full_search(search)
-        end
-    end
+    search ? items.full_search(search) : items
+  end
 
-    items
+  def by_iids(items)
+    params[:iids].present? ? items.where(iid: params[:iids]) : items
   end
 
   def sort(items)
@@ -346,6 +344,31 @@ class IssuableFinder
     end
 
     items
+  end
+
+  def by_weight(items)
+    return items unless weights?
+
+    if filter_by_no_weight?
+      items.where(weight: [-1, nil])
+    elsif filter_by_any_weight?
+      items.where.not(weight: [-1, nil])
+    else
+      items.where(weight: params[:weight])
+    end
+  end
+
+  def weights?
+    params[:weight].present? && params[:weight] != Issue::WEIGHT_ALL &&
+      klass.column_names.include?('weight')
+  end
+
+  def filter_by_no_weight?
+    params[:weight] == Issue::WEIGHT_NONE
+  end
+
+  def filter_by_any_weight?
+    params[:weight] == Issue::WEIGHT_ANY
   end
 
   def by_due_date(items)

@@ -13,6 +13,7 @@ module ChatMessage
       @user_name = params[:user][:username]
       @project_name = params[:project_name]
       @project_url = params[:project_url]
+      @action = params[:object_attributes][:action]
 
       obj_attr = params[:object_attributes]
       obj_attr = HashWithIndifferentAccess.new(obj_attr)
@@ -42,19 +43,23 @@ module ChatMessage
     end
 
     def project_link
-      "[#{project_name}](#{project_url})"
+      link(project_name, project_url)
     end
 
     def merge_request_message
-      "#{user_name} #{state} #{merge_request_link} in #{project_link}: #{title}"
+      "#{user_name} #{state_or_action_text} #{merge_request_link} in #{project_link}: #{title}"
     end
 
     def merge_request_link
-      "[merge request !#{merge_request_id}](#{merge_request_url})"
+      link("merge request !#{merge_request_id}", merge_request_url)
     end
 
     def merge_request_url
       "#{project_url}/merge_requests/#{merge_request_id}"
+    end
+
+    def state_or_action_text
+      @action == 'approved' ? @action : state
     end
   end
 end

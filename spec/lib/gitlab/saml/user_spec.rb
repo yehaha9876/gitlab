@@ -31,6 +31,10 @@ describe Gitlab::Saml::User, lib: true do
       allow(Gitlab::Saml::Config).to receive_messages({ options: { name: 'saml', groups_attribute: 'groups', external_groups: groups, args: {} } })
     end
 
+    def stub_saml_admin_group_config(groups)
+      allow(Gitlab::Saml::Config).to receive_messages({ options: { name: 'saml', groups_attribute: 'groups', admin_groups: groups, args: {} } })
+    end
+
     before { stub_basic_saml_config }
 
     describe 'account exists on server' do
@@ -72,6 +76,35 @@ describe Gitlab::Saml::User, lib: true do
             saml_user.save
             expect(gl_user).to be_valid
             expect(gl_user.external).to be_falsey
+          end
+        end
+      end
+
+      context 'admin groups' do
+        context 'are defined' do
+          it 'marks the user as admin' do
+            stub_saml_admin_group_config(%w(Developers))
+            saml_user.save
+            expect(gl_user).to be_valid
+            expect(gl_user.admin).to be_truthy
+          end
+        end
+
+        before { stub_saml_admin_group_config(%w(Admins)) }
+        context 'are defined but the user does not belong there' do
+          it 'does not mark the user as admin' do
+            saml_user.save
+            expect(gl_user).to be_valid
+            expect(gl_user.admin).to be_falsey
+          end
+        end
+
+        context 'user was admin, now should not be' do
+          it 'makes user non admin' do
+            existing_user.update_attribute('admin', true)
+            saml_user.save
+            expect(gl_user).to be_valid
+            expect(gl_user.admin).to be_falsey
           end
         end
       end
@@ -127,6 +160,26 @@ describe Gitlab::Saml::User, lib: true do
         end
       end
 
+      context 'admin groups' do
+        context 'are defined' do
+          it 'marks the user as admin' do
+            stub_saml_admin_group_config(%w(Developers))
+            saml_user.save
+            expect(gl_user).to be_valid
+            expect(gl_user.admin).to be_truthy
+          end
+        end
+
+        context 'are defined but the user does not belong there' do
+          it 'does not mark the user as admin' do
+            stub_saml_admin_group_config(%w(Admins))
+            saml_user.save
+            expect(gl_user).to be_valid
+            expect(gl_user.admin).to be_falsey
+          end
+        end
+      end
+
       context 'with auto_link_ldap_user disabled (default)' do
         before { stub_omniauth_config({ auto_link_ldap_user: false, auto_link_saml_user: false, allow_single_sign_on: ['saml'] }) }
         include_examples 'to verify compliance with allow_single_sign_on'
@@ -157,9 +210,8 @@ describe Gitlab::Saml::User, lib: true do
                 expect(gl_user.email).to eql 'john@mail.com'
                 expect(gl_user.identities.length).to eql 2
                 identities_as_hash = gl_user.identities.map { |id| { provider: id.provider, extern_uid: id.extern_uid } }
-                expect(identities_as_hash).to match_array([ { provider: 'ldapmain', extern_uid: 'uid=user1,ou=People,dc=example' },
-                                                            { provider: 'saml', extern_uid: uid }
-                                                          ])
+                expect(identities_as_hash).to match_array([{ provider: 'ldapmain', extern_uid: 'uid=user1,ou=People,dc=example' },
+                                                           { provider: 'saml', extern_uid: uid }])
               end
             end
 
@@ -180,9 +232,8 @@ describe Gitlab::Saml::User, lib: true do
                 expect(gl_user.email).to eql 'john@mail.com'
                 expect(gl_user.identities.length).to eql 2
                 identities_as_hash = gl_user.identities.map { |id| { provider: id.provider, extern_uid: id.extern_uid } }
-                expect(identities_as_hash).to match_array([ { provider: 'ldapmain', extern_uid: 'uid=user1,ou=People,dc=example' },
-                                                            { provider: 'saml', extern_uid: uid }
-                                                          ])
+                expect(identities_as_hash).to match_array([{ provider: 'ldapmain', extern_uid: 'uid=user1,ou=People,dc=example' },
+                                                           { provider: 'saml', extern_uid: uid }])
               end
 
               it 'saves successfully on subsequent tries, when both identities are present' do
@@ -206,9 +257,8 @@ describe Gitlab::Saml::User, lib: true do
                 expect(local_gl_user).to be_valid
                 expect(local_gl_user.identities.length).to eql 2
                 identities_as_hash = local_gl_user.identities.map { |id| { provider: id.provider, extern_uid: id.extern_uid } }
-                expect(identities_as_hash).to match_array([ { provider: 'ldapmain', extern_uid: 'uid=user1,ou=People,dc=example' },
-                                                            { provider: 'saml', extern_uid: 'uid=user1,ou=People,dc=example' }
-                                                          ])
+                expect(identities_as_hash).to match_array([{ provider: 'ldapmain', extern_uid: 'uid=user1,ou=People,dc=example' },
+                                                           { provider: 'saml', extern_uid: 'uid=user1,ou=People,dc=example' }])
               end
             end
           end

@@ -8,7 +8,6 @@
 /* global ShortcutsIssuable */
 /* global ZenMode */
 /* global Milestone */
-/* global GLForm */
 /* global IssuableForm */
 /* global LabelsSelect */
 /* global MilestoneSelect */
@@ -20,7 +19,6 @@
 /* global UsersSelect */
 /* global GroupAvatar */
 /* global LineHighlighter */
-/* global ShortcutsBlob */
 /* global ProjectFork */
 /* global BuildArtifacts */
 /* global GroupsSelect */
@@ -36,6 +34,10 @@
 /* global ProjectShow */
 /* global Labels */
 /* global Shortcuts */
+/* global WeightSelect */
+/* global AdminEmailSelect */
+
+const ShortcutsBlob = require('./shortcuts_blob');
 
 (function() {
   var Dispatcher;
@@ -64,17 +66,6 @@
           new UsernameValidator();
           new ActiveTabMemoizer();
           break;
-        case 'sessions:create':
-          if (!gon.u2f) break;
-          window.gl.u2fAuthenticate = new gl.U2FAuthenticate(
-            $("#js-authenticate-u2f"),
-            '#js-login-u2f-form',
-            gon.u2f,
-            document.querySelector('#js-login-2fa-device'),
-            document.querySelector('.js-2fa-form'),
-          );
-          window.gl.u2fAuthenticate.start();
-          break;
         case 'projects:boards:show':
         case 'projects:boards:index':
           shortcut_handler = new ShortcutsNavigation();
@@ -85,7 +76,7 @@
         case 'projects:merge_requests:index':
         case 'projects:issues:index':
           if (gl.FilteredSearchManager) {
-            new gl.FilteredSearchManager();
+            new gl.FilteredSearchManager(page === 'projects:issues:index' ? 'issues' : 'merge_requests');
           }
           Issuable.init();
           new gl.IssuableBulkActions({
@@ -108,9 +99,10 @@
           break;
         case 'projects:milestones:new':
         case 'projects:milestones:edit':
+        case 'projects:milestones:update':
           new ZenMode();
           new gl.DueDateSelectors();
-          new GLForm($('.milestone-form'));
+          new gl.GLForm($('.milestone-form'));
           break;
         case 'groups:milestones:new':
           new ZenMode();
@@ -118,20 +110,25 @@
         case 'projects:compare:show':
           new gl.Diff();
           break;
+        case 'projects:branches:index':
+          gl.AjaxLoadingSpinner.init();
+          break;
         case 'projects:issues:new':
         case 'projects:issues:edit':
           shortcut_handler = new ShortcutsNavigation();
-          new GLForm($('.issue-form'));
+          new gl.GLForm($('.issue-form'));
           new IssuableForm($('.issue-form'));
           new LabelsSelect();
           new MilestoneSelect();
+          new WeightSelect();
           new gl.IssuableTemplateSelectors();
           break;
         case 'projects:merge_requests:new':
+        case 'projects:merge_requests:new_diffs':
         case 'projects:merge_requests:edit':
           new gl.Diff();
           shortcut_handler = new ShortcutsNavigation();
-          new GLForm($('.merge-request-form'));
+          new gl.GLForm($('.merge-request-form'));
           new IssuableForm($('.merge-request-form'));
           new LabelsSelect();
           new MilestoneSelect();
@@ -139,11 +136,11 @@
           break;
         case 'projects:tags:new':
           new ZenMode();
-          new GLForm($('.tag-form'));
+          new gl.GLForm($('.tag-form'));
           break;
         case 'projects:releases:edit':
           new ZenMode();
-          new GLForm($('.release-form'));
+          new gl.GLForm($('.release-form'));
           break;
         case 'projects:merge_requests:show':
           new gl.Diff();
@@ -174,7 +171,7 @@
         case 'projects:commit:pipelines':
           new gl.MiniPipelineGraph({
             container: '.js-pipeline-table',
-          });
+          }).bindEvents();
           break;
         case 'projects:commits:show':
         case 'projects:activity':
@@ -237,7 +234,12 @@
         case 'projects:blame:show':
           new LineHighlighter();
           shortcut_handler = new ShortcutsNavigation();
-          new ShortcutsBlob(true);
+          const fileBlobPermalinkUrlElement = document.querySelector('.js-data-file-blob-permalink-url');
+          const fileBlobPermalinkUrl = fileBlobPermalinkUrlElement && fileBlobPermalinkUrlElement.getAttribute('href');
+          new ShortcutsBlob({
+            skipResetBindings: true,
+            fileBlobPermalinkUrl,
+          });
           break;
         case 'groups:labels:new':
         case 'groups:labels:edit':
@@ -267,11 +269,18 @@
         case 'search:show':
           new Search();
           break;
+        case 'projects:mirrors:show':
+        case 'projects:mirrors:update':
+          new UsersSelect();
+          break;
+        case 'admin:emails:show':
+          new AdminEmailSelect();
+          break;
         case 'projects:protected_branches:index':
           new gl.ProtectedBranchCreate();
           new gl.ProtectedBranchEditList();
           break;
-        case 'projects:variables:index':
+        case 'projects:ci_cd:show':
           new gl.ProjectVariables();
           break;
         case 'ci:lints:create':
@@ -280,9 +289,23 @@
           break;
       }
       switch (path.first()) {
+        case 'sessions':
+        case 'omniauth_callbacks':
+          if (!gon.u2f) break;
+          gl.u2fAuthenticate = new gl.U2FAuthenticate(
+            $('#js-authenticate-u2f'),
+            '#js-login-u2f-form',
+            gon.u2f,
+            document.querySelector('#js-login-2fa-device'),
+            document.querySelector('.js-2fa-form'),
+          );
+          gl.u2fAuthenticate.start();
         case 'admin':
           new Admin();
           switch (path[1]) {
+            case 'application_settings':
+              new gl.ApplicationSettings();
+              break;
             case 'groups':
               new UsersSelect();
               break;
@@ -332,7 +355,7 @@
               new gl.Wikis();
               shortcut_handler = new ShortcutsNavigation();
               new ZenMode();
-              new GLForm($('.wiki-form'));
+              new gl.GLForm($('.wiki-form'));
               break;
             case 'snippets':
               shortcut_handler = new ShortcutsNavigation();
@@ -357,7 +380,7 @@
       }
       // If we haven't installed a custom shortcut handler, install the default one
       if (!shortcut_handler) {
-        return new Shortcuts();
+        new Shortcuts();
       }
     };
 
@@ -376,4 +399,4 @@
 
     return Dispatcher;
   })();
-}).call(this);
+}).call(window);

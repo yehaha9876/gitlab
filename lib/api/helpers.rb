@@ -3,7 +3,7 @@ module API
     include Gitlab::Utils
     include Helpers::Pagination
 
-    SUDO_HEADER = "HTTP_SUDO"
+    SUDO_HEADER = "HTTP_SUDO".freeze
     SUDO_PARAM = :sudo
 
     def declared_params(options = {})
@@ -45,7 +45,7 @@ module API
       if id =~ /^\d+$/
         Project.find_by(id: id)
       else
-        Project.find_with_namespace(id)
+        Project.find_by_full_path(id)
       end
     end
 
@@ -111,6 +111,13 @@ module API
       end
     end
 
+    def authenticate_by_gitlab_geo_token!
+      token = headers['X-Gitlab-Token'].try(:chomp)
+      unless token && Devise.secure_compare(geo_token, token)
+        unauthorized!
+      end
+    end
+
     def authenticated_as_admin!
       authenticate!
       forbidden! unless current_user.is_admin?
@@ -153,27 +160,11 @@ module API
       params_hash = custom_params || params
       attrs = {}
       keys.each do |key|
-        if params_hash[key].present? or (params_hash.has_key?(key) and params_hash[key] == false)
+        if params_hash[key].present? || (params_hash.has_key?(key) && params_hash[key] == false)
           attrs[key] = params_hash[key]
         end
       end
       ActionController::Parameters.new(attrs).permit!
-    end
-
-    # Checks the occurrences of datetime attributes, each attribute if present in the params hash must be in ISO 8601
-    # format (YYYY-MM-DDTHH:MM:SSZ) or a Bad Request error is invoked.
-    #
-    # Parameters:
-    #   keys (required) - An array consisting of elements that must be parseable as dates from the params hash
-    def datetime_attributes!(*keys)
-      keys.each do |key|
-        begin
-          params[key] = Time.xmlschema(params[key]) if params[key].present?
-        rescue ArgumentError
-          message = "\"" + key.to_s + "\" must be a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ"
-          render_api_error!(message, 400)
-        end
-      end
     end
 
     def filter_by_iid(items, iid)
@@ -231,6 +222,10 @@ module API
       end
     end
 
+    def render_spam_error!
+      render_api_error!({ error: 'Spam detected' }, 400)
+    end
+
     def render_api_error!(message, status)
       error!({ 'message' => message }, status, header)
     end
@@ -256,6 +251,14 @@ module API
     # project helpers
 
     def filter_projects(projects)
+      if params[:owned]
+        projects = projects.merge(current_user.owned_projects)
+      end
+
+      if params[:starred]
+        projects = projects.merge(current_user.starred_projects)
+      end
+
       if params[:search].present?
         projects = projects.search(params[:search])
       end
@@ -304,7 +307,7 @@ module API
         header['X-Sendfile'] = path
         body
       else
-        path
+        file path
       end
     end
 
@@ -368,6 +371,10 @@ module API
 
     def secret_token
       Gitlab::Shell.secret_token
+    end
+
+    def geo_token
+      Gitlab::Geo.current_node.system_hook.token
     end
 
     def send_git_blob(repository, blob)

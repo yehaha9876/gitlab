@@ -23,7 +23,7 @@ module IssuablesHelper
   def issuable_json_path(issuable)
     project = issuable.project
 
-    if issuable.kind_of?(MergeRequest)
+    if issuable.is_a?(MergeRequest)
       namespace_project_merge_request_path(project.namespace, project, issuable.iid, :json)
     else
       namespace_project_issue_path(project.namespace, project, issuable.iid, :json)
@@ -158,8 +158,13 @@ module IssuablesHelper
       :author_id,
       :assignee_id,
       :milestone_title,
+      :weight,
       :label_name
     ]
+  end
+
+  def issuable_reference(issuable)
+    @show_full_reference ? issuable.to_reference(full: true) : issuable.to_reference(@group || @project)
   end
 
   def issuable_filter_present?
@@ -194,7 +199,7 @@ module IssuablesHelper
     @counts[issuable_type][state]
   end
 
-  IRRELEVANT_PARAMS_FOR_CACHE_KEY = %i[utf8 sort page]
+  IRRELEVANT_PARAMS_FOR_CACHE_KEY = %i[utf8 sort page].freeze
   private_constant :IRRELEVANT_PARAMS_FOR_CACHE_KEY
 
   def issuables_state_counter_cache_key(issuable_type, state)

@@ -96,16 +96,6 @@ ul.unstyled-list > li {
   border-bottom: none;
 }
 
-ul.task-list {
-  li.task-list-item {
-    list-style-type: none;
-  }
-
-  ul:not(.task-list) {
-    padding-left: 1.3em;
-  }
-}
-
 // Generic content list
 ul.content-list {
   @include basic-list;
@@ -155,11 +145,18 @@ ul.content-list {
       }
 
       > .btn,
-      > .btn-group {
+      > .btn-group,
+      > .dropdown.inline {
         margin-right: $gl-padding-top;
         display: inline-block;
         margin-top: 3px;
         margin-bottom: 4px;
+
+        &.btn-ldap-override {
+          @media (min-width: $screen-sm-min) {
+            margin-bottom: 0;
+          }
+        }
 
         &:last-child {
           margin-right: 0;
@@ -305,4 +302,8 @@ ul.controls {
       }
     }
   }
+}
+
+ul.indent-list {
+  padding: 10px 0 0 30px;
 }

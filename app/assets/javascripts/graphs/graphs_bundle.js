@@ -1,12 +1,4 @@
-/* eslint-disable func-names, space-before-function-paren */
-// This is a manifest file that'll be compiled into including all the files listed below.
-// Add new JavaScript code in separate files in this directory and they'll automatically
-// be included in the compiled file accessible from http://example.com/assets/application.js
-// It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
-// the compiled file.
-//
-/*= require_tree . */
-
-(function() {
-
-}).call(this);
+require('./stat_graph_contributors_graph');
+require('./stat_graph_contributors_util');
+require('./stat_graph_contributors');
+require('./stat_graph');

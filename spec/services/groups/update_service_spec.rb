@@ -38,6 +38,31 @@ describe Groups::UpdateService, services: true do
     end
   end
 
+  context 'repository_size_limit assignment as Bytes' do
+    let(:group) { create(:group, :public, repository_size_limit: 0) }
+    let(:service) { described_class.new(group, user, opts) }
+
+    context 'when param present' do
+      let(:opts) { { repository_size_limit: '100' } }
+
+      it 'converts from MB to Bytes' do
+        service.execute
+
+        expect(group.reload.repository_size_limit).to eql(100 * 1024 * 1024)
+      end
+    end
+
+    context 'when param not present' do
+      let(:opts) { { repository_size_limit: '' } }
+
+      it 'assign nil value' do
+        service.execute
+
+        expect(group.reload.repository_size_limit).to be_nil
+      end
+    end
+  end
+
   context "unauthorized visibility_level validation" do
     let!(:service) { described_class.new(internal_group, user, visibility_level: 99) }
     before do
@@ -51,7 +76,7 @@ describe Groups::UpdateService, services: true do
   end
 
   context 'rename group' do
-    let!(:service) { described_class.new(internal_group, user, path: 'new_path') }
+    let!(:service) { described_class.new(internal_group, user, path: SecureRandom.hex) }
 
     before do
       internal_group.add_user(user, Gitlab::Access::MASTER)

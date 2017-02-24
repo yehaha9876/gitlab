@@ -3,12 +3,17 @@ class MergeRequest < ActiveRecord::Base
   include Issuable
   include Referable
   include Sortable
+  include Elastic::MergeRequestsSearch
   include Importable
+  include Approvable
 
   belongs_to :target_project, class_name: "Project"
   belongs_to :source_project, class_name: "Project"
   belongs_to :merge_user, class_name: "User"
 
+  has_many :approvals, dependent: :destroy
+  has_many :approvers, as: :target, dependent: :destroy
+  has_many :approver_groups, as: :target, dependent: :destroy
   has_many :merge_request_diffs, dependent: :destroy
   has_one :merge_request_diff,
     -> { order('merge_request_diffs.id DESC') }
@@ -104,6 +109,7 @@ class MergeRequest < ActiveRecord::Base
   validates :merge_user, presence: true, if: :merge_when_build_succeeds?, unless: :importing?
   validate :validate_branches, unless: [:allow_broken, :importing?, :closed_without_fork?]
   validate :validate_fork, unless: :closed_without_fork?
+  validate :validate_approvals_before_merge
 
   scope :by_source_or_target_branch, ->(branch_name) do
     where("source_branch = :branch OR target_branch = :branch", branch: branch_name)
@@ -115,9 +121,10 @@ class MergeRequest < ActiveRecord::Base
   scope :merged, -> { with_state(:merged) }
   scope :closed_and_merged, -> { with_states(:closed, :merged) }
   scope :from_source_branches, ->(branches) { where(source_branch: branches) }
-
   scope :join_project, -> { joins(:target_project) }
   scope :references_project, -> { references(:target_project) }
+
+  participant :approvers_left
 
   after_save :keep_around_commit
 
@@ -179,10 +186,11 @@ class MergeRequest < ActiveRecord::Base
     work_in_progress?(title) ? title : "WIP: #{title}"
   end
 
-  def to_reference(from_project = nil, full: false)
+  # `from` argument can be a Namespace or Project.
+  def to_reference(from = nil, full: false)
     reference = "#{self.class.reference_prefix}#{iid}"
 
-    "#{project.to_reference(from_project, full: full)}#{reference}"
+    "#{project.to_reference(from, full: full)}#{reference}"
   end
 
   def first_commit
@@ -202,7 +210,11 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def diff_size
-    opts = diff_options || {}
+    # The `#diffs` method ends up at an instance of a class inheriting from
+    # `Gitlab::Diff::FileCollection::Base`, so use those options as defaults
+    # here too, to get the same diff size without performing highlighting.
+    #
+    opts = Gitlab::Diff::FileCollection::Base.default_options.merge(diff_options || {})
 
     raw_diffs(opts).size
   end
@@ -347,6 +359,22 @@ class MergeRequest < ActiveRecord::Base
     !source_project.forked_from?(target_project)
   end
 
+  def validate_approvals_before_merge
+    return true unless approvals_before_merge
+    return true unless target_project
+
+    # Approvals disabled
+    if target_project.approvals_before_merge == 0
+      errors.add :validate_approvals_before_merge,
+                 'Approvals disabled for target project'
+    elsif approvals_before_merge > target_project.approvals_before_merge
+      true
+    else
+      errors.add :validate_approvals_before_merge,
+                 'Number of approvals must be greater than those on target project'
+    end
+  end
+
   def reopenable?
     closed? && !source_project_missing? && source_branch_exists?
   end
@@ -385,7 +413,7 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def check_if_can_be_merged
-    return unless unchecked?
+    return unless unchecked? && !Gitlab::Geo.secondary?
 
     can_be_merged =
       !broken? && project.repository.can_be_merged?(diff_head_sha, target_branch)
@@ -422,7 +450,7 @@ class MergeRequest < ActiveRecord::Base
 
     check_if_can_be_merged
 
-    can_be_merged?
+    can_be_merged? && !should_be_rebased?
   end
 
   def mergeable_state?(skip_ci_check: false)
@@ -526,7 +554,7 @@ class MergeRequest < ActiveRecord::Base
     }
 
     if diff_head_commit
-      attrs.merge!(last_commit: diff_head_commit.hook_attrs)
+      attrs[:last_commit] = diff_head_commit.hook_attrs
     end
 
     attributes.merge!(attrs)
@@ -545,7 +573,7 @@ class MergeRequest < ActiveRecord::Base
   # Calculating this information for a number of merge requests requires
   # running `ReferenceExtractor` on each of them separately.
   # This optimization does not apply to issues from external sources.
-  def cache_merge_request_closes_issues!(current_user = self.author)
+  def cache_merge_request_closes_issues!(current_user)
     return if project.has_external_issue_tracker?
 
     transaction do
@@ -557,14 +585,10 @@ class MergeRequest < ActiveRecord::Base
     end
   end
 
-  def closes_issue?(issue)
-    closes_issues.include?(issue)
-  end
-
   # Return the set of issues that will be closed if this merge request is accepted.
   def closes_issues(current_user = self.author)
     if target_branch == project.default_branch
-      messages = [description]
+      messages = [title, description]
       messages.concat(commits.map(&:safe_message)) if merge_request_diff
 
       Gitlab::ClosingIssueExtractor.new(project, current_user).
@@ -574,13 +598,13 @@ class MergeRequest < ActiveRecord::Base
     end
   end
 
-  def issues_mentioned_but_not_closing(current_user = self.author)
+  def issues_mentioned_but_not_closing(current_user)
     return [] unless target_branch == project.default_branch
 
     ext = Gitlab::ReferenceExtractor.new(project, current_user)
-    ext.analyze(description)
+    ext.analyze("#{title}\n#{description}")
 
-    ext.issues - closes_issues
+    ext.issues - closes_issues(current_user)
   end
 
   def target_project_path
@@ -601,7 +625,7 @@ class MergeRequest < ActiveRecord::Base
 
   def source_project_namespace
     if source_project && source_project.namespace
-      source_project.namespace.path
+      source_project.namespace.full_path
     else
       "(removed)"
     end
@@ -609,7 +633,7 @@ class MergeRequest < ActiveRecord::Base
 
   def target_project_namespace
     if target_project && target_project.namespace
-      target_project.namespace.path
+      target_project.namespace.full_path
     else
       "(removed)"
     end
@@ -714,18 +738,22 @@ class MergeRequest < ActiveRecord::Base
     !head_pipeline || head_pipeline.success? || head_pipeline.skipped?
   end
 
-  def environments
+  def environments_for(current_user)
     return [] unless diff_head_commit
 
-    @environments ||= begin
-      target_envs = target_project.environments_for(
-        target_branch, commit: diff_head_commit, with_tags: true)
+    @environments ||= Hash.new do |h, current_user|
+      envs = EnvironmentsFinder.new(target_project, current_user,
+        ref: target_branch, commit: diff_head_commit, with_tags: true).execute
 
-      source_envs = source_project.environments_for(
-        source_branch, commit: diff_head_commit) if source_project
+      if source_project
+        envs.concat EnvironmentsFinder.new(source_project, current_user,
+          ref: source_branch, commit: diff_head_commit).execute
+      end
 
-      (target_envs.to_a + source_envs.to_a).uniq
+      h[current_user] = envs.uniq
     end
+
+    @environments[current_user]
   end
 
   def state_human_name
@@ -774,6 +802,50 @@ class MergeRequest < ActiveRecord::Base
       yield
     ensure
       unlock_mr if locked?
+    end
+  end
+
+  def ff_merge_possible?
+    project.repository.is_ancestor?(target_branch_sha, diff_head_sha)
+  end
+
+  def should_be_rebased?
+    self.project.ff_merge_must_be_possible? && !ff_merge_possible?
+  end
+
+  def rebase_dir_path
+    File.join(Gitlab.config.shared.path, 'tmp/rebase', source_project.id.to_s, id.to_s).to_s
+  end
+
+  def squash_dir_path
+    File.join(Gitlab.config.shared.path, 'tmp/squash', source_project.id.to_s, id.to_s).to_s
+  end
+
+  def rebase_in_progress?
+    # The source project can be deleted
+    return false unless source_project
+
+    File.exist?(rebase_dir_path) && !clean_stuck_rebase
+  end
+
+  def clean_stuck_rebase
+    if File.mtime(rebase_dir_path) < 15.minutes.ago
+      FileUtils.rm_rf(rebase_dir_path)
+      true
+    end
+  end
+
+  def squash_in_progress?
+    # The source project can be deleted
+    return false unless source_project
+
+    File.exist?(squash_dir_path) && !clean_stuck_squash
+  end
+
+  def clean_stuck_squash
+    if File.mtime(squash_dir_path) < 15.minutes.ago
+      FileUtils.rm_rf(squash_dir_path)
+      true
     end
   end
 

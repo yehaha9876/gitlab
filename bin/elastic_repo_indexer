@@ -1,0 +1,79 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+require 'json'
+require 'elasticsearch/git'
+require 'active_support'
+require 'active_support/core_ext'
+require 'benchmark'
+
+path_to_log_file = File.expand_path('../../log/es-indexer.log', __FILE__)
+LOGGER = Logger.new(path_to_log_file)
+
+PROJECT_ID = ARGV.shift
+REPO_PATH = ARGV.shift
+FROM_SHA = ENV['FROM_SHA']
+TO_SHA = ENV['TO_SHA']
+RAILS_ENV = ENV['RAILS_ENV']
+
+LOGGER.info("Has been scheduled for project #{REPO_PATH} with SHA range #{FROM_SHA}:#{TO_SHA}")
+
+elastic_connection_info = JSON.parse ENV['ELASTIC_CONNECTION_INFO']
+ELASTIC_HOST = elastic_connection_info['host']
+ELASTIC_PORT = elastic_connection_info['port']
+
+class Repository
+  include Elasticsearch::Git::Repository
+
+  index_name ['gitlab', RAILS_ENV].compact.join('-')
+
+  self.__elasticsearch__.client = Elasticsearch::Client.new(
+    host: ELASTIC_HOST,
+    port: ELASTIC_PORT
+  )
+
+  def client_for_indexing
+    self.__elasticsearch__.client
+  end
+
+  def repository_id
+    PROJECT_ID
+  end
+
+  def project_id
+    PROJECT_ID
+  end
+
+  def path_to_repo
+    REPO_PATH
+  end
+end
+
+repo = Repository.new
+
+params = { from_rev: FROM_SHA, to_rev: TO_SHA }.compact
+
+LOGGER.info("Indexing commits started")
+
+timings = Benchmark.measure do
+  indexed = 0
+  repo.index_commits(params) do |batch, total_count|
+    indexed += batch.length
+    LOGGER.info("Indexed #{indexed}/#{total_count} commits")
+  end
+end
+
+LOGGER.info("Commits for #{REPO_PATH} are indexed. Time elapsed: #{timings.real}")
+
+LOGGER.info("Indexing blobs started")
+
+timings = Benchmark.measure do
+  indexed = 0
+  repo.index_blobs(params) do |batch, total_count|
+    indexed += batch.length
+    LOGGER.info("Indexed #{indexed}/#{total_count} blobs")
+  end
+end
+
+LOGGER.info("Blobs for #{REPO_PATH} are indexed. Time elapsed: #{timings.real}")

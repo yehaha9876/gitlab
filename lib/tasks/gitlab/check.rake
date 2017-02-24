@@ -6,8 +6,6 @@ namespace :gitlab do
                  gitlab:ldap:check
                  gitlab:app:check}
 
-
-
   namespace :app do
     desc "GitLab | Check the configuration of the GitLab Rails app"
     task check: :environment  do
@@ -30,10 +28,10 @@ namespace :gitlab do
       check_ruby_version
       check_git_version
       check_active_users
+      check_elasticsearch if ApplicationSetting.current.elasticsearch_indexing?
 
       finished_checking "GitLab"
     end
-
 
     # Checks
     ########################
@@ -194,7 +192,7 @@ namespace :gitlab do
     def check_migrations_are_up
       print "All migrations up? ... "
 
-      migration_status, _ = Gitlab::Popen.popen(%W(bundle exec rake db:migrate:status))
+      migration_status, _ = Gitlab::Popen.popen(%w(bundle exec rake db:migrate:status))
 
       unless migration_status =~ /down\s+\d{14}/
         puts "yes".color(:green)
@@ -279,7 +277,7 @@ namespace :gitlab do
       upload_path_tmp = File.join(upload_path, 'tmp')
 
       if File.stat(upload_path).mode == 040700
-        unless Dir.exists?(upload_path_tmp)
+        unless Dir.exist?(upload_path_tmp)
           puts 'skipped (no tmp uploads folder yet)'.color(:magenta)
           return
         end
@@ -316,7 +314,7 @@ namespace :gitlab do
       min_redis_version = "2.8.0"
       print "Redis version >= #{min_redis_version}? ... "
 
-      redis_version = run_command(%W(redis-cli --version))
+      redis_version = run_command(%w(redis-cli --version))
       redis_version = redis_version.try(:match, /redis-cli (\d+\.\d+\.\d+)/)
       if redis_version &&
           (Gem::Version.new(redis_version[1]) > Gem::Version.new(min_redis_version))
@@ -350,7 +348,6 @@ namespace :gitlab do
 
       finished_checking "GitLab Shell"
     end
-
 
     # Checks
     ########################
@@ -387,7 +384,7 @@ namespace :gitlab do
 
         unless File.exist?(repo_base_path)
           puts "can't check because of previous errors".color(:magenta)
-          return
+          break
         end
 
         unless File.symlink?(repo_base_path)
@@ -410,7 +407,7 @@ namespace :gitlab do
 
         unless File.exist?(repo_base_path)
           puts "can't check because of previous errors".color(:magenta)
-          return
+          break
         end
 
         if File.stat(repo_base_path).mode.to_s(8).ends_with?("2770")
@@ -440,7 +437,7 @@ namespace :gitlab do
 
         unless File.exist?(repo_base_path)
           puts "can't check because of previous errors".color(:magenta)
-          return
+          break
         end
 
         uid = uid_for(gitlab_shell_ssh_user)
@@ -493,7 +490,6 @@ namespace :gitlab do
           )
           fix_and_rerun
         end
-
       end
     end
 
@@ -565,8 +561,6 @@ namespace :gitlab do
     end
   end
 
-
-
   namespace :sidekiq do
     desc "GitLab | Check the configuration of Sidekiq"
     task check: :environment  do
@@ -578,7 +572,6 @@ namespace :gitlab do
 
       finished_checking "Sidekiq"
     end
-
 
     # Checks
     ########################
@@ -621,11 +614,10 @@ namespace :gitlab do
     end
 
     def sidekiq_process_count
-      ps_ux, _ = Gitlab::Popen.popen(%W(ps ux))
+      ps_ux, _ = Gitlab::Popen.popen(%w(ps ux))
       ps_ux.scan(/sidekiq \d+\.\d+\.\d+/).count
     end
   end
-
 
   namespace :incoming_email do
     desc "GitLab | Check the configuration of Reply by email"
@@ -648,7 +640,6 @@ namespace :gitlab do
 
       finished_checking "Reply by email"
     end
-
 
     # Checks
     ########################
@@ -724,8 +715,11 @@ namespace :gitlab do
     def check_imap_authentication
       print "IMAP server credentials are correct? ... "
 
-      config_path = Rails.root.join('config', 'mail_room.yml')
-      config_file = YAML.load(ERB.new(File.read(config_path)).result)
+      config_path = Rails.root.join('config', 'mail_room.yml').to_s
+      erb = ERB.new(File.read(config_path))
+      erb.filename = config_path
+      config_file = YAML.load(erb.result)
+
       config = config_file[:mailboxes].first
 
       if config
@@ -754,7 +748,7 @@ namespace :gitlab do
     end
 
     def mail_room_running?
-      ps_ux, _ = Gitlab::Popen.popen(%W(ps ux))
+      ps_ux, _ = Gitlab::Popen.popen(%w(ps ux))
       ps_ux.include?("mail_room")
     end
   end
@@ -802,13 +796,13 @@ namespace :gitlab do
     def check_ldap_auth(adapter)
       auth = adapter.config.has_auth?
 
-      if auth && adapter.ldap.bind
-        message = 'Success'.color(:green)
-      elsif auth
-        message = 'Failed. Check `bind_dn` and `password` configuration values'.color(:red)
-      else
-        message = 'Anonymous. No `bind_dn` or `password` configured'.color(:yellow)
-      end
+      message = if auth && adapter.ldap.bind
+                  'Success'.color(:green)
+                elsif auth
+                  'Failed. Check `bind_dn` and `password` configuration values'.color(:red)
+                else
+                  'Anonymous. No `bind_dn` or `password` configured'.color(:yellow)
+                end
 
       puts "LDAP authentication... #{message}"
     end
@@ -835,11 +829,11 @@ namespace :gitlab do
       user = User.find_by(username: username)
       if user
         repo_dirs = user.authorized_projects.map do |p|
-                      File.join(
-                        p.repository_storage_path,
-                        "#{p.path_with_namespace}.git"
-                      )
-                    end
+          File.join(
+            p.repository_storage_path,
+            "#{p.path_with_namespace}.git"
+          )
+        end
 
         repo_dirs.each { |repo_dir| check_repo_integrity(repo_dir) }
       else
@@ -848,11 +842,74 @@ namespace :gitlab do
     end
   end
 
+  namespace :geo do
+    desc 'GitLab | Check Geo configuration and dependencies'
+    task check: :environment do
+      warn_user_is_not_gitlab
+      start_checking 'Geo'
+
+      check_geo_license
+      check_geo_enabled
+      check_nodes_http_connection
+
+      finished_checking 'Geo'
+    end
+
+    # Checks
+    ########################
+
+    def check_geo_license
+      print 'GitLab Geo is available ... '
+      if Gitlab::Geo.license_allows?
+        puts 'yes'.color(:green)
+      else
+        puts 'no'.color(:red)
+
+        try_fixing_it(
+          'Upload a new license that includes GitLab Geo feature'
+        )
+
+        for_more_information(see_geo_features_page)
+      end
+    end
+
+    def check_geo_enabled
+      print 'GitLab Geo is enabled ... '
+      if Gitlab::Geo.enabled?
+        puts 'yes'.color(:green)
+      else
+        puts 'no'.color(:red)
+
+        try_fixing_it(
+          'Follow Geo Setup instructions to configure primary and secondary nodes'
+        )
+
+        for_more_information(see_geo_docs)
+      end
+    end
+
+    def check_nodes_http_connection
+      return unless Gitlab::Geo.enabled?
+
+      if Gitlab::Geo.primary?
+        Gitlab::Geo.secondary_nodes.each do |node|
+          print "Can connect to secondary node: '#{node.url}' ... "
+          check_gitlab_geo_node(node)
+        end
+      end
+
+      if Gitlab::Geo.secondary?
+        print 'Can connect to the primary node ... '
+        check_gitlab_geo_node(Gitlab::Geo.primary_node)
+      end
+    end
+  end
+
   # Helper methods
   ##########################
 
   def fix_and_rerun
-    puts "  Please #{"fix the error above"} and rerun the checks.".color(:red)
+    puts "  Please fix the error above and rerun the checks.".color(:red)
   end
 
   def for_more_information(*sources)
@@ -876,6 +933,18 @@ namespace :gitlab do
 
   def see_installation_guide_section(section)
     "doc/install/installation.md in section \"#{section}\""
+  end
+
+  def see_geo_features_page
+    'https://about.gitlab.com/features/gitlab-geo/'
+  end
+
+  def see_geo_docs
+    'doc/gitlab-geo/README.md'
+  end
+
+  def see_custom_certificate_doc
+    'https://docs.gitlab.com/omnibus/common_installation_problems/README.html#using-self-signed-certificate-or-custom-certificate-authorities'
   end
 
   def sudo_gitlab(command)
@@ -914,7 +983,7 @@ namespace :gitlab do
 
   def check_ruby_version
     required_version = Gitlab::VersionInfo.new(2, 1, 0)
-    current_version = Gitlab::VersionInfo.parse(run_command(%W(ruby --version)))
+    current_version = Gitlab::VersionInfo.parse(run_command(%w(ruby --version)))
 
     print "Ruby version >= #{required_version} ? ... "
 
@@ -985,13 +1054,13 @@ namespace :gitlab do
   end
 
   def check_config_lock(repo_dir)
-    config_exists = File.exist?(File.join(repo_dir,'config.lock'))
+    config_exists = File.exist?(File.join(repo_dir, 'config.lock'))
     config_output = config_exists ? 'yes'.color(:red) : 'no'.color(:green)
     puts "'config.lock' file exists?".color(:yellow) + " ... #{config_output}"
   end
 
   def check_ref_locks(repo_dir)
-    lock_files = Dir.glob(File.join(repo_dir,'refs/heads/*.lock'))
+    lock_files = Dir.glob(File.join(repo_dir, 'refs/heads/*.lock'))
     if lock_files.present?
       puts "Ref lock files exist:".color(:red)
       lock_files.each do |lock_file|
@@ -999,6 +1068,72 @@ namespace :gitlab do
       end
     else
       puts "No ref lock files exist".color(:green)
+    end
+  end
+
+  def check_elasticsearch
+    client = Elasticsearch::Client.new(host: ApplicationSetting.current.elasticsearch_host,
+                                       port: ApplicationSetting.current.elasticsearch_port)
+
+    print "Elasticsearch version 5.1.x? ... "
+
+    version = Gitlab::VersionInfo.parse(client.info["version"]["number"])
+
+    if version.major == 5 && version.minor == 1
+      puts "yes (#{version})".color(:green)
+    else
+      puts "no, you have #{version}".color(:red)
+    end
+  end
+
+  def check_gitlab_geo_node(node)
+    display_error = Proc.new do |e|
+      puts 'no'.color(:red)
+      puts '  Reason:'.color(:blue)
+      puts "  #{e.message}"
+    end
+
+    begin
+      response = Net::HTTP.start(node.uri.host, node.uri.port, use_ssl: (node.uri.scheme == 'https')) do |http|
+        http.request(Net::HTTP::Get.new(node.uri))
+      end
+
+      if response.code_type == Net::HTTPFound
+        puts 'yes'.color(:green)
+      else
+        puts 'no'.color(:red)
+      end
+    rescue Errno::ECONNREFUSED => e
+      display_error.call(e)
+
+      try_fixing_it(
+        'Check if the machine is online and GitLab is running',
+        'Check your firewall rules and make sure this machine can reach the target machine',
+        "Make sure port and protocol are correct: '#{node.url}', or change it in Admin > Geo Nodes"
+      )
+    rescue SocketError => e
+      display_error.call(e)
+
+      if e.cause && e.cause.message.starts_with?('getaddrinfo')
+        try_fixing_it(
+          'Check if your machine can connect to a DNS server',
+          "Check if your machine can resolve DNS for: '#{node.uri.host}'",
+          'If machine host is incorrect, change it in Admin > Geo Nodes'
+        )
+      end
+    rescue OpenSSL::SSL::SSLError => e
+      display_error.call(e)
+
+      try_fixing_it(
+        'If you have a self-signed CA or certificate you need to whitelist it in Omnibus',
+      )
+      for_more_information(see_custom_certificate_doc)
+
+      try_fixing_it(
+        'If you have a valid certificate make sure you have the full certificate chain in the pem file'
+      )
+    rescue Exception => e # rubocop:disable Lint/RescueException
+      display_error.call(e)
     end
   end
 end

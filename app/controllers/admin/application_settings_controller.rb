@@ -17,6 +17,13 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     end
   end
 
+  def usage_data
+    respond_to do |format|
+      format.html { render html: Gitlab::Highlight.highlight('payload.json', Gitlab::UsageData.to_json) }
+      format.json { render json: Gitlab::UsageData.to_json }
+    end
+  end
+
   def reset_runners_token
     @application_setting.reset_runners_registration_token!
     flash[:notice] = 'New runners registration token has been generated!'
@@ -46,6 +53,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
 
   def application_setting_params
     restricted_levels = params[:application_setting][:restricted_visibility_levels]
+
     if restricted_levels.nil?
       params[:application_setting][:restricted_visibility_levels] = []
     else
@@ -55,6 +63,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     end
 
     import_sources = params[:application_setting][:import_sources]
+
     if import_sources.nil?
       params[:application_setting][:import_sources] = []
     else
@@ -71,7 +80,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     params.delete(:domain_blacklist_raw) if params[:domain_blacklist_file]
 
     params.require(:application_setting).permit(
-      application_setting_params_ce
+      application_setting_params_ce << application_setting_params_ee
     )
   end
 
@@ -109,6 +118,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
       :plantuml_url,
       :max_artifacts_size,
       :max_attachment_size,
+      :max_pages_size,
       :metrics_enabled,
       :metrics_host,
       :metrics_method_call_threshold,
@@ -137,12 +147,27 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
       :user_default_external,
       :user_oauth_applications,
       :version_check_enabled,
+      :terminal_max_session_time,
 
       disabled_oauth_sign_in_sources: [],
       import_sources: [],
       repository_storages: [],
       restricted_visibility_levels: [],
       sidekiq_throttling_queues: []
+    ]
+  end
+
+  def application_setting_params_ee
+    [
+      :help_text,
+      :elasticsearch_host,
+      :elasticsearch_indexing,
+      :elasticsearch_port,
+      :elasticsearch_search,
+      :repository_size_limit,
+      :shared_runners_minutes,
+      :usage_ping_enabled,
+      :minimum_mirror_sync_time
     ]
   end
 end

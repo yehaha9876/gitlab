@@ -5,7 +5,7 @@
 /* global ContributorsStatGraphUtil */
 /* global d3 */
 
-/*= require d3 */
+window.d3 = require('d3');
 
 (function() {
   this.ContributorsStatGraph = (function() {
@@ -113,4 +113,4 @@
 
     return ContributorsStatGraph;
   })();
-}).call(this);
+}).call(window);

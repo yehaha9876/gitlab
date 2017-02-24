@@ -1,6 +1,8 @@
 module Gitlab
   module LDAP
     class Person
+      include EE::Gitlab::LDAP::Person
+
       # Active Directory-specific LDAP filter that checks if bit 2 of the
       # userAccountControl attribute is set.
       # Source: http://ctogonewild.com/2009/09/03/bitmask-searches-in-ldap/
@@ -43,9 +45,7 @@ module Gitlab
         attribute_value(:email)
       end
 
-      def dn
-        entry.dn
-      end
+      delegate :dn, to: :entry
 
       private
 

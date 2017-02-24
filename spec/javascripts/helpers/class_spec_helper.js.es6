@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 class ClassSpecHelper {
   static itShouldBeAStaticMethod(base, method) {
     return it('should be a static method', () => {
@@ -7,3 +5,7 @@ class ClassSpecHelper {
     });
   }
 }
+
+window.ClassSpecHelper = ClassSpecHelper;
+
+module.exports = ClassSpecHelper;

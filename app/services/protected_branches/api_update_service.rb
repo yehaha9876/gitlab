@@ -11,20 +11,20 @@ module ProtectedBranches
       @protected_branch = protected_branch
 
       protected_branch.transaction do
-        delete_redundant_access_levels
+        delete_redundant_ee_access_levels
 
         case @developers_can_push
         when true
-          params.merge!(push_access_levels_attributes: [{ access_level: Gitlab::Access::DEVELOPER }])
+          params[:push_access_levels_attributes] = [{ access_level: Gitlab::Access::DEVELOPER }]
         when false
-          params.merge!(push_access_levels_attributes: [{ access_level: Gitlab::Access::MASTER }])
+          params[:push_access_levels_attributes] = [{ access_level: Gitlab::Access::MASTER }]
         end
 
         case @developers_can_merge
         when true
-          params.merge!(merge_access_levels_attributes: [{ access_level: Gitlab::Access::DEVELOPER }])
+          params[:merge_access_levels_attributes] = [{ access_level: Gitlab::Access::DEVELOPER }]
         when false
-          params.merge!(merge_access_levels_attributes: [{ access_level: Gitlab::Access::MASTER }])
+          params[:merge_access_levels_attributes] = [{ access_level: Gitlab::Access::MASTER }]
         end
 
         service = ProtectedBranches::UpdateService.new(@project, @current_user, @params)
@@ -41,6 +41,27 @@ module ProtectedBranches
 
       unless @developers_can_push.nil?
         @protected_branch.push_access_levels.destroy_all
+      end
+    end
+
+    # If a protected branch can have more than one access level (EE), only
+    # remove the relevant access levels. If we don't do this, we'll have a
+    # failed validation.
+    def delete_redundant_ee_access_levels
+      case @developers_can_merge
+      when true
+        @protected_branch.merge_access_levels.developer.destroy_all
+      when false
+        @protected_branch.merge_access_levels.developer.destroy_all
+        @protected_branch.merge_access_levels.master.destroy_all
+      end
+
+      case @developers_can_push
+      when true
+        @protected_branch.push_access_levels.developer.destroy_all
+      when false
+        @protected_branch.push_access_levels.developer.destroy_all
+        @protected_branch.push_access_levels.master.destroy_all
       end
     end
   end

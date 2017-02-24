@@ -27,7 +27,7 @@ class Service < ActiveRecord::Base
 
   validates :project_id, presence: true, unless: Proc.new { |service| service.template? }
 
-  scope :visible, -> { where.not(type: ['GitlabIssueTrackerService', 'GitlabCiService']) }
+  scope :visible, -> { where.not(type: 'GitlabIssueTrackerService') }
   scope :issue_trackers, -> { where(category: 'issue_tracker') }
   scope :external_wikis, -> { where(type: 'ExternalWikiService').active }
   scope :active, -> { where(active: true) }
@@ -226,6 +226,8 @@ class Service < ActiveRecord::Base
       gemnasium
       hipchat
       irker
+      jenkins
+      jenkins_deprecated
       jira
       kubernetes
       mattermost_slash_commands

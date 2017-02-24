@@ -37,7 +37,7 @@ module ApplicationHelper
       if project_id.is_a?(Project)
         project_id
       else
-        Project.find_with_namespace(project_id)
+        Project.find_by_full_path(project_id)
       end
 
     if project.avatar_url
@@ -69,11 +69,12 @@ module ApplicationHelper
   end
 
   def avatar_icon(user_or_email = nil, size = nil, scale = 2)
-    if user_or_email.is_a?(User)
-      user = user_or_email
-    else
-      user = User.find_by_any_email(user_or_email.try(:downcase))
-    end
+    user =
+      if user_or_email.is_a?(User)
+        user_or_email
+      else
+        User.find_by_any_email(user_or_email.try(:downcase))
+      end
 
     if user
       user.avatar_url(size) || default_avatar
@@ -117,6 +118,9 @@ module ApplicationHelper
 
     # Skip if user removed branch right after that
     return false unless project.repository.branch_exists?(event.branch_name)
+
+    # Skip if this was a mirror update
+    return false if project.mirror? && project.repository.up_to_date_with_upstream?(event.branch_name)
 
     true
   end
@@ -248,7 +252,8 @@ module ApplicationHelper
       author_id: params[:author_id],
       author_username: params[:author_username],
       search: params[:search],
-      label_name: params[:label_name]
+      label_name: params[:label_name],
+      weight: params[:weight]
     }
 
     options = exist_opts.merge(options)
@@ -295,5 +300,14 @@ module ApplicationHelper
 
   def page_class
     "issue-boards-page" if current_controller?(:boards)
+  end
+
+  # Returns active css class when condition returns true
+  # otherwise returns nil.
+  #
+  # Example:
+  #   %li{ class: active_when(params[:filter] == '1') }
+  def active_when(condition)
+    'active' if condition
   end
 end

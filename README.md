@@ -1,6 +1,6 @@
 # GitLab
 
-[![Build status](https://gitlab.com/gitlab-org/gitlab-ce/badges/master/build.svg)](https://gitlab.com/gitlab-org/gitlab-ce/commits/master)
+[![Build status](https://gitlab.com/gitlab-org/gitlab-ee/badges/master/build.svg)](https://gitlab.com/gitlab-org/gitlab-ee/commits/master)
 [![CE coverage report](https://gitlab.com/gitlab-org/gitlab-ce/badges/master/coverage.svg?job=coverage)](https://gitlab-org.gitlab.io/gitlab-ce/coverage-ruby)
 [![Code Climate](https://codeclimate.com/github/gitlabhq/gitlabhq.svg)](https://codeclimate.com/github/gitlabhq/gitlabhq)
 [![Core Infrastructure Initiative Best Practices](https://bestpractices.coreinfrastructure.org/projects/42/badge)](https://bestpractices.coreinfrastructure.org/projects/42)
@@ -8,6 +8,36 @@
 ## Canonical source
 
 The canonical source of GitLab Community Edition is [hosted on GitLab.com](https://gitlab.com/gitlab-org/gitlab-ce/).
+
+The source of GitLab Enterprise Edition is [hosted on GitLab.com](https://gitlab.com/gitlab-org/gitlab-ee).
+
+# ![logo](https://about.gitlab.com/images/gitlab_logo.png) GitLab
+
+## Free trial
+
+You can request a free trial of GitLab Enterprise Edition [on our website](https://about.gitlab.com/free-trial/).
+
+## Subscriber onboarding information
+
+Thank you for purchasing a GitLab subscription!
+
+For standard subscribers, please see **emergency contact info and other useful information** in [the Standard subscribers README](https://gitlab.com/standard/standard-subscriber-information/tree/master#README).
+
+GitLab Enterprise Edition repository:
+https://gitlab.com/gitlab-com/gitlab-ee
+
+Download GitLab Enterprise Edition:
+https://about.gitlab.com/downloads-ee
+
+Documentation:
+http://doc.gitlab.com/ee/
+
+To upgrade from CE, just perform a normal upgrade, but use an EE package:
+https://about.gitlab.com/update/#ee
+
+If you need help with your GitLab installation and for any technical questions please contact us at subscribers@gitlab.com
+
+For all other questions, contact us at sales@gitlab.com
 
 ## Open source software to collaborate on code
 
@@ -29,7 +59,7 @@ We're hiring developers, support people, and production engineers all the time, 
 There are two editions of GitLab:
 
 - GitLab Community Edition (CE) is available freely under the MIT Expat license.
-- GitLab Enterprise Edition (EE) includes [extra features](https://about.gitlab.com/features/#compare) that are more useful for organizations with more than 100 users. To use EE and get official support please [become a subscriber](https://about.gitlab.com/pricing/).
+- GitLab Enterprise Edition (EE) includes [extra features](https://about.gitlab.com/products/#compare-options) that are more useful for organizations with more than 100 users. To use EE and get official support please [become a subscriber](https://about.gitlab.com/products/).
 
 ## Website
 
@@ -100,7 +130,7 @@ For upgrading information please see our [update page](https://about.gitlab.com/
 
 ## Documentation
 
-All documentation can be found on [docs.gitlab.com/ce/](https://docs.gitlab.com/ce/).
+All documentation can be found on [doc.gitlab.com/ee/](http://doc.gitlab.com/ee/).
 
 ## Getting help
 

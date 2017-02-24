@@ -10,19 +10,9 @@ module API
 
         args.delete(:id)
         args[:milestone_title] = args.delete(:milestone)
+        args[:label_name] = args.delete(:labels)
 
-        match_all_labels = args.delete(:match_all_labels)
-        labels = args.delete(:labels)
-        args[:label_name] = labels if match_all_labels
-
-        args[:search] = "#{Issue.reference_prefix}#{args.delete(:iid)}" if args.key?(:iid)
-
-        issues = IssuesFinder.new(current_user, args).execute.inc_notes_with_associations
-
-        # TODO: Remove in 9.0  pass `label_name: args.delete(:labels)` to IssuesFinder
-        if !match_all_labels && labels.present?
-          issues = issues.includes(:labels).where('labels.title' => labels.split(','))
-        end
+        issues = IssuesFinder.new(current_user, args).execute
 
         issues.reorder(args[:order_by] => args[:sort])
       end
@@ -43,8 +33,10 @@ module API
         optional :assignee_id, type: Integer, desc: 'The ID of a user to assign issue'
         optional :milestone_id, type: Integer, desc: 'The ID of a milestone to assign issue'
         optional :labels, type: String, desc: 'Comma-separated list of label names'
-        optional :due_date, type: String, desc: 'Date time string in the format YEAR-MONTH-DAY'
+        optional :due_date, type: String, desc: 'Date string in the format YEAR-MONTH-DAY'
         optional :confidential, type: Boolean, desc: 'Boolean parameter if the issue should be confidential'
+        # Gitlab-EE specific
+        optional :weight, type: Integer, values: 0..9, desc: 'The weight of the issue'
       end
     end
 
@@ -79,7 +71,7 @@ module API
       get ":id/issues" do
         group = find_group!(params[:id])
 
-        issues = find_issues(group_id: group.id, state: params[:state] || 'opened', match_all_labels: true)
+        issues = find_issues(group_id: group.id, state: params[:state] || 'opened')
 
         present paginate(issues), with: Entities::Issue, current_user: current_user
       end
@@ -97,7 +89,6 @@ module API
       params do
         optional :state, type: String, values: %w[opened closed all], default: 'all',
                          desc: 'Return opened, closed, or all issues'
-        optional :iid, type: Integer, desc: 'Return the issue having the given `iid`'
         use :issues_params
       end
       get ":id/issues" do
@@ -169,7 +160,8 @@ module API
         optional :state_event, type: String, values: %w[reopen close], desc: 'State of the issue'
         use :issue_params
         at_least_one_of :title, :description, :assignee_id, :milestone_id,
-                        :labels, :created_at, :due_date, :confidential, :state_event
+                        :labels, :created_at, :due_date, :confidential, :state_event,
+                        :weight
       end
       put ':id/issues/:issue_id' do
         issue = user_project.issues.find(params.delete(:issue_id))
@@ -180,9 +172,13 @@ module API
           params.delete(:updated_at)
         end
 
+        update_params = declared_params(include_missing: false).merge(request: request, api: true)
+
         issue = ::Issues::UpdateService.new(user_project,
                                             current_user,
-                                            declared_params(include_missing: false)).execute(issue)
+                                            update_params).execute(issue)
+
+        render_spam_error! if issue.spam?
 
         if issue.valid?
           present issue, with: Entities::Issue, current_user: current_user, project: user_project

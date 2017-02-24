@@ -1,4 +1,9 @@
 class DiffNote < Note
+  # Elastic search configuration (it does not support STI properly)
+  document_type 'note'
+  index_name [Rails.application.class.parent_name.downcase, Rails.env].join('-')
+  include Elastic::NotesSearch
+
   include NoteOnDiff
 
   serialize :original_position, Gitlab::Diff::Position
@@ -8,7 +13,7 @@ class DiffNote < Note
   validates :position, presence: true
   validates :diff_line, presence: true
   validates :line_code, presence: true, line_code: true
-  validates :noteable_type, inclusion: { in: ['Commit', 'MergeRequest'] }
+  validates :noteable_type, inclusion: { in: %w(Commit MergeRequest) }
   validates :resolved_by, presence: true, if: :resolved?
   validate :positions_complete
   validate :verify_supported

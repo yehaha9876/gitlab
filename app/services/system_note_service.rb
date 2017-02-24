@@ -118,16 +118,18 @@ module SystemNoteService
   #
   # Example Note text:
   #
-  #   "Changed estimate of this issue to 3d 5h"
+  #   "removed time estimate"
+  #
+  #   "changed time estimate to 3d 5h"
   #
   # Returns the created Note object
 
   def change_time_estimate(noteable, project, author)
     parsed_time = Gitlab::TimeTrackingFormatter.output(noteable.time_estimate)
     body = if noteable.time_estimate == 0
-             "Removed time estimate on this #{noteable.human_class_name}"
+             "removed time estimate"
            else
-             "Changed time estimate of this #{noteable.human_class_name} to #{parsed_time}"
+             "changed time estimate to #{parsed_time}"
            end
 
     create_note(noteable: noteable, project: project, author: author, note: body)
@@ -142,7 +144,9 @@ module SystemNoteService
   #
   # Example Note text:
   #
-  #   "Added 2h 30m of time spent on this issue"
+  #   "removed time spent"
+  #
+  #   "added 2h 30m of time spent"
   #
   # Returns the created Note object
 
@@ -150,11 +154,11 @@ module SystemNoteService
     time_spent = noteable.time_spent
 
     if time_spent == :reset
-      body = "Removed time spent on this #{noteable.human_class_name}"
+      body = "removed time spent"
     else
       parsed_time = Gitlab::TimeTrackingFormatter.output(time_spent.abs)
-      action = time_spent > 0 ? 'Added' : 'Subtracted'
-      body = "#{action} #{parsed_time} of time spent on this #{noteable.human_class_name}"
+      action = time_spent > 0 ? 'added' : 'subtracted'
+      body = "#{action} #{parsed_time} of time spent"
     end
 
     create_note(noteable: noteable, project: project, author: author, note: body)
@@ -221,7 +225,7 @@ module SystemNoteService
   end
 
   def discussion_continued_in_issue(discussion, project, author, issue)
-    body = "Added #{issue.to_reference} to continue this discussion"
+    body = "created #{issue.to_reference} to continue this discussion"
     note_attributes = discussion.reply_attributes.merge(project: project, author: author, note: body)
     note_attributes[:type] = note_attributes.delete(:note_type)
 
@@ -260,7 +264,7 @@ module SystemNoteService
   #
   # Example Note text:
   #
-  # "made the issue confidential"
+  #   "made the issue confidential"
   #
   # Returns the created Note object
   def change_issue_confidentiality(issue, project, author)
@@ -352,10 +356,10 @@ module SystemNoteService
       note:    cross_reference_note_content(gfm_reference)
     }
 
-    if noteable.kind_of?(Commit)
+    if noteable.is_a?(Commit)
       note_options.merge!(noteable_type: 'Commit', commit_id: noteable.id)
     else
-      note_options.merge!(noteable: noteable)
+      note_options[:noteable] = noteable
     end
 
     if noteable.is_a?(ExternalIssue)
@@ -381,6 +385,7 @@ module SystemNoteService
   # Returns Boolean
   def cross_reference_disallowed?(noteable, mentioner)
     return true if noteable.is_a?(ExternalIssue) && !noteable.project.jira_tracker_active?
+    return true if noteable.is_a?(Issuable) && (noteable.try(:closed?) || noteable.try(:merged?))
     return false unless mentioner.is_a?(MergeRequest)
     return false unless noteable.is_a?(Commit)
 
@@ -403,12 +408,13 @@ module SystemNoteService
     # Initial scope should be system notes of this noteable type
     notes = Note.system.where(noteable_type: noteable.class)
 
-    if noteable.is_a?(Commit)
-      # Commits have non-integer IDs, so they're stored in `commit_id`
-      notes = notes.where(commit_id: noteable.id)
-    else
-      notes = notes.where(noteable_id: noteable.id)
-    end
+    notes =
+      if noteable.is_a?(Commit)
+        # Commits have non-integer IDs, so they're stored in `commit_id`
+        notes.where(commit_id: noteable.id)
+      else
+        notes.where(noteable_id: noteable.id)
+      end
 
     notes_for_mentioner(mentioner, noteable, notes).exists?
   end
@@ -462,6 +468,27 @@ module SystemNoteService
     cross_reference = noteable_ref.to_reference(project)
     body = "moved #{direction} #{cross_reference}"
     create_note(noteable: noteable, project: project, author: author, note: body)
+  end
+
+  # Called when the merge request is approved by user
+  #
+  # noteable - Noteable object
+  # user     - User performing approve
+  #
+  # Example Note text:
+  #
+  #   "approved this merge request"
+  #
+  # Returns the created Note object
+  def approve_mr(noteable, user)
+    body = "approved this merge request"
+
+    create_note(noteable: noteable, project: noteable.project, author: user, note: body)
+  end
+
+  def unapprove_mr(noteable, user)
+    body = "unapproved this merge request"
+    create_note(noteable: noteable, project: noteable.project, author: user, note: body)
   end
 
   private

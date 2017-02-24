@@ -1,13 +1,12 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.7.1'
+gem 'rails', '4.2.8'
 gem 'rails-deprecated_sanitizer', '~> 1.0.3'
 
 # Responders respond_to and respond_with
 gem 'responders', '~> 2.0'
 
 gem 'sprockets', '~> 3.7.0'
-gem 'sprockets-es6', '~> 0.9.2'
 
 # Default values for AR models
 gem 'default_value_for', '~> 3.0.0'
@@ -30,13 +29,15 @@ gem 'omniauth-github',        '~> 1.1.1'
 gem 'omniauth-gitlab',        '~> 1.0.2'
 gem 'omniauth-google-oauth2', '~> 0.4.1'
 gem 'omniauth-kerberos',      '~> 0.3.0', group: :kerberos
+gem 'omniauth-oauth2-generic', '~> 0.2.2'
 gem 'omniauth-saml',          '~> 1.7.0'
 gem 'omniauth-shibboleth',    '~> 1.2.0'
 gem 'omniauth-twitter',       '~> 1.2.0'
 gem 'omniauth_crowd',         '~> 2.2.0'
-gem 'omniauth-authentiq',     '~> 0.2.0'
+gem 'gssapi', group: :kerberos
+gem 'omniauth-authentiq',     '~> 0.3.0'
 gem 'rack-oauth2',            '~> 1.2.1'
-gem 'jwt'
+gem 'jwt',                    '~> 1.5.6'
 
 # Spam and anti-bot protection
 gem 'recaptcha', '~> 3.0', require: 'recaptcha/rails'
@@ -48,6 +49,9 @@ gem 'rqrcode-rails3', '~> 0.1.7'
 gem 'attr_encrypted', '~> 3.0.0'
 gem 'u2f', '~> 0.2.1'
 
+# GitLab Pages
+gem 'validates_hostname', '~> 1.0.6'
+
 # Browser detection
 gem 'browser', '~> 2.2'
 
@@ -55,6 +59,7 @@ gem 'browser', '~> 2.2'
 # GitLab fork with several improvements to original library. For full list of changes
 # see https://github.com/intridea/omniauth-ldap/compare/master...gitlabhq:master
 gem 'gitlab_omniauth-ldap', '~> 1.2.1', require: 'omniauth-ldap'
+gem 'net-ldap'
 
 # Git Wiki
 # Required manually in config/initializers/gollum.rb to control load order
@@ -98,6 +103,12 @@ gem 'unf', '~> 0.1.4'
 # Seed data
 gem 'seed-fu', '~> 2.3.5'
 
+# Search
+gem 'elasticsearch-model', '~> 0.1.9'
+gem 'elasticsearch-rails', '~> 0.1.9'
+gem 'elasticsearch-api',   '5.0.3'
+gem 'gitlab-elasticsearch-git', '1.1.1', require: "elasticsearch/git"
+
 # Markdown and HTML processing
 gem 'html-pipeline',        '~> 1.11.0'
 gem 'deckar01-task_list',   '1.0.6', require: 'task_list/railtie'
@@ -109,7 +120,7 @@ gem 'org-ruby',             '~> 0.9.12'
 gem 'creole',               '~> 0.5.0'
 gem 'wikicloth',            '0.8.1'
 gem 'asciidoctor',          '~> 1.5.2'
-gem 'asciidoctor-plantuml', '0.0.6'
+gem 'asciidoctor-plantuml', '0.0.7'
 gem 'rouge',                '~> 2.0'
 gem 'truncato',             '~> 0.7.8'
 
@@ -198,7 +209,7 @@ gem 'babosa', '~> 1.0.2'
 gem 'loofah', '~> 2.0.3'
 
 # Working with license
-gem 'licensee', '~> 8.0.0'
+gem 'licensee', '~> 8.7.0'
 
 # Protect against bruteforcing
 gem 'rack-attack', '~> 4.4.1'
@@ -219,10 +230,12 @@ gem 'oj', '~> 2.17.4'
 gem 'chronic', '~> 0.10.2'
 gem 'chronic_duration', '~> 0.10.6'
 
+gem 'webpack-rails', '~> 0.9.9'
+gem 'rack-proxy', '~> 0.6.0'
+
 gem 'sass-rails', '~> 5.0.6'
 gem 'coffee-rails', '~> 4.1.0'
 gem 'uglifier', '~> 2.7.2'
-gem 'gitlab-turbolinks-classic', '~> 2.5', '>= 2.5.6'
 
 gem 'addressable',        '~> 2.3.8'
 gem 'bootstrap-sass',     '~> 3.3.0'
@@ -237,6 +250,7 @@ gem 'select2-rails',      '~> 3.5.9'
 gem 'virtus',             '~> 1.0.1'
 gem 'net-ssh',            '~> 3.0.1'
 gem 'base32',             '~> 0.3.0'
+gem "gitlab-license", "~> 1.0"
 
 # Sentry integration
 gem 'sentry-raven', '~> 2.0.0'
@@ -280,6 +294,7 @@ group :development, :test do
   gem 'rspec-retry',        '~> 0.4.5'
   gem 'spinach-rails',      '~> 0.2.1'
   gem 'spinach-rerun-reporter', '~> 0.0.2'
+  gem 'rspec_profiling',    '~> 0.0.5'
 
   # Prevent occasions where minitest is not bundled in packaged versions of ruby (see #3826)
   gem 'minitest', '~> 5.7.0'
@@ -291,18 +306,14 @@ group :development, :test do
   gem 'capybara-screenshot', '~> 1.0.0'
   gem 'poltergeist',         '~> 1.9.0'
 
-  gem 'teaspoon', '~> 1.1.0'
-  gem 'teaspoon-jasmine', '~> 2.2.0'
-
   gem 'spring',                   '~> 1.7.0'
   gem 'spring-commands-rspec',    '~> 1.0.4'
   gem 'spring-commands-spinach',  '~> 1.1.0'
-  gem 'spring-commands-teaspoon', '~> 0.0.2'
 
-  gem 'rubocop', '~> 0.46.0', require: false
-  gem 'rubocop-rspec', '~> 1.9.1', require: false
+  gem 'rubocop', '~> 0.47.1', require: false
+  gem 'rubocop-rspec', '~> 1.12.0', require: false
   gem 'scss_lint', '~> 0.47.0', require: false
-  gem 'haml_lint', '~> 0.18.2', require: false
+  gem 'haml_lint', '~> 0.21.0', require: false
   gem 'simplecov', '0.12.0', require: false
   gem 'flay', '~> 2.6.1', require: false
   gem 'bundler-audit', '~> 0.5.0', require: false
@@ -322,7 +333,7 @@ group :test do
   gem 'email_spec', '~> 1.6.0'
   gem 'json-schema', '~> 2.6.2'
   gem 'webmock', '~> 1.21.0'
-  gem 'test_after_commit', '~> 0.4.2'
+  gem 'test_after_commit', '~> 1.1'
   gem 'sham_rack', '~> 1.3.6'
   gem 'timecop', '~> 0.8.0'
 end
@@ -331,7 +342,7 @@ gem 'newrelic_rpm', '~> 3.16'
 
 gem 'octokit', '~> 4.6.2'
 
-gem 'mail_room', '~> 0.9.0'
+gem 'mail_room', '~> 0.9.1'
 
 gem 'email_reply_trimmer', '~> 0.1'
 gem 'html2text'

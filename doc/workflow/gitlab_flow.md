@@ -67,7 +67,7 @@ With GitLab flow we offer additional guidance for these questions.
 ![Master branch and production branch with arrow that indicate deployments](production_branch.png)
 
 GitHub flow does assume you are able to deploy to production every time you merge a feature branch.
-This is possible for SaaS applications but are many cases where this is not possible.
+This is possible for SaaS applications but there are many cases where this is not possible.
 One would be a situation where you are not in control of the exact release moment, for example an iOS application that needs to pass App Store validation.
 Another example is when you have deployment windows (workdays from 10am to 4pm when the operations team is at full capacity) but you also merge code at other times.
 In these cases you can make a production branch that reflects the deployed code.
@@ -240,6 +240,16 @@ In a CI strategy you can merge in master at the start of the day to prevent pain
 In a synchronization point strategy you only merge in from well defined points in time, for example a tagged release.
 This strategy is [advocated by Linus Torvalds](https://www.mail-archive.com/dri-devel@lists.sourceforge.net/msg39091.html) because the state of the code at these points is better known.
 
+GitLab Enterprise Edition offers a way to rebase before merging a merge request. You can configure this per project basis by navigating to the project settings page and selecting `Merge Requests Rebase` checkbox.
+
+![Merge request settings](merge_request_settings.png)
+
+Before accepting a merge request, select `rebase before merge`.
+![Merge request widget](merge_request_widget.png)
+
+GitLab will attempt to cleanly rebase before merging branches. If clean rebase is not possible, regular merge will be performed.
+If clean rebase is possible and history of the traget branch will be altered with the the merge.
+
 In conclusion, we can say that you should try to prevent merge commits, but not eliminate them.
 Your codebase should be clean but your history should represent what actually happened.
 Developing software happen in small messy steps and it is OK to have your history reflect this.
@@ -311,7 +321,8 @@ If you have not pushed your commits to a shared location yet you can also rebase
 Do not merge in upstream if your code will work and merge cleanly without doing so, Linus even says that [you should never merge in upstream at random points, only at major releases](https://lwn.net/Articles/328438/).
 Merging only when needed prevents creating merge commits in your feature branch that later end up littering the master history.
 
-### References
+## References
 
 - [Sketch file](https://www.dropbox.com/s/58dvsj5votbwrzv/git_flows.sketch?dl=0) with vectors of images in this article
 - [Git Flow by Vincent Driessen](http://nvie.com/posts/a-successful-git-branching-model/)
+- [Blog post with responses](https://about.gitlab.com/2014/09/29/gitlab-flow/)

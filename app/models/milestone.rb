@@ -11,6 +11,7 @@ class Milestone < ActiveRecord::Base
   include Sortable
   include Referable
   include StripAttribute
+  include Elastic::MilestonesSearch
   include Milestoneish
 
   cache_markdown_field :title, pipeline: :single_line

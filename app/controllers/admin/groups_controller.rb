@@ -2,7 +2,7 @@ class Admin::GroupsController < Admin::ApplicationController
   before_action :group, only: [:edit, :update, :destroy, :project_update, :members_update]
 
   def index
-    @groups = Group.with_statistics
+    @groups = Group.with_statistics.with_route
     @groups = @groups.sort(@sort = params[:sort])
     @groups = @groups.search(params[:name]) if params[:name].present?
     @groups = @groups.page(params[:page])
@@ -49,7 +49,7 @@ class Admin::GroupsController < Admin::ApplicationController
   end
 
   def destroy
-    DestroyGroupService.new(@group, current_user).async_execute
+    Groups::DestroyService.new(@group, current_user).async_execute
 
     redirect_to admin_groups_path, alert: "Group '#{@group.name}' was scheduled for deletion."
   end
@@ -61,7 +61,7 @@ class Admin::GroupsController < Admin::ApplicationController
   end
 
   def group_params
-    params.require(:group).permit(group_params_ce)
+    params.require(:group).permit(group_params_ce << group_params_ee)
   end
 
   def group_params_ce
@@ -73,6 +73,13 @@ class Admin::GroupsController < Admin::ApplicationController
       :path,
       :request_access_enabled,
       :visibility_level
+    ]
+  end
+
+  def group_params_ee
+    [
+      :repository_size_limit,
+      :shared_runners_minutes_limit
     ]
   end
 end

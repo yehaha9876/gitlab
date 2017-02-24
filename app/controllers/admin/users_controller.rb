@@ -170,12 +170,12 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(user_params_ce)
+    params.require(:user).permit(user_params_ce << user_params_ee)
   end
 
   def user_params_ce
     [
-      :admin,
+      :access_level,
       :avatar,
       :bio,
       :can_create_group,
@@ -194,10 +194,15 @@ class Admin::UsersController < Admin::ApplicationController
       :provider,
       :remember_me,
       :skype,
-      :theme_id,
       :twitter,
       :username,
       :website_url
+    ]
+  end
+
+  def user_params_ee
+    [
+      :note
     ]
   end
 end

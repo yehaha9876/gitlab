@@ -78,8 +78,8 @@ describe 'Issues', feature: true do
         fill_in 'issue_description', with: 'bug description'
         find('#issuable-due-date').click
 
-        page.within '.ui-datepicker' do
-          click_link date.day
+        page.within '.pika-single' do
+          click_button date.day
         end
 
         expect(find('#issuable-due-date').value).to eq date.to_s
@@ -110,8 +110,8 @@ describe 'Issues', feature: true do
         fill_in 'issue_description', with: 'bug description'
         find('#issuable-due-date').click
 
-        page.within '.ui-datepicker' do
-          click_link date.day
+        page.within '.pika-single' do
+          click_button date.day
         end
 
         expect(find('#issuable-due-date').value).to eq date.to_s
@@ -146,11 +146,22 @@ describe 'Issues', feature: true do
       expect(page).to have_content 'foobar'
       expect(page.all('.no-comments').first.text).to eq "0"
     end
+
+    it 'shows weight on issue row' do
+      create(:issue, author: @user, project: project, weight: 2)
+
+      visit namespace_project_issues_path(project.namespace, project)
+
+      page.within(first('.issue-info')) do
+        expect(page).to have_selector('.fa-balance-scale')
+        expect(page).to have_content(2)
+      end
+    end
   end
 
   describe 'Filter issue' do
     before do
-      ['foobar', 'barbaz', 'gitlab'].each do |title|
+      %w(foobar barbaz gitlab).each do |title|
         create(:issue,
                author: @user,
                assignee: @user,
@@ -382,7 +393,9 @@ describe 'Issues', feature: true do
     it 'changes incoming email address token', js: true do
       find('.issue-email-modal-btn').click
       previous_token = find('input#issue_email').value
-      find('.incoming-email-token-reset').click
+      find('.incoming-email-token-reset').trigger('click')
+
+      wait_for_ajax
 
       expect(page).to have_no_field('issue_email', with: previous_token)
       new_token = project1.new_issue_address(@user.reload)
@@ -489,6 +502,27 @@ describe 'Issues', feature: true do
     end
   end
 
+  describe 'update weight from issue#show', js: true do
+    let!(:issue) { create(:issue, project: project) }
+
+    before do
+      visit namespace_project_issue_path(project.namespace, project, issue)
+    end
+
+    it 'allows user to update to a weight' do
+      page.within('.weight') do
+        expect(page).to have_content "None"
+        click_link 'Edit'
+
+        find('.dropdown-content a', text: '1').click
+
+        page.within('.value') do
+          expect(page).to have_content "1"
+        end
+      end
+    end
+  end
+
   describe 'update milestone from issue#show' do
     let!(:issue) { create(:issue, project: project, author: @user) }
     let!(:milestone) { create(:milestone, project: project) }
@@ -575,6 +609,15 @@ describe 'Issues', feature: true do
 
         expect(page.find_field("issue_description").value).to have_content 'banana_sample'
       end
+
+      it 'adds double newline to end of attachment markdown' do
+        drop_in_dropzone test_image_file
+
+        # Wait for the file to upload
+        sleep 1
+
+        expect(page.find_field("issue_description").value).to match /\n\n$/
+      end
     end
   end
 
@@ -624,8 +667,8 @@ describe 'Issues', feature: true do
         page.within '.due_date' do
           click_link 'Edit'
 
-          page.within '.ui-datepicker-calendar' do
-            click_link date.day
+          page.within '.pika-single' do
+            click_button date.day
           end
 
           wait_for_ajax
@@ -635,11 +678,13 @@ describe 'Issues', feature: true do
       end
 
       it 'removes due date from issue' do
+        date = Date.today.at_beginning_of_month + 2.days
+
         page.within '.due_date' do
           click_link 'Edit'
 
-          page.within '.ui-datepicker-calendar' do
-            first('.ui-state-default').click
+          page.within '.pika-single' do
+            click_button date.day
           end
 
           wait_for_ajax

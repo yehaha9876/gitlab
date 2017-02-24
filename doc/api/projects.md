@@ -36,6 +36,8 @@ Parameters:
 | `sort` | string | no | Return projects sorted in `asc` or `desc` order. Default is `desc` |
 | `search` | string | no | Return list of authorized projects matching the search criteria |
 | `simple` | boolean | no | Return only the ID, URL, name, and path of each project |
+| `owned` | boolean | no | Limit by projects owned by the current user |
+| `starred` | boolean | no | Limit by projects starred by the current user |
 
 ```json
 [
@@ -72,13 +74,11 @@ Parameters:
     "last_activity_at": "2013-09-30T13:46:02Z",
     "creator_id": 3,
     "namespace": {
-      "created_at": "2013-09-30T13:46:02Z",
-      "description": "",
       "id": 3,
       "name": "Diaspora",
-      "owner_id": 1,
       "path": "diaspora",
-      "updated_at": "2013-09-30T13:46:02Z"
+      "kind": "group",
+      "full_path": "diaspora"
     },
     "archived": false,
     "avatar_url": "http://example.com/uploads/project/avatar/4/uploads/avatar.png",
@@ -125,13 +125,11 @@ Parameters:
     "last_activity_at": "2013-09-30T13:46:02Z",
     "creator_id": 3,
     "namespace": {
-      "created_at": "2013-09-30T13:46:02Z",
-      "description": "",
       "id": 4,
       "name": "Brightbox",
-      "owner_id": 1,
       "path": "brightbox",
-      "updated_at": "2013-09-30T13:46:02Z"
+      "kind": "group",
+      "full_path": "brightbox"
     },
     "permissions": {
       "project_access": {
@@ -157,196 +155,6 @@ Parameters:
   }
 ]
 ```
-
-Get a list of projects which the authenticated user can see.
-
-```
-GET /projects/visible
-```
-
-Parameters:
-
-| Attribute | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `archived` | boolean | no | Limit by archived status |
-| `visibility` | string | no | Limit by visibility `public`, `internal`, or `private` |
-| `order_by` | string | no | Return projects ordered by `id`, `name`, `path`, `created_at`, `updated_at`, or `last_activity_at` fields. Default is `created_at` |
-| `sort` | string | no | Return projects sorted in `asc` or `desc` order. Default is `desc` |
-| `search` | string | no | Return list of authorized projects matching the search criteria |
-| `simple` | boolean | no | Return only the ID, URL, name, and path of each project |
-
-```json
-[
-  {
-    "id": 4,
-    "description": null,
-    "default_branch": "master",
-    "public": false,
-    "visibility_level": 0,
-    "ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",
-    "http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",
-    "web_url": "http://example.com/diaspora/diaspora-client",
-    "tag_list": [
-      "example",
-      "disapora client"
-    ],
-    "owner": {
-      "id": 3,
-      "name": "Diaspora",
-      "created_at": "2013-09-30T13:46:02Z"
-    },
-    "name": "Diaspora Client",
-    "name_with_namespace": "Diaspora / Diaspora Client",
-    "path": "diaspora-client",
-    "path_with_namespace": "diaspora/diaspora-client",
-    "issues_enabled": true,
-    "open_issues_count": 1,
-    "merge_requests_enabled": true,
-    "builds_enabled": true,
-    "wiki_enabled": true,
-    "snippets_enabled": false,
-    "container_registry_enabled": false,
-    "created_at": "2013-09-30T13:46:02Z",
-    "last_activity_at": "2013-09-30T13:46:02Z",
-    "creator_id": 3,
-    "namespace": {
-      "created_at": "2013-09-30T13:46:02Z",
-      "description": "",
-      "id": 3,
-      "name": "Diaspora",
-      "owner_id": 1,
-      "path": "diaspora",
-      "updated_at": "2013-09-30T13:46:02Z"
-    },
-    "archived": false,
-    "avatar_url": "http://example.com/uploads/project/avatar/4/uploads/avatar.png",
-    "shared_runners_enabled": true,
-    "forks_count": 0,
-    "star_count": 0,
-    "runners_token": "b8547b1dc37721d05889db52fa2f02",
-    "public_builds": true,
-    "shared_with_groups": []
-  },
-  {
-    "id": 6,
-    "description": null,
-    "default_branch": "master",
-    "public": false,
-    "visibility_level": 0,
-    "ssh_url_to_repo": "git@example.com:brightbox/puppet.git",
-    "http_url_to_repo": "http://example.com/brightbox/puppet.git",
-    "web_url": "http://example.com/brightbox/puppet",
-    "tag_list": [
-      "example",
-      "puppet"
-    ],
-    "owner": {
-      "id": 4,
-      "name": "Brightbox",
-      "created_at": "2013-09-30T13:46:02Z"
-    },
-    "name": "Puppet",
-    "name_with_namespace": "Brightbox / Puppet",
-    "path": "puppet",
-    "path_with_namespace": "brightbox/puppet",
-    "issues_enabled": true,
-    "open_issues_count": 1,
-    "merge_requests_enabled": true,
-    "builds_enabled": true,
-    "wiki_enabled": true,
-    "snippets_enabled": false,
-    "container_registry_enabled": false,
-    "created_at": "2013-09-30T13:46:02Z",
-    "last_activity_at": "2013-09-30T13:46:02Z",
-    "creator_id": 3,
-    "namespace": {
-      "created_at": "2013-09-30T13:46:02Z",
-      "description": "",
-      "id": 4,
-      "name": "Brightbox",
-      "owner_id": 1,
-      "path": "brightbox",
-      "updated_at": "2013-09-30T13:46:02Z"
-    },
-    "permissions": {
-      "project_access": {
-        "access_level": 10,
-        "notification_level": 3
-      },
-      "group_access": {
-        "access_level": 50,
-        "notification_level": 3
-      }
-    },
-    "archived": false,
-    "avatar_url": null,
-    "shared_runners_enabled": true,
-    "forks_count": 0,
-    "star_count": 0,
-    "runners_token": "b8547b1dc37721d05889db52fa2f02",
-    "public_builds": true,
-    "shared_with_groups": []
-  }
-]
-```
-
-### List owned projects
-
-Get a list of projects which are owned by the authenticated user.
-
-```
-GET /projects/owned
-```
-
-Parameters:
-
-| Attribute | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `archived` | boolean | no | Limit by archived status |
-| `visibility` | string | no | Limit by visibility `public`, `internal`, or `private` |
-| `order_by` | string | no | Return projects ordered by `id`, `name`, `path`, `created_at`, `updated_at`, or `last_activity_at` fields. Default is `created_at` |
-| `sort` | string | no | Return projects sorted in `asc` or `desc` order. Default is `desc` |
-| `search` | string | no | Return list of authorized projects matching the search criteria |
-| `simple` | boolean | no | Return only the ID, URL, name, and path of each project |
-| `statistics` | boolean | no | Include project statistics |
-
-### List starred projects
-
-Get a list of projects which are starred by the authenticated user.
-
-```
-GET /projects/starred
-```
-
-Parameters:
-
-| Attribute | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `archived` | boolean | no | Limit by archived status |
-| `visibility` | string | no | Limit by visibility `public`, `internal`, or `private` |
-| `order_by` | string | no | Return projects ordered by `id`, `name`, `path`, `created_at`, `updated_at`, or `last_activity_at` fields. Default is `created_at` |
-| `sort` | string | no | Return projects sorted in `asc` or `desc` order. Default is `desc` |
-| `search` | string | no | Return list of authorized projects matching the search criteria |
-| `simple` | boolean | no | Return only the ID, URL, name, and path of each project |
-
-### List ALL projects
-
-Get a list of all GitLab projects (admin only).
-
-```
-GET /projects/all
-```
-
-Parameters:
-
-| Attribute | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `archived` | boolean | no | Limit by archived status |
-| `visibility` | string | no | Limit by visibility `public`, `internal`, or `private` |
-| `order_by` | string | no | Return projects ordered by `id`, `name`, `path`, `created_at`, `updated_at`, or `last_activity_at` fields. Default is `created_at` |
-| `sort` | string | no | Return projects sorted in `asc` or `desc` order. Default is `desc` |
-| `search` | string | no | Return list of authorized projects matching the search criteria |
-| `statistics` | boolean | no | Include project statistics |
 
 ### Get single project
 
@@ -398,13 +206,11 @@ Parameters:
   "last_activity_at": "2013-09-30T13:46:02Z",
   "creator_id": 3,
   "namespace": {
-    "created_at": "2013-09-30T13:46:02Z",
-    "description": "",
     "id": 3,
     "name": "Diaspora",
-    "owner_id": 1,
     "path": "diaspora",
-    "updated_at": "2013-09-30T13:46:02Z"
+    "kind": "group",
+    "full_path": "diaspora"
   },
   "permissions": {
     "project_access": {
@@ -435,6 +241,7 @@ Parameters:
       "group_access_level": 10
     }
   ],
+  "repository_storage": "default",
   "only_allow_merge_if_build_succeeds": false,
   "only_allow_merge_if_all_discussions_are_resolved": false,
   "request_access_enabled": false
@@ -601,8 +408,6 @@ Parameters:
       },
       "created_at": "2015-12-04T10:33:56.698Z",
       "system": false,
-      "upvote": false,
-      "downvote": false,
       "noteable_id": 377,
       "noteable_type": "Issue"
     },
@@ -634,6 +439,7 @@ Parameters:
 | `name` | string | yes | The name of the new project |
 | `path` | string | no | Custom repository name for new project. By default generated based on name |
 | `namespace_id` | integer | no | Namespace for the new project (defaults to the current user's namespace) |
+| `default_branch` | string | no | `master` by default |
 | `description` | string | no | Short project description |
 | `issues_enabled` | boolean | no | Enable issues for this project |
 | `merge_requests_enabled` | boolean | no | Enable merge requests for this project |
@@ -642,7 +448,6 @@ Parameters:
 | `snippets_enabled` | boolean | no | Enable snippets for this project |
 | `container_registry_enabled` | boolean | no | Enable container registry for this project |
 | `shared_runners_enabled` | boolean | no | Enable shared runners for this project |
-| `public` | boolean | no | If `true`, the same as setting `visibility_level` to 20 |
 | `visibility_level` | integer | no | See [project visibility level](#project-visibility-level) |
 | `import_url` | string | no | URL to import repository from |
 | `public_builds` | boolean | no | If `true`, builds can be viewed by non-project-members |
@@ -650,6 +455,8 @@ Parameters:
 | `only_allow_merge_if_all_discussions_are_resolved` | boolean | no | Set whether merge requests can only be merged when all the discussions are resolved |
 | `lfs_enabled` | boolean | no | Enable LFS |
 | `request_access_enabled` | boolean | no | Allow users to request member access |
+| `repository_storage` | string | no | Which storage shard the repository is on. Available only to admins |
+| `approvals_before_merge` | integer | no | How many approvers should approve merge request by default |
 
 ### Create project for user
 
@@ -666,7 +473,6 @@ Parameters:
 | `user_id` | integer | yes | The user ID of the project owner |
 | `name` | string | yes | The name of the new project |
 | `path` | string | no | Custom repository name for new project. By default generated based on name |
-| `default_branch` | string | no | `master` by default |
 | `namespace_id` | integer | no | Namespace for the new project (defaults to the current user's namespace) |
 | `description` | string | no | Short project description |
 | `issues_enabled` | boolean | no | Enable issues for this project |
@@ -676,7 +482,6 @@ Parameters:
 | `snippets_enabled` | boolean | no | Enable snippets for this project |
 | `container_registry_enabled` | boolean | no | Enable container registry for this project |
 | `shared_runners_enabled` | boolean | no | Enable shared runners for this project |
-| `public` | boolean | no | If `true`, the same as setting `visibility_level` to 20 |
 | `visibility_level` | integer | no | See [project visibility level](#project-visibility-level) |
 | `import_url` | string | no | URL to import repository from |
 | `public_builds` | boolean | no | If `true`, builds can be viewed by non-project-members |
@@ -684,6 +489,8 @@ Parameters:
 | `only_allow_merge_if_all_discussions_are_resolved` | boolean | no | Set whether merge requests can only be merged when all the discussions are resolved |
 | `lfs_enabled` | boolean | no | Enable LFS |
 | `request_access_enabled` | boolean | no | Allow users to request member access |
+| `repository_storage` | string | no | Which storage shard the repository is on. Available only to admins |
+| `approvals_before_merge` | integer | no | How many approvers should approve merge request by default |
 
 ### Edit project
 
@@ -709,7 +516,6 @@ Parameters:
 | `snippets_enabled` | boolean | no | Enable snippets for this project |
 | `container_registry_enabled` | boolean | no | Enable container registry for this project |
 | `shared_runners_enabled` | boolean | no | Enable shared runners for this project |
-| `public` | boolean | no | If `true`, the same as setting `visibility_level` to 20 |
 | `visibility_level` | integer | no | See [project visibility level](#project-visibility-level) |
 | `import_url` | string | no | URL to import repository from |
 | `public_builds` | boolean | no | If `true`, builds can be viewed by non-project-members |
@@ -717,13 +523,15 @@ Parameters:
 | `only_allow_merge_if_all_discussions_are_resolved` | boolean | no | Set whether merge requests can only be merged when all the discussions are resolved |
 | `lfs_enabled` | boolean | no | Enable LFS |
 | `request_access_enabled` | boolean | no | Allow users to request member access |
+| `repository_storage` | string | no | Which storage shard the repository is on. Available only to admins |
+| `approvals_before_merge` | integer | no | How many approvers should approve merge request by default |
 
 ### Fork project
 
 Forks a project into the user namespace of the authenticated user or the one provided.
 
 ```
-POST /projects/fork/:id
+POST /projects/:id/fork
 ```
 
 Parameters:
@@ -782,13 +590,11 @@ Example response:
   "last_activity_at": "2013-09-30T13:46:02Z",
   "creator_id": 3,
   "namespace": {
-    "created_at": "2013-09-30T13:46:02Z",
-    "description": "",
     "id": 3,
     "name": "Diaspora",
-    "owner_id": 1,
     "path": "diaspora",
-    "updated_at": "2013-09-30T13:46:02Z"
+    "kind": "group",
+    "full_path": "diaspora"
   },
   "archived": true,
   "avatar_url": "http://example.com/uploads/project/avatar/3/uploads/avatar.png",
@@ -808,7 +614,7 @@ Example response:
 Unstars a given project. Returns status code `304` if the project is not starred.
 
 ```
-DELETE /projects/:id/star
+POST /projects/:id/unstar
 ```
 
 | Attribute | Type | Required | Description |
@@ -816,7 +622,7 @@ DELETE /projects/:id/star
 | `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
 
 ```bash
-curl --request DELETE --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v3/projects/5/star"
+curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v3/projects/5/unstar"
 ```
 
 Example response:
@@ -850,13 +656,11 @@ Example response:
   "last_activity_at": "2013-09-30T13:46:02Z",
   "creator_id": 3,
   "namespace": {
-    "created_at": "2013-09-30T13:46:02Z",
-    "description": "",
     "id": 3,
     "name": "Diaspora",
-    "owner_id": 1,
     "path": "diaspora",
-    "updated_at": "2013-09-30T13:46:02Z"
+    "kind": "group",
+    "full_path": "diaspora"
   },
   "archived": true,
   "avatar_url": "http://example.com/uploads/project/avatar/3/uploads/avatar.png",
@@ -924,13 +728,11 @@ Example response:
   "last_activity_at": "2013-09-30T13:46:02Z",
   "creator_id": 3,
   "namespace": {
-    "created_at": "2013-09-30T13:46:02Z",
-    "description": "",
     "id": 3,
     "name": "Diaspora",
-    "owner_id": 1,
     "path": "diaspora",
-    "updated_at": "2013-09-30T13:46:02Z"
+    "kind": "group",
+    "full_path": "diaspora"
   },
   "permissions": {
     "project_access": {
@@ -1009,13 +811,11 @@ Example response:
   "last_activity_at": "2013-09-30T13:46:02Z",
   "creator_id": 3,
   "namespace": {
-    "created_at": "2013-09-30T13:46:02Z",
-    "description": "",
     "id": 3,
     "name": "Diaspora",
-    "owner_id": 1,
     "path": "diaspora",
-    "updated_at": "2013-09-30T13:46:02Z"
+    "kind": "group",
+    "full_path": "diaspora"
   },
   "permissions": {
     "project_access": {
@@ -1400,3 +1200,106 @@ Parameters:
 | `query` | string | yes | A string contained in the project name |
 | `order_by` | string | no | Return requests ordered by `id`, `name`, `created_at` or `last_activity_at` fields |
 | `sort` | string | no | Return requests sorted in `asc` or `desc` order |
+
+## Start the Housekeeping task for a Project
+
+>**Note:** This feature was introduced in GitLab 9.0
+
+```
+POST /projects/:id/housekeeping
+>>>>>>> ce/master
+```
+
+Parameters:
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+
+## Push Rules (EE only)
+
+### Show project push rules
+
+Get a project push rule.
+
+```
+GET /projects/:id/push_rule
+```
+
+Parameters:
+
+- `id` (required) - The ID of a project
+
+
+```json
+{
+  "id": 1,
+  "project_id": 3,
+  "commit_message_regex": "Fixes \d +\",
+  "deny_delete_tag": false,
+  "created_at": "2012-10-12T17:04:47Z",
+  "member_check": false,
+  "prevent_secrets": false,
+  "author_email_regex": "",
+  "file_name_regex": "",
+  "max_file_size": 5
+}
+```
+
+### Add project push rule
+
+Adds a push rule to a specified project.
+
+```
+POST /projects/:id/push_rule
+```
+
+Parameters:
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `deny_delete_tag` | boolean | no | Deny deleting a tag |
+| `member_check` | boolean | no | Restrict commits by author (email) to existing GitLab users |
+| `prevent_secrets` | boolean | no | GitLab will reject any files that are likely to contain secrets |
+| `commit_message_regex` | string | no | All commit messages must match this, e.g. `Fixed \d+\..*` |
+| `author_email_regex` | string | no | All commit author emails must match this, e.g. `@my-company.com$` |
+| `file_name_regex` | string | no | All commited filenames must **not** match this, e.g. `(jar|exe)$` |
+| `max_file_size` | integer | no | Maximum file size (MB) |
+
+### Edit project push rule
+
+Edits a push rule for a specified project.
+
+```
+PUT /projects/:id/push_rule
+```
+
+Parameters:
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `deny_delete_tag` | boolean | no | Deny deleting a tag |
+| `member_check` | boolean | no | Restrict commits by author (email) to existing GitLab users |
+| `prevent_secrets` | boolean | no | GitLab will reject any files that are likely to contain secrets |
+| `commit_message_regex` | string | no | All commit messages must match this, e.g. `Fixed \d+\..*` |
+| `author_email_regex` | string | no | All commit author emails must match this, e.g. `@my-company.com$` |
+| `file_name_regex` | string | no | All commited filenames must **not** match this, e.g. `(jar|exe)$` |
+| `max_file_size` | integer | no | Maximum file size (MB) |
+
+### Delete project push rule
+
+Removes a push rule from a project. This is an idempotent method and can be called multiple times.
+Either the push rule is available or not.
+
+```
+DELETE /projects/:id/push_rule
+```
+
+Parameters:
+
+- `id` (required) - The ID of a project
+
+Note the JSON response differs if the push rule is available or not. If the project push rule
+is available before it is returned in the JSON response or an empty response is returned.

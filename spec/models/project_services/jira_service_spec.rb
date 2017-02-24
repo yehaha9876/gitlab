@@ -71,7 +71,7 @@ describe JiraService, models: true do
   describe '#close_issue' do
     let(:custom_base_url) { 'http://custom_url' }
     let(:user)    { create(:user) }
-    let(:project) { create(:project) }
+    let(:project) { create(:empty_project) }
     let(:merge_request) { create(:merge_request) }
 
     before do
@@ -135,7 +135,7 @@ describe JiraService, models: true do
             url: "#{Gitlab.config.gitlab.url}/#{project.path_with_namespace}/commit/#{merge_request.diff_head_sha}",
             title: "GitLab: Solved by commit #{merge_request.diff_head_sha}.",
             icon: { title: "GitLab", url16x16: "https://gitlab.com/favicon.ico" },
-            status: { resolved: true, icon: { url16x16: "http://www.openwebgraphics.com/resources/data/1768/16x16_apply.png", title: "Closed" } }
+            status: { resolved: true }
           }
         )
       ).once
@@ -207,12 +207,12 @@ describe JiraService, models: true do
   end
 
   describe "Stored password invalidation" do
-    let(:project) { create(:project) }
+    let(:project) { create(:empty_project) }
 
     context "when a password was previously set" do
       before do
         @jira_service = JiraService.create!(
-          project: create(:project),
+          project: project,
           properties: {
             url: 'http://jira.example.com/rest/api/2',
             username: 'mic',
@@ -220,13 +220,13 @@ describe JiraService, models: true do
           }
         )
       end
-
+  
       it "reset password if url changed" do
         @jira_service.url = 'http://jira_edited.example.com/rest/api/2'
         @jira_service.save
         expect(@jira_service.password).to be_nil
       end
-
+  
       it "does not reset password if username changed" do
         @jira_service.username = "some_name"
         @jira_service.save
@@ -248,11 +248,11 @@ describe JiraService, models: true do
         expect(@jira_service.password).to be_nil
       end
     end
-
+    
     context "when no password was previously set" do
       before do
         @jira_service = JiraService.create(
-          project: create(:project),
+          project: project,
           properties: {
             url: 'http://jira.example.com/rest/api/2',
             username: 'mic'
@@ -281,7 +281,7 @@ describe JiraService, models: true do
   end
 
   describe 'description and title' do
-    let(:project) { create(:project) }
+    let(:project) { create(:empty_project) }
 
     context 'when it is not set' do
       before do
@@ -316,7 +316,7 @@ describe JiraService, models: true do
   end
 
   describe 'project and issue urls' do
-    let(:project) { create(:project) }
+    let(:project) { create(:empty_project) }
 
     context 'when gitlab.yml was initialized' do
       before do

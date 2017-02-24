@@ -1,190 +1,160 @@
-/* eslint-disable no-param-reassign */
-(() => {
-  window.gl = window.gl || {};
-  window.gl.environmentsList = window.gl.environmentsList || {};
+require('~/lib/utils/common_utils');
+/**
+ * Environments Store.
+ *
+ * Stores received environments, count of stopped environments and count of
+ * available environments.
+ */
+class EnvironmentsStore {
+  constructor() {
+    this.state = {};
+    this.state.environments = [];
+    this.state.stoppedCounter = 0;
+    this.state.availableCounter = 0;
+    this.state.paginationInformation = {};
 
-  gl.environmentsList.EnvironmentsStore = {
-    state: {},
+    return this;
+  }
 
-    create() {
-      this.state.environments = [];
-      this.state.stoppedCounter = 0;
-      this.state.availableCounter = 0;
-      this.state.visibility = 'available';
-      this.state.filteredEnvironments = [];
+  /**
+   *
+   * Stores the received environments.
+   *
+   * In the main environments endpoint, each environment has the following schema
+   * { name: String, size: Number, latest: Object }
+   * In the endpoint to retrieve environments from each folder, the environment does
+   * not have the `latest` key and the data is all in the root level.
+   * To avoid doing this check in the view, we store both cases the same by extracting
+   * what is inside the `latest` key.
+   *
+   * If the `size` is bigger than 1, it means it should be rendered as a folder.
+   * In those cases we add `isFolder` key in order to render it properly.
+   *
+   * Top level environments - when the size is 1 - with `rollout_status_path`
+   * can render a deploy board. We add `isDeployBoardVisible` and `deployBoardData`
+   * keys to those environments.
+   * The first key will let's us know if we should or not render the deploy board.
+   * It will be toggled when the user clicks to seee the deploy board.
+   *
+   * The second key will allow us to update the environment with the received deploy board data.
+   *
+   * @param  {Array} environments
+   * @returns {Array}
+   */
+  storeEnvironments(environments = []) {
+    const filteredEnvironments = environments.map((env) => {
+      let filtered = {};
 
-      return this;
-    },
+      if (env.latest) {
+        filtered = Object.assign({}, env, env.latest);
+        delete filtered.latest;
+      } else {
+        filtered = Object.assign({}, env);
+      }
 
-    /**
-     * In order to display a tree view we need to modify the received
-     * data in to a tree structure based on `environment_type`
-     * sorted alphabetically.
-     * In each children a `vue-` property will be added. This property will be
-     * used to know if an item is a children mostly for css purposes. This is
-     * needed because the children row is a fragment instance and therfore does
-     * not accept non-prop attributes.
-     *
-     *
-     * @example
-     * it will transform this:
-     * [
-     *   { name: "environment", environment_type: "review" },
-     *   { name: "environment_1", environment_type: null }
-     *   { name: "environment_2, environment_type: "review" }
-     * ]
-     * into this:
-     * [
-     *   { name: "review", children:
-     *      [
-     *        { name: "environment", environment_type: "review", vue-isChildren: true},
-     *        { name: "environment_2", environment_type: "review", vue-isChildren: true}
-     *      ]
-     *   },
-     *  {name: "environment_1", environment_type: null}
-     * ]
-     *
-     *
-     * @param  {Array} environments List of environments.
-     * @returns {Array} Tree structured array with the received environments.
-     */
-    storeEnvironments(environments = []) {
-      this.state.stoppedCounter = this.countByState(environments, 'stopped');
-      this.state.availableCounter = this.countByState(environments, 'available');
+      if (filtered.size > 1) {
+        filtered = Object.assign(filtered, env, { isFolder: true, folderName: env.name });
+      } else if (filtered.size === 1 && filtered.rollout_status_path) {
+        filtered = Object.assign(filtered, env, {
+          hasDeployBoard: true,
+          isDeployBoardVisible: false,
+          deployBoardData: {},
+        });
+      }
 
-      const environmentsTree = environments.reduce((acc, environment) => {
-        if (environment.environment_type !== null) {
-          const occurs = acc.filter(element => element.children &&
-             element.name === environment.environment_type);
+      return filtered;
+    });
 
-          environment['vue-isChildren'] = true;
+    this.state.environments = filteredEnvironments;
 
-          if (occurs.length) {
-            acc[acc.indexOf(occurs[0])].children.push(environment);
-            acc[acc.indexOf(occurs[0])].children.slice().sort(this.sortByName);
-          } else {
-            acc.push({
-              name: environment.environment_type,
-              children: [environment],
-              isOpen: false,
-              'vue-isChildren': environment['vue-isChildren'],
-            });
-          }
-        } else {
-          acc.push(environment);
-        }
+    return filteredEnvironments;
+  }
 
-        return acc;
-      }, []).slice().sort(this.sortByName);
+  /**
+   * Stores the pagination information needed to render the pagination for the
+   * table.
+   *
+   * Normalizes the headers to uppercase since they can be provided either
+   * in uppercase or lowercase.
+   *
+   * Parses to an integer the normalized ones needed for the pagination component.
+   *
+   * Stores the normalized and parsed information.
+   *
+   * @param  {Object} pagination = {}
+   * @return {Object}
+   */
+  setPagination(pagination = {}) {
+    const normalizedHeaders = gl.utils.normalizeHeaders(pagination);
+    const paginationInformation = gl.utils.parseIntPagination(normalizedHeaders);
 
-      this.state.environments = environmentsTree;
+    this.state.paginationInformation = paginationInformation;
+    return paginationInformation;
+  }
 
-      this.filterEnvironmentsByVisibility(this.state.environments);
+  /**
+   * Stores the number of available environments.
+   *
+   * @param  {Number} count = 0
+   * @return {Number}
+   */
+  storeAvailableCount(count = 0) {
+    this.state.availableCounter = count;
+    return count;
+  }
 
-      return environmentsTree;
-    },
+  /**
+   * Stores the number of closed environments.
+   *
+   * @param  {Number} count = 0
+   * @return {Number}
+   */
+  storeStoppedCount(count = 0) {
+    this.state.stoppedCounter = count;
+    return count;
+  }
 
-    storeVisibility(visibility) {
-      this.state.visibility = visibility;
-    },
-    /**
-     * Given the visibility prop provided by the url query parameter and which
-     * changes according to the active tab we need to filter which environments
-     * should be visible.
-     *
-     * The environments array is a recursive tree structure and we need to filter
-     * both root level environments and children environments.
-     *
-     * In order to acomplish that, both `filterState` and `filterEnvironmentsByVisibility`
-     * functions work together.
-     * The first one works as the filter that verifies if the given environment matches
-     * the given state.
-     * The second guarantees both root level and children elements are filtered as well.
-     *
-     * Given array of environments will return only
-     * the environments that match the state stored.
-     *
-     * @param {Array} array
-     * @return {Array}
-     */
-    filterEnvironmentsByVisibility(arr) {
-      const filteredEnvironments = arr.map((item) => {
-        if (item.children) {
-          const filteredChildren = this.filterEnvironmentsByVisibility(
-            item.children,
-          ).filter(Boolean);
+  /**
+   * Toggles deploy board visibility for the provided environment ID.
+   *
+   * @param  {Object} environment
+   * @return {Array}
+   */
+  toggleDeployBoard(environmentID) {
+    const environments = Object.assign([], this.state.environments);
 
-          if (filteredChildren.length) {
-            item.children = filteredChildren;
-            return item;
-          }
-        }
+    this.state.environments = environments.map((env) => {
+      let updated = Object.assign({}, env);
 
-        return this.filterState(this.state.visibility, item);
-      }).filter(Boolean);
+      if (env.id === environmentID) {
+        updated = Object.assign({}, updated, { isDeployBoardVisible: !env.isDeployBoardVisible });
+      }
+      return updated;
+    });
 
-      this.state.filteredEnvironments = filteredEnvironments;
-      return filteredEnvironments;
-    },
+    return this.state.environments;
+  }
 
-    /**
-     * Given the state and the environment,
-     * returns only if the environment state matches the one provided.
-     *
-     * @param  {String} state
-     * @param  {Object} environment
-     * @return {Object}
-     */
-    filterState(state, environment) {
-      return environment.state === state && environment;
-    },
+  /**
+   * Store deploy board data for given environment.
+   *
+   * @param  {Number} environmentID
+   * @param  {Object} deployBoard
+   * @return {Array}
+   */
+  storeDeployBoard(environmentID, deployBoard) {
+    const environments = Object.assign([], this.state.environments);
 
-    /**
-     * Toggles folder open property given the environment type.
-     *
-     * @param  {String} envType
-     * @return {Array}
-     */
-    toggleFolder(envType) {
-      const environments = this.state.environments;
+    this.state.environments = environments.map((env) => {
+      let updated = Object.assign({}, env);
 
-      const environmentsCopy = environments.map((env) => {
-        if (env['vue-isChildren'] && env.name === envType) {
-          env.isOpen = !env.isOpen;
-        }
+      if (env.id === environmentID) {
+        updated = Object.assign({}, updated, { deployBoardData: deployBoard });
+      }
+      return updated;
+    });
+    return this.state.environments;
+  }
+}
 
-        return env;
-      });
-
-      this.state.environments = environmentsCopy;
-
-      return environmentsCopy;
-    },
-
-    /**
-     * Given an array of environments, returns the number of environments
-     * that have the given state.
-     *
-     * @param  {Array} environments
-     * @param  {String} state
-     * @returns {Number}
-     */
-    countByState(environments, state) {
-      return environments.filter(env => env.state === state).length;
-    },
-
-    /**
-     * Sorts the two objects provided by their name.
-     *
-     * @param  {Object} a
-     * @param  {Object} b
-     * @returns {Number}
-     */
-    sortByName(a, b) {
-      const nameA = a.name.toUpperCase();
-      const nameB = b.name.toUpperCase();
-
-      return nameA < nameB ? -1 : nameA > nameB ? 1 : 0; // eslint-disable-line
-    },
-  };
-})();
+module.exports = EnvironmentsStore;

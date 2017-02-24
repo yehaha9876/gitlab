@@ -1,70 +1,124 @@
-/* global environmentsList */
-
-//= require vue
-//= require environments/stores/environments_store
-//= require ./mock_data
+const Store = require('~/environments/stores/environments_store');
+const { serverData, deployBoardMockData } = require('./mock_data');
 
 (() => {
-  describe('Store', () => {
+  describe('Environments Store', () => {
+    let store;
+
     beforeEach(() => {
-      gl.environmentsList.EnvironmentsStore.create();
+      store = new Store();
     });
 
     it('should start with a blank state', () => {
-      expect(gl.environmentsList.EnvironmentsStore.state.environments.length).toBe(0);
-      expect(gl.environmentsList.EnvironmentsStore.state.stoppedCounter).toBe(0);
-      expect(gl.environmentsList.EnvironmentsStore.state.availableCounter).toBe(0);
+      expect(store.state.environments.length).toEqual(0);
+      expect(store.state.stoppedCounter).toEqual(0);
+      expect(store.state.availableCounter).toEqual(0);
+      expect(store.state.paginationInformation).toEqual({});
     });
 
     describe('store environments', () => {
-      beforeEach(() => {
-        gl.environmentsList.EnvironmentsStore.storeEnvironments(environmentsList);
+      it('should store environments', () => {
+        store.storeEnvironments(serverData);
+        expect(store.state.environments.length).toEqual(serverData.length);
       });
 
-      it('should count stopped environments and save the count in the state', () => {
-        expect(gl.environmentsList.EnvironmentsStore.state.stoppedCounter).toBe(1);
+      it('should store a non folder environment with deploy board if rollout_status_path key is provided', () => {
+        const environment = {
+          name: 'foo',
+          size: 1,
+          id: 1,
+          rollout_status_path: 'url',
+        };
+
+        store.storeEnvironments([environment]);
+        expect(store.state.environments[0].hasDeployBoard).toEqual(true);
+        expect(store.state.environments[0].isDeployBoardVisible).toEqual(false);
+        expect(store.state.environments[0].deployBoardData).toEqual({});
       });
 
-      it('should count available environments and save the count in the state', () => {
-        expect(gl.environmentsList.EnvironmentsStore.state.availableCounter).toBe(3);
+      it('should add folder keys when environment is a folder', () => {
+        const environment = {
+          name: 'bar',
+          size: 3,
+          id: 2,
+        };
+
+        store.storeEnvironments([environment]);
+        expect(store.state.environments[0].isFolder).toEqual(true);
+        expect(store.state.environments[0].folderName).toEqual('bar');
       });
 
-      it('should store environments with same environment_type as sibilings', () => {
-        expect(gl.environmentsList.EnvironmentsStore.state.environments.length).toBe(3);
+      it('should extract content of `latest` key when provided', () => {
+        const environment = {
+          name: 'bar',
+          size: 3,
+          id: 2,
+          latest: {
+            last_deployment: {},
+            isStoppable: true,
+          },
+        };
 
-        const parentFolder = gl.environmentsList.EnvironmentsStore.state.environments
-        .filter(env => env.children && env.children.length > 0);
-
-        expect(parentFolder[0].children.length).toBe(2);
-        expect(parentFolder[0].children[0].environment_type).toBe('review');
-        expect(parentFolder[0].children[1].environment_type).toBe('review');
-        expect(parentFolder[0].children[0].name).toBe('test-environment');
-        expect(parentFolder[0].children[1].name).toBe('test-environment-1');
-      });
-
-      it('should sort the environments alphabetically', () => {
-        const { environments } = gl.environmentsList.EnvironmentsStore.state;
-
-        expect(environments[0].name).toBe('production');
-        expect(environments[1].name).toBe('review');
-        expect(environments[1].children[0].name).toBe('test-environment');
-        expect(environments[1].children[1].name).toBe('test-environment-1');
-        expect(environments[2].name).toBe('review_app');
+        store.storeEnvironments([environment]);
+        expect(store.state.environments[0].last_deployment).toEqual({});
+        expect(store.state.environments[0].isStoppable).toEqual(true);
       });
     });
 
-    describe('toggleFolder', () => {
+    it('should store available count', () => {
+      store.storeAvailableCount(2);
+      expect(store.state.availableCounter).toEqual(2);
+    });
+
+    it('should store stopped count', () => {
+      store.storeStoppedCount(2);
+      expect(store.state.stoppedCounter).toEqual(2);
+    });
+
+    describe('store pagination', () => {
+      it('should store normalized and integer pagination information', () => {
+        const pagination = {
+          'X-nExt-pAge': '2',
+          'X-page': '1',
+          'X-Per-Page': '1',
+          'X-Prev-Page': '2',
+          'X-TOTAL': '37',
+          'X-Total-Pages': '2',
+        };
+
+        const expectedResult = {
+          perPage: 1,
+          page: 1,
+          total: 37,
+          totalPages: 2,
+          nextPage: 2,
+          previousPage: 2,
+        };
+
+        store.setPagination(pagination);
+        expect(store.state.paginationInformation).toEqual(expectedResult);
+      });
+    });
+
+    describe('deploy boards', () => {
       beforeEach(() => {
-        gl.environmentsList.EnvironmentsStore.storeEnvironments(environmentsList);
+        const environment = {
+          name: 'foo',
+          size: 1,
+          id: 1,
+        };
+
+        store.storeEnvironments([environment]);
       });
 
-      it('should toggle the open property for the given environment', () => {
-        gl.environmentsList.EnvironmentsStore.toggleFolder('review');
+      it('should toggle deploy board property for given environment id', () => {
+        store.toggleDeployBoard(1);
+        expect(store.state.environments[0].isDeployBoardVisible).toEqual(true);
+      });
 
-        const { environments } = gl.environmentsList.EnvironmentsStore.state;
-        const environment = environments.filter(env => env['vue-isChildren'] === true && env.name === 'review');
-
-        expect(environment[0].isOpen).toBe(true);
+      it('should store deploy board data for given environment id', () => {
+        store.storeDeployBoard(1, deployBoardMockData);
+        expect(store.state.environments[0].deployBoardData).toEqual(deployBoardMockData);
       });
     });
   });
