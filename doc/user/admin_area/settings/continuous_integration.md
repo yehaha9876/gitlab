@@ -36,7 +36,6 @@ expiration.
 
 1. Hit **Save** for the changes to take effect.
 
-<<<<<<< ba4fe08c432bf5d296367405061491193b91cf76
 ---
 
 While the setting in the Admin area has a global effect, as an admin you can
