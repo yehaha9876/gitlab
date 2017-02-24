@@ -2,7 +2,12 @@
 
 source "/opt/kubernetes-deploy/src/common.bash"
 
-export GITLAB_REVIEW_APP_IMAGE=ayufan/gitlab-development-kit
+tag=latest
+if [[ -n "$1" ]]; then
+  tag="$1"
+fi
+
+export GITLAB_REVIEW_APP_IMAGE=ayufan/gitlab-development-kit:$tag
 
 if [[ -z "$CI_ENVIRONMENT_URL" ]]; then
   echo "Reading CI_ENVIRONMENT_URL from .gitlab-ci.yml..."
