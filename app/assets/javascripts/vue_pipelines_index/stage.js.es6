@@ -38,6 +38,12 @@ import warningSvg from '../../../views/shared/icons/_icon_status_warning_borderl
         required: true,
       },
     },
+
+    updated() {
+      if (this.builds) {
+        this.stopDropdownClickPropagation();
+      }
+    },
     methods: {
       fetchBuilds(e) {
         const areaExpanded = e.currentTarget.attributes['aria-expanded'];
