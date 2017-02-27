@@ -9,7 +9,7 @@
     gl.compileApprovalsWidget = () => {
       const rootEl = document.getElementById('merge-request-widget-app');
 
-      if (gl.MergeRequestWidgetApp) {
+      if (gl.MergeRequestWidgetApp && widgetSharedStore) {
         gl.MergeRequestWidgetApp.$destroy();
       } else {
         widgetSharedStore = new gl.MergeRequestWidgetStore(rootEl);
