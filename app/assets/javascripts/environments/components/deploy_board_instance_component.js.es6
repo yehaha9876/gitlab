@@ -8,9 +8,7 @@
  *
  */
 
-const Vue = require('vue');
-
-module.exports = Vue.component('deploy_board_instance_component', {
+module.exports = {
 
   props: {
 
@@ -48,4 +46,4 @@ module.exports = Vue.component('deploy_board_instance_component', {
       data-placement="top">
     </div>
   `,
-});
+};
