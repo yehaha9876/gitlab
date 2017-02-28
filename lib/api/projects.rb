@@ -111,8 +111,7 @@ module API
       get do
         authenticate!
 
-        present_projects current_user.authorized_projects,
-          with: Entities::ProjectWithAccess
+        present_projects ProjectsFinder.new.execute(current_user), with: Entities::ProjectWithAccess
       end
 
       desc 'Get an owned projects list for authenticated user' do
