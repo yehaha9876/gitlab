@@ -2,14 +2,17 @@
 /* global EditBlob */
 /* global NewCommitForm */
 
-require('./edit_blob');
+const EditBlob = require('./edit_blob');
 
-(function() {
-  $(function() {
-    var url = $(".js-edit-blob-form").data("relative-url-root");
-    url += $(".js-edit-blob-form").data("assets-prefix");
+$(function() {
+  const $editBlobForm = $('.js-edit-blob-form');
 
-    var blob = new EditBlob(url, $('.js-edit-blob-form').data('blob-language'));
-    new NewCommitForm($('.js-edit-blob-form'));
-  });
-}).call(window);
+  const relativeUrlRoot = $editBlobForm.data('relative-url-root');
+  const assetsPrefix = $editBlobForm.data('assets-prefix');
+  const blobLanguage = $editBlobForm.data('blob-language');
+
+  const assetsPath = relativeUrlRoot + assetsPrefix;
+
+  new EditBlob(assetsPath, blobLanguage);
+  new NewCommitForm($editBlobForm);
+});
