@@ -2,7 +2,8 @@
 # before other initializers as Rails may otherwise memoize a list of migrations
 # excluding the post deployment migrations.
 unless ENV['SKIP_POST_DEPLOYMENT_MIGRATIONS']
-  path = Rails.root.join('db', 'post_migrate').to_s
+  db_path = Rails.application.config.paths['db'].first
+  path = Rails.root.join(db_path, 'post_migrate').to_s
 
   Rails.application.config.paths['db/migrate'] << path
 
