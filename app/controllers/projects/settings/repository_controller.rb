@@ -2,6 +2,8 @@ module Projects
   module Settings
     class RepositoryController < Projects::ApplicationController
       before_action :authorize_admin_project!
+      before_action :push_rule, only: [:show]
+      before_action :remote_mirror, only: [:show]
 
       def show
         @deploy_keys = DeployKeysPresenter
@@ -16,6 +18,14 @@ module Projects
         load_protected_branches
         @protected_branch = @project.protected_branches.new
         load_gon_index
+      end
+
+      def push_rule
+        @push_rule ||= PushRule.find_or_create_by(is_sample: true)
+      end
+
+      def remote_mirror
+        @remote_mirror = @project.remote_mirrors.first_or_initialize
       end
 
       def load_protected_branches
@@ -33,7 +43,9 @@ module Projects
             roles: ProtectedBranch::MergeAccessLevel.human_access_levels.map do |id, text|
               { id: id, text: text, before_divider: true }
             end
-          }
+          },
+          selected_merge_access_levels: @protected_branch.merge_access_levels.map { |access_level| access_level.user_id || access_level.access_level },
+          selected_push_access_levels: @protected_branch.push_access_levels.map { |access_level| access_level.user_id || access_level.access_level }
         }
       end
 
@@ -43,7 +55,9 @@ module Projects
       end
 
       def load_gon_index
-        gon.push(open_branches.merge(access_levels_options))
+        params = open_branches
+        params[:current_project_id] = @project.id if @project
+        gon.push(params.merge(access_levels_options))
       end
     end
   end
