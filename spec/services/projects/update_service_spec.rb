@@ -107,9 +107,8 @@ describe Projects::UpdateService, services: true do
 
       storages = {
         'a' => { 'path' => 'tmp/tests/storage_a' },
-        'b' => { 'path' => 'tmp/tests/storage_b' },
+        'b' => { 'path' => 'tmp/tests/storage_b' }
       }
-
       allow(Gitlab.config.repositories).to receive(:storages).and_return(storages)
     end
 
