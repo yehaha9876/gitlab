@@ -107,7 +107,7 @@ class Notify < BaseMailer
     "<#{model_name}_#{model.id}@#{Gitlab.config.gitlab.host}>"
   end
 
-  def mail_thread(model, headers = {})
+  def mail_thread(model, headers = {}, &block)
     add_project_headers
     add_unsubscription_headers_and_links
 
@@ -127,17 +127,17 @@ class Notify < BaseMailer
       @reply_by_email = true
     end
 
-    mail(headers)
+    mail(headers, &block)
   end
 
   # Send an email that starts a new conversation thread,
   # with headers suitable for grouping by thread in email clients.
   #
   # See: mail_answer_thread
-  def mail_new_thread(model, headers = {})
+  def mail_new_thread(model, headers = {}, &block)
     headers['Message-ID'] = message_id(model)
 
-    mail_thread(model, headers)
+    mail_thread(model, headers, &block)
   end
 
   # Send an email that responds to an existing conversation thread,
@@ -148,14 +148,14 @@ class Notify < BaseMailer
   #  * have a subject that begin by 'Re: '
   #  * have a 'In-Reply-To' or 'References' header that references the original 'Message-ID'
   #
-  def mail_answer_thread(model, headers = {})
+  def mail_answer_thread(model, headers = {}, &block)
     headers['Message-ID'] = "<#{SecureRandom.hex}@#{Gitlab.config.gitlab.host}>"
     headers['In-Reply-To'] = message_id(model)
     headers['References'] = message_id(model)
 
     headers[:subject]&.prepend('Re: ')
 
-    mail_thread(model, headers)
+    mail_thread(model, headers, &block)
   end
 
   def reply_key
