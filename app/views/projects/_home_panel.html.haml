@@ -36,7 +36,7 @@
 
         - if current_user
           - if can?(current_user, :download_code, @project)
-            = render 'projects/buttons/download', project: @project, ref: @ref
+            = render 'projects/buttons/download', project: @project, ref: @ref, pipeline: @project.pipelines.latest_successful_for(@ref)
             = render 'projects/buttons/dropdown'
             = render 'projects/buttons/koding'
 

@@ -114,6 +114,12 @@ module Ci
       success.latest(ref).order(id: :desc).first
     end
 
+    def self.latest_successful_for_multiple(refs)
+      success.latest(refs).order(id: :desc).group_by(&:ref).each_with_object({}) do |(key, value), hash|
+        hash[key] = value.first
+      end
+    end
+
     def self.truncate_sha(sha)
       sha[0...8]
     end

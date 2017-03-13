@@ -10,7 +10,10 @@ class Projects::BranchesController < Projects::ApplicationController
   def index
     @sort = params[:sort].presence || sort_value_name
     @branches = BranchesFinder.new(@repository, params).execute
-    @branches = Kaminari.paginate_array(@branches).page(params[:page])
+    @branches = Kaminari.paginate_array(@branches).page(params[:page]) unless params[:show_all].present?
+
+    branch_names = @branches.map(&:name)
+    @refs_pipelines = @project.pipelines.latest_successful_for_multiple(branch_names)
 
     @max_commits = @branches.reduce(0) do |memo, branch|
       diverging_commit_counts = repository.diverging_commit_counts(branch)
@@ -20,7 +23,7 @@ class Projects::BranchesController < Projects::ApplicationController
     respond_to do |format|
       format.html
       format.json do
-        render json: @branches.map(&:name)
+        render json: branch_names
       end
     end
   end

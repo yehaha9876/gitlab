@@ -9,7 +9,7 @@
 %div{ class: container_class }
   .tree-controls
     = render 'projects/find_file_link'
-    = render 'projects/buttons/download', project: @project, ref: @ref
+    = render 'projects/buttons/download', project: @project, ref: @ref, pipeline: @project.pipelines.latest_successful_for(@ref)
 
   #tree-holder.tree-holder.clearfix
     .nav-block

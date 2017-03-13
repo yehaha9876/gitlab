@@ -24,7 +24,6 @@
           %i.fa.fa-download
           %span Download tar
 
-      - pipeline = project.pipelines.latest_successful_for(ref)
       - if pipeline
         - artifacts = pipeline.builds.latest.with_artifacts
         - if artifacts.any?
