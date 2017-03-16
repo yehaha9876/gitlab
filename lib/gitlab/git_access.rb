@@ -197,6 +197,10 @@ module Gitlab
       ).exec
     end
 
+    def matching_merge_request?(newrev, branch_name)
+      Checks::MatchingMergeRequest.new(newrev, branch_name, project).match?
+    end
+
     def deploy_key
       actor if deploy_key?
     end
