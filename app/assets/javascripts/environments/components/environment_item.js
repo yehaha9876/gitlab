@@ -4,18 +4,20 @@
  * Renders a table row for each environment.
  */
 
-import Timeago from 'timeago.js';
-import ActionsComponent from './environment_actions';
-import ExternalUrlComponent from './environment_external_url';
-import StopComponent from './environment_stop';
-import RollbackComponent from './environment_rollback';
-import TerminalButtonComponent from './environment_terminal_button';
-import '../../lib/utils/text_utility';
-import '../../vue_shared/components/commit';
+const Vue = require('vue');
+const Timeago = require('timeago.js');
+
+require('../../lib/utils/text_utility');
+require('../../vue_shared/components/commit');
+const ActionsComponent = require('./environment_actions');
+const ExternalUrlComponent = require('./environment_external_url');
+const StopComponent = require('./environment_stop');
+const RollbackComponent = require('./environment_rollback');
+const TerminalButtonComponent = require('./environment_terminal_button');
 
 const timeagoInstance = new Timeago();
 
-export default {
+module.exports = Vue.component('environment-item', {
 
   components: {
     'commit-component': gl.CommitComponent,
@@ -48,12 +50,6 @@ export default {
     toggleDeployBoard: {
       type: Function,
       required: false,
-    },
-
-    service: {
-      type: Object,
-      required: true,
-      default: () => ({}),
     },
   },
 
@@ -513,25 +509,22 @@ export default {
       <td class="environments-actions">
         <div v-if="!model.isFolder" class="btn-group pull-right" role="group">
           <actions-component v-if="hasManualActions && canCreateDeployment"
-            :service="service"
             :actions="manualActions"/>
 
           <external-url-component v-if="externalURL && canReadEnvironment"
             :external-url="externalURL"/>
 
           <stop-component v-if="hasStopAction && canCreateDeployment"
-            :stop-url="model.stop_path"
-            :service="service"/>
+            :stop-url="model.stop_path"/>
 
           <terminal-button-component v-if="model && model.terminal_path"
             :terminal-path="model.terminal_path"/>
 
           <rollback-component v-if="canRetry && canCreateDeployment"
             :is-last-deployment="isLastDeployment"
-            :retry-url="retryUrl"
-            :service="service"/>
+            :retry-url="retryUrl"/>
         </div>
       </td>
     </tr>
   `,
-};
+});

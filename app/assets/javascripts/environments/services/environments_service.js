@@ -1,7 +1,7 @@
-/* eslint-disable class-methods-use-this */
-import Vue from 'vue';
+/* eslint-disable class-methods-use-this*/
+const Vue = require('vue');
 
-export default class EnvironmentsService {
+class EnvironmentsService {
   constructor(endpoint) {
     this.environments = Vue.resource(endpoint);
   }
@@ -13,8 +13,6 @@ export default class EnvironmentsService {
   getDeployBoard(endpoint) {
     return Vue.http.get(endpoint);
   }
-
-  postAction(endpoint) {
-    return Vue.http.post(endpoint, {}, { emulateJSON: true });
-  }
 }
+
+module.exports = EnvironmentsService;

@@ -1,11 +1,9 @@
-import Vue from 'vue';
-import environmentTableComp from '~/environments/components/environments_table';
+const EnvironmentTable = require('~/environments/components/environments_table');
 
 describe('Environment item', () => {
-  let EnvironmentTable;
-
+  preloadFixtures('static/environments/element.html.raw');
   beforeEach(() => {
-    EnvironmentTable = Vue.extend(environmentTableComp);
+    loadFixtures('static/environments/element.html.raw');
   });
 
   it('Should render a table', () => {
@@ -27,7 +25,7 @@ describe('Environment item', () => {
         store: {},
         service: {},
       },
-    }).$mount();
+    });
 
     expect(component.$el.tagName).toEqual('TABLE');
   });
@@ -62,7 +60,7 @@ describe('Environment item', () => {
         store: {},
         service: {},
       },
-    }).$mount();
+    });
 
     expect(component.$el.querySelector('.js-deploy-board-row')).toBeDefined();
     expect(
@@ -102,7 +100,7 @@ describe('Environment item', () => {
         store: {},
         service: {},
       },
-    }).$mount();
+    });
 
     component.$el.querySelector('.deploy-board-icon').click();
 

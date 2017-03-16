@@ -1,12 +1,10 @@
-import 'timeago.js';
-import Vue from 'vue';
-import environmentItemComp from '~/environments/components/environment_item';
+window.timeago = require('timeago.js');
+const EnvironmentItem = require('~/environments/components/environment_item');
 
 describe('Environment item', () => {
-  let EnvironmentItem;
-
+  preloadFixtures('static/environments/table.html.raw');
   beforeEach(() => {
-    EnvironmentItem = Vue.extend(environmentItemComp);
+    loadFixtures('static/environments/table.html.raw');
   });
 
   describe('When item is folder', () => {
@@ -23,6 +21,7 @@ describe('Environment item', () => {
       };
 
       component = new EnvironmentItem({
+        el: document.querySelector('tr#environment-row'),
         propsData: {
           model: mockItem,
           canCreateDeployment: false,
@@ -31,7 +30,7 @@ describe('Environment item', () => {
           store: {},
           service: {},
         },
-      }).$mount();
+      });
     });
 
     it('Should render folder icon and name', () => {
@@ -113,6 +112,7 @@ describe('Environment item', () => {
       };
 
       component = new EnvironmentItem({
+        el: document.querySelector('tr#environment-row'),
         propsData: {
           model: environment,
           canCreateDeployment: true,
@@ -121,7 +121,7 @@ describe('Environment item', () => {
           store: {},
           service: {},
         },
-      }).$mount();
+      });
     });
 
     it('should render environment name', () => {

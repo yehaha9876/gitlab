@@ -4,10 +4,12 @@
  * Dumb component used to render top level environments and
  * the folder view.
  */
-import EnvironmentItem from './environment_item';
-import DeployBoard from './deploy_board_component';
+const Vue = require('vue');
+const EnvironmentItem = require('./environment_item');
+const DeployBoard = require('./deploy_board_component').default;
 
-export default {
+module.exports = Vue.component('environment-table-component', {
+
   components: {
     EnvironmentItem,
     DeployBoard,
@@ -46,7 +48,7 @@ export default {
 
     service: {
       type: Object,
-      required: true,
+      required: false,
       default: () => ({}),
     },
   },
@@ -71,8 +73,7 @@ export default {
             :model="model"
             :can-create-deployment="canCreateDeployment"
             :can-read-environment="canReadEnvironment"
-            :toggleDeployBoard="toggleDeployBoard"
-            :service="service"></tr>
+            :toggleDeployBoard="toggleDeployBoard"></tr>
 
           <tr v-if="model.hasDeployBoard && model.isDeployBoardVisible" class="js-deploy-board-row">
             <td colspan="6" class="deploy-board-container">
@@ -89,4 +90,4 @@ export default {
       </tbody>
     </table>
   `,
-};
+});

@@ -1,12 +1,11 @@
-import '~/lib/utils/common_utils';
-
+require('~/lib/utils/common_utils');
 /**
  * Environments Store.
  *
  * Stores received environments, count of stopped environments and count of
  * available environments.
  */
-export default class EnvironmentsStore {
+class EnvironmentsStore {
   constructor() {
     this.state = {};
     this.state.environments = [];
@@ -157,3 +156,5 @@ export default class EnvironmentsStore {
     return this.state.environments;
   }
 }
+
+module.exports = EnvironmentsStore;

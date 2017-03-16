@@ -1,17 +1,16 @@
-/* eslint-disable no-param-reassign, no-new */
-/* global Flash */
-import EnvironmentsService from '../services/environments_service';
-import EnvironmentTable from '../components/environments_table';
-import EnvironmentsStore from '../stores/environments_store';
+/* eslint-disable no-new */
 
-const Flash = require('~/flash');
 const Vue = window.Vue = require('vue');
 window.Vue.use(require('vue-resource'));
-require('../../vue_shared/components/table_pagination');
-require('../../lib/utils/common_utils');
-require('../../vue_shared/vue_resource_interceptor');
+const EnvironmentsService = require('~/environments//services/environments_service');
+const EnvironmentTable = require('~/environments/components/environments_table');
+const EnvironmentsStore = require('~/environments//stores/environments_store');
+const Flash = require('~/flash');
+require('~/vue_shared/components/table_pagination');
+require('~/lib/utils/common_utils');
+require('~/vue_shared/vue_resource_interceptor');
 
-export default Vue.component('environment-folder-view', {
+module.exports = Vue.component('environment-folder-view', {
 
   components: {
     'environment-table': EnvironmentTable,
@@ -184,11 +183,13 @@ export default Vue.component('environment-folder-view', {
             :commit-icon-svg="commitIconSvg"
             :toggleDeployBoard="toggleDeployBoard"
             :store="store"
-            :service="service"/>
+            :service="service">
+          </environment-table>
 
           <table-pagination v-if="state.paginationInformation && state.paginationInformation.totalPages > 1"
             :change="changePage"
-            :pageInfo="state.paginationInformation"/>
+            :pageInfo="state.paginationInformation">
+          </table-pagination>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import EnvironmentsFolderComponent from './environments_folder_view';
+const EnvironmentsFolderComponent = require('./environments_folder_view');
 
 $(() => {
   window.gl = window.gl || {};
