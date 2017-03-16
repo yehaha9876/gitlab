@@ -146,7 +146,7 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def export_csv
-    csv_params = filter_params.permit(IssuableFinder::VALID_PARAMS)
+    csv_params = IssuableFinder.valid_params(filter_params)
     ExportCsvWorker.perform_async(@current_user.id, @project.id, csv_params)
 
     index_path = namespace_project_issues_path(@project.namespace, @project)

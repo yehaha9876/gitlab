@@ -21,6 +21,7 @@
 class IssuableFinder
   NONE = '0'.freeze
   VALID_PARAMS = %i(scope state group_id project_id milestone_title assignee_id search label_name sort assignee_username author_id author_username authorized_only due_date iids non_archived weight).freeze
+  VALID_ARRAY_PARAMS = { label_name: [], iids: [] }.freeze
 
   attr_accessor :current_user, :params
 
@@ -47,6 +48,10 @@ class IssuableFinder
     # Filtering by project HAS TO be the last because we use the project IDs yielded by the issuable query thus far
     items = by_project(items)
     sort(items)
+  end
+
+  def self.valid_params(params)
+    params.permit(*VALID_PARAMS, VALID_ARRAY_PARAMS)
   end
 
   def find(*params)
