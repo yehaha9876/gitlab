@@ -27,6 +27,9 @@ class IssuableFinder
 
   def initialize(current_user, params = {})
     @current_user = current_user
+    if invalid_params?(params)
+      raise ArgumentError, "Invalid issuable params"
+    end
     @params = params
   end
 
@@ -231,6 +234,10 @@ class IssuableFinder
 
   def init_collection
     klass.all
+  end
+
+  def invalid_params?(params)
+    valid_params(params).keys != params.keys
   end
 
   def by_scope(items)
