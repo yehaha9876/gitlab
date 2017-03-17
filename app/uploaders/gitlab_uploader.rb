@@ -3,8 +3,12 @@ class GitlabUploader < CarrierWave::Uploader::Base
     File.join(CarrierWave.root, upload_record.path)
   end
 
-  def self.base_dir
+  def self.root_dir
     'uploads'
+  end
+
+  def self.base_dir
+    File.join(root_dir, 'system')
   end
 
   delegate :base_dir, to: :class

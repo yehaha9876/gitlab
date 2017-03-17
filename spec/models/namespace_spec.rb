@@ -178,8 +178,8 @@ describe Namespace, models: true do
       let(:parent) { create(:group, name: 'parent', path: 'parent') }
       let(:child) { create(:group, name: 'child', path: 'child', parent: parent) }
       let!(:project) { create(:project_empty_repo, path: 'the-project', namespace: child) }
-      let(:uploads_dir) { File.join(CarrierWave.root, 'uploads') }
-      let(:pages_dir) { TestEnv.pages_path }
+      let(:uploads_dir) { File.join(CarrierWave.root, 'uploads', 'system', 'parent') }
+      let(:pages_dir) { File.join(TestEnv.pages_path, 'parent') }
 
       before do
         FileUtils.mkdir_p(File.join(uploads_dir, 'parent', 'child', 'the-project'))
