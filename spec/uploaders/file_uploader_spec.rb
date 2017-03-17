@@ -21,6 +21,7 @@ describe FileUploader do
       uploader = described_class.new(project)
 
       expect(uploader.store_dir).to include(project.path_with_namespace)
+      expect(uploader.store_dir).not_to include("system")
     end
   end
 

@@ -7,15 +7,23 @@ class GitlabUploader < CarrierWave::Uploader::Base
     'uploads'
   end
 
+  # When object storage is used, keep the `root_dir` as `base_dir`.
+  # The files aren't really in folders there, they just have a name.
+  # The files that contain user input in their name, also contain a hash, so
+  # the names are still unique
+  #
+  # This method is overridden in the `FileUploader`
   def self.base_dir
+    return root_dir unless file_storage?
+
     File.join(root_dir, 'system')
   end
 
-  delegate :base_dir, to: :class
-
-  def file_storage?
-    self.class.storage == CarrierWave::Storage::File
+  def self.file_storage?
+    self.storage == CarrierWave::Storage::File
   end
+
+  delegate :base_dir, :file_storage?, to: :class
 
   # Reduce disk IO
   def move_to_cache
