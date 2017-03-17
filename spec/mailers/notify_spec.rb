@@ -54,7 +54,7 @@ describe Notify do
             end
 
             it 'contains a link to note author' do
-              is_expected.to have_body_text issue.author_name
+              is_expected.to have_html_escaped_body_text issue.author_name
               is_expected.to have_body_text /wrote\:/
             end
           end
@@ -66,7 +66,7 @@ describe Notify do
           it_behaves_like 'it should show Gmail Actions View Issue link'
 
           it 'contains the description' do
-            is_expected.to have_body_text /#{issue_with_description.description}/
+            is_expected.to have_html_escaped_body_text issue_with_description.description
           end
         end
 
@@ -91,11 +91,11 @@ describe Notify do
           end
 
           it 'contains the name of the previous assignee' do
-            is_expected.to have_body_text /#{previous_assignee.name}/
+            is_expected.to have_html_escaped_body_text previous_assignee.name
           end
 
           it 'contains the name of the new assignee' do
-            is_expected.to have_body_text /#{assignee.name}/
+            is_expected.to have_html_escaped_body_text assignee.name
           end
 
           it 'contains a link to the issue' do
@@ -158,7 +158,7 @@ describe Notify do
           end
 
           it 'contains the user name' do
-            is_expected.to have_body_text /#{current_user.name}/i
+            is_expected.to have_html_escaped_body_text current_user.name
           end
 
           it 'contains a link to the issue' do
@@ -234,7 +234,7 @@ describe Notify do
             end
 
             it 'contains a link to note author' do
-              is_expected.to have_body_text merge_request.author_name
+              is_expected.to have_html_escaped_body_text merge_request.author_name
               is_expected.to have_body_text /wrote\:/
             end
           end
@@ -265,7 +265,7 @@ describe Notify do
           it_behaves_like "an unsubscribeable thread"
 
           it 'contains the description' do
-            is_expected.to have_body_text /#{merge_request_with_description.description}/
+            is_expected.to have_html_escaped_body_text merge_request_with_description.description
           end
         end
 
@@ -290,11 +290,11 @@ describe Notify do
           end
 
           it 'contains the name of the previous assignee' do
-            is_expected.to have_body_text /#{previous_assignee.name}/
+            is_expected.to have_html_escaped_body_text previous_assignee.name
           end
 
           it 'contains the name of the new assignee' do
-            is_expected.to have_body_text /#{assignee.name}/
+            is_expected.to have_html_escaped_body_text assignee.name
           end
 
           it 'contains a link to the merge request' do
@@ -357,7 +357,7 @@ describe Notify do
           end
 
           it 'contains the user name' do
-            is_expected.to have_body_text /#{current_user.name}/i
+            is_expected.to have_html_escaped_body_text current_user.name
           end
 
           it 'contains a link to the merge request' do
@@ -498,7 +498,7 @@ describe Notify do
       end
 
       it 'contains name of project' do
-        is_expected.to have_body_text /#{project.name_with_namespace}/
+        is_expected.to have_html_escaped_body_text project.name_with_namespace
       end
 
       it 'contains new user role' do
@@ -531,9 +531,9 @@ describe Notify do
           expect(to_emails[0].address).to eq(project.members.owners_and_masters.first.user.notification_email)
 
           is_expected.to have_subject "Request to join the #{project.name_with_namespace} project"
-          is_expected.to have_body_text /#{project.name_with_namespace}/
-          is_expected.to have_body_text /#{namespace_project_project_members_url(project.namespace, project)}/
-          is_expected.to have_body_text /#{project_member.human_access}/
+          is_expected.to have_html_escaped_body_text project.name_with_namespace
+          is_expected.to have_body_text namespace_project_project_members_url(project.namespace, project)
+          is_expected.to have_body_text project_member.human_access
         end
       end
 
@@ -558,9 +558,9 @@ describe Notify do
           expect(to_emails[0].address).to eq(group.members.owners_and_masters.first.user.notification_email)
 
           is_expected.to have_subject "Request to join the #{project.name_with_namespace} project"
-          is_expected.to have_body_text /#{project.name_with_namespace}/
-          is_expected.to have_body_text /#{namespace_project_project_members_url(project.namespace, project)}/
-          is_expected.to have_body_text /#{project_member.human_access}/
+          is_expected.to have_html_escaped_body_text project.name_with_namespace
+          is_expected.to have_body_text namespace_project_project_members_url(project.namespace, project)
+          is_expected.to have_body_text project_member.human_access
         end
       end
     end
@@ -580,13 +580,14 @@ describe Notify do
 
       it 'contains all the useful information' do
         is_expected.to have_subject "Access to the #{project.name_with_namespace} project was denied"
-        is_expected.to have_body_text /#{project.name_with_namespace}/
-        is_expected.to have_body_text /#{project.web_url}/
+        is_expected.to have_html_escaped_body_text project.name_with_namespace
+        is_expected.to have_body_text project.web_url
       end
     end
 
     describe 'project access changed' do
-      let(:project) { create(:empty_project, :public, :access_requestable) }
+      let(:owner) { create(:user, name: "Chang O'Keefe") }
+      let(:project) { create(:empty_project, :public, :access_requestable, namespace: owner.namespace) }
       let(:user) { create(:user) }
       let(:project_member) { create(:project_member, project: project, user: user) }
       subject { Notify.member_access_granted_email('project', project_member.id) }
@@ -597,9 +598,9 @@ describe Notify do
 
       it 'contains all the useful information' do
         is_expected.to have_subject "Access to the #{project.name_with_namespace} project was granted"
-        is_expected.to have_body_text /#{project.name_with_namespace}/
-        is_expected.to have_body_text /#{project.web_url}/
-        is_expected.to have_body_text /#{project_member.human_access}/
+        is_expected.to have_html_escaped_body_text project.name_with_namespace
+        is_expected.to have_body_text project.web_url
+        is_expected.to have_body_text project_member.human_access
       end
     end
 
@@ -628,10 +629,10 @@ describe Notify do
 
       it 'contains all the useful information' do
         is_expected.to have_subject "Invitation to join the #{project.name_with_namespace} project"
-        is_expected.to have_body_text /#{project.name_with_namespace}/
-        is_expected.to have_body_text /#{project.web_url}/
-        is_expected.to have_body_text /#{project_member.human_access}/
-        is_expected.to have_body_text /#{project_member.invite_token}/
+        is_expected.to have_html_escaped_body_text project.name_with_namespace
+        is_expected.to have_body_text project.web_url
+        is_expected.to have_body_text project_member.human_access
+        is_expected.to have_body_text project_member.invite_token
       end
     end
 
@@ -653,10 +654,10 @@ describe Notify do
 
       it 'contains all the useful information' do
         is_expected.to have_subject 'Invitation accepted'
-        is_expected.to have_body_text /#{project.name_with_namespace}/
-        is_expected.to have_body_text /#{project.web_url}/
-        is_expected.to have_body_text /#{project_member.invite_email}/
-        is_expected.to have_body_text /#{invited_user.name}/
+        is_expected.to have_html_escaped_body_text project.name_with_namespace
+        is_expected.to have_body_text project.web_url
+        is_expected.to have_body_text project_member.invite_email
+        is_expected.to have_html_escaped_body_text invited_user.name
       end
     end
 
@@ -677,9 +678,9 @@ describe Notify do
 
       it 'contains all the useful information' do
         is_expected.to have_subject 'Invitation declined'
-        is_expected.to have_body_text /#{project.name_with_namespace}/
-        is_expected.to have_body_text /#{project.web_url}/
-        is_expected.to have_body_text /#{project_member.invite_email}/
+        is_expected.to have_html_escaped_body_text project.name_with_namespace
+        is_expected.to have_body_text project.web_url
+        is_expected.to have_body_text project_member.invite_email
       end
     end
 
@@ -705,7 +706,7 @@ describe Notify do
         end
 
         it 'contains the message from the note' do
-          is_expected.to have_body_text /#{note.note}/
+          is_expected.to have_html_escaped_body_text note.note
         end
 
         it 'does not contain note author' do
@@ -718,7 +719,7 @@ describe Notify do
           end
 
           it 'contains a link to note author' do
-            is_expected.to have_body_text note.author_name
+            is_expected.to have_html_escaped_body_text note.author_name
             is_expected.to have_body_text /wrote\:/
           end
         end
@@ -825,7 +826,7 @@ describe Notify do
         end
 
         it 'contains the message from the note' do
-          is_expected.to have_body_text /#{note.note}/
+          is_expected.to have_html_escaped_body_text note.note
         end
 
         it 'does not contain note author' do
@@ -838,7 +839,7 @@ describe Notify do
           end
 
           it 'contains a link to note author' do
-            is_expected.to have_body_text note.author_name
+            is_expected.to have_html_escaped_body_text note.author_name
             is_expected.to have_body_text /wrote\:/
           end
         end
@@ -884,9 +885,9 @@ describe Notify do
 
       it 'contains all the useful information' do
         is_expected.to have_subject "Request to join the #{group.name} group"
-        is_expected.to have_body_text /#{group.name}/
-        is_expected.to have_body_text /#{group_group_members_url(group)}/
-        is_expected.to have_body_text /#{group_member.human_access}/
+        is_expected.to have_html_escaped_body_text group.name
+        is_expected.to have_body_text group_group_members_url(group)
+        is_expected.to have_body_text group_member.human_access
       end
     end
 
@@ -905,8 +906,8 @@ describe Notify do
 
       it 'contains all the useful information' do
         is_expected.to have_subject "Access to the #{group.name} group was denied"
-        is_expected.to have_body_text /#{group.name}/
-        is_expected.to have_body_text /#{group.web_url}/
+        is_expected.to have_html_escaped_body_text group.name
+        is_expected.to have_body_text group.web_url
       end
     end
 
@@ -923,9 +924,9 @@ describe Notify do
 
       it 'contains all the useful information' do
         is_expected.to have_subject "Access to the #{group.name} group was granted"
-        is_expected.to have_body_text /#{group.name}/
-        is_expected.to have_body_text /#{group.web_url}/
-        is_expected.to have_body_text /#{group_member.human_access}/
+        is_expected.to have_html_escaped_body_text group.name
+        is_expected.to have_body_text group.web_url
+        is_expected.to have_body_text group_member.human_access
       end
     end
 
@@ -954,10 +955,10 @@ describe Notify do
 
       it 'contains all the useful information' do
         is_expected.to have_subject "Invitation to join the #{group.name} group"
-        is_expected.to have_body_text /#{group.name}/
-        is_expected.to have_body_text /#{group.web_url}/
-        is_expected.to have_body_text /#{group_member.human_access}/
-        is_expected.to have_body_text /#{group_member.invite_token}/
+        is_expected.to have_html_escaped_body_text group.name
+        is_expected.to have_body_text group.web_url
+        is_expected.to have_body_text group_member.human_access
+        is_expected.to have_body_text group_member.invite_token
       end
     end
 
@@ -979,10 +980,10 @@ describe Notify do
 
       it 'contains all the useful information' do
         is_expected.to have_subject 'Invitation accepted'
-        is_expected.to have_body_text /#{group.name}/
-        is_expected.to have_body_text /#{group.web_url}/
-        is_expected.to have_body_text /#{group_member.invite_email}/
-        is_expected.to have_body_text /#{invited_user.name}/
+        is_expected.to have_html_escaped_body_text group.name
+        is_expected.to have_body_text group.web_url
+        is_expected.to have_body_text group_member.invite_email
+        is_expected.to have_html_escaped_body_text invited_user.name
       end
     end
 
@@ -1003,9 +1004,9 @@ describe Notify do
 
       it 'contains all the useful information' do
         is_expected.to have_subject 'Invitation declined'
-        is_expected.to have_body_text /#{group.name}/
-        is_expected.to have_body_text /#{group.web_url}/
-        is_expected.to have_body_text /#{group_member.invite_email}/
+        is_expected.to have_html_escaped_body_text group.name
+        is_expected.to have_body_text group.web_url
+        is_expected.to have_body_text group_member.invite_email
       end
     end
   end
