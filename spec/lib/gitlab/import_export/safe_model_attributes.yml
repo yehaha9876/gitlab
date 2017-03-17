@@ -158,6 +158,7 @@ MergeRequest:
 - rebase_commit_sha
 - time_estimate
 - squash
+- head_pipeline_id
 MergeRequestDiff:
 - id
 - state
