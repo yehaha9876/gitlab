@@ -1712,6 +1712,8 @@ describe Project, models: true do
         .with(project.repository_storage_path, project.path_with_namespace, project.import_url)
         .and_return(true)
 
+      allow(Gitlab::UrlBlocker).to receive(:blocked_url?).with(nil).and_return(false)
+
       allow(project).to receive(:repository_exists?).and_return(true)
 
       expect_any_instance_of(Repository).to receive(:after_import)
