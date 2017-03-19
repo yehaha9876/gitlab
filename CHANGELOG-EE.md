@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 8.16.8 (2017-03-19)
+
+- Elastic security fix: Respect feature visibility level.
+
 ## 8.16.7 (2017-02-27)
 
 - Fixed merge request state not updating when approvals feature is active.
