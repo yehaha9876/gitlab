@@ -845,7 +845,7 @@ module API
       end
 
       class Dependency < Grape::Entity
-        expose :id, :name
+        expose :id, :name, :token
         expose :artifacts_file, using: ArtifactFile, if: ->(job, _) { job.artifacts? }
       end
 
@@ -873,7 +873,7 @@ module API
         expose :artifacts, using: Artifacts
         expose :cache, using: Cache
         expose :credentials, using: Credentials
-        expose :depends_on_builds, as: :dependencies, using: Dependency
+        expose :dependencies, using: Dependency
       end
     end
   end
