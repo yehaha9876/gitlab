@@ -101,7 +101,7 @@
                     %button.btn.btn-link= weight
 
         .pull-right.filter-dropdown-container
-          = render 'shared/sort_dropdown'
+          = render 'shared/sort_dropdown', type: local_assigns[:type]
 
     - if @bulk_edit
       .issues_bulk_update.hide
