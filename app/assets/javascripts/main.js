@@ -49,16 +49,6 @@ import { installGlEmojiElement } from './behaviors/gl_emoji';
 installGlEmojiElement();
 
 // blob
-import './blob/template_selectors/blob_ci_yaml_selector';
-import './blob/template_selectors/blob_ci_yaml_selectors';
-import './blob/template_selectors/blob_dockerfile_selector';
-import './blob/template_selectors/blob_dockerfile_selectors';
-import './blob/blob_file_dropzone';
-import './blob/template_selectors/blob_gitignore_selector';
-import './blob/template_selectors/blob_gitignore_selectors';
-import './blob/template_selectors/blob_license_selector';
-import './blob/template_selectors/blob_license_selectors';
-import './blob/template_selectors/template_selector';
 import './blob/create_branch_dropdown';
 import './blob/target_branch_dropdown';
 
