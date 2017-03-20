@@ -1,8 +1,8 @@
 /* global Api */
 
-const BlobCiYamlSelector = require('./blob_ci_yaml_selector');
+import BlobCiYamlSelector from './blob_ci_yaml_selector';
 
-class BlobCiYamlSelectors {
+export default class BlobCiYamlSelectors {
   constructor({ editor, $dropdowns }) {
     this.$dropdowns = $dropdowns || $('.js-gitlab-ci-yml-selector');
     this.initSelectors(editor);
@@ -21,5 +21,3 @@ class BlobCiYamlSelectors {
     });
   }
 }
-
-module.exports = BlobCiYamlSelectors;

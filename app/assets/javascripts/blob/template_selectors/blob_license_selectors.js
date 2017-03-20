@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars, no-param-reassign */
 
-const BlobLicenseSelector = require('./blob_license_selector');
+import BlobLicenseSelector from './blob_license_selector';
 
-class BlobLicenseSelectors {
+export default class BlobLicenseSelectors {
   constructor({ $dropdowns, editor }) {
     this.$dropdowns = $dropdowns || $('.js-license-selector');
     this.initSelectors(editor);
@@ -22,4 +22,3 @@ class BlobLicenseSelectors {
     });
   }
 }
-module.exports = BlobLicenseSelectors;

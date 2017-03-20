@@ -1,8 +1,8 @@
 /* global Api */
 
-const TemplateSelector = require('./template_selector');
+import TemplateSelector from './template_selector';
 
-class BlobLicenseSelector extends TemplateSelector {
+export default class BlobLicenseSelector extends TemplateSelector {
   requestFile(query) {
     const data = {
       project: this.dropdown.data('project'),
@@ -11,5 +11,3 @@ class BlobLicenseSelector extends TemplateSelector {
     return Api.licenseText(query.id, data, (file, config) => this.setEditorContent(file, config));
   }
 }
-
-module.exports = BlobLicenseSelector;
