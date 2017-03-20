@@ -25,7 +25,7 @@ module Issuable
     cache_markdown_field :description
 
     belongs_to :author, class_name: "User"
-    belongs_to :assignee, class_name: "User"
+    has_and_belongs_to_many :assignees, class_name: "User", join_table: :issuable_assignees
     belongs_to :updated_by, class_name: "User"
     belongs_to :milestone
     has_many :notes, as: :noteable, inverse_of: :noteable, dependent: :destroy do

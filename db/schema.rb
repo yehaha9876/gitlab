@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170313133418) do
+ActiveRecord::Schema.define(version: 20170320173259) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -120,14 +120,14 @@ ActiveRecord::Schema.define(version: 20170313133418) do
     t.integer "terminal_max_session_time", default: 0, null: false
     t.integer "minimum_mirror_sync_time", default: 15, null: false
     t.string "default_artifacts_expire_in", default: "0", null: false
+    t.integer "unique_ips_limit_per_user"
+    t.integer "unique_ips_limit_time_window"
+    t.boolean "unique_ips_limit_enabled", default: false, null: false
     t.string "elasticsearch_url", default: "http://localhost:9200"
     t.boolean "elasticsearch_aws", default: false, null: false
     t.string "elasticsearch_aws_region", default: "us-east-1"
     t.string "elasticsearch_aws_access_key"
     t.string "elasticsearch_aws_secret_access_key"
-    t.integer "unique_ips_limit_per_user"
-    t.integer "unique_ips_limit_time_window"
-    t.boolean "unique_ips_limit_enabled", default: false, null: false
     t.integer "geo_status_timeout", default: 10
   end
 
@@ -494,6 +494,16 @@ ActiveRecord::Schema.define(version: 20170313133418) do
   end
 
   add_index "index_statuses", ["project_id"], name: "index_index_statuses_on_project_id", unique: true, using: :btree
+
+  create_table "issuable_assignees", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "issue_id"
+    t.integer "merge_request_id"
+  end
+
+  add_index "issuable_assignees", ["issue_id"], name: "index_issuable_assignees_on_issue_id", using: :btree
+  add_index "issuable_assignees", ["merge_request_id"], name: "index_issuable_assignees_on_merge_request_id", using: :btree
+  add_index "issuable_assignees", ["user_id"], name: "index_issuable_assignees_on_user_id", using: :btree
 
   create_table "issue_metrics", force: :cascade do |t|
     t.integer "issue_id", null: false
@@ -1432,7 +1442,6 @@ ActiveRecord::Schema.define(version: 20170313133418) do
     t.string "organization"
     t.boolean "authorized_projects_populated"
     t.boolean "auditor", default: false, null: false
-    t.boolean "notified_of_own_activity", default: false, null: false
     t.boolean "ghost"
   end
 
@@ -1488,6 +1497,9 @@ ActiveRecord::Schema.define(version: 20170313133418) do
   add_foreign_key "boards", "projects"
   add_foreign_key "chat_teams", "namespaces", on_delete: :cascade
   add_foreign_key "ci_triggers", "users", column: "owner_id", name: "fk_e8e10d1964", on_delete: :cascade
+  add_foreign_key "issuable_assignees", "issues"
+  add_foreign_key "issuable_assignees", "merge_requests"
+  add_foreign_key "issuable_assignees", "users"
   add_foreign_key "issue_metrics", "issues", on_delete: :cascade
   add_foreign_key "label_priorities", "labels", on_delete: :cascade
   add_foreign_key "label_priorities", "projects", on_delete: :cascade
