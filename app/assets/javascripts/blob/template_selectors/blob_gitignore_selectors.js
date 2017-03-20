@@ -1,6 +1,6 @@
-const BlobGitignoreSelector = require('./blob_gitignore_selector');
+import BlobGitignoreSelector from './blob_gitignore_selector';
 
-class BlobGitignoreSelectors {
+export default class BlobGitignoreSelectors {
   constructor({ editor, $dropdowns }) {
     this.$dropdowns = $dropdowns || $('.js-gitignore-selector');
     this.editor = editor;
@@ -21,5 +21,3 @@ class BlobGitignoreSelectors {
     });
   }
 }
-
-module.exports = BlobGitignoreSelectors;

@@ -1,7 +1,7 @@
 /* eslint-disable comma-dangle, max-len, no-useless-return, no-param-reassign, max-len */
 /* global Api */
 
-const TemplateSelector = require('../blob/template_selectors/template_selector');
+import TemplateSelector from '../blob/template_selectors/template_selector';
 
 ((global) => {
   class IssuableTemplateSelector extends TemplateSelector {

@@ -2,7 +2,7 @@
 /* global EditBlob */
 /* global NewCommitForm */
 
-const EditBlob = require('./edit_blob');
+import EditBlob from './edit_blob';
 
 $(function() {
   const $editBlobForm = $('.js-edit-blob-form');

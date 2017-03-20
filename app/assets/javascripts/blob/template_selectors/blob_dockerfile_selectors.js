@@ -1,6 +1,6 @@
-const BlobDockerfileSelector = require('./blob_dockerfile_selector');
+import BlobDockerfileSelector from './blob_dockerfile_selector';
 
-class BlobDockerfileSelectors {
+export default class BlobDockerfileSelectors {
   constructor({ editor, $dropdowns }) {
     this.editor = editor;
     this.$dropdowns = $dropdowns || $('.js-dockerfile-selector');
@@ -21,5 +21,3 @@ class BlobDockerfileSelectors {
     });
   }
 }
-
-module.exports = BlobDockerfileSelectors;

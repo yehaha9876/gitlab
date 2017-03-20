@@ -1,11 +1,9 @@
 /* global Api */
 
-const TemplateSelector = require('./template_selector');
+import TemplateSelector from './template_selector';
 
-class BlobCiYamlSelector extends TemplateSelector {
+export default class BlobCiYamlSelector extends TemplateSelector {
   requestFile(query) {
     return Api.gitlabCiYml(query.name, (file, config) => this.setEditorContent(file, config));
   }
 }
-
-module.exports = BlobCiYamlSelector;

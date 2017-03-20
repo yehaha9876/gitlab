@@ -1,11 +1,11 @@
 /* global ace */
 
-const BlobLicenseSelectors = require('../blob/template_selectors/blob_license_selectors');
-const BlobGitignoreSelectors = require('../blob/template_selectors/blob_gitignore_selectors');
-const BlobCiYamlSelectors = require('../blob/template_selectors/blob_ci_yaml_selectors');
-const BlobDockerfileSelectors = require('../blob/template_selectors/blob_dockerfile_selectors');
+import BlobLicenseSelectors from '../blob/template_selectors/blob_license_selectors';
+import BlobGitignoreSelectors from '../blob/template_selectors/blob_gitignore_selectors';
+import BlobCiYamlSelectors from '../blob/template_selectors/blob_ci_yaml_selectors';
+import BlobDockerfileSelectors from '../blob/template_selectors/blob_dockerfile_selectors';
 
-class EditBlob {
+export default class EditBlob {
   constructor(assetsPath, aceMode) {
     this.configureAceEditor(aceMode, assetsPath);
     this.prepFileContentForSubmit();
@@ -97,5 +97,3 @@ class EditBlob {
     this.editor.getSession().setUseWrapMode(this.isSoftWrapped);
   }
 }
-
-module.exports = EditBlob;

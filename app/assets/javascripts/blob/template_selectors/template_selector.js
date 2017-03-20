@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this, no-unused-vars */
 
-class TemplateSelector {
+export default class TemplateSelector {
   constructor({ dropdown, data, pattern, wrapper, editor, $input } = {}) {
     this.pattern = pattern;
     this.editor = editor;
@@ -64,7 +64,7 @@ class TemplateSelector {
   // To be implemented on the extending class
   // e.g. Api.gitlabCiYml(query.name, file => this.setEditorContent(file));
 
-  setEditorContent(file, { skipFocus }) {
+  setEditorContent(file, { skipFocus } = {}) {
     if (!file) return;
 
     const newValue = file.content;
@@ -90,5 +90,3 @@ class TemplateSelector {
       .removeClass('fa-spinner fa-spin');
   }
 }
-
-module.exports = TemplateSelector;
