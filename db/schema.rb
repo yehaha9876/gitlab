@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170315174634) do
+ActiveRecord::Schema.define(version: 20170317203554) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -63,6 +63,7 @@ ActiveRecord::Schema.define(version: 20170315174634) do
     t.boolean "shared_runners_enabled", default: true, null: false
     t.integer "max_artifacts_size", default: 100, null: false
     t.string "runners_registration_token"
+    t.integer "max_pages_size", default: 100, null: false
     t.boolean "require_two_factor_authentication", default: false
     t.integer "two_factor_grace_period", default: 48
     t.boolean "metrics_enabled", default: false
@@ -806,8 +807,8 @@ ActiveRecord::Schema.define(version: 20170315174634) do
     t.datetime "ldap_sync_last_successful_update_at"
     t.datetime "ldap_sync_last_sync_at"
     t.datetime "deleted_at"
-    t.boolean "lfs_enabled"
     t.text "description_html"
+    t.boolean "lfs_enabled"
     t.integer "parent_id"
     t.integer "shared_runners_minutes_limit"
     t.integer "repository_size_limit", limit: 8
@@ -1180,6 +1181,7 @@ ActiveRecord::Schema.define(version: 20170315174634) do
   end
 
   add_index "routes", ["path"], name: "index_routes_on_path", unique: true, using: :btree
+  add_index "routes", ["path"], name: "index_routes_on_path_text_pattern_ops", using: :btree, opclasses: {"path"=>"varchar_pattern_ops"}
   add_index "routes", ["source_type", "source_id"], name: "index_routes_on_source_type_and_source_id", unique: true, using: :btree
 
   create_table "sent_notifications", force: :cascade do |t|
@@ -1428,8 +1430,8 @@ ActiveRecord::Schema.define(version: 20170315174634) do
     t.datetime "otp_grace_period_started_at"
     t.boolean "ldap_email", default: false, null: false
     t.boolean "external", default: false
-    t.string "organization"
     t.string "incoming_email_token"
+    t.string "organization"
     t.boolean "authorized_projects_populated"
     t.boolean "auditor", default: false, null: false
     t.boolean "ghost"
