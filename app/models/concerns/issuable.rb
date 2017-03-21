@@ -91,7 +91,7 @@ module Issuable
     attr_mentionable :description
 
     participant :author
-    participant :assignee
+    participant :assignees
     participant :notes_with_associations
 
     strip_attributes :title
@@ -309,11 +309,15 @@ module Issuable
     @human_class_name ||= self.class.name.titleize.downcase
   end
 
+  def assignee_list
+    assignees.pluck(:name).join(', ') if assignees.any?
+  end
+
   # Returns a Hash of attributes to be used for Twitter card metadata
   def card_attributes
     {
       'Author'   => author.try(:name),
-      'Assignee' => assignee.try(:name)
+      'Assignees' => assignees.pluck(:name).join(', ')
     }
   end
 

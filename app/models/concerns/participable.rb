@@ -11,7 +11,7 @@
 #       # ...
 #
 #       participant :author
-#       participant :assignee
+#       participant :assignees
 #       participant :notes
 #
 #       participant -> (current_user, ext) do

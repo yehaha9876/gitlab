@@ -23,9 +23,10 @@
 
     = form_for [@project.namespace.becomes(Namespace), @project, issuable], remote: true, format: :json, html: { class: 'issuable-context-form inline-update js-issuable-update' } do |f|
       .block.assignee
-        .sidebar-collapsed-icon.sidebar-collapsed-user{ data: { toggle: "tooltip", placement: "left", container: "body" }, title: (issuable.assignee.name if issuable.assignee) }
-          - if issuable.assignee
-            = link_to_member(@project, issuable.assignee, size: 24)
+        .sidebar-collapsed-icon.sidebar-collapsed-user{ data: { toggle: "tooltip", placement: "left", container: "body" }, title: (issuable.assignee_list) }
+          - if issuable.assignees.any?
+            - issuable.assignees.each do |assignee|
+              = link_to_member(@project, assignee, size: 24)
           - else
             = icon('user', 'aria-hidden': 'true')
         .title.hide-collapsed
@@ -34,13 +35,14 @@
           - if can_edit_issuable
             = link_to 'Edit', '#', class: 'edit-link pull-right'
         .value.hide-collapsed
-          - if issuable.assignee
-            = link_to_member(@project, issuable.assignee, size: 32, extra_class: 'bold') do
-              - if issuable.instance_of?(MergeRequest) && !issuable.can_be_merged_by?(issuable.assignee)
-                %span.pull-right.cannot-be-merged{ data: { toggle: 'tooltip', placement: 'left' }, title: 'Not allowed to merge' }
-                  = icon('exclamation-triangle', 'aria-hidden': 'true')
-              %span.username
-                = issuable.assignee.to_reference
+          - if issuable.assignees.any?
+            - issuable.assignees.each do |assignee|
+              = link_to_member(@project, assignee, size: 32, extra_class: 'bold') do
+                - if issuable.instance_of?(MergeRequest) && !issuable.can_be_merged_by?(assignee)
+                  %span.pull-right.cannot-be-merged{ data: { toggle: 'tooltip', placement: 'left' }, title: 'Not allowed to merge' }
+                    = icon('exclamation-triangle', 'aria-hidden': 'true')
+                %span.username
+                  = assignee.to_reference
           - else
             %span.assign-yourself.no-value
               No assignee

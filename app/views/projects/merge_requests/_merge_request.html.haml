@@ -25,9 +25,10 @@
             = link_to merge_request_path(merge_request), class: "has-tooltip", title: "Cannot be merged automatically", data: { container: 'body' } do
               = icon('exclamation-triangle')
 
-        - if merge_request.assignee
+        - if merge_request.assignees.any?
           %li
-            = link_to_member(merge_request.source_project, merge_request.assignee, name: false, title: "Assigned to :name")
+            - merge_request.assignees.each do |assignee|
+              = link_to_member(merge_request.source_project, assignee, name: false, title: "Assigned to :name")
 
         = render 'shared/issuable_meta_data', issuable: merge_request
 
