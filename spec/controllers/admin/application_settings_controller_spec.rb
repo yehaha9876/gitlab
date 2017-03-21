@@ -78,6 +78,7 @@ describe Admin::ApplicationSettingsController do
 
   describe 'PATCH #update' do
     before do
+      stub_application_setting(repository_size_limit: 100)
       sign_in(admin)
     end
 
