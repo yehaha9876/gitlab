@@ -43,6 +43,12 @@ describe Namespace, models: true do
         end
       end
 
+      context "is case insensitive" do
+        let(:group) { build(:group, path: "System") }
+
+        it { expect(group).not_to be_valid }
+      end
+
       context 'top-level group' do
         let(:group) { build(:group, path: 'tree') }
 

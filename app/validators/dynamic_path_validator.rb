@@ -174,13 +174,13 @@ class DynamicPathValidator < ActiveModel::EachValidator
   def self.child_reserved?(path)
     return false unless path
 
-    path !~ without_reserved_child_paths_regex
+    path.downcase !~ without_reserved_child_paths_regex
   end
 
   def self.wildcard_reserved?(path)
     return false unless path
 
-    path !~ without_reserved_wildcard_paths_regex
+    path.downcase !~ without_reserved_wildcard_paths_regex
   end
 
   delegate :full_path_reserved?,
