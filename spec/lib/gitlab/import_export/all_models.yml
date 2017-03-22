@@ -85,6 +85,7 @@ merge_requests:
 - approvers
 - approver_groups
 - timelogs
+- head_pipeline
 merge_request_diff:
 - merge_request
 pipelines:
@@ -101,6 +102,7 @@ pipelines:
 - cancelable_statuses
 - manual_actions
 - artifacts
+- merge_requests
 statuses:
 - project
 - pipeline
