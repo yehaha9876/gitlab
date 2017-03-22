@@ -3,6 +3,10 @@ module Ci
     # Builds API
     class Builds < Grape::API
       resource :builds do
+        before do
+          Gitlab::Database::LoadBalancing::Session.current.use_primary!
+        end
+
         # Runs oldest pending build by runner - Runners only
         #
         # Parameters:

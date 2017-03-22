@@ -61,6 +61,10 @@ module API
     end
 
     resource :jobs do
+      before do
+        Gitlab::Database::LoadBalancing::Session.current.use_primary!
+      end
+
       desc 'Request a job' do
         success Entities::JobRequest::Response
         http_codes [[201, 'Job was scheduled'],
