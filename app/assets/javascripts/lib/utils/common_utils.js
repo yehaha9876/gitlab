@@ -2,6 +2,8 @@
 (function() {
   (function(w) {
     var base;
+    const faviconEl = document.getElementById('favicon');
+    const originalFavicon = faviconEl ? faviconEl.getAttribute('href') : null;
     w.gl || (w.gl = {});
     (base = w.gl).utils || (base.utils = {});
     w.gl.utils.isInGroupsPage = function() {
@@ -359,6 +361,36 @@
         };
 
         fn(next, stop);
+      });
+    };
+
+    w.gl.utils.setFavicon = (iconName) => {
+      if (faviconEl && iconName) {
+        faviconEl.setAttribute('href', `/assets/${iconName}.ico`);
+      }
+    };
+
+    w.gl.utils.resetFavicon = () => {
+      if (faviconEl) {
+        faviconEl.setAttribute('href', originalFavicon);
+      }
+    };
+
+    w.gl.utils.setCIStatusFavicon = (pageUrl) => {
+      $.ajax({
+        url: pageUrl,
+        dataType: 'json',
+        success: function(data) {
+          const FAVICON_PATH = 'ci_favicons/';
+          if (data && data.icon) {
+            gl.utils.setFavicon(FAVICON_PATH + data.icon);
+          } else {
+            gl.utils.resetFavicon();
+          }
+        },
+        error: function() {
+          gl.utils.resetFavicon();
+        }
       });
     };
   })(window);
