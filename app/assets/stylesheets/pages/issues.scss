@@ -69,21 +69,17 @@ ul.related-merge-requests > li {
   height: 20px;
   border-radius: 3px;
   line-height: 18px;
-  border: 1px solid;
 
   &.merged {
-    border-color: darken($blue-normal, 10%);
-    background: $blue-normal;
+    background: $blue-500;
   }
 
   &.closed {
-    border-color: darken($red-normal, 10%);
-    background: $red-normal;
+    background: $red-500;
   }
 
   &.open {
-    border: 1px solid darken($green-normal, 10%);
-    background: $green-normal;
+    background: $green-500;
   }
 }
 
@@ -130,21 +126,6 @@ ul.related-merge-requests > li {
 .issues-footer {
   padding-top: $gl-padding;
   padding-bottom: 37px;
-}
-
-.issues-export-modal {
-  .export-svg-container {
-    height: 56px;
-    padding: 10px 10px 0;
-  }
-
-  svg {
-    height: 100%;
-  }
-
-  .export-checkmark {
-    color: $green-light;
-  }
 }
 
 .issue-email-modal-btn {

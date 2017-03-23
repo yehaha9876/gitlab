@@ -188,10 +188,6 @@
     white-space: nowrap;
     overflow: hidden;
 
-    &.text-danger {
-      color: $gl-danger;
-    }
-
     &:hover,
     &:focus,
     &.is-focused {
@@ -199,7 +195,7 @@
       text-decoration: none;
 
       .badge {
-        background-color: darken($row-hover, 5%);
+        background-color: darken($dropdown-link-hover-bg, 5%);
       }
     }
 

@@ -122,7 +122,7 @@ ul.content-list {
     }
 
     .member-group-link {
-      color: $blue-normal;
+      color: $blue-600;
     }
 
     .description {
@@ -151,12 +151,6 @@ ul.content-list {
         display: inline-block;
         margin-top: 3px;
         margin-bottom: 4px;
-
-        &.btn-ldap-override {
-          @media (min-width: $screen-sm-min) {
-            margin-bottom: 0;
-          }
-        }
 
         &:last-child {
           margin-right: 0;
