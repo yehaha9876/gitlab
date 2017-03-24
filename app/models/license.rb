@@ -91,6 +91,14 @@ class License < ActiveRecord::Base
     add_ons[code].to_i > 0
   end
 
+  def excluded_add_ons
+    restricted_attr(:excluded_add_ons, {})
+  end
+
+  def plan?(name)
+    restricted_attr(:plan) == name
+  end
+
   def restricted_user_count
     restricted_attr(:active_user_count)
   end
