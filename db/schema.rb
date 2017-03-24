@@ -1072,6 +1072,7 @@ ActiveRecord::Schema.define(version: 20170329124448) do
     t.integer "repository_size_limit", limit: 8
     t.integer "sync_time", default: 60, null: false
     t.boolean "printing_merge_request_link_enabled", default: true, null: false
+    t.string "import_jid"
   end
 
   add_index "projects", ["ci_id"], name: "index_projects_on_ci_id", using: :btree
