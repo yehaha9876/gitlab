@@ -70,4 +70,9 @@ export default class Poll {
     this.canPoll = false;
     clearTimeout(this.timeoutID);
   }
+
+  restart() {
+    this.canPoll = true;
+    this.makeRequest();
+  }
 }
