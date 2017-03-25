@@ -82,6 +82,7 @@ module Projects
           labels: true,
           only: [:id, :iid, :title, :confidential, :due_date, :relative_position],
           include: {
+            assignees: { only: [:id, :name, :username], methods: [:avatar_url] },
             assignee: { only: [:id, :name, :username], methods: [:avatar_url] },
             milestone: { only: [:id, :title] }
           },

@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import eventHub from '../eventhub';
 
+import IssueCardUser from './issue_card_user';
+
 (() => {
   const Store = gl.issueBoards.BoardsStore;
 
@@ -65,6 +67,9 @@ import eventHub from '../eventhub';
         };
       },
     },
+    components: {
+      'issue-card-user': IssueCardUser,
+    },
     template: `
       <div>
         <h4 class="card-title">
@@ -83,19 +88,7 @@ import eventHub from '../eventhub';
             v-if="issue.id">
             #{{ issue.id }}
           </span>
-          <a
-            class="card-assignee has-tooltip"
-            :href="rootPath + issue.assignee.username"
-            :title="'Assigned to ' + issue.assignee.name"
-            v-if="issue.assignee"
-            data-container="body">
-            <img
-              class="avatar avatar-inline s20"
-              :src="issue.assignee.avatar"
-              width="20"
-              height="20"
-              :alt="'Avatar for ' + issue.assignee.name" />
-          </a>
+          <issue-card-user :issue="issue" :rootPath="rootPath" />
           <button
             class="label color-label has-tooltip"
             v-for="label in issue.labels"

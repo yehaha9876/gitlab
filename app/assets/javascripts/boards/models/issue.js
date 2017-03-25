@@ -19,8 +19,16 @@ class ListIssue {
     this.position = obj.relative_position || Infinity;
     this.milestone_id = obj.milestone_id;
 
+
     if (obj.assignee) {
       this.assignee = new ListUser(obj.assignee);
+    }
+
+    if (obj.assignees) {
+      const assignees = [];
+      obj.assignees.forEach(a => assignees.push(new ListUser(a)));
+
+      this.assignees = assignees;
     }
 
     if (obj.milestone) {
