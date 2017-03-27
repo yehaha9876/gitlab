@@ -98,9 +98,16 @@ require('./board_new_form');
         const $milestoneDropdownToggle = $('.js-milestone-select');
         const glDropdown = $milestoneDropdownToggle.data('glDropdown');
         const $milestoneDropdown = $('.dropdown-menu-milestone');
+        const $dropdownText = $('.js-milestone-select .dropdown-toggle-text');
         const hideElements = this.board.milestone === undefined || this.board.milestone_id === null;
+        const milestoneParam = gl.utils.getParameterByName('milestone_title');
+        const defaultMilestoneToggleText = milestoneParam ? $dropdownText.text() : 'Milestone';
 
-        $('#milestone_title').val(this.board.milestone ? this.board.milestone.title : '');
+        if (this.board.milestone) {
+          $('#milestone_title').val(this.board.milestone.title);
+        } else {
+          $('#milestone_title').val(milestoneParam);
+        }
 
         if (glDropdown.fullData) {
           glDropdown.parseData(glDropdown.fullData);
@@ -113,9 +120,8 @@ require('./board_new_form');
           .filter((i, el) => $(el).find('.is-active').length === 0)
           .toggle(hideElements);
 
-        $('.js-milestone-select .dropdown-toggle-text')
-          .text(hideElements ? 'Milestone' : this.board.milestone.title)
-          .toggleClass('is-default', hideElements);
+        $dropdownText.text(hideElements ? defaultMilestoneToggleText : this.board.milestone.title)
+          .toggleClass('is-default', milestoneParam !== null ? false : hideElements);
       },
     },
     created() {
