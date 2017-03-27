@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import eventHub from '../eventhub';
 
-import IssueCardUser from './issue_card_user';
+import IssueCardMultipleUsers from './issue_card_multiple_users';
 
 (() => {
   const Store = gl.issueBoards.BoardsStore;
@@ -68,7 +68,7 @@ import IssueCardUser from './issue_card_user';
       },
     },
     components: {
-      'issue-card-user': IssueCardUser,
+      'issue-card-multiple-users': IssueCardMultipleUsers,
     },
     template: `
       <div>
@@ -88,7 +88,7 @@ import IssueCardUser from './issue_card_user';
             v-if="issue.id">
             #{{ issue.id }}
           </span>
-          <issue-card-user :issue="issue" :rootPath="rootPath" />
+          <issue-card-multiple-users :issue="issue" :rootPath="rootPath" />
           <button
             class="label color-label has-tooltip"
             v-for="label in issue.labels"

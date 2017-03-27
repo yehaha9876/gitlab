@@ -270,8 +270,30 @@
   }
 
   .avatar {
-    margin-left: 0;
+    margin: 0;
   }
+
+  .card-assignee + .avatar-counter {
+    position: relative;
+    left: -4px;
+  }
+
+  .avatar-counter {
+    display: inline-block;
+    border: none;
+    font-size: 10px;
+    line-height: 20px;
+    width: 20px;
+  }
+
+  .wide-counter {
+    width: 27px;
+  }
+}
+
+.card-assignee {
+  margin-right: 7px;
+  margin-bottom: 3px;
 }
 
 .card-number {
