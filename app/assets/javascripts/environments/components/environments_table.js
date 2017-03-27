@@ -94,8 +94,7 @@ export default {
                 :service="service"
                 :environmentID="model.id"
                 :deployBoardData="model.deployBoardData"
-                :endpoint="model.rollout_status_path">
-              </deploy-board>
+                :endpoint="model.rollout_status_path" />
             </td>
           </tr>
         </template>

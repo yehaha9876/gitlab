@@ -34,7 +34,7 @@ export default Vue.component('environment-component', {
       projectStoppedEnvironmentsPath: environmentsData.projectStoppedEnvironmentsPath,
       newEnvironmentPath: environmentsData.newEnvironmentPath,
       helpPagePath: environmentsData.helpPagePath,
-      canRenderDeployBoard: environmentsData.allowDeployBoards,
+      canUseDeployBoard: environmentsData.canUseDeployBoards,
 
       // Pagination Properties,
       paginationInformation: {},
@@ -59,8 +59,8 @@ export default Vue.component('environment-component', {
       return gl.utils.convertPermissionToBoolean(this.canCreateEnvironment);
     },
 
-    canRenderDeployBoardParsed() {
-      return gl.utils.convertPermissionToBoolean(this.canRenderDeployBoard);
+    canRenderDeployBoard() {
+      return gl.utils.convertPermissionToBoolean(this.canUseDeployBoard);
     },
 
     /**
@@ -205,7 +205,7 @@ export default Vue.component('environment-component', {
             :toggleDeployBoard="toggleDeployBoard"
             :store="store"
             :service="service"
-            :can-render-deploy-board="canRenderDeployBoardParsed"
+            :can-render-deploy-board="canRenderDeployBoard"
           />
         </div>
 
