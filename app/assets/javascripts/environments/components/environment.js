@@ -34,6 +34,7 @@ export default Vue.component('environment-component', {
       projectStoppedEnvironmentsPath: environmentsData.projectStoppedEnvironmentsPath,
       newEnvironmentPath: environmentsData.newEnvironmentPath,
       helpPagePath: environmentsData.helpPagePath,
+      canRenderDeployBoard: environmentsData.allowDeployBoards,
 
       // Pagination Properties,
       paginationInformation: {},
@@ -56,6 +57,10 @@ export default Vue.component('environment-component', {
 
     canCreateEnvironmentParsed() {
       return gl.utils.convertPermissionToBoolean(this.canCreateEnvironment);
+    },
+
+    canRenderDeployBoardParsed() {
+      return gl.utils.convertPermissionToBoolean(this.canRenderDeployBoard);
     },
 
     /**
@@ -199,7 +204,9 @@ export default Vue.component('environment-component', {
             :can-read-environment="canReadEnvironmentParsed"
             :toggleDeployBoard="toggleDeployBoard"
             :store="store"
-            :service="service"/>
+            :service="service"
+            :can-render-deploy-board="canRenderDeployBoardParsed"
+          />
         </div>
 
         <table-pagination v-if="state.paginationInformation && state.paginationInformation.totalPages > 1"

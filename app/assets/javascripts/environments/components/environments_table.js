@@ -49,6 +49,19 @@ export default {
       required: true,
       default: () => ({}),
     },
+
+    canRenderDeployBoard: {
+      type: Boolean,
+      required: true,
+    },
+  },
+
+  computed: {
+    shouldRenderDeployBoard() {
+      return this.canRenderDeployBoard &&
+        this.model.hasDeployBoard &&
+        this.model.isDeployBoardVisible;
+    },
   },
 
   template: `
@@ -74,7 +87,7 @@ export default {
             :toggleDeployBoard="toggleDeployBoard"
             :service="service"></tr>
 
-          <tr v-if="model.hasDeployBoard && model.isDeployBoardVisible" class="js-deploy-board-row">
+          <tr v-if="shouldRenderDeployBoard" class="js-deploy-board-row">
             <td colspan="6" class="deploy-board-container">
               <deploy-board
                 :store="store"
