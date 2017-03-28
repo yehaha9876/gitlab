@@ -14,14 +14,10 @@ export default {
         return '99+';
       }
     },
-    wideCounter() {
-      return this.count > 9;
-    },
   },
   template: `
     <span
       class="avatar-counter has-tooltip js-no-trigger"
-      :class="{ 'wide-counter': wideCounter }"
       data-container="body"
       data-placement="bottom"
       data-line-type="old"

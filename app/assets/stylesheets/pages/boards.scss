@@ -276,12 +276,10 @@
   .avatar-counter {
     font-size: 10px;
     line-height: 18px;
-    width: 20px;
+    min-width: 20px;
     height: 20px;
-  }
-
-  .wide-counter {
-    width: 27px;
+    padding-left: 3px;
+    padding-right: 3px;
   }
 }
 
