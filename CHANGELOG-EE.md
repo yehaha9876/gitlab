@@ -937,6 +937,10 @@ Please view this file on the master branch, on stable branches it's out of date.
   - Add documentation for "Share project with group" API call
   - Ability to disable 'Share with Group' feature (via UI and API)
 
+## 9.0.1 (2017-03-28)
+
+- No changes.
+
 ## 9.0.0 (2017-03-22)
 
 - Geo: Replicate repository creation in Geo secondary node. !952
