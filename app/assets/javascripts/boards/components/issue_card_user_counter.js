@@ -20,7 +20,7 @@ export default {
   },
   template: `
     <span
-      class="avatar-counter has-tooltip"
+      class="avatar-counter has-tooltip js-no-trigger"
       :class="{ 'wide-counter': wideCounter }"
       data-container="body"
       data-placement="bottom"

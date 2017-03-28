@@ -6,12 +6,12 @@ export default {
   },
   template: `
     <a
-      class="card-assignee has-tooltip"
+      class="card-assignee has-tooltip js-no-trigger"
       :href="rootPath + assignee.username"
       :title="'Assigned to ' + assignee.name"
       data-container="body">
       <img
-        class="avatar avatar-inline s20"
+        class="avatar avatar-inline s20 js-no-trigger"
         :src="assignee.avatar"
         width="20"
         height="20"

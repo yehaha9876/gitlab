@@ -20,7 +20,7 @@ export default {
     'issue-card-user-counter': IssueCardUserCounter,
   },
   template: `
-    <span>
+    <span class="card-assignee-container">
       <issue-card-user
         v-for="(assignee, index) in issue.assignees"
         v-if="index < 3"

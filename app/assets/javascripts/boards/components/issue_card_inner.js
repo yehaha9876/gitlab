@@ -90,7 +90,7 @@ import IssueCardMultipleUsers from './issue_card_multiple_users';
           </span>
           <issue-card-multiple-users :issue="issue" :rootPath="rootPath" />
           <button
-            class="label color-label has-tooltip"
+            class="label color-label has-tooltip js-no-trigger"
             v-for="label in issue.labels"
             type="button"
             v-if="showLabel(label)"
