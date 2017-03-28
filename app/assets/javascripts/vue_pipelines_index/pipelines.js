@@ -137,7 +137,7 @@ export default {
       data: { page: pageNumber, scope },
       successCallback: this.successCallback,
       errorCallback: this.errorCallback,
-      auxiliarCallback: this.setIsMakingRequest,
+      notificationCallback: this.setIsMakingRequest,
     });
 
     if (!Visibility.hidden()) {
