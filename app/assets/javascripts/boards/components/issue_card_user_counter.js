@@ -15,7 +15,7 @@ export default {
       }
     },
     wideCounter() {
-      return this.count >= 99;
+      return this.count > 9;
     },
   },
   template: `
