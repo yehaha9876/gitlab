@@ -270,8 +270,14 @@ class PrometheusGraph {
       .attr('y', maxMetricValue + 15)
       .text(dayFormat(currentData.time));
 
+      let currentMetricValue = gl.text.formatRelevantDigits(currentData.value);
+      if (key === 'cpu_values') {
+        currentMetricValue = `${currentMetricValue}%`;
+      } else {
+        currentMetricValue = `${currentMetricValue} MB`;
+      }
       d3.select(`${currentPrometheusGraphContainer} .text-metric-usage`)
-      .text(currentData.value.substring(0, 8));
+      .text(currentMetricValue);
     });
   }
 
@@ -344,10 +350,12 @@ class PrometheusGraph {
     Object.keys(metricsResponse.metrics).forEach((key) => {
       if (key === 'cpu_values' || key === 'memory_values') {
         const metricValues = (metricsResponse.metrics[key])[0];
-        this.graphSpecificProperties[key].data = metricValues.values.map(metric => ({
-          time: new Date(metric[0] * 1000),
-          value: metric[1],
-        }));
+        if (typeof metricValues !== 'undefined') {
+          this.graphSpecificProperties[key].data = metricValues.values.map(metric => ({
+            time: new Date(metric[0] * 1000),
+            value: metric[1],
+          }));
+        }
       }
     });
   }
