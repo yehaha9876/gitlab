@@ -63,19 +63,24 @@ export default class Poll {
         this.makeRequest();
       }, pollInterval);
     }
-
     this.options.successCallback(response);
   }
 
   makeRequest() {
-    const { resource, method, data, errorCallback, auxiliarCallback } = this.options;
+    const { resource, method, data, errorCallback, notificationCallback } = this.options;
 
     // It's called everytime a new request is made. Useful to update the status.
-    auxiliarCallback(true);
+    notificationCallback(true);
 
     return resource[method](data)
-    .then(response => this.checkConditions(response))
-    .catch(error => errorCallback(error));
+      .then((response) => {
+        this.checkConditions(response);
+        notificationCallback(false);
+      })
+      .catch((error) => {
+        notificationCallback(false);
+        errorCallback(error);
+      });
   }
 
   /**
