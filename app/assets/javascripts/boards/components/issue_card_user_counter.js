@@ -5,14 +5,14 @@ export default {
   },
   computed: {
     tooltipTitle() {
-      return `+${this.count} more assignees`
+      return `+${this.count} more assignees`;
     },
     text() {
-      if(this.count < 99) {
+      if (this.count < 99) {
         return `+${this.count}`;
-      } else {
-        return '99+';
       }
+
+      return '99+';
     },
   },
   template: `
