@@ -21,9 +21,17 @@ export { default as PipelineBlockedState } from './components/states/mr_widget_p
 export { default as PipelineFailedState } from './components/states/mr_widget_pipeline_failed';
 export { default as MergeWhenPipelineSucceedsState } from './components/states/mr_widget_merge_when_pipeline_succeeds';
 export { default as CheckingState } from './components/states/mr_widget_checking';
-export { default as MRWidgetStore } from './stores/mr_widget_store';
-export { default as MRWidgetService } from './services/mr_widget_service';
+// export { default as MRWidgetStore } from './stores/mr_widget_store';
+// export { default as MRWidgetService } from './services/mr_widget_service';
 export { default as eventHub } from './event_hub';
 export { default as deviseState } from './stores/devise_state';
-export { default as mrWidgetOptions } from './mr_widget_options';
+// export { default as mrWidgetOptions } from './mr_widget_options';
 export { statesToShowHelpWidget, stateToComponentMap } from './stores/state_maps';
+
+/* EE Only */
+
+export { default as WidgetApprovals } from './ee/components/mr_widget_approvals';
+export { default as mrWidgetOptions } from './ee/mr_widget_options';
+export { default as MRWidgetStore } from './ee/stores/mr_widget_store';
+export { default as MRWidgetService } from './ee/services/mr_widget_service';
+

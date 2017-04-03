@@ -19,6 +19,11 @@ class MergeRequestEntity < IssuableEntity
 
   # EE specific
   expose :approvals_before_merge
+  expose :approvals_path do |merge_request|
+    approvals_namespace_project_merge_request_path(merge_request.target_project.namespace,
+                                                    merge_request.target_project,
+                                                    merge_request)  
+  end
 
   # Events
   expose :merge_event, using: EventEntity

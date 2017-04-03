@@ -1,11 +1,14 @@
-import Vue from 'vue';
+import checkmarkSvg from 'icons/_icon_checkmark.svg';
+import pendingAvatarSvg from 'icons/_icon_dotted_circle.svg';
+import LinkToMemberAvatar from '../../../vue_common_component/link_to_member_avatar';
 
-require('../approvals_store');
-require('../../../vue_common_component/link_to_member_avatar');
-
-Vue.component('approvals-footer', {
+export default {
   name: 'approvals-footer',
   props: {
+    service: {
+      type: Object,
+      required: true,
+    },
     approvedBy: {
       type: Array,
       required: false,
@@ -26,19 +29,16 @@ Vue.component('approvals-footer', {
       type: Array,
       required: false,
     },
-    pendingAvatarSvg: {
-      type: String,
-      required: true,
-    },
-    checkmarkSvg: {
-      type: String,
-      required: true,
-    },
   },
   data() {
     return {
       unapproving: false,
+      checkmarkSvg,
+      pendingAvatarSvg,
     };
+  },
+  components: {
+    'link-to-member-avatar': LinkToMemberAvatar,
   },
   computed: {
     showUnapproveButton() {
@@ -48,13 +48,10 @@ Vue.component('approvals-footer', {
   methods: {
     unapproveMergeRequest() {
       this.unapproving = true;
-      gl.ApprovalsStore.unapprove().then(() => {
+      this.service.unapproveMergeRequest().then(() => {
         this.unapproving = false;
       });
     },
-  },
-  beforeCreate() {
-    gl.ApprovalsStore.initStoreOnce();
   },
   template: `
     <div class='mr-widget-footer approved-by-users approvals-footer clearfix mr-approvals-footer'>
@@ -88,4 +85,4 @@ Vue.component('approvals-footer', {
       </span>
     </div>
   `,
-});
+};

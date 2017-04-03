@@ -1,11 +1,13 @@
-import Vue from 'vue';
-
 require('../approvals_store');
 require('../approvals_api');
 
-Vue.component('approvals-body', {
+export default {
   name: 'approvals-body',
   props: {
+    service: {
+      type: Object,
+      required: true,
+    },
     approvedBy: {
       type: Array,
       required: false,
@@ -66,10 +68,7 @@ Vue.component('approvals-body', {
   },
   methods: {
     approveMergeRequest() {
-      this.approving = true;
-      return gl.ApprovalsStore.approve().then(() => {
-        this.approving = false;
-      });
+      this.service.approveMergeRequest();
     },
   },
   beforeCreate() {
@@ -90,4 +89,4 @@ Vue.component('approvals-body', {
       </div>
     </div>
   `,
-});
+};
