@@ -26,6 +26,7 @@ import {
   stateToComponentMap,
   statesToShowHelpWidget,
   SquashBeforeMerge,
+  SecondaryGeoNode,
 } from './dependencies';
 
 export default {
@@ -159,6 +160,7 @@ export default {
     'mr-widget-pipeline-blocked': PipelineBlockedState,
     'mr-widget-pipeline-failed': PipelineFailedState,
     'mr-widget-merge-when-pipeline-succeeds': MergeWhenPipelineSucceedsState,
+    'mr-widget-secondary-geo-node': SecondaryGeoNode,
   },
   template: `
     <div class="mr-state-widget prepend-top-default">

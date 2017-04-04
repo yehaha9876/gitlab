@@ -9,6 +9,7 @@
 
 :javascript
   window.gl.mrWidgetData = #{@merge_request_json}
+  Object.assign(window.gl.mrWidgetData, { 'is_geo_secondary_node': #{(Gitlab::Geo.secondary?).to_s}})
 
 :javascript
   var opts = {
@@ -41,7 +42,7 @@
 
   merge_request_widget = new window.gl.MergeRequestWidget(opts);
 
-#js-vue-mr-widget.mr-widget
+#js-vue-mr-widget.mr-widget{ hello: 'world'}}
 
 - content_for :page_specific_javascripts do
   = page_specific_javascript_bundle_tag('vue_merge_request_widget')

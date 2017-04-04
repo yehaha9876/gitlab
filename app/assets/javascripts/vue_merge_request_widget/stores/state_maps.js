@@ -15,6 +15,7 @@ export const stateToComponentMap = {
   pipelineFailed: 'mr-widget-pipeline-failed',
   mergeWhenPipelineSucceeds: 'mr-widget-merge-when-pipeline-succeeds',
   failedToMerge: 'mr-widget-failed-to-merge',
+  secondaryGeoNode: 'mr-widget-secondary-geo-node',
 };
 
 export const statesToShowHelpWidget = [
