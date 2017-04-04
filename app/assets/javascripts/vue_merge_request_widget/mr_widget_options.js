@@ -25,6 +25,7 @@ import {
   eventHub,
   stateToComponentMap,
   statesToShowHelpWidget,
+  SquashBeforeMerge,
 } from './dependencies';
 
 export default {
@@ -111,6 +112,11 @@ export default {
       this.checkStatus(cb);
     });
 
+    eventHub.$on('MRWidgetFreeze', () => {
+      this.mr.isFrozen = true;
+      this.checkStatus();
+    });
+
     // `params` should be an Array contains a Boolean, like `[true]`
     // Passing parameter as Boolean didn't work.
     eventHub.$on('SetBranchRemoveFlag', (params) => {
@@ -147,6 +153,7 @@ export default {
     'mr-widget-not-allowed': NotAllowedState,
     'mr-widget-missing-branch': MissingBranchState,
     'mr-widget-ready-to-merge': ReadyToMergeState,
+    'mr-widget-squash-before-merge': SquashBeforeMerge,
     'mr-widget-checking': CheckingState,
     'mr-widget-unresolved-discussions': UnresolvedDiscussionsState,
     'mr-widget-pipeline-blocked': PipelineBlockedState,

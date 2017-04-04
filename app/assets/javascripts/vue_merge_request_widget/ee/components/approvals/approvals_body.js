@@ -1,9 +1,10 @@
-require('../approvals_store');
-require('../approvals_api');
-
 export default {
   name: 'approvals-body',
   props: {
+    mr: {
+      type: Object,
+      required: true,
+    },
     service: {
       type: Object,
       required: true,
@@ -68,11 +69,16 @@ export default {
   },
   methods: {
     approveMergeRequest() {
-      this.service.approveMergeRequest();
+      const flashErrorMessage = 'An error occured while submitting your approval.';
+
+      this.approving = true;
+      this.service.approveMergeRequest()
+        .then((res) => {
+          this.mr.setApprovals(res.data);
+          this.approving = false;
+        })
+        .catch(() => new Flash(flashErrorMessage));
     },
-  },
-  beforeCreate() {
-    gl.ApprovalsStore.initStoreOnce();
   },
   template: `
     <div class='approvals-body mr-widget-footer mr-approvals-footer'>
@@ -82,7 +88,7 @@ export default {
       <div v-if='showApproveButton' class='append-bottom-10'>
         <button
           :disabled='approving'
-          @click='approveMergeRequest'
+          @click='approveMergeRequest()'
           class='btn btn-primary approve-btn'>
           Approve Merge Request
         </button>

@@ -1,5 +1,6 @@
 import simplePoll from '~/lib/utils/simple_poll';
 import eventHub from '../../event_hub';
+import SquashBeforeMerge from './mr_widget_squash_before_merge';
 
 export default {
   name: 'MRWidgetReadyToMerge',
@@ -62,6 +63,9 @@ export default {
     },
   },
   methods: {
+    addParam(key, val) {
+      this.additionalParams[key] = val;
+    },
     isMergeAllowed() {
       return !(this.mr.onlyAllowMergeIfPipelineSucceeds && this.mr.isPipelineFailed);
     },
@@ -89,6 +93,10 @@ export default {
         merge_when_pipeline_succeeds: this.setToMergeWhenPipelineSucceeds,
         should_remove_source_branch: this.removeSourceBranch === true,
       };
+
+      if (this.additionalParams) {
+        Object.assign(options, this.additionalParams);
+      }
 
       this.isWorking = true;
 
@@ -197,6 +205,8 @@ export default {
             :disabled="isMergeButtonDisabled"
             type="checkbox"  /> Remove source branch
         </label>
+        <squash-before-merge :is-merge-button-disabled='isMergeButtonDisabled'/>
+        
         <a
           @click.prevent="toggleCommitMessageEditor"
           :disabled="isMergeButtonDisabled"

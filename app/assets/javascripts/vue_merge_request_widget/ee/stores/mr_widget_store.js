@@ -9,6 +9,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   eeSetData(data) {
     this.approvalsPath = data.approvals_path || this.approvalsPath;
     this.approvalsRequired = true;
+    this.approvals = null;
   }
 
   setApprovals(data) {

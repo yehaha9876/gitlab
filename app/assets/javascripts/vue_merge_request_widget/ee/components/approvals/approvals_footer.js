@@ -1,10 +1,14 @@
 import checkmarkSvg from 'icons/_icon_checkmark.svg';
 import pendingAvatarSvg from 'icons/_icon_dotted_circle.svg';
-import LinkToMemberAvatar from '../../../vue_common_component/link_to_member_avatar';
+import LinkToMemberAvatar from '~/vue_shared/components/link_to_member_avatar';
 
 export default {
   name: 'approvals-footer',
   props: {
+    mr: {
+      type: Object,
+      required: true,
+    },
     service: {
       type: Object,
       required: true,
@@ -47,10 +51,15 @@ export default {
   },
   methods: {
     unapproveMergeRequest() {
+      const flashErrorMessage = 'An error occured while removing your approval.';
+
       this.unapproving = true;
-      this.service.unapproveMergeRequest().then(() => {
-        this.unapproving = false;
-      });
+      this.service.unapproveMergeRequest()
+        .then((res) => {
+          this.mr.setApprovals(res.data);
+          this.unapproving = false;
+        })
+        .catch(() => new Flash(flashErrorMessage));
     },
   },
   template: `

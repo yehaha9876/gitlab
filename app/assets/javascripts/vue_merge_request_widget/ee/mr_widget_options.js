@@ -2,7 +2,10 @@ import CEWidgetOptions from '../mr_widget_options';
 import { WidgetApprovals } from '../dependencies';
 
 const EEWidgetOptions = Object.assign({}, CEWidgetOptions);
-const EEComponents = { 'mr-widget-approvals': WidgetApprovals };
+const EEComponents = {
+  'mr-widget-approvals': WidgetApprovals,
+};
+
 const EETemplate = `
     <div class="mr-state-widget prepend-top-default">
       <mr-widget-header :mr="mr" />

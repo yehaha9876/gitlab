@@ -15,12 +15,13 @@ export { default as ConflictsState } from './components/states/mr_widget_conflic
 export { default as NothingToMergeState } from './components/states/mr_widget_nothing_to_merge';
 export { default as MissingBranchState } from './components/states/mr_widget_missing_branch';
 export { default as NotAllowedState } from './components/states/mr_widget_not_allowed';
-export { default as ReadyToMergeState } from './components/states/mr_widget_ready_to_merge';
 export { default as UnresolvedDiscussionsState } from './components/states/mr_widget_unresolved_discussions';
 export { default as PipelineBlockedState } from './components/states/mr_widget_pipeline_blocked';
 export { default as PipelineFailedState } from './components/states/mr_widget_pipeline_failed';
 export { default as MergeWhenPipelineSucceedsState } from './components/states/mr_widget_merge_when_pipeline_succeeds';
 export { default as CheckingState } from './components/states/mr_widget_checking';
+export { default as ReadyToMergeState } from './ee/components/states/mr_widget_ready_to_merge';
+
 // export { default as MRWidgetStore } from './stores/mr_widget_store';
 // export { default as MRWidgetService } from './services/mr_widget_service';
 export { default as eventHub } from './event_hub';
@@ -29,8 +30,7 @@ export { default as deviseState } from './stores/devise_state';
 export { statesToShowHelpWidget, stateToComponentMap } from './stores/state_maps';
 
 /* EE Only */
-
-export { default as WidgetApprovals } from './ee/components/mr_widget_approvals';
+export { default as WidgetApprovals } from './ee/components/approvals/mr_widget_approvals';
 export { default as mrWidgetOptions } from './ee/mr_widget_options';
 export { default as MRWidgetStore } from './ee/stores/mr_widget_store';
 export { default as MRWidgetService } from './ee/services/mr_widget_service';
