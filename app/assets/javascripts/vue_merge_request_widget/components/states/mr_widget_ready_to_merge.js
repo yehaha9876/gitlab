@@ -1,6 +1,5 @@
 import simplePoll from '~/lib/utils/simple_poll';
 import eventHub from '../../event_hub';
-import SquashBeforeMerge from './mr_widget_squash_before_merge';
 
 export default {
   name: 'MRWidgetReadyToMerge',
@@ -63,9 +62,6 @@ export default {
     },
   },
   methods: {
-    addParam(key, val) {
-      this.additionalParams[key] = val;
-    },
     isMergeAllowed() {
       return !(this.mr.onlyAllowMergeIfPipelineSucceeds && this.mr.isPipelineFailed);
     },
