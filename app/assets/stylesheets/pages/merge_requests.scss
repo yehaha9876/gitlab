@@ -614,33 +614,30 @@
   }
 }
 
-#merge-request-widget-app .loading {
-  padding-top: 5px;
+.mr-widget-approvals-container {
+  padding: 5px 16px;
 }
 
-#merge-request-widget-app .loading,
-.approvals-components {
-  border-top: 1px solid $well-inner-border;
+.approvals-loading-text {
+  font-weight: bold;
 }
 
-.approvals-body {
-  @media (max-width: $screen-xs-max) {
-    text-align: center;
-  }
+.approvals-approve-button-wrap {
+  display: inline-block;
+}
 
-  .approve-btn {
-    margin-top: 10px;
-  }
+.approvals-required-text {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 5px;
+  padding-top: 8px;
+  font-weight: bold;
 }
 
 .approvals-footer {
-  display: flex;
-
-  // vertically centers all children
-  > span {
-    align-self: center;
+  p {
+    padding-bottom: 3px;
   }
-
   .hide-asset {
     img {
       display: none;
@@ -653,43 +650,31 @@
   }
 
   .approvers-prefix {
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 5px;
     margin-right: 5px;
   }
 
   .unapprove-btn-wrap {
-    border-left: 1px solid $gray-darker;
+    display: inline-block;
+    vertical-align: top;
     padding-left: 5px;
+    padding-top: 2px;
     margin-left: 10px;
   }
 
-  .unapprove-btn {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-
-    &:hover {
-      color: $gl-text-color-secondary;
-      text-decoration: none;
-    }
-
-    &:focus {
-      outline: none;
-    }
-  }
-
-  // styles for approver avatar checkmark
   .approver-avatar {
     position: relative;
     display: inline-block;
-
-    svg.avatar {
-      position: absolute;
-      top: 12%;
-      right: 4%;
-      height: 45%;
-      width: 45%;
-    }
   }
+}
+
+.approvers-list,
+.potential-approvers-list {
+  display: inline-block;
+  vertical-align: top;
+  padding-top: 5px;
 }
 
 .link-to-member-avatar {

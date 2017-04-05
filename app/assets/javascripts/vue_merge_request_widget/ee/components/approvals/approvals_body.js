@@ -83,18 +83,18 @@ export default {
     },
   },
   template: `
-    <div class='approvals-body mr-widget-footer mr-approvals-footer'>
-      <h4> Requires {{ approvalsRequiredStringified }}
-        <span v-if='showSuggestedApprovers'> (from {{ approverNamesStringified }}) </span>
-      </h4>
-      <div v-if='showApproveButton' class='append-bottom-10'>
+    <div class='approvals-body'>
+      <div v-if='showApproveButton' class='approvals-approve-button-wrap'>
         <button
           :disabled='approving'
           @click='approveMergeRequest'
           class='btn btn-primary approve-btn'>
-          Approve Merge Request
+          Approve
         </button>
       </div>
+      <p class='approvals-required-text'> Requires {{ approvalsRequiredStringified }}
+        <span v-if='showSuggestedApprovers'> (from {{ approverNamesStringified }}) </span>
+      </p>
     </div>
   `,
 };

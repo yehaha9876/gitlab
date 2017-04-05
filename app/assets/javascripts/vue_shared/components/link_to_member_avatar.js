@@ -48,7 +48,7 @@ export default {
     avatarSize: {
       type: Number,
       required: false,
-      default: 32,
+      default: 24,
     },
   },
   data() {

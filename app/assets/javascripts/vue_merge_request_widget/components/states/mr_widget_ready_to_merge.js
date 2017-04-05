@@ -205,6 +205,7 @@ export default {
         
         <!-- Placeholder for EE extension of this component -- renders an empty string in CE -->
         <squash-before-merge :is-merge-button-disabled='isMergeButtonDisabled'/>
+        
         <a
           @click.prevent="toggleCommitMessageEditor"
           :disabled="isMergeButtonDisabled"

@@ -26,13 +26,20 @@ export default {
         this.fetchingApprovals = false;
       })
       .catch(() => new Flash(flashErrorMessage));
-      // TODO: Figure out a way to update shared store (merge request status will have changed)
   },
+
+  /**
+   *  Notes on Style: 
+   * 
+   * 
+   * - 
+   * 
+   */
   template: `
-    <div class='mr-widget-approvals' v-if='mr.approvalsRequired'>
-      <div class='mr-approvals-footer' v-show='fetchingApprovals'> 
+    <div class='mr-widget-approvals-container' v-if='mr.approvalsRequired'>
+      <div class='mr-approvals-loading-state' v-show='fetchingApprovals'> 
+        <span class='approvals-loading-text'> Checking approval status for this merge request. </span>
         <i class='fa fa-spinner fa-spin'/>
-        <span> Checking approval status for this merge request. </span>
       </div>
       <div class='approvals-components' v-if='!fetchingApprovals'>
         <approvals-body
