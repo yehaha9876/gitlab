@@ -27,14 +27,6 @@ export default {
       })
       .catch(() => new Flash(flashErrorMessage));
   },
-
-  /**
-   *  Notes on Style: 
-   * 
-   * 
-   * - 
-   * 
-   */
   template: `
     <div class='mr-widget-approvals-container' v-if='mr.approvalsRequired'>
       <div class='mr-approvals-loading-state' v-show='fetchingApprovals'> 
