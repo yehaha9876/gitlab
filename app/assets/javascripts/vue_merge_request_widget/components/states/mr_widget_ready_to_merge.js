@@ -178,7 +178,7 @@ export default {
         </button>
         <ul
           v-if="shouldShowMergeOptionsDropdown"
-          class="dropdown-menu dropdown-menu-right" role="menu" :disabled='isMergeButtonDisabled'>
+          class="dropdown-menu dropdown-menu-right" role="menu">
           <li>
             <a
               @click.prevent="handleMergeButtonClick(true)"
