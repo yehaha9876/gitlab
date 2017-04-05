@@ -1,4 +1,13 @@
-// TODO: Add a comment about how this works between EE and CE
+/**
+ * This file is the centerpiece of an attempt to reduce potential conflicts
+ * between the CE and EE versions of the MR widget. EE additions to the MR widget should
+ * be contained in the ./vue_merge_request_widget/ee directory, and should **extend**
+ * rather than mutate CE MR Widget code.
+ *
+ * This file should be the only source of conflicts between EE and CE. EE-only components should
+ * be appended to the bottom of the file, and import paths for EE extensions of CE components
+ * should overwrite import paths **without** changing the order of dependencies listed here.
+ */
 
 export { default as Vue } from 'vue';
 export { default as SmartInterval } from '~/smart_interval';
