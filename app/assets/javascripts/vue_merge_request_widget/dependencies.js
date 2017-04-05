@@ -23,7 +23,7 @@ export { default as MergeWhenPipelineSucceedsState } from './components/states/m
 export { default as CheckingState } from './components/states/mr_widget_checking';
 export { default as eventHub } from './event_hub';
 export { default as deviseState } from './stores/devise_state';
-export { statesToShowHelpWidget, stateToComponentMap } from './stores/state_maps';
+export { default as statesToShowHelpWidget, default as stateToComponentMap } from './ee/stores/state_maps';
 export { default as ReadyToMergeState } from './ee/components/states/mr_widget_ready_to_merge';
 
 /* EE Only */
