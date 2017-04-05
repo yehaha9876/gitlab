@@ -23,10 +23,8 @@ import {
   MRWidgetStore,
   MRWidgetService,
   eventHub,
-  stateToComponentMap,
-  statesToShowHelpWidget,
+  StateMaps,
   SquashBeforeMerge,
-  SecondaryGeoNode,
 } from './dependencies';
 
 export default {
@@ -42,10 +40,10 @@ export default {
   },
   computed: {
     componentName() {
-      return stateToComponentMap[this.mr.state];
+      return StateMaps.stateToComponentMap[this.mr.state];
     },
     shouldRenderMergeHelp() {
-      return statesToShowHelpWidget.indexOf(this.mr.state) > -1;
+      return StateMaps.statesToShowHelpWidget.indexOf(this.mr.state) > -1;
     },
     shouldRenderPipelines() {
       return Object.keys(this.mr.pipeline).length || this.mr.hasCI;
@@ -160,7 +158,6 @@ export default {
     'mr-widget-pipeline-blocked': PipelineBlockedState,
     'mr-widget-pipeline-failed': PipelineFailedState,
     'mr-widget-merge-when-pipeline-succeeds': MergeWhenPipelineSucceedsState,
-    'mr-widget-secondary-geo-node': SecondaryGeoNode,
   },
   template: `
     <div class="mr-state-widget prepend-top-default">

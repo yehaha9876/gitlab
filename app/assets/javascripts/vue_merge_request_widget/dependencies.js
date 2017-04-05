@@ -1,4 +1,5 @@
 // TODO: Add a comment about how this works between EE and CE
+
 export { default as Vue } from 'vue';
 export { default as SmartInterval } from '~/smart_interval';
 export { default as WidgetHeader } from './components/mr_widget_header';
@@ -22,12 +23,12 @@ export { default as PipelineFailedState } from './components/states/mr_widget_pi
 export { default as MergeWhenPipelineSucceedsState } from './components/states/mr_widget_merge_when_pipeline_succeeds';
 export { default as CheckingState } from './components/states/mr_widget_checking';
 export { default as eventHub } from './event_hub';
-export { default as deviseState } from './stores/devise_state';
-export { default as statesToShowHelpWidget, default as stateToComponentMap } from './ee/stores/state_maps';
-export { default as ReadyToMergeState } from './ee/components/states/mr_widget_ready_to_merge';
 
 /* EE Only */
 
+export { default as StateMaps } from './ee/stores/state_maps';
+export { default as ReadyToMergeState } from './ee/components/states/mr_widget_ready_to_merge';
+export { default as deviseState } from './ee/stores/devise_state';
 export { default as SecondaryGeoNode } from './ee/components/states/mr_widget_secondary_geo_node';
 export { default as WidgetApprovals } from './ee/components/approvals/mr_widget_approvals';
 export { default as mrWidgetOptions } from './ee/mr_widget_options';
