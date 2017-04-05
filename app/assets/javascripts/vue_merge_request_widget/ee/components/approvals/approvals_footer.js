@@ -1,4 +1,3 @@
-import checkmarkSvg from 'icons/_icon_checkmark.svg';
 import pendingAvatarSvg from 'icons/_icon_dotted_circle.svg';
 import LinkToMemberAvatar from '~/vue_shared/components/link_to_member_avatar';
 import eventHub from '../../../event_hub';
