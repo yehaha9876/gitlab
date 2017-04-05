@@ -58,7 +58,7 @@ export default {
     },
     isMergeButtonDisabled() {
       const { commitMessage } = this;
-      return !commitMessage.length || !this.isMergeAllowed() || this.isWorking;
+      return !commitMessage.length || !this.isMergeAllowed() || this.isWorking || this.mr.isFrozen;
     },
   },
   methods: {
@@ -178,7 +178,7 @@ export default {
         </button>
         <ul
           v-if="shouldShowMergeOptionsDropdown"
-          class="dropdown-menu dropdown-menu-right" role="menu">
+          class="dropdown-menu dropdown-menu-right" role="menu" :disabled='isMergeButtonDisabled'>
           <li>
             <a
               @click.prevent="handleMergeButtonClick(true)"

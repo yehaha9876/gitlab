@@ -3,7 +3,6 @@ import eventHub from '../event_hub';
 import { deviseState } from '../dependencies';
 
 export default class MergeRequestStore {
-
   constructor(data) {
     this.setData(data);
   }

@@ -53,7 +53,7 @@ export default {
         <button
           v-if="mr.canCancelAutomaticMerge"
           @click="cancelAutomaticMerge"
-          :disabled="isCancellingAutoMerge"
+          :disabled="isCancellingAutoMerge || mr.isFrozen"
           type="button" class="btn btn-xs btn-default">
           <i
             v-if="isCancellingAutoMerge"

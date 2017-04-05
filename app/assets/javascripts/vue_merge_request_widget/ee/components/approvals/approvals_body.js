@@ -1,3 +1,5 @@
+import eventHub from '../../../event_hub';
+
 export default {
   name: 'approvals-body',
   props: {

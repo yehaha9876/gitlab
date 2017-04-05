@@ -111,11 +111,6 @@ export default {
       this.checkStatus(cb);
     });
 
-    eventHub.$on('MRWidgetFreeze', () => {
-      this.mr.isFrozen = true;
-      this.checkStatus();
-    });
-
     // `params` should be an Array contains a Boolean, like `[true]`
     // Passing parameter as Boolean didn't work.
     eventHub.$on('SetBranchRemoveFlag', (params) => {

@@ -28,6 +28,7 @@ export { default as eventHub } from './event_hub';
 
 export { default as StateMaps } from './ee/stores/state_maps';
 export { default as ReadyToMergeState } from './ee/components/states/mr_widget_ready_to_merge';
+export { default as SquashBeforeMerge } from './ee/components/states/mr_widget_squash_before_merge';
 export { default as deviseState } from './ee/stores/devise_state';
 export { default as SecondaryGeoNode } from './ee/components/states/mr_widget_secondary_geo_node';
 export { default as WidgetApprovals } from './ee/components/approvals/mr_widget_approvals';

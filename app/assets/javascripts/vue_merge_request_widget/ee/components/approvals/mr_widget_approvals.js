@@ -1,5 +1,6 @@
 import ApprovalsBody from './approvals_body';
 import ApprovalsFooter from './approvals_footer';
+import eventHub from '../../../event_hub';
 
 export default {
   name: 'MRWidgetApprovals',
