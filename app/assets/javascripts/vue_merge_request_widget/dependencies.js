@@ -5,7 +5,7 @@
  * rather than mutate CE MR Widget code.
  *
  * This file should be the only source of conflicts between EE and CE. EE-only components should
- * be appended to the bottom of the file, and import paths for EE extensions of CE components
+ * imported directly where they are needed, and import paths for EE extensions of CE components
  * should overwrite import paths **without** changing the order of dependencies listed here.
  */
 
@@ -40,8 +40,4 @@ export { default as mrWidgetOptions } from './ee/mr_widget_options';
 export { default as StateMaps } from './ee/stores/state_maps'; // TODO: Backport to CE
 export { default as SquashBeforeMerge } from './ee/components/states/mr_widget_squash_before_merge'; // TODO: Backport to CE
 
-/* EE Only */
-
-export { default as SecondaryGeoNode } from './ee/components/states/mr_widget_secondary_geo_node';
-export { default as WidgetApprovals } from './ee/components/approvals/mr_widget_approvals';
 
