@@ -10,7 +10,7 @@ require('./lib/utils/bootstrap_linked_tabs');
       }
 
       if (options.pipelineStatusUrl) {
-        gl.utils.setCIStatusFavicon(options.pipelineStatusUrl);
+        gl.utils.setCiStatusFavicon(options.pipelineStatusUrl);
       }
 
       this.addMarginToBuildColumns();

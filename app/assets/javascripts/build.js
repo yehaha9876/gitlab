@@ -88,7 +88,7 @@ window.Build = (function() {
       dataType: 'json',
       success: function(buildData) {
         $('.js-build-output').html(buildData.trace_html);
-        gl.utils.setCIStatusFavicon(`${this.pageUrl}/status.json`);
+        gl.utils.setCiStatusFavicon(`${this.pageUrl}/status.json`);
         if (window.location.hash === DOWN_BUILD_TRACE) {
           $("html,body").scrollTop(this.$buildTrace.height());
         }

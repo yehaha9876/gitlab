@@ -75,7 +75,7 @@ describe('Build', () => {
         expect(url).toBe(`${BUILD_URL}.json`);
         expect(dataType).toBe('json');
         expect(success).toEqual(jasmine.any(Function));
-        spyOn(gl.utils, 'setCIStatusFavicon').and.callFake(() => {});
+        spyOn(gl.utils, 'setCiStatusFavicon').and.callFake(() => {});
 
         success.call(context, { trace_html: '<span>Example</span>', status: 'running' });
 
@@ -84,7 +84,7 @@ describe('Build', () => {
 
       it('removes the spinner', () => {
         const [{ success, context }] = $.ajax.calls.argsFor(0);
-        spyOn(gl.utils, 'setCIStatusFavicon').and.callFake(() => {});
+        spyOn(gl.utils, 'setCiStatusFavicon').and.callFake(() => {});
         success.call(context, { trace_html: '<span>Example</span>', status: 'success' });
 
         expect($('.js-build-refresh').length).toBe(0);

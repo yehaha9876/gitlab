@@ -342,7 +342,7 @@ require('~/lib/utils/common_utils');
       });
     });
 
-    describe('gl.utils.setCIStatusFavicon', () => {
+    describe('gl.utils.setCiStatusFavicon', () => {
       it('should set page favicon to CI status favicon based on provided status', () => {
         const BUILD_URL = `${gl.TEST_HOST}/frontend-fixtures/builds-project/builds/1/status.json`;
         const FAVICON_PATH = 'ci_favicons/';
@@ -358,7 +358,7 @@ require('~/lib/utils/common_utils');
           expect(spyResetFavicon).toHaveBeenCalled();
         });
 
-        gl.utils.setCIStatusFavicon(BUILD_URL);
+        gl.utils.setCiStatusFavicon(BUILD_URL);
       });
     });
   });
