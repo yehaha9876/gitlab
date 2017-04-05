@@ -37,7 +37,6 @@ export default {
   data() {
     return {
       unapproving: false,
-      checkmarkSvg,
       pendingAvatarSvg,
     };
   },
