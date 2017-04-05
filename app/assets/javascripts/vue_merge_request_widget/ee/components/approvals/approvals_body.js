@@ -88,7 +88,7 @@ export default {
       <div v-if='showApproveButton' class='append-bottom-10'>
         <button
           :disabled='approving'
-          @click='approveMergeRequest()'
+          @click='approveMergeRequest'
           class='btn btn-primary approve-btn'>
           Approve Merge Request
         </button>
