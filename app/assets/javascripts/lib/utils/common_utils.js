@@ -376,14 +376,13 @@
       }
     };
 
-    w.gl.utils.setCIStatusFavicon = (pageUrl) => {
+    w.gl.utils.setCiStatusFavicon = (pageUrl) => {
       $.ajax({
         url: pageUrl,
         dataType: 'json',
         success: function(data) {
-          const FAVICON_PATH = 'ci_favicons/';
           if (data && data.icon) {
-            gl.utils.setFavicon(FAVICON_PATH + data.icon);
+            gl.utils.setFavicon(`ci_favicons/${data.icon}`);
           } else {
             gl.utils.resetFavicon();
           }
