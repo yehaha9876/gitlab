@@ -19,7 +19,6 @@ class MergeRequestEntity < IssuableEntity
 
   # EE specific
   expose :approvals_required
-  expose :approvals_left
   expose :approvals_path do |merge_request|
     approvals_namespace_project_merge_request_path(merge_request.target_project.namespace,
                                                     merge_request.target_project,

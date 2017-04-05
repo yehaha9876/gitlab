@@ -15,12 +15,10 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.approvals = this.approvals || null;
     this.approvalsPath = data.approvals_path || this.approvalsPath;
     this.approvalsRequired = !!data.approvals_required;
-    this.approvalsLeft = !!data.approvals_left;
   }
 
   setApprovals(data) {
     this.approvals = data;
-    this.approvalsRequired = !!data.approvals_required;
     this.approvalsLeft = !!data.approvals_left;
     this.isFrozen = this.approvalsRequired && this.approvalsLeft;
   }
