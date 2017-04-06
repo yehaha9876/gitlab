@@ -83,17 +83,17 @@ export default {
     },
   },
   template: `
-    <div class='approvals-body'>
-      <div v-if='showApproveButton' class='approvals-approve-button-wrap'>
+    <div class="approvals-body">
+      <div v-if="showApproveButton" class="approvals-approve-button-wrap">
         <button
-          :disabled='approving'
-          @click='approveMergeRequest'
-          class='btn btn-primary approve-btn'>
+          :disabled="approving"
+          @click="approveMergeRequest"
+          class="btn btn-primary approve-btn">
           Approve
         </button>
       </div>
-      <p class='approvals-required-text'> Requires {{ approvalsRequiredStringified }}
-        <span v-if='showSuggestedApprovers'> (from {{ approverNamesStringified }}) </span>
+      <p class="approvals-required-text"> Requires {{ approvalsRequiredStringified }}
+        <span v-if="showSuggestedApprovers"> (from {{ approverNamesStringified }}) </span>
       </p>
     </div>
   `,

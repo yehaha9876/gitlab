@@ -62,32 +62,32 @@ export default {
     },
   },
   template: `
-    <div class='approved-by-users approvals-footer clearfix mr-info-list'>
-      <div class='legend'></div>
+    <div class="approved-by-users approvals-footer clearfix mr-info-list">
+      <div class="legend"></div>
       <p>
-        <span class='approvers-prefix'> Approved by </span>
-        <span class='approvers-list' v-for='approver in approvedBy'>
+        <span class="approvers-prefix"> Approved by </span>
+        <span class="approvers-list" v-for="approver in approvedBy">
           <link-to-member-avatar
-            extra-link-class='approver-avatar'
-            :avatar-url='approver.user.avatar_url'
-            :display-name='approver.user.name'
-            :profile-url='approver.user.web_url'
-            :show-tooltip='true'>
+            extra-link-class="approver-avatar"
+            :avatar-url="approver.user.avatar_url"
+            :display-name="approver.user.name"
+            :profile-url="approver.user.web_url"
+            :show-tooltip="true">
           </link-to-member-avatar>
         </span>
-        <span class='potential-approvers-list' v-for='n in approvalsLeft'>
+        <span class="potential-approvers-list" v-for="n in approvalsLeft">
           <link-to-member-avatar
-            :clickable='false'
-            :avatar-html='pendingAvatarSvg'
-            :show-tooltip='false'
-            extra-link-class='hide-asset'>
+            :clickable="false"
+            :avatar-html="pendingAvatarSvg"
+            :show-tooltip="false"
+            extra-link-class="hide-asset">
           </link-to-member-avatar>
         </span>
-        <span class='unapprove-btn-wrap' v-if='showUnapproveButton'>
+        <span class="unapprove-btn-wrap" v-if="showUnapproveButton">
           <button
-            :disabled='unapproving'
-            @click='unapproveMergeRequest'
-            class='btn btn-sm'>
+            :disabled="unapproving"
+            @click="unapproveMergeRequest"
+            class="btn btn-sm">
             Remove your approval
           </button>
         </span>

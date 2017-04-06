@@ -80,10 +80,10 @@ export default {
     },
   },
   template: `
-    <div class='link-to-member-avatar'>
-      <a :href='profileUrl' :class='linkClass' :data-original-title='displayName' :data-container='tooltipContainerAttr'>
-        <svg v-if='avatarHtml' v-html='avatarHtml' :class='avatarHtmlClass' :width='avatarSize' :height='avatarSize' :alt='displayName'></svg>
-        <img :class='avatarClass' :src='avatarUrl' :width='avatarSize' :height='avatarSize' :alt='displayName'/>
+    <div class="link-to-member-avatar">
+      <a :href="profileUrl" :class="linkClass" :data-original-title="displayName" :data-container="tooltipContainerAttr">
+        <svg v-if="avatarHtml" v-html="avatarHtml" :class="avatarHtmlClass" :width="avatarSize" :height="avatarSize" :alt="displayName"></svg>
+        <img :class="avatarClass" :src="avatarUrl" :width="avatarSize" :height="avatarSize" :alt="displayName"/>
       </a>
     </div>
   `,
