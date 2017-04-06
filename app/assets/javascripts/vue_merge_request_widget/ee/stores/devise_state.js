@@ -7,5 +7,3 @@ export default (data) => {
   return CEDeviseState.call(this, data);
 };
 
-
-

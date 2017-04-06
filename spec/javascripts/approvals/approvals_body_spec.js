@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-require('~/merge_request_widget/approvals/components/approvals_body');
+import ApprovalsBody from '~/vue_merge_request_widget/ee/components/approvals/approvals_body';
 
 (() => {
   gl.ApprovalsStore = {
@@ -29,7 +29,7 @@ require('~/merge_request_widget/approvals/components/approvals_body');
       checkmarkSvg: '<svg></svg>',
     };
 
-    const ApprovalsBodyComponent = Vue.component('approvals-body');
+    const ApprovalsBodyComponent = Vue.extend(ApprovalsBody);
 
     this.approvalsBody = new ApprovalsBodyComponent({
       el: '#mock-container',

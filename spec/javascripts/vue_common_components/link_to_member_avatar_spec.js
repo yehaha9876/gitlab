@@ -2,7 +2,7 @@
 
 import Vue from 'vue';
 
-require('~/vue_common_component/link_to_member_avatar');
+import LinkToMemberAvatar from '~/vue_shared/components/link_to_member_avatar';
 
 (() => {
   function initComponent(propsData = {}) {
@@ -12,7 +12,7 @@ require('~/vue_common_component/link_to_member_avatar');
       </div>
     `);
 
-    const LinkToMembersComponent = Vue.component('link-to-member-avatar');
+    const LinkToMembersComponent = Vue.extend(LinkToMemberAvatar);
 
     this.component = new LinkToMembersComponent({
       el: '#mock-container',

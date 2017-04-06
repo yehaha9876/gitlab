@@ -1,4 +1,4 @@
-export default function (data) {
+export default (data) => {
   if (data.is_secondary_geo_node) {
     return 'secondaryGeoNode';
   } else if (data.project_archived) {
@@ -28,4 +28,3 @@ export default function (data) {
   }
   return null;
 };
-

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-require('~/merge_request_widget/approvals/components/approvals_footer');
+import ApprovalsFooter from '~/vue_merge_request_widget/ee/components/approvals/approvals_footer';
 
 (() => {
   gl.ApprovalsStore = {
@@ -28,7 +28,7 @@ require('~/merge_request_widget/approvals/components/approvals_footer');
       checkmarkSvg: '<svg></svg>',
     };
 
-    const ApprovalsFooterComponent = Vue.component('approvals-footer');
+    const ApprovalsFooterComponent = Vue.extend(ApprovalsFooter);
 
     this.approvalsFooter = new ApprovalsFooterComponent({
       el: '#mock-container',
