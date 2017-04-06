@@ -1,9 +1,9 @@
-import CEDeviseState from '../../stores/devise_state';
+import CEGetStateKey from '../../stores/get_state_key';
 
 export default (data) => {
   if (this.isGeoSecondaryNode) {
     return 'geoSecondaryNode';
   }
-  return CEDeviseState.call(this, data);
+  return CEGetStateKey.call(this, data);
 };
 
