@@ -31,7 +31,7 @@ export default {
         Squash commits
       </label>
       <a title data-title="About this feature" data-toggle="tooltip" data-placement="bottom" data-container="body" href="/help/user/project/merge_requests/squash_and_merge">
-        <i class="fa fa-question-circle"></i>
+        <i class="fa fa-question-circle" aria-hidden="true"></i>
       </a>
     </div>`,
 };
