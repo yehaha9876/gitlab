@@ -9,9 +9,9 @@
 
 :javascript
   window.gl.mrWidgetData = #{@merge_request_json}
-  Object.assign(window.gl.mrWidgetData, { 'is_geo_secondary_node': '#{Gitlab::Geo.secondary?}' === "false" ? false : true });
-  Object.assign(window.gl.mrWidgetData, { 'geo_secondary_help_path': "#{help_page_path('/gitlab-geo/configuration.md')}" });
-  Object.assign(window.gl.mrWidgetData, { 'squash_before_merge_help_path': "#{help_page_path('user/project/merge_requests/squash_and_merge')}" });
+  Object.assign(window.gl.mrWidgetData, { 'is_geo_secondary_node': '#{Gitlab::Geo.secondary?}' === 'true' });
+  Object.assign(window.gl.mrWidgetData, { 'geo_secondary_help_path': '#{help_page_path("/gitlab-geo/configuration.md")}' });
+  Object.assign(window.gl.mrWidgetData, { 'squash_before_merge_help_path': '#{help_page_path("user/project/merge_requests/squash_and_merge")}' });
 
 :javascript
   var opts = {
