@@ -202,10 +202,10 @@ export default {
             :disabled="isMergeButtonDisabled"
             type="checkbox"  /> Remove source branch
         </label>
-        
+
         <!-- Placeholder for EE extension of this component -->
         <squash-before-merge v-if="mr.enableSquashBeforeMerge" :mr="mr" :is-merge-button-disabled="isMergeButtonDisabled"/>
-        
+
         <a
           @click.prevent="toggleCommitMessageEditor"
           :disabled="isMergeButtonDisabled"
