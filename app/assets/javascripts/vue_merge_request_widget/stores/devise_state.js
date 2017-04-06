@@ -1,4 +1,4 @@
-export default (data) => {
+export default function deviseState(data) {
   if (data.project_archived) {
     return 'archived';
   } else if (data.branch_missing) {
@@ -25,4 +25,5 @@ export default (data) => {
     return 'readyToMerge';
   }
   return null;
-};
+}
+

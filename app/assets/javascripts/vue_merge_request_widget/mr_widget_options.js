@@ -23,8 +23,8 @@ import {
   MRWidgetStore,
   MRWidgetService,
   eventHub,
-  stateMaps,
-  SquashBeforeMerge,
+  stateToComponentMap,
+  statesToShowHelpWidget,
 } from './dependencies';
 
 export default {
@@ -40,10 +40,10 @@ export default {
   },
   computed: {
     componentName() {
-      return stateMaps.stateToComponentMap[this.mr.state];
+      return stateToComponentMap[this.mr.state];
     },
     shouldRenderMergeHelp() {
-      return stateMaps.statesToShowHelpWidget.indexOf(this.mr.state) > -1;
+      return statesToShowHelpWidget.indexOf(this.mr.state) > -1;
     },
     shouldRenderPipelines() {
       return Object.keys(this.mr.pipeline).length || this.mr.hasCI;
@@ -147,7 +147,6 @@ export default {
     'mr-widget-not-allowed': NotAllowedState,
     'mr-widget-missing-branch': MissingBranchState,
     'mr-widget-ready-to-merge': ReadyToMergeState,
-    'mr-widget-squash-before-merge': SquashBeforeMerge,
     'mr-widget-checking': CheckingState,
     'mr-widget-unresolved-discussions': UnresolvedDiscussionsState,
     'mr-widget-pipeline-blocked': PipelineBlockedState,
