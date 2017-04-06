@@ -58,10 +58,7 @@ export default {
     },
     isMergeButtonDisabled() {
       const { commitMessage } = this;
-      return !commitMessage.length
-        || !this.isMergeAllowed()
-        || this.isWorking
-        || this.mr.preventMerge;
+      return !commitMessage.length || !this.isMergeAllowed() || this.isWorking;
     },
   },
   methods: {
