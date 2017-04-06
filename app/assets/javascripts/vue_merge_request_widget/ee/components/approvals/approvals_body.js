@@ -1,4 +1,4 @@
-import eventHub from '../../../event_hub';
+/* global Flash */
 
 export default {
   name: 'approvals-body',
