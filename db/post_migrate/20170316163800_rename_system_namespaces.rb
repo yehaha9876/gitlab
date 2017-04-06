@@ -173,7 +173,7 @@ class RenameSystemNamespaces < ActiveRecord::Migration
   end
 
   def system_namespaces
-    Namespace.where(arel_table[:path].matches(system_namespace))
+    Namespace.where(parent_id: nil).where(arel_table[:path].matches(system_namespace))
   end
 
   def system_namespace

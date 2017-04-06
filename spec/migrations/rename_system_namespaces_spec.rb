@@ -20,12 +20,12 @@ describe RenameSystemNamespaces, truncate: true do
   end
 
   describe "#system_namespaces" do
-    before do
+    it "only root namespaces called with path `system`" do
       system_namespace
-    end
+      system_namespace_with_parent = build(:namespace, path: 'system', parent: create(:namespace))
+      system_namespace_with_parent.save(validate: false)
 
-    it "includes namespaces called with path `system`" do
-      expect(migration.system_namespaces.map(&:id)).to include(system_namespace.id)
+      expect(migration.system_namespaces.map(&:id)).to contain_exactly(system_namespace.id)
     end
   end
 
@@ -97,42 +97,6 @@ describe RenameSystemNamespaces, truncate: true do
         migration.up
 
         expect(project.route.reload.path).to eq("system0/subgroup/system0")
-      end
-    end
-
-    context "for a sub-namespace" do
-      before do
-        system_namespace.parent = create(:namespace, path: "parent")
-        system_namespace.save(validate: false)
-      end
-
-      it "renames the route to the namespace" do
-        migration.up
-
-        expect(system_namespace.reload.full_path).to eq("parent/system0")
-      end
-
-      it "moves the the repository for a project in the namespace" do
-        create(:project, namespace: system_namespace, path: "system-project")
-        expected_repo = File.join(TestEnv.repos_path, "parent", "system0", "system-project.git")
-
-        migration.up
-
-        expect(File.directory?(expected_repo)).to be(true)
-      end
-
-      it "moves the uploads for the namespace" do
-        allow(migration).to receive(:move_namespace_folders).with(Settings.pages.path, "parent/system", "parent/system0")
-        expect(migration).to receive(:move_namespace_folders).with(uploads_dir, "parent/system", "parent/system0")
-
-        migration.up
-      end
-
-      it "moves the pages for the namespace" do
-        allow(migration).to receive(:move_namespace_folders).with(uploads_dir, "parent/system", "parent/system0")
-        expect(migration).to receive(:move_namespace_folders).with(Settings.pages.path, "parent/system", "parent/system0")
-
-        migration.up
       end
     end
   end
