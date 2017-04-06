@@ -88,7 +88,7 @@
     display: flex;
     -webkit-align-items: center;
     align-items: center;
-    padding: $gl-padding-top $gl-padding 0 $gl-padding;
+    padding: $gl-padding-top $gl-padding 0;
 
     i,
     svg {
@@ -205,7 +205,7 @@
 
     .bold {
       font-weight: bold;
-      color: #5c5c5c;
+      color: $mr-widget-bold-text;
     }
 
     .danger {
@@ -401,11 +401,12 @@
       height: 1px;
       top: 8px;
       width: 8px;
-      left: 0px;
+      left: 0;
     }
 
     &:last-child {
       margin-bottom: 0;
+
       &::before {
         top: 14px;
       }
@@ -640,6 +641,7 @@
   p {
     padding-bottom: 3px;
   }
+
   .hide-asset {
     img {
       display: none;
