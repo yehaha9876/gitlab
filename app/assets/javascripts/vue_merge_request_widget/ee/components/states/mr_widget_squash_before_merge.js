@@ -1,5 +1,5 @@
 import eventHub from '../../../event_hub';
-import CESquashBeforeMerge from '../../../components/states/mr_widget_squash_before_merge';
+import CESquashBeforeMerge from '../../components/states/mr_widget_squash_before_merge';
 
 export default {
   extends: CESquashBeforeMerge,

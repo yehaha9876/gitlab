@@ -28,6 +28,6 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   setApprovals(data) {
     this.approvals = data;
     this.approvalsLeft = !!data.approvals_left;
-    this.isFrozen = this.approvalsRequired && this.approvalsLeft;
+    this.preventMerge = this.approvalsRequired && this.approvalsLeft;
   }
 }
