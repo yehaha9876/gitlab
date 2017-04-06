@@ -23,7 +23,7 @@ import {
   MRWidgetStore,
   MRWidgetService,
   eventHub,
-  StateMaps,
+  stateMaps,
   SquashBeforeMerge,
 } from './dependencies';
 
@@ -40,10 +40,10 @@ export default {
   },
   computed: {
     componentName() {
-      return StateMaps.stateToComponentMap[this.mr.state];
+      return stateMaps.stateToComponentMap[this.mr.state];
     },
     shouldRenderMergeHelp() {
-      return StateMaps.statesToShowHelpWidget.indexOf(this.mr.state) > -1;
+      return stateMaps.statesToShowHelpWidget.indexOf(this.mr.state) > -1;
     },
     shouldRenderPipelines() {
       return Object.keys(this.mr.pipeline).length || this.mr.hasCI;

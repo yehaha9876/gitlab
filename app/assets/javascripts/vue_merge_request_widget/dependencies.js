@@ -37,7 +37,7 @@ export { default as MRWidgetService } from './ee/services/mr_widget_service';
 export { default as eventHub } from './event_hub';
 export { default as deviseState } from './ee/stores/devise_state';
 export { default as mrWidgetOptions } from './ee/mr_widget_options';
-export { default as StateMaps } from './ee/stores/state_maps'; // TODO: Backport to CE
+export { default as stateMaps } from './ee/stores/state_maps'; // TODO: Backport to CE
 export { default as SquashBeforeMerge } from './ee/components/states/mr_widget_squash_before_merge'; // TODO: Backport to CE
 
 
