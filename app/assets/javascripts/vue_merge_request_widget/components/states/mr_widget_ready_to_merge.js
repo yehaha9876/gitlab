@@ -89,10 +89,10 @@ export default {
         merge_when_pipeline_succeeds: this.setToMergeWhenPipelineSucceeds,
         should_remove_source_branch: this.removeSourceBranch === true,
       };
-        
+
       // Only truthy in EE extension of this component
-      if (this.additionalParams) {
-        Object.assign(options, this.additionalParams);
+      if (this.setAdditionalParams) {
+        this.setAdditionalParams(options);
       }
 
       this.isWorking = true;
@@ -203,8 +203,8 @@ export default {
             type="checkbox"  /> Remove source branch
         </label>
         
-        <!-- Placeholder for EE extension of this component -- renders an empty string in CE -->
-        <squash-before-merge :is-merge-button-disabled='isMergeButtonDisabled'/>
+        <!-- Placeholder for EE extension of this component -->
+        <squash-before-merge v-if='mr.enableSquashBeforeMerge' :is-merge-button-disabled='isMergeButtonDisabled'/>
         
         <a
           @click.prevent="toggleCommitMessageEditor"

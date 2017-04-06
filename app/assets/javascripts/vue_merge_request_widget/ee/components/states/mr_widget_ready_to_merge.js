@@ -11,6 +11,14 @@ export default {
       },
     };
   },
+  methods: {
+    // called in CE super component before form submission
+    setAdditionalParams(options) {
+      if (this.additionalParams) {
+        Object.assign(options, this.additionalParams);
+      }
+    },
+  },
   created() {
     eventHub.$on('MRWidgetUpdateSquash', (val) => {
       this.additionalParams.squash = val;

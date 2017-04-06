@@ -4,7 +4,12 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   setData(data) {
     super.setData(data);
     this.initGeo(data);
+    this.initSquashBeforeMerge();
     this.initApprovals(data);
+  }
+
+  initSquashBeforeMerge() {
+    this.enableSquashBeforeMerge = true;
   }
 
   initGeo(data) {
