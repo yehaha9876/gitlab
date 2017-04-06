@@ -3,7 +3,6 @@ import CESquashBeforeMerge from '../../../components/states/mr_widget_squash_bef
 
 export default {
   extends: CESquashBeforeMerge,
-  inherits: true,
   props: {
     isMergeButtonDisabled: {
       type: Boolean,
