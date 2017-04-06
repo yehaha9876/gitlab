@@ -1,7 +1,5 @@
 export default (data) => {
-  if (data.is_secondary_geo_node) {
-    return 'secondaryGeoNode';
-  } else if (data.project_archived) {
+  if (data.project_archived) {
     return 'archived';
   } else if (data.branch_missing) {
     return 'missingBranch';

@@ -4,7 +4,7 @@ import {
 } from '../../stores/state_maps';
 
 const stateToComponentMap = Object.assign({}, CEStateToComponentMap, {
-  secondaryGeoNode: 'mr-widget-secondary-geo-node',
+  geoSecondaryNode: 'mr-widget-geo-secondary-node',
 });
 
 export default {

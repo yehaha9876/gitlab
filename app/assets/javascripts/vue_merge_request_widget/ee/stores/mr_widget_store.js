@@ -4,16 +4,19 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   setData(data) {
     super.setData(data);
     this.initGeo(data);
-    this.initSquashBeforeMerge();
+    this.initSquashBeforeMerge(data);
     this.initApprovals(data);
   }
 
-  initSquashBeforeMerge() {
+  initSquashBeforeMerge(data) {
+    this.squashBeforeMergeHelpPath = this.squashBeforeMergeHelpPath
+      || data.squash_before_merge_help_path;
     this.enableSquashBeforeMerge = true;
   }
 
   initGeo(data) {
-    this.is_geo_secondary_node = data.is_geo_secondary_node;
+    this.isGeoSecondaryNode = this.isGeoSecondaryNode || data.is_geo_secondary_node;
+    this.geoSecondaryHelpPath = this.geoSecondaryHelpPath || data.geo_secondary_help_path;
   }
 
   initApprovals(data) {

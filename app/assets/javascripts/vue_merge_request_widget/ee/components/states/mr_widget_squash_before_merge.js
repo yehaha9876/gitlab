@@ -4,6 +4,10 @@ import CESquashBeforeMerge from '../../../components/states/mr_widget_squash_bef
 export default {
   extends: CESquashBeforeMerge,
   props: {
+    mr: {
+      type: Object,
+      required: true,
+    },
     isMergeButtonDisabled: {
       type: Boolean,
       required: true,
@@ -29,7 +33,7 @@ export default {
           @change="updateSquashModel"/>
         Squash commits
       </label>
-      <a title data-title="About this feature" data-toggle="tooltip" data-placement="bottom" data-container="body" href="/help/user/project/merge_requests/squash_and_merge">
+      <a title data-title="About this feature" data-toggle="tooltip" data-placement="bottom" data-container="body" href="mr.squashBeforeMergeHelpPath">
         <i class="fa fa-question-circle" aria-hidden="true"></i>
       </a>
     </div>`,

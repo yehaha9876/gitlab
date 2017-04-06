@@ -204,7 +204,7 @@ export default {
         </label>
         
         <!-- Placeholder for EE extension of this component -->
-        <squash-before-merge v-if='mr.enableSquashBeforeMerge' :is-merge-button-disabled='isMergeButtonDisabled'/>
+        <squash-before-merge v-if="mr.enableSquashBeforeMerge" :mr="mr" :is-merge-button-disabled="isMergeButtonDisabled"/>
         
         <a
           @click.prevent="toggleCommitMessageEditor"

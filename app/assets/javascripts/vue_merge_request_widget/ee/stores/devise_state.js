@@ -1,8 +1,8 @@
 import CEDeviseState from '../../stores/devise_state';
 
 export default (data) => {
-  if (data.is_secondary_geo_node) {
-    return 'secondaryGeoNode';
+  if (this.isGeoSecondaryNode) {
+    return 'geoSecondaryNode';
   }
   return CEDeviseState.call(this, data);
 };

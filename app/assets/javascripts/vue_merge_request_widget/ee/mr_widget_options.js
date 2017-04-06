@@ -1,12 +1,12 @@
 import CEWidgetOptions from '../mr_widget_options';
 import WidgetApprovals from './components/approvals/mr_widget_approvals';
-import SecondaryGeoNode from './components/states/mr_widget_secondary_geo_node';
+import GeoSecondaryNode from './components/states/mr_widget_secondary_geo_node';
 
 export default {
   extends: CEWidgetOptions,
   components: {
     'mr-widget-approvals': WidgetApprovals,
-    'mr-widget-secondary-geo-node': SecondaryGeoNode,
+    'mr-widget-geo-secondary-node': GeoSecondaryNode,
   },
   computed: {
     shouldRenderApprovals() {
