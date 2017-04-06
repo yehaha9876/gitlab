@@ -3,7 +3,7 @@ import {
   statesToShowHelpWidget as CEStatesToShowHelpWidget,
 } from '../../stores/state_maps';
 
-const stateToComponentMap = Object.assign(CEStateToComponentMap, {
+const stateToComponentMap = Object.assign({}, CEStateToComponentMap, {
   secondaryGeoNode: 'mr-widget-secondary-geo-node',
 });
 
