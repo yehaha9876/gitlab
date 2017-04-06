@@ -21,17 +21,17 @@ export default {
     },
   },
   template: `
-    <div class='accept-control spacing inline'>
-      <label class='merge-param-checkbox'>
+    <div class="accept-control spacing inline">
+      <label class="merge-param-checkbox">
         <input 
-          type='checkbox'
-          :disabled='isMergeButtonDisabled'
+          type="checkbox"
+          :disabled="isMergeButtonDisabled"
           v-model="squashBeforeMerge"
-          @change='updateSquashModel'/>
+          @change="updateSquashModel"/>
         Squash commits
       </label>
-      <a title data-title='About this feature' data-toggle='tooltip' data-placement='bottom' data-container='body' href='/help/user/project/merge_requests/squash_and_merge'>
-        <i class='fa fa-question-circle'></i>
+      <a title data-title="About this feature" data-toggle="tooltip" data-placement="bottom" data-container="body" href="/help/user/project/merge_requests/squash_and_merge">
+        <i class="fa fa-question-circle"></i>
       </a>
     </div>`,
 };
