@@ -75,8 +75,8 @@ export default {
 
       this.approving = true;
       this.service.approveMergeRequest()
-        .then((res) => {
-          this.mr.setApprovals(res.data);
+        .then((data) => {
+          this.mr.setApprovals(data);
           this.approving = false;
         })
         .catch(() => new Flash(flashErrorMessage));

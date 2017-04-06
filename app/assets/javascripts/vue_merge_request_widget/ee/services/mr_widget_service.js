@@ -9,14 +9,17 @@ export default class MRWidgetService extends CEWidgetService {
   }
 
   fetchApprovals() {
-    return this.approvalsResource.get();
+    return this.approvalsResource.get()
+      .then(res => res.json());
   }
 
   approveMergeRequest() {
-    return this.approvalsResource.save();
+    return this.approvalsResource.save()
+      .then(res => res.json());
   }
 
   unapproveMergeRequest() {
-    return this.approvalsResource.delete();
+    return this.approvalsResource.delete()
+      .then(res => res.json());
   }
 }

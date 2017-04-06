@@ -21,8 +21,8 @@ export default {
     const flashErrorMessage = 'An error occured while retrieving approval data for this merge request.';
 
     this.service.fetchApprovals()
-      .then((res) => {
-        this.mr.setApprovals(res.data);
+      .then((data) => {
+        this.mr.setApprovals(data);
         this.fetchingApprovals = false;
       })
       .catch(() => new Flash(flashErrorMessage));

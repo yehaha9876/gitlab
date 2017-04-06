@@ -54,8 +54,8 @@ export default {
 
       this.unapproving = true;
       this.service.unapproveMergeRequest()
-        .then((res) => {
-          this.mr.setApprovals(res.data);
+        .then((data) => {
+          this.mr.setApprovals(data);
           this.unapproving = false;
         })
         .catch(() => new Flash(flashErrorMessage));
