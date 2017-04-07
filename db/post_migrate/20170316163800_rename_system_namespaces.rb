@@ -117,22 +117,6 @@ class RenameSystemNamespaces < ActiveRecord::Migration
     # nothing to do
   end
 
-  # This will replace the first occurance of a string in a column with
-  # the replacement
-  # On postgresql we can use `regexp_replace` for that.
-  # On mysql we remove the pattern from the beginning of the string, and
-  # concatenate the remaining part tot the replacement.
-  def replace_sql(column, pattern, replacement)
-    if Gitlab::Database.mysql?
-      substr = Arel::Nodes::NamedFunction.new("substring", [column, pattern.to_s.size + 1])
-      concat = Arel::Nodes::NamedFunction.new("concat", [Arel::Nodes::Quoted.new(replacement.to_s), substr])
-      Arel::Nodes::SqlLiteral.new(concat.to_sql)
-    else
-      replace = Arel::Nodes::NamedFunction.new("regexp_replace", [column, Arel::Nodes::Quoted.new(pattern.to_s), Arel::Nodes::Quoted.new(replacement.to_s)])
-      Arel::Nodes::SqlLiteral.new(replace.to_sql)
-    end
-  end
-
   def remove_last_occurrence(string, pattern)
     string.reverse.sub(pattern.reverse, "").reverse
   end
