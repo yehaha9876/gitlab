@@ -196,6 +196,10 @@ The curriculum is composed of GitLab videos, screencasts, presentations, project
 1. [How to Integrate Convox with GitLab](https://about.gitlab.com/2016/06/09/continuous-delivery-with-gitlab-and-convox/)
 1. [Getting Started with GitLab and Shippable CI](https://about.gitlab.com/2016/05/05/getting-started-gitlab-and-shippable/)
 
+#### 3.10. Elasticsearch
+
+1. [Docker and AWS Configuration](gitlab-advanced/elasticsearch.md)
+
 ---
 
 ### 4. External Articles
