@@ -44,10 +44,6 @@ FactoryGirl.define do
       state :reopened
     end
 
-    trait :locked do
-      state :locked
-    end
-
     trait :simple do
       source_branch "feature"
       target_branch "master"

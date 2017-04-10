@@ -47,6 +47,7 @@
         %th Job ID
         %th Name
         %th
-        %th Coverage
+        - if pipeline.project.build_coverage_enabled?
+          %th Coverage
         %th
     = render partial: "projects/stage/stage", collection: pipeline.stages, as: :stage

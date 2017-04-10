@@ -83,43 +83,20 @@ feature 'Group', feature: true do
     end
   end
 
-  describe 'create a nested group', js: true do
+  describe 'create a nested group' do
     let(:group) { create(:group, path: 'foo') }
 
-    context 'as admin' do
-      before do
-        visit subgroups_group_path(group)
-        click_link 'New Subgroup'
-      end
-
-      it 'creates a nested group' do
-        fill_in 'Group path', with: 'bar'
-        click_button 'Create group'
-
-        expect(current_path).to eq(group_path('foo/bar'))
-        expect(page).to have_content("Group 'bar' was successfully created.")
-      end
+    before do
+      visit subgroups_group_path(group)
+      click_link 'New Subgroup'
     end
 
-    context 'as group owner' do
-      let(:user) { create(:user) }
+    it 'creates a nested group' do
+      fill_in 'Group path', with: 'bar'
+      click_button 'Create group'
 
-      before do
-        group.add_owner(user)
-        logout
-        login_as(user)
-
-        visit subgroups_group_path(group)
-        click_link 'New Subgroup'
-      end
-
-      it 'creates a nested group' do
-        fill_in 'Group path', with: 'bar'
-        click_button 'Create group'
-
-        expect(current_path).to eq(group_path('foo/bar'))
-        expect(page).to have_content("Group 'bar' was successfully created.")
-      end
+      expect(current_path).to eq(group_path('foo/bar'))
+      expect(page).to have_content("Group 'bar' was successfully created.")
     end
   end
 

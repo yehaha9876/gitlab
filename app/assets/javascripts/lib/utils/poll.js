@@ -65,6 +65,7 @@ export default class Poll {
         this.makeRequest();
       }, pollInterval);
     }
+
     this.options.successCallback(response);
   }
 
@@ -75,14 +76,8 @@ export default class Poll {
     notificationCallback(true);
 
     return resource[method](data)
-      .then((response) => {
-        this.checkConditions(response);
-        notificationCallback(false);
-      })
-      .catch((error) => {
-        notificationCallback(false);
-        errorCallback(error);
-      });
+      .then(response => this.checkConditions(response))
+      .catch(error => errorCallback(error));
   }
 
   /**

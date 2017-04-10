@@ -2,6 +2,8 @@
 /* global Issuable */
 /* global ListUser */
 
+import Vue from 'vue';
+
 (function() {
   var bind = function(fn, me) { return function() { return fn.apply(me, arguments); }; },
     slice = [].slice;
@@ -72,7 +74,7 @@
             e.preventDefault();
 
             if ($dropdown.hasClass('js-issue-board-sidebar')) {
-              gl.issueBoards.boardStoreIssueSet('assignee', new ListUser({
+              Vue.set(gl.issueBoards.BoardsStore.detail.issue, 'assignee', new ListUser({
                 id: _this.currentUser.id,
                 username: _this.currentUser.username,
                 name: _this.currentUser.name,
@@ -223,14 +225,14 @@
                 return $dropdown.closest('form').submit();
               } else if ($dropdown.hasClass('js-issue-board-sidebar')) {
                 if (user.id) {
-                  gl.issueBoards.boardStoreIssueSet('assignee', new ListUser({
+                  Vue.set(gl.issueBoards.BoardsStore.detail.issue, 'assignee', new ListUser({
                     id: user.id,
                     username: user.username,
                     name: user.name,
                     avatar_url: user.avatar_url
                   }));
                 } else {
-                  gl.issueBoards.boardStoreIssueDelete('assignee');
+                  Vue.delete(gl.issueBoards.BoardsStore.detail.issue, 'assignee');
                 }
 
                 updateIssueBoardsIssue();

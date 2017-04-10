@@ -39,8 +39,7 @@ project_tree:
       - :author
       - :events
     - :statuses
-  - triggers:
-    - :trigger_schedule
+  - :triggers
   - :deploy_keys
   - :services
   - :hooks

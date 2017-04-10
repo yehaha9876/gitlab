@@ -24,6 +24,7 @@
 /* global Search */
 /* global Admin */
 /* global NamespaceSelects */
+/* global ShortcutsDashboardNavigation */
 /* global Project */
 /* global ProjectAvatar */
 /* global CompareAutocomplete */
@@ -39,7 +40,6 @@
 import Issue from './issue';
 
 import BindInOut from './behaviors/bind_in_out';
-import Group from './group';
 import GroupName from './group_name';
 import GroupsList from './groups_list';
 import ProjectsList from './projects_list';
@@ -285,9 +285,8 @@ const ShortcutsBlob = require('./shortcuts_blob');
         case 'groups:create':
         case 'admin:groups:create':
           BindInOut.initAll();
-          new Group();
-          new GroupAvatar();
-          break;
+        case 'groups:new':
+        case 'admin:groups:new':
         case 'groups:edit':
         case 'admin:groups:edit':
           new GroupAvatar();
@@ -412,6 +411,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
           break;
         case 'dashboard':
         case 'root':
+          shortcut_handler = new ShortcutsDashboardNavigation();
           new UserCallout();
           break;
         case 'groups':

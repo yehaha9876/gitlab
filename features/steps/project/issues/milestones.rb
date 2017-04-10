@@ -16,7 +16,7 @@ class Spinach::Features::ProjectIssuesMilestones < Spinach::FeatureSteps
   end
 
   step 'I click link "New Milestone"' do
-    click_link "New milestone"
+    click_link "New Milestone"
   end
 
   step 'I submit new milestone "v2.3"' do
