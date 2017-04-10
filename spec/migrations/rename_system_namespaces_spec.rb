@@ -1,5 +1,5 @@
 require "spec_helper"
-require Rails.root.join("db", "post_migrate", "20170316163800_rename_system_namespaces.rb")
+require Rails.root.join("db", "migrate", "20170316163800_rename_system_namespaces.rb")
 
 describe RenameSystemNamespaces, truncate: true do
   let(:migration) { described_class.new }
