@@ -199,125 +199,52 @@ feature 'Login', feature: true do
 
   describe 'with required two-factor authentication enabled' do
     let(:user) { create(:user) }
-    #  TODO: otp_grace_period_started_at
+    before(:each) { stub_application_setting(require_two_factor_authentication: true) }
 
-    context 'global setting' do
-      before(:each) { stub_application_setting(require_two_factor_authentication: true) }
+    context 'with grace period defined' do
+      before(:each) do
+        stub_application_setting(two_factor_grace_period: 48)
+        login_with(user)
+      end
 
-      context 'with grace period defined' do
-        before(:each) do
-          stub_application_setting(two_factor_grace_period: 48)
-          login_with(user)
+      context 'within the grace period' do
+        it 'redirects to two-factor configuration page' do
+          expect(current_path).to eq profile_two_factor_auth_path
+          expect(page).to have_content('You must enable Two-Factor Authentication for your account before')
         end
 
-        context 'within the grace period' do
-          it 'redirects to two-factor configuration page' do
-            expect(current_path).to eq profile_two_factor_auth_path
-            expect(page).to have_content('The global settings require you to enable Two-Factor Authentication for your account. You need to do this before ')
-          end
+        it 'allows skipping two-factor configuration', js: true do
+          expect(current_path).to eq profile_two_factor_auth_path
 
-          it 'allows skipping two-factor configuration', js: true do
-            expect(current_path).to eq profile_two_factor_auth_path
-
-            click_link 'Configure it later'
-            expect(current_path).to eq root_path
-          end
-        end
-
-        context 'after the grace period' do
-          let(:user) { create(:user, otp_grace_period_started_at: 9999.hours.ago) }
-
-          it 'redirects to two-factor configuration page' do
-            expect(current_path).to eq profile_two_factor_auth_path
-            expect(page).to have_content(
-              'The global settings require you to enable Two-Factor Authentication for your account.'
-            )
-          end
-
-          it 'disallows skipping two-factor configuration', js: true do
-            expect(current_path).to eq profile_two_factor_auth_path
-            expect(page).not_to have_link('Configure it later')
-          end
+          click_link 'Configure it later'
+          expect(current_path).to eq root_path
         end
       end
 
-      context 'without grace period defined' do
-        before(:each) do
-          stub_application_setting(two_factor_grace_period: 0)
-          login_with(user)
-        end
+      context 'after the grace period' do
+        let(:user) { create(:user, otp_grace_period_started_at: 9999.hours.ago) }
 
         it 'redirects to two-factor configuration page' do
           expect(current_path).to eq profile_two_factor_auth_path
-          expect(page).to have_content(
-            'The global settings require you to enable Two-Factor Authentication for your account.'
-          )
+          expect(page).to have_content('You must enable Two-Factor Authentication for your account.')
+        end
+
+        it 'disallows skipping two-factor configuration', js: true do
+          expect(current_path).to eq profile_two_factor_auth_path
+          expect(page).not_to have_link('Configure it later')
         end
       end
     end
 
-    context 'group setting' do
-      before do
-        group1 = create :group, name: 'Group 1', require_two_factor_authentication: true
-        group1.add_user(user, GroupMember::DEVELOPER)
-        group2 = create :group, name: 'Group 2', require_two_factor_authentication: true
-        group2.add_user(user, GroupMember::DEVELOPER)
+    context 'without grace period defined' do
+      before(:each) do
+        stub_application_setting(two_factor_grace_period: 0)
+        login_with(user)
       end
 
-      context 'with grace period defined' do
-        before(:each) do
-          stub_application_setting(two_factor_grace_period: 48)
-          login_with(user)
-        end
-
-        context 'within the grace period' do
-          it 'redirects to two-factor configuration page' do
-            expect(current_path).to eq profile_two_factor_auth_path
-            expect(page).to have_content(
-              'The group settings for Group 1 and Group 2 require you to enable ' \
-              'Two-Factor Authentication for your account. You need to do this ' \
-              'before ')
-          end
-
-          it 'allows skipping two-factor configuration', js: true do
-            expect(current_path).to eq profile_two_factor_auth_path
-
-            click_link 'Configure it later'
-            expect(current_path).to eq root_path
-          end
-        end
-
-        context 'after the grace period' do
-          let(:user) { create(:user, otp_grace_period_started_at: 9999.hours.ago) }
-
-          it 'redirects to two-factor configuration page' do
-            expect(current_path).to eq profile_two_factor_auth_path
-            expect(page).to have_content(
-              'The group settings for Group 1 and Group 2 require you to enable ' \
-              'Two-Factor Authentication for your account.'
-            )
-          end
-
-          it 'disallows skipping two-factor configuration', js: true do
-            expect(current_path).to eq profile_two_factor_auth_path
-            expect(page).not_to have_link('Configure it later')
-          end
-        end
-      end
-
-      context 'without grace period defined' do
-        before(:each) do
-          stub_application_setting(two_factor_grace_period: 0)
-          login_with(user)
-        end
-
-        it 'redirects to two-factor configuration page' do
-          expect(current_path).to eq profile_two_factor_auth_path
-          expect(page).to have_content(
-            'The group settings for Group 1 and Group 2 require you to enable ' \
-            'Two-Factor Authentication for your account.'
-          )
-        end
+      it 'redirects to two-factor configuration page' do
+        expect(current_path).to eq profile_two_factor_auth_path
+        expect(page).to have_content('You must enable Two-Factor Authentication for your account.')
       end
     end
   end

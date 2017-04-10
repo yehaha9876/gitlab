@@ -24,8 +24,14 @@ module Gitlab
         }
 
         if Gitlab.config.gitaly.enabled
-          address = Gitlab::GitalyClient.get_address(repository.project.repository_storage)
-          params[:Repository] = repository.gitaly_repository.to_h
+          storage = repository.project.repository_storage
+          address = Gitlab::GitalyClient.get_address(storage)
+          # TODO: use GitalyClient code to assemble the Repository message
+          params[:Repository] = Gitaly::Repository.new(
+            path: repo_path,
+            storage_name: storage,
+            relative_path: Gitlab::RepoPath.strip_storage_path(repo_path),
+          ).to_h
 
           feature_enabled = case action.to_s
                             when 'git_receive_pack'

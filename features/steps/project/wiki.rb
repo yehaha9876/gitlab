@@ -16,16 +16,12 @@ class Spinach::Features::ProjectWiki < Spinach::FeatureSteps
 
   step 'I create the Wiki Home page' do
     fill_in "wiki_content", with: '[link test](test)'
-    page.within '.wiki-form' do
-      click_on "Create page"
-    end
+    click_on "Create page"
   end
 
   step 'I create the Wiki Home page with no content' do
     fill_in "wiki_content", with: ''
-    page.within '.wiki-form' do
-      click_on "Create page"
-    end
+    click_on "Create page"
   end
 
   step 'I should see the newly created wiki page' do
@@ -33,7 +29,7 @@ class Spinach::Features::ProjectWiki < Spinach::FeatureSteps
     expect(page).to have_content "link test"
 
     click_link "link test"
-    expect(page).to have_content "Create page"
+    expect(page).to have_content "Create Page"
   end
 
   step 'I have an existing Wiki page' do
@@ -67,7 +63,7 @@ class Spinach::Features::ProjectWiki < Spinach::FeatureSteps
   end
 
   step 'I click the History button' do
-    click_on 'Page history'
+    click_on "History"
   end
 
   step 'I should see both revisions' do
@@ -125,19 +121,15 @@ class Spinach::Features::ProjectWiki < Spinach::FeatureSteps
   step 'I should see the new wiki page form' do
     expect(current_path).to match('wikis/image.jpg')
     expect(page).to have_content('New Wiki Page')
-    expect(page).to have_content('Create page')
+    expect(page).to have_content('Create Page')
   end
 
   step 'I create a New page with paths' do
-    click_on 'New page'
+    click_on 'New Page'
     fill_in 'Page slug', with: 'one/two/three-test'
-    page.within '#modal-new-wiki' do
-      click_on 'Create page'
-    end
+    click_on 'Create Page'
     fill_in "wiki_content", with: 'wiki content'
-    page.within '.wiki-form' do
-      click_on "Create page"
-    end
+    click_on "Create page"
     expect(current_path).to include 'one/two/three-test'
   end
 
@@ -162,11 +154,11 @@ class Spinach::Features::ProjectWiki < Spinach::FeatureSteps
 
   step 'I view the page history of a Wiki page that has a path' do
     click_on 'Three'
-    click_on 'Page history'
+    click_on 'Page History'
   end
 
   step 'I click on Page History' do
-    click_on 'Page history'
+    click_on 'Page History'
   end
 
   step 'I should see the page history' do

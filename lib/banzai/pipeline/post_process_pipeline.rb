@@ -4,7 +4,6 @@ module Banzai
       def self.filters
         FilterArray[
           Filter::RelativeLinkFilter,
-          Filter::IssuableStateFilter,
           Filter::RedactorFilter
         ]
       end

@@ -104,11 +104,16 @@ module Ci
     end
 
     def playable?
-      action? && manual?
+      project.builds_enabled? && has_commands? &&
+        action? && manual?
     end
 
     def action?
       self.when == 'manual'
+    end
+
+    def has_commands?
+      commands.present?
     end
 
     def play(current_user)
@@ -127,7 +132,8 @@ module Ci
     end
 
     def retryable?
-      success? || failed? || canceled?
+      project.builds_enabled? && has_commands? &&
+        (success? || failed? || canceled?)
     end
 
     def retried?

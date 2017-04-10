@@ -51,7 +51,7 @@ function renderCategory(name, emojiList, opts = {}) {
     <h5 class="emoji-menu-title">
       ${name}
     </h5>
-    <ul class="clearfix emoji-menu-list ${opts.menuListClass || ''}">
+    <ul class="clearfix emoji-menu-list ${opts.menuListClass}">
       ${emojiList.map(emojiName => `
         <li class="emoji-menu-list-item">
           <button class="emoji-menu-btn text-center js-emoji-btn" type="button">
@@ -263,8 +263,7 @@ AwardsHandler.prototype.addAward = function addAward(
     this.addAwardToEmojiBar(votesBlock, normalizedEmoji, checkMutuality);
     return typeof callback === 'function' ? callback() : undefined;
   });
-  $('.emoji-menu').removeClass('is-visible');
-  $('.js-add-award.is-active').removeClass('is-active');
+  return $('.emoji-menu').removeClass('is-visible');
 };
 
 AwardsHandler.prototype.addAwardToEmojiBar = function addAwardToEmojiBar(

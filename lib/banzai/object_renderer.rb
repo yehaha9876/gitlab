@@ -31,8 +31,7 @@ module Banzai
     #
     # Returns the same input objects.
     def render(objects, attribute)
-      documents = render_documents(objects, attribute)
-      documents = post_process_documents(documents, objects, attribute)
+      documents = render_objects(objects, attribute)
       redacted = redact_documents(documents)
 
       objects.each_with_index do |object, index|
@@ -42,24 +41,9 @@ module Banzai
       end
     end
 
-    private
-
-    def render_documents(objects, attribute)
-      pipeline = HTML::Pipeline.new([])
-
-      objects.map do |object|
-        pipeline.to_document(Banzai.render_field(object, attribute))
-      end
-    end
-
-    def post_process_documents(documents, objects, attribute)
-      # Called here to populate cache, refer to IssuableExtractor docs
-      IssuableExtractor.new(project, user).extract(documents)
-
-      documents.zip(objects).map do |document, object|
-        context = context_for(object, attribute)
-        Banzai::Pipeline[:post_process].to_document(document, context)
-      end
+    # Renders the attribute of every given object.
+    def render_objects(objects, attribute)
+      render_attributes(objects, attribute)
     end
 
     # Redacts the list of documents.
@@ -73,15 +57,25 @@ module Banzai
 
     # Returns a Banzai context for the given object and attribute.
     def context_for(object, attribute)
-      base_context.merge(object.banzai_render_context(attribute))
+      context = base_context.dup
+      context = context.merge(object.banzai_render_context(attribute))
+      context
+    end
+
+    # Renders the attributes of a set of objects.
+    #
+    # Returns an Array of `Nokogiri::HTML::Document`.
+    def render_attributes(objects, attribute)
+      objects.map do |object|
+        string = Banzai.render_field(object, attribute)
+        context = context_for(object, attribute)
+
+        Banzai::Pipeline[:relative_link].to_document(string, context)
+      end
     end
 
     def base_context
-      @base_context ||= @redaction_context.merge(
-        current_user: user,
-        project: project,
-        skip_redaction: true
-      )
+      @base_context ||= @redaction_context.merge(current_user: user, project: project)
     end
   end
 end

@@ -4,24 +4,13 @@ module Ci
     include HasStatus
     include Importable
     include AfterCommitQueue
-    include Presentable
 
     belongs_to :project
     belongs_to :user
-    belongs_to :auto_canceled_by, class_name: 'Ci::Pipeline'
-
-    has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
-    has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
 
     has_many :statuses, class_name: 'CommitStatus', foreign_key: :commit_id
     has_many :builds, foreign_key: :commit_id
     has_many :trigger_requests, dependent: :destroy, foreign_key: :commit_id
-
-    has_many :pending_builds, -> { pending }, foreign_key: :commit_id, class_name: 'Ci::Build'
-    has_many :retryable_builds, -> { latest.failed_or_canceled }, foreign_key: :commit_id, class_name: 'Ci::Build'
-    has_many :cancelable_statuses, -> { cancelable }, foreign_key: :commit_id, class_name: 'CommitStatus'
-    has_many :manual_actions, -> { latest.manual_actions }, foreign_key: :commit_id, class_name: 'Ci::Build'
-    has_many :artifacts, -> { latest.with_artifacts_not_expired }, foreign_key: :commit_id, class_name: 'Ci::Build'
 
     delegate :id, to: :project, prefix: true
 
@@ -31,6 +20,7 @@ module Ci
     validate :valid_commit_sha, unless: :importing?
 
     after_create :keep_around_commits, unless: :importing?
+    after_create :refresh_build_status_cache
 
     state_machine :status, initial: :created do
       event :enqueue do
@@ -75,10 +65,6 @@ module Ci
         pipeline.update_duration
       end
 
-      before_transition canceled: any - [:canceled] do |pipeline|
-        pipeline.auto_canceled_by = nil
-      end
-
       after_transition [:created, :pending] => :running do |pipeline|
         pipeline.run_after_commit { PipelineMetricsWorker.perform_async(id) }
       end
@@ -96,8 +82,6 @@ module Ci
 
         pipeline.run_after_commit do
           PipelineHooksWorker.perform_async(id)
-          Ci::ExpirePipelineCacheService.new(project, nil)
-            .execute(pipeline)
         end
       end
 
@@ -176,6 +160,10 @@ module Ci
       end
     end
 
+    def artifacts
+      builds.latest.with_artifacts_not_expired.includes(project: [:namespace])
+    end
+
     def valid_commit_sha
       if self.sha == Gitlab::Git::BLANK_SHA
         self.errors.add(:sha, " cant be 00000000 (branch removal)")
@@ -212,37 +200,27 @@ module Ci
       !tag?
     end
 
+    def manual_actions
+      builds.latest.manual_actions.includes(project: [:namespace])
+    end
+
     def stuck?
-      pending_builds.any?(&:stuck?)
+      builds.pending.includes(:project).any?(&:stuck?)
     end
 
     def retryable?
-      retryable_builds.any?
+      builds.latest.failed_or_canceled.any?(&:retryable?)
     end
 
     def cancelable?
-      cancelable_statuses.any?
-    end
-
-    def auto_canceled?
-      canceled? && auto_canceled_by_id?
+      statuses.cancelable.any?
     end
 
     def cancel_running
-      Gitlab::OptimisticLocking.retry_lock(cancelable_statuses) do |cancelable|
-        cancelable.find_each do |job|
-          yield(job) if block_given?
-          job.cancel
+      Gitlab::OptimisticLocking.retry_lock(
+        statuses.cancelable) do |cancelable|
+          cancelable.find_each(&:cancel)
         end
-      end
-    end
-
-    def auto_cancel_running(pipeline)
-      update(auto_canceled_by: pipeline)
-
-      cancel_running do |job|
-        job.auto_canceled_by = pipeline
-      end
     end
 
     def retry_failed(current_user)
@@ -350,6 +328,7 @@ module Ci
         when 'manual' then block
         end
       end
+      refresh_build_status_cache
     end
 
     def predefined_variables
@@ -389,6 +368,10 @@ module Ci
       Gitlab::Ci::Status::Pipeline::Factory
         .new(self, current_user)
         .fabricate!
+    end
+
+    def refresh_build_status_cache
+      Ci::PipelineStatus.new(project, sha: sha, status: status).store_in_cache_if_needed
     end
 
     private

@@ -6,10 +6,7 @@ import statusCodes from '~/lib/utils/http_status';
 import { formatRelevantDigits } from '~/lib/utils/number_utils';
 import '../flash';
 
-const prometheusContainer = '.prometheus-container';
-const prometheusParentGraphContainer = '.prometheus-graphs';
 const prometheusGraphsContainer = '.prometheus-graph';
-const prometheusStatesContainer = '.prometheus-state';
 const metricsEndpoint = 'metrics.json';
 const timeFormat = d3.time.format('%H:%M');
 const dayFormat = d3.time.format('%b %e, %a');
@@ -17,30 +14,19 @@ const bisectDate = d3.bisector(d => d.time).left;
 const extraAddedWidthParent = 100;
 
 class PrometheusGraph {
+
   constructor() {
-    const $prometheusContainer = $(prometheusContainer);
-    const hasMetrics = $prometheusContainer.data('has-metrics');
-    this.docLink = $prometheusContainer.data('doc-link');
-    this.integrationLink = $prometheusContainer.data('prometheus-integration');
-
-    $(document).ajaxError(() => {});
-
-    if (hasMetrics) {
-      this.margin = { top: 80, right: 180, bottom: 80, left: 100 };
-      this.marginLabelContainer = { top: 40, right: 0, bottom: 40, left: 0 };
-      const parentContainerWidth = $(prometheusGraphsContainer).parent().width() +
-      extraAddedWidthParent;
-      this.originalWidth = parentContainerWidth;
-      this.originalHeight = 330;
-      this.width = parentContainerWidth - this.margin.left - this.margin.right;
-      this.height = this.originalHeight - this.margin.top - this.margin.bottom;
-      this.backOffRequestCounter = 0;
-      this.configureGraph();
-      this.init();
-    } else {
-      this.state = '.js-getting-started';
-      this.updateState();
-    }
+    this.margin = { top: 80, right: 180, bottom: 80, left: 100 };
+    this.marginLabelContainer = { top: 40, right: 0, bottom: 40, left: 0 };
+    const parentContainerWidth = $(prometheusGraphsContainer).parent().width() +
+    extraAddedWidthParent;
+    this.originalWidth = parentContainerWidth;
+    this.originalHeight = 330;
+    this.width = parentContainerWidth - this.margin.left - this.margin.right;
+    this.height = this.originalHeight - this.margin.top - this.margin.bottom;
+    this.backOffRequestCounter = 0;
+    this.configureGraph();
+    this.init();
   }
 
   createGraph() {
@@ -54,19 +40,8 @@ class PrometheusGraph {
 
   init() {
     this.getData().then((metricsResponse) => {
-      let enoughData = true;
-      Object.keys(metricsResponse.metrics).forEach((key) => {
-        let currentKey;
-        if (key === 'cpu_values' || key === 'memory_values') {
-          currentKey = metricsResponse.metrics[key];
-          if (Object.keys(currentKey).length === 0) {
-            enoughData = false;
-          }
-        }
-      });
-      if (!enoughData) {
-        this.state = '.js-loading';
-        this.updateState();
+      if (Object.keys(metricsResponse).length === 0) {
+        new Flash('Empty metrics', 'alert');
       } else {
         this.transformData(metricsResponse);
         this.createGraph();
@@ -370,17 +345,14 @@ class PrometheusGraph {
       }
       return resp.metrics;
     })
-    .catch(() => {
-      this.state = '.js-unable-to-connect';
-      this.updateState();
-    });
+    .catch(() => new Flash('An error occurred while fetching metrics.', 'alert'));
   }
 
   transformData(metricsResponse) {
     Object.keys(metricsResponse.metrics).forEach((key) => {
       if (key === 'cpu_values' || key === 'memory_values') {
         const metricValues = (metricsResponse.metrics[key])[0];
-        if (metricValues !== undefined) {
+        if (typeof metricValues !== 'undefined') {
           this.graphSpecificProperties[key].data = metricValues.values.map(metric => ({
             time: new Date(metric[0] * 1000),
             value: metric[1],
@@ -388,13 +360,6 @@ class PrometheusGraph {
         }
       }
     });
-  }
-
-  updateState() {
-    const $statesContainer = $(prometheusStatesContainer);
-    $(prometheusParentGraphContainer).hide();
-    $(`${this.state}`, $statesContainer).removeClass('hidden');
-    $(prometheusStatesContainer).show();
   }
 }
 

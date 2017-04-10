@@ -93,28 +93,16 @@ pipelines:
 - statuses
 - builds
 - trigger_requests
-- auto_canceled_by
-- auto_canceled_pipelines
-- auto_canceled_jobs
-- pending_builds
-- retryable_builds
-- cancelable_statuses
-- manual_actions
-- artifacts
 statuses:
 - project
 - pipeline
 - user
-- auto_canceled_by
 variables:
 - project
 triggers:
 - project
 - trigger_requests
 - owner
-- trigger_schedule
-trigger_schedule:
-- trigger
 deploy_keys:
 - user
 - deploy_keys_projects
@@ -171,7 +159,6 @@ project:
 - asana_service
 - gemnasium_service
 - slack_service
-- microsoft_teams_service
 - mattermost_service
 - buildkite_service
 - bamboo_service
@@ -222,10 +209,8 @@ project:
 - builds
 - runner_projects
 - runners
-- active_runners
 - variables
 - triggers
-- trigger_schedules
 - environments
 - deployments
 - project_feature

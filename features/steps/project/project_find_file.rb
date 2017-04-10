@@ -9,7 +9,7 @@ class Spinach::Features::ProjectFindFile < Spinach::FeatureSteps
   end
 
   step 'I click Find File button' do
-    click_link 'Find file'
+    click_link 'Find File'
   end
 
   step 'I should see "find file" page' do

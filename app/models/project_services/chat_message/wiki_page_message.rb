@@ -1,12 +1,17 @@
 module ChatMessage
   class WikiPageMessage < BaseMessage
+    attr_reader :user_name
     attr_reader :title
+    attr_reader :project_name
+    attr_reader :project_url
     attr_reader :wiki_page_url
     attr_reader :action
     attr_reader :description
 
     def initialize(params)
-      super
+      @user_name = params[:user][:username]
+      @project_name = params[:project_name]
+      @project_url = params[:project_url]
 
       obj_attr = params[:object_attributes]
       obj_attr = HashWithIndifferentAccess.new(obj_attr)
@@ -24,18 +29,7 @@ module ChatMessage
     end
 
     def attachments
-      return description if markdown
-
       description_message
-    end
-
-    def activity
-      {
-        title: "#{user_name} #{action} #{wiki_page_link}",
-        subtitle: "in #{project_link}",
-        text: title,
-        image: user_avatar
-      }
     end
 
     private

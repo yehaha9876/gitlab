@@ -19,11 +19,6 @@ class Projects::BuildsController < Projects::ApplicationController
       else
         @builds
       end
-    @builds = @builds.includes([
-      { pipeline: :project },
-      :project,
-      :tags
-    ])
     @builds = @builds.page(params[:page]).per(30)
   end
 

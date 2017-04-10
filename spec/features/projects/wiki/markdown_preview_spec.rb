@@ -24,16 +24,12 @@ feature 'Projects > Wiki > User previews markdown changes', feature: true, js: t
   context "while creating a new wiki page" do
     context "when there are no spaces or hyphens in the page name" do
       it "rewrites relative links as expected" do
-        click_link 'New page'
-        page.within '#modal-new-wiki' do
-          fill_in :new_wiki_path, with: 'a/b/c/d'
-          click_button 'Create page'
-        end
+        click_link 'New Page'
+        fill_in :new_wiki_path, with: 'a/b/c/d'
+        click_button 'Create Page'
 
-        page.within '.wiki-form' do
-          fill_in :wiki_content, with: wiki_content
-          click_on "Preview"
-        end
+        fill_in :wiki_content, with: wiki_content
+        click_on "Preview"
 
         expect(page).to have_content("regular link")
 
@@ -46,16 +42,12 @@ feature 'Projects > Wiki > User previews markdown changes', feature: true, js: t
 
     context "when there are spaces in the page name" do
       it "rewrites relative links as expected" do
-        click_link 'New page'
-        page.within '#modal-new-wiki' do
-          fill_in :new_wiki_path, with: 'a page/b page/c page/d page'
-          click_button 'Create page'
-        end
+        click_link 'New Page'
+        fill_in :new_wiki_path, with: 'a page/b page/c page/d page'
+        click_button 'Create Page'
 
-        page.within '.wiki-form' do
-          fill_in :wiki_content, with: wiki_content
-          click_on "Preview"
-        end
+        fill_in :wiki_content, with: wiki_content
+        click_on "Preview"
 
         expect(page).to have_content("regular link")
 
@@ -68,16 +60,12 @@ feature 'Projects > Wiki > User previews markdown changes', feature: true, js: t
 
     context "when there are hyphens in the page name" do
       it "rewrites relative links as expected" do
-        click_link 'New page'
-        page.within '#modal-new-wiki' do
-          fill_in :new_wiki_path, with: 'a-page/b-page/c-page/d-page'
-          click_button 'Create page'
-        end
-        
-        page.within '.wiki-form' do
-          fill_in :wiki_content, with: wiki_content
-          click_on "Preview"
-        end
+        click_link 'New Page'
+        fill_in :new_wiki_path, with: 'a-page/b-page/c-page/d-page'
+        click_button 'Create Page'
+
+        fill_in :wiki_content, with: wiki_content
+        click_on "Preview"
 
         expect(page).to have_content("regular link")
 
@@ -91,17 +79,11 @@ feature 'Projects > Wiki > User previews markdown changes', feature: true, js: t
 
   context "while editing a wiki page" do
     def create_wiki_page(path)
-      click_link 'New page'
-
-      page.within '#modal-new-wiki' do
-        fill_in :new_wiki_path, with: path
-        click_button 'Create page'
-      end
-
-      page.within '.wiki-form' do
-        fill_in :wiki_content, with: 'content'
-        click_on "Create page"
-      end
+      click_link 'New Page'
+      fill_in :new_wiki_path, with: path
+      click_button 'Create Page'
+      fill_in :wiki_content, with: 'content'
+      click_on "Create page"
     end
 
     context "when there are no spaces or hyphens in the page name" do
