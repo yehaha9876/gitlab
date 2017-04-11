@@ -13,9 +13,14 @@ class RenameSystemNamespaces < ActiveRecord::Migration
   class Namespace < ActiveRecord::Base
     self.table_name = 'namespaces'
     belongs_to :parent, class_name: 'RenameSystemNamespaces::Namespace'
-    has_one :route, as: :source, autosave: true, class_name: 'RenameSystemNamespaces::Route'
+    has_one :route, as: :source
     has_many :children, class_name: 'RenameSystemNamespaces::Namespace', foreign_key: :parent_id
     belongs_to :owner, class_name: 'RenameSystemNamespaces::User'
+
+    # Overridden to have the correct `source_type` for the `route` relation
+    def self.name
+      'Namespace'
+    end
 
     def full_path
       if route && route.path.present?
@@ -64,13 +69,6 @@ class RenameSystemNamespaces < ActiveRecord::Migration
   class Route < ActiveRecord::Base
     self.table_name = 'routes'
     belongs_to :source, polymorphic: true
-
-    validates :source, presence: true
-
-    validates :path,
-              length: { within: 1..255 },
-              presence: true,
-              uniqueness: { case_sensitive: false }
   end
 
   class Project < ActiveRecord::Base
@@ -157,7 +155,8 @@ class RenameSystemNamespaces < ActiveRecord::Migration
   end
 
   def system_namespaces
-    Namespace.where(parent_id: nil).where(arel_table[:path].matches(system_namespace))
+    Namespace.where(parent_id: nil).
+      where(arel_table[:path].matches(system_namespace))
   end
 
   def system_namespace
@@ -165,7 +164,7 @@ class RenameSystemNamespaces < ActiveRecord::Migration
   end
 
   def clear_cache_for_namespace(namespace)
-    project_ids = projects_for_namespace(namespace).select(:id).map(&:id)
+    project_ids = projects_for_namespace(namespace).pluck(:id)
     scopes = { "Project" => { id: project_ids },
                "Issue" => { project_id: project_ids },
                "MergeRequest" => { target_project_id: project_ids },
@@ -173,7 +172,8 @@ class RenameSystemNamespaces < ActiveRecord::Migration
 
     ClearDatabaseCacheWorker.perform_async(scopes)
   rescue => e
-    Rails.logger.error ["Couldn't clear the markdown cache: #{e.message}", e.backtrace.join("\n")].join("\n")
+    Rails.logger.error ["Couldn't clear the markdown cache: #{e.message}",
+                        e.backtrace.join("\n")].join("\n")
   end
 
   def projects_for_namespace(namespace)
@@ -193,7 +193,9 @@ class RenameSystemNamespaces < ActiveRecord::Migration
   end
 
   def repo_paths_for_namespace(namespace)
-    projects_for_namespace(namespace).select('distinct(repository_storage)').to_a.map(&:repository_storage_path)
+    projects_for_namespace(namespace).
+      select('distinct(repository_storage)').to_a
+      .map(&:repository_storage_path)
   end
 
   def uploads_dir
