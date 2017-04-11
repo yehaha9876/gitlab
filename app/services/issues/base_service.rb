@@ -9,9 +9,9 @@ module Issues
 
     private
 
-    def create_assignee_note(issue)
+    def create_assignee_note(issue, old_assignees)
       SystemNoteService.change_issue_assignees(
-        issue, issue.project, current_user, issue.assignees)
+        issue, issue.project, current_user, old_assignees)
     end
 
     def execute_hooks(issue, action = 'open')
@@ -22,14 +22,16 @@ module Issues
     end
 
     def filter_assignee(issuable)
-      return if params[:assignee_ids].blank?
+      return if params[:assignee_ids].to_a.empty?
 
-      assignee_ids = params[:assignee_ids].split(',').map(&:strip)
+      assignee_ids = params[:assignee_ids].select{ |assignee_id| assignee_can_read?(issuable, assignee_id)}
 
-      if assignee_ids == [ IssuableFinder::NONE ]
-        params[:assignee_ids] = ""
+      if params[:assignee_ids].map(&:to_s) == [IssuableFinder::NONE]
+        params[:assignee_ids] = []
+      elsif assignee_ids.any?
+        params[:assignee_ids] = assignee_ids
       else
-        params.delete(:assignee_ids) unless assignee_ids.all?{ |assignee_id| assignee_can_read?(issuable, assignee_id)}
+        params.delete(:assignee_ids)
       end
     end
   end

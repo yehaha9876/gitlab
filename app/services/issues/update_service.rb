@@ -17,12 +17,12 @@ module Issues
       old_mentioned_users = options[:old_mentioned_users] || []
       old_assignees = options[:old_assignees] || []
 
-      if has_changes?(issue, old_labels: old_labels)
+      if has_changes?(issue, old_labels: old_labels, old_assignees: old_assignees)
         todo_service.mark_pending_todos_as_done(issue, current_user)
       end
 
       if issue.previous_changes.include?('title') ||
-          issue.previous_changes.include?('description')
+        issue.previous_changes.include?('description')
         todo_service.update_issue(issue, current_user)
       end
 
@@ -30,8 +30,8 @@ module Issues
         create_milestone_note(issue)
       end
 
-      if issue.previous_changes.include?('assignee_ids')
-        create_assignee_note(issue)
+      if issue.assignees != old_assignees
+        create_assignee_note(issue, old_assignees)
         notification_service.reassigned_issue(issue, current_user, old_assignees)
         todo_service.reassigned_issue(issue, current_user)
       end
