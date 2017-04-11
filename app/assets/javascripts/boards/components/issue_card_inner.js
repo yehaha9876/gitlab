@@ -37,13 +37,13 @@ import eventHub from '../eventhub';
         return `${this.issueLinkBase}/${this.issue.id}`;
       },
       assigneeUrl() {
-        return `${this.rootPath}${this.issue.assignee.username}`;
+        return `${this.rootPath}${this.issue.assignees[0].username}`;
       },
       assigneeUrlTitle() {
-        return `Assigned to ${this.issue.assignee.name}`;
+        return `Assigned to ${this.issue.assignees[0].name}`;
       },
       avatarUrlTitle() {
-        return `Avatar for ${this.issue.assignee.name}`;
+        return `Avatar for ${this.issue.assignees[0].name}`;
       },
       issueId() {
         return `#${this.issue.id}`;
@@ -110,12 +110,12 @@ import eventHub from '../eventhub';
             class="card-assignee has-tooltip js-no-trigger"
             :href="assigneeUrl"
             :title="assigneeUrlTitle"
-            v-if="issue.assignee"
+            v-if="issue.assignees.length > 0"
             data-container="body"
           >
             <img
               class="avatar avatar-inline s20 js-no-trigger"
-              :src="issue.assignee.avatar"
+              :src="issue.assignees[0].avatar"
               width="20"
               height="20"
               :alt="avatarUrlTitle"

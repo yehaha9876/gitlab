@@ -15,12 +15,14 @@ class ListIssue {
     this.subscribed = obj.subscribed;
     this.labels = [];
     this.selected = false;
-    this.assignee = false;
+    this.assignees = [];
     this.position = obj.relative_position || Infinity;
     this.milestone_id = obj.milestone_id;
 
-    if (obj.assignee) {
-      this.assignee = new ListUser(obj.assignee);
+    if (obj.assignees) {
+      obj.assignees.forEach((a) => {
+        this.assignees.push(new ListUser(a));
+      });
     }
 
     if (obj.milestone) {
