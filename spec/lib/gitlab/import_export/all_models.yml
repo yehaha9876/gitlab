@@ -96,11 +96,6 @@ pipelines:
 - auto_canceled_by
 - auto_canceled_pipelines
 - auto_canceled_jobs
-- pending_builds
-- retryable_builds
-- cancelable_statuses
-- manual_actions
-- artifacts
 statuses:
 - project
 - pipeline
@@ -222,7 +217,6 @@ project:
 - builds
 - runner_projects
 - runners
-- active_runners
 - variables
 - triggers
 - trigger_schedules
