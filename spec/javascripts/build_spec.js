@@ -144,24 +144,6 @@ describe('Build', () => {
         expect($('#build-trace .js-build-output').text()).toMatch(/Different/);
       });
 
-      it('shows information about truncated log', () => {
-        jasmine.clock().tick(4001);
-        const [{ success }] = $.ajax.calls.argsFor(0);
-
-        success.call($, {
-          html: '<span>Update</span>',
-          status: 'success',
-          append: false,
-          truncated: true,
-          size: '50',
-        });
-
-        expect(
-          $('#build-trace .js-truncated-info').text().trim(),
-        ).toContain('Showing last 50 KiB of log');
-        expect($('#build-trace .js-truncated-info-size').text()).toMatch('50');
-      });
-
       it('reloads the page when the build is done', () => {
         spyOn(gl.utils, 'visitUrl');
 
@@ -175,6 +157,77 @@ describe('Build', () => {
         });
 
         expect(gl.utils.visitUrl).toHaveBeenCalledWith(BUILD_URL);
+      });
+
+      describe('truncated information', () => {
+        describe('when size is less than total', () => {
+          it('shows information about truncated log', () => {
+            jasmine.clock().tick(4001);
+            const [{ success }] = $.ajax.calls.argsFor(0);
+
+            success.call($, {
+              html: '<span>Update</span>',
+              status: 'success',
+              append: false,
+              size: 50,
+              total: 100,
+            });
+
+            expect(document.querySelector('.js-truncated-info').classList).not.toContain('hidden');
+          });
+
+          it('shows the size in KiB', () => {
+            jasmine.clock().tick(4001);
+            const [{ success }] = $.ajax.calls.argsFor(0);
+            const size = 50;
+
+            success.call($, {
+              html: '<span>Update</span>',
+              status: 'success',
+              append: false,
+              size,
+              total: 100,
+            });
+
+            expect(
+              document.querySelector('.js-truncated-info-size').textContent.trim(),
+            ).toEqual(`${size / 1024}`);
+          });
+
+          it('renders the raw link', () => {
+            jasmine.clock().tick(4001);
+            const [{ success }] = $.ajax.calls.argsFor(0);
+
+            success.call($, {
+              html: '<span>Update</span>',
+              status: 'success',
+              append: false,
+              size: 50,
+              total: 100,
+            });
+
+            expect(
+              document.querySelector('.js-raw-link').textContent.trim(),
+            ).toContain('Complete Raw');
+          });
+        });
+
+        describe('when size is equal than total', () => {
+          it('does not show the trunctated information', () => {
+            jasmine.clock().tick(4001);
+            const [{ success }] = $.ajax.calls.argsFor(0);
+
+            success.call($, {
+              html: '<span>Update</span>',
+              status: 'success',
+              append: false,
+              size: 100,
+              total: 100,
+            });
+
+            expect(document.querySelector('.js-truncated-info').classList).toContain('hidden');
+          });
+        });
       });
     });
   });

@@ -5,6 +5,7 @@ consistent-return, prefer-rest-params */
 const bind = function (fn, me) { return function () { return fn.apply(me, arguments); }; };
 const AUTO_SCROLL_OFFSET = 75;
 const DOWN_BUILD_TRACE = '#down-build-trace';
+const BYTES = 1024;
 
 window.Build = (function () {
   Build.timeout = null;
@@ -89,6 +90,7 @@ window.Build = (function () {
       },
       success: ((log) => {
         const $buildContainer = $('.js-build-output');
+        let logBytes;
 
         gl.utils.setCiStatusFavicon(`${this.pageUrl}/status.json`);
 
@@ -98,15 +100,22 @@ window.Build = (function () {
 
         if (log.append) {
           $buildContainer.append(log.html);
+          logBytes += log.size;
         } else {
           $buildContainer.html(log.html);
-          if (log.truncated) {
-            $('.js-truncated-info-size').html(` ${log.size} `);
-            this.$truncatedInfo.removeClass('hidden');
-            this.initAffixTruncatedInfo();
-          } else {
-            this.$truncatedInfo.addClass('hidden');
-          }
+          logBytes = log.size;
+        }
+
+        // if the incremental sum of logBytes we received is less than the total
+        // we need to show a message warning the user about that.
+        if (logBytes < log.total) {
+          // size is in bytes, we need to calculate KiB
+          const size = log.size / BYTES;
+          $('.js-truncated-info-size').html(` ${size} `);
+          this.$truncatedInfo.removeClass('hidden');
+          this.initAffixTruncatedInfo();
+        } else {
+          this.$truncatedInfo.addClass('hidden');
         }
 
         this.checkAutoscroll();
