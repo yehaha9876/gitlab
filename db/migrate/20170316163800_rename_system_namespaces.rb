@@ -82,33 +82,29 @@ class RenameSystemNamespaces < ActiveRecord::Migration
   DOWNTIME = false
 
   def up
-    system_namespaces.each do |namespace|
-      old_path = namespace.path
-      old_full_path = namespace.full_path
-      # Only remove the last occurrence of the path name to get the parent namespace path
-      namespace_path = remove_last_occurrence(old_full_path, old_path)
-      new_path = rename_path(namespace_path, old_path)
-      new_full_path = if namespace_path.present?
-                        File.join(namespace_path, new_path)
-                      else
-                        new_path
-                      end
+    return unless system_namespace
 
-      Namespace.where(id: namespace).update_all(path: new_path) # skips callbacks & validations
+    old_path = system_namespace.path
+    old_full_path = system_namespace.full_path
+    # Only remove the last occurrence of the path name to get the parent namespace path
+    namespace_path = remove_last_occurrence(old_full_path, old_path)
+    new_path = rename_path(namespace_path, old_path)
+    new_full_path = join_namespace_path(namespace_path, new_path)
 
-      replace_statement = replace_sql(Route.arel_table[:path], old_full_path, new_full_path)
+    Namespace.where(id: system_namespace).update_all(path: new_path) # skips callbacks & validations
 
-      update_column_in_batches(:routes, :path, replace_statement)  do |table, query|
-        query.where(Route.arel_table[:path].matches("#{old_full_path}%"))
-      end
+    replace_statement = replace_sql(Route.arel_table[:path], old_full_path, new_full_path)
 
-      clear_cache_for_namespace(namespace)
-
-      # tasks here are based on `Namespace#move_dir`
-      move_repositories(namespace, old_full_path, new_full_path)
-      move_namespace_folders(uploads_dir, old_full_path, new_full_path) if file_storage?
-      move_namespace_folders(pages_dir, old_full_path, new_full_path)
+    update_column_in_batches(:routes, :path, replace_statement)  do |table, query|
+      query.where(Route.arel_table[:path].matches("#{old_full_path}%"))
     end
+
+    clear_cache_for_namespace(system_namespace)
+
+    # tasks here are based on `Namespace#move_dir`
+    move_repositories(system_namespace, old_full_path, new_full_path)
+    move_namespace_folders(uploads_dir, old_full_path, new_full_path) if file_storage?
+    move_namespace_folders(pages_dir, old_full_path, new_full_path)
   end
 
   def down
@@ -142,7 +138,7 @@ class RenameSystemNamespaces < ActiveRecord::Migration
     counter = 0
     path = "#{path_was}#{counter}"
 
-    while route_exists?(File.join(namespace_path, path))
+    while route_exists?(join_namespace_path(namespace_path, path))
       counter += 1
       path = "#{path_was}#{counter}"
     end
@@ -154,12 +150,21 @@ class RenameSystemNamespaces < ActiveRecord::Migration
     Route.where(Route.arel_table[:path].matches(full_path)).any?
   end
 
-  def system_namespaces
-    Namespace.where(parent_id: nil).
-      where(arel_table[:path].matches(system_namespace))
+  def join_namespace_path(namespace_path, path)
+    if namespace_path.present?
+      File.join(namespace_path, path)
+    else
+      path
+    end
   end
 
   def system_namespace
+    @system_namespace ||= Namespace.where(parent_id: nil).
+                            where(arel_table[:path].matches(system_namespace_path)).
+                            first
+  end
+
+  def system_namespace_path
     "system"
   end
 
@@ -194,8 +199,7 @@ class RenameSystemNamespaces < ActiveRecord::Migration
 
   def repo_paths_for_namespace(namespace)
     projects_for_namespace(namespace).
-      select('distinct(repository_storage)').to_a
-      .map(&:repository_storage_path)
+      select('distinct(repository_storage)').map(&:repository_storage_path)
   end
 
   def uploads_dir

@@ -19,19 +19,25 @@ describe RenameSystemNamespaces, truncate: true do
     allow(migration).to receive(:uploads_dir).and_return(uploads_dir)
   end
 
-  describe "#system_namespaces" do
+  describe "#system_namespace" do
     it "only root namespaces called with path `system`" do
       system_namespace
       system_namespace_with_parent = build(:namespace, path: 'system', parent: create(:namespace))
       system_namespace_with_parent.save(validate: false)
 
-      expect(migration.system_namespaces.map(&:id)).to contain_exactly(system_namespace.id)
+      expect(migration.system_namespace.id).to eq(system_namespace.id)
     end
   end
 
   describe "#up" do
     before do
       system_namespace
+    end
+
+    it "doesn't break if there are no namespaces called system" do
+      Namespace.delete_all
+
+      migration.up
     end
 
     it "renames namespaces called system" do
@@ -79,10 +85,7 @@ describe RenameSystemNamespaces, truncate: true do
 
     it "clears the markdown cache for projects in the system namespace" do
       project = create(:project, namespace: system_namespace)
-      scopes = { "Project" => { id: [project.id] },
-                 "Issue" => { project_id: [project.id] },
-                 "MergeRequest" => { target_project_id: [project.id] },
-                 "Note" => { project_id: [project.id] } }
+      scopes = { project_ids: [project.id] }
 
       expect(ClearDatabaseCacheWorker).to receive(:perform_async).with(scopes)
 
