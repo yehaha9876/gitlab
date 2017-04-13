@@ -170,12 +170,8 @@ class RenameSystemNamespaces < ActiveRecord::Migration
 
   def clear_cache_for_namespace(namespace)
     project_ids = projects_for_namespace(namespace).pluck(:id)
-    scopes = { "Project" => { id: project_ids },
-               "Issue" => { project_id: project_ids },
-               "MergeRequest" => { target_project_id: project_ids },
-               "Note" => { project_id: project_ids } }
 
-    ClearDatabaseCacheWorker.perform_async(scopes)
+    ClearDatabaseCacheWorker.perform_async(project_ids: project_ids)
   rescue => e
     Rails.logger.error ["Couldn't clear the markdown cache: #{e.message}",
                         e.backtrace.join("\n")].join("\n")
