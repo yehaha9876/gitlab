@@ -88,9 +88,9 @@ var config = {
         loader: 'raw-loader',
       },
       {
-        test: /\.gif$/,
+        test: /\.(gif|png)$/,
         loader: 'url-loader',
-        query: { mimetype: 'image/gif' },
+        options: { limit: 2048 },
       },
       {
         test: /\.(worker\.js|pdf)$/,
@@ -186,6 +186,7 @@ var config = {
       'emojis':         path.join(ROOT_PATH, 'fixtures/emojis'),
       'empty_states':   path.join(ROOT_PATH, 'app/views/shared/empty_states'),
       'icons':          path.join(ROOT_PATH, 'app/views/shared/icons'),
+      'images':         path.join(ROOT_PATH, 'app/assets/images'),
       'vendor':         path.join(ROOT_PATH, 'vendor/assets/javascripts'),
       'vue$':           'vue/dist/vue.esm.js',
     }

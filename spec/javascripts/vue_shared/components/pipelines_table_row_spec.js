@@ -55,7 +55,7 @@ describe('Pipelines Table Row', () => {
         ).toEqual(pipeline.user.web_url);
 
         expect(
-          component.$el.querySelector('td:nth-child(2) img').getAttribute('title'),
+          component.$el.querySelector('td:nth-child(2) img').getAttribute('data-original-title'),
         ).toEqual(pipeline.user.name);
       });
     });
@@ -66,6 +66,47 @@ describe('Pipelines Table Row', () => {
       expect(
         component.$el.querySelector('td:nth-child(3) .commit-id').getAttribute('href'),
       ).toEqual(pipeline.commit.commit_path);
+    });
+
+    const findElements = () => {
+      const commitTitleElement = component.$el.querySelector('.branch-commit .commit-title');
+      const commitAuthorElement = commitTitleElement.querySelector('a.avatar-image-container');
+
+      if (!commitAuthorElement) {
+        return { commitAuthorElement };
+      }
+
+      const commitAuthorLink = commitAuthorElement.getAttribute('href');
+      const commitAuthorName = commitAuthorElement.querySelector('img.avatar').getAttribute('data-original-title');
+
+      return { commitAuthorElement, commitAuthorLink, commitAuthorName };
+    };
+
+    it('renders nothing without commit', () => {
+      expect(pipelineWithoutCommit.commit).toBe(null);
+      component = buildComponent(pipelineWithoutCommit);
+
+      const { commitAuthorElement } = findElements();
+
+      expect(commitAuthorElement).toBe(null);
+    });
+
+    it('renders commit author', () => {
+      component = buildComponent(pipeline);
+      const { commitAuthorLink, commitAuthorName } = findElements();
+
+      expect(commitAuthorLink).toEqual(pipeline.commit.author.web_url);
+      expect(commitAuthorName).toEqual(pipeline.commit.author.username);
+    });
+
+    it('renders commit with unregistered author', () => {
+      expect(pipelineWithoutAuthor.commit.author).toBe(null);
+      component = buildComponent(pipelineWithoutAuthor);
+
+      const { commitAuthorLink, commitAuthorName } = findElements();
+
+      expect(commitAuthorLink).toEqual(`mailto:${pipelineWithoutAuthor.commit.author_email}`);
+      expect(commitAuthorName).toEqual(pipelineWithoutAuthor.commit.author_name);
     });
   });
 

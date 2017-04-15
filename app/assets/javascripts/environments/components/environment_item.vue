@@ -1,6 +1,8 @@
 <script>
 import Timeago from 'timeago.js';
+import _ from 'underscore';
 import '../../lib/utils/text_utility';
+import userAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
 import ActionsComponent from './environment_actions.vue';
 import ExternalUrlComponent from './environment_external_url.vue';
 import StopComponent from './environment_stop.vue';
@@ -14,6 +16,7 @@ const timeagoInstance = new Timeago();
 
 export default {
   components: {
+    userAvatarLink,
     'commit-component': CommitComponent,
     'actions-component': ActionsComponent,
     'external-url-component': ExternalUrlComponent,
@@ -499,15 +502,13 @@ export default {
 
       <span v-if="!model.isFolder && deploymentHasUser">
         by
-        <a
-          :href="deploymentUser.web_url"
-          class="js-deploy-user-container">
-          <img
-            class="avatar has-tooltip s20"
-            :src="deploymentUser.avatar_url"
-            :alt="userImageAltDescription"
-            :title="deploymentUser.username" />
-        </a>
+        <user-avatar-link
+          class="js-deploy-user-container"
+          :link-href="deploymentUser.web_url"
+          :img-src="deploymentUser.avatar_url"
+          :img-alt="userImageAltDescription"
+          :tooltip-text="deploymentUser.username"
+        />
       </span>
     </td>
 
