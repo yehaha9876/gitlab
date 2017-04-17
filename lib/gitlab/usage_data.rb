@@ -69,7 +69,7 @@ module Gitlab
       def license_usage_data
         usage_data = { uuid: current_application_settings.uuid,
                        version: Gitlab::VERSION,
-                       active_user_count: User.active.count,
+                       active_user_count: User.real.count,
                        mattermost_enabled: Gitlab.config.mattermost.enabled }
 
         license = ::License.current

@@ -662,7 +662,7 @@ module API
       end
 
       expose :active_users do |license, options|
-        ::User.active.count
+        ::User.real.count
       end
     end
 

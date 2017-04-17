@@ -5,7 +5,7 @@ module LicenseHelper
   delegate :new_admin_license_path, to: 'Gitlab::Routing.url_helpers'
 
   def current_active_user_count
-    User.active.count
+    User.real.count
   end
 
   def max_historical_user_count

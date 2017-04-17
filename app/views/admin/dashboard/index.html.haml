@@ -41,7 +41,7 @@
         %p
           Active Users
           %span.light.pull-right
-            = number_with_delimiter(User.active.count)
+            = number_with_delimiter(User.real.count)
       .col-md-4
         %h4
           Features

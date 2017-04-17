@@ -100,7 +100,7 @@ class License < ActiveRecord::Base
   end
 
   def current_active_users_count
-    @current_active_users_count ||= User.active.count
+    @current_active_users_count ||= User.real.count
   end
 
   def validate_with_trueup?
