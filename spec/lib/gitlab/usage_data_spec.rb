@@ -78,7 +78,7 @@ describe Gitlab::UsageData do
       expect(subject[:license_md5]).to eq(Digest::MD5.hexdigest(license.data))
       expect(subject[:version]).to eq(Gitlab::VERSION)
       expect(subject[:licensee]).to eq(license.licensee)
-      expect(subject[:active_user_count]).to eq(User.active.count)
+      expect(subject[:active_user_count]).to eq(User.real.count)
       expect(subject[:licensee]).to eq(license.licensee)
       expect(subject[:license_user_count]).to eq(license.restricted_user_count)
       expect(subject[:license_starts_at]).to eq(license.starts_at)

@@ -1846,4 +1846,16 @@ describe User, models: true do
       end
     end
   end
+
+  context '.real' do
+    before do
+      User.ghost
+      create(:user, name: 'user', state: 'active')
+      create(:user, name: 'user', state: 'blocked')
+    end
+
+    it 'only counts active and non internal users' do
+      expect(User.real.count).to eq(1)
+    end
+  end
 end

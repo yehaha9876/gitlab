@@ -24,9 +24,9 @@ describe License do
     end
 
     describe "Historical active user count" do
-      let(:active_user_count) { User.active.count + 10 }
+      let(:real_user_count) { User.real.count + 10 }
       let(:date)              { License.current.starts_at }
-      let!(:historical_data)  { HistoricalData.create!(date: date, active_user_count: active_user_count) }
+      let!(:historical_data)  { HistoricalData.create!(date: date, real_user_count: real_user_count) }
 
       context "when there is no active user count restriction" do
         it "is valid" do
@@ -36,7 +36,7 @@ describe License do
 
       context "when the active user count restriction is exceeded" do
         before do
-          gl_license.restrictions = { active_user_count: active_user_count - 1 }
+          gl_license.restrictions = { real_user_count: real_user_count - 1 }
         end
 
         context "when the license started" do
@@ -72,7 +72,7 @@ describe License do
 
       context "when the active user count restriction is not exceeded" do
         before do
-          gl_license.restrictions = { active_user_count: active_user_count + 1 }
+          gl_license.restrictions = { real_user_count: real_user_count + 1 }
         end
 
         it "is valid" do
@@ -82,8 +82,8 @@ describe License do
 
       context "when the active user count is met exactly" do
         it "is valid" do
-          active_user_count = 100
-          gl_license.restrictions = { active_user_count: active_user_count }
+          real_user_count = 100
+          gl_license.restrictions = { real_user_count: real_user_count }
 
           expect(license).to be_valid
         end
@@ -179,7 +179,7 @@ describe License do
     describe 'downgrade' do
       context 'when more users were added in previous period' do
         before do
-          HistoricalData.create!(date: 6.months.ago, active_user_count: 15)
+          HistoricalData.create!(date: 6.months.ago, real_user_count: 15)
 
           set_restrictions(restricted_user_count: 5, previous_user_count: 10)
         end
@@ -191,7 +191,7 @@ describe License do
 
       context 'when no users were added in the previous period' do
         before do
-          HistoricalData.create!(date: 6.months.ago, active_user_count: 15)
+          HistoricalData.create!(date: 6.months.ago, real_user_count: 15)
 
           set_restrictions(restricted_user_count: 10, previous_user_count: 15)
         end
@@ -347,7 +347,7 @@ describe License do
 
   def set_restrictions(opts)
     gl_license.restrictions = {
-      active_user_count: opts[:restricted_user_count],
+      real_user_count: opts[:restricted_user_count],
       previous_user_count: opts[:previous_user_count],
       trueup_quantity: opts[:trueup_quantity],
       trueup_from: (Date.today - 1.year).to_s,
