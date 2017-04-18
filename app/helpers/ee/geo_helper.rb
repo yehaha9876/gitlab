@@ -4,10 +4,10 @@ module EE
       if node.primary?
         icon 'star fw', class: 'has-tooltip', title: 'Primary node'
       else
-        status = node.enabled? ? 'healthy' : 'disabled'
+        status = node.enabled? ? 'unknown' : 'disabled'
 
         icon 'globe fw',
-             class: "js-geo-node-icon geo-node-icon-#{status} has-tooltip",
+             class: "js-geo-node-icon fa-spin geo-node-icon-#{status} has-tooltip",
              title: status.capitalize
       end
     end

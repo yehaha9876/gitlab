@@ -3,6 +3,7 @@ import './smart_interval';
 
 const healthyClass = 'geo-node-icon-healthy';
 const unhealthyClass = 'geo-node-icon-unhealthy';
+const unknownClass = 'geo-node-icon-unknown';
 
 class GeoNodeStatus {
   constructor(el) {
@@ -40,6 +41,9 @@ class GeoNodeStatus {
   }
 
   setStatusIcon(healthy) {
+    this.$icon.removeClass('fa-spin');
+    this.$icon.removeClass(unknownClass);
+
     if (healthy) {
       this.$icon.removeClass(unhealthyClass)
                 .addClass(healthyClass)
