@@ -116,7 +116,7 @@ class Repository
       offset: offset,
       after: after,
       before: before,
-      follow: path.present?,
+      follow: Array(path).length == 1,
       skip_merges: skip_merges
     }
 
