@@ -47,6 +47,7 @@ const normalizeNewlines = function(str) {
       this.refresh = bind(this.refresh, this);
       this.keydownNoteText = bind(this.keydownNoteText, this);
       this.toggleCommitList = bind(this.toggleCommitList, this);
+      this.postComment = bind(this.postComment, this);
 
       this.notes_url = notes_url;
       this.note_ids = note_ids;
@@ -94,6 +95,7 @@ const normalizeNewlines = function(str) {
       $(document).on("click", ".note-edit-cancel", this.cancelEdit);
       // Reopen and close actions for Issue/MR combined with note form submit
       $(document).on("click", ".js-comment-button", this.updateCloseButton);
+      $(document).on("click", ".js-insta-comment-button", this.postComment);
       $(document).on("keyup input", ".js-note-text", this.updateTargetButtons);
       // resolve a discussion
       $(document).on('click', '.js-comment-resolve-button', this.resolveDiscussion);
@@ -1148,6 +1150,68 @@ const normalizeNewlines = function(str) {
       $updatedNote.addClass('fade-in').renderGFM();
       $note.replaceWith($updatedNote);
       return $updatedNote;
+    };
+
+    Notes.prototype.createTemporaryNote = function($sampleNote, formContent, uniqueId) {
+      const $tempNote = $sampleNote.clone();
+
+      // Set unique ID for later reference.
+      $tempNote.attr('id', uniqueId);
+      $tempNote.addClass('being-posted');
+      $tempNote.find('.note-headline-meta a').html('<i class="fa fa-spinner fa-spin"></i>');
+
+      // Check if current user is same as what tempLi meta holds
+      if ($tempNote.data('author-id') !== gon.current_user_id) {
+        $tempNote.data('author-id', gon.current_user_id);
+        $tempNote.find('.timeline-icon > a, .note-header-info > a').each((i, anchor) => {
+          $(anchor).attr('href', `/${gon.current_username}`);
+        });
+        $tempNote.find('.note-header-info a .hidden-xs').text(gon.current_user_fullname);
+        $tempNote.find('.note-header-info a .note-headline-light').text(`@${gon.current_user_fullname}`);
+      }
+
+      // Update note body
+      const $noteBody = $tempNote.find('.js-task-list-container');
+      $noteBody.find('.md.note-text').html(formContent); // If we ever preview it, use preview instead!
+      $noteBody.find('.original-note-content').text(formContent);
+      $noteBody.find('.js-task-list-field').text(formContent);
+
+      return $tempNote;
+    };
+
+    Notes.prototype.postComment = function(e) {
+      const self = this;
+      const $form = $(e.target).parents('form');
+      const formData = $form.serialize();
+      const formContent = $form.find('.js-note-text').val();
+      // const formContentMD = $form.find('.js-md-preview').html();
+      const uniqueId = Date.now();
+      let $notesContainer;
+      let $lastLi;
+
+      if ($form.hasClass('js-discussion-note-form')) {
+        $notesContainer = $form.parent('.discussion-notes').find('.notes');
+        $lastLi = $notesContainer.find('.note:not(.system-note)').last();
+      } else if ($form.hasClass('js-main-target-form')) {
+        $notesContainer = $('ul.main-notes-list');
+        $lastLi = $notesContainer.find('.note:not(.system-note)').last();
+      }
+
+      $notesContainer.append(this.createTemporaryNote($lastLi, formContent, uniqueId));
+      $form.find('.js-note-text').val('');
+
+      $.ajax({
+        type: 'POST',
+        url: $form.attr('action'),
+        data: formData,
+        success(note) {
+          $notesContainer.find(`#${uniqueId}`).remove();
+          self.note_ids.push(note.id);
+          $notesContainer.append(note.html).syntaxHighlight();
+          gl.utils.localTimeAgo($notesContainer.find("#note_" + note.id + " .js-timeago"), false);
+          self.updateNotesCount(1);
+        }
+      });
     };
 
     return Notes;

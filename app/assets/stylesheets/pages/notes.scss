@@ -57,6 +57,10 @@ ul.notes {
     position: relative;
     border-bottom: 1px solid $white-normal;
 
+    &.being-posted {
+      opacity: 0.5;
+    }
+
     &.note-discussion {
       &.timeline-entry {
         padding: 14px 10px;
