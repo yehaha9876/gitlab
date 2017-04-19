@@ -1,66 +1,67 @@
 import Vue from 'vue';
 import VueResource from 'vue-resource';
 
-require('./components/time_tracker');
-require('../../smart_interval');
-require('../../subbable_resource');
+import issuableTimeTracker from './components/time_tracker';
+import '../../smart_interval';
+import '../../subbable_resource';
 
 Vue.use(VueResource);
 
-(() => {
-  /* This Vue instance represents what will become the parent instance for the
-    * sidebar. It will be responsible for managing `issuable` state and propagating
-    * changes to sidebar components. We will want to create a separate service to
-    * interface with the server at that point.
-   */
-
-  class IssuableTimeTracking {
-    constructor(issuableJSON) {
-      const parsedIssuable = JSON.parse(issuableJSON);
-      return this.initComponent(parsedIssuable);
-    }
-
-    initComponent(parsedIssuable) {
-      this.parentInstance = new Vue({
-        el: '#issuable-time-tracker',
-        data: {
-          issuable: parsedIssuable,
-        },
-        methods: {
-          fetchIssuable() {
-            return gl.IssuableResource.get.call(gl.IssuableResource, {
-              type: 'GET',
-              url: gl.IssuableResource.endpoint,
-            });
-          },
-          updateState(data) {
-            this.issuable = data;
-          },
-          subscribeToUpdates() {
-            gl.IssuableResource.subscribe(data => this.updateState(data));
-          },
-          listenForSlashCommands() {
-            $(document).on('ajax:success', '.gfm-form', (e, data) => {
-              const subscribedCommands = ['spend_time', 'time_estimate'];
-              const changedCommands = data.commands_changes
-                ? Object.keys(data.commands_changes)
-                : [];
-              if (changedCommands && _.intersection(subscribedCommands, changedCommands).length) {
-                this.fetchIssuable();
-              }
-            });
-          },
-        },
-        created() {
-          this.fetchIssuable();
-        },
-        mounted() {
-          this.subscribeToUpdates();
-          this.listenForSlashCommands();
-        },
+export default {
+  el: '#issuable-time-tracker',
+  data: {
+    issuable: {},
+    docsUrl: '',
+  },
+  components: {
+    'issuable-time-tracker': issuableTimeTracker,
+  },
+  methods: {
+    fetchIssuable() {
+      return gl.IssuableResource.get.call(gl.IssuableResource, {
+        type: 'GET',
+        url: gl.IssuableResource.endpoint,
       });
-    }
-  }
-
-  gl.IssuableTimeTracking = IssuableTimeTracking;
-})(window.gl || (window.gl = {}));
+    },
+    updateState(data) {
+      this.issuable = data;
+    },
+    subscribeToUpdates() {
+      gl.IssuableResource.subscribe(data => this.updateState(data));
+    },
+    listenForSlashCommands() {
+      $(document).on('ajax:success', '.gfm-form', (e, data) => {
+        const subscribedCommands = ['spend_time', 'time_estimate'];
+        const changedCommands = data.commands_changes
+          ? Object.keys(data.commands_changes)
+          : [];
+        if (changedCommands && _.intersection(subscribedCommands, changedCommands).length) {
+          this.fetchIssuable();
+        }
+      });
+    },
+  },
+  created() {
+    this.fetchIssuable();
+  },
+  mounted() {
+    this.subscribeToUpdates();
+    this.listenForSlashCommands();
+  },
+  beforeMount() {
+    const element = this.$el;
+    this.docsUrl = element.dataset.docsUrl;
+    this.issuable = JSON.parse(gl.IssuableTimeTracking);
+  },
+  template: `
+    <div class="block">
+      <issuable-time-tracker
+        :time_estimate='issuable.time_estimate'
+        :time_spent='issuable.total_time_spent'
+        :human_time_estimate='issuable.human_time_estimate'
+        :human_time_spent='issuable.human_time_spent'
+        :docsUrl='docsUrl'
+      />
+    </div>
+  `,
+};
