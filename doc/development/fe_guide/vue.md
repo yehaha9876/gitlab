@@ -78,7 +78,8 @@ source of truth.
 The concept we are trying to follow is better explained by Vue documentation
 itself, please read this guide: [State Management][state-management]
 
-**A folder for the Service**
+
+### A folder for the Service
 
 The Service is used only to communicate with the server.
 It does not store or manipulate any data.
@@ -101,6 +102,220 @@ loaded by `common_vue.js`
 The [issue boards service][issue-boards-service]
 is a good example of this pattern.
 
+
+### End Result
+
+The following example shows an  application:
+
+```javascript
+// store.js
+export default class Store {
+
+  /**  
+   * This is where we will iniatialize the state of our data.
+   * Usually in a small SPA you don't need any options when starting the store. In the case you do
+   * need guarantee it's an Object and it's documented.
+   *    
+   * @param  {Object} options   
+   */   
+  constructor(options) {
+    this.options = options;
+
+    // Create a state object to handle all our data in the same place
+    this.todos = []:
+  }
+
+  setTodos(todos = []) {
+    this.todos = todos;
+  }
+
+  addTodo(todo) {
+    this.todos.push(todo);
+  }
+
+  removeTodo(todoID) {
+    const state = this.todos;
+
+    const newState = state.filter((element) => {element.id !== todoID});
+
+    this.todos = newState;
+  }
+}
+
+// service.js
+import Vue from 'vue';
+import VueResource from 'vue-resource';
+import 'vue_shared/vue_resource_interceptor';
+
+Vue.use(VueResource);
+
+export default class Service {
+  constructor(options) {
+    this.todos = Vue.resource(endpoint.todosEndpoint);
+  }
+
+  getTodos() {
+    return this.todos.get();
+  }
+
+  addTodo(todo) {
+    return this.todos.put(todo);
+  }
+}
+// todo_component.vue
+<script>
+export default {
+  props: {
+    data: {
+      type: Object,
+      required: true,
+    },
+  }
+}
+</script>
+<template>
+  <div>
+    <h1>
+      Title: {{data.title}}
+    </h1>
+    <p>
+      {{data.text}}
+    </p>
+  </div>
+</template>
+
+// todos_main_component.vue
+<script>
+import Store from 'store';
+import Service from 'service';
+import TodoComponent from 'todoComponent';
+export default {
+  /**  
+   * Although most data belongs in the store, each component it's own state.
+   * We want to show a loading spinner while we are fetching the todos, this state belong
+   * in the component.
+   *
+   * We need to access the store methods through all methods of our component.
+   * We need to access the state of our store.
+   */   
+  data() {
+    const store = new Store();
+
+    return {
+      isLoading: false,
+      store: store,
+      todos: store.todos,
+    };
+  },
+
+  components: {
+    todo: TodoComponent,
+  },
+
+  created() {
+    this.service = new Service('todos');
+
+    this.getTodos();
+  },
+
+  methods: {
+    getTodos() {
+      this.isLoading = true;
+
+      this.service.getTodos()
+        .then(response => response.json())
+        .then((response) => {
+          this.store.setTodos(response);
+          this.isLoading = false;
+        })
+        .catch(() => {
+          this.isLoading = false;
+          // Show an error
+        });
+    },
+
+    addTodo(todo) {
+      this.service.addTodo(todo)
+      then(response => response.json())
+      .then((response) => {
+        this.store.addTodo(response);
+      })
+      .catch(() => {
+        // Show an error
+      });
+    }
+  }
+}
+</script>
+<template>
+  <div class="container">
+    <div v-if="isLoading">
+      <i
+        class="fa fa-spin fa-spinner"
+        aria-hidden="true" />
+    </div>
+
+    <div
+      v-if="!isLoading"
+      class="js-todo-list">
+      <template v-for='todo in todos'>
+        <todo :data="todo" />
+      </template>
+
+      <button
+        @click="addTodo"
+        class="js-add-todo">
+        Add Todo
+      </button>
+    </div>
+  <div>
+</template>
+
+// bundle.js
+import todoComponent from 'todos_main_component.vue';
+
+new Vue({
+  el: '.js-todo-app',
+  components: {
+    todoComponent,
+  },
+  render: createElement => createElement('todo-component' {
+    props: {
+      someProp: [],
+    }
+  }),
+});
+
+```
+
+Vue Resource should only be included in this file.
+
+  ```javascript
+  import Vue from 'vue';
+  import VueResource from 'vue-resource';
+
+  Vue.use(VueResource);
+  ```
+
+Common interceptor handles CSRF token.
+You don't need to include this file since it's already being
+loaded by `common_vue.js`
+
+The [issue boards service][issue-boards-service]
+is a good example of this pattern.
+
+## Style guide
+
+Please refer to the Vue section of our [style guide](style_guide_js.md#vuejs)
+for best practices while writing your Vue components and templates.
+
+## Testing Vue Components
+
+Each Vue component has a unique output. This output is always present in the render function.
+
+Although we can test each method of a Vue component individually, our goal must be to test the output
+of the render/template function, which represents the state at all times.
+
 ## Style guide
 
 Please refer to the Vue section of our [style guide](style_guide_js.md#vuejs)
@@ -115,3 +330,7 @@ for best practices while writing your Vue components and templates.
 [state-management]: https://vuejs.org/v2/guide/state-management.html#Simple-State-Management-from-Scratch
 [vue-resource-repo]: https://github.com/pagekit/vue-resource
 [issue-boards-service]: https://gitlab.com/gitlab-org/gitlab-ce/blob/master/app/assets/javascripts/boards/services/board_service.js.es6
+<<<<<<< HEAD
+=======
+[flux]: https://facebook.github.io/flux
+>>>>>>> ed90db4... Merge branch 'master' into 'vue-doc-2'
