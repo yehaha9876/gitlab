@@ -1,12 +1,8 @@
-import timeTrackingHelpState from './help_state';
 import timeTrackingCollapsedState from './collapsed_state';
-import timeTrackingSpentOnlyPane from './spent_only_pane';
-import timeTrackingNoTrackingPane from './no_tracking_pane';
-import timeTrackingEstimateOnlyPane from './estimate_only_pane';
 import timeTrackingComparisonPane from './comparison_pane';
 
 export default {
-  name: 'issuable-time-tracker',
+  name: 'IssuableTimeTracker',
   props: {
     time_estimate: {
       type: Number,
@@ -38,11 +34,7 @@ export default {
   },
   components: {
     'time-tracking-collapsed-state': timeTrackingCollapsedState,
-    'time-tracking-estimate-only-pane': timeTrackingEstimateOnlyPane,
-    'time-tracking-spent-only-pane': timeTrackingSpentOnlyPane,
-    'time-tracking-no-tracking-pane': timeTrackingNoTrackingPane,
     'time-tracking-comparison-pane': timeTrackingComparisonPane,
-    'time-tracking-help-state': timeTrackingHelpState,
   },
   computed: {
     timeSpent() {
@@ -85,53 +77,105 @@ export default {
     },
   },
   template: `
-    <div class='time_tracker time-tracking-component-wrap' v-cloak>
+    <div
+      class="time_tracker time-tracking-component-wrap"
+      v-cloak
+    >
       <time-tracking-collapsed-state
-        :show-comparison-state='showComparisonState'
-        :show-no-time-tracking-state='showNoTimeTrackingState'
-        :show-help-state='showHelpState'
-        :show-spent-only-state='showSpentOnlyState'
-        :show-estimate-only-state='showEstimateOnlyState'
-        :time-spent-human-readable='timeSpentHumanReadable'
-        :time-estimate-human-readable='timeEstimateHumanReadable'>
-      </time-tracking-collapsed-state>
-      <div class='title hide-collapsed'>
+        :show-comparison-state="showComparisonState"
+        :show-no-time-tracking-state="showNoTimeTrackingState"
+        :show-help-state="showHelpState"
+        :show-spent-only-state="showSpentOnlyState"
+        :show-estimate-only-state="showEstimateOnlyState"
+        :time-spent-human-readable="timeSpentHumanReadable"
+        :time-estimate-human-readable="timeEstimateHumanReadable"
+      />
+      <div class="title hide-collapsed">
         Time tracking
-        <div class='help-button pull-right'
-          v-if='!showHelpState'
-          @click='toggleHelpState(true)'>
-          <i class='fa fa-question-circle' aria-hidden='true'></i>
+        <div
+          class="help-button pull-right"
+          v-if="!showHelpState"
+          @click="toggleHelpState(true)"
+        >
+          <i
+            class="fa fa-question-circle"
+            aria-hidden="true"
+          />
         </div>
-        <div class='close-help-button pull-right'
-          v-if='showHelpState'
-          @click='toggleHelpState(false)'>
-          <i class='fa fa-close' aria-hidden='true'></i>
+        <div
+          class="close-help-button pull-right"
+          v-if="showHelpState"
+          @click="toggleHelpState(false)"
+        >
+          <i
+            class="fa fa-close"
+            aria-hidden="true"
+          />
         </div>
       </div>
-      <div class='time-tracking-content hide-collapsed'>
-        <time-tracking-estimate-only-pane
-          v-if='showEstimateOnlyState'
-          :time-estimate-human-readable='timeEstimateHumanReadable'>
-        </time-tracking-estimate-only-pane>
-        <time-tracking-spent-only-pane
-          v-if='showSpentOnlyState'
-          :time-spent-human-readable='timeSpentHumanReadable'>
-        </time-tracking-spent-only-pane>
-        <time-tracking-no-tracking-pane
-          v-if='showNoTimeTrackingState'>
-        </time-tracking-no-tracking-pane>
+      <div class="time-tracking-content hide-collapsed">
+        <div
+          class="time-tracking-estimate-only-pane"
+          v-if="showEstimateOnlyState"
+        >
+          <span class="bold">
+            Estimated:
+          </span>
+          {{ timeEstimateHumanReadable }}
+        </div>
+        <div
+          class="time-tracking-spend-only-pane"
+          v-if="showSpentOnlyState"
+        >
+          <span class="bold">Spent:</span>
+          {{ timeSpentHumanReadable }}
+        </div>
+        <div
+          class="time-tracking-no-tracking-pane"
+          v-if="showNoTimeTrackingState"
+        >
+          <span class="no-value">
+            No estimate or time spent
+          </span>
+        </div>
         <time-tracking-comparison-pane
-          v-if='showComparisonState'
-          :time-estimate='timeEstimate'
-          :time-spent='timeSpent'
-          :time-spent-human-readable='timeSpentHumanReadable'
-          :time-estimate-human-readable='timeEstimateHumanReadable'>
-        </time-tracking-comparison-pane>
-        <transition name='help-state-toggle'>
-          <time-tracking-help-state
-            v-if='showHelpState'
-            :docs-url='docsUrl'>
-          </time-tracking-help-state>
+          v-if="showComparisonState"
+          :time-estimate="timeEstimate"
+          :time-spent="timeSpent"
+          :time-spent-human-readable="timeSpentHumanReadable"
+          :time-estimate-human-readable="timeEstimateHumanReadable"
+        />
+        <transition name="help-state-toggle">
+          <div
+            class="time-tracking-help-state"
+            v-if="showHelpState"
+          >
+            <div class="time-tracking-info">
+              <h4>
+                Track time with slash commands
+              </h4>
+              <p>
+                Slash commands can be used in the issues description and comment boxes.
+              </p>
+              <p>
+                <code>
+                  /estimate
+                </code>
+                will update the estimated time with the latest command.
+              </p>
+              <p>
+                <code>
+                  /spend
+                </code>
+                will update the sum of the time spent.
+              </p>
+              <a
+                class="btn btn-default learn-more-button"
+                :href="docsUrl">
+                Learn more
+              </a>
+            </div>
+          </div>
         </transition>
       </div>
     </div>

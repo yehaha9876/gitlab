@@ -56,11 +56,11 @@ export default {
   template: `
     <div class="block">
       <issuable-time-tracker
-        :time_estimate='issuable.time_estimate'
-        :time_spent='issuable.total_time_spent'
-        :human_time_estimate='issuable.human_time_estimate'
-        :human_time_spent='issuable.human_time_spent'
-        :docsUrl='docsUrl'
+        :time_estimate="issuable.time_estimate"
+        :time_spent="issuable.total_time_spent"
+        :human_time_estimate="issuable.human_time_estimate"
+        :human_time_spent="issuable.human_time_spent"
+        :docsUrl="docsUrl"
       />
     </div>
   `,
