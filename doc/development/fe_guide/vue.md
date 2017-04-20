@@ -103,6 +103,21 @@ The [issue boards service][issue-boards-service]
 is a good example of this pattern.
 
 
+Vue Resource should only be imported in the service file.
+
+  ```javascript
+  import Vue from 'vue';
+  import VueResource from 'vue-resource';
+
+  Vue.use(VueResource);
+  ```
+
+### CSRF token
+We use vue resource interceptor to manage CSRF token.
+`app/assets/javascripts/vue_shared/vue_resource_interceptor.js` holds all common interceptors.
+Note: You don't need to load `app/assets/javascripts/vue_shared/vue_resource_interceptor.js`
+since it's already being loaded by `common_vue.js`.
+
 ### End Result
 
 The following example shows an  application:
@@ -288,19 +303,6 @@ new Vue({
 
 ```
 
-Vue Resource should only be included in this file.
-
-  ```javascript
-  import Vue from 'vue';
-  import VueResource from 'vue-resource';
-
-  Vue.use(VueResource);
-  ```
-
-Common interceptor handles CSRF token.
-You don't need to include this file since it's already being
-loaded by `common_vue.js`
-
 The [issue boards service][issue-boards-service]
 is a good example of this pattern.
 
@@ -330,7 +332,4 @@ for best practices while writing your Vue components and templates.
 [state-management]: https://vuejs.org/v2/guide/state-management.html#Simple-State-Management-from-Scratch
 [vue-resource-repo]: https://github.com/pagekit/vue-resource
 [issue-boards-service]: https://gitlab.com/gitlab-org/gitlab-ce/blob/master/app/assets/javascripts/boards/services/board_service.js.es6
-<<<<<<< HEAD
-=======
 [flux]: https://facebook.github.io/flux
->>>>>>> ed90db4... Merge branch 'master' into 'vue-doc-2'
