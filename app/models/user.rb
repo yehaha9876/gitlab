@@ -383,6 +383,14 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.internal_attributes
+    [:ghost]
+  end
+
+  def self.non_internal
+    where(Hash[internal_attributes.zip([[false, nil]] * internal_attributes.size)])
+  end
+
   #
   # Instance methods
   #
