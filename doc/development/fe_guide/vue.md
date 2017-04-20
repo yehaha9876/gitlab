@@ -118,6 +118,21 @@ We use vue resource interceptor to manage CSRF token.
 Note: You don't need to load `app/assets/javascripts/vue_shared/vue_resource_interceptor.js`
 since it's already being loaded by `common_vue.js`.
 
+Vue Resource should only be imported in the service file.
+
+  ```javascript
+  import Vue from 'vue';
+  import VueResource from 'vue-resource';
+
+  Vue.use(VueResource);
+  ```
+
+### CSRF token
+We use vue resource interceptor to manage CSRF token.
+`app/assets/javascripts/vue_shared/vue_resource_interceptor.js` holds all common interceptors.
+Note: You don't need to load `app/assets/javascripts/vue_shared/vue_resource_interceptor.js`
+since it's already being loaded by `common_vue.js`.
+
 ### End Result
 
 The following example shows an  application:
