@@ -994,8 +994,7 @@ Parameters:
 
 ### Get user activities (admin only)
 
->**Note:** This API endpoint is only available on 8.15 EE and above.
-
+>**Note:** This API endpoint is only available on 8.15 (EE) and 9.1 (CE) and above.
 
 Get the last activity date for all users, sorted from oldest to newest.
 
