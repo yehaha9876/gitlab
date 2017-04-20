@@ -85,6 +85,19 @@ It does not store or manipulate any data.
 We use [vue-resource][vue-resource-repo] to
 communicate with the server.
 
+Vue Resource should only be included in this file.
+
+  ```javascript
+  import Vue from 'vue';
+  import VueResource from 'vue-resource';
+
+  Vue.use(VueResource);
+  ```
+
+Common interceptor handles CSRF token.
+You don't need to include this file since it's already being
+loaded by `common_vue.js`
+
 The [issue boards service][issue-boards-service]
 is a good example of this pattern.
 
