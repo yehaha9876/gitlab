@@ -95,7 +95,7 @@ class RenameSystemNamespaces < ActiveRecord::Migration
 
     replace_statement = replace_sql(Route.arel_table[:path], old_full_path, new_full_path)
 
-    update_column_in_batches(:routes, :path, replace_statement)  do |table, query|
+    update_column_in_batches(:routes, :path, replace_statement) do |table, query|
       query.where(Route.arel_table[:path].matches("#{old_full_path}%"))
     end
 
@@ -194,8 +194,8 @@ class RenameSystemNamespaces < ActiveRecord::Migration
   end
 
   def repo_paths_for_namespace(namespace)
-    projects_for_namespace(namespace).
-      select('distinct(repository_storage)').map(&:repository_storage_path)
+    projects_for_namespace(namespace).distinct.
+      select(:repository_storage).map(&:repository_storage_path)
   end
 
   def uploads_dir
