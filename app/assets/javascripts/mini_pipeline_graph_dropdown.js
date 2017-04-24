@@ -28,7 +28,9 @@ export default class MiniPipelineGraph {
    * All dropdown events are fired at the .dropdown-menu's parent element.
    */
   bindEvents() {
-    $(document).off('shown.bs.dropdown', this.container).on('shown.bs.dropdown', this.container, this.getBuildsList);
+    $(document)
+      .off('shown.bs.dropdown', this.container)
+      .on('shown.bs.dropdown', this.container, this.getBuildsList);
   }
 
   /**
@@ -91,6 +93,7 @@ export default class MiniPipelineGraph {
       },
       error: () => {
         this.toggleLoading(button);
+        $(button).dropdown('toggle');
         new Flash('An error occurred while fetching the builds.', 'alert');
       },
     });
