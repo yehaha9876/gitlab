@@ -63,4 +63,19 @@ describe('Pipelines Stage', () => {
       expect(minifiedComponent).toContain(expectedSVG);
     });
   });
+
+  describe('when request fails', () => {
+    it('closes dropdown', () => {
+      spyOn($, 'ajax').and.callFake(options => options.error());
+      const StageComponent = Vue.extend(Stage);
+
+      const component = new StageComponent({
+        propsData: { stage: { status: { icon: 'foo' } } },
+      });
+
+      expect(
+        $(component.$el, '.js-builds-dropdown-container').is('visible'),
+      ).toEqual(false);
+    });
+  });
 });
