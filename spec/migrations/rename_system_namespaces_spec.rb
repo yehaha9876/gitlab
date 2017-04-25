@@ -83,13 +83,54 @@ describe RenameSystemNamespaces, truncate: true do
       migration.up
     end
 
-    it "clears the markdown cache for projects in the system namespace" do
-      project = create(:project, namespace: system_namespace)
-      scopes = { project_ids: [project.id] }
+    describe "clears the markdown cache for projects in the system namespace" do
+      let!(:project) { create(:project, namespace: system_namespace) }
 
-      expect(ClearDatabaseCacheWorker).to receive(:perform_async).with(scopes)
+      it 'removes description_html from projects' do
+        migration.up
 
-      migration.up
+        expect(project.reload.description_html).to be_nil
+      end
+
+      it 'removes issue descriptions' do
+        issue = create(:issue, project: project, description_html: 'Issue description')
+
+        migration.up
+
+        expect(issue.reload.description_html).to be_nil
+      end
+
+      it 'removes merge request descriptions' do
+        merge_request = create(:merge_request,
+                               source_project: project,
+                               target_project: project,
+                               description_html: 'MergeRequest description')
+
+        migration.up
+
+        expect(merge_request.reload.description_html).to be_nil
+      end
+
+      it 'removes note html' do
+        note = create(:note,
+                      project: project,
+                      noteable: create(:issue, project: project),
+                      note_html: 'note description')
+
+        migration.up
+
+        expect(note.reload.note_html).to be_nil
+      end
+
+      it 'removes milestone description' do
+        milestone = create(:milestone,
+                           project: project,
+                           description_html: 'milestone description')
+
+        migration.up
+
+        expect(milestone.reload.description_html).to be_nil
+      end
     end
 
     context "system namespace -> subgroup -> system0 project" do

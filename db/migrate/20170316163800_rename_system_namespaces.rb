@@ -1,6 +1,5 @@
 # See http://doc.gitlab.com/ce/development/migration_style_guide.html
 # for more information on how to write migrations for GitLab.
-
 class RenameSystemNamespaces < ActiveRecord::Migration
   include Gitlab::Database::MigrationHelpers
   include Gitlab::ShellAdapter
@@ -171,10 +170,25 @@ class RenameSystemNamespaces < ActiveRecord::Migration
   def clear_cache_for_namespace(namespace)
     project_ids = projects_for_namespace(namespace).pluck(:id)
 
-    ClearDatabaseCacheWorker.perform_async(project_ids: project_ids)
-  rescue => e
-    Rails.logger.error ["Couldn't clear the markdown cache: #{e.message}",
-                        e.backtrace.join("\n")].join("\n")
+    update_column_in_batches(:projects, :description_html, nil) do |table, query|
+      query.where(table[:id].in(project_ids))
+    end
+
+    update_column_in_batches(:issues, :description_html, nil) do |table, query|
+      query.where(table[:project_id].in(project_ids))
+    end
+
+    update_column_in_batches(:merge_requests, :description_html, nil) do |table, query|
+      query.where(table[:target_project_id].in(project_ids))
+    end
+
+    update_column_in_batches(:notes, :note_html, nil) do |table, query|
+      query.where(table[:project_id].in(project_ids))
+    end
+
+    update_column_in_batches(:milestones, :description_html, nil) do |table, query|
+      query.where(table[:project_id].in(project_ids))
+    end
   end
 
   def projects_for_namespace(namespace)
