@@ -52,6 +52,7 @@ import BlobForkSuggestion from './blob/blob_fork_suggestion';
 import UserCallout from './user_callout';
 import { ProtectedTagCreate, ProtectedTagEditList } from './protected_tags';
 import ShortcutsWiki from './shortcuts_wiki';
+import AutoWidthDropdownSelect from './issuable/auto_width_dropdown_select';
 import BlobViewer from './blob/viewer/index';
 import GeoNodes from './geo_nodes';
 import ServiceDeskRoot from './projects/settings_service_desk/service_desk_root';
@@ -204,6 +205,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
           new LabelsSelect();
           new MilestoneSelect();
           new gl.IssuableTemplateSelectors();
+          new AutoWidthDropdownSelect($('.js-target-branch-select')).init();
           break;
         case 'projects:tags:new':
           new ZenMode();
