@@ -79,7 +79,7 @@ describe('Mini Pipeline Graph Dropdown', () => {
     document.querySelector('.js-builds-dropdown-button').click();
 
     setTimeout(() => {
-      expect($('.js-builds-dropdown-container').is('visible')).toEqual(false);
+      expect($('.js-builds-dropdown-container').parent().hasClass('open')).toEqual(false);
       done();
     }, 0);
   });

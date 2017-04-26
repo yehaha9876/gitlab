@@ -33,7 +33,11 @@ export default {
           this.builds = JSON.parse(response.body).html;
         })
         .catch(() => {
-          $(this.$refs.dropdown).dropdown('toggle');
+          // If dropdown is opened we'll close it.
+          if (this.$el.classList.contains('open')) {
+            $(this.$refs.dropdown).dropdown('toggle');
+          }
+
           const flash = new Flash('Something went wrong on our end.');
           return flash;
         });
@@ -94,7 +98,9 @@ export default {
           class="fa fa-caret-down"
           aria-hidden="true" />
       </button>
-      <ul class="dropdown-menu mini-pipeline-graph-dropdown-menu js-builds-dropdown-container">
+      <ul
+        ref="dropdown-content"
+        class="dropdown-menu mini-pipeline-graph-dropdown-menu js-builds-dropdown-container">
         <div
           class="arrow-up"
           aria-hidden="true"></div>

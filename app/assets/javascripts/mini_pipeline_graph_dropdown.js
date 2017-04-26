@@ -93,7 +93,9 @@ export default class MiniPipelineGraph {
       },
       error: () => {
         this.toggleLoading(button);
-        $(button).dropdown('toggle');
+        if ($(button).parent().hasClass('open')) {
+          $(button).dropdown('toggle');
+        }
         new Flash('An error occurred while fetching the builds.', 'alert');
       },
     });

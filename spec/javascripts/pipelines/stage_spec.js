@@ -74,7 +74,7 @@ describe('Pipelines Stage', () => {
       });
 
       expect(
-        $(component.$el, '.js-builds-dropdown-container').is('visible'),
+        component.$el.classList.contains('open'),
       ).toEqual(false);
     });
   });
