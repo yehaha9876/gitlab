@@ -66,7 +66,7 @@ The following guide assumes that:
 1. Edit `/etc/gitlab/gitlab.rb` and add the following:
 
     ```ruby
-    geo_primary_role['enable'] = true
+    geo_primary_role['enable'] = true # Remove this for versions before 9.1
     postgresql['listen_address'] = "1.2.3.4"
     postgresql['trust_auth_cidr_addresses'] = ['127.0.0.1/32','1.2.3.4/32']
     postgresql['md5_auth_cidr_addresses'] = ['5.6.7.8/32']
