@@ -83,19 +83,12 @@ const normalizeNewlines = function(str) {
     };
 
     Notes.prototype.addBinding = function() {
-      // add note to UI after creation
-      $(document).on("ajax:success", ".js-main-target-form", this.addNote);
-      $(document).on("ajax:success", ".js-discussion-note-form", this.addDiscussionNote);
-      // catch note ajax errors
-      $(document).on("ajax:error", ".js-main-target-form", this.addNoteError);
-      // change note in UI after update
-      $(document).on("ajax:success", "form.edit-note", this.updateNote);
       // Edit note link
       $(document).on("click", ".js-note-edit", this.showEditForm.bind(this));
       $(document).on("click", ".note-edit-cancel", this.cancelEdit);
       // Reopen and close actions for Issue/MR combined with note form submit
-      $(document).on("click", ".js-comment-button", this.updateComment);
-      $(document).on("click", ".js-insta-comment-button", this.postComment);
+      $(document).on("click", ".js-comment-submit-button", this.postComment);
+      $(document).on("click", ".js-comment-save-button", this.updateComment);
       $(document).on("keyup input", ".js-note-text", this.updateTargetButtons);
       // resolve a discussion
       $(document).on('click', '.js-comment-resolve-button', this.resolveDiscussion);
@@ -103,9 +96,6 @@ const normalizeNewlines = function(str) {
       $(document).on("click", ".js-note-delete", this.removeNote);
       // delete note attachment
       $(document).on("click", ".js-note-attachment-delete", this.removeAttachment);
-      // reset main target form after submit
-      $(document).on("ajax:complete", ".js-main-target-form", this.reenableTargetFormSubmitButton);
-      $(document).on("ajax:success", ".js-main-target-form", this.resetMainTargetForm);
       // reset main target form when clicking discard
       $(document).on("click", ".js-note-discard", this.resetMainTargetForm);
       // update the file name when an attachment is selected
@@ -127,9 +117,6 @@ const normalizeNewlines = function(str) {
     };
 
     Notes.prototype.cleanBinding = function() {
-      $(document).off("ajax:success", ".js-main-target-form");
-      $(document).off("ajax:success", ".js-discussion-note-form");
-      $(document).off("ajax:success", "form.edit-note");
       $(document).off("click", ".js-note-edit");
       $(document).off("click", ".note-edit-cancel");
       $(document).off("click", ".js-note-delete");
@@ -558,13 +545,23 @@ const normalizeNewlines = function(str) {
     Adds new note to list.
      */
 
-    Notes.prototype.addNote = function(xhr, note, status) {
+    Notes.prototype.addNote = function($form, note) {
       this.handleCreateChanges(note);
       return this.renderNote(note);
     };
 
-    Notes.prototype.addNoteError = function(xhr, note, status) {
-      return new Flash('Your comment could not be submitted! Please check your network connection and try again.', 'alert', this.parentTimeline);
+    Notes.prototype.addNoteError = function($form) {
+      let formParentTimeline;
+      if ($form.hasClass('js-main-target-form')) {
+        formParentTimeline = $form.parents('.timeline');
+      } else if ($form.hasClass('js-discussion-note-form')) {
+        formParentTimeline = $form.closest('.discussion-notes').find('.notes');
+      }
+      return new Flash('Your comment could not be submitted! Please check your network connection and try again.', 'alert', formParentTimeline);
+    };
+
+    Notes.prototype.updateNoteError = function($parentTimeline) {
+      return new Flash('Your comment could not be updated! Please check your network connection and try again.');
     };
 
     /*
@@ -573,9 +570,7 @@ const normalizeNewlines = function(str) {
     Adds new note to list.
      */
 
-    Notes.prototype.addDiscussionNote = function(xhr, note, status) {
-      var $form = $(xhr.target);
-
+    Notes.prototype.addDiscussionNote = function($form, note) {
       if ($form.attr('data-resolve-all') != null) {
         var projectPath = $form.data('project-path');
         var discussionId = $form.data('discussion-id');
@@ -701,7 +696,7 @@ const normalizeNewlines = function(str) {
       var $editForm = $(selector);
 
       $editForm.insertBefore('.notes-form');
-      $editForm.find('.js-comment-button').enable();
+      $editForm.find('.js-comment-save-button').enable();
       $editForm.find('.js-finish-edit-warning').hide();
     };
 
@@ -1156,51 +1151,53 @@ const normalizeNewlines = function(str) {
       };
     };
 
-    Notes.prototype.createPlaceholderNote = function($baseNote, formContent, uniqueId) {
-      const $tempNote = $baseNote.clone();
-
-      // Set unique ID for later reference.
-      $tempNote.attr('id', uniqueId);
-      $tempNote.addClass('being-posted');
-      $tempNote.find('.note-headline-meta a').html('<i class="fa fa-spinner fa-spin"></i>');
-
-      // Check if current user is same as what tempLi meta holds
-      if ($tempNote.data('author-id') !== gon.current_user_id) {
-        $tempNote.data('author-id', gon.current_user_id);
-        $tempNote.find('.timeline-icon > a, .note-header-info > a').each((i, anchor) => {
-          $(anchor).attr('href', `/${gon.current_username}`);
-        });
-        $tempNote.find('.note-header-info a .hidden-xs').text(gon.current_user_fullname);
-        $tempNote.find('.note-header-info a .note-headline-light').text(`@${gon.current_user_fullname}`);
-      }
-
-      // Update note body
-      const $noteBody = $tempNote.find('.js-task-list-container');
-      $noteBody.find('.md.note-text').html(formContent); // If we ever preview it, use preview instead!
-      $noteBody.find('.original-note-content').text(formContent);
-      $noteBody.find('.js-task-list-field').text(formContent);
-      $tempNote.addClass('fade-in');
+    Notes.prototype.createPlaceholderNote = function(formContent, uniqueId) {
+      const $tempNote = $(
+        `<li id="${uniqueId}" class="note being-posted fade-in timeline-entry">
+           <div class="timeline-entry-inner">
+              <div class="timeline-icon">
+                 <a href="/${gon.current_username}"><span class="dummy-avatar"></span></a>
+              </div>
+              <div class="timeline-content">
+                 <div class="note-header">
+                    <div class="note-header-info">
+                       <a href="/${gon.current_username}">
+                         <span class="hidden-xs">${gon.current_user_fullname}</span>
+                         <span class="note-headline-light">@${gon.current_username}</span>
+                       </a>
+                       <span class="note-headline-light">
+                          <i class="fa fa-spinner fa-spin"></i>
+                       </span>
+                    </div>
+                 </div>
+                 <div class="note-body">
+                   <div class="note-text">${formContent}</div>
+                 </div>
+              </div>
+           </div>
+        </li>`
+      );
 
       return $tempNote;
     };
 
     Notes.prototype.postComment = function(e) {
+      e.preventDefault();
       const self = this;
       const { $form, formData, formContent, formAction } = self.getFormData(e.target);
-      // const formContentMD = $form.find('.js-md-preview').html();
+      const $closeBtn = $form.find('.js-note-target-close');
+      const isMainForm = $form.hasClass('js-main-target-form');
+      const isDiscussionForm = $form.hasClass('js-discussion-note-form');
       const uniqueId = Date.now();
       let $notesContainer;
-      let $lastLi;
 
-      if ($form.hasClass('js-discussion-note-form')) {
+      if (isDiscussionForm) {
         $notesContainer = $form.parent('.discussion-notes').find('.notes');
-        $lastLi = $notesContainer.find('.note:not(.system-note)').last();
-      } else if ($form.hasClass('js-main-target-form')) {
+      } else if (isMainForm) {
         $notesContainer = $('ul.main-notes-list');
-        $lastLi = $notesContainer.find('.note:not(.system-note)').last();
       }
 
-      $notesContainer.append(this.createPlaceholderNote($lastLi, formContent, uniqueId));
+      $notesContainer.append(this.createPlaceholderNote(formContent, uniqueId));
       $form.find('.js-note-text').val('');
 
       $.ajax({
@@ -1209,14 +1206,21 @@ const normalizeNewlines = function(str) {
         data: formData,
         success(note) {
           $notesContainer.find(`#${uniqueId}`).remove();
-          self.note_ids.push(note.id);
-          const $note = $(note.html);
-          $note.addClass('fade-in-complete');
-          $notesContainer.append($note).syntaxHighlight();
-          gl.utils.localTimeAgo($notesContainer.find("#note_" + note.id + " .js-timeago"), false);
-          self.updateNotesCount(1);
+          if (isDiscussionForm) {
+            self.addDiscussionNote($form, note);
+          } else if (isMainForm) {
+            self.addNote($form, note);
+            self.reenableTargetFormSubmitButton(e);
+            self.resetMainTargetForm(e);
+          }
+        },
+        error() {
+          $notesContainer.find(`#${uniqueId}`).remove();
+          self.addNoteError($form);
         }
       });
+
+      return $closeBtn.text($closeBtn.data('original-text'));
     };
 
     Notes.prototype.updateComment = function(e) {
@@ -1226,15 +1230,13 @@ const normalizeNewlines = function(str) {
       const $closeBtn = $form.find('.js-note-target-close');
       const $editingNote = $form.parents('.note.is-editting');
       const $noteBody = $editingNote.find('.js-task-list-container');
+      const $noteBodyText = $noteBody.find('.note-text');
 
-      $noteBody.find('.md.note-text').html(formContent); // If we ever preview it, use preview instead!
-      $noteBody.find('.original-note-content').text(formContent);
-      $noteBody.find('.js-task-list-field').text(formContent);
+      const cachedNoteBodyText = $noteBodyText.html();
+      $noteBodyText.html(formContent);
 
-      $editingNote.removeClass('is-editting');
-      $editingNote.addClass('being-posted');
+      $editingNote.removeClass('is-editting').addClass('being-posted fade-in');
       $editingNote.find('.note-headline-meta a').html('<i class="fa fa-spinner fa-spin"></i>');
-      $editingNote.addClass('fade-in');
 
       $.ajax({
         type: 'POST',
@@ -1242,6 +1244,15 @@ const normalizeNewlines = function(str) {
         data: formData,
         success(note) {
           self.updateNote(null, note, null);
+        },
+        error() {
+          // Revert back to original note
+          $noteBodyText.html(cachedNoteBodyText);
+          $editingNote.removeClass('being-posted fade-in');
+          $editingNote.find('.fa.fa-spinner').remove();
+
+          // Show Flash message about failure
+          self.updateNoteError();
         }
       });
 
