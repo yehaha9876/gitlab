@@ -71,7 +71,7 @@ describe('Pipelines Stage', () => {
 
       const component = new StageComponent({
         propsData: { stage: { status: { icon: 'foo' } } },
-      });
+      }).$mount();
 
       expect(
         component.$el.classList.contains('open'),
