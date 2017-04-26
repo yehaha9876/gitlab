@@ -897,8 +897,6 @@
  * Top arrow in the dropdown in the mini pipeline graph
  */
 .mini-pipeline-graph-dropdown-menu {
-  overflow: visible; // Needed for the arrow to be visible.
-
   .arrow-up {
     &::before,
     &::after {
