@@ -705,6 +705,10 @@ ul.notes {
   }
 }
 
+.discussion-notes .flash-container {
+  margin-bottom: 0;
+}
+
 // Merge request notes in diffs
 .diff-file {
   // Diff is side by side
