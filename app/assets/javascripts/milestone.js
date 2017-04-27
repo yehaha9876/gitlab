@@ -21,7 +21,7 @@
 
     Milestone.sortIssues = function(data) {
       var sort_issues_url;
-      sort_issues_url = location.href + "/sort_issues";
+      sort_issues_url = location.pathname + "/sort_issues";
       return $.ajax({
         type: "PUT",
         url: sort_issues_url,
@@ -38,7 +38,7 @@
 
     Milestone.sortMergeRequests = function(data) {
       var sort_mr_url;
-      sort_mr_url = location.href + "/sort_merge_requests";
+      sort_mr_url = location.pathname + "/sort_merge_requests";
       return $.ajax({
         type: "PUT",
         url: sort_mr_url,
@@ -81,10 +81,14 @@
     };
 
     function Milestone() {
-      var oldMouseStart;
       this.bindIssuesSorting();
-      this.bindMergeRequestSorting();
       this.bindTabsSwitching();
+
+      // Load merge request tab if it is active
+      // merge request tab is active based on different conditions in the backend
+      this.loadTab($('.js-milestone-tabs .active a'));
+
+      this.loadInitialTab();
     }
 
     Milestone.prototype.bindIssuesSorting = function() {
@@ -100,13 +104,11 @@
     };
 
     Milestone.prototype.bindTabsSwitching = function() {
-      return $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
-        var currentTabClass, previousTabClass;
-        currentTabClass = $(e.target).data('show');
-        previousTabClass = $(e.relatedTarget).data('show');
-        $(previousTabClass).hide();
-        $(currentTabClass).removeClass('hidden');
-        return $(currentTabClass).show();
+      return $('a[data-toggle="tab"]').on('show.bs.tab', (e) => {
+        const $target = $(e.target);
+
+        location.hash = $target.attr('href');
+        this.loadTab($target);
       });
     };
 
@@ -167,6 +169,35 @@
           this.options.onUpdate.call(this, e);
         }
       });
+    };
+
+    Milestone.prototype.loadInitialTab = function() {
+      const $target = $(`.js-milestone-tabs a[href="${location.hash}"]`);
+
+      if ($target.length) {
+        $target.tab('show');
+      }
+    };
+
+    Milestone.prototype.loadTab = function($target) {
+      const endpoint = $target.data('endpoint');
+      const tabElId = $target.attr('href');
+
+      if (endpoint && !$target.hasClass('is-loaded')) {
+        $.ajax({
+          url: endpoint,
+          dataType: 'JSON',
+        })
+        .fail(() => new Flash('Error loading milestone tab'))
+        .done((data) => {
+          $(tabElId).html(data.html);
+          $target.addClass('is-loaded');
+
+          if (tabElId === '#tab-merge-requests') {
+            this.bindMergeRequestSorting();
+          }
+        });
+      }
     };
 
     return Milestone;
