@@ -152,11 +152,29 @@ a {
   }
 
   100% {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn $fade-in-duration 1;
+}
+
+@keyframes fadeInHalf {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
     opacity: 0.5;
   }
 }
 
-@keyframes fadeInComplete {
+.fade-in-half {
+  animation: fadeInHalf $fade-in-duration 1;
+}
+
+@keyframes fadeInFull {
   0% {
     opacity: 0.5;
   }
@@ -166,10 +184,6 @@ a {
   }
 }
 
-.fade-in {
-  animation: fadeIn $fade-in-duration 1;
-}
-
-.fade-in-complete {
-  animation: fadeInComplete $fade-in-duration 1;
+.fade-in-full {
+  animation: fadeInFull $fade-in-duration 1;
 }
