@@ -14,8 +14,9 @@ describe UpdateUploadPathsToSystem do
       _upload_with_system_path = create(:upload, model: create(:empty_project), path: "uploads/system/project/avatar.jpg")
       _upload_with_other_path = create(:upload, model: create(:empty_project), path: "thelongsecretforafileupload/avatar.jpg")
       old_upload = create(:upload, model: create(:empty_project), path: "uploads/project/avatar.jpg")
+      group_upload = create(:upload, model: create(:group), path: "uploads/group/avatar.jpg")
 
-      expect(Upload.where(migration.uploads_to_switch_to_new_path)).to contain_exactly(old_upload)
+      expect(Upload.where(migration.uploads_to_switch_to_new_path)).to contain_exactly(old_upload, group_upload)
     end
   end
 
