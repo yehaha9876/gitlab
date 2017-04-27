@@ -91,7 +91,7 @@ const normalizeNewlines = function(str) {
       $(document).on("click", ".js-comment-save-button", this.updateComment);
       $(document).on("keyup input", ".js-note-text", this.updateTargetButtons);
       // resolve a discussion
-      $(document).on('click', '.js-comment-resolve-button', this.resolveDiscussion);
+      $(document).on('click', '.js-comment-resolve-button', this.postComment);
       // remove a note (in general)
       $(document).on("click", ".js-note-delete", this.removeNote);
       // delete note attachment
@@ -594,7 +594,7 @@ const normalizeNewlines = function(str) {
       var $html, $note_li;
       // Convert returned HTML to a jQuery object so we can modify it further
       $html = $(noteEntity.html);
-      $html.addClass('fade-in-complete');
+      $html.addClass('fade-in-full');
       this.revertNoteEditForm();
       gl.utils.localTimeAgo($('.js-timeago', $html));
       $html.renderGFM();
@@ -1066,17 +1066,6 @@ const normalizeNewlines = function(str) {
       return this.notesCountBadge.text(parseInt(this.notesCountBadge.text(), 10) + updateCount);
     };
 
-    Notes.prototype.resolveDiscussion = function() {
-      var $this = $(this);
-      var discussionId = $this.attr('data-discussion-id');
-
-      $this
-        .closest('form')
-        .attr('data-discussion-id', discussionId)
-        .attr('data-resolve-all', 'true')
-        .attr('data-project-path', $this.attr('data-project-path'));
-    };
-
     Notes.prototype.toggleCommitList = function(e) {
       const $element = $(e.currentTarget);
       const $closestSystemCommitList = $element.siblings('.system-note-commit-list');
@@ -1125,7 +1114,7 @@ const normalizeNewlines = function(str) {
     Notes.animateAppendNote = function(noteHtml, $notesList) {
       const $note = $(noteHtml);
 
-      $note.addClass('fade-in').renderGFM();
+      $note.addClass('fade-in-full').renderGFM();
       $notesList.append($note);
       return $note;
     };
@@ -1138,20 +1127,26 @@ const normalizeNewlines = function(str) {
       return $updatedNote;
     };
 
-    Notes.prototype.getFormData = function(target) {
-      const $form = $(target).parents('form');
-
+    /**
+     * Get data from Form attributes to use for saving/submitting comment.
+     */
+    Notes.prototype.getFormData = function($form) {
       return {
-        $form,
         formData: $form.serialize(),
         formContent: $form.find('.js-note-text').val(),
         formAction: $form.attr('action'),
       };
     };
 
+    /**
+     * Create placeholder note DOM element populated with comment body
+     * that we will show while comment is being posted.
+     * Once comment is _actually_ posted on server, we will have final element
+     * in response that we will show in place of this temporary element.
+     */
     Notes.prototype.createPlaceholderNote = function(formContent, uniqueId) {
       const $tempNote = $(
-        `<li id="${uniqueId}" class="note being-posted fade-in timeline-entry">
+        `<li id="${uniqueId}" class="note being-posted fade-in-half timeline-entry">
            <div class="timeline-entry-inner">
               <div class="timeline-icon">
                  <a href="/${gon.current_username}"><span class="dummy-avatar"></span></a>
@@ -1164,7 +1159,7 @@ const normalizeNewlines = function(str) {
                          <span class="note-headline-light">@${gon.current_username}</span>
                        </a>
                        <span class="note-headline-light">
-                          <i class="fa fa-spinner fa-spin"></i>
+                          <i class="fa fa-spinner fa-spin" aria-label="Comment is being posted" aria-hidden="true"></i>
                        </span>
                     </div>
                  </div>
@@ -1179,80 +1174,149 @@ const normalizeNewlines = function(str) {
       return $tempNote;
     };
 
+    /**
+     * This method does following tasks step-by-step whenever a new comment
+     * is submitted by user (both main thread comments as well as discussion comments).
+     *
+     * 1) Get Form metadata
+     * 2) Identify comment type; a) Main thread b) Discussion thread c) Discussion resolve
+     * 3) Build temporary placeholder element (using `createPlaceholderNote`)
+     * 4) Show placeholder note on UI
+     * 5) Perform network request to submit the note
+     *    a) If request is successfully completed
+     *        1. Remove placeholder element
+     *        2. Show submitted Note element
+     *        3. Perform post-submit errands
+     *           a. Mark discussion as resolved if comment submission was for resolve.
+     *           b. Reset comment form to original state.
+     *    b) If request failed
+     *        1. Remove placeholder element
+     *        2. Show error Flash message about failure
+     */
     Notes.prototype.postComment = function(e) {
       e.preventDefault();
-      const self = this;
-      const { $form, formData, formContent, formAction } = self.getFormData(e.target);
+
+      // Get Form metadata
+      const $submitBtn = $(e.target);
+      const $form = $submitBtn.parents('form');
       const $closeBtn = $form.find('.js-note-target-close');
       const isMainForm = $form.hasClass('js-main-target-form');
       const isDiscussionForm = $form.hasClass('js-discussion-note-form');
-      const uniqueId = Date.now();
+      const isDiscussionResolve = $submitBtn.hasClass('js-comment-resolve-button');
+      const { formData, formContent, formAction } = this.getFormData($form);
+      const uniqueId = gl.utils.guid();
       let $notesContainer;
 
+      // Get reference to notes container based on type of comment
       if (isDiscussionForm) {
         $notesContainer = $form.parent('.discussion-notes').find('.notes');
       } else if (isMainForm) {
         $notesContainer = $('ul.main-notes-list');
       }
 
+      // If comment is to resolve discussion, disable submit buttons while
+      // comment posting is finished.
+      if (isDiscussionResolve) {
+        $submitBtn.disable();
+        $form.find('.js-comment-submit-button').disable();
+      }
+
+      // Show placeholder note and clear the form textarea
       $notesContainer.append(this.createPlaceholderNote(formContent, uniqueId));
       $form.find('.js-note-text').val('');
 
+      // Make request to submit comment on server
       $.ajax({
         type: 'POST',
         url: formAction,
         data: formData,
-        success(note) {
+        success: (note) => {
+          // Submission successful! remove placeholder
           $notesContainer.find(`#${uniqueId}`).remove();
+
+          // Check if this was discussion comment
           if (isDiscussionForm) {
+            // Remove flash-container
             $notesContainer.find('.flash-container').remove();
-            self.addDiscussionNote($form, note);
+
+            // If comment intends to resolve discussion, do the same.
+            if (isDiscussionResolve) {
+              $form
+                .attr('data-discussion-id', $submitBtn.data('discussion-id'))
+                .attr('data-resolve-all', 'true')
+                .attr('data-project-path', $submitBtn.data('project-path'));
+            }
+
+            // Show final note element on UI and append flash-container after that
+            this.addDiscussionNote($form, note);
             $notesContainer.append('<div class="flash-container" style="display: none;"></div>');
-          } else if (isMainForm) {
-            self.addNote($form, note);
-            self.reenableTargetFormSubmitButton(e);
-            self.resetMainTargetForm(e);
+          } else if (isMainForm) { // Check if this was main thread comment
+            // Show final note element on UI and perform form and action buttons cleanup
+            this.addNote($form, note);
+            this.reenableTargetFormSubmitButton(e);
+            this.resetMainTargetForm(e);
           }
         },
-        error() {
+        error: () => {
+          // Submission failed, remove placeholder note and show Flash error message
           $notesContainer.find(`#${uniqueId}`).remove();
-          self.addNoteError($form);
+          this.addNoteError($form);
         }
       });
 
       return $closeBtn.text($closeBtn.data('original-text'));
     };
 
+    /**
+     * This method does following tasks step-by-step whenever an existing comment
+     * is updated by user (both main thread comments as well as discussion comments).
+     *
+     * 1) Get Form metadata
+     * 2) Update note element with new content
+     * 3) Perform network request to submit the updated note
+     *    a) If request is successfully completed
+     *        1. Show submitted Note element
+     *    b) If request failed
+     *        1. Revert Note element to original content
+     *        2. Show error Flash message about failure
+     */
     Notes.prototype.updateComment = function(e) {
       e.preventDefault();
-      const self = this;
-      const { $form, formData, formContent, formAction } = self.getFormData(e.target);
+
+      // Get Form metadata
+      const $submitBtn = $(e.target);
+      const $form = $submitBtn.parents('form');
       const $closeBtn = $form.find('.js-note-target-close');
       const $editingNote = $form.parents('.note.is-editting');
       const $noteBody = $editingNote.find('.js-task-list-container');
       const $noteBodyText = $noteBody.find('.note-text');
+      const { formData, formContent, formAction } = this.getFormData($form);
 
+      // Cache original comment content
       const cachedNoteBodyText = $noteBodyText.html();
+
+      // Show updated comment content temporarily
       $noteBodyText.html(formContent);
+      $editingNote.removeClass('is-editting').addClass('being-posted fade-in-half');
+      $editingNote.find('.note-headline-meta a').html('<i class="fa fa-spinner fa-spin" aria-label="Comment is being updated" aria-hidden="true"></i>');
 
-      $editingNote.removeClass('is-editting').addClass('being-posted fade-in');
-      $editingNote.find('.note-headline-meta a').html('<i class="fa fa-spinner fa-spin"></i>');
-
+      // Make request to update comment on server
       $.ajax({
         type: 'POST',
         url: formAction,
         data: formData,
-        success(note) {
-          self.updateNote(null, note, null);
+        success: (note) => {
+          // Submission successful! render final note element
+          this.updateNote(null, note, null);
         },
-        error() {
-          // Revert back to original note
+        error: () => {
+          // Submission failed, revert back to original note
           $noteBodyText.html(cachedNoteBodyText);
           $editingNote.removeClass('being-posted fade-in');
           $editingNote.find('.fa.fa-spinner').remove();
 
           // Show Flash message about failure
-          self.updateNoteError();
+          this.updateNoteError();
         }
       });
 
