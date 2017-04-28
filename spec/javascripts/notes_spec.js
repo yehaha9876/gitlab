@@ -238,8 +238,8 @@ import '~/notes';
         $resultantNote = Notes.animateAppendNote(noteHTML, $notesList);
       });
 
-      it('should have `fade-in` class', () => {
-        expect($resultantNote.hasClass('fade-in')).toEqual(true);
+      it('should have `fade-in-full` class', () => {
+        expect($resultantNote.hasClass('fade-in-full')).toEqual(true);
       });
 
       it('should append note to the notes list', () => {
