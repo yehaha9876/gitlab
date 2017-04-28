@@ -1139,17 +1139,6 @@ const normalizeNewlines = function(str) {
     };
 
     /**
-     * Perform network request to submit form contents and return jQuery Defferred.
-     */
-    Notes.prototype.submitComment = function(formAction, formData) {
-      return $.ajax({
-        type: 'POST',
-        url: formAction,
-        data: formData,
-      });
-    };
-
-    /**
      * Create placeholder note DOM element populated with comment body
      * that we will show while comment is being posted.
      * Once comment is _actually_ posted on server, we will have final element
@@ -1193,7 +1182,7 @@ const normalizeNewlines = function(str) {
      * 2) Identify comment type; a) Main thread b) Discussion thread c) Discussion resolve
      * 3) Build temporary placeholder element (using `createPlaceholderNote`)
      * 4) Show placeholder note on UI
-     * 5) Perform network request to submit the note using `submitComment`
+     * 5) Perform network request to submit the note using `gl.utils.ajaxPost`
      *    a) If request is successfully completed
      *        1. Remove placeholder element
      *        2. Show submitted Note element
@@ -1238,7 +1227,7 @@ const normalizeNewlines = function(str) {
 
       /* eslint-disable promise/catch-or-return */
       // Make request to submit comment on server
-      this.submitComment(formAction, formData)
+      gl.utils.ajaxPost(formAction, formData)
         .then((note) => {
           // Submission successful! remove placeholder
           $notesContainer.find(`#${uniqueId}`).remove();
@@ -1280,7 +1269,7 @@ const normalizeNewlines = function(str) {
      *
      * 1) Get Form metadata
      * 2) Update note element with new content
-     * 3) Perform network request to submit the updated note using `submitComment`
+     * 3) Perform network request to submit the updated note using `gl.utils.ajaxPost`
      *    a) If request is successfully completed
      *        1. Show submitted Note element
      *    b) If request failed
@@ -1309,7 +1298,7 @@ const normalizeNewlines = function(str) {
 
       /* eslint-disable promise/catch-or-return */
       // Make request to update comment on server
-      this.submitComment(formAction, formData)
+      gl.utils.ajaxPost(formAction, formData)
         .then((note) => {
           // Submission successful! render final note element
           this.updateNote(null, note, null);
