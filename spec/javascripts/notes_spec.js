@@ -272,5 +272,144 @@ import '~/notes';
         expect($note.replaceWith).toHaveBeenCalledWith($updatedNote);
       });
     });
+
+    describe('getFormData', () => {
+      it('should return form metadata object from form reference', () => {
+        this.notes = new Notes();
+
+        const $form = $('form');
+        const sampleComment = 'foobar';
+        $form.find('textarea.js-note-text').val(sampleComment);
+        const { formData, formContent, formAction } = this.notes.getFormData($form);
+
+        expect(formData.indexOf(sampleComment) > -1).toBe(true);
+        expect(formContent).toEqual(sampleComment);
+        expect(formAction).toEqual($form.attr('action'));
+      });
+    });
+
+    describe('createPlaceholderNote', () => {
+      it('should return constructed placeholder element based on form contents', () => {
+        this.notes = new Notes();
+        window.gon.current_username = 'root';
+        window.gon.current_user_fullname = 'Administrator';
+
+        const sampleComment = 'foobar';
+        const uniqueId = 'b1234-a4567';
+        const $tempNote = this.notes.createPlaceholderNote(sampleComment, uniqueId);
+        const $tempNoteHeader = $tempNote.find('.note-header');
+
+        expect($tempNote.prop('nodeName')).toEqual('LI');
+        expect($tempNote.attr('id')).toEqual(uniqueId);
+        $tempNote.find('.timeline-icon > a, .note-header-info > a').each(function() {
+          expect($(this).attr('href')).toEqual(`/${window.gon.current_username}`);
+        });
+        expect($tempNoteHeader.find('.hidden-xs').text().trim()).toEqual(window.gon.current_user_fullname);
+        expect($tempNoteHeader.find('.note-headline-light').text().trim()).toEqual(`@${window.gon.current_username}`);
+        expect($tempNote.find('.note-body .note-text').text().trim()).toEqual(sampleComment);
+      });
+    });
+
+    describe('postComment & updateComment', () => {
+      const sampleComment = 'foo';
+      const updatedComment = 'bar';
+      const note = {
+        id: 1234,
+        html: `<li class="note note-row-1234 timeline-entry" id="note_1234">
+                <div class="note-text">${sampleComment}</div>
+               </li>`,
+        note: sampleComment,
+        valid: true
+      };
+      let $form;
+      let $notesContainer;
+
+      beforeEach(() => {
+        this.notes = new Notes();
+        window.gon.current_username = 'root';
+        window.gon.current_user_fullname = 'Administrator';
+        $form = $('form');
+        $notesContainer = $('ul.main-notes-list');
+        $form.find('textarea.js-note-text').val(sampleComment);
+        $('.js-comment-button').click();
+      });
+
+      it('should show placeholder note while new comment is being posted', () => {
+        expect($notesContainer.find('.note.being-posted').length > 0).toEqual(true);
+      });
+
+      it('should remove placeholder note when new comment is done posting', () => {
+        spyOn($, 'ajax').and.callFake((options) => {
+          options.success(note);
+          expect($notesContainer.find('.note.being-posted').length).toEqual(0);
+        });
+      });
+
+      it('should show actual note element when new comment is done posting', () => {
+        spyOn($, 'ajax').and.callFake((options) => {
+          options.success(note);
+          expect($notesContainer.find(`#${note.id}`).length > 0).toEqual(true);
+        });
+      });
+
+      it('should show flash error message when new comment failed to be posted', () => {
+        spyOn($, 'ajax').and.callFake((options) => {
+          options.error();
+          expect($notesContainer.parent().find('.flash-container .flash-text').is(':visible')).toEqual(true);
+        });
+      });
+
+      it('should show updated comment as _actively being posted_ while comment being updated', () => {
+        spyOn($, 'ajax').and.callFake((options) => {
+          options.success(note);
+          const $noteEl = $notesContainer.find(`#note_${note.id}`);
+          $noteEl.find('.js-note-edit').click();
+          $noteEl.find('textarea.js-note-text').val(updatedComment);
+          $noteEl.find('.js-comment-save-button').click();
+          expect($noteEl.hasClass('.being-posted')).toEqual(true);
+          expect($noteEl.find('.note-text').text()).toEqual(updatedComment);
+        });
+      });
+
+      it('should show updated comment when comment update is done posting', () => {
+        spyOn($, 'ajax').and.callFake((options) => {
+          options.success(note);
+          const $noteEl = $notesContainer.find(`#note_${note.id}`);
+          $noteEl.find('.js-note-edit').click();
+          $noteEl.find('textarea.js-note-text').val(updatedComment);
+          $noteEl.find('.js-comment-save-button').click();
+
+          spyOn($, 'ajax').and.callFake((updateOptions) => {
+            const updatedNote = Object.assign({}, note);
+            updatedNote.note = updatedComment;
+            updatedNote.html = `<li class="note note-row-1234 timeline-entry" id="note_1234">
+                                  <div class="note-text">${updatedComment}</div>
+                                </li>`;
+            updateOptions.success(updatedNote);
+            const $updatedNoteEl = $notesContainer.find(`#note_${updatedNote.id}`);
+            expect($updatedNoteEl.hasClass('.being-posted')).toEqual(false); // Remove being-posted visuals
+            expect($updatedNoteEl.find('note-text').text().trim()).toEqual(updatedComment); // Verify if comment text updated
+          });
+        });
+      });
+
+      it('should show flash error message when comment failed to be updated', () => {
+        spyOn($, 'ajax').and.callFake((options) => {
+          options.success(note);
+          const $noteEl = $notesContainer.find(`#note_${note.id}`);
+          $noteEl.find('.js-note-edit').click();
+          $noteEl.find('textarea.js-note-text').val(updatedComment);
+          $noteEl.find('.js-comment-save-button').click();
+
+          spyOn($, 'ajax').and.callFake((updateOptions) => {
+            updateOptions.error();
+            const $updatedNoteEl = $notesContainer.find(`#note_${note.id}`);
+            expect($updatedNoteEl.hasClass('.being-posted')).toEqual(false); // Remove being-posted visuals
+            expect($updatedNoteEl.find('note-text').text().trim()).toEqual(sampleComment); // See if comment reverted back to original
+            expect($notesContainer.parent().find('.flash-container .flash-text').is(':visible')).toEqual(true); // Flash error message shown
+          });
+        });
+      });
+    });
   });
 }).call(window);
