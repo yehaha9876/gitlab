@@ -20,4 +20,3 @@ describe "projects/imports/new.html.haml" do
     end
   end
 end
-
