@@ -113,9 +113,10 @@ describe 'Issue Boards', feature: true, js: true do
 
         page.within('.dropdown-menu-user') do
           click_link 'Unassigned'
-
-          wait_for_vue_resource
         end
+
+        find('.dropdown-menu-toggle').click
+        wait_for_vue_resource
 
         expect(page).to have_content('No assignee')
       end
@@ -129,7 +130,7 @@ describe 'Issue Boards', feature: true, js: true do
       page.within(find('.assignee')) do
         expect(page).to have_content('No assignee')
 
-        click_link 'assign yourself'
+        find('.btn-link', text: 'assign yourself').click
 
         wait_for_vue_resource
 
