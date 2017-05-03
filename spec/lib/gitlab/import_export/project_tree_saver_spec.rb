@@ -219,7 +219,7 @@ describe Gitlab::ImportExport::ProjectTreeSaver, services: true do
                      releases: [release],
                      group: group
                     )
-    project.update(description_html: 'description')
+    project.update_column(:description_html, 'description')
     project_label = create(:label, project: project)
     group_label = create(:group_label, group: group)
     create(:label_link, label: project_label, target: issue)

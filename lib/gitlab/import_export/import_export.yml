@@ -120,8 +120,4 @@ methods:
   merge_requests:
     - :diff_head_sha
   project:
-<<<<<<< HEAD
     - :description_html
-=======
-    - :description_html
->>>>>>> ce/9-1-stable
