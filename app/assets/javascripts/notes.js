@@ -26,6 +26,7 @@ const normalizeNewlines = function(str) {
 
   this.Notes = (function() {
     const MAX_VISIBLE_COMMIT_LIST_COUNT = 3;
+    const REGEX_SLASH_COMMANDS = /\/\w+/g;
 
     Notes.interval = null;
 
@@ -1139,19 +1140,34 @@ const normalizeNewlines = function(str) {
     };
 
     /**
+     * Identify if comment has any slash commands
+     */
+    Notes.prototype.hasSlashCommands = function(formContent) {
+      return REGEX_SLASH_COMMANDS.test(formContent);
+    };
+
+    /**
+     * Remove slash commands and leave comment with pure message
+     */
+    Notes.prototype.stripSlashCommands = function(formContent) {
+      return formContent.replace(REGEX_SLASH_COMMANDS, '').trim();
+    };
+
+    /**
      * Create placeholder note DOM element populated with comment body
      * that we will show while comment is being posted.
      * Once comment is _actually_ posted on server, we will have final element
      * in response that we will show in place of this temporary element.
      */
-    Notes.prototype.createPlaceholderNote = function(formContent, uniqueId) {
+    Notes.prototype.createPlaceholderNote = function(formContent, uniqueId, isDiscussionNote) {
+      const discussionCls = isDiscussionNote ? 'discussion' : '';
       const $tempNote = $(
         `<li id="${uniqueId}" class="note being-posted fade-in-half timeline-entry">
            <div class="timeline-entry-inner">
               <div class="timeline-icon">
                  <a href="/${gon.current_username}"><span class="dummy-avatar"></span></a>
               </div>
-              <div class="timeline-content">
+              <div class="timeline-content ${discussionCls}">
                  <div class="note-header">
                     <div class="note-header-info">
                        <a href="/${gon.current_username}">
@@ -1200,12 +1216,14 @@ const normalizeNewlines = function(str) {
       const $submitBtn = $(e.target);
       const $form = $submitBtn.parents('form');
       const $closeBtn = $form.find('.js-note-target-close');
+      const commentType = $submitBtn.parent().find('li.droplab-item-selected').attr('id');
       const isMainForm = $form.hasClass('js-main-target-form');
       const isDiscussionForm = $form.hasClass('js-discussion-note-form');
       const isDiscussionResolve = $submitBtn.hasClass('js-comment-resolve-button');
       const { formData, formContent, formAction } = this.getFormData($form);
       const uniqueId = gl.utils.guid();
       let $notesContainer;
+      let tempFormContent;
 
       // Get reference to notes container based on type of comment
       if (isDiscussionForm) {
@@ -1221,8 +1239,17 @@ const normalizeNewlines = function(str) {
         $form.find('.js-comment-submit-button').disable();
       }
 
-      // Show placeholder note and clear the form textarea
-      $notesContainer.append(this.createPlaceholderNote(formContent, uniqueId));
+      tempFormContent = formContent;
+      if (this.hasSlashCommands(formContent)) {
+        tempFormContent = this.stripSlashCommands(formContent);
+      }
+
+      if (tempFormContent) {
+        // Show placeholder note
+        $notesContainer.append(this.createPlaceholderNote(tempFormContent, uniqueId, commentType === 'discussion'));
+      }
+
+      // Clear the form textarea
       $form.find('.js-note-text').val('');
 
       /* eslint-disable promise/catch-or-return */
@@ -1254,6 +1281,8 @@ const normalizeNewlines = function(str) {
             this.reenableTargetFormSubmitButton(e);
             this.resetMainTargetForm(e);
           }
+
+          $form.trigger('ajax:success', [note]);
         }).fail(() => {
           // Submission failed, remove placeholder note and show Flash error message
           $notesContainer.find(`#${uniqueId}`).remove();
