@@ -56,17 +56,17 @@ describe('Sidebar store', () => {
     expect(this.store.assignees.length).toEqual(0);
   });
 
-  it('process assigned data', () => {
+  it('set assigned data', () => {
     const users = {
       assignees: Mock.createNumberRandomUsers(3),
     };
 
-    this.store.processAssigneeData(users);
+    this.store.setAssigneeData(users);
     expect(this.store.assignees.length).toEqual(3);
   });
 
-  it('process time tracking data', () => {
-    this.store.processTimeTrackingData(Mock.time);
+  it('set time tracking data', () => {
+    this.store.setTimeTrackingData(Mock.time);
     expect(this.store.timeEstimate).toEqual(Mock.time.time_estimate);
     expect(this.store.totalTimeSpent).toEqual(Mock.time.total_time_spent);
     expect(this.store.humanTimeEstimate).toEqual(Mock.time.human_time_estimate);
