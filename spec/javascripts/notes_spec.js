@@ -288,15 +288,50 @@ import '~/notes';
       });
     });
 
+    describe('hasSlashCommands', () => {
+      beforeEach(() => {
+        this.notes = new Notes();
+      });
+
+      it('should return true when comment has slash commands', () => {
+        const sampleComment = '/wip /milestone %1.0 /merge /unassign Merging this';
+        const hasSlashCommands = this.notes.hasSlashCommands(sampleComment);
+
+        expect(hasSlashCommands).toBeTruthy();
+      });
+
+      it('should return false when comment does NOT have any slash commands', () => {
+        const sampleComment = 'Looking good, Awesome!';
+        const hasSlashCommands = this.notes.hasSlashCommands(sampleComment);
+
+        expect(hasSlashCommands).toBeFalsy();
+      });
+    });
+
+    describe('stripSlashCommands', () => {
+      const REGEX_SLASH_COMMANDS = /\/\w+/g;
+
+      it('should strip slash commands from the comment', () => {
+        this.notes = new Notes();
+        const sampleComment = '/wip /milestone %1.0 /merge /unassign Merging this';
+        const stripedComment = this.notes.stripSlashCommands(sampleComment);
+
+        expect(REGEX_SLASH_COMMANDS.test(stripedComment)).toBeFalsy();
+      });
+    });
+
     describe('createPlaceholderNote', () => {
-      it('should return constructed placeholder element based on form contents', () => {
+      const sampleComment = 'foobar';
+      const uniqueId = 'b1234-a4567';
+
+      beforeEach(() => {
         this.notes = new Notes();
         window.gon.current_username = 'root';
         window.gon.current_user_fullname = 'Administrator';
+      });
 
-        const sampleComment = 'foobar';
-        const uniqueId = 'b1234-a4567';
-        const $tempNote = this.notes.createPlaceholderNote(sampleComment, uniqueId);
+      it('should return constructed placeholder element for regular note based on form contents', () => {
+        const $tempNote = this.notes.createPlaceholderNote(sampleComment, uniqueId, false);
         const $tempNoteHeader = $tempNote.find('.note-header');
 
         expect($tempNote.prop('nodeName')).toEqual('LI');
@@ -304,9 +339,17 @@ import '~/notes';
         $tempNote.find('.timeline-icon > a, .note-header-info > a').each(function() {
           expect($(this).attr('href')).toEqual(`/${window.gon.current_username}`);
         });
+        expect($tempNote.find('.timeline-content').hasClass('discussion')).toBeFalsy();
         expect($tempNoteHeader.find('.hidden-xs').text().trim()).toEqual(window.gon.current_user_fullname);
         expect($tempNoteHeader.find('.note-headline-light').text().trim()).toEqual(`@${window.gon.current_username}`);
         expect($tempNote.find('.note-body .note-text').text().trim()).toEqual(sampleComment);
+      });
+
+      it('should return constructed placeholder element for discussion note based on form contents', () => {
+        const $tempNote = this.notes.createPlaceholderNote(sampleComment, uniqueId, true);
+
+        expect($tempNote.prop('nodeName')).toEqual('LI');
+        expect($tempNote.find('.timeline-content').hasClass('discussion')).toBeTruthy();
       });
     });
 
@@ -349,6 +392,14 @@ import '~/notes';
         spyOn($, 'ajax').and.callFake((options) => {
           options.success(note);
           expect($notesContainer.find(`#${note.id}`).length > 0).toEqual(true);
+        });
+      });
+
+      it('should trigger ajax:success event on Form when new comment is done posting', () => {
+        spyOn($, 'ajax').and.callFake((options) => {
+          options.success(note);
+          spyOn($form, 'trigger');
+          expect($form.trigger).toHaveBeenCalledWith('ajax:success', [note]);
         });
       });
 
