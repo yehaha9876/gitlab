@@ -10,7 +10,7 @@ describe('Assignee component', () => {
     AssigneeComponent = Vue.extend(Assignee);
   });
 
-  describe('No assigness/users', () => {
+  describe('No assignees/users', () => {
     it('displays only "No assignee" when no users are assigned and the issue is read-only', () => {
       component = new AssigneeComponent({
         propsData: {

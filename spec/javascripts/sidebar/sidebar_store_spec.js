@@ -30,6 +30,12 @@ describe('Sidebar store', () => {
     });
   });
 
+
+  afterEach(() => {
+    this.store = null;
+    delete SidebarStore.singleton;
+  });
+
   it('adds a new assignee', () => {
     this.store.addAssignee(assignee);
     expect(this.store.assignees.length).toEqual(1);
