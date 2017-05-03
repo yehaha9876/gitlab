@@ -23,6 +23,7 @@ module SharedNote
     page.within(".js-main-target-form") do
       fill_in "note[note]", with: "XML attached"
       click_button "Comment"
+      wait_for_ajax
     end
   end
 
@@ -36,6 +37,7 @@ module SharedNote
   step 'I submit the comment' do
     page.within(".js-main-target-form") do
       click_button "Comment"
+      wait_for_ajax
     end
   end
 

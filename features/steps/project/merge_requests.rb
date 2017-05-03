@@ -98,7 +98,7 @@ class Spinach::Features::ProjectMergeRequests < Spinach::FeatureSteps
   end
 
   step 'I click link "Close"' do
-    first(:css, '.close-mr-link').click
+    first(:css, '.js-note-target-close').click
   end
 
   step 'I submit new merge request "Wiki Feature"' do

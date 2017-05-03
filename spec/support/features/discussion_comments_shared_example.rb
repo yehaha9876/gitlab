@@ -27,6 +27,7 @@ shared_examples 'discussion comments' do |resource_name|
 
       find(close_selector).click
 
+      wait_for_ajax
       find(comments_selector, match: :first)
       find("#{comments_selector}.system-note")
       entries = all(comments_selector)
