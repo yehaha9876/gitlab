@@ -113,6 +113,11 @@ const normalizeNewlines = function(str) {
       $(document).on("visibilitychange", this.visibilityChange);
       // when issue status changes, we need to refresh data
       $(document).on("issuable:change", this.refresh);
+      // ajax:events that happen on Form when actions like Reopen, Close are performed on Issues and MRs.
+      $(document).on("ajax:success", ".js-main-target-form", this.addNote);
+      $(document).on("ajax:success", ".js-discussion-note-form", this.addDiscussionNote);
+      $(document).on("ajax:success", ".js-main-target-form", this.resetMainTargetForm);
+      $(document).on("ajax:complete", ".js-main-target-form", this.reenableTargetFormSubmitButton);
       // when a key is clicked on the notes
       return $(document).on("keydown", ".js-note-text", this.keydownNoteText);
     };
@@ -132,6 +137,9 @@ const normalizeNewlines = function(str) {
       $(document).off("keydown", ".js-note-text");
       $(document).off('click', '.js-comment-resolve-button');
       $(document).off("click", '.system-note-commit-list-toggler');
+      $(document).off("ajax:success", ".js-main-target-form");
+      $(document).off("ajax:success", ".js-discussion-note-form");
+      $(document).off("ajax:complete", ".js-main-target-form");
     };
 
     Notes.initCommentTypeToggle = function (form) {
@@ -1339,7 +1347,7 @@ const normalizeNewlines = function(str) {
       const $submitBtn = $(e.target);
       const $form = $submitBtn.parents('form');
       const $closeBtn = $form.find('.js-note-target-close');
-      const $editingNote = $form.parents('.note.is-editting');
+      const $editingNote = $form.parents('.note.is-editing');
       const $noteBody = $editingNote.find('.js-task-list-container');
       const $noteBodyText = $noteBody.find('.note-text');
       const { formData, formContent, formAction } = this.getFormData($form);
@@ -1349,7 +1357,7 @@ const normalizeNewlines = function(str) {
 
       // Show updated comment content temporarily
       $noteBodyText.html(formContent);
-      $editingNote.removeClass('is-editting').addClass('being-posted fade-in-half');
+      $editingNote.removeClass('is-editing').addClass('being-posted fade-in-half');
       $editingNote.find('.note-headline-meta a').html('<i class="fa fa-spinner fa-spin" aria-label="Comment is being updated" aria-hidden="true"></i>');
 
       /* eslint-disable promise/catch-or-return */
