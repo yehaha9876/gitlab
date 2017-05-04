@@ -569,7 +569,7 @@ const normalizeNewlines = function(str) {
     Adds new note to list.
      */
 
-    Notes.prototype.addDiscussionNote = function($form, note) {
+    Notes.prototype.addDiscussionNote = function($form, note, isNewDiffComment) {
       if ($form.attr('data-resolve-all') != null) {
         var projectPath = $form.data('project-path');
         var discussionId = $form.data('discussion-id');
@@ -582,7 +582,9 @@ const normalizeNewlines = function(str) {
 
       this.renderNote(note, $form);
       // cleanup after successfully creating a diff/discussion note
-      this.removeDiscussionNoteForm($form);
+      if (isNewDiffComment) {
+        this.removeDiscussionNoteForm($form);
+      }
     };
 
     /*
@@ -1214,7 +1216,7 @@ const normalizeNewlines = function(str) {
 
       // Get Form metadata
       const $submitBtn = $(e.target);
-      const $form = $submitBtn.parents('form');
+      let $form = $submitBtn.parents('form');
       const $closeBtn = $form.find('.js-note-target-close');
       const commentType = $submitBtn.parent().find('li.droplab-item-selected').attr('id');
       const isMainForm = $form.hasClass('js-main-target-form');
@@ -1250,7 +1252,13 @@ const normalizeNewlines = function(str) {
       }
 
       // Clear the form textarea
-      $form.find('.js-note-text').val('');
+      if ($notesContainer.length) {
+        if (isMainForm) {
+          this.resetMainTargetForm(e);
+        } else if (isDiscussionForm) {
+          this.removeDiscussionNoteForm($form);
+        }
+      }
 
       /* eslint-disable promise/catch-or-return */
       // Make request to submit comment on server
@@ -1272,20 +1280,33 @@ const normalizeNewlines = function(str) {
                 .attr('data-project-path', $submitBtn.data('project-path'));
             }
 
-            // Show final note element on UI and append flash-container after that
-            this.addDiscussionNote($form, note);
-            $notesContainer.append('<div class="flash-container" style="display: none;"></div>');
+            // Show final note element on UI
+            this.addDiscussionNote($form, note, $notesContainer.length === 0);
+
+            // append flash-container to the Notes list
+            if ($notesContainer.length) {
+              $notesContainer.append('<div class="flash-container" style="display: none;"></div>');
+            }
           } else if (isMainForm) { // Check if this was main thread comment
             // Show final note element on UI and perform form and action buttons cleanup
             this.addNote($form, note);
             this.reenableTargetFormSubmitButton(e);
-            this.resetMainTargetForm(e);
           }
 
           $form.trigger('ajax:success', [note]);
         }).fail(() => {
           // Submission failed, remove placeholder note and show Flash error message
           $notesContainer.find(`#${uniqueId}`).remove();
+
+          // Show form again on UI on failure
+          if (isDiscussionForm && $notesContainer.length) {
+            const replyButton = $notesContainer.parent().find('.js-discussion-reply-button');
+            $.proxy(this.replyToDiscussionNote, replyButton[0], { target: replyButton[0] }).call();
+            $form = $notesContainer.parent().find('form');
+          }
+
+          $form.find('.js-note-text').val(formContent);
+          this.reenableTargetFormSubmitButton(e);
           this.addNoteError($form);
         });
 
