@@ -30,10 +30,8 @@ describe('Sidebar store', () => {
     });
   });
 
-
   afterEach(() => {
-    this.store = null;
-    delete SidebarStore.singleton;
+    SidebarStore.singleton = null;
   });
 
   it('adds a new assignee', () => {

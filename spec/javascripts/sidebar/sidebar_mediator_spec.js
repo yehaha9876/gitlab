@@ -1,11 +1,19 @@
 import Vue from 'vue';
 import SidebarMediator from '~/sidebar/sidebar_mediator';
+import SidebarStore from '~/sidebar/stores/sidebar_store';
+import SidebarService from '~/sidebar/services/sidebar_service';
 import Mock from './mock_data';
 
 describe('Sidebar mediator', () => {
   beforeEach(() => {
     Vue.http.interceptors.push(Mock.sidebarMockInterceptor);
     this.mediator = new SidebarMediator(Mock.mediator);
+  });
+
+  afterEach(() => {
+    SidebarService.singleton = null;
+    SidebarStore.singleton = null;
+    SidebarMediator.singleton = null;
   });
 
   it('assigns yourself ', () => {

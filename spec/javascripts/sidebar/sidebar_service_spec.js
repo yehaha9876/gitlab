@@ -2,10 +2,14 @@ import Vue from 'vue';
 import SidebarService from '~/sidebar/services/sidebar_service';
 import Mock from './mock_data';
 
-fdescribe('Sidebar service', () => {
+describe('Sidebar service', () => {
   beforeEach(() => {
     Vue.http.interceptors.push(Mock.sidebarMockInterceptor);
     this.service = new SidebarService('/gitlab-org/gitlab-shell/issues/5.json');
+  });
+
+  afterEach(() => {
+    SidebarService.singleton = null;
   });
 
   it('gets the data', (done) => {
