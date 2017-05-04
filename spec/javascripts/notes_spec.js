@@ -395,6 +395,13 @@ import '~/notes';
         });
       });
 
+      it('should reset Form when new comment is done posting', () => {
+        spyOn($, 'ajax').and.callFake((options) => {
+          options.success(note);
+          expect($form.find('textarea.js-note-text')).toEqual('');
+        });
+      });
+
       it('should trigger ajax:success event on Form when new comment is done posting', () => {
         spyOn($, 'ajax').and.callFake((options) => {
           options.success(note);
@@ -407,6 +414,13 @@ import '~/notes';
         spyOn($, 'ajax').and.callFake((options) => {
           options.error();
           expect($notesContainer.parent().find('.flash-container .flash-text').is(':visible')).toEqual(true);
+        });
+      });
+
+      it('should refill form textarea with original comment content when new comment failed to be posted', () => {
+        spyOn($, 'ajax').and.callFake((options) => {
+          options.error();
+          expect($form.find('textarea.js-note-text')).toEqual(sampleComment);
         });
       });
 
