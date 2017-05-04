@@ -274,7 +274,7 @@ describe SnippetsController do
       it 'returns LF line endings by default' do
         get action, id: personal_snippet.to_param
 
-        expect(response.body).to eq("first line\nsecond line\nthird line")
+        expect(response.body).to eq("first line\r\nsecond line\r\nthird line")
       end
 
       it 'does not convert line endings when parameter present' do

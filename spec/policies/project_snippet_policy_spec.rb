@@ -89,6 +89,8 @@ describe ProjectSnippetPolicy, models: true do
     context 'external user' do
       let(:current_user) { create(:user, :external) }
 
+      subject { abilities(current_user, :private) }
+
       it do
         is_expected.not_to include(:read_project_snippet)
         is_expected.not_to include(*author_permissions)
@@ -150,6 +152,8 @@ describe ProjectSnippetPolicy, models: true do
 
     context 'auditor user' do
       let(:current_user) { create(:user, :auditor) }
+
+      subject { abilities(current_user, :private) }
 
       it do
         is_expected.to include(:read_project_snippet)

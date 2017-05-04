@@ -194,7 +194,7 @@ describe SnippetsFinder do
     it "returns all snippets for admin users" do
       user = create(:user, :admin)
 
-      snippets = SnippetsFinder.new.execute(user, filter: :by_project, project: project1)
+      snippets = SnippetsFinder.new(user, filter: :by_project, project: project1).execute
 
       expect(snippets).to include(@snippet1, @snippet2, @snippet3)
     end
@@ -202,7 +202,7 @@ describe SnippetsFinder do
     it "returns all snippets for auditor users" do
       user = create(:user, :auditor)
 
-      snippets = SnippetsFinder.new.execute(user, filter: :by_project, project: project1)
+      snippets = SnippetsFinder.new(user, filter: :by_project, project: project1).execute
 
       expect(snippets).to include(@snippet1, @snippet2, @snippet3)
     end
