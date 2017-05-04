@@ -10,9 +10,7 @@ describe('sidebar bundle', () => {
   gl.sidebarOptions = Mock.mediator;
 
   beforeEach(() => {
-    spyOn(SidebarTimeTracking.methods, 'listenForSlashCommands').and.callFake((e, data) => {
-      console.log('arguments: ', data);
-    });
+    spyOn(SidebarTimeTracking.methods, 'listenForSlashCommands').and.callFake(() => { });
     preloadFixtures('issues/open-issue.html.raw');
     Vue.http.interceptors.push(Mock.sidebarMockInterceptor);
     loadFixtures('issues/open-issue.html.raw');
