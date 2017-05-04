@@ -323,30 +323,42 @@ import '~/notes';
     describe('createPlaceholderNote', () => {
       const sampleComment = 'foobar';
       const uniqueId = 'b1234-a4567';
+      const currentUsername = 'root';
+      const currentUserFullname = 'Administrator';
 
       beforeEach(() => {
         this.notes = new Notes();
-        window.gon.current_username = 'root';
-        window.gon.current_user_fullname = 'Administrator';
       });
 
       it('should return constructed placeholder element for regular note based on form contents', () => {
-        const $tempNote = this.notes.createPlaceholderNote(sampleComment, uniqueId, false);
+        const $tempNote = this.notes.createPlaceholderNote({
+          formContent: sampleComment,
+          uniqueId,
+          isDiscussionNote: false,
+          currentUsername,
+          currentUserFullname
+        });
         const $tempNoteHeader = $tempNote.find('.note-header');
 
         expect($tempNote.prop('nodeName')).toEqual('LI');
         expect($tempNote.attr('id')).toEqual(uniqueId);
         $tempNote.find('.timeline-icon > a, .note-header-info > a').each(function() {
-          expect($(this).attr('href')).toEqual(`/${window.gon.current_username}`);
+          expect($(this).attr('href')).toEqual(`/${currentUsername}`);
         });
         expect($tempNote.find('.timeline-content').hasClass('discussion')).toBeFalsy();
-        expect($tempNoteHeader.find('.hidden-xs').text().trim()).toEqual(window.gon.current_user_fullname);
-        expect($tempNoteHeader.find('.note-headline-light').text().trim()).toEqual(`@${window.gon.current_username}`);
+        expect($tempNoteHeader.find('.hidden-xs').text().trim()).toEqual(currentUserFullname);
+        expect($tempNoteHeader.find('.note-headline-light').text().trim()).toEqual(`@${currentUsername}`);
         expect($tempNote.find('.note-body .note-text').text().trim()).toEqual(sampleComment);
       });
 
       it('should return constructed placeholder element for discussion note based on form contents', () => {
-        const $tempNote = this.notes.createPlaceholderNote(sampleComment, uniqueId, true);
+        const $tempNote = this.notes.createPlaceholderNote({
+          formContent: sampleComment,
+          uniqueId,
+          isDiscussionNote: true,
+          currentUsername,
+          currentUserFullname
+        });
 
         expect($tempNote.prop('nodeName')).toEqual('LI');
         expect($tempNote.find('.timeline-content').hasClass('discussion')).toBeTruthy();
