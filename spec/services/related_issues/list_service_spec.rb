@@ -37,7 +37,7 @@ describe RelatedIssues::ListService, service: true do
 
       it 'verifies number of queries' do
         recorded = ActiveRecord::QueryRecorder.new { subject }
-        expect(recorded.count).to be_within(1).of(39)
+        expect(recorded.count).to be_within(1).of(42)
       end
 
       it 'returns related issues JSON' do
@@ -48,7 +48,6 @@ describe RelatedIssues::ListService, service: true do
             title: issue_b.title,
             iid: issue_b.iid,
             state: issue_b.state,
-            reference: issue_b.to_reference(project),
             path: "/#{project.full_path}/issues/#{issue_b.iid}",
             project_full_path: issue_b.project.full_path,
             namespace_full_path: issue_b.project.namespace.full_path,
@@ -61,7 +60,6 @@ describe RelatedIssues::ListService, service: true do
             title: issue_c.title,
             iid: issue_c.iid,
             state: issue_c.state,
-            reference: issue_c.to_reference(project),
             path: "/#{project.full_path}/issues/#{issue_c.iid}",
             project_full_path: issue_c.project.full_path,
             namespace_full_path: issue_c.project.namespace.full_path,
@@ -74,13 +72,53 @@ describe RelatedIssues::ListService, service: true do
             title: issue_d.title,
             iid: issue_d.iid,
             state: issue_d.state,
-            reference: issue_d.to_reference(project),
             path: "/#{project.full_path}/issues/#{issue_d.iid}",
             project_full_path: issue_d.project.full_path,
             namespace_full_path: issue_d.project.namespace.full_path,
             destroy_relation_path: "/#{project.full_path}/issues/#{issue_d.iid}/related_issues/#{related_issue_c.id}"
           }
         )
+      end
+    end
+
+    context 'referencing issue with removed relationships' do
+      context 'when referenced a deleted issue' do
+        let(:issue_b) { create :issue, project: project }
+        let!(:related_issue) do
+          create(:related_issue, issue: issue, related_issue: issue_b)
+        end
+
+        it 'ignores issue' do
+          issue_b.destroy!
+
+          is_expected.to eq([])
+        end
+      end
+
+      context 'when referenced an issue with deleted project' do
+        let(:issue_b) { create :issue, project: project }
+        let!(:related_issue) do
+          create(:related_issue, issue: issue, related_issue: issue_b)
+        end
+
+        it 'ignores issue' do
+          project.destroy!
+
+          is_expected.to eq([])
+        end
+      end
+
+      context 'when referenced an issue with deleted namespace' do
+        let(:issue_b) { create :issue, project: project }
+        let!(:related_issue) do
+          create(:related_issue, issue: issue, related_issue: issue_b)
+        end
+
+        it 'ignores issue' do
+          project.namespace.destroy!
+
+          is_expected.to eq([])
+        end
       end
     end
 

@@ -12,7 +12,6 @@ module RelatedIssues
           title: referenced_issue.title,
           iid: referenced_issue.iid,
           state: referenced_issue.state,
-          reference: referenced_issue.to_reference(@issue.project),
           project_full_path: referenced_issue.project.full_path,
           namespace_full_path: referenced_issue.project.namespace.full_path,
           path: namespace_project_issue_path(referenced_issue.project.namespace, referenced_issue.project, referenced_issue.iid),
@@ -31,11 +30,11 @@ module RelatedIssues
         <<-SQL.strip_heredoc
           SELECT issues.*, related_issues.id as related_issues_id FROM issues
           INNER JOIN related_issues ON related_issues.related_issue_id = issues.id
-          WHERE related_issues.issue_id = #{@issue.id}
+          WHERE related_issues.issue_id = #{@issue.id} AND issues.deleted_at IS NULL
           UNION ALL
           SELECT issues.*, related_issues.id as related_issues_id FROM issues
           INNER JOIN related_issues ON related_issues.issue_id = issues.id
-          WHERE related_issues.related_issue_id = #{@issue.id}
+          WHERE related_issues.related_issue_id = #{@issue.id} AND issues.deleted_at IS NULL
           ORDER BY related_issues_id
         SQL
       )
