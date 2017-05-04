@@ -12,7 +12,8 @@ module Search
         Gitlab::Elastic::SnippetSearchResults.new(current_user,
                                                   params[:search])
       else
-        snippets = Snippet.accessible_to(current_user)
+        snippets = SnippetsFinder.new(current_user).execute
+
         Gitlab::SnippetSearchResults.new(snippets, params[:search])
       end
     end
