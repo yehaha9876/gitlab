@@ -379,14 +379,6 @@
       });
     };
 
-    /**
-     * Generates random unique GUID, eg; f4ccf724-4cc3-93c5-0912-e7b8d440a832
-     */
-    w.gl.utils.guid = () => {
-      const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-      return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
-    };
-
     w.gl.utils.setFavicon = (faviconPath) => {
       if (faviconEl && faviconPath) {
         faviconEl.setAttribute('href', faviconPath);

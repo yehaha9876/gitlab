@@ -373,22 +373,5 @@ require('~/lib/utils/common_utils');
         expect(ajaxSpy.calls.allArgs()[0][0].type).toEqual('POST');
       });
     });
-
-    describe('gl.utils.guid', () => {
-      it('should generate a random Globally Unique Identifier string', () => {
-        const guid = gl.utils.guid();
-        const guidParts = guid.split('-');
-        const partLengths = [8, 4, 4, 4, 12];
-        const partLengthMatcher = (part, expectedLength) => {
-          expect(part.length).toBe(expectedLength);
-        };
-
-        expect(guid).toBeDefined();
-        expect(guidParts.length).toBe(5); // There are 5 string chunks split with `-`
-        guidParts.forEach((part, index) => {
-          partLengthMatcher(part, partLengths[index]);
-        });
-      });
-    });
   });
 })();
