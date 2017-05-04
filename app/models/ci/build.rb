@@ -51,6 +51,11 @@ module Ci
     after_save :update_project_statistics, if: :artifacts_size_changed?
     after_destroy :update_project_statistics
 
+    enum artifacts_storage: { 
+      artifacts_storage_undefined: nil,
+      artifacts_storage_upgraded: 1,
+    }
+
     class << self
       # This is needed for url_for to work,
       # as the controller is JobsController
@@ -285,17 +290,27 @@ module Ci
       !artifacts_expired? && artifacts_file.exists?
     end
 
+    def browsable_artifacts?
+      artifacts_metadata?
+    end
+
+    def downloadable_single_artifacts_file?
+      artifacts_metadata? && artifacts_file.local_file?
+    end
+
     def artifacts_metadata?
       artifacts? && artifacts_metadata.exists?
     end
 
     def artifacts_metadata_entry(path, **options)
-      metadata = Gitlab::Ci::Build::Artifacts::Metadata.new(
-        artifacts_metadata.path,
-        path,
-        **options)
+      artifacts_metadata.use_file do |metadata_path|
+        metadata = Gitlab::Ci::Build::Artifacts::Metadata.new(
+          metadata_path,
+          path,
+          **options)
 
-      metadata.to_entry
+        metadata.to_entry
+      end
     end
 
     def erase_artifacts!
