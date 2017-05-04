@@ -549,7 +549,7 @@ const normalizeNewlines = function(str) {
       return this.renderNote(note);
     };
 
-    Notes.prototype.addNoteError = function($form) {
+    Notes.prototype.addNoteError = ($form) => {
       let formParentTimeline;
       if ($form.hasClass('js-main-target-form')) {
         formParentTimeline = $form.parents('.timeline');
@@ -559,9 +559,7 @@ const normalizeNewlines = function(str) {
       return new Flash('Your comment could not be submitted! Please check your network connection and try again.', 'alert', formParentTimeline);
     };
 
-    Notes.prototype.updateNoteError = function($parentTimeline) {
-      return new Flash('Your comment could not be updated! Please check your network connection and try again.');
-    };
+    Notes.prototype.updateNoteError = $parentTimeline => new Flash('Your comment could not be updated! Please check your network connection and try again.');
 
     /*
     Called in response to the new note form being submitted
@@ -594,18 +592,18 @@ const normalizeNewlines = function(str) {
      */
 
     Notes.prototype.updateNote = function(_xhr, noteEntity, _status) {
-      var $html, $note_li;
+      var $noteEntityEl, $note_li;
       // Convert returned HTML to a jQuery object so we can modify it further
-      $html = $(noteEntity.html);
-      $html.addClass('fade-in-full');
+      $noteEntityEl = $(noteEntity.html);
+      $noteEntityEl.addClass('fade-in-full');
       this.revertNoteEditForm();
-      gl.utils.localTimeAgo($('.js-timeago', $html));
-      $html.renderGFM();
-      $html.find('.js-task-list-container').taskList('enable');
+      gl.utils.localTimeAgo($('.js-timeago', $noteEntityEl));
+      $noteEntityEl.renderGFM();
+      $noteEntityEl.find('.js-task-list-container').taskList('enable');
       // Find the note's `li` element by ID and replace it with the updated HTML
       $note_li = $('.note-row-' + noteEntity.id);
 
-      $note_li.replaceWith($html);
+      $note_li.replaceWith($noteEntityEl);
 
       if (typeof gl.diffNotesCompileComponents !== 'undefined') {
         gl.diffNotesCompileComponents();
@@ -1161,20 +1159,20 @@ const normalizeNewlines = function(str) {
      * Once comment is _actually_ posted on server, we will have final element
      * in response that we will show in place of this temporary element.
      */
-    Notes.prototype.createPlaceholderNote = function(formContent, uniqueId, isDiscussionNote) {
-      const discussionCls = isDiscussionNote ? 'discussion' : '';
+    Notes.prototype.createPlaceholderNote = function({ formContent, uniqueId, isDiscussionNote, currentUsername, currentUserFullname }) {
+      const discussionClass = isDiscussionNote ? 'discussion' : '';
       const $tempNote = $(
         `<li id="${uniqueId}" class="note being-posted fade-in-half timeline-entry">
            <div class="timeline-entry-inner">
               <div class="timeline-icon">
-                 <a href="/${gon.current_username}"><span class="dummy-avatar"></span></a>
+                 <a href="/${currentUsername}"><span class="dummy-avatar"></span></a>
               </div>
-              <div class="timeline-content ${discussionCls}">
+              <div class="timeline-content ${discussionClass}">
                  <div class="note-header">
                     <div class="note-header-info">
-                       <a href="/${gon.current_username}">
-                         <span class="hidden-xs">${gon.current_user_fullname}</span>
-                         <span class="note-headline-light">@${gon.current_username}</span>
+                       <a href="/${currentUsername}">
+                         <span class="hidden-xs">${currentUserFullname}</span>
+                         <span class="note-headline-light">@${currentUsername}</span>
                        </a>
                        <span class="note-headline-light">
                           <i class="fa fa-spinner fa-spin" aria-label="Comment is being posted" aria-hidden="true"></i>
@@ -1182,7 +1180,9 @@ const normalizeNewlines = function(str) {
                     </div>
                  </div>
                  <div class="note-body">
-                   <div class="note-text">${formContent}</div>
+                   <div class="note-text">
+                     <p>${formContent}</p>
+                   </div>
                  </div>
               </div>
            </div>
@@ -1218,7 +1218,7 @@ const normalizeNewlines = function(str) {
       const $submitBtn = $(e.target);
       let $form = $submitBtn.parents('form');
       const $closeBtn = $form.find('.js-note-target-close');
-      const commentType = $submitBtn.parent().find('li.droplab-item-selected').attr('id');
+      const isDiscussionNote = $submitBtn.parent().find('li.droplab-item-selected').attr('id') === 'discussion';
       const isMainForm = $form.hasClass('js-main-target-form');
       const isDiscussionForm = $form.hasClass('js-discussion-note-form');
       const isDiscussionResolve = $submitBtn.hasClass('js-comment-resolve-button');
@@ -1248,7 +1248,13 @@ const normalizeNewlines = function(str) {
 
       if (tempFormContent) {
         // Show placeholder note
-        $notesContainer.append(this.createPlaceholderNote(tempFormContent, uniqueId, commentType === 'discussion'));
+        $notesContainer.append(this.createPlaceholderNote({
+          formContent: tempFormContent,
+          uniqueId,
+          isDiscussionNote,
+          currentUsername: gon.current_username,
+          currentUserFullname: gon.current_user_fullname,
+        }));
       }
 
       // Clear the form textarea
