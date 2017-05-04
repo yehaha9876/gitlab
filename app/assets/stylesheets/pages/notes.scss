@@ -58,6 +58,7 @@ ul.notes {
     border-bottom: 1px solid $white-normal;
 
     &.being-posted {
+      pointer-events: none;
       opacity: 0.5;
 
       .dummy-avatar {
