@@ -1223,7 +1223,7 @@ const normalizeNewlines = function(str) {
       const isDiscussionForm = $form.hasClass('js-discussion-note-form');
       const isDiscussionResolve = $submitBtn.hasClass('js-comment-resolve-button');
       const { formData, formContent, formAction } = this.getFormData($form);
-      const uniqueId = gl.utils.guid();
+      const uniqueId = _.uniqueId('tempNote_');
       let $notesContainer;
       let tempFormContent;
 
