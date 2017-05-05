@@ -1,5 +1,10 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 9.0.7 (2017-05-05)
+
+- Respect project features when searching alternative branches with elasticsearch enabled.
+- Fix for XSS in project mirror errors caused by Hamlit filter usage.
+
 ## 9.0.6 (2017-04-21)
 
 - Cache Gitlab::Geo queries. !1507
