@@ -272,12 +272,8 @@ const normalizeNewlines = function(str) {
       return this.initRefresh();
     };
 
-    Notes.prototype.handleCreateChanges = function(noteEntity) {
+    Notes.prototype.handleSlashCommands = function(noteEntity) {
       var votesBlock;
-      if (typeof noteEntity === 'undefined') {
-        return;
-      }
-
       if (noteEntity.commands_changes) {
         if ('merge' in noteEntity.commands_changes) {
           $.get(mrRefreshWidgetUrl);
@@ -553,7 +549,6 @@ const normalizeNewlines = function(str) {
      */
 
     Notes.prototype.addNote = function($form, note) {
-      this.handleCreateChanges(note);
       return this.renderNote(note);
     };
 
@@ -1305,6 +1300,10 @@ const normalizeNewlines = function(str) {
             // Show final note element on UI and perform form and action buttons cleanup
             this.addNote($form, note);
             this.reenableTargetFormSubmitButton(e);
+          }
+
+          if (note.commands_changes) {
+            this.handleSlashCommands(note);
           }
 
           $form.trigger('ajax:success', [note]);
