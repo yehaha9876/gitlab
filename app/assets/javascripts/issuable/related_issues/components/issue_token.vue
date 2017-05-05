@@ -120,7 +120,9 @@ export default {
           class="fa fa-spinner fa-spin"
           aria-label="Fetching info">
         </i>
-        {{ title }}
+        <span class="issue-token-title-text">
+          {{ title }}
+        </span>
       </span>
     </a>
     <button
