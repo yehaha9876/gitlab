@@ -29,7 +29,7 @@ const sidebarMockData = {
           id: 22,
           state: 'active',
           avatar_url: 'http: //www.gravatar.com/avatar/52e4ce24a915fb7e51e1ad3b57f4b00a?s=80\u0026d=identicon',
-          web_url: 'http: //localhost: 3001/user0',
+          web_url: 'http: //localhost:3001/user0',
         },
         {
           name: 'Marguerite Bartell',
@@ -37,7 +37,7 @@ const sidebarMockData = {
           id: 18,
           state: 'active',
           avatar_url: 'http: //www.gravatar.com/avatar/4852a41fb41616bf8f140d3701673f53?s=80\u0026d=identicon',
-          web_url: 'http: //localhost: 3001/tajuana',
+          web_url: 'http: //localhost:3001/tajuana',
         },
         {
           name: 'Laureen Ritchie',
@@ -45,7 +45,7 @@ const sidebarMockData = {
           id: 16,
           state: 'active',
           avatar_url: 'http: //www.gravatar.com/avatar/e301827eb03be955c9c172cb9a8e4e8a?s=80\u0026d=identicon',
-          web_url: 'http: //localhost: 3001/michaele.will',
+          web_url: 'http: //localhost:3001/michaele.will',
         },
       ],
       due_date: null,
@@ -98,20 +98,7 @@ export default {
     name: 'Administrator',
     username: 'root',
   },
-  createNumberRandomUsers(numberUsers) {
-    const users = [];
-    for (let i = 0; i < numberUsers; i = i += 1) {
-      users.push(
-        {
-          avatarUrl: 'http://gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80&d=identicon',
-          id: (i + 1),
-          name: `GitLab User ${i}`,
-          username: `gitlab${i}`,
-        },
-      );
-    }
-    return users;
-  },
+
   sidebarMockInterceptor(request, next) {
     const body = sidebarMockData[request.method.toUpperCase()][request.url];
 

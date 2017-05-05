@@ -1,5 +1,6 @@
 import SidebarStore from '~/sidebar/stores/sidebar_store';
 import Mock from './mock_data';
+import UsersMockHelper from '../test_helpers/user_mock_data';
 
 describe('Sidebar store', () => {
   const assignee = {
@@ -62,7 +63,7 @@ describe('Sidebar store', () => {
 
   it('set assigned data', () => {
     const users = {
-      assignees: Mock.createNumberRandomUsers(3),
+      assignees: UsersMockHelper.createNumberRandomUsers(3),
     };
 
     this.store.setAssigneeData(users);

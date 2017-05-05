@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Assignee from '~/sidebar/components/assignees/assignees';
 import UsersMock from './mock_data';
+import UsersMockHelper from '../test_helpers/user_mock_data';
 
 describe('Assignee component', () => {
   let component;
@@ -58,7 +59,7 @@ describe('Assignee component', () => {
     it('Shows one user with avatar, username and author name', () => {
       component = new AssigneeComponent({
         propsData: {
-          rootPath: 'http://localhost:3000',
+          rootPath: 'http://localhost:3000/',
           users: [
             UsersMock.user,
           ],
@@ -74,11 +75,25 @@ describe('Assignee component', () => {
       // Username
       expect(component.$el.querySelector('.author_link .username').innerText.trim()).toEqual(`@${UsersMock.user.username}`);
     });
+
+    it('has the root url present in the assigneeUrl method', () => {
+      component = new AssigneeComponent({
+        propsData: {
+          rootPath: 'http://localhost:3000/',
+          users: [
+            UsersMock.user,
+          ],
+          editable: true,
+        },
+      }).$mount();
+
+      expect(component.assigneeUrl(UsersMock.user).indexOf('http://localhost:3000/')).not.toEqual(-1);
+    });
   });
 
   describe('Two or more assignees/users', () => {
     it('Shows two assignees', () => {
-      const users = UsersMock.createNumberRandomUsers(2);
+      const users = UsersMockHelper.createNumberRandomUsers(2);
       component = new AssigneeComponent({
         propsData: {
           rootPath: 'http://localhost:3000',
@@ -92,7 +107,7 @@ describe('Assignee component', () => {
     });
 
     it('Shows the "show-less" assignees label', (done) => {
-      const users = UsersMock.createNumberRandomUsers(6);
+      const users = UsersMockHelper.createNumberRandomUsers(6);
       component = new AssigneeComponent({
         propsData: {
           rootPath: 'http://localhost:3000',
@@ -115,7 +130,7 @@ describe('Assignee component', () => {
     });
 
     it('Shows the "show-less" when "n+ more " label is clicked', (done) => {
-      const users = UsersMock.createNumberRandomUsers(6);
+      const users = UsersMockHelper.createNumberRandomUsers(6);
       component = new AssigneeComponent({
         propsData: {
           rootPath: 'http://localhost:3000',
@@ -132,9 +147,22 @@ describe('Assignee component', () => {
       });
     });
 
+    it('gets the count of avatar via a computed property ', () => {
+      const users = UsersMockHelper.createNumberRandomUsers(6);
+      component = new AssigneeComponent({
+        propsData: {
+          rootPath: 'http://localhost:3000',
+          users,
+          editable: true,
+        },
+      }).$mount();
+
+      expect(component.sidebarAvatarCounter).toEqual(`+${users.length - 1}`);
+    });
+
     describe('n+ more label', () => {
       beforeEach(() => {
-        const users = UsersMock.createNumberRandomUsers(6);
+        const users = UsersMockHelper.createNumberRandomUsers(6);
         component = new AssigneeComponent({
           propsData: {
             rootPath: 'http://localhost:3000',
