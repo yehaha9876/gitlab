@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 8.17.6 (2017-05-05)
+
+- Respect project features when searching alternative branches with elasticsearch enabled.
+
 ## 8.17.5 (2017-04-05)
 
 - No changes.
