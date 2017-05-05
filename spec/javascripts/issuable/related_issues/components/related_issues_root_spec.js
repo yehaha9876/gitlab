@@ -121,83 +121,60 @@ describe('RelatedIssuesRoot', () => {
     });
 
     describe('onAddIssuableFormSubmit', () => {
-      describe('when service.addRelatedIssues is succeeding', () => {
-        const interceptor = (request, next) => {
-          next(request.respondWith(JSON.stringify({}), {
-            status: 200,
-          }));
-        };
+      const interceptor = (request, next) => {
+        next(request.respondWith(JSON.stringify({}), {
+          status: 200,
+        }));
+      };
 
-        beforeEach(() => {
-          vm = createComponent(defaultProps);
-          vm.store.addToIssueMap(issuable1Reference, issuable1);
-          vm.store.addToIssueMap(issuable2Reference, issuable2);
+      beforeEach(() => {
+        vm = createComponent(defaultProps);
+        vm.store.addToIssueMap(issuable1Reference, issuable1);
+        vm.store.addToIssueMap(issuable2Reference, issuable2);
 
-          Vue.http.interceptors.push(interceptor);
-        });
+        Vue.http.interceptors.push(interceptor);
+      });
 
-        afterEach(() => {
-          Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
-        });
+      afterEach(() => {
+        Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
+      });
 
-        it('submit pending issues as related issues', (done) => {
-          vm.store.setPendingRelatedIssues([issuable1Reference]);
-          vm.onAddIssuableFormSubmit();
+      it('submit zero pending issue as related issue', (done) => {
+        vm.store.setPendingRelatedIssues([]);
+        vm.onAddIssuableFormSubmit();
 
-          setTimeout(() => {
-            expect(vm.computedPendingRelatedIssues.length).toEqual(0);
-            expect(vm.computedRelatedIssues.length).toEqual(1);
-            expect(vm.computedRelatedIssues[0].reference).toEqual(issuable1Reference);
+        setTimeout(() => {
+          expect(vm.computedPendingRelatedIssues.length).toEqual(0);
+          expect(vm.computedRelatedIssues.length).toEqual(0);
 
-            done();
-          });
-        });
-
-        it('submit multiple pending issues as related issues', (done) => {
-          vm.store.setPendingRelatedIssues([issuable1Reference, issuable2Reference]);
-          vm.onAddIssuableFormSubmit();
-
-          setTimeout(() => {
-            expect(vm.computedPendingRelatedIssues.length).toEqual(0);
-            expect(vm.computedRelatedIssues.length).toEqual(2);
-            expect(vm.computedRelatedIssues[0].reference).toEqual(issuable1Reference);
-            expect(vm.computedRelatedIssues[1].reference).toEqual(issuable2Reference);
-
-            done();
-          });
+          done();
         });
       });
 
-      describe('when service.addRelatedIssues fails', () => {
-        const interceptor = (request, next) => {
-          next(request.respondWith(JSON.stringify({}), {
-            status: 422,
-          }));
-        };
+      it('submit pending issue as related issue', (done) => {
+        vm.store.setPendingRelatedIssues([issuable1Reference]);
+        vm.onAddIssuableFormSubmit();
 
-        beforeEach(() => {
-          vm = createComponent(defaultProps);
-          vm.store.addToIssueMap(issuable1Reference, issuable1);
-          vm.store.addToIssueMap(issuable2Reference, issuable2);
+        setTimeout(() => {
+          expect(vm.computedPendingRelatedIssues.length).toEqual(0);
+          expect(vm.computedRelatedIssues.length).toEqual(1);
+          expect(vm.computedRelatedIssues[0].reference).toEqual(issuable1Reference);
 
-          Vue.http.interceptors.push(interceptor);
+          done();
         });
+      });
 
-        afterEach(() => {
-          Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
-        });
+      it('submit multiple pending issues as related issues', (done) => {
+        vm.store.setPendingRelatedIssues([issuable1Reference, issuable2Reference]);
+        vm.onAddIssuableFormSubmit();
 
-        it('submit pending issues as related issues fails and restores to pending related issues', (done) => {
-          vm.store.setPendingRelatedIssues([issuable1Reference]);
-          vm.onAddIssuableFormSubmit();
+        setTimeout(() => {
+          expect(vm.computedPendingRelatedIssues.length).toEqual(0);
+          expect(vm.computedRelatedIssues.length).toEqual(2);
+          expect(vm.computedRelatedIssues[0].reference).toEqual(issuable1Reference);
+          expect(vm.computedRelatedIssues[1].reference).toEqual(issuable2Reference);
 
-          setTimeout(() => {
-            expect(vm.computedPendingRelatedIssues.length).toEqual(1);
-            expect(vm.computedPendingRelatedIssues[0].reference).toEqual(issuable1Reference);
-            expect(vm.computedRelatedIssues.length).toEqual(0);
-
-            done();
-          });
+          done();
         });
       });
     });
@@ -246,6 +223,112 @@ describe('RelatedIssuesRoot', () => {
 
             done();
           });
+        });
+      });
+    });
+
+    describe('onAddIssuableFormInput', () => {
+      beforeEach(() => {
+        vm = createComponent(defaultProps);
+      });
+
+      it('fill in issue number reference and adds to pending related issues', () => {
+        const input = '#123 ';
+        vm.onAddIssuableFormInput(input, input.length);
+
+        expect(vm.computedPendingRelatedIssues.length).toEqual(1);
+        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('#123');
+      });
+
+      it('fill in with full reference', () => {
+        const input = 'asdf/qwer#444 ';
+        vm.onAddIssuableFormInput(input, input.length);
+
+        expect(vm.computedPendingRelatedIssues.length).toEqual(1);
+        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('asdf/qwer#444');
+      });
+
+      it('fill in with multiple references', () => {
+        const input = 'asdf/qwer#444 #12 ';
+        vm.onAddIssuableFormInput(input, input.length);
+
+        expect(vm.computedPendingRelatedIssues.length).toEqual(2);
+        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('asdf/qwer#444');
+        expect(vm.computedPendingRelatedIssues[1].reference).toEqual('#12');
+      });
+
+      it('fill in with some invalid things', () => {
+        const input = 'something random stuff here ';
+        vm.onAddIssuableFormInput(input, input.length);
+
+        expect(vm.computedPendingRelatedIssues.length).toEqual(0);
+      });
+
+      it('fill in invalid and some legit references', () => {
+        const input = 'something random #123 ';
+        vm.onAddIssuableFormInput(input, input.length);
+
+        expect(vm.computedPendingRelatedIssues.length).toEqual(1);
+        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('#123');
+      });
+
+      it('keep reference piece in input while we are touching it', () => {
+        const input = 'a #123 b';
+        vm.onAddIssuableFormInput(input, 3);
+
+        expect(vm.computedPendingRelatedIssues.length).toEqual(0);
+      });
+    });
+
+    describe('onAddIssuableFormBlur', () => {
+      beforeEach(() => {
+        vm = createComponent(defaultProps);
+      });
+
+      it('add valid reference to pending when blurring', () => {
+        const input = '#123';
+        vm.onAddIssuableFormBlur(input);
+
+        expect(vm.computedPendingRelatedIssues.length).toEqual(1);
+        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('#123');
+      });
+
+      it('add any valid references to pending when blurring', () => {
+        const input = 'asdf #123';
+        vm.onAddIssuableFormBlur(input);
+
+        expect(vm.computedPendingRelatedIssues.length).toEqual(1);
+        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('#123');
+      });
+    });
+
+    describe('processIssuableReferences', () => {
+      beforeEach(() => {
+        vm = createComponent(defaultProps);
+      });
+
+      it('process issue number reference', () => {
+        const reference = '#123';
+        const result = vm.processIssuableReferences([reference]);
+
+        expect(result).toEqual({
+          unprocessableReferences: [],
+          references: [reference],
+        });
+      });
+
+      it('process multiple issue number references with some unprocecessable', () => {
+        const rawReferences = '#123 abc #456'.split(/\s/);
+        const result = vm.processIssuableReferences(rawReferences);
+
+        expect(result).toEqual({
+          unprocessableReferences: [
+            'abc',
+          ],
+          references: [
+            rawReferences[0],
+            rawReferences[2],
+          ],
         });
       });
     });

@@ -1,11 +1,13 @@
-const ISSUABLE_REFERENCE_RE = /^((?:[^\s/]+(?:\/(?!#))?)*)#(\d+)$/i;
+const ISSUABLE_REFERENCE_REGEX = /^((?:[^\s/]+(?:\/(?!#))?)*)#(\d+)$/i;
+// Matches a rough URL with some numbers on the end
+const ISSUABLE_URL_REGEX = /[^.\s]+\/\d+\/?$/i;
 
 function getReferencePieces(partialReference, namespacePath, projectPath) {
   const [
     ,
     fullNamespace = '',
     resultantIssue,
-  ] = partialReference.match(ISSUABLE_REFERENCE_RE);
+  ] = partialReference.match(ISSUABLE_REFERENCE_REGEX);
   const namespacePieces = fullNamespace.split('/');
   const resultantNamespace = namespacePieces.length > 1 ? namespacePieces.slice(0, -1).join('/') : namespacePath;
   const resultantProject = namespacePieces.slice(-1)[0] || projectPath;
@@ -31,18 +33,9 @@ function assembleDisplayIssuableReference(issue, currentNamespacePath, currentPr
   return necessaryReference;
 }
 
-function assembleFullIssuableReference(partialReference, currentNamespacePath, currentProjectPath) {
-  const {
-    namespace,
-    project,
-    issue,
-  } = getReferencePieces(partialReference, currentNamespacePath, currentProjectPath);
-  return `${namespace}/${project}#${issue}`;
-}
-
 export {
-  ISSUABLE_REFERENCE_RE,
+  ISSUABLE_REFERENCE_REGEX,
+  ISSUABLE_URL_REGEX,
   getReferencePieces,
   assembleDisplayIssuableReference,
-  assembleFullIssuableReference,
 };
