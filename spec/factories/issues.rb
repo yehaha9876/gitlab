@@ -14,6 +14,7 @@ FactoryGirl.define do
 
     trait :closed do
       state :closed
+      closed_at Time.now
     end
 
     trait :reopened do

@@ -9,12 +9,15 @@
 - [Groups](groups.md)
 - Issues - The GitLab Issue Tracker is an advanced and complete tool for
   tracking the evolution of a new idea or the process of solving a problem.
+  - (EE) [Exporting Issues](../user/project/issues/csv_export.md) Export issues as a CSV, emailed as an attachment.
   - [Confidential issues](../user/project/issues/confidential_issues.md)
   - [Due date for issues](../user/project/issues/due_dates.md)
 - [Issue Board](../user/project/issue_board.md)
 - [Keyboard shortcuts](shortcuts.md)
 - [File finder](file_finder.md)
+- (EE) [File lock](../user/project/file_lock.md)
 - [Labels](../user/project/labels.md)
+- (EE) [Issue weight](issue_weight.md)
 - [Notification emails](notifications.md)
 - [Project Features](project_features.md)
 - [Project forking workflow](forking_workflow.md)
@@ -37,6 +40,10 @@
   - [Revert changes in the UI](../user/project/merge_requests/revert_changes.md)
   - [Merge requests versions](../user/project/merge_requests/versions.md)
   - ["Work In Progress" merge requests](../user/project/merge_requests/work_in_progress_merge_requests.md)
+  - (EE) [Merge request approvals](../user/project/merge_requests/merge_request_approvals.md)
+  - (EE) [Fast-forward merge requests](../user/project/merge_requests/fast_forward_merge.md)
+- (EE) [Repository mirroring](repository_mirroring.md)
+- (EE Premium) [Service Desk](../user/project/service_desk.md)
 - [Manage large binaries with Git LFS](lfs/manage_large_binaries_with_git_lfs.md)
 - [Importing from SVN, GitHub, Bitbucket, etc](importing/README.md)
 - [Todos](todos.md)

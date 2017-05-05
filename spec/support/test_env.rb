@@ -14,6 +14,7 @@ module TestEnv
     'feature_conflict'                   => 'bb5206f',
     'fix'                                => '48f0be4',
     'improve/awesome'                    => '5937ac0',
+    'merged-target'                      => '21751bf',
     'markdown'                           => '0ed8c6c',
     'lfs'                                => 'be93687',
     'master'                             => 'b83d6e3',
@@ -40,7 +41,8 @@ module TestEnv
     'csv'                                => '3dd0896',
     'v1.1.0'                             => 'b83d6e3',
     'add-ipython-files'                  => '6d85bb69',
-    'add-pdf-file'                       => 'e774ebd3'
+    'add-pdf-file'                       => 'e774ebd3',
+    'squash-large-files'                 => '54cec52',
   }.freeze
 
   # gitlab-test-fork is a fork of gitlab-fork, but we don't necessarily

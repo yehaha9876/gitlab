@@ -82,6 +82,15 @@ constraints(ProjectUrlConstrainer.new) do
           get :pipeline_status
           get :ci_environments_status
           post :toggle_subscription
+
+          ## EE-specific
+          get :approvals
+          post :approvals, action: :approve
+          delete :approvals, action: :unapprove
+
+          post :rebase
+          ## EE-specific
+
           post :remove_wip
           get :diff_for_path
           post :resolve_conflicts
@@ -97,6 +106,11 @@ constraints(ProjectUrlConstrainer.new) do
           get :new_diffs, path: 'new/diffs'
         end
 
+        ## EE-specific
+        resources :approvers, only: :destroy
+        resources :approver_groups, only: :destroy
+        ## EE-specific
+
         resources :discussions, only: [], constraints: { id: /\h{40}/ } do
           member do
             post :resolve
@@ -105,12 +119,32 @@ constraints(ProjectUrlConstrainer.new) do
         end
       end
 
+      ## EE-specific
+      resources :path_locks, only: [:index, :destroy] do
+        collection do
+          post :toggle
+        end
+      end
+
+      ## EE-specific
+      get '/service_desk' => 'service_desk#show', as: :service_desk
+      put '/service_desk' => 'service_desk#update', as: :service_desk_refresh
+
       resources :variables, only: [:index, :show, :update, :create, :destroy]
       resources :triggers, only: [:index, :create, :edit, :update, :destroy] do
         member do
           post :take_ownership
         end
       end
+
+      ## EE-specific
+      resource :mirror, only: [:show, :update] do
+        member do
+          post :update_now
+        end
+      end
+      resources :push_rules, constraints: { id: /\d+/ }, only: [:update]
+      ## EE-specific
 
       resources :pipelines, only: [:index, :new, :create, :show] do
         collection do
@@ -132,6 +166,7 @@ constraints(ProjectUrlConstrainer.new) do
           post :stop
           get :terminal
           get :metrics
+          get :status, constraints: { format: :json }
           get '/terminal.ws/authorize', to: 'environments#terminal_websocket_authorize', constraints: { format: nil }
         end
 
@@ -238,7 +273,8 @@ constraints(ProjectUrlConstrainer.new) do
           post :create_merge_request
         end
         collection do
-          post  :bulk_update
+          post :bulk_update
+          post :export_csv
         end
       end
 
@@ -269,7 +305,7 @@ constraints(ProjectUrlConstrainer.new) do
 
       get 'noteable/:target_type/:target_id/notes' => 'notes#index', as: 'noteable_notes'
 
-      resources :boards, only: [:index, :show] do
+      resources :boards, only: [:index, :show, :create, :update, :destroy] do
         scope module: :boards do
           resources :issues, only: [:index, :update]
 
@@ -302,6 +338,11 @@ constraints(ProjectUrlConstrainer.new) do
         end
       end
 
+      ## EE-specific
+      resources :approvers, only: :destroy
+      resources :approver_groups, only: :destroy
+      ## EE-specific
+
       resources :runner_projects, only: [:create, :destroy]
       resources :badges, only: [:index] do
         collection do
@@ -313,6 +354,11 @@ constraints(ProjectUrlConstrainer.new) do
           end
         end
       end
+
+      ## EE-specific
+      resources :audit_events, only: [:index]
+      ## EE-specific
+
       namespace :settings do
         resource :members, only: [:show]
         resource :ci_cd, only: [:show], controller: 'ci_cd'

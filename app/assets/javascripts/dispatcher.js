@@ -33,6 +33,8 @@
 /* global Labels */
 /* global Shortcuts */
 /* global Sidebar */
+/* global WeightSelect */
+/* global AdminEmailSelect */
 /* global ShortcutsWiki */
 
 import Issue from './issue';
@@ -42,6 +44,7 @@ import Group from './group';
 import GroupName from './group_name';
 import GroupsList from './groups_list';
 import ProjectsList from './projects_list';
+import ApproversSelect from './approvers_select';
 import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
 import BlobLinePermalinkUpdater from './blob/blob_line_permalink_updater';
 import Landing from './landing';
@@ -51,6 +54,8 @@ import { ProtectedTagCreate, ProtectedTagEditList } from './protected_tags';
 import ShortcutsWiki from './shortcuts_wiki';
 import BlobViewer from './blob/viewer/index';
 import AutoWidthDropdownSelect from './issuable/auto_width_dropdown_select';
+import GeoNodes from './geo_nodes';
+import ServiceDeskRoot from './projects/settings_service_desk/service_desk_root';
 
 const ShortcutsBlob = require('./shortcuts_blob');
 
@@ -187,6 +192,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
           new IssuableForm($('.issue-form'));
           new LabelsSelect();
           new MilestoneSelect();
+          new WeightSelect();
           new gl.IssuableTemplateSelectors();
           break;
         case 'projects:merge_requests:new':
@@ -243,6 +249,13 @@ const ShortcutsBlob = require('./shortcuts_blob');
         case 'projects:commits:show':
         case 'projects:activity':
           shortcut_handler = new ShortcutsNavigation();
+          break;
+        case 'projects:edit':
+          const el = document.querySelector('.js-service-desk-setting-root');
+          if (el) {
+            const serviceDeskRoot = new ServiceDeskRoot(el);
+            serviceDeskRoot.init();
+          }
           break;
         case 'projects:show':
           shortcut_handler = new ShortcutsNavigation();
@@ -355,10 +368,18 @@ const ShortcutsBlob = require('./shortcuts_blob');
         case 'search:show':
           new Search();
           break;
+        case 'projects:mirrors:show':
+        case 'projects:mirrors:update':
+          new UsersSelect();
+          break;
+        case 'admin:emails:show':
+          new AdminEmailSelect();
+          break;
         case 'projects:repository:show':
           // Initialize Protected Branch Settings
           new gl.ProtectedBranchCreate();
           new gl.ProtectedBranchEditList();
+          new UsersSelect();
           // Initialize Protected Tag Settings
           new ProtectedTagCreate();
           new ProtectedTagEditList();
@@ -411,6 +432,9 @@ const ShortcutsBlob = require('./shortcuts_blob');
             case 'abuse_reports':
               new gl.AbuseReports();
               break;
+            case 'geo_nodes':
+              new GeoNodes($('.geo-nodes'));
+              break;
           }
           break;
         case 'dashboard':
@@ -435,6 +459,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
             case 'edit':
               shortcut_handler = new ShortcutsNavigation();
               new ProjectNew();
+              new ApproversSelect();
               break;
             case 'new':
               new ProjectNew();
@@ -470,7 +495,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
             case 'builds':
             case 'hooks':
             case 'services':
-            case 'protected_branches':
+            case 'repository':
               shortcut_handler = new ShortcutsNavigation();
           }
       }

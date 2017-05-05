@@ -10,6 +10,10 @@ class FilteredSearchDropdownManager {
     this.filteredSearchInput = this.container.querySelector('.filtered-search');
     this.page = page;
 
+    if (this.page === 'issues' || this.page === 'boards') {
+      this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeysWithWeights;
+    }
+
     this.setupMapping();
 
     this.cleanupWrapper = this.cleanup.bind(this);
@@ -57,6 +61,14 @@ class FilteredSearchDropdownManager {
         element: this.container.querySelector('#js-dropdown-hint'),
       },
     };
+
+    if (this.page === 'issues' || this.page === 'boards') {
+      this.mapping.weight = {
+        reference: null,
+        gl: 'DropdownNonUser',
+        element: document.querySelector('#js-dropdown-weight'),
+      };
+    }
   }
 
   static addWordToInput(tokenName, tokenValue = '', clicked = false) {

@@ -13,6 +13,7 @@
     %li
       = link_to truncate(title, length: 40), namespace_project_tree_path(@project.namespace, @project, tree_join(@ref, path))
 
+
   - if current_user
     %li
       - if !on_top_of_branch?

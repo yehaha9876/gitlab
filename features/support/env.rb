@@ -14,14 +14,22 @@ end
   require Rails.root.join('spec', 'support', f)
 end
 
+# EE-only
+%w(license).each do |f|
+  require Rails.root.join('spec', 'support', f)
+end
+
 Dir["#{Rails.root}/features/steps/shared/*.rb"].each { |file| require file }
 
 WebMock.allow_net_connect!
 
 Spinach.hooks.before_run do
   include RSpec::Mocks::ExampleMethods
+  include ActiveJob::TestHelper
   RSpec::Mocks.setup
   TestEnv.init(mailer: false)
+  License.destroy_all
+  TestLicense.init
 
   # skip pre-receive hook check so we can use
   # web editor and merge

@@ -165,6 +165,7 @@ entry.
 - Fix API group/issues default state filter. (Alexander Randa)
 - Prevent builds dropdown to close when the user clicks in a build.
 - Display all closed issues in “done” board list.
+- added focus mode button to issue boards.
 - Remove no-new annotation from file_template_mediator.js.
 - Changed dropdown style slightly.
 - Change gfm textarea to use monospace font.
@@ -664,6 +665,7 @@ entry.
 ## 8.17.0 (2017-02-22)
 
 - API: Fix file downloading. !0 (8267)
+- Read true-up info from license and validate it. !1159
 - Changed composer installer script in the CI PHP example doc. !4342 (Jeffrey Cafferata)
 - Display fullscreen button on small screens. !5302 (winniehell)
 - Add system hook for when a project is updated (other than rename/transfer). !5711 (Tommy Beadle)
@@ -856,8 +858,6 @@ entry.
 
 ## 8.16.7 (2017-02-27)
 
-- No changes.
-- No changes.
 - Fix MR changes tab size count when there are over 100 files in the diff.
 
 ## 8.16.6 (2017-02-17)
@@ -1057,6 +1057,7 @@ entry.
 
 ## 8.15.8 (2017-03-19)
 
+- Read true-up info from license and validate it. !1159
 - Only show public emails in atom feeds.
 - To protect against Server-side Request Forgery project import URLs are now prohibited against localhost or the server IP except for the assigned instance URL and port. Imports are also prohibited from ports below 1024 with the exception of ports 22, 80, and 443.
 
@@ -1070,6 +1071,14 @@ entry.
 - Fix XSS vulnerability in SVG attachments.
 - Prevent the GitHub importer from assigning labels and comments to merge requests or issues belonging to other projects.
 - Patch XSS vulnerability in RDOC support.
+
+## 8.15.5 (2017-01-20)
+
+- Ensure export files are removed after a namespace is deleted.
+- Don't allow project guests to subscribe to merge requests through the API. (Robert Schilling)
+- Prevent users from creating notes on resources they can't access.
+- Prevent users from deleting system deploy keys via the project deploy key API.
+- Upgrade omniauth gem to 1.3.2.
 
 ## 8.15.4 (2017-01-09)
 
@@ -1353,6 +1362,14 @@ entry.
 - Speed up group milestone index by passing group_id to IssuesFinder. !8363
 - Ensure issuable state changes only fire webhooks once.
 
+## 8.14.7 (2017-01-21)
+
+- Ensure export files are removed after a namespace is deleted.
+- Don't allow project guests to subscribe to merge requests through the API. (Robert Schilling)
+- Prevent users from creating notes on resources they can't access.
+- Prevent users from deleting system deploy keys via the project deploy key API.
+- Upgrade omniauth gem to 1.3.2.
+
 ## 8.14.6 (2017-01-10)
 
 - Update the gitlab-markup gem to the version 1.5.1. !8509
@@ -1634,6 +1651,14 @@ entry.
 - Updated commit SHA styling on the branches page.
 - Fix "Without projects" filter. !6611 (Ben Bodenmiller)
 - Fix 404 when visit /projects page
+
+## 8.13.12 (2017-01-21)
+
+- Ensure export files are removed after a namespace is deleted.
+- Don't allow project guests to subscribe to merge requests through the API. (Robert Schilling)
+- Prevent users from creating notes on resources they can't access.
+- Prevent users from deleting system deploy keys via the project deploy key API.
+- Upgrade omniauth gem to 1.3.2.
 
 ## 8.13.11 (2017-01-10)
 

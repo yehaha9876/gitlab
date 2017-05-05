@@ -3,10 +3,12 @@
  * Render environments table.
  */
 import EnvironmentTableRowComponent from './environment_item.vue';
+import DeployBoard from './deploy_board_component.vue';
 
 export default {
   components: {
     'environment-item': EnvironmentTableRowComponent,
+    DeployBoard,
   },
 
   props: {
@@ -32,6 +34,18 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+
+    toggleDeployBoard: {
+      type: Function,
+      required: false,
+      default: () => {},
+    },
+
+    store: {
+      type: Object,
+      required: false,
+      default: () => ({}),
     },
   },
 
@@ -73,7 +87,20 @@ export default {
           :model="model"
           :can-create-deployment="canCreateDeployment"
           :can-read-environment="canReadEnvironment"
+          :toggleDeployBoard="toggleDeployBoard"
           />
+
+        <tr v-if="model.hasDeployBoard && model.isDeployBoardVisible" class="js-deploy-board-row">
+          <td colspan="6" class="deploy-board-container">
+            <deploy-board
+              :store="store"
+              :service="service"
+              :environmentID="model.id"
+              :deployBoardData="model.deployBoardData"
+              :endpoint="model.rollout_status_path"
+              />
+          </td>
+        </tr>
 
         <template v-if="model.isFolder && model.isOpen && model.children && model.children.length > 0">
           <tr v-if="isLoadingFolderContent">
@@ -92,6 +119,7 @@ export default {
               :can-create-deployment="canCreateDeployment"
               :can-read-environment="canReadEnvironment"
               />
+
 
             <tr>
               <td

@@ -3,6 +3,7 @@ module ProtectedBranchAccess
 
   included do
     include ProtectedRefAccess
+    include EE::ProtectedBranchAccess
 
     belongs_to :protected_branch
 

@@ -73,6 +73,8 @@ The total number of the following is sent back to GitLab Inc.:
 - Protected branches
 - Releases
 - Remote mirrors
+- Service Desk projects
+- Service Desk issues
 - Uploads
 - Web hooks
 

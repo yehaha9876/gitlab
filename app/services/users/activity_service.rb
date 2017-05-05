@@ -14,7 +14,7 @@ module Users
     private
 
     def record_activity
-      Gitlab::UserActivities.record(@author.id)
+      Gitlab::UserActivities.record(@author.id) unless Gitlab::Geo.secondary?
 
       Rails.logger.debug("Recorded activity: #{@activity} for User ID: #{@author.id} (username: #{@author.username}")
     end

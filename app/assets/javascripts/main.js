@@ -175,6 +175,14 @@ import './visibility_select';
 import './wikis';
 import './zen_mode';
 
+// EE-only scripts
+import './admin_email_select';
+import './application_settings';
+import './approvals';
+import './ldap_groups_select';
+import './path_locks';
+import './weight_select';
+
 // eslint-disable-next-line global-require
 if (process.env.NODE_ENV !== 'production') require('./test_utils/');
 
@@ -333,8 +341,11 @@ $(function () {
     var btn = $(e.target);
     var form = btn.closest('form');
     var text = btn.data('confirm-danger-message');
+    var warningMessage = btn.data('warning-message');
     e.preventDefault();
-    return new ConfirmDangerModal(form, text);
+    return new ConfirmDangerModal(form, text, {
+      warningMessage: warningMessage
+    });
   });
   $('input[type="search"]').each(function () {
     var $this = $(this);

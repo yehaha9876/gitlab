@@ -14,5 +14,13 @@ module Search
 
       @projects = super.inside_path(group.full_path)
     end
+
+    def elastic_projects
+      @elastic_projects ||= projects.pluck(:id)
+    end
+
+    def elastic_global
+      false
+    end
   end
 end

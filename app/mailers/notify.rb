@@ -1,13 +1,17 @@
 class Notify < BaseMailer
   include ActionDispatch::Routing::PolymorphicRoutes
 
+  include Emails::AdminNotification
   include Emails::Issues
+  include Emails::CsvExport
   include Emails::MergeRequests
   include Emails::Notes
   include Emails::Projects
   include Emails::Profile
   include Emails::Pipelines
   include Emails::Members
+
+  include Emails::EE::ServiceDesk
 
   helper MergeRequestsHelper
   helper DiffHelper

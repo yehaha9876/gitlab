@@ -40,6 +40,10 @@ Sidekiq.configure_server do |config|
   end
   Sidekiq::Cron::Job.load_from_hash! cron_jobs
 
+  Gitlab::Mirror.configure_cron_job!
+
+  Gitlab::Geo.configure_cron_jobs!
+
   Gitlab::SidekiqThrottler.execute!
 
   config = Gitlab::Database.config ||

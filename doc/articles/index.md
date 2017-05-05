@@ -11,6 +11,7 @@ They are written by members of the GitLab Team and by
 
 - **LDAP**
   - [How to configure LDAP with GitLab CE](how_to_configure_ldap_gitlab_ce/index.md)
+  - [How to configure LDAP with GitLab EE](how_to_configure_ldap_gitlab_ee/index.md)
 
 ## GitLab Pages
 

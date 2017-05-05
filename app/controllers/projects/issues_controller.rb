@@ -6,7 +6,7 @@ class Projects::IssuesController < Projects::ApplicationController
   include IssuableCollections
   include SpammableActions
 
-  prepend_before_action :authenticate_user!, only: [:new]
+  prepend_before_action :authenticate_user!, only: [:new, :export_csv]
 
   before_action :redirect_to_external_issue_tracker, only: [:index, :new]
   before_action :module_enabled
@@ -30,6 +30,7 @@ class Projects::IssuesController < Projects::ApplicationController
   def index
     @collection_type    = "Issue"
     @issues             = issues_collection
+
     @issues             = @issues.page(params[:page])
     @issuable_meta_data = issuable_meta_data(@issues, @collection_type)
 
@@ -162,6 +163,13 @@ class Projects::IssuesController < Projects::ApplicationController
     render_conflict_response
   end
 
+  def export_csv
+    ExportCsvWorker.perform_async(@current_user.id, @project.id, filter_params)
+
+    index_path = namespace_project_issues_path(@project.namespace, @project)
+    redirect_to(index_path, notice: "Your CSV export has started. It will be emailed to #{current_user.notification_email} when complete.")
+  end
+
   def referenced_merge_requests
     @merge_requests = @issue.referenced_merge_requests(current_user)
     @closed_by_merge_requests = @issue.closed_by_merge_requests(current_user)
@@ -274,7 +282,7 @@ class Projects::IssuesController < Projects::ApplicationController
 
   def issue_params
     params.require(:issue).permit(
-      :title, :assignee_id, :position, :description, :confidential,
+      :title, :assignee_id, :position, :description, :confidential, :weight,
       :milestone_id, :due_date, :state_event, :task_num, :lock_version, label_ids: []
     )
   end

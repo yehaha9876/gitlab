@@ -636,7 +636,7 @@ In `/etc/gitlab/gitlab.rb`:
 
 ```ruby
 redis['master_name'] = 'gitlab-redis'
-redis['password'] = 'redis-password-goes-here'
+redis['master_password'] = 'redis-password-goes-here'
 gitlab_rails['redis_sentinels'] = [
   {'host' => '10.0.0.1', 'port' => 26379},
   {'host' => '10.0.0.2', 'port' => 26379},

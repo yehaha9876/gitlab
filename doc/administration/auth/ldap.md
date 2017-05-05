@@ -6,6 +6,15 @@ servers, including Microsoft Active Directory, Apple Open Directory, Open LDAP,
 and 389 Server. GitLab EE includes enhanced integration, including group
 membership syncing.
 
+## GitLab EE
+
+The information on this page is relevant for both GitLab CE and EE. For more
+details about EE-specific LDAP features, see [LDAP EE Documentation](ldap-ee.md).
+
+[//]: # (Do *NOT* modify this file in EE documentation. All changes in this)
+[//]: # (file should happen in CE, too. If the change is EE-specific, put)
+[//]: # (it in `ldap-ee.md`.)
+
 ## Security
 
 GitLab assumes that LDAP users are not able to change their LDAP 'mail', 'email'
@@ -51,6 +60,11 @@ syntax will be used by GitLab.
 The configuration inside `gitlab_rails['ldap_servers']` below is sensitive to
 incorrect indentation. Be sure to retain the indentation given in the example.
 Copy/paste can sometimes cause problems.
+
+> **Note:** The `method` value `ssl` corresponds to 'Simple TLS' in the LDAP
+  library. `tls` corresponds to StartTLS, not to be confused with regular TLS.
+  Normally, if you specify `ssl` is will be on port 636 while `tls` (StartTLS)
+  would be on port 389. `plain` also operates on port 389.
 
 **Omnibus configuration**
 
@@ -157,6 +171,14 @@ main: # 'main' is the GitLab 'provider ID' of this LDAP server
   #
   admin_group: ''
 
+  # An array of CNs of groups containing users that should be considered external
+  #
+  #   Ex. ['interns', 'contractors']
+  #
+  #   Note: Not `cn=interns` or the full DN
+  #
+  external_groups: []
+
   # The LDAP attribute containing a user's public SSH key
   #
   #   Ex. ssh_public_key
@@ -231,6 +253,24 @@ group you can use the following syntax:
 (memberOf=CN=My Group,DC=Example,DC=com)
 ```
 
+### Escaping special characters
+
+If the `user_filter` DN contains a special characters. For example a comma
+
+```
+OU=GitLab, Inc,DC=gitlab,DC=com
+```
+
+This character needs to be escaped as documented in [RFC 4515](https://tools.ietf.org/search/rfc4515).
+
+Due to the way the string is parsed the special character needs to be convered
+to hex and `\\5C\\` (`5C` = `\` in hex) added before it.
+As an example the above DN would look like
+
+```
+OU=GitLab\\5C\\2C Inc,DC=gitlab,DC=com
+```
+
 Please note that GitLab does not support the custom filter syntax used by
 omniauth-ldap.
 
@@ -244,6 +284,74 @@ attribute is not found in GitLab's database, a new user is created.
 In other words, if an existing GitLab user wants to enable LDAP sign-in for
 themselves, they should check that their GitLab email address matches their
 LDAP email address, and then sign into GitLab via their LDAP credentials.
+
+## Adjusting LDAP user and group sync schedules
+
+You can manually configure LDAP user and group sync times by setting the
+following configuration values.
+
+>**Note:**
+These are cron formatted values. You can use a crontab generator to create
+these values, for example http://www.crontabgenerator.com/.
+
+### Adjusting LDAP user sync schedule
+
+By default, GitLab will run a worker once per day at 01:30 a.m. server time to
+check and update GitLab users against LDAP.
+
+**Omnibus installations**
+
+1. Edit `/etc/gitlab/gitlab.rb`:
+
+    ```ruby
+    gitlab_rails['ldap_sync_worker_cron'] = "* */12 * * *"
+    ```
+
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+
+**Source installations**
+
+1. Edit `config/gitlab.yaml`:
+
+    ```yaml
+    cron_jobs
+      ldap_sync_worker_cron:
+        "* */12 * * *"
+    ```
+
+1. [Restart GitLab](../restart_gitlab.md#installations-from-source) for the changes to take effect.
+
+### Adjusting LDAP group sync schedule
+
+By default, GitLab will run a group sync process every hour, on the hour.
+
+>**Note**: It's recommended not to run group sync at too short intervals as this
+could lead to multiple syncs running concurrently. This is primarily a concern
+for installations with a large number of LDAP users. Please review the
+[LDAP group sync benchmark metrics](../auth/ldap-ee.md#benchmarks) to see how
+your installation compares before proceeding.
+
+**Omnibus installations**
+
+1. Edit `/etc/gitlab/gitlab.rb`:
+
+    ```ruby
+    gitlab_rails['ldap_group_sync_worker_cron'] = "*/30 * * * *"
+    ```
+
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+
+**Source installations**
+
+1. Edit `config/gitlab.yaml`:
+
+    ```yaml
+    cron_jobs
+      ldap_group_sync_worker_cron:
+        "*/30 * * * *"
+    ```
+
+1. [Restart GitLab](../restart_gitlab.md#installations-from-source) for the changes to take effect.
 
 ## Limitations
 

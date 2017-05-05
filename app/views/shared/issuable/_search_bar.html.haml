@@ -1,8 +1,12 @@
 - type = local_assigns.fetch(:type)
+- board = local_assigns.fetch(:board, nil)
 - block_css_class = type != :boards_modal ? 'row-content-block second-block' : ''
 
 .issues-filters
   .issues-details-filters.filtered-search-block{ class: block_css_class, "v-pre" => type == :boards_modal }
+    - if type == :boards && board
+      #js-multiple-boards-switcher.inline.boards-switcher{ "v-cloak" => true }
+        = render "projects/boards/switcher", board: board
     = form_tag page_filter_path(without: [:assignee_id, :author_id, :milestone_title, :label_name, :search]), method: :get, class: 'filter-form js-filter-form' do
       - if params[:search].present?
         = hidden_field_tag :search, params[:search]
@@ -70,22 +74,25 @@
                         {{name}}
                       %span.dropdown-light-content
                         @{{username}}
-            #js-dropdown-milestone.filtered-search-input-dropdown-menu.dropdown-menu{ data: { icon: 'clock-o', hint: 'milestone', tag: '%milestone' } }
-              %ul{ data: { dropdown: true } }
-                %li.filter-dropdown-item{ data: { value: 'none' } }
-                  %button.btn.btn-link
-                    No Milestone
-                %li.filter-dropdown-item{ data: { value: 'upcoming' } }
-                  %button.btn.btn-link
-                    Upcoming
-                %li.filter-dropdown-item{ 'data-value' => 'started' }
-                  %button.btn.btn-link
-                    Started
-                %li.divider
-              %ul.filter-dropdown{ data: { dynamic: true, dropdown: true } }
-                %li.filter-dropdown-item
-                  %button.btn.btn-link.js-data-value
-                    {{title}}
+
+            - unless board && board.milestone_id
+              #js-dropdown-milestone.filtered-search-input-dropdown-menu.dropdown-menu{ data: { icon: 'clock-o', hint: 'milestone', tag: '%milestone' } }
+                %ul{ data: { dropdown: true } }
+                  %li.filter-dropdown-item{ data: { value: 'none' } }
+                    %button.btn.btn-link
+                      No Milestone
+                  %li.filter-dropdown-item{ data: { value: 'upcoming' } }
+                    %button.btn.btn-link
+                      Upcoming
+                  %li.filter-dropdown-item{ 'data-value' => 'started' }
+                    %button.btn.btn-link
+                      Started
+                  %li.divider
+                %ul.filter-dropdown{ data: { dynamic: true, dropdown: true } }
+                  %li.filter-dropdown-item
+                    %button.btn.btn-link.js-data-value
+                      {{title}}
+
             #js-dropdown-label.filtered-search-input-dropdown-menu.dropdown-menu{ data: { icon: 'tag', hint: 'label', tag: '~label', type: 'array' } }
               %ul{ data: { dropdown: true } }
                 %li.filter-dropdown-item{ data: { value: 'none' } }
@@ -98,6 +105,22 @@
                     %span.dropdown-label-box{ style: 'background: {{color}}' }
                     %span.label-title.js-data-value
                       {{title}}
+
+            - if type == :issues || type == :boards
+              #js-dropdown-weight.filtered-search-input-dropdown-menu.dropdown-menu{ data: { icon: 'balance-scale', hint: 'weight', tag: 'weight' } }
+                %ul{ 'data-dropdown' => true }
+                  %li.filter-dropdown-item{ 'data-value' => 'none' }
+                    %button.btn.btn-link
+                      No Weight
+                  %li.filter-dropdown-item{ 'data-value' => 'any' }
+                    %button.btn.btn-link
+                      Any Weight
+                  %li.divider
+                %ul.filter-dropdown{ 'data-dropdown' => true }
+                  - Issue.weight_filter_options.each do |weight|
+                    %li.filter-dropdown-item{ 'data-value' => "#{weight}" }
+                      %button.btn.btn-link= weight
+
         .filter-dropdown-container
           - if type == :boards
             - if can?(current_user, :admin_list, @project)
@@ -111,7 +134,7 @@
                   = dropdown_loading
               #js-add-issues-btn.prepend-left-10
           - elsif type != :boards_modal
-            = render 'shared/sort_dropdown'
+            = render 'shared/sort_dropdown', type: local_assigns[:type]
 
     - if @bulk_edit
       .issues_bulk_update.hide

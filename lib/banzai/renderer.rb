@@ -159,7 +159,7 @@ module Banzai
 
     # GitLab EE needs to disable updates on GET requests in Geo
     def self.update_object?(object)
-      true
+      !Gitlab::Geo.secondary?
     end
   end
 end

@@ -4,6 +4,8 @@ require 'rails/all'
 
 Bundler.require(:default, Rails.env)
 
+require 'elasticsearch/rails/instrumentation'
+
 module Gitlab
   class Application < Rails::Application
     require_dependency Rails.root.join('lib/gitlab/redis')
@@ -30,6 +32,9 @@ module Gitlab
                                      #{config.root}/app/services/concerns))
 
     config.generators.templates.push("#{config.root}/generator_templates")
+
+    # EE specific paths.
+    config.eager_load_paths.push("#{config.root}/app/workers/concerns")
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
@@ -151,6 +156,9 @@ module Gitlab
     # This is needed for gitlab-shell
     ENV['GITLAB_PATH_OUTSIDE_HOOK'] = ENV['PATH']
     ENV['GIT_TERMINAL_PROMPT'] = '0'
+
+    # Gitlab Geo Middleware support
+    config.middleware.insert_after ActionDispatch::Flash, 'Gitlab::Middleware::ReadonlyGeo'
 
     config.generators do |g|
       g.factory_girl false

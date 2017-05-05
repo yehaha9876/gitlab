@@ -13,8 +13,16 @@ module API
         optional :share_with_group_lock, type: Boolean, desc: 'Prevent sharing a project with another group within this group'
       end
 
+      params :optional_params_ee do
+        optional :membership_lock, type: Boolean, desc: 'Prevent adding new members to project membership within this group'
+        optional :ldap_cn, type: String, desc: 'LDAP Common Name'
+        optional :ldap_access, type: Integer, desc: 'A valid access level'
+        all_or_none_of :ldap_cn, :ldap_access
+      end
+
       params :optional_params do
         use :optional_params_ce
+        use :optional_params_ee
       end
 
       params :statistics_params do
@@ -76,9 +84,22 @@ module API
       post do
         authorize! :create_group
 
+        ldap_link_attrs = {
+          cn: params.delete(:ldap_cn),
+          group_access: params.delete(:ldap_access)
+        }
+
         group = ::Groups::CreateService.new(current_user, declared_params(include_missing: false)).execute
 
         if group.persisted?
+          # NOTE: add backwards compatibility for single ldap link
+          if ldap_link_attrs[:cn].present?
+            group.ldap_group_links.create(
+              cn: ldap_link_attrs[:cn],
+              group_access: ldap_link_attrs[:group_access]
+            )
+          end
+
           present group, with: Entities::Group, current_user: current_user
         else
           render_api_error!("Failed to save group #{group.errors.messages}", 400)

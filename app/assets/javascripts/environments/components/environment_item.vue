@@ -10,11 +10,6 @@ import MonitoringButtonComponent from './environment_monitoring.vue';
 import CommitComponent from '../../vue_shared/components/commit';
 import eventHub from '../event_hub';
 
-/**
- * Envrionment Item Component
- *
- * Renders a table row for each environment.
- */
 const timeagoInstance = new Timeago();
 
 export default {
@@ -46,11 +41,17 @@ export default {
       required: false,
       default: false,
     },
+
+    toggleDeployBoard: {
+      type: Function,
+      required: false,
+    },
+
   },
 
   computed: {
     /**
-     * Verifies if `last_deployment` key exists in the current Envrionment.
+     * Verifies if `last_deployment` key exists in the current Environment.
      * This key is required to render most of the html - this method works has
      * an helper.
      *
@@ -435,6 +436,22 @@ export default {
 <template>
   <tr :class="{ 'js-child-row': model.isChildren }">
     <td>
+      <span
+        class="deploy-board-icon"
+        v-if="model.hasDeployBoard"
+        @click="toggleDeployBoard(model)">
+
+        <i
+          v-show="!model.isDeployBoardVisible"
+          class="fa fa-caret-right"
+          aria-hidden="true" />
+
+        <i
+          v-show="model.isDeployBoardVisible"
+          class="fa fa-caret-down"
+          aria-hidden="true" />
+      </span>
+
       <a
         v-if="!model.isFolder"
         class="environment-name"

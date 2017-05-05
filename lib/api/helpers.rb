@@ -1,5 +1,7 @@
 module API
   module Helpers
+    prepend EE::API::Helpers
+
     include Gitlab::Utils
     include Helpers::Pagination
 
@@ -112,6 +114,13 @@ module API
     def authenticate_by_gitlab_shell_token!
       input = params['secret_token'].try(:chomp)
       unless Devise.secure_compare(secret_token, input)
+        unauthorized!
+      end
+    end
+
+    def authenticate_by_gitlab_geo_token!
+      token = headers['X-Gitlab-Token'].try(:chomp)
+      unless token && Devise.secure_compare(geo_token, token)
         unauthorized!
       end
     end
@@ -382,6 +391,10 @@ module API
 
     def secret_token
       Gitlab::Shell.secret_token
+    end
+
+    def geo_token
+      Gitlab::Geo.current_node.system_hook.token
     end
 
     def send_git_blob(repository, blob)

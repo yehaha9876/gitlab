@@ -21,6 +21,11 @@ describe Auth::ContainerRegistryAuthenticationService, services: true do
     allow_any_instance_of(JSONWebToken::RSAToken).to receive(:key).and_return(rsa_key)
   end
 
+  shared_examples 'an authenticated' do
+    it { is_expected.to include(:token) }
+    it { expect(payload).to include('access') }
+  end
+
   shared_examples 'a valid token' do
     it { is_expected.to include(:token) }
     it { expect(payload).to include('access') }
@@ -239,6 +244,14 @@ describe Auth::ContainerRegistryAuthenticationService, services: true do
 
     before do
       current_project.team << [current_user, :developer]
+    end
+
+    context 'allow to use offline_token' do
+      let(:current_params) do
+        { offline_token: true }
+      end
+
+      it_behaves_like 'an authenticated'
     end
 
     it_behaves_like 'a valid token'

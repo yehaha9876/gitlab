@@ -27,9 +27,19 @@
           tree_join(@commit.sha, @path)), class: 'btn btn-sm js-data-file-blob-permalink-url'
 
     .btn-group{ role: "group" }<
+      - if current_user
+        = lock_file_link(html_options: {class: 'btn btn-sm path-lock'})
+
       = edit_blob_link if blob.readable_text?
       - if current_user
         = replace_blob_link
         = delete_blob_link
 
 = render 'projects/fork_suggestion'
+
+- if license_allows_file_locks?
+  :javascript
+    PathLocks.init(
+      '#{toggle_namespace_project_path_locks_path(@project.namespace, @project)}',
+      '#{@path}'
+    );

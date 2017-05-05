@@ -226,6 +226,8 @@ class Service < ActiveRecord::Base
       gemnasium
       hipchat
       irker
+      jenkins
+      jenkins_deprecated
       jira
       kubernetes
       mattermost_slash_commands

@@ -2,6 +2,9 @@
 = render "admin/dashboard/head"
 
 %div{ class: container_class }
+  - if @license
+    = render "admin/licenses/breakdown", license: @license
+
   .admin-dashboard.prepend-top-default
     .row
       .col-md-4
@@ -68,6 +71,16 @@
           = reply_email
           %span.light.pull-right
             = boolean_to_icon Gitlab::IncomingEmail.enabled?
+        - elastic = "Elasticsearch"
+        %p{ "aria-label" => "#{elastic}: status " + (current_application_settings.elasticsearch_search? ? "on" : "off") }
+          = elastic
+          %span.light.pull-right
+            = boolean_to_icon current_application_settings.elasticsearch_search?
+        - geo = "Geo"
+        %p{ "aria-label" => "#{geo}: status " + (Gitlab::Geo.enabled? ? "on" : "off") }
+          = geo
+          %span.light.pull-right
+            = boolean_to_icon Gitlab::Geo.enabled?
         - container_reg = "Container Registry"
         %p{ "aria-label" => "#{container_reg}: status " + (Gitlab.config.registry.enabled ? "on" : "off") }
           = container_reg
@@ -104,6 +117,14 @@
           GitLab API
           %span.pull-right
             = API::API::version
+        - if Gitlab::Geo.enabled?
+          %p
+            Geo
+            %span.pull-right
+              - if Gitlab::Geo.current_node
+                = Gitlab::Geo.current_node.primary ? 'Primary node' : 'Secondary node'
+              - else
+                Undefined
         %p
           Git
           %span.pull-right

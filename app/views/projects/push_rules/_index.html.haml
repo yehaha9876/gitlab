@@ -1,0 +1,13 @@
+.row.prepend-top-default.append-bottom-default
+  .col-lg-3
+    %h4.prepend-top-0
+      Push Rules
+    %p.light
+      Push Rules outline what is accepted for this project.
+  .col-lg-9
+    %h5.prepend-top-0
+      Add new push rule
+    = form_for [@project.namespace.becomes(Namespace), @project, @push_rule] do |f|
+      = form_errors(@push_rule)
+
+      = render "shared/push_rules_form", f: f

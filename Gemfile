@@ -12,7 +12,7 @@ gem 'sprockets', '~> 3.7.0'
 gem 'default_value_for', '~> 3.0.0'
 
 # Supported DBs
-gem 'mysql2', '~> 0.3.16', group: :mysql
+gem 'mysql2', '~> 0.4.5', group: :mysql
 gem 'pg', '~> 0.18.2', group: :postgres
 
 gem 'rugged', '~> 0.25.1.1'
@@ -33,13 +33,14 @@ gem 'omniauth-gitlab', '~> 1.0.2'
 gem 'omniauth-google-oauth2', '~> 0.4.1'
 gem 'omniauth-kerberos', '~> 0.3.0', group: :kerberos
 gem 'omniauth-oauth2-generic', '~> 0.2.2'
-gem 'omniauth-saml', '~> 1.7.0'
-gem 'omniauth-shibboleth', '~> 1.2.0'
-gem 'omniauth-twitter', '~> 1.2.0'
-gem 'omniauth_crowd', '~> 2.2.0'
-gem 'omniauth-authentiq', '~> 0.3.0'
-gem 'rack-oauth2', '~> 1.2.1'
-gem 'jwt', '~> 1.5.6'
+gem 'omniauth-saml',          '~> 1.7.0'
+gem 'omniauth-shibboleth',    '~> 1.2.0'
+gem 'omniauth-twitter',       '~> 1.2.0'
+gem 'omniauth_crowd',         '~> 2.2.0'
+gem 'gssapi', group: :kerberos
+gem 'omniauth-authentiq',     '~> 0.3.0'
+gem 'rack-oauth2',            '~> 1.2.1'
+gem 'jwt',                    '~> 1.5.6'
 
 # Spam and anti-bot protection
 gem 'recaptcha', '~> 3.0', require: 'recaptcha/rails'
@@ -61,6 +62,7 @@ gem 'browser', '~> 2.2'
 # GitLab fork with several improvements to original library. For full list of changes
 # see https://github.com/intridea/omniauth-ldap/compare/master...gitlabhq:master
 gem 'gitlab_omniauth-ldap', '~> 1.2.1', require: 'omniauth-ldap'
+gem 'net-ldap'
 
 # Git Wiki
 # Required manually in config/initializers/gollum.rb to control load order
@@ -106,6 +108,13 @@ gem 'unf', '~> 0.1.4'
 
 # Seed data
 gem 'seed-fu', '~> 2.3.5'
+
+# Search
+gem 'elasticsearch-model', '~> 0.1.9'
+gem 'elasticsearch-rails', '~> 0.1.9'
+gem 'elasticsearch-api',   '5.0.3'
+gem 'aws-sdk'
+gem 'faraday_middleware-aws-signers-v4'
 
 # Markdown and HTML processing
 gem 'html-pipeline', '~> 1.11.0'
@@ -244,12 +253,13 @@ gem 'font-awesome-rails', '~> 4.7'
 gem 'gemojione', '~> 3.0'
 gem 'gon', '~> 6.1.0'
 gem 'jquery-atwho-rails', '~> 1.3.2'
-gem 'jquery-rails', '~> 4.1.0'
-gem 'request_store', '~> 1.3'
-gem 'select2-rails', '~> 3.5.9'
-gem 'virtus', '~> 1.0.1'
-gem 'net-ssh', '~> 3.0.1'
-gem 'base32', '~> 0.3.0'
+gem 'jquery-rails',       '~> 4.1.0'
+gem 'request_store',      '~> 1.3'
+gem 'select2-rails',      '~> 3.5.9'
+gem 'virtus',             '~> 1.0.1'
+gem 'net-ssh',            '~> 3.0.1'
+gem 'base32',             '~> 0.3.0'
+gem "gitlab-license", "~> 1.0"
 
 # Sentry integration
 gem 'sentry-raven', '~> 2.4.0'

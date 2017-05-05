@@ -34,6 +34,7 @@ gl.issueBoards.ModalFooter = Vue.extend({
       // Post the data to the backend
       gl.boardService.bulkUpdate(issueIds, {
         add_label_ids: [list.label.id],
+        milestone_id: this.state.currentBoard.milestone_id,
       }).catch(() => {
         new Flash('Failed to update issues, please try again.', 'alert');
 

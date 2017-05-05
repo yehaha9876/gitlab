@@ -85,6 +85,10 @@ excluded_attributes:
     - :id
     - :star_count
     - :last_activity_at
+    - :mirror_last_update_at
+    - :mirror_last_successful_update_at
+    - :mirror_user_id
+    - :mirror_trigger_builds
   snippets:
     - :expired_at
   merge_request_diff:

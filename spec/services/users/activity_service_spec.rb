@@ -38,6 +38,16 @@ describe Users::ActivityService, services: true do
         end
       end
     end
+
+    context 'when in Geo secondary node' do
+      before { allow(Gitlab::Geo).to receive(:secondary?).and_return(true) }
+
+      it 'does not update last_activity_at' do
+        service.execute
+
+        expect(last_hour_user_ids).to eq([])
+      end
+    end
   end
 
   def last_hour_user_ids

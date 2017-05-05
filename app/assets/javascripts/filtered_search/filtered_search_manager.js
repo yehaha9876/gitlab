@@ -15,6 +15,10 @@ class FilteredSearchManager {
     this.tokensContainer = this.container.querySelector('.tokens-container');
     this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeys;
 
+    if (page === 'issues' || page === 'boards') {
+      this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeysWithWeights;
+    }
+
     this.recentSearchesStore = new RecentSearchesStore();
     let recentSearchesKey = 'issue-recent-searches';
     if (page === 'merge_requests') {
@@ -136,6 +140,8 @@ class FilteredSearchManager {
       const { lastVisualToken } = gl.FilteredSearchVisualTokens.getLastVisualTokenBeforeInput();
 
       if (this.filteredSearchInput.value === '' && lastVisualToken) {
+        if (this.canEdit && !this.canEdit(lastVisualToken)) return;
+
         this.filteredSearchInput.value = gl.FilteredSearchVisualTokens.getLastTokenPartial();
         gl.FilteredSearchVisualTokens.removeLastTokenPartial();
       }
@@ -234,6 +240,8 @@ class FilteredSearchManager {
 
   editToken(e) {
     const token = e.target.closest('.js-visual-token');
+
+    if (this.canEdit && !this.canEdit(token)) return;
 
     if (token) {
       gl.FilteredSearchVisualTokens.editToken(token);

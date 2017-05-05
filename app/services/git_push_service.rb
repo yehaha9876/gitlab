@@ -52,9 +52,14 @@ class GitPushService < BaseService
       update_gitattributes if is_default_branch?
     end
 
+    if current_application_settings.elasticsearch_indexing? && is_default_branch?
+      ElasticCommitIndexerWorker.perform_async(@project.id, params[:oldrev], params[:newrev])
+    end
+
     execute_related_hooks
     perform_housekeeping
 
+    update_remote_mirrors
     update_caches
   end
 
@@ -92,6 +97,13 @@ class GitPushService < BaseService
 
   protected
 
+  def update_remote_mirrors
+    return if @project.remote_mirrors.empty?
+
+    @project.mark_stuck_remote_mirrors_as_failed!
+    @project.update_remote_mirrors
+  end
+
   def execute_related_hooks
     # Update merge requests that may be affected by this push. A new branch
     # could cause the last commit of a merge request to change.
@@ -99,12 +111,13 @@ class GitPushService < BaseService
     UpdateMergeRequestsWorker
       .perform_async(@project.id, current_user.id, params[:oldrev], params[:newrev], params[:ref])
 
+    mirror_update = @project.mirror? && @project.repository.up_to_date_with_upstream?(branch_name)
     SystemHookPushWorker.perform_async(build_push_data.dup, :push_hooks)
 
     EventCreateService.new.push(@project, current_user, build_push_data)
     @project.execute_hooks(build_push_data.dup, :push_hooks)
     @project.execute_services(build_push_data.dup, :push_hooks)
-    Ci::CreatePipelineService.new(@project, current_user, build_push_data).execute
+    Ci::CreatePipelineService.new(@project, current_user, build_push_data).execute(mirror_update: mirror_update)
 
     if push_remove_branch?
       AfterBranchDeleteService

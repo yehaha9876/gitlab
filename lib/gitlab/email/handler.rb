@@ -2,13 +2,16 @@ require 'gitlab/email/handler/create_note_handler'
 require 'gitlab/email/handler/create_issue_handler'
 require 'gitlab/email/handler/unsubscribe_handler'
 
+require 'gitlab/email/handler/ee/service_desk_handler'
+
 module Gitlab
   module Email
     module Handler
       HANDLERS = [
+        EE::ServiceDeskHandler,
         UnsubscribeHandler,
         CreateNoteHandler,
-        CreateIssueHandler
+        CreateIssueHandler,
       ].freeze
 
       def self.for(mail, mail_key)

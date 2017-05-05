@@ -1,9 +1,12 @@
 class Groups::GroupMembersController < Groups::ApplicationController
+  prepend EE::Groups::GroupMembersController
+
   include MembershipActions
   include SortingHelper
 
   # Authorize
-  before_action :authorize_admin_group_member!, except: [:index, :leave, :request_access]
+  before_action :authorize_admin_group_member!, except: [:index, :leave, :request_access, :update, :override]
+  before_action :authorize_update_group_member!, only: [:update, :override]
 
   def index
     @sort = params[:sort].presence || sort_value_name
@@ -26,7 +29,11 @@ class Groups::GroupMembersController < Groups::ApplicationController
 
     return render_403 unless can?(current_user, :update_group_member, @group_member)
 
-    @group_member.update_attributes(member_params)
+    old_access_level = @group_member.human_access
+
+    if @group_member.update_attributes(member_params)
+      log_audit_event(@group_member, action: :update, old_access_level: old_access_level)
+    end
   end
 
   def resend_invite

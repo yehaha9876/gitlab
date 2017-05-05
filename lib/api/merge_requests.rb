@@ -54,8 +54,14 @@ module API
           optional :remove_source_branch, type: Boolean, desc: 'Remove source branch when merging'
         end
 
+        params :optional_params_ee do
+          optional :approvals_before_merge, type: Integer, desc: 'Number of approvals required before this can be merged'
+          optional :squash, type: Boolean, desc: 'Squash commits when merging'
+        end
+
         params :optional_params do
           use :optional_params_ce
+          use :optional_params_ee
         end
       end
 
@@ -170,8 +176,13 @@ module API
         optional :state_event, type: String, values: %w[close reopen],
                                desc: 'Status of the merge request'
 
+        # EE
+        at_least_one_of_ee = [
+          :squash
+        ]
+
         use :optional_params
-        at_least_one_of(*at_least_one_of_ce)
+        at_least_one_of(*(at_least_one_of_ce + at_least_one_of_ee))
       end
       put ':id/merge_requests/:merge_request_iid' do
         merge_request = find_merge_request_with_access(params.delete(:merge_request_iid), :update_merge_request)
@@ -199,6 +210,9 @@ module API
         optional :merge_when_pipeline_succeeds, type: Boolean,
                                                 desc: 'When true, this merge request will be merged when the pipeline succeeds'
         optional :sha, type: String, desc: 'When present, must have the HEAD SHA of the source branch'
+
+        # EE
+        optional :squash, type: Boolean, desc: 'When true, the commits will be squashed into a single commit on merge'
       end
       put ':id/merge_requests/:merge_request_iid/merge' do
         merge_request = find_project_merge_request(params[:merge_request_iid])
@@ -214,6 +228,10 @@ module API
 
         if params[:sha] && merge_request.diff_head_sha != params[:sha]
           render_api_error!("SHA does not match HEAD of source branch: #{merge_request.diff_head_sha}", 409)
+        end
+
+        if params[:squash]
+          merge_request.update(squash: params[:squash])
         end
 
         merge_params = {
@@ -245,6 +263,52 @@ module API
         ::MergeRequest::MergeWhenPipelineSucceedsService
           .new(merge_request.target_project, current_user)
           .cancel(merge_request)
+      end
+
+      # Get the status of the merge request's approvals
+      #
+      # Parameters:
+      #   id (required)                 - The ID of a project
+      #   merge_request_idd (required)  - IID of MR
+      # Examples:
+      #   GET /projects/:id/merge_requests/:merge_request_iid/approvals
+      #
+      get ':id/merge_requests/:merge_request_iid/approvals' do
+        merge_request = find_merge_request_with_access(params[:merge_request_iid])
+
+        present merge_request, with: Entities::MergeRequestApprovals, current_user: current_user
+      end
+
+      # Approve a merge request
+      #
+      # Parameters:
+      #   id (required)                 - The ID of a project
+      #   merge_request_iid (required)  - IID of MR
+      # Examples:
+      #   POST /projects/:id/merge_requests/:merge_request_iid/approve
+      #
+      post ':id/merge_requests/:merge_request_iid/approve' do
+        merge_request = find_project_merge_request(params[:merge_request_iid])
+
+        unauthorized! unless merge_request.can_approve?(current_user)
+
+        ::MergeRequests::ApprovalService
+          .new(user_project, current_user)
+          .execute(merge_request)
+
+        present merge_request, with: Entities::MergeRequestApprovals, current_user: current_user
+      end
+
+      post ':id/merge_requests/:merge_request_iid/unapprove' do
+        merge_request = find_project_merge_request(params[:merge_request_iid])
+
+        not_found! unless merge_request.has_approved?(current_user)
+
+        ::MergeRequests::RemoveApprovalService
+          .new(user_project, current_user)
+          .execute(merge_request)
+
+        present merge_request, with: Entities::MergeRequestApprovals, current_user: current_user
       end
 
       desc 'List issues that will be closed on merge' do

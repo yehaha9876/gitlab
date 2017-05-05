@@ -5,7 +5,7 @@ describe 'Issue Boards', feature: true, js: true do
   include DragTo
 
   let(:project) { create(:empty_project, :public) }
-  let(:board)   { create(:board, project: project) }
+  let!(:board)  { create(:board, project: project) }
   let(:user)    { create(:user) }
   let!(:user2)  { create(:user) }
 
@@ -18,7 +18,7 @@ describe 'Issue Boards', feature: true, js: true do
 
   context 'no lists' do
     before do
-      visit namespace_project_board_path(project.namespace, project, board)
+      visit namespace_project_boards_path(project.namespace, project)
       wait_for_vue_resource
       expect(page).to have_selector('.board', count: 2)
     end
@@ -82,7 +82,7 @@ describe 'Issue Boards', feature: true, js: true do
     let!(:issue9) { create(:labeled_issue, project: project, labels: [planning, testing, bug, accepting], relative_position: 1) }
 
     before do
-      visit namespace_project_board_path(project.namespace, project, board)
+      visit namespace_project_boards_path(project.namespace, project)
 
       wait_for_vue_resource
 
@@ -163,7 +163,7 @@ describe 'Issue Boards', feature: true, js: true do
         create(:labeled_issue, project: project, labels: [planning])
       end
 
-      visit namespace_project_board_path(project.namespace, project, board)
+      visit namespace_project_boards_path(project.namespace, project)
       wait_for_vue_resource
 
       page.within(find('.board', match: :first)) do
@@ -512,7 +512,7 @@ describe 'Issue Boards', feature: true, js: true do
 
   context 'keyboard shortcuts' do
     before do
-      visit namespace_project_board_path(project.namespace, project, board)
+      visit namespace_project_boards_path(project.namespace, project)
       wait_for_vue_resource
     end
 
@@ -525,7 +525,7 @@ describe 'Issue Boards', feature: true, js: true do
   context 'signed out user' do
     before do
       logout
-      visit namespace_project_board_path(project.namespace, project, board)
+      visit namespace_project_boards_path(project.namespace, project)
       wait_for_vue_resource
     end
 
@@ -549,7 +549,7 @@ describe 'Issue Boards', feature: true, js: true do
       project.team << [user_guest, :guest]
       logout
       login_as(user_guest)
-      visit namespace_project_board_path(project.namespace, project, board)
+      visit namespace_project_boards_path(project.namespace, project)
       wait_for_vue_resource
     end
 

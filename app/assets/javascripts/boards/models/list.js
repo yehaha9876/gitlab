@@ -101,6 +101,7 @@ class List {
       .then((resp) => {
         const data = resp.json();
         issue.id = data.iid;
+        issue.milestone = data.milestone;
       });
   }
 

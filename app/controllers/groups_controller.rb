@@ -135,7 +135,7 @@ class GroupsController < Groups::ApplicationController
   end
 
   def group_params
-    params.require(:group).permit(group_params_ce)
+    params.require(:group).permit(group_params_ce << group_params_ee)
   end
 
   def group_params_ce
@@ -154,6 +154,13 @@ class GroupsController < Groups::ApplicationController
       :chat_team_name,
       :require_two_factor_authentication,
       :two_factor_grace_period
+    ]
+  end
+
+  def group_params_ee
+    [
+      :membership_lock,
+      :repository_size_limit
     ]
   end
 

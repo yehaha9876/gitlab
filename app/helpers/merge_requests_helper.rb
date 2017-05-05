@@ -85,6 +85,20 @@ module MergeRequestsHelper
     )
   end
 
+  def render_items_list(items, separator = "and")
+    items_cnt = items.size
+
+    case items_cnt
+    when 1
+      items.first
+    when 2
+      "#{items.first} #{separator} #{items.last}"
+    else
+      last_item = items.pop
+      "#{items.join(", ")} #{separator} #{last_item}"
+    end
+  end
+
   def mr_assign_issues_link
     issues = MergeRequests::AssignIssuesService.new(@project,
                                                     current_user,
@@ -158,6 +172,6 @@ module MergeRequestsHelper
   end
 
   def merge_params_ee(merge_request)
-    {}
+    { squash: merge_request.squash }
   end
 end

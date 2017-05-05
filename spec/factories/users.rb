@@ -12,6 +12,10 @@ FactoryGirl.define do
       admin true
     end
 
+    trait :auditor do
+      auditor true
+    end
+
     trait :blocked do
       after(:build) { |user, _| user.block! }
     end
@@ -27,6 +31,10 @@ FactoryGirl.define do
     trait :ghost do
       ghost true
       after(:build) { |user, _| user.block! }
+    end
+
+    trait :with_avatar do
+      avatar { File.open(Rails.root.join('spec/fixtures/dk.png')) }
     end
 
     trait :two_factor_via_otp do
@@ -62,5 +70,7 @@ FactoryGirl.define do
     end
 
     factory :admin, traits: [:admin]
+    factory :auditor, traits: [:auditor]
+    factory :external_user, traits: [:external]
   end
 end

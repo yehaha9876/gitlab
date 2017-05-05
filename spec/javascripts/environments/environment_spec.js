@@ -52,7 +52,7 @@ describe('Environment', () => {
       });
     });
 
-    describe('with paginated environments', () => {
+    describe('with environments', () => {
       const environmentsResponseInterceptor = (request, next) => {
         next(request.respondWith(JSON.stringify({
           environments: [environment],
@@ -146,6 +146,17 @@ describe('Environment', () => {
           setTimeout(() => {
             component.$el.querySelector('.gl-pagination li:nth-child(5) a').click();
             expect(gl.utils.visitUrl).toHaveBeenCalledWith('?page=2&scope=all');
+            done();
+          }, 0);
+        });
+      });
+
+      describe('deploy boards', () => {
+        it('should render arrow to open deploy boards', (done) => {
+          setTimeout(() => {
+            expect(
+              component.$el.querySelector('.deploy-board-icon i.fa-caret-right'),
+            ).toBeDefined();
             done();
           }, 0);
         });

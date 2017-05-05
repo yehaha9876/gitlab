@@ -23,6 +23,7 @@ Issue:
 - weight
 - time_estimate
 - relative_position
+- service_desk_reply_to
 Event:
 - id
 - target_type
@@ -120,6 +121,8 @@ ProjectMember:
 - invite_accepted_at
 - requested_at
 - expires_at
+- ldap
+- override
 User:
 - id
 - username
@@ -154,6 +157,7 @@ MergeRequest:
 - approvals_before_merge
 - rebase_commit_sha
 - time_estimate
+- squash
 MergeRequestDiff:
 - id
 - state
@@ -351,7 +355,15 @@ Project:
 - auto_cancel_pending_pipelines
 - printing_merge_request_link_enabled
 - build_allow_git_fetch
-- last_repository_updated_at
+- merge_requests_template
+- merge_requests_rebase_enabled
+- approvals_before_merge
+- reset_approvals_on_push
+- merge_requests_ff_only_enabled
+- issues_template
+- repository_size_limit
+- sync_time
+- service_desk_enabled
 Author:
 - name
 ProjectFeature:
@@ -371,12 +383,16 @@ ProtectedBranch::MergeAccessLevel:
 - access_level
 - created_at
 - updated_at
+- user_id
+- group_id
 ProtectedBranch::PushAccessLevel:
 - id
 - protected_branch_id
 - access_level
 - created_at
 - updated_at
+- user_id
+- group_id
 ProtectedTag::CreateAccessLevel:
 - id
 - protected_tag_id

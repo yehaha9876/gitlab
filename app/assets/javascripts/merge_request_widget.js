@@ -126,6 +126,23 @@ import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
       });
     };
 
+    MergeRequestWidget.prototype.rebaseInProgress = function() {
+      return $.ajax({
+        type: 'GET',
+        url: $('.merge-request').data('url'),
+        success: (function(_this) {
+          return function(data) {
+            if (data["rebase_in_progress?"]) {
+              return setTimeout(merge_request_widget.rebaseInProgress, 1000);
+            } else {
+              return location.reload();
+            }
+          };
+        })(this),
+        dataType: 'json'
+      });
+    };
+
     MergeRequestWidget.prototype.cancelPolling = function () {
       this.ciStatusInterval.cancel();
       this.ciEnvironmentStatusInterval.cancel();
@@ -136,7 +153,12 @@ import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
         var $html = $(data);
         this.updateMergeButton(this.status, this.hasCi, $html);
         $('.mr-widget-body').replaceWith($html.find('.mr-widget-body'));
-        $('.mr-widget-footer').replaceWith($html.find('.mr-widget-footer'));
+        $('.mr-widget-footer:not(.mr-approvals-footer)').replaceWith($html.find('.mr-widget-footer:not(.mr-approvals-footer)'));
+        $('.approvals-components').replaceWith($html.find('.approvals-components'));
+
+        if (gl.compileApprovalsWidget) {
+          gl.compileApprovalsWidget();
+        }
       });
     };
 
@@ -233,7 +255,7 @@ import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
         environment.ci_success_icon = this.$ciSuccessIcon;
         const templateString = _.unescape($template[0].outerHTML);
         const template = _.template(templateString)(environment);
-        this.$widgetBody.before(template);
+        $('.mr-widget-body').before(template);
       }
     };
 

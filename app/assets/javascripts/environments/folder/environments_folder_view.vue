@@ -22,6 +22,7 @@ export default {
 
     return {
       store,
+      service: {},
       folderName,
       endpoint,
       state: store.state,
@@ -104,6 +105,17 @@ export default {
   },
 
   methods: {
+
+    /**
+     * Toggles the visibility of the deploy boards of the clicked environment.
+     *
+     * @param  {Object} model
+     * @return {Object}
+     */
+    toggleDeployBoard(model) {
+      return this.store.toggleDeployBoard(model.id);
+    },
+
     /**
      * Will change the page number and update the URL.
      *
@@ -129,7 +141,7 @@ export default {
       </h4>
 
       <ul class="nav-links">
-        <li :class="{ active: scope === null || scope === 'available' }">
+        <li :class="{ 'active': scope === null || scope === 'available' }">
           <a
             :href="availablePath"
             class="js-available-environments-folder-tab">
@@ -139,7 +151,7 @@ export default {
             </span>
           </a>
         </li>
-        <li :class="{ active : scope === 'stopped' }">
+        <li :class="{ 'active' : scope === 'stopped' }">
           <a
             :href="stoppedPath"
             class="js-stopped-environments-folder-tab">
@@ -169,6 +181,9 @@ export default {
           :environments="state.environments"
           :can-create-deployment="canCreateDeploymentParsed"
           :can-read-environment="canReadEnvironmentParsed"
+          :toggleDeployBoard="toggleDeployBoard"
+          :store="store"
+          :service="service"
           />
 
         <table-pagination

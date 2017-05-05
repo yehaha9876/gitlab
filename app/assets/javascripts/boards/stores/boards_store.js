@@ -23,6 +23,11 @@ gl.issueBoards.BoardsStore = {
     this.state.lists = [];
     this.filter.path = gl.utils.getUrlParamsArray().join('&');
   },
+  createNewListDropdownData() {
+    this.state.currentBoard = {};
+    this.state.currentPage = '';
+    this.state.reload = false;
+  },
   addList (listObj) {
     const list = new List(listObj);
     this.state.lists.push(list);
@@ -122,7 +127,11 @@ gl.issueBoards.BoardsStore = {
       return list[key] === val && byType;
     })[0];
   },
-  updateFiltersUrl () {
-    history.pushState(null, null, `?${this.filter.path}`);
-  }
+  updateFiltersUrl (replaceState = false) {
+    if (replaceState) {
+      history.replaceState(null, null, `?${this.filter.path}`);
+    } else {
+      history.pushState(null, null, `?${this.filter.path}`);
+    }
+  },
 };

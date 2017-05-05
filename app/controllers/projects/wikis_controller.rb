@@ -1,6 +1,4 @@
 class Projects::WikisController < Projects::ApplicationController
-  include MarkdownPreview
-
   before_action :authorize_read_wiki!
   before_action :authorize_create_wiki!, only: [:edit, :create, :history]
   before_action :authorize_admin_wiki!, only: :destroy
@@ -50,6 +48,9 @@ class Projects::WikisController < Projects::ApplicationController
     @page = WikiPages::UpdateService.new(@project, current_user, wiki_params).execute(@page)
 
     if @page.valid?
+      # Triggers repository update on secondary nodes when Geo is enabled
+      Gitlab::Geo.notify_wiki_update(@project) if Gitlab::Geo.primary?
+
       redirect_to(
         namespace_project_wiki_path(@project.namespace, @project, @page),
         notice: 'Wiki was successfully updated.'
@@ -63,6 +64,8 @@ class Projects::WikisController < Projects::ApplicationController
     @page = WikiPages::CreateService.new(@project, current_user, wiki_params).execute
 
     if @page.persisted?
+      # Triggers repository update on secondary nodes when Geo is enabled
+      Gitlab::Geo.notify_wiki_update(@project) if Gitlab::Geo.primary?
       redirect_to(
         namespace_project_wiki_path(@project.namespace, @project, @page),
         notice: 'Wiki was successfully updated.'
@@ -85,6 +88,7 @@ class Projects::WikisController < Projects::ApplicationController
 
   def destroy
     @page = @project_wiki.find_page(params[:id])
+
     WikiPages::DestroyService.new(@project, current_user).execute(@page)
 
     redirect_to(
@@ -97,9 +101,14 @@ class Projects::WikisController < Projects::ApplicationController
   end
 
   def preview_markdown
-    context = { pipeline: :wiki, project_wiki: @project_wiki, page_slug: params[:id] }
+    result = PreviewMarkdownService.new(@project, current_user, params).execute
 
-    render_markdown_preview(params[:text], context)
+    render json: {
+      body: view_context.markdown(result[:text], pipeline: :wiki, project_wiki: @project_wiki, page_slug: params[:id]),
+      references: {
+        users: result[:users]
+      }
+    }
   end
 
   private

@@ -26,10 +26,14 @@ module Gitlab
             deploy_keys: DeployKey.count,
             deployments: Deployment.count,
             environments: Environment.count,
+            geo_nodes: GeoNode.count,
             groups: Group.count,
             issues: Issue.count,
             keys: Key.count,
             labels: Label.count,
+            ldap_group_links: LdapGroupLink.count,
+            ldap_keys: LDAPKey.count,
+            ldap_users: User.ldap.count,
             lfs_objects: LfsObject.count,
             merge_requests: MergeRequest.count,
             milestones: Milestone.count,
@@ -39,12 +43,26 @@ module Gitlab
             projects_prometheus_active: PrometheusService.active.count,
             protected_branches: ProtectedBranch.count,
             releases: Release.count,
+            remote_mirrors: RemoteMirror.count,
             services: Service.where(active: true).count,
             snippets: Snippet.count,
             todos: Todo.count,
             uploads: Upload.count,
             web_hooks: WebHook.count
-          }
+          }.merge(service_desk_counts)
+        }
+      end
+
+      def service_desk_counts
+        return {} unless ::License.current.add_on?('GitLab_ServiceDesk')
+
+        projects_with_service_desk = Project.where(service_desk_enabled: true)
+
+        {
+          service_desk_enabled_projects: projects_with_service_desk.count,
+          service_desk_issues: Issue.where(project: projects_with_service_desk,
+                                           author: User.support_bot,
+                                           confidential: true).count
         }
       end
 
@@ -55,10 +73,34 @@ module Gitlab
           active_user_count: User.active.count,
           recorded_at: Time.now,
           mattermost_enabled: Gitlab.config.mattermost.enabled,
-          edition: 'CE'
+          edition: 'EE'
         }
 
+        license = ::License.current
+
+        if license
+          usage_data[:edition] = license_edition(license.plan)
+          usage_data[:license_md5] = Digest::MD5.hexdigest(license.data)
+          usage_data[:historical_max_users] = ::HistoricalData.max_historical_user_count
+          usage_data[:licensee] = license.licensee
+          usage_data[:license_user_count] = license.restricted_user_count
+          usage_data[:license_starts_at] = license.starts_at
+          usage_data[:license_expires_at] = license.expires_at
+          usage_data[:license_add_ons] = license.add_ons
+        end
+
         usage_data
+      end
+
+      def license_edition(plan)
+        case plan
+        when 'premium'
+          'EEP'
+        when 'starter'
+          'EES'
+        else # Older licenses
+          'EE'
+        end
       end
     end
   end

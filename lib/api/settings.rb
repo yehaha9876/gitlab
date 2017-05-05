@@ -165,8 +165,48 @@ module API
       end
       optional :terminal_max_session_time, type: Integer, desc: 'Maximum time for web terminal websocket connection (in seconds). Set to 0 for unlimited time.'
       optional :polling_interval_multiplier, type: BigDecimal, desc: 'Interval multiplier used by endpoints that perform polling. Set to 0 to disable polling.'
+      at_least_one_of :default_branch_protection, :default_project_visibility, :default_snippet_visibility,
+                      :default_group_visibility, :restricted_visibility_levels, :import_sources,
+                      :enabled_git_access_protocol, :gravatar_enabled, :default_projects_limit,
+                      :max_attachment_size, :session_expire_delay, :disabled_oauth_sign_in_sources,
+                      :user_oauth_applications, :user_default_external, :signup_enabled,
+                      :send_user_confirmation_email, :domain_whitelist, :domain_blacklist_enabled,
+                      :after_sign_up_text, :signin_enabled, :require_two_factor_authentication,
+                      :home_page_url, :after_sign_out_path, :sign_in_text, :help_page_text,
+                      :shared_runners_enabled, :max_artifacts_size,
+                      :default_artifacts_expire_in, :max_pages_size,
+                      :container_registry_token_expire_delay,
+                      :metrics_enabled, :sidekiq_throttling_enabled, :recaptcha_enabled,
+                      :akismet_enabled, :admin_notification_email, :sentry_enabled,
+                      :repository_checks_enabled, :koding_enabled, :plantuml_enabled,
+                      :version_check_enabled, :email_author_in_body, :html_emails_enabled,
+                      :housekeeping_enabled, :terminal_max_session_time, :polling_interval_multiplier
 
-      at_least_one_of(*at_least_one_of_ce)
+      # EE
+      at_least_one_of_ee = [
+        :elasticsearch_indexing,
+        :help_text,
+        :repository_size_limit,
+        :repository_storages,
+        :usage_ping_enabled
+      ]
+      optional :help_text, type: String, desc: 'GitLab server administrator information'
+      optional :elasticsearch_indexing, type: Boolean, desc: 'Enable Elasticsearch indexing'
+      given elasticsearch_indexing: ->(val) { val } do
+        optional :elasticsearch_search, type: Boolean, desc: 'Enable Elasticsearch search'
+        requires :elasticsearch_url, type: String, desc: 'The url to use for connecting to Elasticsearch. Use a comma-separated list to support clustering (e.g., "http://localhost:9200, http://localhost:9201")'
+      end
+      optional :elasticsearch_aws, type: Boolean, desc: 'Enable support for AWS hosted elasticsearch'
+      given elasticsearch_aws: ->(val) { val } do
+        requires :elasticsearch_aws_region, type: String, desc: 'The AWS region the elasticsearch domain is configured'
+        optional :elasticsearch_aws_access_key, type: String, desc: 'AWS IAM access key'
+        optional :elasticsearch_aws_secret_access_key, type: String, desc: 'AWS IAM secret access key'
+      end
+      optional :usage_ping_enabled, type: Boolean, desc: 'Every week GitLab will report license usage back to GitLab, Inc.'
+      optional :repository_storages, type: Array[String], desc: 'A list of names of enabled storage paths, taken from `gitlab.yml`. New projects will be created in one of these stores, chosen at random.'
+      optional :repository_size_limit, type: Integer, desc: 'Size limit per repository (MB)'
+
+      at_least_one_of(*(at_least_one_of_ce + at_least_one_of_ee))
     end
     put "application/settings" do
       attrs = declared_params(include_missing: false)

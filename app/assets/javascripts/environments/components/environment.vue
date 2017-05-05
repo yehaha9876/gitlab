@@ -20,6 +20,7 @@ export default {
 
     return {
       store,
+      service: {},
       state: store.state,
       visibility: 'available',
       isLoading: false,
@@ -56,6 +57,16 @@ export default {
     canCreateEnvironmentParsed() {
       return gl.utils.convertPermissionToBoolean(this.canCreateEnvironment);
     },
+
+    /**
+     * Pagination should only be rendered when we have information about it and when the
+     * number of total pages is bigger than 1.
+     *
+     * @return {Boolean}
+     */
+    shouldRenderPagination() {
+      return this.state.paginationInformation && this.state.paginationInformation.totalPages > 1;
+    },
   },
 
   /**
@@ -79,6 +90,17 @@ export default {
   },
 
   methods: {
+
+    /**
+     * Toggles the visibility of the deploy boards of the clicked environment.
+     *
+     * @param  {Object} model
+     * @return {Object}
+     */
+    toggleDeployBoard(model) {
+      return this.store.toggleDeployBoard(model.id);
+    },
+
     toggleFolder(folder, folderUrl) {
       this.store.toggleFolder(folder);
 
@@ -165,7 +187,7 @@ export default {
             </span>
           </a>
         </li>
-        <li :class="{ active : scope === 'stopped' }">
+        <li :class="{ 'active' : scope === 'stopped' }">
           <a :href="projectStoppedEnvironmentsPath">
             Stopped
             <span class="badge js-stopped-environments-count">
@@ -225,11 +247,13 @@ export default {
           :environments="state.environments"
           :can-create-deployment="canCreateDeploymentParsed"
           :can-read-environment="canReadEnvironmentParsed"
+          :toggleDeployBoard="toggleDeployBoard"
+          :store="store"
+          :service="service"
           :is-loading-folder-content="isLoadingFolderContent" />
       </div>
 
-      <table-pagination
-        v-if="state.paginationInformation && state.paginationInformation.totalPages > 1"
+      <table-pagination v-if="state.paginationInformation && state.paginationInformation.totalPages > 1"
         :change="changePage"
         :pageInfo="state.paginationInformation" />
     </div>

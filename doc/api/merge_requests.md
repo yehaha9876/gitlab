@@ -76,8 +76,10 @@ Parameters:
     "sha": "8888888888888888888888888888888888888888",
     "merge_commit_sha": null,
     "user_notes_count": 1,
+    "approvals_before_merge": null
     "should_remove_source_branch": true,
     "force_remove_source_branch": false,
+    "squash": false,
     "web_url": "http://example.com/example/example/merge_requests/1"
   }
 ]
@@ -145,8 +147,10 @@ Parameters:
   "sha": "8888888888888888888888888888888888888888",
   "merge_commit_sha": "9999999999999999999999999999999999999999",
   "user_notes_count": 1,
+  "approvals_before_merge": null
   "should_remove_source_branch": true,
   "force_remove_source_branch": false,
+  "squash": false,
   "web_url": "http://example.com/example/example/merge_requests/1"
 }
 ```
@@ -250,8 +254,10 @@ Parameters:
   "sha": "8888888888888888888888888888888888888888",
   "merge_commit_sha": null,
   "user_notes_count": 1,
+  "approvals_before_merge": null,
   "should_remove_source_branch": true,
   "force_remove_source_branch": false,
+  "squash": false,
   "web_url": "http://example.com/example/example/merge_requests/1",
   "changes": [
     {
@@ -287,6 +293,17 @@ POST /projects/:id/merge_requests
 | `labels`               | string  | no       | Labels for MR as a comma-separated list                                         |
 | `milestone_id`         | integer | no       | The ID of a milestone                                                           |
 | `remove_source_branch` | boolean | no       | Flag indicating if a merge request should remove the source branch when merging |
+| `approvals_before_merge` | integer| no | Number of approvals required before this can be merged (see below) |
+| `squash` | boolean| no | Squash commits into a single commit when merging |
+
+If `approvals_before_merge` is not provided, it inherits the value from the
+target project. If it is provided, then the following conditions must hold in
+order for it to take effect:
+
+1. The target project's `approvals_before_merge` must be greater than zero. (A
+   value of zero disables approvals for that project.)
+2. The provided value of `approvals_before_merge` must be greater than the
+   target project's `approvals_before_merge`.
 
 ```json
 {
@@ -337,8 +354,10 @@ POST /projects/:id/merge_requests
   "sha": "8888888888888888888888888888888888888888",
   "merge_commit_sha": null,
   "user_notes_count": 0,
+  "approvals_before_merge": null
   "should_remove_source_branch": true,
   "force_remove_source_branch": false,
+  "squash": false,
   "web_url": "http://example.com/example/example/merge_requests/1"
 }
 ```
@@ -363,6 +382,9 @@ PUT /projects/:id/merge_requests/:merge_request_iid
 | `labels`               | string  | no       | Labels for MR as a comma-separated list                                         |
 | `milestone_id`         | integer | no       | The ID of a milestone                                                           |
 | `remove_source_branch` | boolean | no       | Flag indicating if a merge request should remove the source branch when merging |
+| `squash` | boolean| no | Squash commits into a single commit when merging |
+
+Must include at least one non-required attribute from above.
 
 Must include at least one non-required attribute from above.
 
@@ -414,8 +436,10 @@ Must include at least one non-required attribute from above.
   "sha": "8888888888888888888888888888888888888888",
   "merge_commit_sha": null,
   "user_notes_count": 1,
+  "approvals_before_merge": null
   "should_remove_source_branch": true,
   "force_remove_source_branch": false,
+  "squash": false,
   "web_url": "http://example.com/example/example/merge_requests/1"
 }
 ```
@@ -512,11 +536,133 @@ Parameters:
   "sha": "8888888888888888888888888888888888888888",
   "merge_commit_sha": "9999999999999999999999999999999999999999",
   "user_notes_count": 1,
+  "approvals_before_merge": null
   "should_remove_source_branch": true,
   "force_remove_source_branch": false,
+  "squash": false,
   "web_url": "http://example.com/example/example/merge_requests/1"
 }
 ```
+
+## Merge Request Approvals
+
+>**Note:** This API endpoint is only available on 8.9 EE and above.
+
+You can request information about a merge request's approval status using the
+following endpoint:
+
+```
+GET /projects/:id/merge_requests/:merge_request_iid/approvals
+```
+
+**Parameters:**
+
+| Attribute           | Type    | Required | Description         |
+|---------------------|---------|----------|---------------------|
+| `id`                | integer | yes      | The ID of a project |
+| `merge_request_iid` | integer | yes      | The IID of MR       |
+
+```json
+{
+  "id": 5,
+  "iid": 5,
+  "project_id": 1,
+  "title": "Approvals API",
+  "description": "Test",
+  "state": "opened",
+  "created_at": "2016-06-08T00:19:52.638Z",
+  "updated_at": "2016-06-08T21:20:42.470Z",
+  "merge_status": "can_be_merged",
+  "approvals_required": 2,
+  "approvals_missing": 1,
+  "approved_by": [
+    {
+      "user": {
+        "name": "Administrator",
+        "username": "root",
+        "id": 1,
+        "state": "active",
+        "avatar_url": "http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon",
+        "web_url": "http://localhost:3000/u/root"
+      }
+    }
+  ]
+}
+```
+
+## Approve Merge Request
+
+>**Note:** This API endpoint is only available on 8.9 EE and above.
+
+If you are allowed to, you can approve a merge request using the following
+endpoint:
+
+```
+POST /projects/:id/merge_requests/:merge_request_iid/approve
+```
+
+**Parameters:**
+
+| Attribute           | Type    | Required | Description         |
+|---------------------|---------|----------|---------------------|
+| `id`                | integer | yes      | The ID of a project |
+| `merge_request_iid` | integer | yes      | The IID of MR       |
+
+```json
+{
+  "id": 5,
+  "iid": 5,
+  "project_id": 1,
+  "title": "Approvals API",
+  "description": "Test",
+  "state": "opened",
+  "created_at": "2016-06-08T00:19:52.638Z",
+  "updated_at": "2016-06-09T21:32:14.105Z",
+  "merge_status": "can_be_merged",
+  "approvals_required": 2,
+  "approvals_left": 0,
+  "approved_by": [
+    {
+      "user": {
+        "name": "Administrator",
+        "username": "root",
+        "id": 1,
+        "state": "active",
+        "avatar_url": "http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon",
+        "web_url": "http://localhost:3000/u/root"
+      }
+    },
+    {
+      "user": {
+        "name": "Nico Cartwright",
+        "username": "ryley",
+        "id": 2,
+        "state": "active",
+        "avatar_url": "http://www.gravatar.com/avatar/cf7ad14b34162a76d593e3affca2adca?s=80\u0026d=identicon",
+        "web_url": "http://localhost:3000/u/ryley"
+      }
+    }
+  ]
+}
+```
+
+## Unapprove Merge Request
+
+>**Note:** This API endpoint is only available on 9.0 EE and above.
+
+If you did approve a merge request, you can unapprove it using the following
+endpoint:
+
+```
+POST /projects/:id/merge_requests/:merge_request_iid/unapprove
+```
+
+**Parameters:**
+
+| Attribute           | Type    | Required | Description         |
+|---------------------|---------|----------|---------------------|
+| `id`                | integer | yes      | The ID of a project |
+| `merge_request_iid` | integer | yes      | The IID of MR       |
 
 ## Cancel Merge When Pipeline Succeeds
 
@@ -582,8 +728,10 @@ Parameters:
   "sha": "8888888888888888888888888888888888888888",
   "merge_commit_sha": null,
   "user_notes_count": 1,
+  "approvals_before_merge": null
   "should_remove_source_branch": true,
   "force_remove_source_branch": false,
+  "squash": false,
   "web_url": "http://example.com/example/example/merge_requests/1"
 }
 ```
@@ -650,7 +798,8 @@ Example response when the GitLab issue tracker is used:
       "created_at" : "2016-01-04T15:31:51.081Z",
       "iid" : 6,
       "labels" : [],
-      "user_notes_count": 1
+      "user_notes_count": 1,
+      "approvals_before_merge": null
    },
 ]
 ```
@@ -906,6 +1055,7 @@ Example response:
     "user_notes_count": 7,
     "should_remove_source_branch": true,
     "force_remove_source_branch": false,
+    "squash": true,
     "web_url": "http://example.com/example/example/merge_requests/1"
   },
   "target_url": "https://gitlab.example.com/gitlab-org/gitlab-ci/merge_requests/7",

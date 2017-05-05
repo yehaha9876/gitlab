@@ -22,6 +22,13 @@ describe Banzai::Renderer do
 
         is_expected.to eq('field_html')
       end
+
+      it "skips database caching on a Geo secondary" do
+        allow(Gitlab::Geo).to receive(:secondary?).and_return(true)
+        expect(object).to receive(:refresh_markdown_cache!).with(do_update: false)
+
+        is_expected.to eq('field_html')
+      end
     end
 
     context 'with an up-to-date cache' do

@@ -15,7 +15,11 @@ class Projects::ProjectMembersController < Projects::ApplicationController
 
     return render_403 unless can?(current_user, :update_project_member, @project_member)
 
-    @project_member.update_attributes(member_params)
+    old_access_level = @project_member.human_access
+
+    if @project_member.update_attributes(member_params)
+      log_audit_event(@project_member, action: :update, old_access_level: old_access_level)
+    end
   end
 
   def resend_invite

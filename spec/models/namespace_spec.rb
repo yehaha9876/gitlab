@@ -216,6 +216,18 @@ describe Namespace, models: true do
     end
   end
 
+  describe '#actual_size_limit' do
+    let(:namespace) { build(:namespace) }
+
+    before do
+      allow_any_instance_of(ApplicationSetting).to receive(:repository_size_limit).and_return(50)
+    end
+
+    it 'returns the correct size limit' do
+      expect(namespace.actual_size_limit).to eq(50)
+    end
+  end
+
   describe '#rm_dir', 'callback', repository: true do
     let!(:project) { create(:project_empty_repo, namespace: namespace) }
     let(:repository_storage_path) { Gitlab.config.repositories.storages.default['path'] }

@@ -2,6 +2,8 @@
 
 ## List users
 
+Active users = Total accounts - Blocked users
+
 Get a list of users.
 
 This function takes pagination parameters `page` and `per_page` to restrict the list of users.
@@ -946,8 +948,6 @@ settings page.
 ```
 POST /users/:user_id/impersonation_tokens
 ```
-
-Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |

@@ -21,6 +21,7 @@ var config = {
   entry: {
     blob:                 './blob_edit/blob_bundle.js',
     boards:               './boards/boards_bundle.js',
+    burndown_chart:       './burndown_chart/index.js',
     common:               './commons/index.js',
     common_vue:           ['vue', './vue_shared/common_vue.js'],
     common_d3:            ['d3'],
@@ -34,11 +35,13 @@ var config = {
     graphs:               './graphs/graphs_bundle.js',
     group:                './group.js',
     groups_list:          './groups_list.js',
+    issues:               './issues/issues_bundle.js',
     issuable:             './issuable/issuable_bundle.js',
     issue_show:           './issue_show/index.js',
     main:                 './main.js',
     merge_conflicts:      './merge_conflicts/merge_conflicts_bundle.js',
     merge_request_widget: './merge_request_widget/ci_bundle.js',
+    mr_widget_ee:         './merge_request_widget/widget_bundle.js',
     monitoring:           './monitoring/monitoring_bundle.js',
     network:              './network/network_bundle.js',
     notebook_viewer:      './blob/notebook_viewer.js',
@@ -134,6 +137,8 @@ var config = {
         'notebook_viewer',
         'pdf_viewer',
         'pipelines',
+        'mr_widget_ee',
+        'issue_show'
       ],
       minChunks: function(module, count) {
         return module.resource && (/vue_shared/).test(module.resource);
@@ -147,6 +152,7 @@ var config = {
         'graphs',
         'users',
         'monitoring',
+        'burndown_chart',
       ],
     }),
 

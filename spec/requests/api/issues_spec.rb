@@ -690,6 +690,7 @@ describe API::Issues do
       expect(json_response['assignee']).to be_a Hash
       expect(json_response['author']).to be_a Hash
       expect(json_response['confidential']).to be_falsy
+      expect(json_response['weight']).to be_nil
     end
 
     it "returns a project issue by internal id" do
@@ -761,13 +762,14 @@ describe API::Issues do
   describe "POST /projects/:id/issues" do
     it 'creates a new project issue' do
       post api("/projects/#{project.id}/issues", user),
-        title: 'new issue', labels: 'label, label2'
+        title: 'new issue', labels: 'label, label2', weight: 3
 
       expect(response).to have_http_status(201)
       expect(json_response['title']).to eq('new issue')
       expect(json_response['description']).to be_nil
       expect(json_response['labels']).to eq(%w(label label2))
       expect(json_response['confidential']).to be_falsy
+      expect(json_response['weight']).to eq(3)
     end
 
     it 'creates a new confidential project issue' do
@@ -1157,6 +1159,38 @@ describe API::Issues do
 
       expect(response).to have_http_status(200)
       expect(json_response['due_date']).to eq(due_date)
+    end
+  end
+
+  describe 'PUT /projects/:id/issues/:issue_id to update weight' do
+    it 'updates an issue with no weight' do
+      put api("/projects/#{project.id}/issues/#{issue.iid}", user), weight: 5
+
+      expect(response).to have_http_status(200)
+      expect(json_response['weight']).to eq(5)
+    end
+
+    it 'removes a weight from an issue' do
+      weighted_issue = create(:issue, project: project, weight: 2)
+
+      put api("/projects/#{project.id}/issues/#{weighted_issue.iid}", user), weight: nil
+
+      expect(response).to have_http_status(200)
+      expect(json_response['weight']).to be_nil
+    end
+
+    it 'returns 400 if weight is less than minimum weight' do
+      put api("/projects/#{project.id}/issues/#{issue.iid}", user), weight: -1
+
+      expect(response).to have_http_status(400)
+      expect(json_response['error']).to eq('weight does not have a valid value')
+    end
+
+    it 'returns 400 if weight is more than maximum weight' do
+      put api("/projects/#{project.id}/issues/#{issue.iid}", user), weight: 10
+
+      expect(response).to have_http_status(400)
+      expect(json_response['error']).to eq('weight does not have a valid value')
     end
   end
 

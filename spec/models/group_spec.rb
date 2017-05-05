@@ -175,6 +175,33 @@ describe Group, models: true do
     end
   end
 
+  describe '#avatar_url' do
+    let!(:group) { create(:group, :access_requestable, :with_avatar) }
+    let(:user) { create(:user) }
+    subject { group.avatar_url }
+
+    context 'when avatar file is uploaded' do
+      before do
+        group.add_master(user)
+      end
+
+      let(:avatar_path) { "/uploads/group/avatar/#{group.id}/dk.png" }
+
+      it { should eq "http://#{Gitlab.config.gitlab.host}#{avatar_path}" }
+
+      context 'when in a geo secondary node' do
+        let(:geo_url) { 'http://geo.example.com' }
+
+        before do
+          allow(Gitlab::Geo).to receive(:secondary?) { true }
+          allow(Gitlab::Geo).to receive_message_chain(:primary_node, :url) { geo_url }
+        end
+
+        it { should eq "#{geo_url}#{avatar_path}" }
+      end
+    end
+  end
+
   describe '.search' do
     it 'returns groups with a matching name' do
       expect(described_class.search(group.name)).to eq([group])

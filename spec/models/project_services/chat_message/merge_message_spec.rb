@@ -50,6 +50,19 @@ describe ChatMessage::MergeMessage, models: true do
     end
   end
 
+  context 'approval' do
+    before do
+      args[:object_attributes][:action] = 'approved'
+    end
+
+    it 'returns a message regarding approval of merge requests' do
+      expect(subject.pretext).to eq(
+        'test.user approved <http://somewhere.com/merge_requests/100|!100 *Merge Request title*> '\
+        'in <http://somewhere.com|project_name>: *Merge Request title*')
+      expect(subject.attachments).to be_empty
+    end
+  end
+
   context 'with markdown' do
     before do
       args[:markdown] = true

@@ -58,6 +58,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
 
   def application_setting_params
     import_sources = params[:application_setting][:import_sources]
+
     if import_sources.nil?
       params[:application_setting][:import_sources] = []
     else
@@ -74,7 +75,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     params.delete(:domain_blacklist_raw) if params[:domain_blacklist_file]
 
     params.require(:application_setting).permit(
-      application_setting_params_ce
+      application_setting_params_ce << application_setting_params_ee
     )
   end
 
@@ -156,6 +157,24 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
       repository_storages: [],
       restricted_visibility_levels: [],
       sidekiq_throttling_queues: []
+    ]
+  end
+
+  def application_setting_params_ee
+    [
+      :help_text,
+      :elasticsearch_url,
+      :elasticsearch_indexing,
+      :elasticsearch_aws,
+      :elasticsearch_aws_access_key,
+      :elasticsearch_aws_secret_access_key,
+      :elasticsearch_aws_region,
+      :elasticsearch_search,
+      :repository_size_limit,
+      :shared_runners_minutes,
+      :minimum_mirror_sync_time,
+      :geo_status_timeout,
+      :elasticsearch_experimental_indexer,
     ]
   end
 end

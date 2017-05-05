@@ -62,6 +62,7 @@ describe Project, models: true do
     it { is_expected.to have_many(:variables) }
     it { is_expected.to have_many(:triggers) }
     it { is_expected.to have_many(:pages_domains) }
+    it { is_expected.to have_many(:path_locks).dependent(:destroy) }
     it { is_expected.to have_many(:labels).class_name('ProjectLabel').dependent(:destroy) }
     it { is_expected.to have_many(:users_star_projects).dependent(:destroy) }
     it { is_expected.to have_many(:environments).dependent(:destroy) }
@@ -72,6 +73,7 @@ describe Project, models: true do
     it { is_expected.to have_many(:project_group_links).dependent(:destroy) }
     it { is_expected.to have_many(:notification_settings).dependent(:destroy) }
     it { is_expected.to have_many(:forks).through(:forked_project_links) }
+    it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
     it { is_expected.to have_many(:uploads).dependent(:destroy) }
 
     context 'after initialized' do
@@ -107,15 +109,6 @@ describe Project, models: true do
         end
       end
     end
-
-    describe '#boards' do
-      it 'raises an error when attempting to add more than one board to the project' do
-        subject.boards.build
-
-        expect { subject.boards.build }.to raise_error(Project::BoardLimitExceeded, 'Number of permitted boards exceeded')
-        expect(subject.boards.size).to eq 1
-      end
-    end
   end
 
   describe 'modules' do
@@ -127,6 +120,18 @@ describe Project, models: true do
     it { is_expected.to include_module(Gitlab::CurrentSettings) }
     it { is_expected.to include_module(Referable) }
     it { is_expected.to include_module(Sortable) }
+  end
+
+  describe 'scopes' do
+    context '#with_wiki_enabled' do
+      it 'returns a project' do
+        project = create(:project_empty_repo, wiki_access_level: ProjectFeature::ENABLED)
+        project1 = create(:project, wiki_access_level: ProjectFeature::DISABLED)
+
+        expect(Project.with_wiki_enabled).to include(project)
+        expect(Project.with_wiki_enabled).not_to include(project1)
+      end
+    end
   end
 
   describe 'validation' do
@@ -188,6 +193,28 @@ describe Project, models: true do
         expect(project2).not_to be_valid
         expect(project2.errors[:repository_storage].first).to match(/is not included in the list/)
       end
+    end
+
+    context '#mark_stuck_remote_mirrors_as_failed!' do
+      it 'fails stuck remote mirrors' do
+        project = create(:project, :remote_mirror)
+
+        project.remote_mirrors.first.update_attributes(
+          update_status: :started,
+          last_update_at: 2.days.ago
+        )
+
+        expect do
+          project.mark_stuck_remote_mirrors_as_failed!
+        end.to change { project.remote_mirrors.stuck.count }.from(1).to(0)
+      end
+    end
+
+    context 'mirror' do
+      subject { build(:project, mirror: true) }
+
+      it { is_expected.to validate_presence_of(:import_url) }
+      it { is_expected.to validate_presence_of(:mirror_user) }
     end
 
     it 'does not allow an invalid URI as import_url' do
@@ -450,6 +477,14 @@ describe Project, models: true do
     end
   end
 
+  describe "#kerberos_url_to_repo" do
+    let(:project) { create(:empty_project, path: "somewhere") }
+
+    it 'returns valid kerberos url for this repo' do
+      expect(project.kerberos_url_to_repo).to eq("#{Gitlab.config.build_gitlab_kerberos_url}/#{project.namespace.path}/somewhere.git")
+    end
+  end
+
   describe "#new_issue_address" do
     let(:project) { create(:empty_project, path: "somewhere") }
     let(:user) { create(:user) }
@@ -597,6 +632,92 @@ describe Project, models: true do
     end
   end
 
+  describe 'repository size restrictions' do
+    let(:project) { build(:empty_project) }
+
+    before do
+      allow_any_instance_of(ApplicationSetting).to receive(:repository_size_limit).and_return(50)
+    end
+
+    describe '#changes_will_exceed_size_limit?' do
+      before do
+        allow(project).to receive(:repository_and_lfs_size).and_return(49)
+      end
+      it 'returns true when changes go over' do
+        expect(project.changes_will_exceed_size_limit?(5)).to be_truthy
+      end
+    end
+
+    describe '#actual_size_limit' do
+      it 'returns the limit set in the application settings' do
+        expect(project.actual_size_limit).to eq(50)
+      end
+
+      it 'returns the value set in the group' do
+        group = create(:group, repository_size_limit: 100)
+        project.update_attribute(:namespace_id, group.id)
+
+        expect(project.actual_size_limit).to eq(100)
+      end
+
+      it 'returns the value set locally' do
+        project.update_attribute(:repository_size_limit, 75)
+
+        expect(project.actual_size_limit).to eq(75)
+      end
+    end
+
+    describe '#size_limit_enabled?' do
+      it 'returns false when disabled' do
+        project.update_attribute(:repository_size_limit, 0)
+
+        expect(project.size_limit_enabled?).to be_falsey
+      end
+
+      it 'returns true when a limit is set' do
+        project.update_attribute(:repository_size_limit, 75)
+
+        expect(project.size_limit_enabled?).to be_truthy
+      end
+    end
+
+    describe '#above_size_limit?' do
+      let(:project) do
+        create(:empty_project,
+               statistics: build(:project_statistics))
+      end
+
+      it 'returns true when above the limit' do
+        allow(project).to receive(:repository_and_lfs_size).and_return(100)
+
+        expect(project.above_size_limit?).to be_truthy
+      end
+
+      it 'returns false when not over the limit' do
+        expect(project.above_size_limit?).to be_falsey
+      end
+    end
+
+    describe '#size_to_remove' do
+      it 'returns the correct value' do
+        allow(project).to receive(:repository_and_lfs_size).and_return(100)
+
+        expect(project.size_to_remove).to eq(50)
+      end
+    end
+  end
+
+  describe '#repository_size_limit column' do
+    it 'support values up to 8 exabytes' do
+      project = create(:empty_project)
+      project.update_column(:repository_size_limit, 8.exabytes - 1)
+
+      project.reload
+
+      expect(project.repository_size_limit).to eql(8.exabytes - 1)
+    end
+  end
+
   describe '#default_issues_tracker?' do
     it "is true if used internal tracker" do
       project = build(:empty_project)
@@ -666,6 +787,44 @@ describe Project, models: true do
       expect do
         project.cache_has_external_issue_tracker
       end.to change { project.has_external_issue_tracker}.to(false)
+    end
+
+    it 'does not cache data when in a secondary gitlab geo node' do
+      allow(Gitlab::Geo).to receive(:secondary?) { true }
+
+      expect do
+        project.cache_has_external_issue_tracker
+      end.not_to change { project.has_external_issue_tracker }
+    end
+  end
+
+  describe '#cache_has_external_wiki' do
+    let(:project) { create(:empty_project, has_external_wiki: nil) }
+
+    it 'stores true if there is any external_wikis' do
+      services = double(:service, external_wikis: [ExternalWikiService.new])
+      expect(project).to receive(:services).and_return(services)
+
+      expect do
+        project.cache_has_external_wiki
+      end.to change { project.has_external_wiki}.to(true)
+    end
+
+    it 'stores false if there is no external_wikis' do
+      services = double(:service, external_wikis: [])
+      expect(project).to receive(:services).and_return(services)
+
+      expect do
+        project.cache_has_external_wiki
+      end.to change { project.has_external_wiki}.to(false)
+    end
+
+    it 'does not cache data when in a secondary gitlab geo node' do
+      allow(Gitlab::Geo).to receive(:secondary?) { true }
+
+      expect do
+        project.cache_has_external_wiki
+      end.not_to change { project.has_external_wiki }
     end
   end
 
@@ -811,11 +970,19 @@ describe Project, models: true do
 
     context 'when avatar file is uploaded' do
       let(:project) { create(:empty_project, :with_avatar) }
+      let(:avatar_path) { "/uploads/project/avatar/#{project.id}/dk.png" }
 
-      it 'creates a correct avatar path' do
-        avatar_path = "/uploads/project/avatar/#{project.id}/dk.png"
+      it { should eq "http://#{Gitlab.config.gitlab.host}#{avatar_path}" }
 
-        expect(project.avatar_url).to eq("http://#{Gitlab.config.gitlab.host}#{avatar_path}")
+      context 'When in a geo secondary node' do
+        let(:geo_url) { 'http://geo.example.com' }
+
+        before do
+          allow(Gitlab::Geo).to receive(:secondary?) { true }
+          allow(Gitlab::Geo).to receive_message_chain(:primary_node, :url) { geo_url }
+        end
+
+        it { should eq "#{geo_url}#{avatar_path}" }
       end
     end
 
@@ -824,9 +991,7 @@ describe Project, models: true do
         allow(project).to receive(:avatar_in_git) { true }
       end
 
-      let(:avatar_path) do
-        "/#{project.full_path}/avatar"
-      end
+      let(:avatar_path) { "/#{project.full_path}/avatar" }
 
       it { should eq "http://#{Gitlab.config.gitlab.host}#{avatar_path}" }
     end
@@ -836,6 +1001,43 @@ describe Project, models: true do
 
       it { should eq nil }
     end
+  end
+
+  describe '#execute_hooks' do
+    it "triggers project and group hooks" do
+      group = create :group, name: 'gitlab'
+      project = create(:project, name: 'gitlabhq', namespace: group)
+      project_hook = create(:project_hook, push_events: true, project: project)
+      group_hook = create(:group_hook, push_events: true, group: group)
+
+      stub_request(:post, project_hook.url)
+      stub_request(:post, group_hook.url)
+
+      expect_any_instance_of(GroupHook).to receive(:async_execute).and_return(true)
+      expect_any_instance_of(ProjectHook).to receive(:async_execute).and_return(true)
+
+      project.execute_hooks({}, :push_hooks)
+    end
+  end
+
+  describe '#allowed_to_share_with_group?' do
+    let(:project) { create(:project) }
+
+    it "returns true" do
+      expect(project.allowed_to_share_with_group?).to be_truthy
+    end
+
+    it "returns false" do
+      project.namespace.update(share_with_group_lock: true)
+      expect(project.allowed_to_share_with_group?).to be_falsey
+    end
+  end
+
+  describe '#pipeline' do
+    let(:project) { create :project }
+    let(:pipeline) { create :ci_pipeline, project: project, ref: 'master' }
+
+    subject { project.pipeline(pipeline.sha, 'master') }
   end
 
   describe '#pipeline_for' do
@@ -1099,6 +1301,33 @@ describe Project, models: true do
     end
   end
 
+  describe '#pages_url' do
+    let(:group) { create :group, name: group_name }
+    let(:project) { create :empty_project, namespace: group, name: project_name }
+    let(:domain) { 'Example.com' }
+
+    subject { project.pages_url }
+
+    before do
+      allow(Settings.pages).to receive(:host).and_return(domain)
+      allow(Gitlab.config.pages).to receive(:url).and_return('http://example.com')
+    end
+
+    context 'group page' do
+      let(:group_name) { 'Group' }
+      let(:project_name) { 'group.example.com' }
+
+      it { is_expected.to eq("http://group.example.com") }
+    end
+
+    context 'project page' do
+      let(:group_name) { 'Group' }
+      let(:project_name) { 'Project' }
+
+      it { is_expected.to eq("http://group.example.com/project") }
+    end
+  end
+
   describe '.search' do
     let(:project) { create(:empty_project, description: 'kitten mittens') }
 
@@ -1303,6 +1532,28 @@ describe Project, models: true do
     end
   end
 
+  describe 'handling import URL' do
+    context 'when project is a mirror' do
+      it 'returns the full URL' do
+        project = create(:project, :mirror, import_url: 'http://user:pass@test.com')
+
+        project.import_finish
+
+        expect(project.reload.import_url).to eq('http://user:pass@test.com')
+      end
+    end
+
+    context 'when project is not a mirror' do
+      it 'returns the sanitized URL' do
+        project = create(:project, import_status: 'started', import_url: 'http://user:pass@test.com')
+
+        project.import_finish
+
+        expect(project.reload.import_url).to eq('http://test.com')
+      end
+    end
+  end
+
   describe '#user_can_push_to_empty_repo?' do
     let(:project) { create(:empty_project) }
     let(:user)    { create(:user) }
@@ -1424,6 +1675,44 @@ describe Project, models: true do
         expect(project).to receive(:container_repositories)
         expect(project).not_to have_container_registry_tags
       end
+    end
+  end
+
+  describe 'Project import job' do
+    let(:project) { create(:empty_project) }
+    let(:mirror) { false }
+
+    before do
+      allow_any_instance_of(Gitlab::Shell).to receive(:import_repository)
+        .with(project.repository_storage_path, project.path_with_namespace, project.import_url)
+        .and_return(true)
+
+      allow(project).to receive(:repository_exists?).and_return(true)
+
+      expect_any_instance_of(Repository).to receive(:after_import)
+        .and_call_original
+    end
+
+    it 'imports a project' do
+      expect_any_instance_of(RepositoryImportWorker).to receive(:perform).and_call_original
+
+      project.import_start
+      project.add_import_job
+
+      expect(project.reload.import_status).to eq('finished')
+    end
+
+    it 'imports a mirrored project' do
+      allow_any_instance_of(RepositoryUpdateMirrorWorker).to receive(:perform)
+      expect_any_instance_of(RepositoryImportWorker).to receive(:perform).and_call_original
+
+      project.import_start
+
+      project.mirror = true
+
+      project.add_import_job
+
+      expect(project.reload.import_status).to eq('finished')
     end
   end
 
@@ -1606,6 +1895,103 @@ describe Project, models: true do
     end
   end
 
+  describe '.where_full_path_in' do
+    context 'without any paths' do
+      it 'returns an empty relation' do
+        expect(Project.where_full_path_in([])).to eq([])
+      end
+    end
+
+    context 'without any valid paths' do
+      it 'returns an empty relation' do
+        expect(Project.where_full_path_in(%w[foo])).to eq([])
+      end
+    end
+
+    context 'with valid paths' do
+      let!(:project1) { create(:project) }
+      let!(:project2) { create(:project) }
+
+      it 'returns the projects matching the paths' do
+        projects = Project.where_full_path_in([project1.path_with_namespace,
+                                               project2.path_with_namespace])
+
+        expect(projects).to contain_exactly(project1, project2)
+      end
+
+      it 'returns projects regardless of the casing of paths' do
+        projects = Project.where_full_path_in([project1.path_with_namespace.upcase,
+                                               project2.path_with_namespace.upcase])
+
+        expect(projects).to contain_exactly(project1, project2)
+      end
+    end
+  end
+
+  describe '#find_path_lock' do
+    let(:project) { create :empty_project }
+    let(:path_lock) { create :path_lock, project: project }
+    let(:path) { path_lock.path }
+
+    it 'returns path_lock' do
+      expect(project.find_path_lock(path)).to eq(path_lock)
+    end
+
+    it 'returns nil' do
+      expect(project.find_path_lock('app/controllers')).to be_falsey
+    end
+  end
+
+  describe '#change_repository_storage' do
+    let(:project) { create(:project, repository_storage: 'a') }
+    let(:read_only_project) { create(:project, repository_storage: 'a', repository_read_only: true) }
+
+    before do
+      FileUtils.mkdir('tmp/tests/storage_a')
+      FileUtils.mkdir('tmp/tests/storage_b')
+
+      storages = {
+        'a' => { 'path' => 'tmp/tests/storage_a' },
+        'b' => { 'path' => 'tmp/tests/storage_b' }
+      }
+      allow(Gitlab.config.repositories).to receive(:storages).and_return(storages)
+    end
+
+    after do
+      FileUtils.rm_rf('tmp/tests/storage_a')
+      FileUtils.rm_rf('tmp/tests/storage_b')
+    end
+
+    it 'schedule the transfer of the repository to the new storage and locks the project' do
+      expect(ProjectUpdateRepositoryStorageWorker).to receive(:perform_async).with(project.id, 'b')
+
+      project.change_repository_storage('b')
+      project.save
+
+      expect(project).to be_repository_read_only
+    end
+
+    it "doesn't schedule the transfer if the repository is already read-only" do
+      expect(ProjectUpdateRepositoryStorageWorker).not_to receive(:perform_async)
+
+      read_only_project.change_repository_storage('b')
+      read_only_project.save
+    end
+
+    it "doesn't lock or schedule the transfer if the storage hasn't changed" do
+      expect(ProjectUpdateRepositoryStorageWorker).not_to receive(:perform_async)
+
+      project.change_repository_storage('a')
+      project.save
+
+      expect(project).not_to be_repository_read_only
+    end
+
+    it 'throws an error if an invalid repository storage is provided' do
+      expect { project.change_repository_storage('c') }.to raise_error
+    end
+  end
+
   describe '#change_head' do
     let(:project) { create(:project, :repository) }
 
@@ -1667,6 +2053,35 @@ describe Project, models: true do
       3.times { project.increment_pushes_since_gc }
 
       expect(project.pushes_since_gc).to eq(3)
+    end
+  end
+
+  describe '#repository_and_lfs_size' do
+    let(:project) { create(:project) }
+    let(:size) { 50 }
+
+    before do
+      allow(project.statistics).to receive(:total_repository_size).and_return(size)
+    end
+
+    it 'returns the total repository and lfs size' do
+      expect(project.repository_and_lfs_size).to eq(size)
+    end
+  end
+
+  describe '#approver_group_ids=' do
+    let(:project) { create(:empty_project) }
+
+    it 'create approver_groups' do
+      group = create :group
+      group1 = create :group
+
+      project = create :project
+
+      project.approver_group_ids = "#{group.id}, #{group1.id}"
+      project.save!
+
+      expect(project.approver_groups.map(&:group)).to match_array([group, group1])
     end
   end
 

@@ -1,12 +1,16 @@
-# GitLab Community Edition
+# GitLab Enterprise Edition
 
 [GitLab](https://about.gitlab.com/) is a Git-based fully featured platform
 for software development.
 
-**GitLab Community Edition (CE)** is an opensource product, self-hosted, free to use.
-All [GitLab products](https://about.gitlab.com/products/) contain the features
-available in GitLab CE. Premium features are available in
-[GitLab Enterprise Edition (EE)](https://about.gitlab.com/gitlab-ee/).
+**GitLab Enterprise Edition (EE)** is an opencore product, self-hosted,
+available under distinct [subscriptions](https://about.gitlab.com/products/).
+
+GitLab EE contains all the features available in
+[GitLab Community Edition (CE)](https://docs.gitlab.com/ce/),
+plus premium features available in each version: **Enterprise Edition Starter**
+(**EES**) and **Enterprise Edition Premium** (**EEP**). Everything available in
+**EES** is also available in **EEP**.
 
 ----
 
@@ -53,9 +57,12 @@ Manage files and branches from the UI (user interface):
   - [File templates](user/project/repository/web_editor.md#template-dropdowns)
   - [Create a directory](user/project/repository/web_editor.md#create-a-directory)
   - [Start a merge request](user/project/repository/web_editor.md#tips) (when committing via UI)
+  - **(EES/EEP)** [Lock a file](user/project/file_lock.md): Lock a file to avoid merge conflicts.
 - Branches
   - [Create a branch](user/project/repository/web_editor.md#create-a-new-branch)
   - [Protected branches](user/project/protected_branches.md#protected-branches)
+- **(EES/EEP)** [Repository Mirroring](workflow/repository_mirroring.md)
+- **(EES/EEP)** [Push rules](push_rules/push_rules.md): Additional control over pushes to your project.
 
 ### Issues and Merge Requests (MRs)
 
@@ -70,9 +77,11 @@ Manage files and branches from the UI (user interface):
 - [Merge Requests](user/project/merge_requests/index.md)
   - [Work In Progress Merge Requests](user/project/merge_requests/work_in_progress_merge_requests.md)
   - [Merge Request discussion resolution](user/discussions/index.md#moving-a-single-discussion-to-a-new-issue): Resolve discussions, move discussions in a merge request to an issue, only allow merge requests to be merged if all discussions are resolved.
+  - **(EES/EEP)** [Merge Request approval](user/project/merge_requests/merge_request_approvals.md): Make sure every merge request is approved by one or more people before getting merged.
   - [Checkout merge requests locally](user/project/merge_requests/index.md#checkout-merge-requests-locally)
   - [Cherry-pick](user/project/merge_requests/cherry_pick_changes.md)
 - [Milestones](user/project/milestones/index.md): Organize issues and merge requests into a cohesive group, optionally setting a due date.
+  - **(EES/EEP)** [Burndown Charts](user/project/milestones/index.md#burndown-charts): Watch your project's progress throughout a specific milestone.
 - [Todos](workflow/todos.md): A chronological list of to-dos that are waiting for your input, all in a simple dashboard.
 
 ### Git and GitLab
@@ -90,6 +99,9 @@ Manage files and branches from the UI (user interface):
 
 Take a step ahead and dive into GitLab's advanced features.
 
+- **(EEP)** [GitLab Service Desk](user/project/service_desk.md): A simple way to allow people to create issues in your GitLab instance without needing their own user account.
+- **(EEP)** [File Locking](user/project/file_lock.md): Lock a file to avoid merge conflicts.
+- **(EES/EEP)** [Contribution Analytics](analytics/contribution_analytics.md): See detailed statistics of projects' contributors.
 - [GitLab Pages](user/project/pages/index.md): Build, test, and deploy your static website with GitLab Pages.
 - [Snippets](user/snippets.md): Snippets allow you to create little bits of code.
 - [Wikis](user/project/wiki/index.md): Enhance your repository documentation with built-in wikis.
@@ -99,6 +111,8 @@ Take a step ahead and dive into GitLab's advanced features.
 - [GitLab CI](ci/README.md): Explore the features and capabilities of Continuous Integration, Continuous Delivery, and Continuous Deployment with GitLab.
   - [Auto Deploy](ci/autodeploy/index.md): Configure GitLab CI for the deployment of your application.
   - [Review Apps](ci/review_apps/index.md): Preview changes to your app right from a merge request.
+  - **(EEP)** [Deploy Boards](user/project/deploy_boards.md): View of the current health and status of each CI environment running on Kubernetes, displaying the status of the pods in the deployment.
+  - **(EEP)** [Canary Deployments](user/project/deploy_boards.md#canary-deployments): A popular CI strategy, where a small portion of the fleet is updated to the new version first.
 - [GitLab Cycle Analytics](user/project/cycle_analytics.md): Cycle Analytics measures the time it takes to go from an [idea to production](https://about.gitlab.com/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab/#from-idea-to-production-with-gitlab) for each project you have.
 - [GitLab Container Registry](user/project/container_registry.md): Learn how to use GitLab's built-in Container Registry.
 
@@ -126,11 +140,14 @@ have access to GitLab administration tools and settings.
 - [Migrate GitLab CI to CE/EE](migrate_ci_to_ce/README.md): If you have an old GitLab installation (older than 8.0), follow this guide to migrate your existing GitLab CI data to GitLab CE/EE.
 - [Restart GitLab](administration/restart_gitlab.md): Learn how to restart GitLab and its components.
 - [Update](update/README.md): Update guides to upgrade your installation.
+- [Upload your GitLab License](user/admin_area/license.md) Upload the license you purchased for GitLab Enterprise Edition to unlock its features.
 
 ### User permissions
 
 - [Access restrictions](user/admin_area/settings/visibility_and_access_controls.md#enabled-git-access-protocols): Define which Git access protocols can be used to talk to GitLab
 - [Authentication/Authorization](topics/authentication/index.md#gitlab-administrators): Enforce 2FA, configure external authentication with LDAP, SAML, CAS and additional Omniauth providers.
+  - **(EES/EEP)** [Sync LDAP](administration/auth/ldap-ee.md)
+  - **(EES/EEP)** [Kerberos authentication](integration/kerberos.md)
 
 ### GitLab admins' superpowers
 
@@ -141,6 +158,16 @@ have access to GitLab administration tools and settings.
 - [High Availability](administration/high_availability/README.md): Configure multiple servers for scaling or high availability.
 - [User cohorts](user/admin_area/user_cohorts.md) View user activity over time.
 - [Web terminals](administration/integration/terminal.md): Provide terminal access to environments from within GitLab.
+- **(EES/EEP)** [Audit logs and events](administration/audit_events.md): View the changes made within the GitLab server.
+- **(EES/EEP)** [Elasticsearch](integration/elasticsearch.md): A flexible, scalable and powerful search service to keep GitLab's search fast when dealing with huge amount of data.
+- **(EES/EEP)** [Email users](tools/email.md): Email GitLab users from within GitLab.
+- **(EES/EEP)** [Limit project size](user/admin_area/settings/account_and_limit_settings.md): Set a hard limit for your repositories' size.
+- **(EEP)** [Auditor users](administration/auditor_users.md): Users with read-only access to all projects, groups, and other resources on the GitLab instance.
+- **(EEP)** [GitLab GEO](gitlab-geo/README.md): Replicate your GitLab instance to other geographical locations as a read-only fully operational version.
+- **(EEP)** [Pivotal Tile](https://about.gitlab.com/2015/11/03/pivotal-cloud-foundry-tile-for-gitlab-ee/): Deploy GitLab as a pre-configured appliance using Ops Manager (BOSH) for Pivotal Cloud Foundry. See also: [Pivotal documentation](https://docs.pivotal.io/partners/gitlab/index.html).
+- **(EES/EEP)** [Database load balancing](administration/database_load_balancing.md): Distribute database queries among multiple database servers.
+- **(EES/EEP)** [Omnibus support for external MySQL DB](https://docs.gitlab.com/omnibus/settings/database.html#using-a-mysql-database-management-server-enterprise-edition-only): Omnibus package supports configuring an external MySQL database.
+- **(EES/EEP)** [Omnibus support for log forwarding](https://docs.gitlab.com/omnibus/settings/logs.html#udp-log-shipping-gitlab-enterprise-edition-only)
 - GitLab CI
     - [CI admin settings](user/admin_area/settings/continuous_integration.md): Define max artifacts size and expiration time.
 
@@ -149,6 +176,8 @@ have access to GitLab administration tools and settings.
 - [Integrations](integration/README.md): How to integrate with systems such as JIRA, Redmine, Twitter.
 - [Koding](administration/integration/koding.md): Set up Koding to use with GitLab.
 - [Mattermost](user/project/integrations/mattermost.md): Set up GitLab with Mattermost.
+- **(EES/EEP)** [Jenkins](integration/jenkins.md): Set up GitLab with Jenkins.
+
 
 ### Monitoring
 

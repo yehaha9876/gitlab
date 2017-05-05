@@ -47,6 +47,9 @@ module API
         optional :blocked, type: Boolean, default: false, desc: 'Filters only blocked users'
         all_or_none_of :extern_uid, :provider
 
+        # EE
+        optional :skip_ldap, type: Boolean, default: false, desc: 'Skip LDAP users'
+
         use :pagination
       end
       get do
@@ -61,6 +64,7 @@ module API
         users = users.active if params[:active]
         users = users.search(params[:search]) if params[:search].present?
         users = users.blocked if params[:blocked]
+        users = users.non_ldap if params[:skip_ldap]
 
         if current_user.admin?
           users = users.joins(:identities).merge(Identity.with_extern_uid(params[:provider], params[:extern_uid])) if params[:extern_uid] && params[:provider]
