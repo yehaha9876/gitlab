@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Assignee from '~/sidebar/components/assignees/assignees';
 import UsersMock from './mock_data';
 
-fdescribe('Assignee component', () => {
+describe('Assignee component', () => {
   let component;
   let AssigneeComponent;
 
@@ -114,7 +114,7 @@ fdescribe('Assignee component', () => {
       });
     });
 
-    it('Shows the "show-less"  when "n+ more " label is clicked', (done) => {
+    it('Shows the "show-less" when "n+ more " label is clicked', (done) => {
       const users = UsersMock.createNumberRandomUsers(6);
       component = new AssigneeComponent({
         propsData: {
@@ -132,23 +132,29 @@ fdescribe('Assignee component', () => {
       });
     });
 
-    it('Shows the "n+ more"  when "show less" label is clicked', (done) => {
-      const users = UsersMock.createNumberRandomUsers(6);
-      component = new AssigneeComponent({
-        propsData: {
-          rootPath: 'http://localhost:3000',
-          users,
-          editable: true,
-        },
-      }).$mount();
-      component.toggleShowLess();
+    describe('n+ more label', () => {
+      beforeEach(() => {
+        const users = UsersMock.createNumberRandomUsers(6);
+        component = new AssigneeComponent({
+          propsData: {
+            rootPath: 'http://localhost:3000',
+            users,
+            editable: true,
+          },
+        }).$mount();
+      });
 
-      Vue.nextTick(() => {
+      it('shows "+1 more" label', () => {
         expect(component.$el.querySelector('.user-list-more .btn-link').innerText.trim())
-          .toBe('- show less');
-        component.$el.querySelector('.user-list-more .btn-link').click();
+          .toBe('+ 1 more');
+      });
+
+      it('shows "show less" label', (done) => {
+        component.toggleShowLess();
+
         Vue.nextTick(() => {
-          // TODO: This times out
+          expect(component.$el.querySelector('.user-list-more .btn-link').innerText.trim())
+            .toBe('- show less');
           done();
         });
       });
