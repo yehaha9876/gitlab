@@ -84,7 +84,6 @@ feature 'Signup', :js, :feature do
     end
 
     it 'does not redisplay the password' do
-      existing_user = create(:user)
       user = build(:user)
 
       visit root_path
@@ -93,7 +92,7 @@ feature 'Signup', :js, :feature do
 
       fill_in 'new_user_name',     with: user.name
       fill_in 'new_user_username', with: user.username
-      fill_in 'new_user_email',    with: existing_user.email
+      fill_in 'new_user_email',    with: user.email
       fill_in 'new_user_password', with: user.password
       click_button "Register"
 
