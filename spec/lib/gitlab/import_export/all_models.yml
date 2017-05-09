@@ -3,12 +3,13 @@ issues:
 - subscriptions
 - award_emoji
 - author
-- assignee
+- assignees
 - updated_by
 - milestone
 - notes
 - label_links
 - labels
+- last_edited_by
 - todos
 - user_agent_detail
 - moved_to
@@ -16,6 +17,7 @@ issues:
 - merge_requests_closing_issues
 - metrics
 - timelogs
+- issue_assignees
 events:
 - author
 - project
@@ -26,6 +28,7 @@ notes:
 - noteable
 - author
 - updated_by
+- last_edited_by
 - resolved_by
 - todos
 - events
@@ -72,6 +75,7 @@ merge_requests:
 - notes
 - label_links
 - labels
+- last_edited_by
 - todos
 - target_project
 - source_project
@@ -101,6 +105,7 @@ pipelines:
 - cancelable_statuses
 - manual_actions
 - artifacts
+- pipeline_schedule
 statuses:
 - project
 - pipeline
@@ -112,9 +117,13 @@ triggers:
 - project
 - trigger_requests
 - owner
-- trigger_schedule
-trigger_schedule:
-- trigger
+pipeline_schedules:
+- project
+- owner
+- pipelines
+- last_pipeline
+pipeline_schedule:
+- pipelines
 deploy_keys:
 - user
 - deploy_keys_projects
@@ -225,7 +234,7 @@ project:
 - active_runners
 - variables
 - triggers
-- trigger_schedules
+- pipeline_schedules
 - environments
 - deployments
 - project_feature
