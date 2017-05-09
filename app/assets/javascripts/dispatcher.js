@@ -55,6 +55,7 @@ import ShortcutsWiki from './shortcuts_wiki';
 import BlobViewer from './blob/viewer/index';
 import GeoNodes from './geo_nodes';
 import ServiceDeskRoot from './projects/settings_service_desk/service_desk_root';
+import AutoWidthDropdownSelect from './issuable/auto_width_dropdown_select';
 
 const ShortcutsBlob = require('./shortcuts_blob');
 
@@ -204,6 +205,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
           new LabelsSelect();
           new MilestoneSelect();
           new gl.IssuableTemplateSelectors();
+          new AutoWidthDropdownSelect($('.js-target-branch-select')).init();
           break;
         case 'projects:tags:new':
           new ZenMode();
@@ -263,6 +265,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
           }
           break;
         case 'projects:pipelines:builds':
+        case 'projects:pipelines:failures':
         case 'projects:pipelines:show':
           const { controllerAction } = document.querySelector('.js-pipeline-container').dataset;
           const pipelineStatusUrl = `${document.querySelector('.js-pipeline-tab-link a').getAttribute('href')}/status.json`;
@@ -356,6 +359,9 @@ const ShortcutsBlob = require('./shortcuts_blob');
           break;
         case 'projects:artifacts:browse':
           new BuildArtifacts();
+          break;
+        case 'projects:artifacts:file':
+          new BlobViewer();
           break;
         case 'help:index':
           gl.VersionCheckImage.bindErrorEvent($('img.js-version-status-badge'));
