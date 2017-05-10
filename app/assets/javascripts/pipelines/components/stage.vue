@@ -14,7 +14,7 @@
  */
 
 /* global Flash */
-import { borderlessStatusIconEntityMap } from '../../vue_shared/ci_status_icons';
+import { statusClassToSvgMap } from '../../vue_shared/pipeline_svg_icons';
 
 export default {
   props: {
@@ -113,7 +113,7 @@ export default {
     },
 
     svgIcon() {
-      return borderlessStatusIconEntityMap[this.stage.status.icon];
+      return statusClassToSvgMap[this.stage.status.icon];
     },
   },
 };
