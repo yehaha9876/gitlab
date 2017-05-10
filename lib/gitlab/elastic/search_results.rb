@@ -177,7 +177,7 @@ module Gitlab
                           }
                         }
 
-          if current_user
+          if current_user && !current_user.external?
             conditions << {
                             bool: {
                               filter: [
