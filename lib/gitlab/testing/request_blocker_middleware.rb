@@ -30,9 +30,12 @@ module Gitlab
 
       def call(env)
         increment_active_requests
+        puts "RequestBlockerMiddleware call numActive: #{@@num_active_requests}"
         if block_requests?
+          puts "blocking request #{env["REQUEST_URI"]}"
           block_request(env)
         else
+          puts "allowing request #{env["REQUEST_URI"]}"
           @app.call(env)
         end
       ensure

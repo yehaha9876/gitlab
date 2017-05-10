@@ -9,12 +9,14 @@ module WaitForRequests
   # This is inspired by http://www.salsify.com/blog/engineering/tearing-capybara-ajax-tests
   def wait_for_requests_complete
     Gitlab::Testing::RequestBlockerMiddleware.block_requests!
+    puts "wait_for_requests_complete block_requests!"
     wait_for('pending AJAX requests complete') do
       Gitlab::Testing::RequestBlockerMiddleware.num_active_requests.zero? &&
         finished_all_requests?
     end
   ensure
     Gitlab::Testing::RequestBlockerMiddleware.allow_requests!
+    puts "wait_for_requests_complete allow_requests!"
   end
 
   def finished_all_requests?
