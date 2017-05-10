@@ -755,7 +755,13 @@
     align-self: center;
   }
 
+  .potential-approvers-list {
+    margin-left: -5px;
+  }
+
   .hide-asset {
+    margin-right: 3px;
+
     img {
       display: none;
     }
@@ -773,9 +779,8 @@
   }
 
   .approvers-list img {
-    width: 18px;
-    height: 18px;
-    margin-top: 3px;
+    margin-top: 7px;
+    margin-right: 5px;
   }
 
   .unapprove-btn {
@@ -805,18 +810,6 @@
       height: 45%;
       width: 45%;
     }
-  }
-}
-
-.link-to-member-avatar {
-  .disabled {
-    pointer-events: none;
-    cursor: default;
-  }
-
-  .avatar {
-    margin-bottom: -2px;
-    margin-right: 3px;
   }
 }
 

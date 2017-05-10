@@ -1,6 +1,7 @@
 /* global Flash */
 import pendingAvatarSvg from 'icons/_icon_dotted_circle.svg';
-import LinkToMemberAvatar from '~/vue_shared/components/link_to_member_avatar';
+import UserAvatarLink from '../../../../vue_shared/components/user_avatar/user_avatar_link.vue';
+import UserAvatarSvg from '../../../../vue_shared/components/user_avatar/user_avatar_svg.vue';
 import eventHub from '../../../event_hub';
 
 export default {
@@ -42,7 +43,8 @@ export default {
     };
   },
   components: {
-    'link-to-member-avatar': LinkToMemberAvatar,
+    'user-avatar-link': UserAvatarLink,
+    'user-avatar-svg': UserAvatarSvg,
   },
   computed: {
     showUnapproveButton() {
@@ -71,19 +73,21 @@ export default {
         <p class="approvers-prefix">Approved by</p>
         <div class="approvers-list">
           <span v-for="approver in approvedBy">
-            <link-to-member-avatar
-              extra-link-class="approver-avatar"
-              :avatar-url="approver.user.avatar_url"
-              :display-name="approver.user.name"
-              :profile-url="approver.user.web_url"
-              :show-tooltip="true" />
+            <user-avatar-link
+              class="approver-avatar"
+              :href="approver.user.web_url"
+              :img-src="approver.user.avatar_url"
+              :img-size="18"
+              :tooltip-text="approver.user.name"
+            />
           </span>
-          <span class="potential-approvers-list" v-for="n in approvalsLeft">
-            <link-to-member-avatar
-              :clickable="false"
-              :avatar-html="pendingAvatarSvg"
-              :show-tooltip="false"
-              extra-link-class="hide-asset" />
+          <span class="potential-approvers-list">
+            <user-avatar-svg
+              v-for="n in approvalsLeft"
+              class="hide-asset"
+              :svg="pendingAvatarSvg"
+              :size="18"
+            />
           </span>
         </div>
         <span class="unapprove-btn-wrap" v-if="showUnapproveButton">
