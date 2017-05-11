@@ -62,7 +62,7 @@ class ServiceDeskRoot {
         this.store.setIncomingEmail(incomingEmail);
       })
       .catch((err) => {
-        this.store.setFetchError(err);
+        this.store.setFetchError(new Error(err));
       });
   }
 
@@ -76,7 +76,7 @@ class ServiceDeskRoot {
         this.store.setIncomingEmail(incomingEmail);
       })
       .catch((err) => {
-        this.store.setFetchError(err);
+        this.store.setFetchError(new Error(err));
       });
   }
 
