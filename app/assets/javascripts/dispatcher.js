@@ -57,27 +57,30 @@ import AutoWidthDropdownSelect from './issuable/auto_width_dropdown_select';
 import UsersSelect from './users_select';
 
 const ShortcutsBlob = require('./shortcuts_blob');
+const eeDispatcher = require('./ee/dispatcher').default;
 
 (function() {
   var Dispatcher;
 
   $(function() {
-    return new Dispatcher();
+    const page = $('body').attr('data-page');
+
+    if (!page) return;
+
+    new Dispatcher(page);
+    eeDispatcher.init(page);
   });
 
   Dispatcher = (function() {
-    function Dispatcher() {
+    function Dispatcher(page) {
       this.initSearch();
       this.initFieldErrors();
-      this.initPageScripts();
+      this.initPageScripts(page);
     }
 
-    Dispatcher.prototype.initPageScripts = function() {
-      var page, path, shortcut_handler, fileBlobPermalinkUrlElement, fileBlobPermalinkUrl;
-      page = $('body').attr('data-page');
-      if (!page) {
-        return false;
-      }
+    Dispatcher.prototype.initPageScripts = function(page) {
+      var path, shortcut_handler, fileBlobPermalinkUrlElement, fileBlobPermalinkUrl;
+
       path = page.split(':');
       shortcut_handler = null;
 
