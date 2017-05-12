@@ -55,6 +55,7 @@ import BlobViewer from './blob/viewer/index';
 import GeoNodes from './geo_nodes';
 import ServiceDeskRoot from './projects/settings_service_desk/service_desk_root';
 import AutoWidthDropdownSelect from './issuable/auto_width_dropdown_select';
+import eeDispatcher from './ee/dispatcher';
 
 const ShortcutsBlob = require('./shortcuts_blob');
 
@@ -62,22 +63,24 @@ const ShortcutsBlob = require('./shortcuts_blob');
   var Dispatcher;
 
   $(function() {
-    return new Dispatcher();
+    const page = $('body').attr('data-page');
+
+    if (!page) return;
+
+    new Dispatcher(page);
+    eeDispatcher.init(page);
   });
 
   Dispatcher = (function() {
-    function Dispatcher() {
+    function Dispatcher(page) {
       this.initSearch();
       this.initFieldErrors();
-      this.initPageScripts();
+      this.initPageScripts(page);
     }
 
-    Dispatcher.prototype.initPageScripts = function() {
-      var page, path, shortcut_handler, fileBlobPermalinkUrlElement, fileBlobPermalinkUrl;
-      page = $('body').attr('data-page');
-      if (!page) {
-        return false;
-      }
+    Dispatcher.prototype.initPageScripts = function(page) {
+      var path, shortcut_handler, fileBlobPermalinkUrlElement, fileBlobPermalinkUrl;
+
       path = page.split(':');
       shortcut_handler = null;
 
