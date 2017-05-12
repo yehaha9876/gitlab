@@ -14,7 +14,6 @@
 /* global NotificationsForm */
 /* global TreeView */
 /* global NotificationsDropdown */
-/* global UsersSelect */
 /* global GroupAvatar */
 /* global LineHighlighter */
 /* global ProjectFork */
@@ -55,6 +54,7 @@ import BlobViewer from './blob/viewer/index';
 import GeoNodes from './geo_nodes';
 import ServiceDeskRoot from './projects/settings_service_desk/service_desk_root';
 import AutoWidthDropdownSelect from './issuable/auto_width_dropdown_select';
+import UsersSelect from './users_select';
 
 const ShortcutsBlob = require('./shortcuts_blob');
 
@@ -116,6 +116,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
         case 'projects:boards:show':
         case 'projects:boards:index':
           shortcut_handler = new ShortcutsNavigation();
+          new UsersSelect();
           break;
         case 'projects:builds:show':
           new Build();
@@ -130,6 +131,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
             prefixId: page === 'projects:merge_requests:index' ? 'merge_request_' : 'issue_',
           });
           shortcut_handler = new ShortcutsNavigation();
+          new UsersSelect();
           break;
         case 'projects:issues:show':
           new Issue();
@@ -141,6 +143,10 @@ const ShortcutsBlob = require('./shortcuts_blob');
         case 'dashboard:milestones:show':
           new Milestone();
           new Sidebar();
+          break;
+        case 'groups:issues':
+        case 'groups:merge_requests':
+          new UsersSelect();
           break;
         case 'dashboard:todos:index':
           new gl.Todos();
@@ -225,6 +231,10 @@ const ShortcutsBlob = require('./shortcuts_blob');
           break;
         case 'dashboard:activity':
           new gl.Activities();
+          break;
+        case 'dashboard:issues':
+        case 'dashboard:merge_requests':
+          new UsersSelect();
           break;
         case 'projects:commit:show':
           new Commit();
@@ -392,6 +402,9 @@ const ShortcutsBlob = require('./shortcuts_blob');
         case 'snippets:show':
           new LineHighlighter();
           new BlobViewer();
+          break;
+        case 'import:fogbugz:new_user_map':
+          new UsersSelect();
           break;
       }
       switch (path.first()) {

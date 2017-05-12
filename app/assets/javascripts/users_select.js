@@ -553,17 +553,17 @@ import eventHub from './sidebar/event_hub';
             },
             initSelection: function() {
               var args;
-              args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+              args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
               return _this.initSelection.apply(_this, args);
             },
             formatResult: function() {
               var args;
-              args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+              args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
               return _this.formatResult.apply(_this, args);
             },
             formatSelection: function() {
               var args;
-              args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+              args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
               return _this.formatSelection.apply(_this, args);
             },
             dropdownCssClass: "ajax-users-dropdown",
