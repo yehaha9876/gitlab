@@ -88,7 +88,26 @@ namespace :gitlab do
     end
 
     desc "GitLab | Elasticsearch | Index all database objects"
-    multitask index_database: INDEXABLE_CLASSES.values
+    task index_database: :environment do
+      Thread.abort_on_exception = true
+      queue = Queue.new
+      workers_number = 4
+
+      INDEXABLE_CLASSES.values.each{ |task_name| queue << task_name }
+
+      workers = Array.new(workers_number) do
+        Thread.new do
+          begin
+            while task_name = queue.pop(true)
+              Rake::Task["gitlab:elastic:#{task_name}"].invoke
+            end
+          rescue ThreadError
+          end
+        end
+      end
+
+      workers.each(&:join)
+    end
 
     desc "GitLab | Elasticsearch | Create empty index"
     task create_empty_index: :environment do
