@@ -106,7 +106,7 @@ in your SAML IdP:
     [the omniauth-saml documentation](https://github.com/omniauth/omniauth-saml)
     for details on these options.
 
-1.  Change the value of `issuer` to the GitLab instance domain name, which will identify the application
+1.  Change the value of `issuer` to the 'GitLab external URL', which will identify the application
     to the IdP.
 
 1.  [Reconfigure][] or [restart GitLab][] for the changes to take effect if you
