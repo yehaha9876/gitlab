@@ -1,5 +1,3 @@
-/* global Flash */
-
 import FilteredSearchContainer from './container';
 import RecentSearchesRoot from './recent_searches_root';
 import RecentSearchesStore from './stores/recent_searches_store';
@@ -20,7 +18,9 @@ import eventHub from './event_hub';
         this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeysWithWeights;
       }
 
-      this.recentSearchesStore = new RecentSearchesStore();
+      this.recentSearchesStore = new RecentSearchesStore({
+        isLocalStorageAvailable: RecentSearchesService.isAvailable(),
+      });
       let recentSearchesKey = 'issue-recent-searches';
       if (page === 'merge_requests') {
         recentSearchesKey = 'merge-request-recent-searches';
@@ -29,9 +29,10 @@ import eventHub from './event_hub';
 
       // Fetch recent searches from localStorage
       this.fetchingRecentSearchesPromise = this.recentSearchesService.fetch()
-        .catch(() => {
+        .catch((error) => {
+          if (error.name === 'RecentSearchesServiceError') return undefined;
           // eslint-disable-next-line no-new
-          new Flash('An error occured while parsing recent searches');
+          new window.Flash('An error occured while parsing recent searches');
           // Gracefully fail to empty array
           return [];
         })

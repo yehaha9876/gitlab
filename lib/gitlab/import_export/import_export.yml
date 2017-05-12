@@ -89,6 +89,8 @@ excluded_attributes:
     - :mirror_last_successful_update_at
     - :mirror_user_id
     - :mirror_trigger_builds
+    - :last_repository_updated_at
+    - :last_repository_check_at
   snippets:
     - :expired_at
   merge_request_diff:
@@ -118,4 +120,8 @@ methods:
   merge_requests:
     - :diff_head_sha
   project:
+<<<<<<< HEAD
     - :description_html
+=======
+    - :description_html
+>>>>>>> ce/9-1-stable
