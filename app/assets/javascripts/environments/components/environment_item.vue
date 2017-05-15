@@ -1,6 +1,5 @@
 <script>
 import Timeago from 'timeago.js';
-import _ from 'underscore';
 import '../../lib/utils/text_utility';
 import userAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
 import ActionsComponent from './environment_actions.vue';
