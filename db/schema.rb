@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170506185517) do
+ActiveRecord::Schema.define(version: 20170516183131) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -543,7 +543,7 @@ ActiveRecord::Schema.define(version: 20170506185517) do
 
   add_index "index_statuses", ["project_id"], name: "index_index_statuses_on_project_id", unique: true, using: :btree
 
-  create_table "issue_assignees", force: :cascade do |t|
+  create_table "issue_assignees", id: false, force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "issue_id", null: false
   end
@@ -1624,8 +1624,8 @@ ActiveRecord::Schema.define(version: 20170506185517) do
   add_foreign_key "ci_trigger_requests", "ci_triggers", column: "trigger_id", name: "fk_b8ec8b7245", on_delete: :cascade
   add_foreign_key "ci_triggers", "users", column: "owner_id", name: "fk_e8e10d1964", on_delete: :cascade
   add_foreign_key "container_repositories", "projects"
-  add_foreign_key "issue_assignees", "issues", on_delete: :cascade
-  add_foreign_key "issue_assignees", "users", on_delete: :cascade
+  add_foreign_key "issue_assignees", "issues", name: "fk_b7d881734a", on_delete: :cascade
+  add_foreign_key "issue_assignees", "users", name: "fk_5e0c8d9154", on_delete: :cascade
   add_foreign_key "issue_metrics", "issues", on_delete: :cascade
   add_foreign_key "label_priorities", "labels", on_delete: :cascade
   add_foreign_key "label_priorities", "projects", on_delete: :cascade
