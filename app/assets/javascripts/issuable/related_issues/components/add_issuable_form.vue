@@ -1,4 +1,5 @@
 <script>
+import GfmAutoComplete from '~/gfm_auto_complete';
 import eventHub from '../event_hub';
 import IssueToken from './issue_token.vue';
 
@@ -18,6 +19,11 @@ export default {
       type: Array,
       required: false,
       default: () => [],
+    },
+    autoCompleteSources: {
+      type: Object,
+      required: false,
+      default: {},
     },
   },
 
@@ -58,7 +64,7 @@ export default {
 
   mounted() {
     const $input = $(this.$refs.input);
-    gl.GfmAutoComplete.setup($input, {
+    new GfmAutoComplete(this.autoCompleteSources).setup($input, {
       issues: true,
     });
     $input.on('inserted-issues.atwho', this.onInput);

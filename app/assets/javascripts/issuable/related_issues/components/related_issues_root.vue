@@ -116,6 +116,9 @@ export default {
         this.currentProjectPath,
       );
     },
+    autoCompleteSources() {
+      return gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources;
+    },
   },
 
   methods: {
@@ -141,6 +144,7 @@ export default {
     },
     onAddIssuableFormSubmit() {
       const currentPendingIssues = this.state.pendingRelatedIssues;
+      const currentRelatedIssues = this.state.relatedIssues;
       if (currentPendingIssues.length > 0) {
         this.service.addRelatedIssues(currentPendingIssues)
           .then(res => res.json())
@@ -151,8 +155,23 @@ export default {
               _.uniq(this.state.relatedIssues.concat(currentPendingIssues)),
             );
           })
-          .catch(() => new Flash('An error occurred while submitting related issues.'));
+          .catch(() => {
+            // Something went wrong, so restore and tell them about it
+            this.store.setPendingRelatedIssues(
+              _.uniq(this.state.pendingRelatedIssues.concat(currentPendingIssues)),
+            );
+            // Remove the temporary relation
+            this.store.setRelatedIssues(currentRelatedIssues);
+
+            // eslint-disable-next-line no-new
+            new Flash('An error occurred while submitting related issues.');
+          });
+
+        // Show the relation right away
         this.store.setPendingRelatedIssues([]);
+        this.store.setRelatedIssues(
+          _.uniq(currentRelatedIssues.concat(currentPendingIssues)),
+        );
       }
     },
     onAddIssuableFormCancel() {
@@ -322,5 +341,6 @@ export default {
     :can-add-related-issues="canAddRelatedIssues"
     :pending-related-issues="computedPendingRelatedIssues"
     :is-form-visible="isFormVisible"
-    :input-value="inputValue" />
+    :input-value="inputValue"
+    :auto-complete-sources="autoCompleteSources" />
 </template>
