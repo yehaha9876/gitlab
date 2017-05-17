@@ -71,17 +71,21 @@ describe Projects::PropagateServiceTemplate, services: true do
     end
 
     describe 'bulk update' do
-      it 'creates services for all projects' do
-        project_total = 5
+      let(:project_total) { 5 }
+      
+      before do
         stub_const 'Projects::PropagateServiceTemplate::BATCH_SIZE', 3
-
+        
         project_total.times { create(:empty_project) }
-
-        expect { described_class.propagate(service_template) }.
-          to change { Service.all.reload.count }.by(project_total + 1)
+        
+        described_class.propagate(service_template)
+      end
+      
+      it 'creates services for all projects' do
+        expect(Service.all.reload.count).to eq(project_total + 2)
       end
     end
-
+    
     describe 'external tracker' do
       it 'updates the project external tracker' do
         service_template.update!(category: 'issue_tracker', default: false)
