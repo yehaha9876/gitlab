@@ -37,6 +37,11 @@ export default {
       required: false,
       default: '',
     },
+    autoCompleteSources: {
+      type: Object,
+      required: false,
+      default: {},
+    },
   },
 
   components: {
@@ -118,7 +123,8 @@ export default {
         <add-issuable-form
           :input-value="inputValue"
           :pending-issuables="pendingRelatedIssues"
-          add-button-label="Add related issues" />
+          add-button-label="Add related issues"
+          :auto-complete-sources="autoCompleteSources" />
       </div>
       <div
         v-if="hasRelatedIssues"
