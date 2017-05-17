@@ -53,7 +53,11 @@ import eventHub from './sidebar/event_hub';
           $collapsedSidebar = $block.find('.sidebar-collapsed-user');
           $loading = $block.find('.block-loading').fadeOut();
           selectedIdDefault = (defaultNullUser && showNullUser) ? 0 : null;
-          selectedId = $dropdown.data('selected') || selectedIdDefault;
+          selectedId = $dropdown.data('selected');
+
+          if (selectedId === undefined) {
+            selectedId = selectedIdDefault;
+          }
 
           const assignYourself = function () {
             const unassignedSelected = $dropdown.closest('.selectbox')
@@ -435,8 +439,9 @@ import eventHub from './sidebar/event_hub';
             },
             opened: function(e) {
               const $el = $(e.currentTarget);
-              if ($dropdown.hasClass('js-issue-board-sidebar')) {
-                selectedId = parseInt($dropdown[0].dataset.selected, 10) || selectedIdDefault;
+              const selected = getSelected();
+              if ($dropdown.hasClass('js-issue-board-sidebar') && selected.length === 0) {
+                this.addInput($dropdown.data('field-name'), 0, {});
               }
               $el.find('.is-active').removeClass('is-active');
 
@@ -444,8 +449,10 @@ import eventHub from './sidebar/event_hub';
                 $el.find(`li[data-user-id="${id}"] .dropdown-menu-user-link`).addClass('is-active');
               }
 
-              if ($selectbox[0]) {
+              if (selected.length > 0) {
                 getSelected().forEach(selectedId => highlightSelected(selectedId));
+              } else if ($dropdown.hasClass('js-issue-board-sidebar')) {
+                highlightSelected(0);
               } else {
                 highlightSelected(selectedId);
               }
@@ -456,15 +463,19 @@ import eventHub from './sidebar/event_hub';
               username = user.username ? "@" + user.username : "";
               avatar = user.avatar_url ? user.avatar_url : false;
 
-              let selected = user.id === parseInt(selectedId, 10);
+              let selected = false;
 
               if (this.multiSelect) {
+                selected = getSelected().find(u => user.id === u);
+
                 const fieldName = this.fieldName;
                 const field = $dropdown.closest('.selectbox').find("input[name='" + fieldName + "'][value='" + user.id + "']");
 
                 if (field.length) {
                   selected = true;
                 }
+              } else {
+                selected = user.id === selectedId;
               }
 
               img = "";
