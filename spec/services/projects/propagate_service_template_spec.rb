@@ -78,7 +78,7 @@ describe Projects::PropagateServiceTemplate, services: true do
         project_total.times { create(:empty_project) }
 
         expect { described_class.propagate(service_template) }.
-          to change { Service.count }.by(project_total + 1)
+          to change { Service.all.reload.count }.by(project_total + 1)
       end
     end
 
