@@ -72,31 +72,20 @@ describe Projects::PropagateServiceTemplate, services: true do
 
     describe 'bulk update' do
       let(:project_total) { 5 }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> gl-ce/9-2-stable
       before do
         stub_const 'Projects::PropagateServiceTemplate::BATCH_SIZE', 3
-        
+
         project_total.times { create(:empty_project) }
-<<<<<<< HEAD
-        
-        described_class.propagate(service_template)
-      end
-      
-=======
 
         described_class.propagate(service_template)
       end
 
->>>>>>> gl-ce/9-2-stable
       it 'creates services for all projects' do
         expect(Service.all.reload.count).to eq(project_total + 2)
       end
     end
-    
+
     describe 'external tracker' do
       it 'updates the project external tracker' do
         service_template.update!(category: 'issue_tracker', default: false)
