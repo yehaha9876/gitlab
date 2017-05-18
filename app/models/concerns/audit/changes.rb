@@ -1,15 +1,16 @@
 module Audit
   module Changes
     extend ActiveSupport::Concern
+    attr_accessor :current_user
+
+    COLUMN_OVERRIDES = { email: :notification_email }
 
     module ClassMethods
-      attr_accessor :current_user
-
       def audit_changes(column, options)
-        after_update -> { audit_event(column, options) }, if: ->(model) do
-          column = "notification_email" if column == :email
+        column = COLUMN_OVERRIDES[column] || column
 
-          model.public_send("#{column}_changed?".to_sym)
+        after_update -> { audit_event(column, options) }, if: ->(model) do
+          model.public_send("#{column}_changed?")
         end
       end
     end
@@ -17,10 +18,14 @@ module Audit
     def audit_event(column, options)
       raise NotImplementedError, "#{self.class} has no current user assigned." unless self.current_user
 
-      options.merge!(action: :update_column, column: column)
+      options.merge!(action: :update,
+                     column: column,
+                     from: self.public_send("#{column}_was"),
+                     to: self.public_send("#{column}")
+                     )
 
-      AuditEventService.new(self.current_user, self, options)
-        .for_member(self).security_event
+      AuditEventService.new(self.current_user, self, options).
+        for_changes.security_event
     end
   end
 end

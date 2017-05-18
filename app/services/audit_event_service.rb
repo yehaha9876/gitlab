@@ -44,6 +44,26 @@ class AuditEventService
     self
   end
 
+  def for_changes
+    action = @details[:action]
+
+    @details =
+      case action
+        when :update
+          {
+            change: @details[:as] || @details[:column],
+            from:  @details[:from],
+            to: @details[:to],
+            author_name: @author.name,
+            target_id: @entity,
+            target_type: @entity.class,
+            target_details: @entity.name
+          }
+      end
+
+    self
+  end
+
   def for_deploy_key(key_title)
     action = @details[:action]
     author_name = @author.name
