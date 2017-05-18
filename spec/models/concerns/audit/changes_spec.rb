@@ -11,7 +11,7 @@ describe Audit::Changes do
     it 'does not call the audit event service' do
       expect(AuditEventService).not_to receive(:new)
 
-      FooUser.update(name: 'new name')
+      FooUser.update!(name: 'new name')
     end
   end
 
@@ -19,7 +19,7 @@ describe Audit::Changes do
     it 'calls the audit event service' do
       expect(AuditEventService).to receive(:new)
 
-      FooUser.update(email: 'new@email.com')
+      FooUser.update!(email: 'new@email.com')
     end
   end
 end

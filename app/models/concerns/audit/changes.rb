@@ -6,7 +6,11 @@ module Audit
       attr_accessor :current_user
 
       def audit_changes(column, options)
-        before_update -> { audit_event(column, options) }, if: "#{column}_changed?".to_sym
+        after_update -> { audit_event(column, options) }, if: ->(model) do
+          column = "notification_email" if column == :email
+
+          model.public_send("#{column}_changed?".to_sym)
+        end
       end
     end
 
