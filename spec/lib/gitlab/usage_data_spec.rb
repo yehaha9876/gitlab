@@ -60,8 +60,11 @@ describe Gitlab::UsageData do
         pages_domains
         protected_branches
         releases
+<<<<<<< HEAD
         remote_mirrors
         services
+=======
+>>>>>>> ce/9-2-stable
         snippets
         todos
         uploads

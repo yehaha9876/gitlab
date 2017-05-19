@@ -56,6 +56,7 @@ import BlobViewer from './blob/viewer/index';
 import GeoNodes from './geo_nodes';
 import ServiceDeskRoot from './projects/settings_service_desk/service_desk_root';
 import AutoWidthDropdownSelect from './issuable/auto_width_dropdown_select';
+import RefSelectDropdown from './ref_select_dropdown';
 
 const ShortcutsBlob = require('./shortcuts_blob');
 
@@ -210,6 +211,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
         case 'projects:tags:new':
           new ZenMode();
           new gl.GLForm($('.tag-form'));
+          new RefSelectDropdown($('.js-branch-select'), window.gl.availableRefs);
           break;
         case 'projects:releases:edit':
           new ZenMode();
