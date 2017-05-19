@@ -151,6 +151,7 @@ var config = {
         'pdf_viewer',
         'pipelines',
         'balsamiq_viewer',
+        'pipelines_graph',
         'schedule_form',
         'schedules_index',
         'sidebar',
