@@ -28,7 +28,6 @@ for all signed in users.
 [were added][ee-735] in GitLab Enterprise Edition
 8.12. [Moved to GitLab Community Edition][ce-23361] in 9.1.
 
-<<<<<<< HEAD
 GitLab Inc. can collect non-sensitive information about how GitLab users
 use their GitLab instance upon the activation of a ping feature
 located in the admin panel (`/admin/application_settings`).
@@ -85,7 +84,7 @@ For example: `"mattermost_enabled":true"`.
 More data will be added over time. The goal of this ping is to be as light as
 possible, so it won't have any performance impact on your installation when
 the calculation is made.
-=======
+
 GitLab sends a weekly payload containing usage data to GitLab Inc. The usage
 ping uses high-level data to help our product, support, and sales teams. It does
 not send any project names, usernames, or any other specific data. The
@@ -93,7 +92,6 @@ information from the usage ping is not anonymous, it is linked to the hostname
 of the instance.
 
 You can view the exact JSON payload in the administration panel.
->>>>>>> gl-ce/9-2-stable
 
 ### Deactivate the usage ping
 
