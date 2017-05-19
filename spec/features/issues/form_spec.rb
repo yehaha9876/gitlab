@@ -23,9 +23,11 @@ describe 'New/edit issue', feature: true, js: true do
       visit new_namespace_project_issue_path(project.namespace, project)
     end
 
-    describe 'multiple assignees' do
+    describe 'single assignee' do
       before do
         click_button 'Unassigned'
+
+        wait_for_ajax
       end
 
       it 'unselects other assignees when unassigned is selected' do
@@ -33,12 +35,10 @@ describe 'New/edit issue', feature: true, js: true do
           click_link user2.name
         end
 
+        click_button user2.name
+
         page.within '.dropdown-menu-user' do
           click_link 'Unassigned'
-        end
-
-        page.within '.js-assignee-search' do
-          expect(page).to have_content 'Unassigned'
         end
 
         expect(find('input[name="issue[assignee_ids][]"]', visible: false).value).to match('0')
@@ -51,11 +51,13 @@ describe 'New/edit issue', feature: true, js: true do
 
         expect(find('a', text: 'Assign to me', visible: false)).not_to be_visible
 
-        page.within '.dropdown-menu-user' do
+        click_button user.name
+
+        page.within('.dropdown-menu-user') do
           click_link user.name
         end
 
-        expect(find('a', text: 'Assign to me')).to be_visible
+        expect(page.find('.dropdown-menu-user', visible: false)).not_to be_visible
       end
     end
 
@@ -161,6 +163,9 @@ describe 'New/edit issue', feature: true, js: true do
 
     it 'correctly updates the selected user when changing assignee' do
       click_button 'Unassigned'
+
+      wait_for_ajax
+
       page.within '.dropdown-menu-user' do
         click_link user.name
       end
