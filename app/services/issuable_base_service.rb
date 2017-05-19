@@ -236,14 +236,9 @@ class IssuableBaseService < BaseService
         )
 
         if old_assignees != issuable.assignees
-<<<<<<< HEAD
           new_assignees = issuable.assignees.to_a
           affected_assignees = (old_assignees + new_assignees) - (old_assignees & new_assignees)
           affected_assignees.compact.each(&:invalidate_cache_counts)
-=======
-          assignees = old_assignees + issuable.assignees.to_a
-          assignees.compact.each(&:invalidate_cache_counts)
->>>>>>> ce/9-2-stable
         end
 
         after_update(issuable)
