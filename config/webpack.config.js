@@ -151,10 +151,7 @@ var config = {
         'pdf_viewer',
         'pipelines',
         'balsamiq_viewer',
-<<<<<<< HEAD
-=======
         'pipelines_graph',
->>>>>>> ce/9-2-stable
         'schedule_form',
         'schedules_index',
         'sidebar',
