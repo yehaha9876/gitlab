@@ -136,6 +136,7 @@ describe 'Issue Boards', feature: true, js: true do
           click_link 'Unassigned'
         end
 
+        find('.dropdown-menu-toggle').click
         wait_for_vue_resource
 
         expect(page).to have_content('No assignee')
@@ -143,6 +144,7 @@ describe 'Issue Boards', feature: true, js: true do
 
       expect(card_two).not_to have_selector('.avatar')
     end
+
 
     it 'assignees to current user' do
       click_card(card)
