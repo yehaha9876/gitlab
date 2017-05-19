@@ -263,7 +263,6 @@ describe ApplicationSetting, models: true do
     end
   end
 
-<<<<<<< HEAD
   describe '#repository_size_limit column' do
     it 'support values up to 8 exabytes' do
       setting.update_column(:repository_size_limit, 8.exabytes - 1)
@@ -317,7 +316,9 @@ describe ApplicationSetting, models: true do
         aws_access_key: 'test-access-key',
         aws_secret_access_key: 'test-secret-access-key'
       )
-=======
+    end
+  end
+
   describe 'usage ping settings' do
     context 'when the usage ping is disabled in gitlab.yml' do
       before do
@@ -377,7 +378,6 @@ describe ApplicationSetting, models: true do
           expect(setting.usage_ping_enabled).to be_truthy
         end
       end
->>>>>>> gl-ce/9-2-stable
     end
   end
 end
