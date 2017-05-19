@@ -360,7 +360,7 @@ class User < ActiveRecord::Base
     end
 
     def find_by_full_path(path, follow_redirects: false)
-      namespace = Namespace.find_by_full_path(path, follow_redirects: follow_redirects)
+      namespace = Namespace.for_user.find_by_full_path(path, follow_redirects: follow_redirects)
       namespace&.owner
     end
 
@@ -948,6 +948,11 @@ class User < ActiveRecord::Base
   def update_cache_counts
     assigned_open_merge_requests_count(force: true)
     assigned_open_issues_count(force: true)
+  end
+
+  def invalidate_cache_counts
+    Rails.cache.delete(['users', id, 'assigned_open_merge_requests_count'])
+    Rails.cache.delete(['users', id, 'assigned_open_issues_count'])
   end
 
   def todos_done_count(force: false)

@@ -129,7 +129,6 @@ class MergeRequest < ActiveRecord::Base
   participant :assignee
 
   after_save :keep_around_commit
-  after_save :update_assignee_cache_counts, if: :assignee_id_changed?
 
   def self.reference_prefix
     '!'
@@ -189,13 +188,6 @@ class MergeRequest < ActiveRecord::Base
 
   def self.wip_title(title)
     work_in_progress?(title) ? title : "WIP: #{title}"
-  end
-
-  def update_assignee_cache_counts
-    # make sure we flush the cache for both the old *and* new assignees(if they exist)
-    previous_assignee = User.find_by_id(assignee_id_was) if assignee_id_was
-    previous_assignee&.update_cache_counts
-    assignee&.update_cache_counts
   end
 
   # Returns a Hash of attributes to be used for Twitter card metadata
@@ -305,6 +297,8 @@ class MergeRequest < ActiveRecord::Base
   attr_writer :target_branch_sha, :source_branch_sha
 
   def source_branch_head
+    return unless source_project
+
     source_branch_ref = @source_branch_sha || source_branch
     source_project.repository.commit(source_branch_ref) if source_branch_ref
   end
@@ -985,6 +979,7 @@ class MergeRequest < ActiveRecord::Base
 
     return @conflicts_can_be_resolved_in_ui = false unless cannot_be_merged?
     return @conflicts_can_be_resolved_in_ui = false unless has_complete_diff_refs?
+    return @conflicts_can_be_resolved_in_ui = false if branch_missing?
 
     begin
       # Try to parse each conflict. If the MR's mergeable status hasn't been updated,

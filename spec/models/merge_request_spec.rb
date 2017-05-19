@@ -88,48 +88,6 @@ describe MergeRequest, models: true do
     end
   end
 
-  describe "before_save" do
-    describe "#update_cache_counts when a merge request is reassigned" do
-      let(:project) { create :project }
-      let(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
-      let(:assignee) { create :user }
-
-      context "when previous assignee exists" do
-        before do
-          project.team << [assignee, :developer]
-          merge_request.update(assignee: assignee)
-        end
-
-        it "updates cache counts for new assignee" do
-          user = create(:user)
-
-          expect(user).to receive(:update_cache_counts)
-
-          merge_request.update(assignee: user)
-        end
-
-        it "updates cache counts for previous assignee" do
-          old_assignee = merge_request.assignee
-          allow(User).to receive(:find_by_id).with(old_assignee.id).and_return(old_assignee)
-
-          expect(old_assignee).to receive(:update_cache_counts)
-
-          merge_request.update(assignee: nil)
-        end
-      end
-
-      context "when previous assignee does not exist" do
-        it "updates cache count for the new assignee" do
-          merge_request.update(assignee: nil)
-
-          expect_any_instance_of(User).to receive(:update_cache_counts)
-
-          merge_request.update(assignee: assignee)
-        end
-      end
-    end
-  end
-
   describe '#card_attributes' do
     it 'includes the author name' do
       allow(subject).to receive(:author).and_return(double(name: 'Robert'))
@@ -1794,6 +1752,13 @@ describe MergeRequest, models: true do
 
     it 'returns a falsey value when the MR is marked as having conflicts, but has none' do
       merge_request = create_merge_request('master')
+
+      expect(merge_request.conflicts_can_be_resolved_in_ui?).to be_falsey
+    end
+
+    it 'returns a falsey value when one of the MR branches is missing' do
+      merge_request = create_merge_request('conflict-resolvable')
+      merge_request.project.repository.rm_branch(merge_request.author, 'conflict-resolvable')
 
       expect(merge_request.conflicts_can_be_resolved_in_ui?).to be_falsey
     end
