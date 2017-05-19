@@ -758,6 +758,99 @@
   }
 }
 
+#merge-request-widget-app .loading {
+  padding-top: 5px;
+  border-top: 1px solid $well-inner-border;
+}
+
+.approvals-body {
+  @media (max-width: $screen-xs-max) {
+    text-align: center;
+  }
+}
+
+.approvals-footer {
+  display: flex;
+
+  .legend {
+    height: 16px;
+    top: 0;
+  }
+
+  .approvers-prefix::before {
+    top: 10px;
+  }
+
+  // vertically centers all children
+  > span {
+    align-self: center;
+  }
+
+  .hide-asset {
+    img {
+      display: none;
+    }
+
+    svg {
+      margin-bottom: -7px; // makes up for border removed
+      border: none;
+    }
+  }
+
+  .approvers-prefix,
+  .approvers-list {
+    margin-right: 5px;
+    float: left;
+  }
+
+  .approvers-list img {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+  }
+
+  .unapprove-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+
+    &:hover {
+      color: $gl-text-color-secondary;
+      text-decoration: none;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  // styles for approver avatar checkmark
+  .approver-avatar {
+    position: relative;
+    display: inline-block;
+
+    svg.avatar {
+      position: absolute;
+      top: 12%;
+      right: 4%;
+      height: 45%;
+      width: 45%;
+    }
+  }
+}
+
+.link-to-member-avatar {
+  .disabled {
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .avatar {
+    margin-bottom: -2px;
+    margin-right: 3px;
+  }
+}
+
 .mr-memory-usage {
   p.usage-info-loading,
   p.usage-info-unavailable,
