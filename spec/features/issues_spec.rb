@@ -491,7 +491,6 @@ describe 'Issues', feature: true do
             expect(page).to have_content "No assignee"
           end
         end
-
       end
     end
 
