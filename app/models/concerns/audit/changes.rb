@@ -3,11 +3,9 @@ module Audit
     extend ActiveSupport::Concern
     attr_accessor :current_user
 
-    COLUMN_OVERRIDES = { email: :notification_email }
-
     module ClassMethods
-      def audit_changes(column, options)
-        column = COLUMN_OVERRIDES[column] || column
+      def audit_changes(column, options = {})
+        column = options[:column] || column
 
         after_update -> { audit_event(column, options) }, if: ->(model) do
           model.public_send("#{column}_changed?")

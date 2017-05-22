@@ -10,6 +10,7 @@ class User < ActiveRecord::Base
   include Sortable
   include CaseSensitivity
   include TokenAuthenticatable
+  include Audit::Changes
   prepend EE::GeoAwareAvatar
   prepend EE::User
 
@@ -169,6 +170,9 @@ class User < ActiveRecord::Base
   after_save :ensure_namespace_correct
   after_initialize :set_projects_limit
   after_destroy :post_destroy_hook
+
+  audit_changes :email, as: 'email_address', column: :notification_email
+  audit_changes :password
 
   # User's Layout preference
   enum layout: [:fixed, :fluid]
