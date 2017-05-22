@@ -113,7 +113,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def update
-    user_params_with_pass = user_params.dup
+    user_params_with_pass = user_params.merge(current_user: current_user)
 
     if params[:user][:password].present?
       user_params_with_pass.merge!(
