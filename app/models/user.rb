@@ -171,8 +171,8 @@ class User < ActiveRecord::Base
   after_initialize :set_projects_limit
   after_destroy :post_destroy_hook
 
-  audit_changes :email, as: 'email_address', column: :notification_email
-  audit_changes :password
+  audit_changes :email, as: 'email address', column: :notification_email
+  audit_changes :encrypted_password, as: 'password', skip_changes: true
 
   # User's Layout preference
   enum layout: [:fixed, :fluid]

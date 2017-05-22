@@ -55,7 +55,7 @@ class AuditEventService
             from:  @details[:from],
             to: @details[:to],
             author_name: @author.name,
-            target_id: @entity,
+            target_id: @entity.id,
             target_type: @entity.class,
             target_details: @entity.name
           }
