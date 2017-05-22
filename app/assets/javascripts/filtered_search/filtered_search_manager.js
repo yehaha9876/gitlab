@@ -56,11 +56,15 @@ class FilteredSearchManager {
       this.recentSearchesRoot.init();
 
       this.bindEvents();
-      this.loadSearchParamsFromURL();
       this.dropdownManager.setDropdown();
-
       this.cleanupWrapper = this.cleanup.bind(this);
       document.addEventListener('beforeunload', this.cleanupWrapper);
+    }
+  }
+
+  setup() {
+    if (this.filteredSearchInput) {
+      this.loadSearchParamsFromURL();
     }
   }
 
@@ -140,9 +144,9 @@ class FilteredSearchManager {
     if (e.keyCode === 8 || e.keyCode === 46) {
       const { lastVisualToken } = gl.FilteredSearchVisualTokens.getLastVisualTokenBeforeInput();
 
-      if (this.filteredSearchInput.value === '' && lastVisualToken) {
-        if (this.canEdit && !this.canEdit(lastVisualToken)) return;
-
+      const sanitizedTokenName = lastVisualToken && lastVisualToken.querySelector('.name').textContent.trim();
+      const canEdit = sanitizedTokenName && this.canEdit && this.canEdit(sanitizedTokenName);
+      if (this.filteredSearchInput.value === '' && lastVisualToken && canEdit) {
         this.filteredSearchInput.value = gl.FilteredSearchVisualTokens.getLastTokenPartial();
         gl.FilteredSearchVisualTokens.removeLastTokenPartial();
       }
@@ -241,10 +245,10 @@ class FilteredSearchManager {
 
   editToken(e) {
     const token = e.target.closest('.js-visual-token');
+    const sanitizedTokenName = token.querySelector('.name').textContent.trim();
+    const canEdit = this.canEdit && this.canEdit(sanitizedTokenName);
 
-    if (this.canEdit && !this.canEdit(token)) return;
-
-    if (token) {
+    if (token && canEdit) {
       gl.FilteredSearchVisualTokens.editToken(token);
       this.tokenChange();
     }
@@ -394,7 +398,12 @@ class FilteredSearchManager {
 
       if (condition) {
         hasFilteredSearch = true;
-        gl.FilteredSearchVisualTokens.addFilterVisualToken(condition.tokenKey, condition.value);
+        const canEdit = this.canEdit && this.canEdit(condition.tokenKey);
+        gl.FilteredSearchVisualTokens.addFilterVisualToken(
+          condition.tokenKey,
+          condition.value,
+          canEdit,
+        );
       } else {
         // Sanitize value since URL converts spaces into +
         // Replace before decode so that we know what was originally + versus the encoded +
@@ -413,18 +422,27 @@ class FilteredSearchManager {
           }
 
           hasFilteredSearch = true;
-          gl.FilteredSearchVisualTokens.addFilterVisualToken(sanitizedKey, `${symbol}${quotationsToUse}${sanitizedValue}${quotationsToUse}`);
+          const canEdit = this.canEdit && this.canEdit(sanitizedKey);
+          gl.FilteredSearchVisualTokens.addFilterVisualToken(
+            sanitizedKey,
+            `${symbol}${quotationsToUse}${sanitizedValue}${quotationsToUse}`,
+            canEdit,
+          );
         } else if (!match && keyParam === 'assignee_id') {
           const id = parseInt(value, 10);
           if (usernameParams[id]) {
             hasFilteredSearch = true;
-            gl.FilteredSearchVisualTokens.addFilterVisualToken('assignee', `@${usernameParams[id]}`);
+            const tokenName = 'assignee';
+            const canEdit = this.canEdit && this.canEdit(tokenName);
+            gl.FilteredSearchVisualTokens.addFilterVisualToken(tokenName, `@${usernameParams[id]}`, canEdit);
           }
         } else if (!match && keyParam === 'author_id') {
           const id = parseInt(value, 10);
           if (usernameParams[id]) {
             hasFilteredSearch = true;
-            gl.FilteredSearchVisualTokens.addFilterVisualToken('author', `@${usernameParams[id]}`);
+            const tokenName = 'author';
+            const canEdit = this.canEdit && this.canEdit(tokenName);
+            gl.FilteredSearchVisualTokens.addFilterVisualToken(tokenName, `@${usernameParams[id]}`, canEdit);
           }
         } else if (!match && keyParam === 'search') {
           hasFilteredSearch = true;
@@ -518,6 +536,11 @@ class FilteredSearchManager {
     this.filteredSearchInput.value = text;
     this.filteredSearchInput.dispatchEvent(new CustomEvent('input'));
     this.search();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  canEdit() {
+    return true;
   }
 }
 
