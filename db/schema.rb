@@ -743,7 +743,6 @@ ActiveRecord::Schema.define(version: 20170707184244) do
 
   create_table "issues", force: :cascade do |t|
     t.string "title"
-    t.integer "assignee_id"
     t.integer "author_id"
     t.integer "project_id"
     t.datetime "created_at"
@@ -771,7 +770,6 @@ ActiveRecord::Schema.define(version: 20170707184244) do
     t.integer "last_edited_by_id"
   end
 
-  add_index "issues", ["assignee_id"], name: "index_issues_on_assignee_id", using: :btree
   add_index "issues", ["author_id"], name: "index_issues_on_author_id", using: :btree
   add_index "issues", ["confidential"], name: "index_issues_on_confidential", using: :btree
   add_index "issues", ["created_at"], name: "index_issues_on_created_at", using: :btree
