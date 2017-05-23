@@ -15,7 +15,6 @@ class MergeRequestEntity < IssuableEntity
   expose :target_project_id
 
   # EE-specific
-  expose :assignee_id
   expose :approvals_before_merge
   expose :squash
   expose :rebase_commit_sha
