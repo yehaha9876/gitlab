@@ -87,12 +87,12 @@ export default {
       @click="onInputWrapperClick">
       <ul class="add-issuable-form-input-token-list">
         <li
-          :key="issuable.reference"
+          :key="issuable.id"
           v-for="issuable in pendingIssuables"
           class="js-add-issuable-form-token-list-item add-issuable-form-token-list-item">
           <issue-token
             event-namespace="pendingIssuable"
-            :reference="issuable.reference"
+            :id="issuable.id"
             :display-reference="issuable.displayReference"
             :title="issuable.title"
             :path="issuable.path"

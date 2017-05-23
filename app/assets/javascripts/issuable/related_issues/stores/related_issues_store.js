@@ -16,11 +16,13 @@ class RelatedIssuesStore {
     };
   }
 
-  getIssueFromReference(reference, namespacePath, projectPath) {
-    const issue = this.state.issueMap[reference];
+  getIssue(id, namespacePath, projectPath) {
+    const issue = this.state.issueMap[id];
 
+    let reference = issue ? issue.reference : id;
     let displayReference = reference;
     if (issue && issue.fetchStatus === FETCH_SUCCESS_STATUS) {
+      reference = assembleDisplayIssuableReference(issue);
       displayReference = assembleDisplayIssuableReference(
         issue,
         namespacePath,
@@ -31,6 +33,7 @@ class RelatedIssuesStore {
     const fetchStatus = issue ? issue.fetchStatus : FETCH_ERROR_STATUS;
 
     return {
+      id: String(id),
       reference,
       displayReference,
       path: issue && issue.path,
@@ -41,9 +44,9 @@ class RelatedIssuesStore {
     };
   }
 
-  getIssuesFromReferences(references, namespacePath, projectPath) {
-    return references.map(reference =>
-      this.getIssueFromReference(reference, namespacePath, projectPath));
+  getIssues(ids, namespacePath, projectPath) {
+    return ids.map(id =>
+      this.getIssue(id, namespacePath, projectPath));
   }
 
   addToIssueMap(reference, issue) {

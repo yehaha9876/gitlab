@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import RelatedIssuesRoot from '~/issuable/related_issues/components/related_issues_root.vue';
+import { FETCH_SUCCESS_STATUS } from '~/issuable/related_issues/constants';
 
 const defaultProps = {
   endpoint: '/foo/bar/issues/1/related_issues',
@@ -19,10 +20,12 @@ const createComponent = (propsData = {}) => {
 const issuable1 = {
   namespace_full_path: 'foo',
   project_path: 'bar',
+  id: '200',
   iid: '123',
   title: 'issue1',
   path: '/foo/bar/issues/123',
   state: 'opened',
+  fetchStatus: FETCH_SUCCESS_STATUS,
   destroy_relation_path: '/foo/bar/issues/123/related_issues/1',
 };
 const issuable1Reference = `${issuable1.namespace_full_path}/${issuable1.project_path}#${issuable1.iid}`;
@@ -30,11 +33,13 @@ const issuable1Reference = `${issuable1.namespace_full_path}/${issuable1.project
 const issuable2 = {
   namespace_full_path: 'foo',
   project_path: 'bar',
+  id: '201',
   iid: '124',
-  title: 'issue2',
+  title: 'issue1',
   path: '/foo/bar/issues/124',
   state: 'opened',
-  destroy_relation_path: '/foo/bar/issues/124/related_issues/2',
+  fetchStatus: FETCH_SUCCESS_STATUS,
+  destroy_relation_path: '/foo/bar/issues/124/related_issues/1',
 };
 const issuable2Reference = `${issuable2.namespace_full_path}/${issuable2.project_path}#${issuable2.iid}`;
 
@@ -129,8 +134,8 @@ describe('RelatedIssuesRoot', () => {
 
       beforeEach(() => {
         vm = createComponent(defaultProps);
-        vm.store.addToIssueMap(issuable1Reference, issuable1);
-        vm.store.addToIssueMap(issuable2Reference, issuable2);
+        vm.store.addToIssueMap(issuable1.id, issuable1);
+        vm.store.addToIssueMap(issuable2.id, issuable2);
 
         Vue.http.interceptors.push(interceptor);
       });
@@ -152,10 +157,11 @@ describe('RelatedIssuesRoot', () => {
       });
 
       it('submit pending issue as related issue', (done) => {
-        vm.store.setPendingRelatedIssues([issuable1Reference]);
+        vm.store.setPendingRelatedIssues([issuable1.id]);
         vm.onAddIssuableFormSubmit();
 
         setTimeout(() => {
+          console.log(vm.computedRelatedIssues[0]);
           expect(vm.computedPendingRelatedIssues.length).toEqual(0);
           expect(vm.computedRelatedIssues.length).toEqual(1);
           expect(vm.computedRelatedIssues[0].reference).toEqual(issuable1Reference);
@@ -314,6 +320,7 @@ describe('RelatedIssuesRoot', () => {
         expect(result).toEqual({
           unprocessableReferences: [],
           references: [reference],
+          ids: jasmine.any(Array),
         });
       });
 
@@ -329,6 +336,7 @@ describe('RelatedIssuesRoot', () => {
             rawReferences[0],
             rawReferences[2],
           ],
+          ids: jasmine.any(Array),
         });
       });
     });
