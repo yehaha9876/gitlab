@@ -16,6 +16,9 @@ An issue starts with its status (open or closed), followed by its author,
 and includes many other functionalities, numbered on the image above to
 explain what they mean, one by one.
 
+Many of the elements of the issue screen refresh automatically, such as the title and description, when they are changed by another user.
+Comments and system notes also appear automatically in response to various actions and content updates.
+
 #### 1. New Issue, close issue, edit
 
 - New issue: create a new issue in the same project
@@ -67,7 +70,7 @@ This feature is available only in [GitLab Enterprise Edition](https://about.gitl
 > **Note:**
 both estimate and spend times are set via [GitLab Slash Commands](../slash_commands.md).
 
-Learn more on the [Time Tracking documentation](../../../workflow/time_tracking.md).
+Learn more on the [Time Tracking documentation](https://docs.gitlab.com/ee/workflow/time_tracking.html).
 
 #### 6. Due date
 
@@ -96,7 +99,7 @@ Issue Weights are only available in [GitLab Enterprise Edition](https://about.gi
 - Attribute a weight (in a 0 to 9 range) to that issue. Easy to complete
 should weight 1 and very hard to complete should weight 9.
 
-Learn more on the [Issue Weight documentation](../../../workflow/issue_weight.md).
+Learn more on the [Issue Weight documentation](https://docs.gitlab.com/ee/workflow/issue_weight.html).
 
 #### 9. Participants
 
