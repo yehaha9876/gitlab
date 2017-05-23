@@ -59,6 +59,14 @@ function replaceInList(list, needle, replacement) {
   });
 }
 
+function checkIsProcessable(reference) {
+  const isValidReference = ISSUABLE_REFERENCE_REGEX.test(reference);
+  const isRoughIssueUrl = ISSUABLE_URL_REGEX.test(reference);
+  const isProcessable = isValidReference || isRoughIssueUrl;
+
+  return isProcessable;
+}
+
 export default {
   name: 'RelatedIssuesRoot',
 
@@ -231,18 +239,16 @@ export default {
       this.inputValue = `${results.unprocessableReferences.join(' ')}`;
     },
     processIssuableReferences(rawReferences) {
-      const unprocessableReferences = [];
       const references = rawReferences
         .filter((reference) => {
-          const isValidReference = ISSUABLE_REFERENCE_REGEX.test(reference);
-          const isRoughIssueUrl = ISSUABLE_URL_REGEX.test(reference);
-          const isProcessable = isValidReference || isRoughIssueUrl;
-
-          if (!isProcessable) {
-            unprocessableReferences.push(reference);
-          }
-
+          const isProcessable = checkIsProcessable(reference);
           return isProcessable;
+        });
+
+      const unprocessableReferences = rawReferences
+        .filter((reference) => {
+          const isProcessable = checkIsProcessable(reference);
+          return !isProcessable;
         });
 
       // Add some temporary placeholders to lookup while we wait
