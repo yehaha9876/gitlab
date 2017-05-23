@@ -132,12 +132,12 @@ export default {
         <ul
           class="related-issues-token-body">
           <li
-            :key="issue.reference"
+            :key="issue.id"
             v-for="issue in relatedIssues"
             class="js-related-issues-token-list-item related-issues-token-list-item">
             <issue-token
               event-namespace="relatedIssue"
-              :reference="issue.reference"
+              :id="issue.id"
               :display-reference="issue.displayReference"
               :title="issue.title"
               :path="issue.path"

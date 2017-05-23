@@ -10,7 +10,7 @@ export default {
   name: 'IssueToken',
 
   props: {
-    reference: {
+    id: {
       type: String,
       required: true,
     },
@@ -58,7 +58,7 @@ export default {
       return this.fetchStatus === FETCH_ERROR_STATUS;
     },
     removeButtonLabel() {
-      return `Remove related issue ${this.reference}`;
+      return `Remove related issue ${this.id}`;
     },
     hasState() {
       return this.state && this.state.length > 0;
@@ -75,7 +75,7 @@ export default {
         namespacePrefix = `${this.eventNamespace}-`;
       }
 
-      eventHub.$emit(`${namespacePrefix}removeRequest`, this.reference);
+      eventHub.$emit(`${namespacePrefix}removeRequest`, this.id);
     },
   },
   updated() {
@@ -96,7 +96,7 @@ export default {
       class="issue-token-link"
       :href="path">
       <span
-        ref="reference"
+        ref="id"
         class="issue-token-reference">
         <i
           ref="stateIcon"

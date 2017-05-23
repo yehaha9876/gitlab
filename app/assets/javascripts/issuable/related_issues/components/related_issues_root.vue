@@ -35,6 +35,7 @@ We avoid making duplicate requests by storing issue data in the `store -> issueM
 We can check for the existence in the store and the `fetchStatus` of each issue inside.
 */
 
+import _ from 'underscore';
 import eventHub from '../event_hub';
 import RelatedIssuesBlock from './related_issues_block.vue';
 import RelatedIssuesStore from '../stores/related_issues_store';
@@ -111,14 +112,14 @@ export default {
 
   computed: {
     computedRelatedIssues() {
-      return this.store.getIssuesFromReferences(
+      return this.store.getIssues(
         this.state.relatedIssues,
         this.currentNamespacePath,
         this.currentProjectPath,
       );
     },
     computedPendingRelatedIssues() {
-      return this.store.getIssuesFromReferences(
+      return this.store.getIssues(
         this.state.pendingRelatedIssues,
         this.currentNamespacePath,
         this.currentProjectPath,
@@ -130,13 +131,13 @@ export default {
   },
 
   methods: {
-    onRelatedIssueRemoveRequest(reference) {
-      this.store.setRelatedIssues(this.state.relatedIssues.filter(ref => ref !== reference));
+    onRelatedIssueRemoveRequest(idToRemove) {
+      this.store.setRelatedIssues(this.state.relatedIssues.filter(id => id !== idToRemove));
 
-      this.service.removeRelatedIssue(this.state.issueMap[reference].destroy_relation_path)
+      this.service.removeRelatedIssue(this.state.issueMap[idToRemove].destroy_relation_path)
         .catch(() => {
           // Restore issue we were unable to delete
-          this.store.setRelatedIssues(this.state.relatedIssues.concat(reference));
+          this.store.setRelatedIssues(this.state.relatedIssues.concat(idToRemove));
 
           // eslint-disable-next-line no-new
           new Flash('An error occurred while removing related issues.');
@@ -145,9 +146,9 @@ export default {
     onShowAddRelatedIssuesForm() {
       this.isFormVisible = true;
     },
-    onAddIssuableFormIssuableRemoveRequest(reference) {
+    onAddIssuableFormIssuableRemoveRequest(idToRemove) {
       this.store.setPendingRelatedIssues(
-        this.state.pendingRelatedIssues.filter(ref => ref !== reference),
+        this.state.pendingRelatedIssues.filter(id => id !== idToRemove),
       );
     },
     onAddIssuableFormSubmit() {
@@ -191,17 +192,15 @@ export default {
       this.service.fetchRelatedIssues()
         .then(res => res.json())
         .then((issues) => {
-          const relatedIssueReferences = issues.map((issue) => {
-            const referenceKey = `${issue.namespace_full_path}/${issue.project_path}#${issue.iid}`;
-
-            this.store.addToIssueMap(referenceKey, {
+          const relatedIssueIds = issues.map((issue) => {
+            this.store.addToIssueMap(String(issue.id), {
               ...issue,
               fetchStatus: FETCH_SUCCESS_STATUS,
             });
 
-            return referenceKey;
+            return issue.id;
           });
-          this.store.setRelatedIssues(relatedIssueReferences);
+          this.store.setRelatedIssues(relatedIssueIds);
         })
         .catch(() => new Flash('An error occurred while fetching related issues.'));
     },
@@ -225,7 +224,7 @@ export default {
       const results = this.processIssuableReferences(untouchedReferences);
       if (results.references.length > 0) {
         this.store.setPendingRelatedIssues(
-          _.uniq(this.state.pendingRelatedIssues.concat(results.references)),
+          _.uniq(this.state.pendingRelatedIssues.concat(results.ids)),
         );
         this.inputValue = `${results.unprocessableReferences.map(ref => `${ref} `).join('')}${touchedReference}`;
       }
@@ -234,7 +233,7 @@ export default {
       const rawReferences = newValue.split(/\s+/);
       const results = this.processIssuableReferences(rawReferences);
       this.store.setPendingRelatedIssues(
-        _.uniq(this.state.pendingRelatedIssues.concat(results.references)),
+        _.uniq(this.state.pendingRelatedIssues.concat(results.ids)),
       );
       this.inputValue = `${results.unprocessableReferences.join(' ')}`;
     },
@@ -253,12 +252,15 @@ export default {
 
       // Add some temporary placeholders to lookup while we wait
       // for data to come back from the server
-      references.forEach((reference) => {
-        const isIssueErrored = this.state.issueMap[reference] &&
-          this.state.issueMap[reference].fetchStatus === FETCH_ERROR_STATUS;
+      const ids = references.map((reference) => {
+        const issueEntry = this.state.issueMap[reference];
+        const id = issueEntry ? String(issueEntry.id) : _.uniqueId('pending_');
+        const isIssueErrored = issueEntry &&
+          issueEntry.fetchStatus === FETCH_ERROR_STATUS;
 
-        if (!this.state.issueMap[reference] || isIssueErrored) {
-          this.store.addToIssueMap(reference, {
+        if (!issueEntry || isIssueErrored) {
+          this.store.addToIssueMap(id, {
+            id,
             reference,
             fetchStatus: FETCHING_STATUS,
           });
@@ -273,44 +275,39 @@ export default {
               // They may have input a valid looking reference but it doesn't actually exist
               // Or they don't have the permissions to relate it.
               if (issue) {
-                const fullReference = `${issue.namespace_full_path}/${issue.project_path}#${issue.iid}`;
-
                 // Add our fully-qualified entry
-                this.store.addToIssueMap(fullReference, {
+                this.store.addToIssueMap(String(issue.id), {
                   ...issue,
                   fetchStatus: FETCH_SUCCESS_STATUS,
                 });
-
-                // Clear out the invalid raw reference now that
-                // we have a fully-qualified entry to use instead
-                if (reference !== fullReference) {
-                  this.store.addToIssueMap(reference, null);
-                }
 
                 // Update our reference lists to point to the
                 // fully-qualified entry in the issueMap
                 this.store.setPendingRelatedIssues(
                   _.uniq(replaceInList(
                     this.state.pendingRelatedIssues,
-                    reference,
-                    fullReference,
+                    id,
+                    issue.id,
                   )),
                 );
               } else {
                 // Mark the issue as trouble-some
-                this.store.addToIssueMap(reference, {
-                  ...this.store.getIssueFromReference(reference),
+                this.store.addToIssueMap(id, {
+                  ...this.store.getIssue(id),
                   fetchStatus: FETCH_ERROR_STATUS,
                 });
               }
             })
             .catch(() => new Flash('An error occurred while fetching issue info.'));
         }
+
+        return id;
       });
 
       return {
         unprocessableReferences,
         references,
+        ids,
       };
     },
   },

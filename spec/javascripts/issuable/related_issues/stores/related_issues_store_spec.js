@@ -8,6 +8,7 @@ import RelatedIssuesStore from '~/issuable/related_issues/stores/related_issues_
 const issuable1 = {
   namespace_full_path: 'foo',
   project_path: 'bar',
+  id: '200',
   iid: '123',
   title: 'issue1',
   path: '/foo/bar/issues/123',
@@ -20,6 +21,7 @@ const issuable1Reference = `${issuable1.namespace_full_path}/${issuable1.project
 const issuable2 = {
   namespace_full_path: 'foo',
   project_path: 'bar',
+  id: '201',
   iid: '124',
   title: 'issue1',
   path: '/foo/bar/issues/124',
@@ -36,12 +38,12 @@ describe('RelatedIssuesStore', () => {
     store = new RelatedIssuesStore();
   });
 
-  describe('getIssueFromReference', () => {
+  describe('getIssue', () => {
     it('get issue with issueMap populated', () => {
       store.state.issueMap = {
-        [issuable1Reference]: issuable1,
+        [issuable1.id]: issuable1,
       };
-      expect(store.getIssueFromReference(issuable1Reference, 'foo', 'bar')).toEqual({
+      expect(store.getIssue(issuable1.id, 'foo', 'bar')).toEqual({
         ..._.omit(issuable1, 'namespace_full_path', 'project_path', 'iid', 'destroy_relation_path'),
         reference: issuable1Reference,
         displayReference: '#123',
@@ -51,9 +53,10 @@ describe('RelatedIssuesStore', () => {
     });
 
     it('get issue with issue missing in issueMap', () => {
-      expect(store.getIssueFromReference(issuable1Reference, 'foo', 'bar')).toEqual({
-        reference: issuable1Reference,
-        displayReference: issuable1Reference,
+      expect(store.getIssue(issuable1.id, 'foo', 'bar')).toEqual({
+        id: issuable1.id,
+        reference: issuable1.id,
+        displayReference: issuable1.id,
         title: undefined,
         path: undefined,
         state: undefined,
@@ -63,13 +66,13 @@ describe('RelatedIssuesStore', () => {
     });
   });
 
-  describe('getIssuesFromReferences', () => {
+  describe('getIssues', () => {
     it('get issues with issueMap populated', () => {
       store.state.issueMap = {
-        [issuable1Reference]: issuable1,
-        [issuable2Reference]: issuable2,
+        [issuable1.id]: issuable1,
+        [issuable2.id]: issuable2,
       };
-      expect(store.getIssuesFromReferences([issuable1Reference, issuable2Reference], 'foo', 'bar')).toEqual([{
+      expect(store.getIssues([issuable1.id, issuable2.id], 'foo', 'bar')).toEqual([{
         ..._.omit(issuable1, 'namespace_full_path', 'project_path', 'iid', 'destroy_relation_path'),
         reference: issuable1Reference,
         displayReference: '#123',
@@ -91,10 +94,10 @@ describe('RelatedIssuesStore', () => {
     });
 
     it('add issue', () => {
-      store.addToIssueMap(issuable1Reference, issuable1);
+      store.addToIssueMap(issuable1.id, issuable1);
 
       expect(store.state.issueMap).toEqual({
-        [issuable1Reference]: issuable1,
+        [issuable1.id]: issuable1,
       });
     });
   });
@@ -105,7 +108,7 @@ describe('RelatedIssuesStore', () => {
     });
 
     it('add reference', () => {
-      const relatedIssues = ['#123'];
+      const relatedIssues = [issuable1.id];
       store.setRelatedIssues(relatedIssues);
 
       expect(store.state.relatedIssues).toEqual(relatedIssues);
@@ -118,7 +121,7 @@ describe('RelatedIssuesStore', () => {
     });
 
     it('add reference', () => {
-      const relatedIssues = ['#123'];
+      const relatedIssues = [issuable1.id];
       store.setPendingRelatedIssues(relatedIssues);
 
       expect(store.state.pendingRelatedIssues).toEqual(relatedIssues);
