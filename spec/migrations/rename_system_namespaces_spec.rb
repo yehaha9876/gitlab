@@ -11,6 +11,11 @@ describe RenameSystemNamespaces, truncate: true do
     namespace
   end
 
+  def save_invalid_routable(routable)
+    routable.__send__(:prepare_route)
+    routable.save(validate: false)
+  end
+
   before do
     FileUtils.remove_dir(test_dir) if File.directory?(test_dir)
     FileUtils.mkdir_p(uploads_dir)
@@ -53,7 +58,8 @@ describe RenameSystemNamespaces, truncate: true do
     end
 
     it "renames the route for projects of the namespace" do
-      project = create(:project, path: "project-path", namespace: system_namespace)
+      project = build(:project, path: "project-path", namespace: system_namespace)
+      save_invalid_routable(project)
 
       migration.up
 
@@ -71,7 +77,9 @@ describe RenameSystemNamespaces, truncate: true do
     end
 
     it "moves the the repository for a project in the namespace" do
-      create(:project, namespace: system_namespace, path: "system-project")
+      project = build(:project, namespace: system_namespace, path: "system-project")
+      save_invalid_routable(project)
+      TestEnv.copy_repo(project)
       expected_repo = File.join(TestEnv.repos_path, "system0", "system-project.git")
 
       migration.up
@@ -94,7 +102,11 @@ describe RenameSystemNamespaces, truncate: true do
     end
 
     describe "clears the markdown cache for projects in the system namespace" do
-      let!(:project) { create(:project, namespace: system_namespace) }
+      let!(:project) do
+        project = build(:project, namespace: system_namespace)
+        save_invalid_routable(project)
+        project
+      end
 
       it 'removes description_html from projects' do
         migration.up
@@ -145,8 +157,10 @@ describe RenameSystemNamespaces, truncate: true do
 
     context "system namespace -> subgroup -> system0 project" do
       it "updates the route of the project correctly" do
-        subgroup = create(:group, path: "subgroup", parent: system_namespace)
-        project = create(:project, path: "system0", namespace: subgroup)
+        subgroup = build(:group, path: "subgroup", parent: system_namespace)
+        save_invalid_routable(subgroup)
+        project = build(:project, path: "system0", namespace: subgroup)
+        save_invalid_routable(project)
 
         migration.up
 
