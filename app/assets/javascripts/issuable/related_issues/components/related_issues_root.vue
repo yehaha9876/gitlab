@@ -50,24 +50,6 @@ import {
   ISSUABLE_URL_REGEX,
 } from '../../../lib/utils/issuable_reference_utils';
 
-function replaceInList(list, needle, replacement) {
-  return list.map((item) => {
-    if (item === needle) {
-      return replacement;
-    }
-
-    return item;
-  });
-}
-
-function checkIsProcessable(reference) {
-  const isValidReference = ISSUABLE_REFERENCE_REGEX.test(reference);
-  const isRoughIssueUrl = ISSUABLE_URL_REGEX.test(reference);
-  const isProcessable = isValidReference || isRoughIssueUrl;
-
-  return isProcessable;
-}
-
 export default {
   name: 'RelatedIssuesRoot',
 
@@ -132,7 +114,7 @@ export default {
 
   methods: {
     onRelatedIssueRemoveRequest(idToRemove) {
-      this.store.setRelatedIssues(this.state.relatedIssues.filter(id => id !== idToRemove));
+      this.store.removeRelatedIssue(idToRemove);
 
       this.service.removeRelatedIssue(this.state.issueMap[idToRemove].destroy_relation_path)
         .catch(() => {
@@ -147,9 +129,7 @@ export default {
       this.isFormVisible = true;
     },
     onAddIssuableFormIssuableRemoveRequest(idToRemove) {
-      this.store.setPendingRelatedIssues(
-        this.state.pendingRelatedIssues.filter(id => id !== idToRemove),
-      );
+      this.store.removePendingRelatedIssue(idToRemove);
     },
     onAddIssuableFormSubmit() {
       const currentPendingIssues = this.state.pendingRelatedIssues;
@@ -193,7 +173,7 @@ export default {
         .then(res => res.json())
         .then((issues) => {
           const relatedIssueIds = issues.map((issue) => {
-            this.store.addToIssueMap(String(issue.id), {
+            this.store.addToIssueMap(issue.id, {
               ...issue,
               fetchStatus: FETCH_SUCCESS_STATUS,
             });
@@ -217,6 +197,7 @@ export default {
           isTouched = true;
         }
 
+        // `+ 1` to factor in the missing space we split at earlier
         iteratingPos = iteratingPos + reference.length + 1;
         return !isTouched;
       });
@@ -226,7 +207,8 @@ export default {
         this.store.setPendingRelatedIssues(
           _.uniq(this.state.pendingRelatedIssues.concat(results.ids)),
         );
-        this.inputValue = `${results.unprocessableReferences.map(ref => `${ref} `).join('')}${touchedReference}`;
+        const unprocessableString = results.unprocessableReferences.map(ref => `${ref} `).join('');
+        this.inputValue = `${unprocessableString}${touchedReference}`;
       }
     },
     onAddIssuableFormBlur(newValue) {
@@ -235,26 +217,21 @@ export default {
       this.store.setPendingRelatedIssues(
         _.uniq(this.state.pendingRelatedIssues.concat(results.ids)),
       );
-      this.inputValue = `${results.unprocessableReferences.join(' ')}`;
+      const unprocessableString = results.unprocessableReferences.join(' ');
+      this.inputValue = unprocessableString;
     },
     processIssuableReferences(rawReferences) {
       const references = rawReferences
-        .filter((reference) => {
-          const isProcessable = checkIsProcessable(reference);
-          return isProcessable;
-        });
+        .filter(reference => this.checkIsProcessable(reference));
 
       const unprocessableReferences = rawReferences
-        .filter((reference) => {
-          const isProcessable = checkIsProcessable(reference);
-          return !isProcessable;
-        });
+        .filter(reference => !this.checkIsProcessable(reference));
 
       // Add some temporary placeholders to lookup while we wait
       // for data to come back from the server
       const ids = references.map((reference) => {
         const issueEntry = this.state.issueMap[reference];
-        const id = issueEntry ? String(issueEntry.id) : _.uniqueId('pending_');
+        const id = issueEntry ? issueEntry.id : _.uniqueId('pending_');
         const isIssueErrored = issueEntry &&
           issueEntry.fetchStatus === FETCH_ERROR_STATUS;
 
@@ -276,7 +253,7 @@ export default {
               // Or they don't have the permissions to relate it.
               if (issue) {
                 // Add our fully-qualified entry
-                this.store.addToIssueMap(String(issue.id), {
+                this.store.addToIssueMap(issue.id, {
                   ...issue,
                   fetchStatus: FETCH_SUCCESS_STATUS,
                 });
@@ -284,7 +261,7 @@ export default {
                 // Update our reference lists to point to the
                 // fully-qualified entry in the issueMap
                 this.store.setPendingRelatedIssues(
-                  _.uniq(replaceInList(
+                  _.uniq(this.replaceInList(
                     this.state.pendingRelatedIssues,
                     id,
                     issue.id,
@@ -309,6 +286,23 @@ export default {
         references,
         ids,
       };
+    },
+
+    replaceInList(list, needle, replacement) {
+      return list.map((item) => {
+        if (item === needle) {
+          return replacement;
+        }
+
+        return item;
+      });
+    },
+    checkIsProcessable(reference) {
+      const isValidReference = ISSUABLE_REFERENCE_REGEX.test(reference);
+      const isRoughIssueUrl = ISSUABLE_URL_REGEX.test(reference);
+      const isProcessable = isValidReference || isRoughIssueUrl;
+
+      return isProcessable;
     },
   },
 

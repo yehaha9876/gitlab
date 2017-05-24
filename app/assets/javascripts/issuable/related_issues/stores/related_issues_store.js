@@ -52,17 +52,27 @@ class RelatedIssuesStore {
   addToIssueMap(reference, issue) {
     this.state.issueMap = {
       ...this.state.issueMap,
-      [reference]: issue,
+      [String(reference)]: issue,
     };
   }
 
-  setRelatedIssues(value) {
-    this.state.relatedIssues = value;
+  setRelatedIssues(issues) {
+    this.state.relatedIssues = issues;
+  }
+
+  removeRelatedIssue(idToRemove) {
+    this.state.relatedIssues = this.state.relatedIssues.filter(id => id !== idToRemove);
   }
 
   setPendingRelatedIssues(issues) {
     this.state.pendingRelatedIssues = issues;
   }
+
+  removePendingRelatedIssue(idToRemove) {
+    this.state.pendingRelatedIssues =
+      this.state.pendingRelatedIssues.filter(id => id !== idToRemove);
+  }
+
 }
 
 export default RelatedIssuesStore;

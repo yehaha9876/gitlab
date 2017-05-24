@@ -137,7 +137,7 @@ export default {
             class="js-related-issues-token-list-item related-issues-token-list-item">
             <issue-token
               event-namespace="relatedIssue"
-              :id="issue.id"
+              :id-key="issue.id"
               :display-reference="issue.displayReference"
               :title="issue.title"
               :path="issue.path"
