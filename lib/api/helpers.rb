@@ -13,6 +13,10 @@ module API
       declared(params, options).to_h.symbolize_keys
     end
 
+    def audit_declared_params(options)
+      declared_params(options).merge(current_user: current_user)
+    end
+
     def current_user
       return @current_user if defined?(@current_user)
 

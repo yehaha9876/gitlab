@@ -44,7 +44,7 @@ module API
         post do
           authenticated_as_admin!
 
-          params = declared_params(include_missing: false)
+          params = audit_declared_params(include_missing: false)
           user = ::Users::CreateService.new(current_user, params.merge!(skip_confirmation: !params[:confirm])).execute
 
           if user.persisted?

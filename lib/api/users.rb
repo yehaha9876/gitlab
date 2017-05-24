@@ -146,7 +146,7 @@ module API
             User.where(username: params[:username]).
                 where.not(id: user.id).count > 0
 
-        user_params = declared_params(include_missing: false)
+        user_params = audit_declared_params(include_missing: false)
         identity_attrs = user_params.slice(:provider, :extern_uid)
 
         if identity_attrs.any?
@@ -240,7 +240,7 @@ module API
         user = User.find_by(id: params.delete(:id))
         not_found!('User') unless user
 
-        email = user.emails.new(declared_params(include_missing: false))
+        email = user.emails.new(audit_declared_params(include_missing: false))
 
         if email.save
           NotificationService.new.new_email(email)
@@ -281,6 +281,8 @@ module API
         not_found!('Email') unless email
 
         email.destroy
+
+        user.current_user = current_user
         user.update_secondary_emails!
       end
 
