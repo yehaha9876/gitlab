@@ -23,7 +23,7 @@ export default {
     autoCompleteSources: {
       type: Object,
       required: false,
-      default: {},
+      default: () => ({}),
     },
   },
 
@@ -92,7 +92,7 @@ export default {
           class="js-add-issuable-form-token-list-item add-issuable-form-token-list-item">
           <issue-token
             event-namespace="pendingIssuable"
-            :id="issuable.id"
+            :id-key="issuable.id"
             :display-reference="issuable.displayReference"
             :title="issuable.title"
             :path="issuable.path"

@@ -115,6 +115,26 @@ describe('RelatedIssuesStore', () => {
     });
   });
 
+  describe('removeRelatedIssue', () => {
+    it('remove issue', () => {
+      const relatedIssues = [issuable1.id];
+      store.state.relatedIssues = relatedIssues;
+
+      store.removeRelatedIssue(issuable1.id);
+
+      expect(store.state.relatedIssues).toEqual([]);
+    });
+
+    it('remove issue with multiple in store', () => {
+      const relatedIssues = [issuable1.id, issuable2.id];
+      store.state.relatedIssues = relatedIssues;
+
+      store.removeRelatedIssue(issuable1.id);
+
+      expect(store.state.relatedIssues).toEqual([issuable2.id]);
+    });
+  });
+
   describe('setPendingRelatedIssues', () => {
     it('defaults to empty array', () => {
       expect(store.state.pendingRelatedIssues).toEqual([]);
@@ -125,6 +145,26 @@ describe('RelatedIssuesStore', () => {
       store.setPendingRelatedIssues(relatedIssues);
 
       expect(store.state.pendingRelatedIssues).toEqual(relatedIssues);
+    });
+  });
+
+  describe('removePendingRelatedIssue', () => {
+    it('remove issue', () => {
+      const relatedIssues = [issuable1.id];
+      store.state.pendingRelatedIssues = relatedIssues;
+
+      store.removePendingRelatedIssue(issuable1.id);
+
+      expect(store.state.pendingRelatedIssues).toEqual([]);
+    });
+
+    it('remove issue with multiple in store', () => {
+      const relatedIssues = [issuable1.id, issuable2.id];
+      store.state.pendingRelatedIssues = relatedIssues;
+
+      store.removePendingRelatedIssue(issuable1.id);
+
+      expect(store.state.pendingRelatedIssues).toEqual([issuable2.id]);
     });
   });
 });
