@@ -1,15 +1,17 @@
 import Vue from 'vue';
 import LinkedPipelineComponent from '~/pipelines/components/graph/linked_pipeline.vue';
+import mockData from './mock_data';
 
 const LinkedPipeline = Vue.extend(LinkedPipelineComponent);
+const mockPipeline = mockData.triggered[0];
 
-describe('Linked pipeline', () => {
+fdescribe('Linked pipeline', () => {
   beforeEach(() => {
     this.propsData = {
-      pipelineId: 12345,
-      pipelinePath: 'my/pipeline/path',
-      pipelineStatus: 'cancelled',
-      projectName: 'GitLab CE',
+      pipelineId: mockPipeline.id,
+      pipelinePath: mockPipeline.path,
+      pipelineStatus: mockPipeline.details.status,
+      projectName: mockPipeline.project_name,
     };
 
     this.linkedPipeline = new LinkedPipeline({
@@ -36,8 +38,8 @@ describe('Linked pipeline', () => {
   });
 
   it('should render the project name', () => {
-    const projectNameElement = this.linkedPipeline.$el.querySelector('.linked-project-pipeline-name');
-    expect(projectNameElement).toContain(this.propsData.projectName);
+    const projectNameElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-project-name');
+    expect(projectNameElement.innerText).toContain(this.propsData.projectName);
   });
 
   it('should render an svg within the status container', () => {
@@ -61,6 +63,6 @@ describe('Linked pipeline', () => {
 
   it('should render the pipeline id', () => {
     const pipelineIdElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-id');
-    expect(pipelineIdElement).toContain(`${this.propsData.pipelineId}`);
+    expect(pipelineIdElement.innerText).toContain(`${this.propsData.pipelineId}`);
   });
 });

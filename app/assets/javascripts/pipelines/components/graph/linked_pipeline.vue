@@ -4,7 +4,7 @@ import ciStatus from '../../../vue_shared/components/ci_icon.vue';
 export default {
   props: {
     pipelineId: {
-      type: String,
+      type: Number,
       required: true,
     },
     pipelinePath: {
@@ -19,17 +19,17 @@ export default {
       type: String,
       required: true,
     },
-    components: {
-      ciStatus,
-    },
+  },
+  components: {
+    ciStatus,
   },
 };
 
 </script>
 
 <template>
-  <li class="build">
-    <a :href="pipelinePath" class="build-content">
+  <li class="build linked-pipeline">
+    <a :href="pipelinePath" class="build-content linked-pipeline-link">
       <span class="linked-pipeline-status">
         <ci-status :status="pipelineStatus"/>
       </span>

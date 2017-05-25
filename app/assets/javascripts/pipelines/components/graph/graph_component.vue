@@ -19,23 +19,12 @@
     data() {
       const DOMdata = document.getElementById('js-pipeline-graph-vue').dataset;
       const store = new PipelineStore();
-      const upstreamPipelines = [
-        { id: '111', path: 'hello/world/tho', project_name: 'My Project Name', status: 'success' },
-      ];
-
-      const downstreamPipelines = [
-        { id: '111', path: 'hello/world/tho', project_name: 'My Project Name', status: 'success' },
-        { id: '111', path: 'hello/world/tho', project_name: 'My Project Name', status: 'success' },
-        { id: '111', path: 'hello/world/tho', project_name: 'My Project Name', status: 'success' },
-      ];
 
       return {
         isLoading: false,
         endpoint: DOMdata.endpoint,
         store,
         state: store.state,
-        upstreamPipelines,
-        downstreamPipelines,
       };
     },
 
@@ -114,6 +103,7 @@
         v-if="state.triggerer"
         :linked-pipelines="state.triggerer"
         column-title="Upstream"
+        connector-side="right"
       />
 
       <ul
@@ -132,6 +122,7 @@
         v-if="state.triggered"
         :linked-pipelines="state.triggered"
         column-title="Downstream"
+        connector-side="left"
       />
     </div>
   </div>

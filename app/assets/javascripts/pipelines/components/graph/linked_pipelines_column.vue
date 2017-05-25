@@ -1,5 +1,5 @@
 <script>
-import relatedProjectPipelineComponent from './linked_pipeline.vue';
+import linkedPipeline from './linked_pipeline.vue';
 
 export default {
   props: {
@@ -11,6 +11,10 @@ export default {
       type: Array,
       required: true,
     },
+    connectedSide: {
+      type: String,
+      required: false,
+    },
   },
   components: {
     linkedPipeline,
@@ -20,7 +24,7 @@ export default {
 
 <template>
   <div class="stage-column linked-pipelines-column">
-    <span class="stage-name linked-pipeline-title"> {{ columnTitle }} </span>
+    <span class="stage-name linked-pipelines-column-title"> {{ columnTitle }} </span>
     <ul>
       <linked-pipeline
         v-for="(pipeline, index) in linkedPipelines"

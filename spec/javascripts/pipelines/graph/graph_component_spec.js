@@ -2,7 +2,7 @@ import Vue from 'vue';
 import graphComponent from '~/pipelines/components/graph/graph_component.vue';
 import graphJSON from './mock_data';
 
-describe('graph component', () => {
+fdescribe('graph component', () => {
   preloadFixtures('static/graph.html.raw');
 
   let GraphComponent;
