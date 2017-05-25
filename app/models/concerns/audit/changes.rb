@@ -4,7 +4,8 @@ module Audit
     attr_accessor :current_user
 
     module ClassMethods
-      # Creates an audit entry for a column change on a model
+
+      # Creates an audit entry for a column value change on a model
       #
       # Params:
       # +column+:: Column to monitor any changes on
@@ -19,9 +20,37 @@ module Audit
       # audit_changes :email, as: 'email address', column: :notification_email, skip_changes: true
       def audit_changes(column, options = {})
         column = options[:column] || column
+        options.merge!(action: :update)
 
         after_update -> { audit_event(column, options) }, if: ->(model) do
           model.public_send("#{column}_changed?")
+        end
+      end
+
+      # Creates an audit entry for a column value creation or deletion on a model
+      #
+      # Params:
+      # +column+:: Column to monitor any changes on
+      # +options+:: Hash that may contain the following options:
+      #   +as+:: Human readable text for the column to display
+      #   +column+:: Alternative column to monitor changes (if a gem or
+      # callback keeps the original unchanged)
+      #
+      # Full example:
+      # audit_presence :email, as: 'email address', column: :notification_email
+      def audit_presence(column, options = {})
+        column = options[:column] || column
+
+        after_create -> do
+          audit_event(column, options.merge(action: :create))
+        end, if: ->(model) do
+          model.public_send("#{column}")
+        end
+
+        after_destroy -> do
+          audit_event(column, options.merge(action: :destroy))
+        end, if: ->(model) do
+          model.public_send("#{column}")
         end
       end
     end
@@ -30,7 +59,6 @@ module Audit
       raise NotImplementedError, "#{self.class} has no current user assigned." unless self.current_user
 
       options.tap do |options_hash|
-        options_hash[:action] = :update
         options_hash[:column] = column
 
         unless options[:skip_changes]
@@ -38,9 +66,13 @@ module Audit
           options_hash[:to] = self.public_send("#{column}")
         end
       end
-
-      AuditEventService.new(self.current_user, self, options).
-        for_changes.security_event
+      if options[:action] == :update
+        AuditEventService.new(self.current_user, self, options).
+          for_changes.security_event
+      else
+        AuditEventService.new(self.current_user, self, options).
+          for_presence.security_event
+      end
     end
   end
 end
