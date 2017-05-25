@@ -46,6 +46,10 @@ module Gitlab
       Rails.configuration.respond_to?(:geo_database)
     end
 
+    def self.tracking_connection_available?
+      self.cache_value(:tracking_connection_available) { self.configured? && (self.secondary? || Rails.env.test?) }
+    end
+
     def self.license_allows?
       ::License.current&.feature_available?(:geo)
     end
