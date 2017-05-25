@@ -280,9 +280,9 @@ module API
         email = user.emails.find_by(id: params[:email_id])
         not_found!('Email') unless email
 
+        email.current_user = current_user
         email.destroy
 
-        user.current_user = current_user
         user.update_secondary_emails!
       end
 
@@ -515,7 +515,7 @@ module API
         requires :email, type: String, desc: 'The new email'
       end
       post "emails" do
-        email = current_user.emails.new(declared_params)
+        email = current_user.emails.new(audit_declared_params)
 
         if email.save
           NotificationService.new.new_email(email)
@@ -532,6 +532,8 @@ module API
       delete "emails/:email_id" do
         email = current_user.emails.find_by(id: params[:email_id])
         not_found!('Email') unless email
+
+        email.current_user = current_user
 
         email.destroy
         current_user.update_secondary_emails!
