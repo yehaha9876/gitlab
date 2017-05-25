@@ -45,19 +45,39 @@ class AuditEventService
   end
 
   def for_changes
-    action = @details[:action]
+    @details =
+      {
+        change: @details[:as] || @details[:column],
+        from: @details[:from],
+        to: @details[:to],
+        author_name: @author.name,
+        target_id: @entity.id,
+        target_type: @entity.class,
+        target_details: @entity.name
+      }
+    self
+  end
+
+  def for_presence
+    target_details = @entity.respond_to?(:name) ? @entity.name : @entity.send(@details[:column])
 
     @details =
-      case action
-        when :update
+      case @details[:action]
+        when :create
           {
-            change: @details[:as] || @details[:column],
-            from:  @details[:from],
-            to: @details[:to],
+            add: @details[:as] || @details[:column],
             author_name: @author.name,
             target_id: @entity.id,
             target_type: @entity.class,
-            target_details: @entity.name
+            target_details: target_details
+          }
+        when :destroy
+          {
+            remove: @details[:as] || @details[:column],
+            author_name: @author.name,
+            target_id: @entity.id,
+            target_type: @entity.class,
+            target_details: target_details
           }
       end
 

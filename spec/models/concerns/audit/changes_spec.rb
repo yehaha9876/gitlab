@@ -42,13 +42,24 @@ describe Audit::Changes do
       end
     end
 
-    describe 'audit presence' do
+    describe 'audit creation' do
       it 'calls the audit event service' do
-        expect_any_instance_of(AuditEventService).to receive(:security_event)
+        expect_any_instance_of(AuditEventService).to receive(:security_event).and_call_original
 
         user = create(:user)
 
-        FooEmail.create(current_user: user, user: user, email: 'test@email.com')
+        FooEmail.create!(current_user: user, user: user, email: 'test@email.com')
+      end
+    end
+
+    describe 'audit deletion' do
+      it 'calls the audit event service' do
+        user = create(:user)
+        foo_email = FooEmail.create!(current_user: user, user: user, email: 'test@email.com')
+
+        expect_any_instance_of(AuditEventService).to receive(:security_event).and_call_original
+
+        foo_email.destroy!
       end
     end
   end

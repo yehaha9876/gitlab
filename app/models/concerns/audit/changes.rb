@@ -66,6 +66,13 @@ module Audit
           options_hash[:to] = self.public_send("#{column}")
         end
       end
+
+      log_event(options)
+    end
+
+    private
+
+    def log_event(options)
       if options[:action] == :update
         AuditEventService.new(self.current_user, self, options).
           for_changes.security_event
