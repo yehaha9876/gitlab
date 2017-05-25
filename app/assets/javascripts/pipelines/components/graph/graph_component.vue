@@ -111,9 +111,9 @@
       </div>
 
       <linked-pipelines-column
-        v-if="upstreamPipelines"
-        :linked-pipelines="upstreamPipelines"
-        linked-pipeline-orientation="Upstream"
+        v-if="state.triggerer"
+        :linked-pipelines="state.triggerer"
+        column-title="Upstream"
       />
 
       <ul
@@ -129,9 +129,9 @@
       </ul>
 
       <linked-pipelines-column
-        v-if="downstreamPipelines"
-        :linked-pipelines="downstreamPipelines"
-        linked-pipeline-orientation="Downstream"
+        v-if="state.triggered"
+        :linked-pipelines="state.triggered"
+        column-title="Downstream"
       />
     </div>
   </div>

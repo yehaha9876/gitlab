@@ -3,7 +3,7 @@ import relatedProjectPipelineComponent from './linked_pipeline.vue';
 
 export default {
   props: {
-    linkedPipelineOrientation: {
+    columnTitle: {
       type: String,
       required: true,
     },
@@ -20,13 +20,13 @@ export default {
 
 <template>
   <div class="stage-column linked-pipelines-column">
-    <span class="stage-name linked-pipeline-title"> {{ linkedPipelineOrientation }} </span>
+    <span class="stage-name linked-pipeline-title"> {{ columnTitle }} </span>
     <ul>
       <linked-pipeline
         v-for="(pipeline, index) in linkedPipelines"
         :pipeline-id="pipeline.id"
         :project-name="pipeline.project_name"
-        :pipeline-status="pipeline.status"
+        :pipeline-status="pipeline.details.status"
         :pipeline-path="pipeline.path"
       />
     </ul>
