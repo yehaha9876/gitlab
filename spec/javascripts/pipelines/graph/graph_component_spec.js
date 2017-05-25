@@ -2,14 +2,13 @@ import Vue from 'vue';
 import graphComponent from '~/pipelines/components/graph/graph_component.vue';
 import graphJSON from './mock_data';
 
+const GraphComponent = Vue.extend(graphComponent);
+
 fdescribe('graph component', () => {
   preloadFixtures('static/graph.html.raw');
 
-  let GraphComponent;
-
   beforeEach(() => {
     loadFixtures('static/graph.html.raw');
-    GraphComponent = Vue.extend(graphComponent);
   });
 
   describe('while is loading', () => {
@@ -66,70 +65,78 @@ fdescribe('graph component', () => {
     });
 
     describe('methods', () => {
+      const component = new GraphComponent().$mount('#js-pipeline-graph-vue');
+
       describe('stageConnectorClass', () => {
         it('returns no-margin when it is the first stage column and only has one job', () => {
-
+          // TODO: Stretch -- unrelated, but should be added
         });
 
         it('returns whatttt when it is the first stage column but multiple jobs', () => {
-
+          // TODO: Stretch -- unrelated, but should be added
         });
 
         it('returns left-margin when it is not the first column', () => {
-
+          // TODO: Stretch -- unrelated, but should be added
         });
       });
 
       describe('capitalizeStageName', () => {
         it('returns a capitalized stage name', () => {
-
+          // TODO: Stretch -- unrelated, but should be added
         });
       });
     });
 
     describe('setup', () => {
-      it('polling is started when the component is created', () => {
+      const component = new GraphComponent().$mount('#js-pipeline-graph-vue');
 
+      it('polling is started when the component is created', () => {
+        // TODO: Stretch -- unrelated, but should be added
       });
 
       it('polling is stopped when visibility is hidden', () => {
-
+        // TODO: Stretch -- unrelated, but should be added
       });
 
       it('polling is restarted when visibility is shown', () => {
-
+        // TODO: Stretch -- unrelated, but should be added
       });
     });
   });
 
   describe('Linked Pipelines', () => {
     describe('when upstream pipelines are defined', () => {
-      it('should render an upstream pipelines column', () => {
+      const component = new GraphComponent().$mount('#js-pipeline-graph-vue');
 
+      it('should render an upstream pipelines column', () => {
+        expect(component.$el.querySelector('.linked-pipelines-column')).not.toBeNull();
+        expect(component.$el.querySelector('.linked-pipelines-column-title').innerText).toContain('Upstream');
       });
 
       it('should render the upstream column with no margin', () => {
-
+        // TODO:
       });
 
       it('should render the first stage column with left-margin', () => {
-
+        // TODO:
       });
     });
 
     describe('when downstream pipelines are defined', () => {
-      it('should render a downstream pipelines column', () => {
+      const component = new GraphComponent().$mount('#js-pipeline-graph-vue');
 
+      it('should render a downstream pipelines column', () => {
+        expect(component.$el.querySelector('.linked-pipelines-column')).not.toBeNull();
+        expect(component.$el.querySelector('.linked-pipelines-column-title').innerText).toContain('Downstream');
       });
     });
 
     describe('when neither upstream nor downstream pipelines are defined', () => {
-      it('should not render an upstream pipelines column', () => {
+      const component = new GraphComponent().$mount('#js-pipeline-graph-vue');
 
-      });
-
-      it('should not render a downstream pipelines column', () => {
-
+      it('should not render a linked pipelines column', () => {
+        expect(component.$el.querySelector('.linked-pipelines-column')).toBeNull();
       });
     });
   });

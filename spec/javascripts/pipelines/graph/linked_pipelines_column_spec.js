@@ -12,8 +12,6 @@ fdescribe('Linked Pipelines Column', () => {
       connectedSide: 'right',
     };
 
-    console.log("PropsData", this.propsData);
-
     this.linkedPipelinesColumn = new LinkedPipelinesColumnComponent({
       propsData: this.propsData,
     }).$mount();
@@ -29,7 +27,7 @@ fdescribe('Linked Pipelines Column', () => {
   });
 
   it('has the correct number of linked pipeline child components', () => {
-
+    expect(this.linkedPipelinesColumn.$children.length).toBe(this.propsData.linkedPipelines.length);
   });
 
   it('renders the correct number of linked pipelines', () => {
@@ -38,7 +36,7 @@ fdescribe('Linked Pipelines Column', () => {
   });
 
   it('renders connectors on the correct side', () => {
-
+    // TODO:
   });
 });
 

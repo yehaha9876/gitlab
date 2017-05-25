@@ -47,22 +47,24 @@ fdescribe('Linked pipeline', () => {
     expect(pipelineStatusElement.querySelector('svg')).not.toBeNull();
   });
 
-  it('should render the correct pipeline status icon', () => {
+  it('should render the pipeline status icon svg', () => {
     const pipelineStatusElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-status');
-
+    expect(pipelineStatusElement.innerHTML).toContain('<svg');
   });
 
   it('should render the correct pipeline status icon style selector', () => {
     const pipelineStatusElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-status');
-
+    expect(pipelineStatusElement.firstChild.classList.contains('ci-status-icon-running')).toBe(true);
   });
 
   it('should have a ci-status child component', () => {
-
+    const ciStatusComponent = this.linkedPipeline.$children[0];
+    expect(ciStatusComponent).toBeDefined();
+    expect(ciStatusComponent.$el.classList.contains('ci-status-icon')).toBe(true);
   });
 
   it('should render the pipeline id', () => {
     const pipelineIdElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-id');
-    expect(pipelineIdElement.innerText).toContain(`${this.propsData.pipelineId}`);
+    expect(pipelineIdElement.innerText).toContain(`#${this.propsData.pipelineId}`);
   });
 });

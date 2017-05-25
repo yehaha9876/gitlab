@@ -28,6 +28,7 @@ export default {
     <ul>
       <linked-pipeline
         v-for="(pipeline, index) in linkedPipelines"
+        :key="pipeline.id"
         :pipeline-id="pipeline.id"
         :project-name="pipeline.project_name"
         :pipeline-status="pipeline.details.status"
