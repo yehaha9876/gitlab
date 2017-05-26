@@ -6,6 +6,7 @@
 # Values are checked for formatting and exclusion from a list of reserved path
 # names.
 class DynamicPathValidator < ActiveModel::EachValidator
+<<<<<<< HEAD
   # All routes that appear on the top level must be listed here.
   # This will make sure that groups cannot be created with these names
   # as these routes would be masked by the paths already in place.
@@ -181,25 +182,28 @@ class DynamicPathValidator < ActiveModel::EachValidator
     return false unless path
 
     path.downcase !~ without_reserved_wildcard_paths_regex
+=======
+  class << self
+    def valid_namespace_path?(path)
+      "#{path}/" =~ Gitlab::Regex.full_namespace_path_regex
+    end
+
+    def valid_project_path?(path)
+      "#{path}/" =~ Gitlab::Regex.full_project_path_regex
+    end
+>>>>>>> origin/9-2-stable
   end
 
-  delegate :full_path_reserved?,
-           :child_reserved?,
-           to: :class
-
-  def path_reserved_for_record?(record, value)
+  def path_valid_for_record?(record, value)
     full_path = record.respond_to?(:full_path) ? record.full_path : value
 
-    # For group paths the entire path cannot contain a reserved child word
-    # The path doesn't contain the last `_project_part` so we need to validate
-    # if the entire path.
-    # Example:
-    #   A *group* with full path `parent/activity` is reserved.
-    #   A *project* with full path `parent/activity` is allowed.
-    if record.is_a? Group
-      child_reserved?(full_path)
+    return true unless full_path
+
+    case record
+    when Project
+      self.class.valid_project_path?(full_path)
     else
-      full_path_reserved?(full_path)
+      self.class.valid_namespace_path?(full_path)
     end
   end
 
@@ -209,7 +213,7 @@ class DynamicPathValidator < ActiveModel::EachValidator
       return
     end
 
-    if path_reserved_for_record?(record, value)
+    unless path_valid_for_record?(record, value)
       record.errors.add(attribute, "#{value} is a reserved name")
     end
   end
