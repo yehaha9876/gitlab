@@ -1070,6 +1070,7 @@ describe Notify do
       stub_config_setting(email_subject_suffix: 'A Nice Suffix')
       perform_enqueued_jobs do
         user.email = "new-email@mail.com"
+        user.current_user = user
         user.save
       end
     end
@@ -1231,6 +1232,7 @@ describe Notify do
       context "when the committer email domain is within the GitLab domain" do
         before do
           user.update_attribute(:email, "user@company.com")
+          user.current_user = user
           user.confirm
         end
 
@@ -1248,6 +1250,7 @@ describe Notify do
       context "when the committer email domain is not completely within the GitLab domain" do
         before do
           user.update_attribute(:email, "user@something.company.com")
+          user.current_user = user
           user.confirm
         end
 
@@ -1265,6 +1268,7 @@ describe Notify do
       context "when the committer email domain is outside the GitLab domain" do
         before do
           user.update_attribute(:email, "user@mpany.com")
+          user.current_user = user
           user.confirm
         end
 

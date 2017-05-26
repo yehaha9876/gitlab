@@ -8,7 +8,8 @@ shared_context 'gitlab email notification' do
 
   before do
     reset_delivered_emails!
-    email = recipient.emails.create(email: "notifications@example.com")
+    email = recipient.emails.create(email: "notifications@example.com", current_user: recipient)
+    recipient.current_user = recipient
     recipient.update_attribute(:notification_email, email.email)
     stub_incoming_email_setting(enabled: true, address: "reply+%{key}@#{Gitlab.config.gitlab.host}")
   end
