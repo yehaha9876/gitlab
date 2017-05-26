@@ -25,6 +25,7 @@ class RelatedIssuesService {
         return {
           namespace_full_path: referencePieces.namespace,
           project_path: referencePieces.project,
+          id: issue.id,
           iid: issue.iid,
           path: baseIssueEndpoint,
           state: issue.state,

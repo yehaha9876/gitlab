@@ -135,7 +135,10 @@ export default {
       const currentPendingIssues = this.state.pendingRelatedIssues;
       const currentRelatedIssues = this.state.relatedIssues;
       if (currentPendingIssues.length > 0) {
-        this.service.addRelatedIssues(currentPendingIssues)
+        const currentPendingReferences = this.computedPendingRelatedIssues.map(
+          issue => issue.reference,
+        );
+        this.service.addRelatedIssues(currentPendingReferences)
           .then(res => res.json())
           .then(() => {
             // TODO: Wait for BE `1` so we can update accurately
@@ -231,7 +234,7 @@ export default {
       // for data to come back from the server
       const ids = references.map((reference) => {
         const issueEntry = this.state.issueMap[reference];
-        const id = issueEntry ? issueEntry.id : _.uniqueId('pending_');
+        const id = issueEntry ? issueEntry.id : `pending_${reference}`;
         const isIssueErrored = issueEntry &&
           issueEntry.fetchStatus === FETCH_ERROR_STATUS;
 
