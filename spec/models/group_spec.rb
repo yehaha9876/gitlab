@@ -159,7 +159,7 @@ describe Group, models: true do
       end
 
       let(:avatar_path) do
-        "/uploads/group/avatar/#{group.id}/avatar.png"
+        "/uploads/system/group/avatar/#{group.id}/avatar.png"
       end
 
       it { should eq "http://#{Gitlab.config.gitlab.host}#{avatar_path}" }
