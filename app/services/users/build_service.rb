@@ -97,7 +97,7 @@ module Users
         end
       end
 
-      user_params
+      user_params.merge(current_user: current_user)
     end
 
     def skip_user_confirmation_email_from_setting

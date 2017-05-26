@@ -57,6 +57,7 @@ module Gitlab
         end
 
         gl_user.ldap_email = auth_hash.has_email?
+        gl_user.current_user ||= gl_user
 
         gl_user
       end
