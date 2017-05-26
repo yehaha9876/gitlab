@@ -170,6 +170,6 @@ describe 'GlobalSearch' do
   end
 
   def search(user, search, snippets: false)
-    SearchService.new(user, search: search, snippets: snippets ? 'true' : 'false').search_results
+    Search::GlobalService.new(user, search: search).execute
   end
 end
