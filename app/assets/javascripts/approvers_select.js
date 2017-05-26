@@ -146,7 +146,7 @@ export default class ApproversSelect {
   }
 
   static saveApprovers(fieldName) {
-    const $input = $(`[name="${fieldName}"]`);
+    const $input = window.$(`[name="${fieldName}"]`);
     const newValue = $input.val();
     const $loadWrapper = $('.load-wrapper');
     const $approverSelect = $('.js-select-user-and-group');
@@ -157,7 +157,7 @@ export default class ApproversSelect {
 
     const $form = $('.js-add-approvers').closest('form');
     $loadWrapper.removeClass('hidden');
-    $.ajax({
+    window.$.ajax({
       url: $form.attr('action'),
       type: 'POST',
       data: {
@@ -166,7 +166,7 @@ export default class ApproversSelect {
       },
       success: ApproversSelect.updateApproverList,
       complete() {
-        $input.val('val', '');
+        $input.val('');
         $approverSelect.select2('val', '');
         $loadWrapper.addClass('hidden');
       },

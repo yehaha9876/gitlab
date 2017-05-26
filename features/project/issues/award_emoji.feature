@@ -7,15 +7,6 @@ Feature: Award Emoji
     And I visit "Bugfix" issue page
 
   @javascript
-  Scenario: I repeatedly add and remove thumbsup award in the issue
-    Given I click the thumbsup award Emoji
-    Then I have award added
-    Given I click the thumbsup award Emoji
-    Then I have no awards added
-    Given I click the thumbsup award Emoji
-    Then I have award added
-
-  @javascript
   Scenario: I add and remove custom award in the issue
     Given I click to emoji-picker
     Then The emoji menu is visible
@@ -23,6 +14,15 @@ Feature: Award Emoji
     Then I click to emoji in the picker
     Then I have award added
     And I can remove it by clicking to icon
+
+  @javascript
+  Scenario: I repeatedly add and remove thumbsup award in the issue
+    Given I click the thumbsup award Emoji
+    Then I have award added
+    Given I click the thumbsup award Emoji
+    Then I have no awards added
+    Given I click the thumbsup award Emoji
+    Then I have award added
 
   @javascript
   Scenario: I can see the list of emoji categories
