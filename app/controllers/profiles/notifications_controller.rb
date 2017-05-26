@@ -7,7 +7,7 @@ class Profiles::NotificationsController < Profiles::ApplicationController
   end
 
   def update
-    if current_user.update_attributes(user_params)
+    if current_user.update_attributes(user_params.merge(current_user: current_user))
       flash[:notice] = "Notification settings saved"
     else
       flash[:alert] = "Failed to save new settings"

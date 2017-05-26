@@ -3,9 +3,10 @@ require 'spec_helper'
 describe Profiles::NotificationsController do
   let(:user) do
     create(:user) do |user|
-      user.emails.create(email: 'original@example.com')
-      user.emails.create(email: 'new@example.com')
+      user.emails.create(current_user: user, email: 'original@example.com')
+      user.emails.create(current_user: user, email: 'new@example.com')
       user.notification_email = 'original@example.com'
+      user.current_user = user
       user.save!
     end
   end
