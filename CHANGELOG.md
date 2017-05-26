@@ -2,6 +2,16 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 9.2.2 (2017-05-25)
+
+- Fix issue where real time pipelines were not cached. !11615
+- Make all notes use equal padding.
+
+## 9.2.1 (2017-05-23)
+
+- Fix placement of note emoji on hover.
+- Fix migration for older PostgreSQL versions.
+
 ## 9.2.0 (2017-05-22)
 
 - API: Filter merge requests by milestone and labels. (10924)
