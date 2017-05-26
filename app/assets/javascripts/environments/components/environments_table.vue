@@ -47,6 +47,11 @@ export default {
       required: false,
       default: () => ({}),
     },
+
+    service: {
+      type: Object,
+      required: true,
+    },
   },
 
   methods: {
