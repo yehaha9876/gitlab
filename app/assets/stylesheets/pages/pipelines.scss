@@ -350,7 +350,9 @@
   overflow: auto;
 
   .stage-column-list,
-  .builds-container > ul {
+  .builds-container > ul,
+  .linked-pipelines-column > ul {
+    display: inline-block;
     padding: 0;
   }
 
@@ -364,12 +366,16 @@
     margin-right: 3px;
   }
 
+  .linked-pipelines-column.graph-position-left {
+    margin-left: 0!important;
+  }
+
   .stage-column {
     display: inline-block;
     vertical-align: top;
 
     &:not(:last-child) {
-      margin-right: 44px;
+      @extend .column-margin-before;
     }
 
     &.left-margin {
@@ -377,15 +383,7 @@
         margin-left: 44px;
 
         .left-connector {
-          &::before {
-            content: '';
-            position: absolute;
-            top: 48%;
-            left: -44px;
-            border-top: 2px solid $border-color;
-            width: 44px;
-            height: 1px;
-          }
+          @extend .flat-connector-before;
         }
       }
     }
@@ -402,15 +400,11 @@
       .build {
         // Remove right connecting horizontal line from first build in last stage
         &:first-child {
-          &::after {
-            border: none;
-          }
+          @extend .remove-connector-after;
         }
         // Remove right curved connectors from all builds in last stage
         &:not(:first-child) {
-          &::after {
-            border: none;
-          }
+          @extend .remove-connector-after;
         }
         // Remove opposite curve
         .curve {
@@ -440,29 +434,7 @@
 
     // Curve first child connecting lines in opposite direction
     .curve {
-      display: none;
-
-      &::before,
-      &::after {
-        content: '';
-        width: 21px;
-        height: 25px;
-        position: absolute;
-        top: -31px;
-        border-top: 2px solid $border-color;
-      }
-
-      &::after {
-        left: -44px;
-        border-right: 2px solid $border-color;
-        border-radius: 0 20px;
-      }
-
-      &::before {
-        right: -44px;
-        border-left: 2px solid $border-color;
-        border-radius: 20px 0 0;
-      }
+      @extend .first-curve-connector;
     }
   }
 
@@ -474,6 +446,42 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  .linked-pipelines-column {
+
+  }
+
+  .linked-pipeline {
+    position: relative;
+    width: 186px;
+    margin-bottom: 10px;
+    white-space: normal;
+    color: $gl-text-color-secondary;
+    border-radius: 0;
+    font-style: italic;
+
+    @extend .flat-connector-after;
+
+    .linked-pipeline-link {
+      display: inline-block;
+      padding: 8px 10px 9px;
+      width: 100%;
+      border: 1px solid $border-color;
+      background-color: $white-light;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:hover {
+        background-color: $stage-hover-bg;
+        border: 1px solid $stage-hover-border;
+        color: $gl-text-color;
+      }
+    }
+
+    .linked-pipeline-status {}
+  }
+
 
   .build {
     position: relative;
@@ -553,59 +561,146 @@
       }
     }
 
-
     // Connect first build in each stage with right horizontal line
     &:first-child {
-      &::after {
-        content: '';
-        position: absolute;
-        top: 48%;
-        right: -48px;
-        border-top: 2px solid $border-color;
-        width: 48px;
-        height: 1px;
-      }
+      @extend .flat-connector-after;
     }
 
     // Connect each build (except for first) with curved lines
     &:not(:first-child) {
-      &::after,
-      &::before {
-        content: '';
-        top: -49px;
-        position: absolute;
-        border-bottom: 2px solid $border-color;
-        width: 25px;
-        height: 69px;
-      }
-
-      // Right connecting curves
-      &::after {
-        right: -25px;
-        border-right: 2px solid $border-color;
-        border-radius: 0 0 20px;
-      }
-
-      // Left connecting curves
-      &::before {
-        left: -25px;
-        border-left: 2px solid $border-color;
-        border-radius: 0 0 0 20px;
-      }
+      @extend .non-first-build-curve;
     }
 
     // Connect second build to first build with smaller curved line
     &:nth-child(2) {
-      &::after,
-      &::before {
-        height: 29px;
-        top: -9px;
-      }
-
-      .curve {
-        display: block;
-      }
+      @extend .second-build-small-curve;
     }
+  }
+}
+
+.first-curve-connector {
+  display: none;
+
+  &::before,
+  &::after {
+
+    // for all curves before and after
+    content: '';
+    width: 21px;
+    height: 25px;
+    position: absolute;
+    top: -31px;
+    border-top: 2px solid $border-color;
+  }
+
+  &::after {
+    // for curves after
+    left: -44px;
+    border-right: 2px solid $border-color;
+    border-radius: 0 20px;
+  }
+
+  &::before {
+    // for curves before
+    right: -44px;
+    border-left: 2px solid $border-color;
+    border-radius: 20px 0 0;
+  }
+}
+
+.remove-connector-after {
+  &::after {
+    border: none;
+  }
+}
+
+.remove-connector-before {
+  &::before {
+    border: none;
+  }
+}
+
+.flat-connector-after {
+  &::after {
+    content: '';
+    position: absolute;
+    top: 48%;
+    right: -48px;
+    border-top: 2px solid $border-color;
+    width: 48px;
+    height: 1px;
+  }
+}
+
+.column-margin-before {
+  margin-left: 44px;
+}
+
+.no-column-margin-before {
+  margin-left: 0;
+}
+
+.flat-connector-before {
+  &::before {
+    // left-connecor-flat comes before column except for first
+    content: '';
+    position: absolute;
+    top: 48%;
+    left: -44px;
+    border-top: 2px solid $border-color;
+    width: 44px;
+    height: 1px;
+  }
+}
+
+.curved-connector {
+
+}
+
+.curved-connector-before {
+
+}
+
+.curved-connector-after {
+
+
+}
+
+.non-first-build-curve {
+  &::after,
+  &::before {
+    content: '';
+    top: -49px;
+    position: absolute;
+    border-bottom: 2px solid $border-color;
+    width: 25px;
+    height: 69px;
+  }
+
+  // Right connecting curves
+  &::after {
+    right: -25px;
+    border-right: 2px solid $border-color;
+    border-radius: 0 0 20px;
+  }
+
+  // Left connecting curves
+  &::before {
+    left: -25px;
+    border-left: 2px solid $border-color;
+    border-radius: 0 0 0 20px;
+  }
+}
+
+.second-build-small-curve {
+  &::after,
+  &::before {
+    height: 29px;
+    top: -9px;
+  }
+
+  .curve {
+    display: block;
   }
 }
 
@@ -983,4 +1078,4 @@
     height: 13px;
     width: 12px;
   }
-}
+ }

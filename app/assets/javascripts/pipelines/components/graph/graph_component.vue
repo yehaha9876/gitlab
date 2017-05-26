@@ -103,7 +103,7 @@
         v-if="state.triggerer"
         :linked-pipelines="state.triggerer"
         column-title="Upstream"
-        connector-side="right"
+        graph-position="left"
       />
 
       <ul
@@ -122,7 +122,7 @@
         v-if="state.triggered"
         :linked-pipelines="state.triggered"
         column-title="Downstream"
-        connector-side="left"
+        graph-position="right"
       />
     </div>
   </div>
