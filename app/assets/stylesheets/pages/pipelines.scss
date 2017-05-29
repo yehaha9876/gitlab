@@ -350,9 +350,7 @@
   overflow: auto;
 
   .stage-column-list,
-  .builds-container > ul,
-  .linked-pipelines-column > ul {
-    display: inline-block;
+  .builds-container > ul {
     padding: 0;
   }
 
@@ -366,16 +364,12 @@
     margin-right: 3px;
   }
 
-  .linked-pipelines-column.graph-position-left {
-    margin-left: 0!important;
-  }
-
   .stage-column {
     display: inline-block;
     vertical-align: top;
 
     &:not(:last-child) {
-      @extend .column-margin-before;
+      margin-right: 44px;
     }
 
     &.left-margin {
@@ -473,40 +467,6 @@
     text-overflow: ellipsis;
   }
 
-  .linked-pipelines-column {
-
-  }
-
-  .linked-pipeline {
-    position: relative;
-    width: 186px;
-    margin-bottom: 10px;
-    white-space: normal;
-    color: $gl-text-color-secondary;
-    border-radius: 0;
-    font-style: italic;
-
-    .linked-pipeline-link {
-      display: inline-block;
-      padding: 8px 10px 9px;
-      width: 100%;
-      border: 1px solid $border-color;
-      background-color: $white-light;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-
-      &:hover {
-        background-color: $stage-hover-bg;
-        border: 1px solid $stage-hover-border;
-        color: $gl-text-color;
-      }
-    }
-
-    .linked-pipeline-status {}
-  }
-
-
   .build {
     position: relative;
     width: 186px;
@@ -588,7 +548,15 @@
 
     // Connect first build in each stage with right horizontal line
     &:first-child {
-      @extend .flat-connector-after;
+      &::after {
+        content: '';
+        position: absolute;
+        top: 48%;
+        right: -48px;
+        border-top: 2px solid $border-color;
+        width: 48px;
+        height: 1px;
+      }
     }
 
     // Connect each build (except for first) with curved lines
@@ -630,39 +598,6 @@
         display: block;
       }
     }
-  }
-}
-
-.flat-connector-after {
-  &::after {
-    content: '';
-    position: absolute;
-    top: 48%;
-    right: -48px;
-    border-top: 2px solid $border-color;
-    width: 48px;
-    height: 1px;
-  }
-}
-
-.column-margin-before {
-  margin-left: 44px;
-}
-
-.no-column-margin-before {
-  margin-left: 0;
-}
-
-.flat-connector-before {
-  &::before {
-    // left-connecor-flat comes before column except for first
-    content: '';
-    position: absolute;
-    top: 48%;
-    left: -44px;
-    border-top: 2px solid $border-color;
-    width: 44px;
-    height: 1px;
   }
 }
 
@@ -1040,4 +975,48 @@
     height: 13px;
     width: 12px;
   }
- }
+}
+
+
+/* Styles for cross project pipelines */
+
+.stage-column-list {
+  display: inline-block;
+}
+
+.flat-connector-before {
+  &::before {
+    content: '';
+    position: absolute;
+    top: 48%;
+    left: -44px;
+    border-top: 2px solid $border-color;
+    width: 44px;
+    height: 1px;
+  }
+}
+
+.linked-pipelines-column {
+  @extend .stage-column;
+
+  &.graph-position-right {
+    margin-left: 40px;
+  }
+
+  & > ul {
+    padding: 0;
+  }
+}
+
+.linked-pipeline {
+  @extend .build;
+  font-style: italic;
+
+  .linked-pipeline-content {
+    @extend .build-content;
+    border-radius: 0!important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

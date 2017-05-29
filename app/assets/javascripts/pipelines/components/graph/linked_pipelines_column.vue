@@ -21,11 +21,7 @@ export default {
   },
   computed: {
     columnCss() {
-      if (this.graphPosition === 'right') {
-        return `graph-position-right column-margin-before`;
-      } else {
-        return `graph-position-left`;
-      }
+      return `graph-position-${this.graphPosition}`;
     },
   },
   methods: {
@@ -41,7 +37,7 @@ export default {
 
 <template>
   <div
-    class="stage-column linked-pipelines-column"
+    class="linked-pipelines-column"
     :class="columnCss"
     >
     <div class="stage-name linked-pipelines-column-title"> {{ columnTitle }} </div>

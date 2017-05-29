@@ -25,6 +25,14 @@ export default {
       required: false,
       default: '',
     },
+    hasUpstream: {
+      type: Boolean,
+      required: true,
+    },
+    hasDownstream: {
+      type: Boolean,
+      required: true,
+    },
   },
 
   components: {
@@ -42,7 +50,7 @@ export default {
     },
 
     buildConnnectorClass(index) {
-      return index === 0 && !this.isFirstColumn ? 'left-connector' : '';
+      return index === 0 && (!this.isFirstColumn || this.hasUpstream) ? 'left-connector' : '';
     },
   },
 };

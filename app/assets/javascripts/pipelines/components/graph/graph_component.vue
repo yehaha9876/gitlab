@@ -100,7 +100,7 @@
       </div>
 
       <linked-pipelines-column
-        v-if="state.triggerer"
+        v-if="state.triggerer.length"
         :linked-pipelines="state.triggerer"
         column-title="Upstream"
         graph-position="left"
@@ -115,11 +115,14 @@
           :jobs="stage.groups"
           :key="stage.name"
           :stage-connector-class="stageConnectorClass(index, stage)"
-          :is-first-column="isFirstColumn(index)"/>
+          :is-first-column="isFirstColumn(index)"
+          :has-upstream="!!state.triggerer.length"
+          :has-downstream="!!state.triggered.length"
+          />
       </ul>
 
       <linked-pipelines-column
-        v-if="state.triggered"
+        v-if="state.triggered.length"
         :linked-pipelines="state.triggered"
         column-title="Downstream"
         graph-position="right"

@@ -41,17 +41,17 @@ export default {
 </script>
 
 <template>
-  <li class="linked-pipeline build"
+  <li class="linked-pipeline"
       :class="pipelineCss"
     >
     <div class="curve"></div>
     <div>
-      <a :href="pipelinePath" class="linked-pipeline-link">
-        <span class="linked-pipeline-status ci-status-tex ci-status-textt">
+      <a :href="pipelinePath" class="linked-pipeline-content">
+        <span class="linked-pipeline-status ci-status-text">
           <ci-status :status="pipelineStatus"/>
         </span>
         <span class="linked-pipeline-project-name"> {{ projectName }}</span>
-        <span class="linked-pipeline-id"> #{{ pipelineId }}</span>
+        <span class="linked-pipeline-id"> &#8226; #{{ pipelineId }}</span>
       </a>
     </div>
   </li>
