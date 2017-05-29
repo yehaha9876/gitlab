@@ -127,7 +127,7 @@ describe Gitlab::ImportExport::MembersMapper, services: true do
 
       before do
         group.add_users([user, user2], GroupMember::DEVELOPER)
-        user.update(email: 'invite@test.com')
+        user.update(email: 'invite@test.com', current_user: user)
       end
 
       it 'maps the importer' do

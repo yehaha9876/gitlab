@@ -1222,7 +1222,7 @@ describe User, models: true do
 
     it "returns true if additional email exists" do
       user = create :user
-      user.emails.create(email: "bruno@example.com")
+      user.emails.create(current_user: user, email: "bruno@example.com")
 
       expect(User.existing_member?("bruno@example.com")).to be_truthy
     end

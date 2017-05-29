@@ -40,6 +40,7 @@ class Profiles::PasswordsController < Profiles::ApplicationController
       %w(password password_confirmation).include?(key.to_s)
     end
     password_attributes[:password_automatically_set] = false
+    password_attributes[:current_user] = current_user
 
     unless @user.password_automatically_set || @user.valid_password?(user_params[:current_password])
       redirect_to edit_profile_password_path, alert: 'You must provide a valid current password'
