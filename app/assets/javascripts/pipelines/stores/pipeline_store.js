@@ -18,9 +18,16 @@ export default class PipelineStore {
   }
 
   storeGraph(graph = []) {
-    graph[3].groups.push(graph[3].groups[0]);
+    // single job in first stage
+   // graph[0].groups = [graph[0].groups[0]];
+
+    // multiple jobs in last stage
+    graph[3].groups.push(graph[0].groups[0]);
     this.state.graph = graph;
-    this.state.triggered = mockTriggereds;
     this.state.triggerer = mockTriggerers;
+
+    // single triggered
+    // this.state.triggered = [mockTriggereds[0]];
+    this.state.triggered = mockTriggereds;
   }
 }
