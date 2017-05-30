@@ -36,22 +36,15 @@ class FilteredSearchVisualTokens {
     }
   }
 
-  static createVisualTokenElementHTML(canEdit = true) {
-    let removeTokenMarkup = '';
-    if (canEdit) {
-      removeTokenMarkup = `
-        <div class="remove-token" role="button">
-          <i class="fa fa-close"></i>
-        </div>
-      `;
-    }
-
+  static createVisualTokenElementHTML() {
     return `
       <div class="selectable" role="button">
         <div class="name"></div>
         <div class="value-container">
           <div class="value"></div>
-          ${removeTokenMarkup}
+          <div class="remove-token" role="button">
+            <i class="fa fa-close"></i>
+          </div>
         </div>
       </div>
     `;
@@ -91,13 +84,13 @@ class FilteredSearchVisualTokens {
     }
   }
 
-  static addVisualTokenElement(name, value, isSearchTerm, canEdit) {
+  static addVisualTokenElement(name, value, isSearchTerm) {
     const li = document.createElement('li');
     li.classList.add('js-visual-token');
     li.classList.add(isSearchTerm ? 'filtered-search-term' : 'filtered-search-token');
 
     if (value) {
-      li.innerHTML = FilteredSearchVisualTokens.createVisualTokenElementHTML(canEdit);
+      li.innerHTML = FilteredSearchVisualTokens.createVisualTokenElementHTML();
       FilteredSearchVisualTokens.renderVisualTokenValue(li, name, value);
     } else {
       li.innerHTML = '<div class="name"></div>';
@@ -121,20 +114,20 @@ class FilteredSearchVisualTokens {
     }
   }
 
-  static addFilterVisualToken(tokenName, tokenValue, canEdit) {
+  static addFilterVisualToken(tokenName, tokenValue) {
     const { lastVisualToken, isLastVisualTokenValid }
       = FilteredSearchVisualTokens.getLastVisualTokenBeforeInput();
     const addVisualTokenElement = FilteredSearchVisualTokens.addVisualTokenElement;
 
     if (isLastVisualTokenValid) {
-      addVisualTokenElement(tokenName, tokenValue, false, canEdit);
+      addVisualTokenElement(tokenName, tokenValue, false);
     } else {
       const previousTokenName = lastVisualToken.querySelector('.name').innerText;
       const tokensContainer = FilteredSearchContainer.container.querySelector('.tokens-container');
       tokensContainer.removeChild(lastVisualToken);
 
       const value = tokenValue || tokenName;
-      addVisualTokenElement(previousTokenName, value, false, canEdit);
+      addVisualTokenElement(previousTokenName, value, false);
     }
   }
 

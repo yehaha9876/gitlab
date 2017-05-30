@@ -13,7 +13,6 @@ export default {
     FilteredSearchContainer.container = this.$el;
 
     this.filteredSearch = new FilteredSearchBoards(this.store);
-    this.filteredSearch.setup();
     this.filteredSearch.removeTokens();
     this.filteredSearch.handleInputPlaceholder();
     this.filteredSearch.toggleClearSearchButton();

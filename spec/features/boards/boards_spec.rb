@@ -5,9 +5,7 @@ describe 'Issue Boards', feature: true, js: true do
   include DragTo
 
   let(:project) { create(:empty_project, :public) }
-  let(:milestone) { create(:milestone, title: "v2.2", project: project) }
   let!(:board)  { create(:board, project: project) }
-  let!(:board_with_milestone)  { create(:board, project: project, milestone: milestone) }
   let(:user)    { create(:user) }
   let!(:user2)  { create(:user) }
 
@@ -509,22 +507,6 @@ describe 'Issue Boards', feature: true, js: true do
 
         wait_for_vue_resource
       end
-    end
-  end
-
-  context 'locked milestone' do
-    before do
-      visit namespace_project_board_path(project.namespace, project, board_with_milestone)
-      wait_for_vue_resource
-    end
-
-    it 'should not have remove button' do
-      expect(page).to have_selector('.js-visual-token .remove-token', count: 0)
-    end
-
-    it 'should not be able to be backspaced' do
-      find('.input-token .filtered-search').native.send_key(:backspace)
-      expect(page).to have_selector('.js-visual-token', count: 1)
     end
   end
 

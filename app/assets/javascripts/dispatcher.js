@@ -125,10 +125,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
         case 'projects:merge_requests:index':
         case 'projects:issues:index':
           if (gl.FilteredSearchManager) {
-            const filteredSearchManager = new gl.FilteredSearchManager(
-              page === 'projects:issues:index' ? 'issues' : 'merge_requests',
-            );
-            filteredSearchManager.setup();
+            new gl.FilteredSearchManager(page === 'projects:issues:index' ? 'issues' : 'merge_requests');
           }
           Issuable.init();
           new gl.IssuableBulkActions({

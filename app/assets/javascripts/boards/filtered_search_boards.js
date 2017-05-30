@@ -42,7 +42,9 @@ export default class FilteredSearchBoards extends gl.FilteredSearchManager {
     this.filteredSearchInput.dispatchEvent(new Event('input'));
   }
 
-  canEdit(tokenName) {
+  canEdit(token) {
+    const tokenName = token.querySelector('.name').textContent.trim();
+
     return this.cantEdit.indexOf(tokenName) === -1;
   }
 }
