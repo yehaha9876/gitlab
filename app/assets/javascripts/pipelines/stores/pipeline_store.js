@@ -3,9 +3,9 @@ const mockTriggerers = [
 ];
 
 const mockTriggereds = [
-  { id: 111, path: 'hello/world/tho', project_name: 'GitLab EE', details: { status: { icon: 'icon_status_failed', group: 'failed' } } },
-  { id: 111, path: 'hello/world/tho', project_name: 'Gitaly', details: { status: { icon: 'icon_status_pending', group: 'pending' } } },
-  { id: 111, path: 'hello/world/tho', project_name: 'GitHub', details: { status: { icon: 'icon_status_success', group: 'success' } } },
+  { id: 111, path: 'hello/world/tho', project: { name: 'GitLab EE' }, details: { status: { icon: 'icon_status_failed', group: 'failed' } } },
+  { id: 111, path: 'hello/world/tho', project: { name: 'Gitaly' }, details: { status: { icon: 'icon_status_pending', group: 'pending' } } },
+  { id: 111, path: 'hello/world/tho', project: { name: 'GitHub' }, details: { status: { icon: 'icon_status_success', group: 'success' } } },
 ];
 
 export default class PipelineStore {

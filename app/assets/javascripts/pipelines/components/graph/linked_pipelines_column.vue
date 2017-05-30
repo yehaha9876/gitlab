@@ -48,7 +48,7 @@ export default {
         :class="maybeApplyFlatConnectorBefore(index, graphPosition)"
         :key="pipeline.id"
         :pipeline-id="pipeline.id"
-        :project-name="pipeline.project_name"
+        :project-name="pipeline.project.name"
         :pipeline-status="pipeline.details.status"
         :pipeline-path="pipeline.path"
         :graph-position="graphPosition"
