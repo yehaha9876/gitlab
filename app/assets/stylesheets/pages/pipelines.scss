@@ -1,5 +1,3 @@
-$linked-project-column-margin: 60px;
-
 .pipelines {
   .stage {
     max-width: 90px;
@@ -384,24 +382,6 @@ $linked-project-column-margin: 60px;
       }
     }
 
-    &.has-downstream {
-      margin-right: $linked-project-column-margin;
-    }
-
-    &.has-upstream {
-      margin-left: 44px!important;
-
-      .left-connector {
-        @extend .flat-connector-before;
-
-        &::before {
-          left: -60px!important;
-          width: 60px!important;
-        }
-      }
-    }
-
-
     &.no-margin {
       margin: 0;
     }
@@ -409,7 +389,8 @@ $linked-project-column-margin: 60px;
     li {
       list-style: none;
     }
-    // last stage column
+
+    // when downstream pipelines are present, the last stage isn't the last column
     &:last-child:not(.has-downstream) {
       .build {
         // Remove right connecting horizontal line from first build in last stage
@@ -433,7 +414,7 @@ $linked-project-column-margin: 60px;
       }
     }
 
-    // first stage column
+    // when upstream pipelines are present, the first stage isn't the first column
     &:first-child:not(.has-upstream) {
       .build {
         // Remove left curved connectors from all builds in first stage
@@ -580,8 +561,6 @@ $linked-project-column-margin: 60px;
       }
     }
 
-
-
     // Connect each build (except for first) with curved lines
     &:not(:first-child) {
       &::after,
@@ -601,7 +580,7 @@ $linked-project-column-margin: 60px;
         border-radius: 0 0 20px;
       }
 
-      // Left connectin curves
+      // Left connecting curves
       &::before {
         left: -25px;
         border-left: 2px solid $border-color;
@@ -1001,7 +980,9 @@ $linked-project-column-margin: 60px;
 }
 
 
-/* Styles for cross project pipelines */
+/**
+ * Cross-project pipelines (applied conditionally to pipeline graph)
+ */
 
 .stage-column-list {
   display: inline-block;
@@ -1035,7 +1016,20 @@ $linked-project-column-margin: 60px;
 .linked-pipelines-column {
   position: relative;
 
-  .triangle-pointer {
+  &.graph-position-left {
+    margin-right: $linked-project-column-margin!important;
+    .cross-project-triangle {
+      right: -55px;
+    }
+  }
+
+  &.graph-position-right {
+    .cross-project-triangle {
+      left: -64px;
+    }
+  }
+
+  .cross-project-triangle {
     position: absolute;
     top: 49px;
     width: 0;
@@ -1047,26 +1041,28 @@ $linked-project-column-margin: 60px;
     line-height: 0;
     z-index: 10;
   }
+}
 
-  &.graph-position-left {
-    margin-right: $linked-project-column-margin!important;
-    .triangle-pointer {
-      right: -55px;
-    }
-  }
+.stage-column.has-upstream {
+  margin-left: 44px!important;
 
-  &.graph-position-right {
-    .triangle-pointer {
-      left: -64px;
+  .left-connector {
+    @extend .flat-connector-before;
+
+    &::before {
+      left: -$linked-project-column-margin!important;
+      width: $linked-project-column-margin!important;
     }
   }
 }
 
-.has-downstream {
+.stage-column.has-downstream {
+  margin-right: $linked-project-column-margin;
+
   .build {
     &:first-child {
       &::after {
-        right: -60px!important;
+        right: -$linked-project-column-margin!important;
         width: $linked-project-column-margin!important;
       }
     }
@@ -1079,20 +1075,22 @@ $linked-project-column-margin: 60px;
   font-style: italic;
   height: 40px;
 
+  // apply custom dimensions to connector before and after for triangle arrow
   &.flat-connector-before {
     &::before {
-      left: -60px;
-      width: 60px;
+      left: -$linked-project-column-margin;
+      width: $linked-project-column-margin;
     }
   }
 
   &::after {
-    right: -60px;
-    width: 60px;
+    right: -$linked-project-column-margin;
+    width: $linked-project-column-margin;
   }
 
   .linked-pipeline-content {
     @extend .build-content;
+
     border-radius: 0!important;
     white-space: nowrap;
     overflow: hidden;
