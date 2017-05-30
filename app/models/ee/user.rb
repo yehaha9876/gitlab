@@ -62,5 +62,12 @@ module EE
       return if ::Gitlab::Geo.secondary?
       super
     end
+
+    # Devise method overriden to set an author when Devise confirms a user
+    def confirm(*args)
+      self.current_user = EE::FakeAuthor.new
+
+      super(*args)
+    end
   end
 end
