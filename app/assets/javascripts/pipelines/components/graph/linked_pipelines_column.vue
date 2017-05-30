@@ -26,13 +26,7 @@ export default {
   },
   methods: {
     flatConnectorCss(index) {
-      let className = '';
-
-      if (index === 0 && this.graphPosition === 'right') {
-        className += 'flat-connector-before';
-      }
-
-      return className;
+      return (index === 0 && this.graphPosition === 'right') ? 'flat-connector-before' : '';
     },
   },
 };
