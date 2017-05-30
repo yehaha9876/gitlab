@@ -370,8 +370,9 @@ ul.related-merge-requests > li {
 }
 
 .issue-token-title-text {
-  text-overflow: ellipsis;
   overflow: hidden;
+  max-width: 30ch;
+  text-overflow: ellipsis;
 }
 
 .issue-token-remove-button {
