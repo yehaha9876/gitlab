@@ -314,13 +314,13 @@ ul.related-merge-requests > li {
 
   .issue-token:hover &,
   .issue-token-link:focus > & {
-    background-color: issue-token-reference-hover-background-color;
+    background-color: $gray-normal;
     color: $gl-link-hover-color;
     text-decoration: none;
   }
 
   .issue-token-error:hover &,
-  .issue-token-link:focus > & {
+  .issue-token-error > .issue-token-link:focus > & {
     background-color: $red-75;
   }
 }
@@ -360,7 +360,7 @@ ul.related-merge-requests > li {
   }
 
   .issue-token-error:hover &,
-  .issue-token-link:focus > & {
+  .issue-token-error > .issue-token-link:focus > & {
     background-color: $red-100;
   }
 
@@ -392,7 +392,7 @@ ul.related-merge-requests > li {
   }
 
   .issue-token-error:hover &,
-  .issue-token-link:focus > & {
+  .issue-token-error > .issue-token-link:focus > & {
     background-color: $red-100;
   }
 
