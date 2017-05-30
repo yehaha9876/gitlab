@@ -48,6 +48,8 @@ import {
   ISSUABLE_URL_REGEX,
 } from '../../../lib/utils/issuable_reference_utils';
 
+const SPACE_FACTOR = 1;
+
 export default {
   name: 'RelatedIssuesRoot',
 
@@ -193,8 +195,8 @@ export default {
           isTouched = true;
         }
 
-        // `+ 1` to factor in the missing space we split at earlier
-        iteratingPos = iteratingPos + reference.length + 1;
+        // `+ SPACE_FACTOR` to factor in the missing space we split at earlier
+        iteratingPos = iteratingPos + reference.length + SPACE_FACTOR;
         return !isTouched;
       });
 
