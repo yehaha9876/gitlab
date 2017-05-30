@@ -899,7 +899,7 @@ describe User, models: true do
       end
 
       let(:avatar_path) do
-        "/uploads/system/user/avatar/#{user.id}/uploads/avatar.png"
+        "/uploads/user/avatar/#{user.id}/uploads/avatar.png"
       end
 
       it { should eq "http://#{Gitlab.config.gitlab.host}#{avatar_path}" }
