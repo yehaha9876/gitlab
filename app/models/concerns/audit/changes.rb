@@ -58,7 +58,9 @@ module Audit
     end
 
     def audit_event(column, options)
-      log_error(options[:quiet]) unless self.current_user
+      error(options[:quiet]) unless self.current_user
+
+      self.current_user ||= EE::FakeAuthor.new
 
       options.tap do |options_hash|
         options_hash[:column] = column
@@ -74,15 +76,13 @@ module Audit
 
     private
 
-    def log_error(quiet)
+    def error(quiet)
       raise NotImplementedError, "#{self.class} has no current user assigned." unless quiet
 
       Rails.logger.warn("#{self.class} has no current user assigned. Caller: #{caller.join("\n")}")
     end
 
     def log_event(options)
-      self.current_user ||= EE::FakeAuthor.new
-
       if options[:action] == :update
         AuditEventService.new(self.current_user, self, options).
           for_changes.security_event

@@ -3,7 +3,7 @@ module EE
     FAKE_NAME = 'System'
 
     def name
-      'System'
+      FAKE_NAME
     end
   end
 end
