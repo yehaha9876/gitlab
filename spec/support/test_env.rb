@@ -1,4 +1,5 @@
 require 'rspec/mocks'
+require 'shoulda/matchers'
 
 module TestEnv
   extend self
@@ -85,6 +86,8 @@ module TestEnv
   def disable_mailer
     allow_any_instance_of(NotificationService).to receive(:mailer).
       and_return(double.as_null_object)
+
+    disable_audit_quiet
   end
 
   def enable_mailer
@@ -94,6 +97,22 @@ module TestEnv
 
   def disable_pre_receive
     allow_any_instance_of(Gitlab::Git::Hook).to receive(:trigger).and_return([true, nil])
+  end
+
+  def disable_quiet_audit
+    allow_any_instance_of(Audit::Changes).to receive(:error).with(true).and_return do
+     raise NotImplementedError, <<-ERROR
+      An object has no current user assigned. This is most likely because there is a new
+      possible audit event that is not being registered correctly. In order to know the author
+      of the event, the object to have +current_user+ set to the current user.
+
+      If this is an exception, you can use +enable_quiet_audit+ on your spec example.
+     ERROR
+    end
+  end
+
+  def enable_quiet_audit
+    allow_any_instance_of(Audit::Changes).to receive(:error).with(true).and_call_original
   end
 
   # Clean /tmp/tests
