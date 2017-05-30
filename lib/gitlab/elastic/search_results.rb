@@ -212,7 +212,7 @@ module Gitlab
                           }
                         }
 
-          if current_user && !current_user.external?
+          if current_user
             conditions << {
                             bool: {
                               filter: [
