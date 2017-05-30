@@ -3,9 +3,7 @@ require 'spec_helper'
 describe 'GlobalSearch' do
   let(:features) { %i(issues merge_requests repository builds) }
   let(:non_member) { create :user }
-  let(:external_non_member) { create :user, external: true }
   let(:member) { create :user }
-  let(:external_member) { create :user, external: true }
   let(:guest) { create :user }
 
   before do
@@ -13,7 +11,6 @@ describe 'GlobalSearch' do
     Gitlab::Elastic::Helper.create_empty_index
 
     project.team << [member, :developer]
-    project.team << [external_member, :developer]
     project.team << [guest, :guest]
   end
 
@@ -31,10 +28,8 @@ describe 'GlobalSearch' do
         create_items(project, feature_settings(:disabled))
 
         expect_no_items_to_be_found(member)
-        expect_no_items_to_be_found(external_member)
         expect_no_items_to_be_found(guest)
         expect_no_items_to_be_found(non_member)
-        expect_no_items_to_be_found(external_non_member)
         expect_no_items_to_be_found(nil)
       end
 
@@ -42,10 +37,8 @@ describe 'GlobalSearch' do
         create_items(project, feature_settings(:enabled))
 
         expect_items_to_be_found(member)
-        expect_items_to_be_found(external_member)
         expect_non_code_items_to_be_found(guest)
         expect_no_items_to_be_found(non_member)
-        expect_no_items_to_be_found(external_non_member)
         expect_no_items_to_be_found(nil)
       end
     end
@@ -58,10 +51,8 @@ describe 'GlobalSearch' do
         create_items(project, feature_settings(:disabled))
 
         expect_no_items_to_be_found(member)
-        expect_no_items_to_be_found(external_member)
         expect_no_items_to_be_found(guest)
         expect_no_items_to_be_found(non_member)
-        expect_no_items_to_be_found(external_non_member)
         expect_no_items_to_be_found(nil)
       end
 
@@ -69,10 +60,8 @@ describe 'GlobalSearch' do
         create_items(project, feature_settings(:enabled))
 
         expect_items_to_be_found(member)
-        expect_items_to_be_found(external_member)
         expect_items_to_be_found(guest)
         expect_items_to_be_found(non_member)
-        expect_no_items_to_be_found(external_non_member)
         expect_no_items_to_be_found(nil)
       end
 
@@ -80,10 +69,8 @@ describe 'GlobalSearch' do
         create_items(project, feature_settings(:private))
 
         expect_items_to_be_found(member)
-        expect_items_to_be_found(external_member)
         expect_non_code_items_to_be_found(guest)
         expect_no_items_to_be_found(non_member)
-        expect_no_items_to_be_found(external_non_member)
         expect_no_items_to_be_found(nil)
       end
     end
@@ -96,10 +83,8 @@ describe 'GlobalSearch' do
         create_items(project, feature_settings(:disabled))
 
         expect_no_items_to_be_found(member)
-        expect_no_items_to_be_found(external_member)
         expect_no_items_to_be_found(guest)
         expect_no_items_to_be_found(non_member)
-        expect_no_items_to_be_found(external_non_member)
         expect_no_items_to_be_found(nil)
       end
 
@@ -107,10 +92,8 @@ describe 'GlobalSearch' do
         create_items(project, feature_settings(:enabled))
 
         expect_items_to_be_found(member)
-        expect_items_to_be_found(external_member)
         expect_items_to_be_found(guest)
         expect_items_to_be_found(non_member)
-        expect_items_to_be_found(external_non_member)
         expect_items_to_be_found(nil)
       end
 
@@ -118,10 +101,8 @@ describe 'GlobalSearch' do
         create_items(project, feature_settings(:private))
 
         expect_items_to_be_found(member)
-        expect_items_to_be_found(external_member)
         expect_non_code_items_to_be_found(guest)
         expect_no_items_to_be_found(non_member)
-        expect_no_items_to_be_found(external_non_member)
         expect_no_items_to_be_found(nil)
       end
     end
@@ -162,14 +143,14 @@ describe 'GlobalSearch' do
   end
 
   def expect_non_code_items_to_be_found(user)
-    results = search(user, 'term')
+    results = search(guest, 'term')
     expect(results.issues_count).not_to eq(0)
     expect(results.merge_requests_count).to eq(0)
-    expect(search(user, 'def').blobs_count).to eq(0)
-    expect(search(user, 'add').commits_count).to eq(0)
+    expect(search(guest, 'def').blobs_count).to eq(0)
+    expect(search(guest, 'add').commits_count).to eq(0)
   end
 
-  def search(user, search, snippets: false)
+  def search(user, search)
     Search::GlobalService.new(user, search: search).execute
   end
 end
