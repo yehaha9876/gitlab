@@ -94,7 +94,10 @@ export default {
     <a
       ref="link"
       class="issue-token-link"
-      :href="path">
+      :href="path"
+      :title="title"
+      data-toggle="tooltip"
+      data-placement="top">
       <span
         ref="reference"
         class="issue-token-reference">
