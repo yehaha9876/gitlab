@@ -119,7 +119,11 @@ export default {
       </div>
       <div
         v-if="isFormVisible"
-        class="js-add-related-issues-form-area related-issues-add-related-issues-form panel-body">
+        :class="{
+          'js-add-related-issues-form-area': true,
+          'panel-body': true,
+          'related-issues-add-related-issues-form-with-break': hasRelatedIssues
+        }">
         <add-issuable-form
           :input-value="inputValue"
           :pending-issuables="pendingRelatedIssues"
