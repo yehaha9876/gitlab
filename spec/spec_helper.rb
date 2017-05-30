@@ -71,10 +71,6 @@ RSpec.configure do |config|
     TestLicense.init
   end
 
-  config.before(:each) do
-    disable_quiet_audit
-  end
-
   config.after(:suite) do
     TestEnv.cleanup
   end
