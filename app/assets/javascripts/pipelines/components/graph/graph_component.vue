@@ -108,6 +108,9 @@
           className += 'has-downstream';
         }
       },
+      crossProjectPipelinesClass() {
+        return this.hasTriggered || this.hasTriggerer ? 'has-cross-project-pipelines' : '';
+      }
     },
   };
 </script>
@@ -130,7 +133,8 @@
 
       <ul
         v-if="!isLoading"
-        class="stage-column-list">
+        class="stage-column-list"
+        :class="crossProjectPipelinesClass">
         <stage-column-component
           v-for="(stage, index) in state.graph"
           :class="linkedPipelineClass(index)"

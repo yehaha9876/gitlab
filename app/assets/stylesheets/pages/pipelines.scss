@@ -984,37 +984,18 @@
  * Cross-project pipelines (applied conditionally to pipeline graph)
  */
 
-.stage-column-list {
+.has-cross-project-pipelines.stage-column-list {
   display: inline-block;
-}
-
-.flat-connector-before {
-  &::before {
-    content: '';
-    position: absolute;
-    top: 48%;
-    left: -44px;
-    border-top: 2px solid $border-color;
-    width: 44px;
-    height: 1px;
-  }
 }
 
 .linked-pipelines-column {
   @extend .stage-column;
 
-  &.graph-position-right {
-    margin-left: $linked-project-column-margin;
-  }
+  position: relative;
 
   & > ul {
     padding: 0;
   }
-}
-
-
-.linked-pipelines-column {
-  position: relative;
 
   &.graph-position-left {
     margin-right: $linked-project-column-margin!important;
@@ -1024,24 +1005,14 @@
   }
 
   &.graph-position-right {
+    margin-left: $linked-project-column-margin;
+
     .cross-project-triangle {
       left: -64px;
     }
   }
-
-  .cross-project-triangle {
-    position: absolute;
-    top: 49px;
-    width: 0;
-    height: 0;
-    border-bottom: 7px solid transparent;
-    border-top: 7px solid transparent;
-    border-left: 7px solid $gray-darkest;
-    font-size: 0;
-    line-height: 0;
-    z-index: 10;
-  }
 }
+
 
 .stage-column.has-upstream {
   margin-left: 44px!important;
@@ -1096,4 +1067,29 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+
+.flat-connector-before {
+  &::before {
+    content: '';
+    position: absolute;
+    top: 48%;
+    left: -44px;
+    border-top: 2px solid $border-color;
+    width: 44px;
+    height: 1px;
+  }
+}
+
+.cross-project-triangle {
+  position: absolute;
+  top: 49px;
+  width: 0;
+  height: 0;
+  border-bottom: 7px solid transparent;
+  border-top: 7px solid transparent;
+  border-left: 7px solid $gray-darkest;
+  font-size: 0;
+  line-height: 0;
+  z-index: 10;
 }
