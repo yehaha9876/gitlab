@@ -30,6 +30,7 @@ export default {
   data() {
     return {
       isInputFocused: false,
+      isAutoCompleteOpen: false,
     };
   },
 
@@ -48,8 +49,14 @@ export default {
     onBlur() {
       this.isInputFocused = false;
 
-      const value = this.$refs.input.value;
-      eventHub.$emit('addIssuableFormBlur', value);
+      // Avoid tokenizing partial input when clicking an autocomplete item
+      if (!this.isAutoCompleteOpen) {
+        const value = this.$refs.input.value;
+        eventHub.$emit('addIssuableFormBlur', value);
+      }
+    },
+    onAutoCompleteToggled(isOpen) {
+      this.isAutoCompleteOpen = isOpen;
     },
     onInputWrapperClick() {
       this.$refs.input.focus();
@@ -67,6 +74,8 @@ export default {
     new GfmAutoComplete(this.autoCompleteSources).setup($input, {
       issues: true,
     });
+    $input.on('shown-issues.atwho', this.onAutoCompleteToggled.bind(this, true));
+    $input.on('hidden-issues.atwho', this.onAutoCompleteToggled.bind(this, false));
     $input.on('inserted-issues.atwho', this.onInput);
   },
 
