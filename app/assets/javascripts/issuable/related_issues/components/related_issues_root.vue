@@ -122,12 +122,19 @@ export default {
           const serverRelatedIssueIds = this.updateIssueMapFromServerResponse(data.issues);
           this.store.setRelatedIssues(serverRelatedIssueIds);
         })
-        .catch(() => {
+        .catch((res) => {
+          const data = {
+            result: {
+              message: 'An error occurred while removing related issues.',
+            },
+            ...(res.data || {}),
+          };
+
           // Restore issue we were unable to delete
           this.store.setRelatedIssues(this.state.relatedIssues.concat(idToRemove));
 
           // eslint-disable-next-line no-new
-          new Flash('An error occurred while removing related issues.');
+          new Flash(data.result.message);
         });
     },
     onShowAddRelatedIssuesForm() {
@@ -149,7 +156,13 @@ export default {
             const serverRelatedIssueIds = this.updateIssueMapFromServerResponse(data.issues);
             this.store.setRelatedIssues(serverRelatedIssueIds);
           })
-          .catch(() => {
+          .catch((res) => {
+            const data = {
+              result: {
+                message: 'An error occurred while submitting related issues.',
+              },
+              ...(res.data || {}),
+            };
             // Something went wrong, so restore and tell them about it
             this.store.setPendingRelatedIssues(
               _.uniq(this.state.pendingRelatedIssues.concat(currentPendingIssues)),
@@ -158,7 +171,7 @@ export default {
             this.store.setRelatedIssues(currentRelatedIssues);
 
             // eslint-disable-next-line no-new
-            new Flash('An error occurred while submitting related issues.');
+            new Flash(data.result.message);
           });
 
         // Show the relation right away
