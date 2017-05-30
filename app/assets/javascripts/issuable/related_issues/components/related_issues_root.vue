@@ -41,9 +41,7 @@ import RelatedIssuesBlock from './related_issues_block.vue';
 import RelatedIssuesStore from '../stores/related_issues_store';
 import RelatedIssuesService from '../services/related_issues_service';
 import {
-  FETCHING_STATUS,
   FETCH_SUCCESS_STATUS,
-  FETCH_ERROR_STATUS,
 } from '../constants';
 import {
   ISSUABLE_REFERENCE_REGEX,
@@ -117,6 +115,11 @@ export default {
       this.store.removeRelatedIssue(idToRemove);
 
       this.service.removeRelatedIssue(this.state.issueMap[idToRemove].destroy_relation_path)
+        .then(res => res.json())
+        .then((data) => {
+          const serverRelatedIssueIds = this.updateIssueMapFromServerResponse(data.issues);
+          this.store.setRelatedIssues(serverRelatedIssueIds);
+        })
         .catch(() => {
           // Restore issue we were unable to delete
           this.store.setRelatedIssues(this.state.relatedIssues.concat(idToRemove));
@@ -140,12 +143,9 @@ export default {
         );
         this.service.addRelatedIssues(currentPendingReferences)
           .then(res => res.json())
-          .then(() => {
-            // TODO: Wait for BE `1` so we can update accurately
-            // with the response instead of the what was submitted, https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1797#todo
-            this.store.setRelatedIssues(
-              _.uniq(this.state.relatedIssues.concat(currentPendingIssues)),
-            );
+          .then((data) => {
+            const serverRelatedIssueIds = this.updateIssueMapFromServerResponse(data.issues);
+            this.store.setRelatedIssues(serverRelatedIssueIds);
           })
           .catch(() => {
             // Something went wrong, so restore and tell them about it
@@ -175,15 +175,8 @@ export default {
       this.service.fetchRelatedIssues()
         .then(res => res.json())
         .then((issues) => {
-          const relatedIssueIds = issues.map((issue) => {
-            this.store.addToIssueMap(issue.id, {
-              ...issue,
-              fetchStatus: FETCH_SUCCESS_STATUS,
-            });
-
-            return issue.id;
-          });
-          this.store.setRelatedIssues(relatedIssueIds);
+          const serverRelatedIssueIds = this.updateIssueMapFromServerResponse(issues);
+          this.store.setRelatedIssues(serverRelatedIssueIds);
         })
         .catch(() => new Flash('An error occurred while fetching related issues.'));
     },
@@ -230,56 +223,15 @@ export default {
       const unprocessableReferences = rawReferences
         .filter(reference => !this.checkIsProcessable(reference));
 
-      // Add some temporary placeholders to lookup while we wait
-      // for data to come back from the server
+      // Add some temporary placeholders to lookup
       const ids = references.map((reference) => {
         const issueEntry = this.state.issueMap[reference];
         const id = issueEntry ? issueEntry.id : `pending_${reference}`;
-        const isIssueErrored = issueEntry &&
-          issueEntry.fetchStatus === FETCH_ERROR_STATUS;
 
-        if (!issueEntry || isIssueErrored) {
-          this.store.addToIssueMap(id, {
-            id,
-            reference,
-            fetchStatus: FETCHING_STATUS,
-          });
-
-          // TODO: We will only need to pass in the references once `3` is in place, https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1797#todo
-          this.service.fetchIssueFromReference(
-            reference,
-            this.currentNamespacePath,
-            this.currentProjectPath,
-          )
-            .then((issue) => {
-              // They may have input a valid looking reference but it doesn't actually exist
-              // Or they don't have the permissions to relate it.
-              if (issue) {
-                // Add our fully-qualified entry
-                this.store.addToIssueMap(issue.id, {
-                  ...issue,
-                  fetchStatus: FETCH_SUCCESS_STATUS,
-                });
-
-                // Update our reference lists to point to the
-                // fully-qualified entry in the issueMap
-                this.store.setPendingRelatedIssues(
-                  _.uniq(this.replaceInList(
-                    this.state.pendingRelatedIssues,
-                    id,
-                    issue.id,
-                  )),
-                );
-              } else {
-                // Mark the issue as trouble-some
-                this.store.addToIssueMap(id, {
-                  ...this.store.getIssue(id),
-                  fetchStatus: FETCH_ERROR_STATUS,
-                });
-              }
-            })
-            .catch(() => new Flash('An error occurred while fetching issue info.'));
-        }
+        this.store.addToIssueMap(id, {
+          id,
+          reference,
+        });
 
         return id;
       });
@@ -289,6 +241,18 @@ export default {
         references,
         ids,
       };
+    },
+    updateIssueMapFromServerResponse(serverIssues) {
+      const serverRelatedIssueIds = serverIssues.map((issue) => {
+        this.store.addToIssueMap(issue.id, {
+          ...issue,
+          fetchStatus: FETCH_SUCCESS_STATUS,
+        });
+
+        return String(issue.id);
+      });
+
+      return serverRelatedIssueIds;
     },
 
     replaceInList(list, needle, replacement) {

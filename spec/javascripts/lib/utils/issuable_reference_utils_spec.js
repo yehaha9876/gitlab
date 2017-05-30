@@ -1,7 +1,6 @@
 import {
   ISSUABLE_REFERENCE_REGEX,
   ISSUABLE_URL_REGEX,
-  getReferencePieces,
   assembleDisplayIssuableReference,
 } from '~/lib/utils/issuable_reference_utils';
 
@@ -59,51 +58,6 @@ describe('issuable_reference_utils', () => {
     });
     it('should not match string with numbers in it', () => {
       expect(ISSUABLE_URL_REGEX.test('somethingwith123inthemiddle')).toEqual(false);
-    });
-  });
-
-  describe('getReferencePieces', () => {
-    it('should work with only issue number reference', () => {
-      expect(getReferencePieces('#111', 'foo', 'bar')).toEqual({
-        namespace: 'foo',
-        project: 'bar',
-        issue: '111',
-      });
-    });
-    it('should work with project and issue number reference', () => {
-      expect(getReferencePieces('qux#111', 'foo', 'bar')).toEqual({
-        namespace: 'foo',
-        project: 'qux',
-        issue: '111',
-      });
-    });
-    it('should work with full reference', () => {
-      expect(getReferencePieces('foo/garply#111', 'foo', 'bar')).toEqual({
-        namespace: 'foo',
-        project: 'garply',
-        issue: '111',
-      });
-    });
-    it('should work with sub-groups', () => {
-      expect(getReferencePieces('some/with/sub/groups/other#111', 'foo', 'bar')).toEqual({
-        namespace: 'some/with/sub/groups',
-        project: 'other',
-        issue: '111',
-      });
-    });
-    it('does not mangle other group references', () => {
-      expect(getReferencePieces('some/other#111', 'foo', 'bar')).toEqual({
-        namespace: 'some',
-        project: 'other',
-        issue: '111',
-      });
-    });
-    it('does not mangle other group even with partial match', () => {
-      expect(getReferencePieces('bar/baz/fido#111', 'foo/bar/baz', 'garply')).toEqual({
-        namespace: 'bar/baz',
-        project: 'fido',
-        issue: '111',
-      });
     });
   });
 

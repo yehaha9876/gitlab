@@ -1,10 +1,14 @@
 import Vue from 'vue';
 import eventHub from '~/issuable/related_issues/event_hub';
-import RelatedIssuesService from '~/issuable/related_issues/services/related_issues_service';
+import {
+  FETCHING_STATUS,
+  FETCH_ERROR_STATUS,
+} from '~/issuable/related_issues/constants';
 import issueToken from '~/issuable/related_issues/components/issue_token.vue';
 
 describe('IssueToken', () => {
-  const reference = 'foo/bar#123';
+  const idKey = '200';
+  const displayReference = 'foo/bar#123';
   const title = 'some title';
   let IssueToken;
   let vm;
@@ -23,13 +27,14 @@ describe('IssueToken', () => {
     beforeEach(() => {
       vm = new IssueToken({
         propsData: {
-          reference,
+          idKey,
+          displayReference,
         },
       }).$mount();
     });
 
     it('shows reference', () => {
-      expect(vm.$el.textContent.trim()).toEqual(reference);
+      expect(vm.$el.textContent.trim()).toEqual(displayReference);
     });
   });
 
@@ -37,14 +42,15 @@ describe('IssueToken', () => {
     beforeEach(() => {
       vm = new IssueToken({
         propsData: {
-          reference,
+          idKey,
+          displayReference,
           title,
         },
       }).$mount();
     });
 
     it('shows reference and title', () => {
-      expect(vm.$refs.reference.textContent.trim()).toEqual(reference);
+      expect(vm.$refs.reference.textContent.trim()).toEqual(displayReference);
       expect(vm.$refs.title.textContent.trim()).toEqual(title);
     });
   });
@@ -54,7 +60,8 @@ describe('IssueToken', () => {
     beforeEach(() => {
       vm = new IssueToken({
         propsData: {
-          reference,
+          idKey,
+          displayReference,
           title,
           path,
         },
@@ -71,7 +78,8 @@ describe('IssueToken', () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {
-            reference,
+            idKey,
+            displayReference,
             state: 'opened',
           },
         }).$mount();
@@ -86,7 +94,8 @@ describe('IssueToken', () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {
-            reference,
+            idKey,
+            displayReference,
             state: 'closed',
           },
         }).$mount();
@@ -103,7 +112,8 @@ describe('IssueToken', () => {
     beforeEach(() => {
       vm = new IssueToken({
         propsData: {
-          reference,
+          idKey,
+          displayReference,
           title,
           state,
         },
@@ -112,18 +122,19 @@ describe('IssueToken', () => {
 
     it('shows reference, title, and state', () => {
       expect(vm.$refs.stateIcon.getAttribute('aria-label')).toEqual(state);
-      expect(vm.$refs.reference.textContent.trim()).toEqual(reference);
+      expect(vm.$refs.reference.textContent.trim()).toEqual(displayReference);
       expect(vm.$refs.title.textContent.trim()).toEqual(title);
     });
   });
 
   describe('with fetchStatus', () => {
-    describe('`canRemove: RelatedIssuesService.FETCHING_STATUS`', () => {
+    describe('`fetchStatus: FETCHING_STATUS`', () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {
-            reference,
-            fetchStatus: RelatedIssuesService.FETCHING_STATUS,
+            idKey,
+            displayReference,
+            fetchStatus: FETCHING_STATUS,
           },
         }).$mount();
       });
@@ -133,12 +144,13 @@ describe('IssueToken', () => {
       });
     });
 
-    describe('`canRemove: RelatedIssuesService.FETCH_ERROR_STATUS`', () => {
+    describe('`fetchStatus: FETCH_ERROR_STATUS`', () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {
-            reference,
-            fetchStatus: RelatedIssuesService.FETCH_ERROR_STATUS,
+            idKey,
+            displayReference,
+            fetchStatus: FETCH_ERROR_STATUS,
           },
         }).$mount();
       });
@@ -154,7 +166,8 @@ describe('IssueToken', () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {
-            reference,
+            idKey,
+            displayReference,
           },
         }).$mount();
       });
@@ -168,7 +181,8 @@ describe('IssueToken', () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {
-            reference,
+            idKey,
+            displayReference,
             canRemove: true,
           },
         }).$mount();
@@ -186,7 +200,8 @@ describe('IssueToken', () => {
     beforeEach(() => {
       vm = new IssueToken({
         propsData: {
-          reference,
+          idKey,
+          displayReference,
         },
       }).$mount();
       removeRequestSpy = jasmine.createSpy('spy');

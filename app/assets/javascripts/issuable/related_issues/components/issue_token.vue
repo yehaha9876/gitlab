@@ -96,7 +96,7 @@ export default {
       class="issue-token-link"
       :href="path">
       <span
-        ref="id"
+        ref="reference"
         class="issue-token-reference">
         <i
           ref="stateIcon"

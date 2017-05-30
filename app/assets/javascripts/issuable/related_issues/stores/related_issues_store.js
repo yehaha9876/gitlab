@@ -49,10 +49,13 @@ class RelatedIssuesStore {
       this.getIssue(id, namespacePath, projectPath));
   }
 
-  addToIssueMap(reference, issue) {
+  addToIssueMap(id, issue) {
     this.state.issueMap = {
       ...this.state.issueMap,
-      [String(reference)]: issue,
+      [String(id)]: {
+        ...issue,
+        id: String(issue.id),
+      },
     };
   }
 
