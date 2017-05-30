@@ -270,6 +270,20 @@ class User < ActiveRecord::Base
       end
     end
 
+    # EE-specific
+    # Devise method overriden to set an author when Devise resets a password internally
+    def find_first_by_auth_conditions(tainted_conditions, opts={})
+      if tainted_conditions.keys.include?('reset_password_token')
+        found = super(tainted_conditions, opts={})
+        found.current_user = EE::FakeAuthor.new if found
+
+        found
+      else
+        super(*args)
+      end
+    end
+    # EE-specific
+
     def sort(method)
       case method.to_s
       when 'recent_sign_in' then order_recent_sign_in
