@@ -235,7 +235,7 @@ export default {
     "active": true,
     "coverage": null,
     "path": "/gitlab-org/gitlab-ce/pipelines/129",
-    "project_name": "GitLab CE",
+    "project" : { "name": "GitLabCE" },
     "details": {
       "status": {
         "icon": "icon_status_running",
@@ -295,7 +295,7 @@ export default {
       "active": true,
       "coverage": null,
       "path": "/gitlab-org/gitlab-ce/pipelines/132",
-      "project_name": "GitLab CE",
+      "project" : { "name": "GitLabCE" },
       "details": {
         "status": {
           "icon": "icon_status_running",
@@ -354,7 +354,7 @@ export default {
       "active": true,
       "coverage": null,
       "path": "/gitlab-org/gitlab-ce/pipelines/133",
-      "project_name": "GitLab CE",
+      "project" : { "name": "GitLabCE" },
       "details": {
         "status": {
           "icon": "icon_status_running",
@@ -413,7 +413,7 @@ export default {
       "active": true,
       "coverage": null,
       "path": "/gitlab-org/gitlab-ce/pipelines/130",
-      "project_name": "GitLab CE",
+      "project" : { "name": "GitLabCE" },
       "details": {
         "status": {
           "icon": "icon_status_running",

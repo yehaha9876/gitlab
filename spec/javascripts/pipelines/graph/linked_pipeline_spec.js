@@ -11,7 +11,7 @@ fdescribe('Linked pipeline', () => {
       pipelineId: mockPipeline.id,
       pipelinePath: mockPipeline.path,
       pipelineStatus: mockPipeline.details.status,
-      projectName: mockPipeline.project_name,
+      projectName: mockPipeline.project.name,
     };
 
     this.linkedPipeline = new LinkedPipeline({

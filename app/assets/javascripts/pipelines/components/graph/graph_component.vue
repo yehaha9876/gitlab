@@ -51,6 +51,14 @@
         }
       });
     },
+    computed: {
+      hasTriggered() {
+        return !!this.state.triggered.length;
+      },
+      hasTriggerer() {
+        return !!this.state.triggerer.length;
+      },
+    },
     methods: {
       successCallback(response) {
         const data = response.json();
@@ -77,7 +85,7 @@
 
         // If it's the first stage column and only has one job
         if (index === 0 && stage.groups.length === 1) {
-          if (!this.state.triggerer.length) {
+          if (!this.hasTriggerer) {
             className = 'no-margin';
           } else {
             className = 'left-margin';
@@ -90,23 +98,15 @@
         return className;
       },
       linkedPipelineClass(index) {
-        if (this.hasUpstream(index)) {
-          return 'has-upstream';
-        } else if (this.hasDownstream(index)) {
-          return 'has-downstream';
-        }
-      },
-      hasUpstream(index) {
+        let className = '';
         const isFirstStage = index === 0;
-        const hasTriggerer = !!this.state.triggerer.length;
-
-        return isFirstStage && hasTriggerer;
-      },
-      hasDownstream(index) {
         const isLastStage = index === this.state.graph.length - 1;
-        const hasTriggered = !!this.state.triggered.length;
 
-        return isLastStage && hasTriggered;
+        if (isFirstStage && this.hasTriggerer(index)) {
+          className += 'has-upstream';
+        } else if (isLastStage && this.hasTriggered(index)) {
+          className += 'has-downstream';
+        }
       },
     },
   };
@@ -122,7 +122,7 @@
       </div>
 
       <linked-pipelines-column
-        v-if="state.triggerer.length"
+        v-if="hasTriggerer"
         :linked-pipelines="state.triggerer"
         column-title="Upstream"
         graph-position="left"
@@ -139,13 +139,12 @@
           :key="stage.name"
           :stage-connector-class="stageConnectorClass(index, stage)"
           :is-first-column="isFirstColumn(index)"
-          :has-upstream="hasUpstream(index)"
-          :has-downstream="hasDownstream(index)"
+          :has-triggerer="hasTriggerer"
           />
       </ul>
 
       <linked-pipelines-column
-        v-if="state.triggered.length"
+        v-if="hasTriggered"
         :linked-pipelines="state.triggered"
         column-title="Downstream"
         graph-position="right"

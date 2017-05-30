@@ -19,31 +19,16 @@ export default {
       type: String,
       required: true,
     },
-    graphPosition: {
-      type: String,
-      required: true,
-    },
   },
   components: {
     ciStatus,
-  },
-  computed: {
-    pipelineCss() {
-      if (this.graphPosition === 'right') {
-        return ``;
-      } else {
-        return ``;
-      }
-    },
   },
 };
 
 </script>
 
 <template>
-  <li class="linked-pipeline"
-      :class="pipelineCss"
-    >
+  <li class="linked-pipeline">
     <div class="curve"></div>
     <div>
       <a :href="pipelinePath" class="linked-pipeline-content">

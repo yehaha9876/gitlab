@@ -25,11 +25,14 @@ export default {
     },
   },
   methods: {
-    maybeApplyFlatConnectorBefore(index, graphPosition) {
-      if (index === 0 && graphPosition === 'right') {
-        return 'flat-connector-before';
+    flatConnectorCss(index) {
+      let className = '';
+
+      if (index === 0 && this.graphPosition === 'right') {
+        className += 'flat-connector-before';
       }
-      return '';
+
+      return className;
     },
   },
 };
@@ -45,13 +48,12 @@ export default {
     <ul>
       <linked-pipeline
         v-for="(pipeline, index) in linkedPipelines"
-        :class="maybeApplyFlatConnectorBefore(index, graphPosition)"
+        :class="flatConnectorCss(index)"
         :key="pipeline.id"
         :pipeline-id="pipeline.id"
         :project-name="pipeline.project.name"
         :pipeline-status="pipeline.details.status"
         :pipeline-path="pipeline.path"
-        :graph-position="graphPosition"
       />
     </ul>
   </div>
