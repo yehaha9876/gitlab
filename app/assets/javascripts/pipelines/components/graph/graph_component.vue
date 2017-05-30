@@ -102,9 +102,9 @@
         const isFirstStage = index === 0;
         const isLastStage = index === this.state.graph.length - 1;
 
-        if (isFirstStage && this.hasTriggerer(index)) {
+        if (isFirstStage && this.hasTriggerer) {
           className += 'has-upstream';
-        } else if (isLastStage && this.hasTriggered(index)) {
+        } else if (isLastStage && this.hasTriggered) {
           className += 'has-downstream';
         }
       },
