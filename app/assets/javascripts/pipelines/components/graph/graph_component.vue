@@ -51,7 +51,6 @@
         }
       });
     },
-
     methods: {
       successCallback(response) {
         const data = response.json();
@@ -78,13 +77,36 @@
 
         // If it's the first stage column and only has one job
         if (index === 0 && stage.groups.length === 1) {
-          className = 'no-margin';
+          if (!this.state.triggerer.length) {
+            className = 'no-margin';
+          } else {
+            className = 'left-margin';
+          }
         } else if (index > 0) {
           // If it is not the first column
           className = 'left-margin';
         }
 
         return className;
+      },
+      linkedPipelineClass(index) {
+        if (this.hasUpstream(index)) {
+          return 'has-upstream';
+        } else if (this.hasDownstream(index)) {
+          return 'has-downstream';
+        }
+      },
+      hasUpstream(index) {
+        const isFirstStage = index === 0;
+        const hasTriggerer = !!this.state.triggerer.length;
+
+        return isFirstStage && hasTriggerer;
+      },
+      hasDownstream(index) {
+        const isLastStage = index === this.state.graph.length - 1;
+        const hasTriggered = !!this.state.triggered.length;
+
+        return isLastStage && hasTriggered;
       },
     },
   };
@@ -111,13 +133,14 @@
         class="stage-column-list">
         <stage-column-component
           v-for="(stage, index) in state.graph"
+          :class="linkedPipelineClass(index)"
           :title="capitalizeStageName(stage.name)"
           :jobs="stage.groups"
           :key="stage.name"
           :stage-connector-class="stageConnectorClass(index, stage)"
           :is-first-column="isFirstColumn(index)"
-          :has-upstream="!!state.triggerer.length"
-          :has-downstream="!!state.triggered.length"
+          :has-upstream="hasUpstream(index)"
+          :has-downstream="hasDownstream(index)"
           />
       </ul>
 

@@ -41,6 +41,7 @@ export default {
     :class="columnCss"
     >
     <div class="stage-name linked-pipelines-column-title"> {{ columnTitle }} </div>
+    <div class="triangle-pointer"></div>
     <ul>
       <linked-pipeline
         v-for="(pipeline, index) in linkedPipelines"

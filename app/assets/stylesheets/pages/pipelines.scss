@@ -1,3 +1,5 @@
+$linked-project-column-margin: 60px;
+
 .pipelines {
   .stage {
     max-width: 90px;
@@ -382,6 +384,24 @@
       }
     }
 
+    &.has-downstream {
+      margin-right: $linked-project-column-margin;
+    }
+
+    &.has-upstream {
+      margin-left: 44px!important;
+
+      .left-connector {
+        @extend .flat-connector-before;
+
+        &::before {
+          left: -60px!important;
+          width: 60px!important;
+        }
+      }
+    }
+
+
     &.no-margin {
       margin: 0;
     }
@@ -389,8 +409,8 @@
     li {
       list-style: none;
     }
-
-    &:last-child {
+    // last stage column
+    &:last-child:not(.has-downstream) {
       .build {
         // Remove right connecting horizontal line from first build in last stage
         &:first-child {
@@ -413,7 +433,8 @@
       }
     }
 
-    &:first-child {
+    // first stage column
+    &:first-child:not(.has-upstream) {
       .build {
         // Remove left curved connectors from all builds in first stage
         &:not(:first-child) {
@@ -559,6 +580,8 @@
       }
     }
 
+
+
     // Connect each build (except for first) with curved lines
     &:not(:first-child) {
       &::after,
@@ -578,7 +601,7 @@
         border-radius: 0 0 20px;
       }
 
-      // Left connecting curves
+      // Left connectin curves
       &::before {
         left: -25px;
         border-left: 2px solid $border-color;
@@ -1000,7 +1023,7 @@
   @extend .stage-column;
 
   &.graph-position-right {
-    margin-left: 40px;
+    margin-left: $linked-project-column-margin;
   }
 
   & > ul {
@@ -1008,9 +1031,65 @@
   }
 }
 
+
+.linked-pipelines-column {
+  position: relative;
+
+  .triangle-pointer {
+    position: absolute;
+    top: 49px;
+    width: 0;
+    height: 0;
+    border-bottom: 7px solid transparent;
+    border-top: 7px solid transparent;
+    border-left: 7px solid $gray-darkest;
+    font-size: 0;
+    line-height: 0;
+    z-index: 10;
+  }
+
+  &.graph-position-left {
+    margin-right: $linked-project-column-margin!important;
+    .triangle-pointer {
+      right: -55px;
+    }
+  }
+
+  &.graph-position-right {
+    .triangle-pointer {
+      left: -64px;
+    }
+  }
+}
+
+.has-downstream {
+  .build {
+    &:first-child {
+      &::after {
+        right: -60px!important;
+        width: $linked-project-column-margin!important;
+      }
+    }
+  }
+}
+
 .linked-pipeline {
   @extend .build;
+
   font-style: italic;
+  height: 40px;
+
+  &.flat-connector-before {
+    &::before {
+      left: -60px;
+      width: 60px;
+    }
+  }
+
+  &::after {
+    right: -60px;
+    width: 60px;
+  }
 
   .linked-pipeline-content {
     @extend .build-content;

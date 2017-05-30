@@ -18,6 +18,7 @@ export default class PipelineStore {
   }
 
   storeGraph(graph = []) {
+    graph[3].groups.push(graph[3].groups[0]);
     this.state.graph = graph;
     this.state.triggered = mockTriggereds;
     this.state.triggerer = mockTriggerers;
