@@ -95,7 +95,7 @@ describe NotificationService, services: true do
 
   describe 'Email' do
     describe '#new_email' do
-      let!(:email) { create(:email) }
+      let!(:email) { create(:email, current_user: assignee) }
 
       it { expect(notification.new_email(email)).to be_truthy }
 
