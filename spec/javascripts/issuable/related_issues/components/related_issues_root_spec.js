@@ -126,22 +126,10 @@ describe('RelatedIssuesRoot', () => {
     });
 
     describe('onAddIssuableFormSubmit', () => {
-      const interceptor = (request, next) => {
-        next(request.respondWith(JSON.stringify({}), {
-          status: 200,
-        }));
-      };
-
       beforeEach(() => {
         vm = createComponent(defaultProps);
         vm.store.addToIssueMap(issuable1.id, issuable1);
         vm.store.addToIssueMap(issuable2.id, issuable2);
-
-        Vue.http.interceptors.push(interceptor);
-      });
-
-      afterEach(() => {
-        Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
       });
 
       it('submit zero pending issue as related issue', (done) => {
@@ -149,38 +137,73 @@ describe('RelatedIssuesRoot', () => {
         vm.onAddIssuableFormSubmit();
 
         setTimeout(() => {
-          expect(vm.computedPendingRelatedIssues.length).toEqual(0);
-          expect(vm.computedRelatedIssues.length).toEqual(0);
+          Vue.nextTick(() => {
+            expect(vm.computedPendingRelatedIssues.length).toEqual(0);
+            expect(vm.computedRelatedIssues.length).toEqual(0);
 
-          done();
+            done();
+          });
         });
       });
 
       it('submit pending issue as related issue', (done) => {
+        const interceptor = (request, next) => {
+          next(request.respondWith(JSON.stringify({
+            issues: [issuable1],
+            result: {
+              message: 'something was successfully related',
+              status: 'success',
+            },
+          }), {
+            status: 200,
+          }));
+        };
+        Vue.http.interceptors.push(interceptor);
+
         vm.store.setPendingRelatedIssues([issuable1.id]);
         vm.onAddIssuableFormSubmit();
 
         setTimeout(() => {
-          console.log(vm.computedRelatedIssues[0]);
-          expect(vm.computedPendingRelatedIssues.length).toEqual(0);
-          expect(vm.computedRelatedIssues.length).toEqual(1);
-          expect(vm.computedRelatedIssues[0].reference).toEqual(issuable1Reference);
+          Vue.nextTick(() => {
+            expect(vm.computedPendingRelatedIssues.length).toEqual(0);
+            expect(vm.computedRelatedIssues.length).toEqual(1);
+            expect(vm.computedRelatedIssues[0].id).toEqual(issuable1.id);
 
-          done();
+            done();
+
+            Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
+          });
         });
       });
 
       it('submit multiple pending issues as related issues', (done) => {
-        vm.store.setPendingRelatedIssues([issuable1Reference, issuable2Reference]);
+        const interceptor = (request, next) => {
+          next(request.respondWith(JSON.stringify({
+            issues: [issuable1, issuable2],
+            result: {
+              message: 'something was successfully related',
+              status: 'success',
+            },
+          }), {
+            status: 200,
+          }));
+        };
+        Vue.http.interceptors.push(interceptor);
+
+        vm.store.setPendingRelatedIssues([issuable1.id, issuable2.id]);
         vm.onAddIssuableFormSubmit();
 
         setTimeout(() => {
-          expect(vm.computedPendingRelatedIssues.length).toEqual(0);
-          expect(vm.computedRelatedIssues.length).toEqual(2);
-          expect(vm.computedRelatedIssues[0].reference).toEqual(issuable1Reference);
-          expect(vm.computedRelatedIssues[1].reference).toEqual(issuable2Reference);
+          Vue.nextTick(() => {
+            expect(vm.computedPendingRelatedIssues.length).toEqual(0);
+            expect(vm.computedRelatedIssues.length).toEqual(2);
+            expect(vm.computedRelatedIssues[0].id).toEqual(issuable1.id);
+            expect(vm.computedRelatedIssues[1].id).toEqual(issuable2.id);
 
-          done();
+            done();
+
+            Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
+          });
         });
       });
     });

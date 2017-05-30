@@ -40,7 +40,7 @@ export default {
     autoCompleteSources: {
       type: Object,
       required: false,
-      default: {},
+      default: () => ({}),
     },
   },
 
