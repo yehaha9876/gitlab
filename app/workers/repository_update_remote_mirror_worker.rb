@@ -30,6 +30,7 @@ class RepositoryUpdateRemoteMirrorWorker
     raise
   rescue UpdateError => ex
     remote_mirror.mark_as_failed(Gitlab::UrlSanitizer.sanitize(ex.message))
+    Rails.logger.error("RepositoryUpdateRemoteMirrorWorker: push to remote repository #{remote_mirror.project.id} failed")
     raise
   rescue => ex
     raise UpdateError, "#{ex.class}: #{ex.message}"
