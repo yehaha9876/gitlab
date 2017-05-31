@@ -113,7 +113,7 @@ export default {
           <input
             ref="input"
             type="text"
-            class="add-issuable-form-input"
+            class="js-add-issuable-form-input add-issuable-form-input"
             :value="inputValue"
             placeholder="Search issues..."
             @input="onInput"
@@ -126,7 +126,7 @@ export default {
       <button
         ref="addButton"
         type="button"
-        class="btn btn-new pull-left"
+        class="js-add-issuable-form-add-button btn btn-new pull-left"
         @click="onFormSubmit">
         {{ addButtonLabel }}
       </button>

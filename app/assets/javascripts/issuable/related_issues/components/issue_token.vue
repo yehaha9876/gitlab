@@ -116,7 +116,7 @@ export default {
       <span
         v-if="hasTitle"
         ref="title"
-        class="issue-token-title">
+        class="js-issue-token-title issue-token-title">
         <i
           ref="fetchStatusIcon"
           v-if="isFetching"
@@ -132,7 +132,7 @@ export default {
       ref="removeButton"
       v-if="canRemove"
       type="button"
-      class="issue-token-remove-button"
+      class="js-issue-token-remove-button issue-token-remove-button"
       :class="{ 'issue-token-remove-button-standalone': !hasTitle }"
       :title="removeButtonLabel"
       data-toggle="tooltip"

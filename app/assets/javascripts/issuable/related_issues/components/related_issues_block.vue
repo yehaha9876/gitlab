@@ -93,7 +93,7 @@ export default {
               aria-label="Read more about related issues">
             </i>
           </a>
-          <div class="related-issues-header-issue-count issue-count-badge">
+          <div class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge">
             <span
               class="issue-count-badge-count"
               :class="{ 'has-btn': this.canAddRelatedIssues }">
@@ -103,7 +103,7 @@ export default {
               ref="issueCountBadgeAddButton"
               v-if="canAddRelatedIssues"
               type="button"
-              class="issue-count-badge-add-button btn btn-small btn-default"
+              class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-small btn-default"
               title="Add an issue"
               aria-label="Add an issue"
               data-toggle="tooltip"
@@ -119,9 +119,8 @@ export default {
       </div>
       <div
         v-if="isFormVisible"
+        class="js-add-related-issues-form-area panel-body"
         :class="{
-          'js-add-related-issues-form-area': true,
-          'panel-body': true,
           'related-issues-add-related-issues-form-with-break': hasRelatedIssues
         }">
         <add-issuable-form
