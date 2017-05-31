@@ -1,3 +1,5 @@
+/* global Flash */
+
 import Vue from 'vue';
 import Visibility from 'visibilityjs';
 import Poll from '../lib/utils/poll';
@@ -10,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const store = new PipelineStore();
   const service = new PipelineService(DOMdata.endpoint);
 
-  new Vue({
+  return new Vue({
     el: '#js-pipeline-graph-vue',
     components: {
       pipelineGraph,
@@ -25,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resource: service,
         method: 'getPipeline',
         successCallback: (response) => {
-          store.storeGraph(response.json().details.stages)
+          store.storeGraph(response.json().details.stages);
         },
         errorCallback: () => new Flash('An error occurred while fetching the pipeline.'),
       });

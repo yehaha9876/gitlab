@@ -1,5 +1,5 @@
 const mockTriggerers = [
-  { id: 111, path: 'hello/world/tho', project: { name : 'GitLab Shell' }, details: { status: { icon: 'icon_status_pending', group: 'pending' } } },
+  { id: 111, path: 'hello/world/tho', project: { name: 'GitLab Shell' }, details: { status: { icon: 'icon_status_pending', group: 'pending' } } },
 ];
 
 const mockTriggereds = [

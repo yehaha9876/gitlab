@@ -11,7 +11,7 @@ const state = {
   triggerer: linkedPipelineJSON.triggerer,
 };
 
-fdescribe('graph component', function () {
+describe('graph component', function () {
   describe('while is loading', function () {
     beforeEach(function () {
       this.component = new GraphComponent({
