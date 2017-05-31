@@ -20,12 +20,12 @@ export default {
     linkedPipeline,
   },
   computed: {
-    columnCss() {
+    columnClass() {
       return `graph-position-${this.graphPosition}`;
     },
   },
   methods: {
-    flatConnectorCss(index) {
+    flatConnectorClass(index) {
       return (index === 0 && this.graphPosition === 'right') ? 'flat-connector-before' : '';
     },
   },
@@ -35,14 +35,14 @@ export default {
 <template>
   <div
     class="linked-pipelines-column"
-    :class="columnCss"
+    :class="columnClass"
     >
     <div class="stage-name linked-pipelines-column-title"> {{ columnTitle }} </div>
     <div class="cross-project-triangle"></div>
     <ul>
       <linked-pipeline
         v-for="(pipeline, index) in linkedPipelines"
-        :class="flatConnectorCss(index)"
+        :class="flatConnectorClass(index)"
         :key="pipeline.id"
         :pipeline-id="pipeline.id"
         :project-name="pipeline.project.name"
