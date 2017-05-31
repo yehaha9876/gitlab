@@ -58,6 +58,9 @@
       hasTriggerer() {
         return !!this.state.triggerer.length;
       },
+      crossProjectPipelinesClass() {
+        return this.hasTriggered || this.hasTriggerer ? 'has-cross-project-pipelines' : '';
+      },
     },
     methods: {
       successCallback(response) {
@@ -107,10 +110,9 @@
         } else if (isLastStage && this.hasTriggered) {
           className += 'has-downstream';
         }
+
+        return className;
       },
-      crossProjectPipelinesClass() {
-        return this.hasTriggered || this.hasTriggerer ? 'has-cross-project-pipelines' : '';
-      }
     },
   };
 </script>

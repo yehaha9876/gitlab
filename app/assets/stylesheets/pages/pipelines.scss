@@ -1000,7 +1000,7 @@
   &.graph-position-left {
     margin-right: $linked-project-column-margin!important;
     .cross-project-triangle {
-      right: -55px;
+      right: -64px;
     }
   }
 
@@ -1015,7 +1015,7 @@
 
 
 .stage-column.has-upstream {
-  margin-left: 44px!important;
+  margin-left: $linked-project-column-margin!important;
 
   .left-connector {
     @extend .flat-connector-before;
@@ -1049,14 +1049,14 @@
   // apply custom dimensions to connector before and after for triangle arrow
   &.flat-connector-before {
     &::before {
-      left: -$linked-project-column-margin;
-      width: $linked-project-column-margin;
+      left: -$linked-project-column-margin!important;
+      width: $linked-project-column-margin!important;
     }
   }
 
   &::after {
-    right: -$linked-project-column-margin;
-    width: $linked-project-column-margin;
+    right: -$linked-project-column-margin!important;
+    width: $linked-project-column-margin!important;
   }
 
   .linked-pipeline-content {
