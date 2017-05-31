@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import LinkedPipelineComponent from '~/pipelines/components/graph/linked_pipeline.vue';
-import mockData from './mock_data';
+import mockData from './linked_pipelines_mock_data';
 
 const LinkedPipeline = Vue.extend(LinkedPipelineComponent);
 const mockPipeline = mockData.triggered[0];
 
-fdescribe('Linked pipeline', () => {
+describe('Linked pipeline', () => {
   beforeEach(() => {
     this.propsData = {
       pipelineId: mockPipeline.id,
@@ -28,12 +28,12 @@ fdescribe('Linked pipeline', () => {
   });
 
   it('should render a link', () => {
-    const linkElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-link');
+    const linkElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-content');
     expect(linkElement).not.toBeNull();
   });
 
   it('should link to the correct path', () => {
-    const linkElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-link');
+    const linkElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-content');
     expect(linkElement.getAttribute('href')).toBe(this.propsData.pipelinePath);
   });
 

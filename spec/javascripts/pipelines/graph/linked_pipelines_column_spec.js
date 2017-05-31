@@ -1,15 +1,15 @@
 import Vue from 'vue';
 import LinkedPipelinesColumn from '~/pipelines/components/graph/linked_pipelines_column.vue';
-import mockData from './mock_data';
+import mockData from './linked_pipelines_mock_data';
 
 const LinkedPipelinesColumnComponent = Vue.extend(LinkedPipelinesColumn);
 
-fdescribe('Linked Pipelines Column', () => {
+describe('Linked Pipelines Column', () => {
   beforeEach(() => {
     this.propsData = {
       columnTitle: 'Upstream',
       linkedPipelines: mockData.triggered,
-      connectedSide: 'right',
+      graphPosition: 'right',
     };
 
     this.linkedPipelinesColumn = new LinkedPipelinesColumnComponent({
@@ -35,8 +35,19 @@ fdescribe('Linked Pipelines Column', () => {
     expect(linkedPipelineElements.length).toBe(this.propsData.linkedPipelines.length);
   });
 
-  it('renders connectors on the correct side', () => {
-    // TODO:
+  describe('flatConnectorClass', () => {
+    beforeEach(() => {
+      this.flatConnectorClass = this.linkedPipelinesColumn.flatConnectorClass;
+    });
+
+    it('should return flat-connector-before for the first job on the right side of the graph', () => {
+      expect(this.flatConnectorClass(0)).toBe('flat-connector-before');
+    });
+
+    it('should return an empty string for subsequent jobs', () => {
+      expect(this.flatConnectorClass(1)).toBeFalsy();
+      expect(this.flatConnectorClass(99)).toBeFalsy();
+    });
   });
 });
 
