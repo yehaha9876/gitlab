@@ -20,7 +20,7 @@ class RepositoryUpdateMirrorWorker
       result = Projects::UpdateMirrorService.new(project, @current_user).execute
       if result[:status] == :error
         project.mark_import_as_failed(result[:message])
-        Rails.logger.error("#{self.class}: mirror update failed for project #{project.id}")
+        Rails.logger.error("#{self.class}: #{result[:message]}. Project ID: #{project.id}")
         return
       end
 
