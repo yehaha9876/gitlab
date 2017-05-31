@@ -20,6 +20,7 @@ class RepositoryUpdateMirrorWorker
       result = Projects::UpdateMirrorService.new(project, @current_user).execute
       if result[:status] == :error
         project.mark_import_as_failed(result[:message])
+        Rails.logger.error("RepositoryUpdateMirrorWorker: import failed for project #{project.id}")
         return
       end
 
@@ -27,6 +28,7 @@ class RepositoryUpdateMirrorWorker
     rescue => ex
       if project
         project.mark_import_as_failed("We're sorry, a temporary error occurred, please try again.")
+        Rails.logger.error("RepositoryUpdateMirrorWorker: import failed for project #{project.id}")
         raise UpdateMirrorError, "#{ex.class}: #{Gitlab::UrlSanitizer.sanitize(ex.message)}"
       end
     end
