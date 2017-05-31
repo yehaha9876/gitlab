@@ -999,13 +999,14 @@
 
   &.graph-position-left {
     margin-right: $linked-project-column-margin!important;
+
     .cross-project-triangle {
       right: -64px;
     }
   }
 
   &.graph-position-right {
-    margin-left: $linked-project-column-margin;
+    margin-left: $linked-project-column-margin!important;
 
     .cross-project-triangle {
       left: -64px;
