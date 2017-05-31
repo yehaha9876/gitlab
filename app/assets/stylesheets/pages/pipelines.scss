@@ -1,3 +1,30 @@
+@mixin flat-connector-before($length: 44px) {
+  &::before {
+    content: '';
+    position: absolute;
+    top: 48%;
+    left: -$length;
+    border-top: 2px solid $border-color;
+    width: $length;
+    height: 1px;
+  }
+}
+
+@mixin build-content($border-radius: 30px) {
+  display: inline-block;
+  padding: 8px 10px 9px;
+  width: 100%;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  background-color: $white-light;
+
+  &:hover {
+    background-color: $stage-hover-bg;
+    border: 1px solid $stage-hover-border;
+    color: $gl-text-color;
+  }
+}
+
 .pipelines {
   .stage {
     max-width: 90px;
@@ -377,7 +404,7 @@
         margin-left: 44px;
 
         .left-connector {
-          @extend .flat-connector-before;
+          @include flat-connector-before;
         }
       }
     }
@@ -533,20 +560,8 @@
     }
 
     .build-content {
-      display: inline-block;
-      padding: 8px 10px 9px;
-      width: 100%;
-      border: 1px solid $border-color;
-      border-radius: 30px;
-      background-color: $white-light;
-
-      &:hover {
-        background-color: $stage-hover-bg;
-        border: 1px solid $stage-hover-border;
-        color: $gl-text-color;
-      }
+      @include build-content();
     }
-
 
     // Connect first build in each stage with right horizontal line
     &:first-child {
@@ -979,12 +994,11 @@
   }
 }
 
-
 /**
  * Cross-project pipelines (applied conditionally to pipeline graph)
  */
 
-.has-cross-project-pipelines.stage-column-list {
+.has-linked-pipelines.stage-column-list {
   display: inline-block;
 }
 
@@ -1014,17 +1028,11 @@
   }
 }
 
-
 .stage-column.has-upstream {
   margin-left: $linked-project-column-margin!important;
 
   .left-connector {
-    @extend .flat-connector-before;
-
-    &::before {
-      left: -$linked-project-column-margin!important;
-      width: $linked-project-column-margin!important;
-    }
+    @include flat-connector-before($linked-project-column-margin);
   }
 }
 
@@ -1049,10 +1057,7 @@
 
   // apply custom dimensions to connector before and after for triangle arrow
   &.flat-connector-before {
-    &::before {
-      left: -$linked-project-column-margin!important;
-      width: $linked-project-column-margin!important;
-    }
+    @include flat-connector-before($linked-project-column-margin);
   }
 
   &::after {
@@ -1061,24 +1066,10 @@
   }
 
   .linked-pipeline-content {
-    @extend .build-content;
-
-    border-radius: 0!important;
+    @include build-content(0);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-}
-
-.flat-connector-before {
-  &::before {
-    content: '';
-    position: absolute;
-    top: 48%;
-    left: -44px;
-    border-top: 2px solid $border-color;
-    width: 44px;
-    height: 1px;
   }
 }
 

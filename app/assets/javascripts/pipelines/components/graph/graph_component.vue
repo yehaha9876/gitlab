@@ -58,8 +58,8 @@
       hasTriggerer() {
         return !!this.state.triggerer.length;
       },
-      crossProjectPipelinesClass() {
-        return this.hasTriggered || this.hasTriggerer ? 'has-cross-project-pipelines' : '';
+      linkedPipelinesClass() {
+        return this.hasTriggered || this.hasTriggerer ? 'has-linked-pipelines' : '';
       },
     },
     methods: {
@@ -136,7 +136,7 @@
       <ul
         v-if="!isLoading"
         class="stage-column-list"
-        :class="crossProjectPipelinesClass">
+        :class="linkedPipelinesClass">
         <stage-column-component
           v-for="(stage, index) in state.graph"
           :class="linkedPipelineClass(index)"
