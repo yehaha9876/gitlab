@@ -79,9 +79,15 @@ export default {
     },
   },
   updated() {
+    const link = this.$refs.link;
     const removeButton = this.$refs.removeButton;
+
+    if (link) {
+      $(link).tooltip('fixTitle');
+    }
+
     if (removeButton) {
-      $(this.$refs.removeButton).tooltip('fixTitle');
+      $(removeButton).tooltip('fixTitle');
     }
   },
 };
