@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170523091700) do
+ActiveRecord::Schema.define(version: 20170601163708) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -282,7 +282,8 @@ ActiveRecord::Schema.define(version: 20170523091700) do
     t.string "coverage_regex"
     t.integer "auto_canceled_by_id"
     t.boolean "retried"
-    t.integer "artifacts_storage"
+    t.integer "artifacts_file_store", default: 1, null: false
+    t.integer "artifacts_metadata_store", default: 1, null: false
   end
 
   add_index "ci_builds", ["auto_canceled_by_id"], name: "index_ci_builds_on_auto_canceled_by_id", using: :btree

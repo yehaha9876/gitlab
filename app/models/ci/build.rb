@@ -51,11 +51,6 @@ module Ci
     after_save :update_project_statistics, if: :artifacts_size_changed?
     after_destroy :update_project_statistics
 
-    enum artifacts_storage: { 
-      artifacts_storage_undefined: nil,
-      artifacts_storage_upgraded: 1,
-    }
-
     class << self
       # This is needed for url_for to work,
       # as the controller is JobsController
