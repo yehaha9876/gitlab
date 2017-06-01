@@ -3,15 +3,17 @@
 > [Introduced][ee-1797] in [GitLab Enterprise Edition Starter][ee] 9.3.
 
 Related issues are a bi-directional relationship between any two issues
-and appear in a block below the issue description.
+and appear in a block below the issue description. Issues can be across groups
+and projects.
 
-The relationship only shows up in the UI if the user has [permissions] to see both issues.
+The relationship only shows up in the UI if the user has write [permissions]
+to see both issues (`> Guest`).
 
 ## Adding a related issue
 
 You can relate one issue to the other by clicking the issue count badge "+" button
 in the header of the related issue block. Then use the input that will appear
-where you can type in the issue reference.
+where you can type in the issue reference or paste in a link to an issue.
 
 Valid references will be added to a temporary list that you can review.
 When ready, click the green "Add related issues" button to submit.
