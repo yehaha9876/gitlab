@@ -10,7 +10,7 @@ class ProfilesController < Profiles::ApplicationController
 
   def update
     user_params.except!(:email) if @user.ldap_user?
-    user_params.merge!(current_user: @user)
+    user_params[:current_user] = @user
 
     respond_to do |format|
       if @user.update_attributes(user_params)

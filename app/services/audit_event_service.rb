@@ -63,22 +63,22 @@ class AuditEventService
 
     @details =
       case @details[:action]
-        when :create
-          {
-            add: @details[:as] || @details[:column],
-            author_name: @author.name,
-            target_id: @entity.id,
-            target_type: @entity.class,
-            target_details: target_details
-          }
-        when :destroy
-          {
-            remove: @details[:as] || @details[:column],
-            author_name: @author.name,
-            target_id: @entity.id,
-            target_type: @entity.class,
-            target_details: target_details
-          }
+      when :create
+        {
+          add: @details[:as] || @details[:column],
+          author_name: @author.name,
+          target_id: @entity.id,
+          target_type: @entity.class,
+          target_details: target_details
+        }
+      when :destroy
+        {
+          remove: @details[:as] || @details[:column],
+          author_name: @author.name,
+          target_id: @entity.id,
+          target_type: @entity.class,
+          target_details: target_details
+        }
       end
 
     self

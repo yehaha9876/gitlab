@@ -4,7 +4,6 @@ module Audit
     attr_accessor :current_user
 
     module ClassMethods
-
       # Creates an audit entry for a column value change on a model
       #
       # Params:
@@ -21,7 +20,7 @@ module Audit
       # audit_changes :email, as: 'email address', column: :notification_email, skip_changes: true
       def audit_changes(column, options = {})
         column = options[:column] || column
-        options.merge!(action: :update)
+        options[:action] = :update
 
         after_update -> { audit_event(column, options) }, if: ->(model) do
           model.public_send("#{column}_changed?")

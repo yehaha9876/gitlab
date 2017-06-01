@@ -5,7 +5,7 @@ describe Audit::Changes do
     before do
       stub_const 'FooUser', create(:user)
       FooUser.class_eval do
-        include Audit::Changes
+        include described_class
         attr_accessor :email_test
         audit_changes :email_test, as: 'email_address', skip_changes: true
       end
@@ -36,7 +36,7 @@ describe Audit::Changes do
     before do
       stub_const 'FooUser', create(:user)
       FooUser.class_eval do
-        include Audit::Changes
+        include described_class
         attr_accessor :email_test
       end
     end
@@ -68,7 +68,7 @@ describe Audit::Changes do
     before do
       stub_const 'FooEmail', Email
       FooEmail.class_eval do
-        include Audit::Changes
+        include described_class
         attr_accessor :email_test
         audit_presence :email_test, as: 'email_address', skip_changes: true
       end
