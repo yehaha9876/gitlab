@@ -1,11 +1,12 @@
 require 'spec_helper'
 
+# rubocop:disable RSpec/DescribedClass:
 describe Audit::Changes do
   describe '.audit_changes' do
     before do
       stub_const 'FooUser', create(:user)
       FooUser.class_eval do
-        include described_class
+        include Audit::Changes
         attr_accessor :email_test
         audit_changes :email_test, as: 'email_address', skip_changes: true
       end
@@ -36,7 +37,7 @@ describe Audit::Changes do
     before do
       stub_const 'FooUser', create(:user)
       FooUser.class_eval do
-        include described_class
+        include Audit::Changes
         attr_accessor :email_test
       end
     end
@@ -68,7 +69,7 @@ describe Audit::Changes do
     before do
       stub_const 'FooEmail', Email
       FooEmail.class_eval do
-        include described_class
+        include Audit::Changes
         attr_accessor :email_test
         audit_presence :email_test, as: 'email_address', skip_changes: true
       end
@@ -96,3 +97,4 @@ describe Audit::Changes do
     end
   end
 end
+# rubocop:enable RSpec/DescribedClass:
