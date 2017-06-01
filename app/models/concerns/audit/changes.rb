@@ -76,9 +76,9 @@ module Audit
     private
 
     def error(quiet)
-      raise NotImplementedError, "#{self.class} has no current user assigned." unless quiet
-
       Rails.logger.warn("#{self.class} has no current user assigned. Caller: #{caller.join("\n")}")
+
+      raise NotImplementedError, "#{self.class} has no current user assigned." unless quiet
     end
 
     def log_event(options)

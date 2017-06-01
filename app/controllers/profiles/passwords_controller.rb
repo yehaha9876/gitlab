@@ -21,7 +21,8 @@ class Profiles::PasswordsController < Profiles::ApplicationController
     result = @user.update_attributes(
       password: new_password,
       password_confirmation: new_password_confirmation,
-      password_automatically_set: false
+      password_automatically_set: false,
+      current_user: current_user
     )
 
     if result
