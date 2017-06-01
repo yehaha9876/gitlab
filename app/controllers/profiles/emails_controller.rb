@@ -18,6 +18,7 @@ class Profiles::EmailsController < Profiles::ApplicationController
 
   def destroy
     @email = current_user.emails.find(params[:id])
+    @email.current_user = current_user
     @email.destroy
 
     current_user.update_secondary_emails!
@@ -31,6 +32,6 @@ class Profiles::EmailsController < Profiles::ApplicationController
   private
 
   def email_params
-    params.require(:email).permit(:email)
+    params.require(:email).permit(:email).merge(current_user: current_user)
   end
 end
