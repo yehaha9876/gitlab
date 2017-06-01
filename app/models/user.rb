@@ -279,7 +279,7 @@ class User < ActiveRecord::Base
 
         found
       else
-        super(*args)
+        super(tainted_conditions, opts)
       end
     end
     # EE-specific
