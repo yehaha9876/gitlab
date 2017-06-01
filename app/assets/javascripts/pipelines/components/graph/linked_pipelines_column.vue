@@ -20,7 +20,7 @@ export default {
     linkedPipeline,
   },
   computed: {
-    columnClass() {
+    columnId() {
       return `graph-position-${this.graphPosition}`;
     },
   },
@@ -35,7 +35,7 @@ export default {
 <template>
   <div
     class="linked-pipelines-column"
-    :id="columnClass"
+    :id="columnId"
     >
     <div class="stage-name linked-pipelines-column-title"> {{ columnTitle }} </div>
     <div class="cross-project-triangle"></div>
