@@ -24,7 +24,7 @@ export default {
     },
     hasTriggerer: {
       type: Boolean,
-      required: true,
+      required: false,
     },
   },
   components: {
