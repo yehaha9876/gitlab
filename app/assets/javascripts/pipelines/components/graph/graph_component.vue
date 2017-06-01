@@ -45,16 +45,19 @@
 
         // If it's the first stage column and only has one job
         if (index === 0 && stage.groups.length === 1) {
+          // and no upstream pipelines
           if (!this.hasTriggerer) {
             className = 'no-margin';
           } else {
             className = 'left-margin';
           }
+        // if there is only one job in the stage
+        } else if (stage.groups.length === 1) {
+          className = '';
         } else if (index > 0) {
           // If it is not the first column
           className = 'left-margin';
         }
-
         return className;
       },
       linkedPipelineClass(index) {
