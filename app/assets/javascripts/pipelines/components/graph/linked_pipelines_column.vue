@@ -35,7 +35,7 @@ export default {
 <template>
   <div
     class="linked-pipelines-column"
-    :class="columnClass"
+    :id="columnClass"
     >
     <div class="stage-name linked-pipelines-column-title"> {{ columnTitle }} </div>
     <div class="cross-project-triangle"></div>

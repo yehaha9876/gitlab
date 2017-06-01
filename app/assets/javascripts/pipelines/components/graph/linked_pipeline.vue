@@ -28,7 +28,7 @@ export default {
 </script>
 
 <template>
-  <li class="linked-pipeline">
+  <li class="linked-pipeline build">
     <div class="curve"></div>
     <div>
       <a :href="pipelinePath" class="linked-pipeline-content">
