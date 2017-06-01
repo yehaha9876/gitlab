@@ -26,7 +26,7 @@ describe Gitlab::GithubImport::UserFormatter, lib: true do
 
       it 'returns GitLab user id when any of user linked emails matches GitHub email' do
         gl_user = create(:user, email: 'johndoe@example.com')
-        create(:email, user: gl_user, email: octocat.email, current_user: create(:user))
+        create(:email, user: gl_user, email: octocat.email)
 
         expect(user.gitlab_id).to eq gl_user.id
       end

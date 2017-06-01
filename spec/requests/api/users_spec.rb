@@ -4,7 +4,7 @@ describe API::Users do
   let(:user)  { create(:user) }
   let(:admin) { create(:admin) }
   let(:key) { create(:key, user: user) }
-  let(:email) { create(:email, user: user, current_user: user) }
+  let(:email) { create(:email, user: user) }
   let(:omniauth_user) { create(:omniauth_user) }
   let(:ldap_user) { create(:omniauth_user, provider: 'ldapmain') }
   let(:ldap_blocked_user) { create(:omniauth_user, provider: 'ldapmain', state: 'ldap_blocked') }

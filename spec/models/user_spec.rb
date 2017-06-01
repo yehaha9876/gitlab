@@ -738,7 +738,7 @@ describe User, models: true do
     end
 
     it 'finds by secondary email' do
-      email = create(:email, email: 'foo@example.com', current_user: EE::FakeAuthor.new)
+      email = create(:email, email: 'foo@example.com')
       user  = email.user
 
       expect(User.find_by_any_email(email.email)).to eq user
@@ -795,7 +795,7 @@ describe User, models: true do
     let!(:user) { create(:user, name: 'John Doe', username: 'john.doe', email: 'john.doe@example.com' ) }
     let!(:another_user) { create(:user, name: 'Albert Smith', username: 'albert.smith', email: 'albert.smith@example.com' ) }
     let!(:email) do
-      create(:email, user: another_user, email: 'alias@example.com', current_user: EE::FakeAuthor.new)
+      create(:email, user: another_user, email: 'alias@example.com')
     end
 
     it 'returns users with a matching name' do
@@ -849,10 +849,10 @@ describe User, models: true do
     end
 
     it 'returns multiple users with matching secondary emails' do
-      email1 = create(:email, email: '1_testemail@example.com', current_user: EE::FakeAuthor.new)
-      email2 = create(:email, email: '2_testemail@example.com', current_user: EE::FakeAuthor.new)
-      email3 = create(:email, email: 'other@email.com', current_user: EE::FakeAuthor.new)
-      email3.user.update_attributes!(email: 'another@mail.com', current_user: EE::FakeAuthor.new)
+      email1 = create(:email, email: '1_testemail@example.com')
+      email2 = create(:email, email: '2_testemail@example.com')
+      email3 = create(:email, email: 'other@email.com')
+      email3.user.update_attributes!(email: 'another@mail.com', current_user: user)
 
       expect(
         search_with_secondary_emails('testemail@example.com').map(&:id)
