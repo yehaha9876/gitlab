@@ -14,7 +14,6 @@ module Audit
       # callback keeps the original unchanged)
       #   +skip_changes+:: Do not record what the attribute was has been
       # changed to. Useful for passwords.
-      #   +quiet+ Do not raise error when current user is missing
       #
       # Full example:
       # audit_changes :email, as: 'email address', column: :notification_email, skip_changes: true
@@ -35,7 +34,6 @@ module Audit
       #   +as+:: Human readable text for the column to display
       #   +column+:: Alternative column to monitor changes (if a gem or
       # callback keeps the original unchanged)
-      #   +quiet+ Do not raise error when current user is missing
       #
       # Full example:
       # audit_presence :email, as: 'email address', column: :notification_email
@@ -57,9 +55,7 @@ module Audit
     end
 
     def audit_event(column, options)
-      error(options[:quiet]) unless self.current_user
-
-      self.current_user ||= EE::SystemAuthor.new
+      audit_error unless self.current_user
 
       options.tap do |options_hash|
         options_hash[:column] = column
@@ -75,10 +71,14 @@ module Audit
 
     private
 
-    def error(quiet)
+    def audit_error
       Rails.logger.warn("#{self.class} has no current user assigned. Caller: #{caller.join("\n")}")
 
-      raise NotImplementedError, "#{self.class} has no current user assigned." unless quiet
+      raise NotImplementedError, <<-ERROR_TEXT
+#{self.class} has no current user assigned but it is being audited.
+Please set current_user to the author of the request that changes #{self.class}.
+If this is a system change, please set it to EE::SystemAuthor.new
+      ERROR_TEXT
     end
 
     def log_event(options)
