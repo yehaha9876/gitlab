@@ -275,7 +275,7 @@ class User < ActiveRecord::Base
     def find_first_by_auth_conditions(tainted_conditions, opts = {})
       if tainted_conditions.keys.include?('reset_password_token')
         found = super(tainted_conditions, opts)
-        found&.current_user = EE::FakeAuthor.new
+        found&.current_user = EE::SystemAuthor.new
 
         found
       else
@@ -541,7 +541,7 @@ class User < ActiveRecord::Base
     primary_email_record = emails.find_by(email: email)
     if primary_email_record
       primary_email_record.destroy
-      emails.create(email: email_was, current_user: current_user || FakeAuthor.new)
+      emails.create(email: email_was, current_user: current_user || SystemAuthor.new)
 
       update_secondary_emails!
     end

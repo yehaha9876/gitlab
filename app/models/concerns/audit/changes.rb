@@ -59,7 +59,7 @@ module Audit
     def audit_event(column, options)
       error(options[:quiet]) unless self.current_user
 
-      self.current_user ||= EE::FakeAuthor.new
+      self.current_user ||= EE::SystemAuthor.new
 
       options.tap do |options_hash|
         options_hash[:column] = column

@@ -1,5 +1,5 @@
 module EE
-  class FakeAuthor
+  class SystemAuthor
     FAKE_NAME = 'System'.freeze
 
     def id

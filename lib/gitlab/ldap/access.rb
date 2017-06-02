@@ -153,7 +153,7 @@ module Gitlab
         return false if user.email == ldap_email
 
         user.skip_reconfirmation!
-        user.update(email: ldap_email, current_user: EE::FakeAuthor.new)
+        user.update(email: ldap_email, current_user: EE::SystemAuthor.new)
       end
 
       delegate :sync_ssh_keys?, to: :ldap_config

@@ -65,7 +65,7 @@ module EE
 
     # Devise method overriden to set an author when Devise confirms a user
     def confirm(*args)
-      self.current_user = EE::FakeAuthor.new
+      self.current_user = EE::SystemAuthor.new
 
       super(*args)
     end
