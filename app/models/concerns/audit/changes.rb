@@ -12,8 +12,7 @@ module Audit
       #   +as+:: Human readable text for the column to display
       #   +column+:: Alternative column to monitor changes (if a gem or
       # callback keeps the original unchanged)
-      #   +skip_changes+:: Do not record what the attribute was has been
-      # changed to. Useful for passwords.
+      #   +skip_changes+:: Do not record what the attribute old and new values.
       #
       # Full example:
       # audit_changes :email, as: 'email address', column: :notification_email, skip_changes: true
@@ -82,13 +81,10 @@ If this is a system change, please set it to EE::SystemAuthor.new
     end
 
     def log_event(options)
-      if options[:action] == :update
-        AuditEventService.new(self.current_user, self, options).
-          for_changes.security_event
-      else
-        AuditEventService.new(self.current_user, self, options).
-          for_presence.security_event
-      end
+      audit_method = options[:action] == :update ? :for_changes : :for_presence
+
+      AuditEventService.new(self.current_user, self, options).
+        public_send(audit_method).security_event
     end
   end
 end
