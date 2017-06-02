@@ -541,7 +541,7 @@ class User < ActiveRecord::Base
     primary_email_record = emails.find_by(email: email)
     if primary_email_record
       primary_email_record.destroy
-      emails.create(email: email_was)
+      emails.create(email: email_was, current_user: current_user || FakeAuthor.new)
 
       update_secondary_emails!
     end
