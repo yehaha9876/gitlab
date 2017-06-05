@@ -1,20 +1,11 @@
 import Vue from 'vue';
-import RelatedIssuesRoot from '~/issuable/related_issues/components/related_issues_root.vue';
+import relatedIssuesRoot from '~/issuable/related_issues/components/related_issues_root.vue';
 import { FETCH_SUCCESS_STATUS } from '~/issuable/related_issues/constants';
 
 const defaultProps = {
   endpoint: '/foo/bar/issues/1/related_issues',
   currentNamespacePath: 'foo',
   currentProjectPath: 'bar',
-};
-
-const createComponent = (propsData = {}) => {
-  const Component = Vue.extend(RelatedIssuesRoot);
-
-  return new Component({
-    propsData,
-  })
-    .$mount();
 };
 
 const issuable1 = {
@@ -42,7 +33,13 @@ const issuable2 = {
 };
 
 describe('RelatedIssuesRoot', () => {
+  let RelatedIssuesRoot;
   let vm;
+
+  beforeEach(() => {
+    RelatedIssuesRoot = Vue.extend(relatedIssuesRoot);
+  });
+
   afterEach(() => {
     if (vm) {
       vm.$destroy();
@@ -52,7 +49,9 @@ describe('RelatedIssuesRoot', () => {
   describe('methods', () => {
     describe('onRelatedIssueRemoveRequest', () => {
       beforeEach(() => {
-        vm = createComponent(defaultProps);
+        vm = new RelatedIssuesRoot({
+          propsData: defaultProps,
+        }).$mount();
         vm.store.addToIssueMap(issuable1.id, issuable1);
         vm.store.setRelatedIssues([issuable1.id]);
       });
@@ -101,7 +100,9 @@ describe('RelatedIssuesRoot', () => {
 
     describe('onShowAddRelatedIssuesForm', () => {
       beforeEach(() => {
-        vm = createComponent(defaultProps);
+        vm = new RelatedIssuesRoot({
+          propsData: defaultProps,
+        }).$mount();
       });
 
       it('show add related issues form', () => {
@@ -113,7 +114,9 @@ describe('RelatedIssuesRoot', () => {
 
     describe('onAddIssuableFormIssuableRemoveRequest', () => {
       beforeEach(() => {
-        vm = createComponent(defaultProps);
+        vm = new RelatedIssuesRoot({
+          propsData: defaultProps,
+        }).$mount();
         vm.store.addToIssueMap(issuable1.id, issuable1);
         vm.store.setPendingRelatedIssues([issuable1.id]);
       });
@@ -127,7 +130,9 @@ describe('RelatedIssuesRoot', () => {
 
     describe('onAddIssuableFormSubmit', () => {
       beforeEach(() => {
-        vm = createComponent(defaultProps);
+        vm = new RelatedIssuesRoot({
+          propsData: defaultProps,
+        }).$mount();
         vm.store.addToIssueMap(issuable1.id, issuable1);
         vm.store.addToIssueMap(issuable2.id, issuable2);
       });
@@ -210,7 +215,9 @@ describe('RelatedIssuesRoot', () => {
 
     describe('onAddIssuableFormCancel', () => {
       beforeEach(() => {
-        vm = createComponent(defaultProps);
+        vm = new RelatedIssuesRoot({
+          propsData: defaultProps,
+        }).$mount();
         vm.isFormVisible = true;
         vm.inputValue = 'foo';
       });
@@ -232,7 +239,9 @@ describe('RelatedIssuesRoot', () => {
       };
 
       beforeEach(() => {
-        vm = createComponent(defaultProps);
+        vm = new RelatedIssuesRoot({
+          propsData: defaultProps,
+        }).$mount();
 
         Vue.http.interceptors.push(interceptor);
       });
@@ -258,7 +267,9 @@ describe('RelatedIssuesRoot', () => {
 
     describe('onAddIssuableFormInput', () => {
       beforeEach(() => {
-        vm = createComponent(defaultProps);
+        vm = new RelatedIssuesRoot({
+          propsData: defaultProps,
+        }).$mount();
       });
 
       it('fill in issue number reference and adds to pending related issues', () => {
@@ -320,7 +331,9 @@ describe('RelatedIssuesRoot', () => {
 
     describe('onAddIssuableFormBlur', () => {
       beforeEach(() => {
-        vm = createComponent(defaultProps);
+        vm = new RelatedIssuesRoot({
+          propsData: defaultProps,
+        }).$mount();
       });
 
       it('add valid reference to pending when blurring', () => {
@@ -342,7 +355,9 @@ describe('RelatedIssuesRoot', () => {
 
     describe('processIssuableReferences', () => {
       beforeEach(() => {
-        vm = createComponent(defaultProps);
+        vm = new RelatedIssuesRoot({
+          propsData: defaultProps,
+        }).$mount();
       });
 
       it('process issue number reference', () => {
