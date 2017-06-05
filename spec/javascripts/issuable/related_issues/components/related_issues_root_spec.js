@@ -28,7 +28,6 @@ const issuable1 = {
   fetchStatus: FETCH_SUCCESS_STATUS,
   destroy_relation_path: '/foo/bar/issues/123/related_issues/1',
 };
-const issuable1Reference = `${issuable1.namespace_full_path}/${issuable1.project_path}#${issuable1.iid}`;
 
 const issuable2 = {
   namespace_full_path: 'foo',
@@ -41,7 +40,6 @@ const issuable2 = {
   fetchStatus: FETCH_SUCCESS_STATUS,
   destroy_relation_path: '/foo/bar/issues/124/related_issues/1',
 };
-const issuable2Reference = `${issuable2.namespace_full_path}/${issuable2.project_path}#${issuable2.iid}`;
 
 describe('RelatedIssuesRoot', () => {
   let vm;
@@ -55,19 +53,21 @@ describe('RelatedIssuesRoot', () => {
     describe('onRelatedIssueRemoveRequest', () => {
       beforeEach(() => {
         vm = createComponent(defaultProps);
-        vm.store.addToIssueMap(issuable1Reference, issuable1);
-        vm.store.setRelatedIssues([issuable1Reference]);
+        vm.store.addToIssueMap(issuable1.id, issuable1);
+        vm.store.setRelatedIssues([issuable1.id]);
       });
 
       it('remove related issue and succeeds', (done) => {
         const interceptor = (request, next) => {
-          next(request.respondWith(JSON.stringify({}), {
+          next(request.respondWith(JSON.stringify({
+            issues: [],
+          }), {
             status: 200,
           }));
         };
         Vue.http.interceptors.push(interceptor);
 
-        vm.onRelatedIssueRemoveRequest(issuable1Reference);
+        vm.onRelatedIssueRemoveRequest(issuable1.id);
 
         setTimeout(() => {
           expect(vm.computedRelatedIssues).toEqual([]);
@@ -86,11 +86,11 @@ describe('RelatedIssuesRoot', () => {
         };
         Vue.http.interceptors.push(interceptor);
 
-        vm.onRelatedIssueRemoveRequest(issuable1Reference);
+        vm.onRelatedIssueRemoveRequest(issuable1.id);
 
         setTimeout(() => {
           expect(vm.computedRelatedIssues.length).toEqual(1);
-          expect(vm.computedRelatedIssues[0].reference).toEqual(issuable1Reference);
+          expect(vm.computedRelatedIssues[0].id).toEqual(issuable1.id);
 
           Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
 
@@ -114,12 +114,12 @@ describe('RelatedIssuesRoot', () => {
     describe('onAddIssuableFormIssuableRemoveRequest', () => {
       beforeEach(() => {
         vm = createComponent(defaultProps);
-        vm.store.addToIssueMap(issuable1Reference, issuable1);
-        vm.store.setPendingRelatedIssues([issuable1Reference]);
+        vm.store.addToIssueMap(issuable1.id, issuable1);
+        vm.store.setPendingRelatedIssues([issuable1.id]);
       });
 
       it('remove pending related issue', () => {
-        vm.onAddIssuableFormIssuableRemoveRequest(issuable1Reference);
+        vm.onAddIssuableFormIssuableRemoveRequest(issuable1.id);
 
         expect(vm.computedPendingRelatedIssues.length).toEqual(0);
       });
@@ -247,8 +247,8 @@ describe('RelatedIssuesRoot', () => {
         setTimeout(() => {
           Vue.nextTick(() => {
             expect(vm.computedRelatedIssues.length).toEqual(2);
-            expect(vm.computedRelatedIssues[0].reference).toEqual(issuable1Reference);
-            expect(vm.computedRelatedIssues[1].reference).toEqual(issuable2Reference);
+            expect(vm.computedRelatedIssues[0].id).toEqual(issuable1.id);
+            expect(vm.computedRelatedIssues[1].id).toEqual(issuable2.id);
 
             done();
           });
@@ -275,6 +275,15 @@ describe('RelatedIssuesRoot', () => {
 
         expect(vm.computedPendingRelatedIssues.length).toEqual(1);
         expect(vm.computedPendingRelatedIssues[0].reference).toEqual('asdf/qwer#444');
+      });
+
+      it('fill in with issue link', () => {
+        const link = 'http://localhost:3000/foo/bar/issues/111';
+        const input = `${link} `;
+        vm.onAddIssuableFormInput(input, input.length);
+
+        expect(vm.computedPendingRelatedIssues.length).toEqual(1);
+        expect(vm.computedPendingRelatedIssues[0].reference).toEqual(link);
       });
 
       it('fill in with multiple references', () => {
