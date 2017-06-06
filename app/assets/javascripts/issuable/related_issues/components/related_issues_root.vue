@@ -26,7 +26,7 @@ Your caret can stop touching a `rawReference` can happen in a variety of ways:
 
 ---
 
-We validate `rawReferences` client-side on their form, not actual existentance.
+We validate `rawReferences` client-side on their form, not actual existence.
 We only check existence, permissions when you actually submit the `pendingRelatedIssues`
 
 ---
