@@ -21,8 +21,8 @@ module SystemNoteHelper
     'outdated' => 'icon_edit',
     'approved' => 'icon_check',
     'unapproved' => 'icon_fa_close',
-    'relate' => 'icon_link',
-    'unrelate' => 'icon_chain_broken'
+    'relate' => 'icon_anchor',
+    'unrelate' => 'icon_anchor_broken'
   }.freeze
 
   def icon_for_system_note(note)
