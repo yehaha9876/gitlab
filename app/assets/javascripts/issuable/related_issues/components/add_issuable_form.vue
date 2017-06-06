@@ -81,6 +81,8 @@ export default {
 
   beforeDestroy() {
     const $input = $(this.$refs.input);
+    $input.off('shown-issues.atwho');
+    $input.off('hidden-issues.atwho');
     $input.off('inserted-issues.atwho', this.onInput);
   },
 };

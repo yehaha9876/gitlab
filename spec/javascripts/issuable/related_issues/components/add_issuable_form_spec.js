@@ -30,6 +30,10 @@ describe('AddIssuableForm', () => {
 
   afterEach(() => {
     if (vm) {
+      // Avoid any NPE errors from `@blur` being called
+      // after `vm.$destroy` in tests, https://github.com/vuejs/vue/issues/5829
+      document.activeElement.blur();
+
       vm.$destroy();
     }
   });
