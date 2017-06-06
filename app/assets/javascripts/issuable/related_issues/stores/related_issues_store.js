@@ -2,7 +2,7 @@ import {
   FETCH_SUCCESS_STATUS,
   FETCH_ERROR_STATUS,
 } from '../constants';
-import { assembleDisplayIssuableReference } from '../../../lib/utils/issuable_reference_utils';
+import assembleDisplayIssuableReference from '../../../lib/utils/assemble_display_issuable_reference';
 
 class RelatedIssuesStore {
   constructor() {

@@ -26,11 +26,6 @@ Your caret can stop touching a `rawReference` can happen in a variety of ways:
 
 ---
 
-We validate `rawReferences` client-side on their form, not actual existence.
-We only check existence, permissions when you actually submit the `pendingRelatedIssues`
-
----
-
 We avoid making duplicate requests by storing issue data in the `store -> issueMap`.
 We can check for the existence in the store and the `fetchStatus` of each issue inside.
 */
@@ -43,10 +38,6 @@ import RelatedIssuesService from '../services/related_issues_service';
 import {
   FETCH_SUCCESS_STATUS,
 } from '../constants';
-import {
-  ISSUABLE_REFERENCE_REGEX,
-  ISSUABLE_URL_REGEX,
-} from '../../../lib/utils/issuable_reference_utils';
 
 const SPACE_FACTOR = 1;
 
@@ -188,7 +179,7 @@ export default {
 
       let touchedReference;
       let iteratingPos = 0;
-      const untouchedReferences = rawReferences.filter((reference) => {
+      const untouchedRawReferences = rawReferences.filter((reference) => {
         let isTouched = false;
         if (caretPos >= iteratingPos && caretPos <= (iteratingPos + reference.length)) {
           touchedReference = reference;
@@ -200,49 +191,36 @@ export default {
         return !isTouched;
       });
 
-      const results = this.processIssuableReferences(untouchedReferences);
-      if (results.references.length > 0) {
-        this.store.setPendingRelatedIssues(
-          _.uniq(this.state.pendingRelatedIssues.concat(results.ids)),
-        );
-        const unprocessableString = results.unprocessableReferences.map(ref => `${ref} `).join('');
-        this.inputValue = `${unprocessableString}${touchedReference}`;
-      }
+      const ids = this.processPendingReferences(untouchedRawReferences);
+      this.store.setPendingRelatedIssues(
+        _.uniq(this.state.pendingRelatedIssues.concat(ids)),
+      );
+      this.inputValue = `${touchedReference}`;
     },
     onAddIssuableFormBlur(newValue) {
       const rawReferences = newValue.split(/\s+/);
-      const results = this.processIssuableReferences(rawReferences);
+      const ids = this.processPendingReferences(rawReferences);
       this.store.setPendingRelatedIssues(
-        _.uniq(this.state.pendingRelatedIssues.concat(results.ids)),
+        _.uniq(this.state.pendingRelatedIssues.concat(ids)),
       );
-      const unprocessableString = results.unprocessableReferences.join(' ');
-      this.inputValue = unprocessableString;
+      this.inputValue = '';
     },
-    processIssuableReferences(rawReferences) {
-      const references = rawReferences
-        .filter(reference => this.checkIsProcessable(reference));
-
-      const unprocessableReferences = rawReferences
-        .filter(reference => !this.checkIsProcessable(reference));
-
+    processPendingReferences(rawReferences) {
       // Add some temporary placeholders to lookup
-      const ids = references.map((reference) => {
-        const issueEntry = this.state.issueMap[reference];
-        const id = issueEntry ? issueEntry.id : `pending_${reference}`;
+      const ids = rawReferences
+        .filter(reference => reference.trim().length > 0)
+        .map((reference) => {
+          const id = `pending_${reference}`;
 
-        this.store.addToIssueMap(id, {
-          id,
-          reference,
+          this.store.addToIssueMap(id, {
+            id,
+            reference,
+          });
+
+          return id;
         });
 
-        return id;
-      });
-
-      return {
-        unprocessableReferences,
-        references,
-        ids,
-      };
+      return ids;
     },
     updateIssueMapFromServerResponse(serverIssues) {
       const serverRelatedIssueIds = serverIssues.map((issue) => {
@@ -265,9 +243,6 @@ export default {
 
         return item;
       });
-    },
-    checkIsProcessable(reference) {
-      return ISSUABLE_REFERENCE_REGEX.test(reference) || ISSUABLE_URL_REGEX.test(reference);
     },
   },
 

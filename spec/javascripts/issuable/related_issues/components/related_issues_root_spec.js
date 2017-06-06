@@ -307,25 +307,31 @@ describe('RelatedIssuesRoot', () => {
       });
 
       it('fill in with some invalid things', () => {
-        const input = 'something random stuff here ';
+        const input = 'something random ';
         vm.onAddIssuableFormInput(input, input.length);
 
-        expect(vm.computedPendingRelatedIssues.length).toEqual(0);
+        expect(vm.computedPendingRelatedIssues.length).toEqual(2);
+        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('something');
+        expect(vm.computedPendingRelatedIssues[1].reference).toEqual('random');
       });
 
       it('fill in invalid and some legit references', () => {
         const input = 'something random #123 ';
         vm.onAddIssuableFormInput(input, input.length);
 
-        expect(vm.computedPendingRelatedIssues.length).toEqual(1);
-        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('#123');
+        expect(vm.computedPendingRelatedIssues.length).toEqual(3);
+        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('something');
+        expect(vm.computedPendingRelatedIssues[1].reference).toEqual('random');
+        expect(vm.computedPendingRelatedIssues[2].reference).toEqual('#123');
       });
 
       it('keep reference piece in input while we are touching it', () => {
-        const input = 'a #123 b';
+        const input = 'a #123 b ';
         vm.onAddIssuableFormInput(input, 3);
 
-        expect(vm.computedPendingRelatedIssues.length).toEqual(0);
+        expect(vm.computedPendingRelatedIssues.length).toEqual(2);
+        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('a');
+        expect(vm.computedPendingRelatedIssues[1].reference).toEqual('b');
       });
     });
 
@@ -348,12 +354,13 @@ describe('RelatedIssuesRoot', () => {
         const input = 'asdf #123';
         vm.onAddIssuableFormBlur(input);
 
-        expect(vm.computedPendingRelatedIssues.length).toEqual(1);
-        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('#123');
+        expect(vm.computedPendingRelatedIssues.length).toEqual(2);
+        expect(vm.computedPendingRelatedIssues[0].reference).toEqual('asdf');
+        expect(vm.computedPendingRelatedIssues[1].reference).toEqual('#123');
       });
     });
 
-    describe('processIssuableReferences', () => {
+    describe('processPendingReferences', () => {
       beforeEach(() => {
         vm = new RelatedIssuesRoot({
           propsData: defaultProps,
@@ -362,29 +369,22 @@ describe('RelatedIssuesRoot', () => {
 
       it('process issue number reference', () => {
         const reference = '#123';
-        const result = vm.processIssuableReferences([reference]);
+        const ids = vm.processPendingReferences([reference]);
 
-        expect(result).toEqual({
-          unprocessableReferences: [],
-          references: [reference],
-          ids: jasmine.any(Array),
-        });
+        expect(ids).toEqual([
+          'pending_#123',
+        ]);
       });
 
       it('process multiple issue number references with some unprocecessable', () => {
         const rawReferences = '#123 abc #456'.split(/\s/);
-        const result = vm.processIssuableReferences(rawReferences);
+        const ids = vm.processPendingReferences(rawReferences);
 
-        expect(result).toEqual({
-          unprocessableReferences: [
-            'abc',
-          ],
-          references: [
-            rawReferences[0],
-            rawReferences[2],
-          ],
-          ids: jasmine.any(Array),
-        });
+        expect(ids).toEqual([
+          'pending_#123',
+          'pending_abc',
+          'pending_#456',
+        ]);
       });
     });
   });
