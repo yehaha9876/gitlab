@@ -22,7 +22,7 @@ export default {
       required: false,
       default: false,
     },
-    pendingRelatedIssues: {
+    pendingReferences: {
       type: Array,
       required: false,
       default: () => [],
@@ -125,7 +125,7 @@ export default {
         }">
         <add-issuable-form
           :input-value="inputValue"
-          :pending-issuables="pendingRelatedIssues"
+          :pending-references="pendingReferences"
           add-button-label="Add related issues"
           :auto-complete-sources="autoCompleteSources" />
       </div>
@@ -141,12 +141,12 @@ export default {
             <issue-token
               event-namespace="relatedIssue"
               :id-key="issue.id"
-              :display-reference="issue.displayReference"
+              :display-reference="issue.reference"
               :title="issue.title"
               :path="issue.path"
               :state="issue.state"
               :fetch-status="issue.fetchStatus"
-              :can-remove="issue.canRemove" />
+              :can-remove="true" />
           </li>
         </ul>
         </div>

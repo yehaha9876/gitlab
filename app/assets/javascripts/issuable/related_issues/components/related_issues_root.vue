@@ -8,9 +8,9 @@ Given `abc 123 zxc`, `rawReferences = ['abc', '123', 'zxc']`
 Consider you are typing `abc 123 zxc` in the input and your caret position is
 at position 4 right before the `123` `rawReference`. Then you type `#` and
 it becomes a valid reference, `#123`, but we don't want to jump it straight into
-`pendingRelatedIssues` because you could still want to type. Say you typed `999`
+`pendingReferences` because you could still want to type. Say you typed `999`
 and now we have `#999123`. Only when you move your caret away from that `rawReference`
-do we actually put it in the `pendingRelatedIssues`.
+do we actually put it in the `pendingReferences`.
 
 Your caret can stop touching a `rawReference` can happen in a variety of ways:
 
@@ -20,24 +20,16 @@ Your caret can stop touching a `rawReference` can happen in a variety of ways:
 ---
 
  - When you click the "Add related issues"(in the `AddIssuableForm`),
-   we submit the `pendingRelatedIssues` to the server and they come back as actual `relatedIssues`
- - When you click the "Cancel"(in the `AddIssuableForm`), we clear out `pendingRelatedIssues`
+   we submit the `pendingReferences` to the server and they come back as actual `relatedIssues`
+ - When you click the "Cancel"(in the `AddIssuableForm`), we clear out `pendingReferences`
    and hide the `AddIssuableForm` area.
 
----
-
-We avoid making duplicate requests by storing issue data in the `store -> issueMap`.
-We can check for the existence in the store and the `fetchStatus` of each issue inside.
 */
 
-import _ from 'underscore';
 import eventHub from '../event_hub';
 import RelatedIssuesBlock from './related_issues_block.vue';
 import RelatedIssuesStore from '../stores/related_issues_store';
 import RelatedIssuesService from '../services/related_issues_service';
-import {
-  FETCH_SUCCESS_STATUS,
-} from '../constants';
 
 const SPACE_FACTOR = 1;
 
@@ -84,20 +76,6 @@ export default {
   },
 
   computed: {
-    computedRelatedIssues() {
-      return this.store.getIssues(
-        this.state.relatedIssues,
-        this.currentNamespacePath,
-        this.currentProjectPath,
-      );
-    },
-    computedPendingRelatedIssues() {
-      return this.store.getIssues(
-        this.state.pendingRelatedIssues,
-        this.currentNamespacePath,
-        this.currentProjectPath,
-      );
-    },
     autoCompleteSources() {
       return gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources;
     },
@@ -105,155 +83,109 @@ export default {
 
   methods: {
     onRelatedIssueRemoveRequest(idToRemove) {
+      const issueToRemove = _.find(this.state.relatedIssues, issue => issue.id === idToRemove);
+
       this.store.removeRelatedIssue(idToRemove);
 
-      this.service.removeRelatedIssue(this.state.issueMap[idToRemove].destroy_relation_path)
-        .then(res => res.json())
-        .then((data) => {
-          const serverRelatedIssueIds = this.updateIssueMapFromServerResponse(data.issues);
-          this.store.setRelatedIssues(serverRelatedIssueIds);
-        })
-        .catch(() => {
-          // Restore issue we were unable to delete
-          this.store.setRelatedIssues(this.state.relatedIssues.concat(idToRemove));
+      if (issueToRemove) {
+        this.service.removeRelatedIssue(issueToRemove.destroy_relation_path)
+          .then(res => res.json())
+          .then((data) => {
+            this.store.setRelatedIssues(data.issues);
+          })
+          .catch(() => {
+            // Restore issue we were unable to delete
+            this.store.setRelatedIssues(this.state.relatedIssues.concat(issueToRemove));
 
-          // eslint-disable-next-line no-new
-          new Flash('An error occurred while removing related issues.');
-        });
+            // eslint-disable-next-line no-new
+            new Flash('An error occurred while removing related issues.');
+          });
+      } else {
+        // eslint-disable-next-line no-new
+        new Flash('We could not determine the path to remove the related issue');
+      }
     },
     onShowAddRelatedIssuesForm() {
       this.isFormVisible = true;
     },
-    onAddIssuableFormIssuableRemoveRequest(idToRemove) {
+    onPendingIssueRemoveRequest(idToRemove) {
       this.store.removePendingRelatedIssue(idToRemove);
     },
-    onAddIssuableFormSubmit() {
-      const currentPendingIssues = this.state.pendingRelatedIssues;
-      const currentRelatedIssues = this.state.relatedIssues;
-      if (currentPendingIssues.length > 0) {
-        const currentPendingReferences = this.computedPendingRelatedIssues.map(
-          issue => issue.reference,
-        );
-        this.service.addRelatedIssues(currentPendingReferences)
+    onPendingFormSubmit() {
+      const pendingReferences = this.state.pendingReferences;
+
+      if (pendingReferences.length > 0) {
+        this.service.addRelatedIssues(pendingReferences)
           .then(res => res.json())
           .then((data) => {
-            const serverRelatedIssueIds = this.updateIssueMapFromServerResponse(data.issues);
-            this.store.setRelatedIssues(serverRelatedIssueIds);
+            this.store.setpendingReferences([]);
+            this.store.setRelatedIssues(data.issues);
           })
           .catch((res) => {
-            // Something went wrong, so restore and tell them about it
-            this.store.setPendingRelatedIssues(
-              _.uniq(this.state.pendingRelatedIssues.concat(currentPendingIssues)),
-            );
-            // Remove the temporary relation
-            this.store.setRelatedIssues(currentRelatedIssues);
-
             // eslint-disable-next-line no-new
             new Flash(res.data.message || 'An error occurred while submitting related issues.');
           });
-
-        // Show the relation right away
-        this.store.setPendingRelatedIssues([]);
-        this.store.setRelatedIssues(
-          _.uniq(currentRelatedIssues.concat(currentPendingIssues)),
-        );
       }
     },
-    onAddIssuableFormCancel() {
+    onPendingFormCancel() {
       this.isFormVisible = false;
-      this.store.setPendingRelatedIssues([]);
+      this.store.setpendingReferences([]);
       this.inputValue = '';
     },
     fetchRelatedIssues() {
       this.service.fetchRelatedIssues()
         .then(res => res.json())
         .then((issues) => {
-          const serverRelatedIssueIds = this.updateIssueMapFromServerResponse(issues);
-          this.store.setRelatedIssues(serverRelatedIssueIds);
+          this.store.setRelatedIssues(issues);
         })
         .catch(() => new Flash('An error occurred while fetching related issues.'));
     },
 
-    onAddIssuableFormInput(newValue, caretPos) {
-      const rawReferences = newValue.split(/\s/);
+    onInput(newValue, caretPos) {
+      const rawReferences = newValue
+        .split(/\s/);
 
       let touchedReference;
       let iteratingPos = 0;
-      const untouchedRawReferences = rawReferences.filter((reference) => {
-        let isTouched = false;
-        if (caretPos >= iteratingPos && caretPos <= (iteratingPos + reference.length)) {
-          touchedReference = reference;
-          isTouched = true;
-        }
+      const untouchedRawReferences = rawReferences
+        .filter((reference) => {
+          let isTouched = false;
+          if (caretPos >= iteratingPos && caretPos <= (iteratingPos + reference.length)) {
+            touchedReference = reference;
+            isTouched = true;
+          }
 
-        // `+ SPACE_FACTOR` to factor in the missing space we split at earlier
-        iteratingPos = iteratingPos + reference.length + SPACE_FACTOR;
-        return !isTouched;
-      });
+          // `+ SPACE_FACTOR` to factor in the missing space we split at earlier
+          iteratingPos = iteratingPos + reference.length + SPACE_FACTOR;
+          return !isTouched;
+        })
+        .filter(reference => reference.trim().length > 0);
 
-      const ids = this.processPendingReferences(untouchedRawReferences);
-      this.store.setPendingRelatedIssues(
-        _.uniq(this.state.pendingRelatedIssues.concat(ids)),
+      this.store.setpendingReferences(
+        this.state.pendingReferences.concat(untouchedRawReferences),
       );
       this.inputValue = `${touchedReference}`;
     },
-    onAddIssuableFormBlur(newValue) {
-      const rawReferences = newValue.split(/\s+/);
-      const ids = this.processPendingReferences(rawReferences);
-      this.store.setPendingRelatedIssues(
-        _.uniq(this.state.pendingRelatedIssues.concat(ids)),
+    onBlur(newValue) {
+      const rawReferences = newValue
+        .split(/\s+/)
+        .filter(reference => reference.trim().length > 0);
+
+      this.store.setpendingReferences(
+        this.state.pendingReferences.concat(rawReferences),
       );
       this.inputValue = '';
-    },
-    processPendingReferences(rawReferences) {
-      // Add some temporary placeholders to lookup
-      const ids = rawReferences
-        .filter(reference => reference.trim().length > 0)
-        .map((reference) => {
-          const id = `pending_${reference}`;
-
-          this.store.addToIssueMap(id, {
-            id,
-            reference,
-          });
-
-          return id;
-        });
-
-      return ids;
-    },
-    updateIssueMapFromServerResponse(serverIssues) {
-      const serverRelatedIssueIds = serverIssues.map((issue) => {
-        this.store.addToIssueMap(issue.id, {
-          ...issue,
-          fetchStatus: FETCH_SUCCESS_STATUS,
-        });
-
-        return String(issue.id);
-      });
-
-      return serverRelatedIssueIds;
-    },
-
-    replaceInList(list, needle, replacement) {
-      return list.map((item) => {
-        if (item === needle) {
-          return replacement;
-        }
-
-        return item;
-      });
     },
   },
 
   created() {
     eventHub.$on('relatedIssue-removeRequest', this.onRelatedIssueRemoveRequest);
     eventHub.$on('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
-    eventHub.$on('pendingIssuable-removeRequest', this.onAddIssuableFormIssuableRemoveRequest);
-    eventHub.$on('addIssuableFormSubmit', this.onAddIssuableFormSubmit);
-    eventHub.$on('addIssuableFormCancel', this.onAddIssuableFormCancel);
-    eventHub.$on('addIssuableFormInput', this.onAddIssuableFormInput);
-    eventHub.$on('addIssuableFormBlur', this.onAddIssuableFormBlur);
+    eventHub.$on('pendingIssuable-removeRequest', this.onPendingIssueRemoveRequest);
+    eventHub.$on('addIssuableFormSubmit', this.onPendingFormSubmit);
+    eventHub.$on('addIssuableFormCancel', this.onPendingFormCancel);
+    eventHub.$on('addIssuableFormInput', this.onInput);
+    eventHub.$on('addIssuableFormBlur', this.onBlur);
 
     this.service = new RelatedIssuesService(this.endpoint);
     this.fetchRelatedIssues();
@@ -262,11 +194,11 @@ export default {
   beforeDestroy() {
     eventHub.$off('relatedIssue-removeRequest', this.onRelatedIssueRemoveRequest);
     eventHub.$off('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
-    eventHub.$off('pendingIssuable-removeRequest', this.onAddIssuableFormIssuableRemoveRequest);
-    eventHub.$off('addIssuableFormSubmit', this.onAddIssuableFormSubmit);
-    eventHub.$off('addIssuableFormCancel', this.onAddIssuableFormCancel);
-    eventHub.$off('addIssuableFormInput', this.onAddIssuableFormInput);
-    eventHub.$off('addIssuableFormBlur', this.onAddIssuableFormBlur);
+    eventHub.$off('pendingIssuable-removeRequest', this.onPendingIssueRemoveRequest);
+    eventHub.$off('addIssuableFormSubmit', this.onPendingFormSubmit);
+    eventHub.$off('addIssuableFormCancel', this.onPendingFormCancel);
+    eventHub.$off('addIssuableFormInput', this.onInput);
+    eventHub.$off('addIssuableFormBlur', this.onBlur);
   },
 };
 </script>
@@ -274,9 +206,9 @@ export default {
 <template>
   <related-issues-block
     :help-path="helpPath"
-    :related-issues="computedRelatedIssues"
+    :related-issues="state.relatedIssues"
     :can-add-related-issues="canAddRelatedIssues"
-    :pending-related-issues="computedPendingRelatedIssues"
+    :pending-references="state.pendingReferences"
     :is-form-visible="isFormVisible"
     :input-value="inputValue"
     :auto-complete-sources="autoCompleteSources" />

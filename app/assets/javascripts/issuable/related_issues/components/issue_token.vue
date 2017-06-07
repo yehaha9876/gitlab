@@ -11,7 +11,7 @@ export default {
 
   props: {
     idKey: {
-      type: String,
+      type: [String, Number],
       required: true,
     },
     displayReference: {

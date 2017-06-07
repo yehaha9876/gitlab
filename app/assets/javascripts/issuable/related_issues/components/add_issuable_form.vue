@@ -15,7 +15,7 @@ export default {
       type: String,
       required: true,
     },
-    pendingIssuables: {
+    pendingReferences: {
       type: Array,
       required: false,
       default: () => [],
@@ -98,17 +98,13 @@ export default {
       @click="onInputWrapperClick">
       <ul class="add-issuable-form-input-token-list">
         <li
-          :key="issuable.id"
-          v-for="issuable in pendingIssuables"
+          :key="reference"
+          v-for="reference in pendingReferences"
           class="js-add-issuable-form-token-list-item add-issuable-form-token-list-item">
           <issue-token
             event-namespace="pendingIssuable"
-            :id-key="issuable.id"
-            :display-reference="issuable.displayReference"
-            :title="issuable.title"
-            :path="issuable.path"
-            :state="issuable.state"
-            :fetch-status="issuable.fetchStatus"
+            :id-key="reference"
+            :display-reference="reference"
             :can-remove="true" />
         </li>
         <li class="add-issuable-form-input-list-item">

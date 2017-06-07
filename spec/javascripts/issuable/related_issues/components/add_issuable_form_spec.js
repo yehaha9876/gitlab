@@ -47,9 +47,9 @@ describe('AddIssuableForm', () => {
         propsData: {
           inputValue,
           addButtonLabel,
-          pendingIssuables: [
-            issuable1,
-            issuable2,
+          pendingReferences: [
+            issuable1.reference,
+            issuable2.reference,
           ],
         },
       }).$mount();
