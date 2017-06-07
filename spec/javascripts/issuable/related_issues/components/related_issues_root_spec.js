@@ -115,7 +115,7 @@ describe('RelatedIssuesRoot', () => {
       it('remove pending related issue', () => {
         expect(vm.state.pendingReferences.length).toEqual(1);
 
-        vm.onPendingIssueRemoveRequest(issuable1.reference);
+        vm.onPendingIssueRemoveRequest(0);
 
         expect(vm.state.pendingReferences.length).toEqual(0);
       });

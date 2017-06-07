@@ -99,11 +99,11 @@ export default {
       <ul class="add-issuable-form-input-token-list">
         <li
           :key="reference"
-          v-for="reference in pendingReferences"
+          v-for="(reference, index) in pendingReferences"
           class="js-add-issuable-form-token-list-item add-issuable-form-token-list-item">
           <issue-token
             event-namespace="pendingIssuable"
-            :id-key="reference"
+            :id-key="index"
             :display-reference="reference"
             :can-remove="true" />
         </li>

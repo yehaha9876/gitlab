@@ -92,8 +92,8 @@ export default {
     onShowAddRelatedIssuesForm() {
       this.isFormVisible = true;
     },
-    onPendingIssueRemoveRequest(idToRemove) {
-      this.store.removePendingRelatedIssue(idToRemove);
+    onPendingIssueRemoveRequest(indexToRemove) {
+      this.store.removePendingRelatedIssue(indexToRemove);
     },
     onPendingFormSubmit() {
       if (this.state.pendingReferences.length > 0) {

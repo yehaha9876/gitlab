@@ -6,7 +6,7 @@ export default {
 
   props: {
     idKey: {
-      type: [String, Number],
+      type: Number,
       required: true,
     },
     displayReference: {

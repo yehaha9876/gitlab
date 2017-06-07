@@ -76,7 +76,7 @@ describe('RelatedIssuesStore', () => {
       const relatedIssues = [issuable1.reference];
       store.state.pendingReferences = relatedIssues;
 
-      store.removePendingRelatedIssue(issuable1.reference);
+      store.removePendingRelatedIssue(0);
 
       expect(store.state.pendingReferences).toEqual([]);
     });
@@ -85,7 +85,7 @@ describe('RelatedIssuesStore', () => {
       const relatedIssues = [issuable1.reference, issuable2.reference];
       store.state.pendingReferences = relatedIssues;
 
-      store.removePendingRelatedIssue(issuable1.reference);
+      store.removePendingRelatedIssue(0);
 
       expect(store.state.pendingReferences).toEqual([issuable2.reference]);
     });

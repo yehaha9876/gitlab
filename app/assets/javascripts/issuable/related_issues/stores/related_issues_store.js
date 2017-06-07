@@ -20,9 +20,9 @@ class RelatedIssuesStore {
     this.state.pendingReferences = issues;
   }
 
-  removePendingRelatedIssue(referenceToRemove) {
+  removePendingRelatedIssue(indexToRemove) {
     this.state.pendingReferences =
-      this.state.pendingReferences.filter(reference => reference !== referenceToRemove);
+      this.state.pendingReferences.filter((reference, index) => index !== indexToRemove);
   }
 
 }
