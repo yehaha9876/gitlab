@@ -62,8 +62,8 @@ export default {
   },
 
   methods: {
-    showAddRelatedIssuesForm() {
-      eventHub.$emit('showAddRelatedIssuesForm');
+    toggleAddRelatedIssuesForm() {
+      eventHub.$emit('toggleAddRelatedIssuesForm');
     },
   },
 
@@ -108,7 +108,7 @@ export default {
               aria-label="Add an issue"
               data-toggle="tooltip"
               data-placement="top"
-              @click="showAddRelatedIssuesForm">
+              @click="toggleAddRelatedIssuesForm">
               <i
                 class="fa fa-plus"
                 aria-hidden="true">

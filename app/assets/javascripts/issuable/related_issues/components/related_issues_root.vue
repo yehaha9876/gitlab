@@ -89,8 +89,8 @@ export default {
         new Flash('We could not determine the path to remove the related issue');
       }
     },
-    onShowAddRelatedIssuesForm() {
-      this.isFormVisible = true;
+    onToggleAddRelatedIssuesForm() {
+      this.isFormVisible = !this.isFormVisible;
     },
     onPendingIssueRemoveRequest(indexToRemove) {
       this.store.removePendingRelatedIssue(indexToRemove);
@@ -159,7 +159,7 @@ export default {
 
   created() {
     eventHub.$on('relatedIssue-removeRequest', this.onRelatedIssueRemoveRequest);
-    eventHub.$on('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
+    eventHub.$on('toggleAddRelatedIssuesForm', this.onToggleAddRelatedIssuesForm);
     eventHub.$on('pendingIssuable-removeRequest', this.onPendingIssueRemoveRequest);
     eventHub.$on('addIssuableFormSubmit', this.onPendingFormSubmit);
     eventHub.$on('addIssuableFormCancel', this.onPendingFormCancel);
@@ -172,7 +172,7 @@ export default {
 
   beforeDestroy() {
     eventHub.$off('relatedIssue-removeRequest', this.onRelatedIssueRemoveRequest);
-    eventHub.$off('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
+    eventHub.$off('toggleAddRelatedIssuesForm', this.onToggleAddRelatedIssuesForm);
     eventHub.$off('pendingIssuable-removeRequest', this.onPendingIssueRemoveRequest);
     eventHub.$off('addIssuableFormSubmit', this.onPendingFormSubmit);
     eventHub.$off('addIssuableFormCancel', this.onPendingFormCancel);

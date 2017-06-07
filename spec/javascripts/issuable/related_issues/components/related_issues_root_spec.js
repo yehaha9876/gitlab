@@ -90,17 +90,25 @@ describe('RelatedIssuesRoot', () => {
       });
     });
 
-    describe('onShowAddRelatedIssuesForm', () => {
+    describe('onToggleAddRelatedIssuesForm', () => {
       beforeEach(() => {
         vm = new RelatedIssuesRoot({
           propsData: defaultProps,
         }).$mount();
       });
 
-      it('show add related issues form', () => {
-        vm.onShowAddRelatedIssuesForm();
+      it('toggle related issues form to visible', () => {
+        vm.onToggleAddRelatedIssuesForm();
 
         expect(vm.isFormVisible).toEqual(true);
+      });
+
+      it('show add related issues form to hidden', () => {
+        vm.isFormVisible = true;
+
+        vm.onToggleAddRelatedIssuesForm();
+
+        expect(vm.isFormVisible).toEqual(false);
       });
     });
 
