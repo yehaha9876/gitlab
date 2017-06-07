@@ -38,6 +38,12 @@ export default {
     issueToken: IssueToken,
   },
 
+  computed: {
+    isSubmitButtonDisabled() {
+      return this.pendingReferences.length === 0;
+    },
+  },
+
   methods: {
     onInput() {
       const value = this.$refs.input.value;
@@ -125,7 +131,8 @@ export default {
         ref="addButton"
         type="button"
         class="js-add-issuable-form-add-button btn btn-new pull-left"
-        @click="onFormSubmit">
+        @click="onFormSubmit"
+        :disabled="isSubmitButtonDisabled">
         {{ addButtonLabel }}
       </button>
       <button
