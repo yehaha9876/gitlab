@@ -7,6 +7,11 @@ export default {
   name: 'RelatedIssuesBlock',
 
   props: {
+    isFetching: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     relatedIssues: {
       type: Array,
       required: false,
@@ -83,37 +88,47 @@ export default {
       <div
         class="panel-heading"
         :class="{ 'panel-empty-heading': !this.hasRelatedIssues }">
-        <h3 class="panel-title">
-          Related issues
-          <a
-            v-if="hasHelpPath"
-            :href="helpPath">
-            <i
-              class="related-issues-header-help-icon fa fa-question-circle"
-              aria-label="Read more about related issues">
-            </i>
-          </a>
-          <div class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge">
-            <span
-              class="issue-count-badge-count"
-              :class="{ 'has-btn': this.canAddRelatedIssues }">
-              {{ relatedIssueCount }}
-            </span>
-            <button
-              ref="issueCountBadgeAddButton"
-              v-if="canAddRelatedIssues"
-              type="button"
-              class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-small btn-default"
-              title="Add an issue"
-              aria-label="Add an issue"
-              data-toggle="tooltip"
-              data-placement="top"
-              @click="toggleAddRelatedIssuesForm">
+        <h3 class="panel-title related-issues-panel-title">
+          <div>
+            Related issues
+            <a
+              v-if="hasHelpPath"
+              :href="helpPath">
               <i
-                class="fa fa-plus"
-                aria-hidden="true">
+                class="related-issues-header-help-icon fa fa-question-circle"
+                aria-label="Read more about related issues">
               </i>
-            </button>
+            </a>
+            <div class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge">
+              <span
+                class="issue-count-badge-count"
+                :class="{ 'has-btn': this.canAddRelatedIssues }">
+                {{ relatedIssueCount }}
+              </span>
+              <button
+                ref="issueCountBadgeAddButton"
+                v-if="canAddRelatedIssues"
+                type="button"
+                class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-small btn-default"
+                title="Add an issue"
+                aria-label="Add an issue"
+                data-toggle="tooltip"
+                data-placement="top"
+                @click="toggleAddRelatedIssuesForm">
+                <i
+                  class="fa fa-plus"
+                  aria-hidden="true">
+                </i>
+              </button>
+            </div>
+          </div>
+          <div>
+            <i
+              ref="loadingIcon"
+              v-if="isFetching"
+              class="fa fa-spinner fa-spin"
+              aria-label="Fetching related issues">
+            </i>
           </div>
         </h3>
       </div>

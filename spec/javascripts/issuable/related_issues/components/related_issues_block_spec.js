@@ -46,6 +46,24 @@ describe('RelatedIssuesBlock', () => {
     it('add related issues form is hidden', () => {
       expect(vm.$el.querySelector('.js-add-related-issues-form-area')).toBeNull();
     });
+
+    it('should not show loading icon', () => {
+      expect(vm.$refs.loadingIcon).toBeUndefined();
+    });
+  });
+
+  describe('with isFetching=true', () => {
+    beforeEach(() => {
+      vm = new RelatedIssuesBlock({
+        propsData: {
+          isFetching: true,
+        },
+      }).$mount();
+    });
+
+    it('should show loading icon', () => {
+      expect(vm.$refs.loadingIcon).toBeDefined();
+    });
   });
 
   describe('with canAddRelatedIssues=true', () => {
@@ -94,7 +112,7 @@ describe('RelatedIssuesBlock', () => {
   });
 
   describe('methods', () => {
-    let showAddRelatedIssuesFormSpy;
+    let toggleAddRelatedIssuesFormSpy;
 
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
@@ -104,18 +122,18 @@ describe('RelatedIssuesBlock', () => {
           ],
         },
       }).$mount();
-      showAddRelatedIssuesFormSpy = jasmine.createSpy('spy');
-      eventHub.$on('showAddRelatedIssuesForm', showAddRelatedIssuesFormSpy);
+      toggleAddRelatedIssuesFormSpy = jasmine.createSpy('spy');
+      eventHub.$on('toggleAddRelatedIssuesForm', toggleAddRelatedIssuesFormSpy);
     });
 
     afterEach(() => {
-      eventHub.$off('showAddRelatedIssuesForm', showAddRelatedIssuesFormSpy);
+      eventHub.$off('toggleAddRelatedIssuesForm', toggleAddRelatedIssuesFormSpy);
     });
 
     it('when expanding add related issue form', () => {
-      expect(showAddRelatedIssuesFormSpy).not.toHaveBeenCalled();
-      vm.showAddRelatedIssuesForm();
-      expect(showAddRelatedIssuesFormSpy).toHaveBeenCalled();
+      expect(toggleAddRelatedIssuesFormSpy).not.toHaveBeenCalled();
+      vm.toggleAddRelatedIssuesForm();
+      expect(toggleAddRelatedIssuesFormSpy).toHaveBeenCalled();
     });
   });
 });

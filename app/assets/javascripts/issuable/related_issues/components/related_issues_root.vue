@@ -58,6 +58,7 @@ export default {
 
     return {
       state: this.store.state,
+      isFetching: false,
       isFormVisible: false,
       inputValue: '',
     };
@@ -116,10 +117,12 @@ export default {
       this.inputValue = '';
     },
     fetchRelatedIssues() {
+      this.isFetching = true;
       this.service.fetchRelatedIssues()
         .then(res => res.json())
         .then((issues) => {
           this.store.setRelatedIssues(issues);
+          this.isFetching = false;
         })
         .catch(() => new Flash('An error occurred while fetching related issues.'));
     },
@@ -189,6 +192,7 @@ export default {
 <template>
   <related-issues-block
     :help-path="helpPath"
+    :isFetching="isFetching"
     :related-issues="state.relatedIssues"
     :can-add-related-issues="canAddRelatedIssues"
     :pending-references="state.pendingReferences"

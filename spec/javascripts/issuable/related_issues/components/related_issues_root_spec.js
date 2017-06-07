@@ -231,34 +231,64 @@ describe('RelatedIssuesRoot', () => {
     });
 
     describe('fetchRelatedIssues', () => {
-      const interceptor = (request, next) => {
-        next(request.respondWith(JSON.stringify([issuable1, issuable2]), {
-          status: 200,
-        }));
-      };
-
       beforeEach(() => {
         vm = new RelatedIssuesRoot({
           propsData: defaultProps,
         }).$mount();
-
-        Vue.http.interceptors.push(interceptor);
       });
 
-      afterEach(() => {
-        Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
+      describe('when the network has not responded yet', () => {
+        it('should be fetching', (done) => {
+          vm.fetchRelatedIssues();
+
+          setTimeout(() => {
+            Vue.nextTick(() => {
+              expect(vm.isFetching).toEqual(true);
+
+              done();
+            });
+          });
+        });
       });
 
-      it('fetching related issues', (done) => {
-        vm.fetchRelatedIssues();
+      describe('when the network responds', () => {
+        const interceptor = (request, next) => {
+          next(request.respondWith(JSON.stringify([issuable1, issuable2]), {
+            status: 200,
+          }));
+        };
 
-        setTimeout(() => {
-          Vue.nextTick(() => {
-            expect(vm.state.relatedIssues.length).toEqual(2);
-            expect(vm.state.relatedIssues[0].id).toEqual(issuable1.id);
-            expect(vm.state.relatedIssues[1].id).toEqual(issuable2.id);
+        beforeEach(() => {
+          Vue.http.interceptors.push(interceptor);
+        });
 
-            done();
+        afterEach(() => {
+          Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
+        });
+
+        it('should be done fetching', (done) => {
+          vm.fetchRelatedIssues();
+
+          setTimeout(() => {
+            Vue.nextTick(() => {
+              expect(vm.isFetching).toEqual(false);
+
+              done();
+            });
+          });
+        });
+
+        it('should fetch related issues', (done) => {
+          vm.fetchRelatedIssues();
+
+          setTimeout(() => {
+            Vue.nextTick(() => {
+              expect(vm.state.relatedIssues.length).toEqual(2);
+              expect(vm.state.relatedIssues[0].id).toEqual(issuable1.id);
+              expect(vm.state.relatedIssues[1].id).toEqual(issuable2.id);
+
+              done();
+            });
           });
         });
       });

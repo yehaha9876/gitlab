@@ -2,6 +2,11 @@
   margin-top: $gl-vert-padding;
 }
 
+.related-issues-panel-title {
+  display: flex;
+  justify-content: space-between;
+}
+
 .related-issues-header-help-icon {
   margin-left: 0.25em;
   color: $gl-text-color-secondary;
