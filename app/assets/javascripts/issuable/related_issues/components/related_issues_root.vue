@@ -100,8 +100,12 @@ export default {
         this.service.addRelatedIssues(this.state.pendingReferences)
           .then(res => res.json())
           .then((data) => {
+            // We could potentially lose some pending issues in the interim here
             this.store.setPendingReferences([]);
             this.store.setRelatedIssues(data.issues);
+
+            // Close the form on submission
+            this.isFormVisible = false;
           })
           .catch(res => new Flash(res.data.message || 'An error occurred while submitting related issues.'));
       }
