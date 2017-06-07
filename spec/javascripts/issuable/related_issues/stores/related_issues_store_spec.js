@@ -58,14 +58,14 @@ describe('RelatedIssuesStore', () => {
     });
   });
 
-  describe('setpendingReferences', () => {
+  describe('setPendingReferences', () => {
     it('defaults to empty array', () => {
       expect(store.state.pendingReferences).toEqual([]);
     });
 
     it('add reference', () => {
       const relatedIssues = [issuable1.reference];
-      store.setpendingReferences(relatedIssues);
+      store.setPendingReferences(relatedIssues);
 
       expect(store.state.pendingReferences).toEqual(relatedIssues);
     });

@@ -41,14 +41,6 @@ export default {
       type: String,
       required: true,
     },
-    currentNamespacePath: {
-      type: String,
-      required: true,
-    },
-    currentProjectPath: {
-      type: String,
-      required: true,
-    },
     canAddRelatedIssues: {
       type: Boolean,
       required: false,
@@ -85,21 +77,13 @@ export default {
     onRelatedIssueRemoveRequest(idToRemove) {
       const issueToRemove = _.find(this.state.relatedIssues, issue => issue.id === idToRemove);
 
-      this.store.removeRelatedIssue(idToRemove);
-
       if (issueToRemove) {
         this.service.removeRelatedIssue(issueToRemove.destroy_relation_path)
           .then(res => res.json())
           .then((data) => {
             this.store.setRelatedIssues(data.issues);
           })
-          .catch(() => {
-            // Restore issue we were unable to delete
-            this.store.setRelatedIssues(this.state.relatedIssues.concat(issueToRemove));
-
-            // eslint-disable-next-line no-new
-            new Flash('An error occurred while removing related issues.');
-          });
+          .catch(() => new Flash('An error occurred while removing related issues.'));
       } else {
         // eslint-disable-next-line no-new
         new Flash('We could not determine the path to remove the related issue');
@@ -112,24 +96,19 @@ export default {
       this.store.removePendingRelatedIssue(idToRemove);
     },
     onPendingFormSubmit() {
-      const pendingReferences = this.state.pendingReferences;
-
-      if (pendingReferences.length > 0) {
-        this.service.addRelatedIssues(pendingReferences)
+      if (this.state.pendingReferences.length > 0) {
+        this.service.addRelatedIssues(this.state.pendingReferences)
           .then(res => res.json())
           .then((data) => {
-            this.store.setpendingReferences([]);
+            this.store.setPendingReferences([]);
             this.store.setRelatedIssues(data.issues);
           })
-          .catch((res) => {
-            // eslint-disable-next-line no-new
-            new Flash(res.data.message || 'An error occurred while submitting related issues.');
-          });
+          .catch(res => new Flash(res.data.message || 'An error occurred while submitting related issues.'));
       }
     },
     onPendingFormCancel() {
       this.isFormVisible = false;
-      this.store.setpendingReferences([]);
+      this.store.setPendingReferences([]);
       this.inputValue = '';
     },
     fetchRelatedIssues() {
@@ -161,7 +140,7 @@ export default {
         })
         .filter(reference => reference.trim().length > 0);
 
-      this.store.setpendingReferences(
+      this.store.setPendingReferences(
         this.state.pendingReferences.concat(untouchedRawReferences),
       );
       this.inputValue = `${touchedReference}`;
@@ -171,7 +150,7 @@ export default {
         .split(/\s+/)
         .filter(reference => reference.trim().length > 0);
 
-      this.store.setpendingReferences(
+      this.store.setPendingReferences(
         this.state.pendingReferences.concat(rawReferences),
       );
       this.inputValue = '';

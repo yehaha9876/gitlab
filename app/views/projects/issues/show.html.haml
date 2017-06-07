@@ -70,8 +70,6 @@
 
     - if can?(current_user, :read_issue_link, @project)
       .js-related-issues-root{ data: { endpoint: namespace_project_issue_links_path(@project.namespace, @project, @issue),
-        namespace: @project.namespace.path,
-        project: @project.path,
         can_add_related_issues: "#{can?(current_user, :update_issue, @issue)}",
         help_path: help_page_path('user/project/issues/related_issues') } }
 

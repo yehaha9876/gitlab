@@ -16,7 +16,7 @@ class RelatedIssuesStore {
     this.state.relatedIssues = this.state.relatedIssues.filter(issue => issue.id !== idToRemove);
   }
 
-  setpendingReferences(issues) {
+  setPendingReferences(issues) {
     this.state.pendingReferences = issues;
   }
 

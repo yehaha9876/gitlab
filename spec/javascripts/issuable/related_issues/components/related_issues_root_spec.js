@@ -109,7 +109,7 @@ describe('RelatedIssuesRoot', () => {
         vm = new RelatedIssuesRoot({
           propsData: defaultProps,
         }).$mount();
-        vm.store.setpendingReferences([issuable1.reference]);
+        vm.store.setPendingReferences([issuable1.reference]);
       });
 
       it('remove pending related issue', () => {
@@ -129,7 +129,7 @@ describe('RelatedIssuesRoot', () => {
       });
 
       it('submit zero pending issue as related issue', (done) => {
-        vm.store.setpendingReferences([]);
+        vm.store.setPendingReferences([]);
         vm.onPendingFormSubmit();
 
         setTimeout(() => {
@@ -156,7 +156,7 @@ describe('RelatedIssuesRoot', () => {
         };
         Vue.http.interceptors.push(interceptor);
 
-        vm.store.setpendingReferences([issuable1.reference]);
+        vm.store.setPendingReferences([issuable1.reference]);
         vm.onPendingFormSubmit();
 
         setTimeout(() => {
@@ -186,7 +186,7 @@ describe('RelatedIssuesRoot', () => {
         };
         Vue.http.interceptors.push(interceptor);
 
-        vm.store.setpendingReferences([issuable1.reference, issuable2.reference]);
+        vm.store.setPendingReferences([issuable1.reference, issuable2.reference]);
         vm.onPendingFormSubmit();
 
         setTimeout(() => {
