@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 9.0.10 (2017-06-07)
+
+- No changes.
+
 ## 9.0.9 (2017-06-02)
 
 - No changes.
