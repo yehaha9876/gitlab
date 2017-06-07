@@ -336,7 +336,6 @@ ul.related-merge-requests > li {
   display: flex;
   align-items: baseline;
   padding-left: 0.5em;
-  padding-right: 0.5em;
   background-color: $gray-normal;
   color: $gl-text-color-secondary;
   transition: background $general-hover-transition-duration $general-hover-transition-curve;
@@ -351,6 +350,10 @@ ul.related-merge-requests > li {
   }
 }
 
+.issue-token-title-standalone {
+  padding-right: 0.5em;
+}
+
 .issue-token-title-text {
   overflow: hidden;
   max-width: 264px;
@@ -358,23 +361,21 @@ ul.related-merge-requests > li {
 }
 
 .issue-token-remove-button {
-  padding: 0 0.5em 0 0;
+  padding: 0 0.5em;
   background-color: $gray-normal;
   border: 0;
   color: $gl-text-color-secondary;
   transition: background $general-hover-transition-duration $general-hover-transition-curve;
 
+  &:hover,
+  &:focus,
   .issue-token:hover &,
   .issue-token-link:focus + & {
     background-color: $border-gray-normal;
+    outline: none;
   }
 
   & > .fa {
     font-size: 0.9em;
   }
-}
-
-// When there isn't a title
-.issue-token-remove-button-standalone {
-  padding-left: 0.5em;
 }

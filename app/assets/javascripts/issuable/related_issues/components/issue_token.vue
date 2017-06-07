@@ -104,7 +104,8 @@ export default {
       <span
         v-if="hasTitle"
         ref="title"
-        class="js-issue-token-title issue-token-title">
+        class="js-issue-token-title issue-token-title"
+        :class="{ 'issue-token-title-standalone': !canRemove }">
         <span class="issue-token-title-text">
           {{ title }}
         </span>
@@ -115,7 +116,6 @@ export default {
       v-if="canRemove"
       type="button"
       class="js-issue-token-remove-button issue-token-remove-button"
-      :class="{ 'issue-token-remove-button-standalone': !hasTitle }"
       :title="removeButtonLabel"
       data-toggle="tooltip"
       @click="onRemoveRequest">
