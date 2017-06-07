@@ -52,8 +52,13 @@ describe Geo::GeoBackfillWorker, services: true do
       subject.perform
     end
 
+<<<<<<< HEAD:spec/workers/geo/geo_backfill_worker_spec.rb
     it 'does not perform Geo::RepositoryBackfillService when tracking DB is not available' do
       allow(Rails.configuration).to receive(:respond_to?).with(:geo_database) { false }
+=======
+    it 'does not perform Geo::RepositorySyncService when secondary role is disabled' do
+      allow(Gitlab::Geo).to receive(:secondary_role_enabled?) { false }
+>>>>>>> 818f065... Merge branch '2181-fix-secondary-node-settings-changed' into 'master':spec/workers/geo_repository_sync_worker_spec.rb
 
       expect(Geo::RepositoryBackfillService).not_to receive(:new)
 
