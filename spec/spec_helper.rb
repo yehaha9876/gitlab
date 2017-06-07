@@ -69,6 +69,10 @@ RSpec.configure do |config|
     TestEnv.init
   end
 
+  config.after(:context) do
+    puts "GC statistics: #{GC.stat}"
+  end
+
   config.before(:all) do
     License.destroy_all
     TestLicense.init
