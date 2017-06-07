@@ -308,20 +308,11 @@ ul.related-merge-requests > li {
   background-color: $gray-lighter;
   transition: background $general-hover-transition-duration $general-hover-transition-curve, color $general-hover-transition-duration $general-hover-transition-curve;
 
-  .issue-token-error & {
-    background-color: $red-50;
-  }
-
   .issue-token:hover &,
   .issue-token-link:focus > & {
     background-color: $gray-normal;
     color: $gl-link-hover-color;
     text-decoration: none;
-  }
-
-  .issue-token-error:hover &,
-  .issue-token-error > .issue-token-link:focus > & {
-    background-color: $red-75;
   }
 }
 
@@ -350,18 +341,9 @@ ul.related-merge-requests > li {
   color: $gl-text-color-secondary;
   transition: background $general-hover-transition-duration $general-hover-transition-curve;
 
-  .issue-token-error & {
-    background-color: $red-75;
-  }
-
   .issue-token:hover &,
   .issue-token-link:focus > & {
     background-color: $border-gray-normal;
-  }
-
-  .issue-token-error:hover &,
-  .issue-token-error > .issue-token-link:focus > & {
-    background-color: $red-100;
   }
 
   & > .fa {
@@ -382,18 +364,9 @@ ul.related-merge-requests > li {
   color: $gl-text-color-secondary;
   transition: background $general-hover-transition-duration $general-hover-transition-curve;
 
-  .issue-token-error & {
-    background-color: $red-75;
-  }
-
   .issue-token:hover &,
   .issue-token-link:focus + & {
     background-color: $border-gray-normal;
-  }
-
-  .issue-token-error:hover &,
-  .issue-token-error > .issue-token-link:focus > & {
-    background-color: $red-100;
   }
 
   & > .fa {

@@ -145,7 +145,6 @@ export default {
               :title="issue.title"
               :path="issue.path"
               :state="issue.state"
-              :fetch-status="issue.fetchStatus"
               :can-remove="true" />
           </li>
         </ul>

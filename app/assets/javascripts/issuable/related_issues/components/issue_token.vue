@@ -1,10 +1,5 @@
 <script>
 import eventHub from '../event_hub';
-import {
-  FETCHING_STATUS,
-  FETCH_SUCCESS_STATUS,
-  FETCH_ERROR_STATUS,
-} from '../constants';
 
 export default {
   name: 'IssueToken',
@@ -38,11 +33,6 @@ export default {
       required: false,
       default: '',
     },
-    fetchStatus: {
-      type: String,
-      required: false,
-      default: FETCH_SUCCESS_STATUS,
-    },
     canRemove: {
       type: Boolean,
       required: false,
@@ -51,12 +41,6 @@ export default {
   },
 
   computed: {
-    isFetching() {
-      return this.fetchStatus === FETCHING_STATUS;
-    },
-    hasFetchingError() {
-      return this.fetchStatus === FETCH_ERROR_STATUS;
-    },
     removeButtonLabel() {
       return `Remove related issue ${this.displayReference}`;
     },
@@ -64,7 +48,7 @@ export default {
       return this.state && this.state.length > 0;
     },
     hasTitle() {
-      return this.title.length > 0 || this.isFetching;
+      return this.title.length > 0;
     },
   },
 
@@ -94,9 +78,7 @@ export default {
 </script>
 
 <template>
-  <div
-    class="issue-token"
-    :class="{ 'issue-token-error': hasFetchingError }">
+  <div class="issue-token">
     <a
       ref="link"
       class="issue-token-link"
@@ -123,12 +105,6 @@ export default {
         v-if="hasTitle"
         ref="title"
         class="js-issue-token-title issue-token-title">
-        <i
-          ref="fetchStatusIcon"
-          v-if="isFetching"
-          class="fa fa-spinner fa-spin"
-          aria-label="Fetching info">
-        </i>
         <span class="issue-token-title-text">
           {{ title }}
         </span>

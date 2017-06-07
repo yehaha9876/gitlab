@@ -1,9 +1,5 @@
 import Vue from 'vue';
 import eventHub from '~/issuable/related_issues/event_hub';
-import {
-  FETCHING_STATUS,
-  FETCH_ERROR_STATUS,
-} from '~/issuable/related_issues/constants';
 import issueToken from '~/issuable/related_issues/components/issue_token.vue';
 
 describe('IssueToken', () => {
@@ -124,40 +120,6 @@ describe('IssueToken', () => {
       expect(vm.$refs.stateIcon.getAttribute('aria-label')).toEqual(state);
       expect(vm.$refs.reference.textContent.trim()).toEqual(displayReference);
       expect(vm.$refs.title.textContent.trim()).toEqual(title);
-    });
-  });
-
-  describe('with fetchStatus', () => {
-    describe('`fetchStatus: FETCHING_STATUS`', () => {
-      beforeEach(() => {
-        vm = new IssueToken({
-          propsData: {
-            idKey,
-            displayReference,
-            fetchStatus: FETCHING_STATUS,
-          },
-        }).$mount();
-      });
-
-      it('shows loading indicator/spinner', () => {
-        expect(vm.$refs.fetchStatusIcon).toBeDefined();
-      });
-    });
-
-    describe('`fetchStatus: FETCH_ERROR_STATUS`', () => {
-      beforeEach(() => {
-        vm = new IssueToken({
-          propsData: {
-            idKey,
-            displayReference,
-            fetchStatus: FETCH_ERROR_STATUS,
-          },
-        }).$mount();
-      });
-
-      it('tints the token red', () => {
-        expect(vm.$el.classList.contains('issue-token-error')).toEqual(true);
-      });
     });
   });
 
