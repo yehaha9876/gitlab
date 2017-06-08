@@ -560,11 +560,11 @@ describe MergeRequest, models: true do
 
     it "excludes blocked users" do
       developer = create(:user)
-      blocked_developer = create(:user).tap { |u| u.block! }
       project.team << [developer, :developer]
-      project.team << [blocked_developer, :developer]
 
-      expect(merge_request.number_of_potential_approvers).to eq(1)
+      expect do
+        developer.block!
+      end.to change { merge_request.number_of_potential_approvers }.by(-1)
     end
 
     context "when the project is part of a group" do
@@ -1496,12 +1496,13 @@ describe MergeRequest, models: true do
     let(:approver) { create(:user) }
 
     context 'on a project with only one member' do
+      let(:author) { project.owner }
+
       context 'when there is one approver' do
         before { project.update_attributes(approvals_before_merge: 1) }
 
         context 'when that approver is the MR author' do
           before do
-            project.team << [author, :developer]
             create(:approver, user: author, target: merge_request)
           end
 
@@ -1520,7 +1521,6 @@ describe MergeRequest, models: true do
 
         context 'when that approver is not the MR author' do
           before do
-            project.team << [approver, :developer]
             create(:approver, user: approver, target: merge_request)
           end
 

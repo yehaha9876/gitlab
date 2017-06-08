@@ -27,10 +27,10 @@ describe AdminEmailsWorker do
       it "sends email to subscribed users" do
         perform_enqueued_jobs do
           described_class.new.perform(recipient_id, 'subject', 'body')
-          expect(ActionMailer::Base.deliveries.count).to be 2
+          expect(ActionMailer::Base.deliveries.count).to eq(2)
         end
       end
-    end   
+    end
 
     context "sending emails to members of a project only" do
       let(:recipient_id) { "project-#{project.id}" }
@@ -38,10 +38,10 @@ describe AdminEmailsWorker do
       it "sends email to subscribed users" do
         perform_enqueued_jobs do
           described_class.new.perform(recipient_id, 'subject', 'body')
-          expect(ActionMailer::Base.deliveries.count).to be 2
+          expect(ActionMailer::Base.deliveries.count).to eq(3) # 2 + project owner
         end
       end
-    end   
+    end
 
     context "sending emails to users directly" do
       let(:recipient_id) { "all" }
@@ -49,9 +49,9 @@ describe AdminEmailsWorker do
       it "sends email to subscribed users" do
         perform_enqueued_jobs do
           described_class.new.perform(recipient_id, 'subject', 'body')
-          expect(ActionMailer::Base.deliveries.count).to be 4
+          expect(ActionMailer::Base.deliveries.count).to eq(4)
         end
       end
-    end   
+    end
   end
 end

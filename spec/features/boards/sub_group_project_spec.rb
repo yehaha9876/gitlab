@@ -26,7 +26,7 @@ describe 'Sub-group project issue boards', :feature, :js do
 
     page.within '.labels' do
       click_link 'Edit'
-      click_link 'Create new label'
+      click_link 'Create new label', wait: 8
     end
 
     page.within '.dropdown-new-label' do
