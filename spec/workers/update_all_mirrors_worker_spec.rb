@@ -3,7 +3,10 @@ require 'rails_helper'
 describe UpdateAllMirrorsWorker do
   subject(:worker) { described_class.new }
 
-  before { allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:try_obtain).and_return(true) }
+  before do
+    allow(Gitlab::UrlBlocker).to receive(:blocked_url?).and_return(false)
+    allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:try_obtain).and_return(true)
+  end
 
   describe '#perform' do
     let!(:fifteen_mirror)  { create(:empty_project, :mirror, sync_time: Gitlab::Mirror::FIFTEEN) }
@@ -21,7 +24,12 @@ describe UpdateAllMirrorsWorker do
     end
 
     it 'does not execute if cannot get the lease' do
-      allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:try_obtain).and_return(false)
+      allow(Gitlab::ExclusiveLease).to receive(:new)
+        .and_call_original
+
+      allow(Gitlab::ExclusiveLease).to receive(:new)
+        .with('update_all_mirrors', anything)
+        .and_return(double(try_obtain: false))
 
       create(:empty_project, :mirror)
 

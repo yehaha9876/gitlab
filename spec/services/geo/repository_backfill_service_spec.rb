@@ -6,6 +6,10 @@ describe Geo::RepositoryBackfillService, services: true do
   subject { described_class.new(project.id) }
 
   describe '#execute' do
+    before do
+      allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:try_obtain).and_return(true)
+    end
+
     context 'when repository is empty' do
       let(:project) { create(:project_empty_repo) }
 
@@ -32,7 +36,10 @@ describe Geo::RepositoryBackfillService, services: true do
       end
 
       it 'releases lease' do
-        expect(Gitlab::ExclusiveLease).to receive(:cancel).once.and_call_original
+        allow_any_instance_of(Repository).to receive(:fetch_geo_mirror) { true }
+
+        expect(Gitlab::ExclusiveLease).to receive(:cancel).once.with(
+          subject.__send__(:lease_key), anything).and_call_original
 
         subject.execute
       end
@@ -81,6 +88,8 @@ describe Geo::RepositoryBackfillService, services: true do
 
       context 'tracking database' do
         it 'tracks repository sync' do
+          allow_any_instance_of(Repository).to receive(:fetch_geo_mirror) { true }
+
           expect { subject.execute }.to change(Geo::ProjectRegistry, :count).by(1)
         end
 
@@ -132,6 +141,8 @@ describe Geo::RepositoryBackfillService, services: true do
 
       context 'tracking database' do
         it 'does not create a new registry' do
+          allow_any_instance_of(Repository).to receive(:fetch_geo_mirror) { true }
+
           expect { subject.execute }.not_to change(Geo::ProjectRegistry, :count)
         end
 
