@@ -14,30 +14,17 @@ class FilteredSearchManager {
     this.tokensContainer = this.container.querySelector('.tokens-container');
     this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeys;
 
-<<<<<<< HEAD
     if (page === 'issues' || page === 'boards') {
       this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeysWithWeights;
-=======
-    if (this.page === 'issues' || this.page === 'boards') {
-      this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeysIssuesEE;
->>>>>>> 17b0afe... Merge branch '2433-update-locked-milestone-to-not-be-removable' into 'master'
     }
 
+    this.searchHistoryDropdownElement = document.querySelector('.js-filtered-search-history-dropdown');
     this.recentSearchesStore = new RecentSearchesStore({
       isLocalStorageAvailable: RecentSearchesService.isAvailable(),
     });
-<<<<<<< HEAD
     let recentSearchesKey = 'issue-recent-searches';
-    if (page === 'merge_requests') {
-      recentSearchesKey = 'merge-request-recent-searches';
-=======
-    this.searchHistoryDropdownElement = document.querySelector('.js-filtered-search-history-dropdown');
-    const projectPath = this.searchHistoryDropdownElement ?
-      this.searchHistoryDropdownElement.dataset.projectFullPath : 'project';
-    let recentSearchesPagePrefix = 'issue-recent-searches';
     if (this.page === 'merge_requests') {
-      recentSearchesPagePrefix = 'merge-request-recent-searches';
->>>>>>> 17b0afe... Merge branch '2433-update-locked-milestone-to-not-be-removable' into 'master'
+      recentSearchesKey = 'merge-request-recent-searches';
     }
     this.recentSearchesService = new RecentSearchesService(recentSearchesKey);
   }
@@ -63,20 +50,12 @@ class FilteredSearchManager {
 
     if (this.filteredSearchInput) {
       this.tokenizer = gl.FilteredSearchTokenizer;
-<<<<<<< HEAD
-      this.dropdownManager = new gl.FilteredSearchDropdownManager(this.filteredSearchInput.getAttribute('data-base-endpoint') || '', page);
-=======
-      this.dropdownManager = new gl.FilteredSearchDropdownManager(this.filteredSearchInput.getAttribute('data-base-endpoint') || '', this.tokenizer, this.page);
->>>>>>> 17b0afe... Merge branch '2433-update-locked-milestone-to-not-be-removable' into 'master'
+      this.dropdownManager = new gl.FilteredSearchDropdownManager(this.filteredSearchInput.getAttribute('data-base-endpoint') || '', this.page);
 
       this.recentSearchesRoot = new RecentSearchesRoot(
         this.recentSearchesStore,
         this.recentSearchesService,
-<<<<<<< HEAD
-        document.querySelector('.js-filtered-search-history-dropdown'),
-=======
         this.searchHistoryDropdownElement,
->>>>>>> 17b0afe... Merge branch '2433-update-locked-milestone-to-not-be-removable' into 'master'
       );
       this.recentSearchesRoot.init();
 

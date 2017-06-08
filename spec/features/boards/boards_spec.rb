@@ -515,7 +515,7 @@ describe 'Issue Boards', feature: true, js: true do
   context 'locked milestone' do
     before do
       visit namespace_project_board_path(project.namespace, project, board_with_milestone)
-      wait_for_requests
+      wait_for_vue_resource
     end
 
     it 'should not have remove button' do
