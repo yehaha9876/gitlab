@@ -306,6 +306,8 @@ ul.related-merge-requests > li {
   padding-left: 0.5em;
   padding-right: 0.5em;
   background-color: $gray-lighter;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
   transition: background $general-hover-transition-duration $general-hover-transition-curve, color $general-hover-transition-duration $general-hover-transition-curve;
 
   .issue-token:hover &,
@@ -352,6 +354,8 @@ ul.related-merge-requests > li {
 
 .issue-token-title-standalone {
   padding-right: 0.5em;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
 }
 
 .issue-token-title-text {
@@ -366,6 +370,8 @@ ul.related-merge-requests > li {
   padding: 0 0.5em;
   background-color: $gray-normal;
   border: 0;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
   color: $gl-text-color-secondary;
   transition: background $general-hover-transition-duration $general-hover-transition-curve;
 
