@@ -485,9 +485,15 @@ module ProjectsHelper
 
   def project_feature_options
     {
+<<<<<<< HEAD
       ProjectFeature::DISABLED => s_('ProjectFeature|Disabled'),
       ProjectFeature::PRIVATE => s_('ProjectFeature|Only team members'),
       ProjectFeature::ENABLED => s_('ProjectFeature|Everyone with access')
+=======
+      s_('ProjectFeature|Disabled') => ProjectFeature::DISABLED,
+      s_('ProjectFeature|Only team members') => ProjectFeature::PRIVATE,
+      s_('ProjectFeature|Everyone with access') => ProjectFeature::ENABLED
+>>>>>>> 1d3405ddc1... Merge branch 'bvl-port-project-translations-to-ee' into 'master'
     }
   end
 
