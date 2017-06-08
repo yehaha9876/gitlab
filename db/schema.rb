@@ -1061,6 +1061,8 @@ ActiveRecord::Schema.define(version: 20170606202615) do
     t.date "expires_at"
   end
 
+  add_index "project_group_links", ["group_id"], name: "index_project_group_links_on_group_id", using: :btree
+
   create_table "project_import_data", force: :cascade do |t|
     t.integer "project_id"
     t.text "data"
@@ -1552,7 +1554,6 @@ ActiveRecord::Schema.define(version: 20170606202615) do
     t.boolean "external", default: false
     t.string "incoming_email_token"
     t.string "organization"
-    t.boolean "authorized_projects_populated"
     t.boolean "auditor", default: false, null: false
     t.boolean "ghost"
     t.boolean "require_two_factor_authentication_from_group", default: false, null: false
