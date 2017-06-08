@@ -106,6 +106,9 @@ describe 'Related issues', feature: true, js: true do
 
           items = all('.js-related-issues-token-list-item .js-issue-token-title')
 
+          # Form gets hidden after submission
+          expect(page).not_to have_selector('.js-add-related-issues-form-area')
+          # Check if related issues are present
           expect(items.count).to eq(1)
           expect(items[0].text).to eq(issue_b.title)
           expect(find('.js-related-issues-header-issue-count')).to have_content('1')
