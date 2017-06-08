@@ -301,7 +301,7 @@ ul.related-merge-requests > li {
 
 .issue-token-reference {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   margin-right: 1px;
   padding-left: 0.5em;
   padding-right: 0.5em;
@@ -361,6 +361,8 @@ ul.related-merge-requests > li {
 }
 
 .issue-token-remove-button {
+  display: flex;
+  align-items: center;
   padding: 0 0.5em;
   background-color: $gray-normal;
   border: 0;
