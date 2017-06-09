@@ -173,9 +173,9 @@ describe('RelatedIssuesRoot', () => {
             expect(vm.state.relatedIssues.length).toEqual(1);
             expect(vm.state.relatedIssues[0].id).toEqual(issuable1.id);
 
-            done();
-
             Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
+
+            done();
           });
         });
       });
@@ -204,9 +204,9 @@ describe('RelatedIssuesRoot', () => {
             expect(vm.state.relatedIssues[0].id).toEqual(issuable1.id);
             expect(vm.state.relatedIssues[1].id).toEqual(issuable2.id);
 
-            done();
-
             Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
+
+            done();
           });
         });
       });
