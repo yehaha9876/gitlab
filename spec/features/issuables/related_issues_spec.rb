@@ -157,6 +157,8 @@ describe 'Related issues', feature: true, js: true do
 
           first('.js-issue-token-remove-button').click
 
+          wait_for_requests
+
           items_after = all('.js-related-issues-token-list-item .js-issue-token-title')
 
           expect(items_after.count).to eq(1)
