@@ -1,5 +1,6 @@
 <script>
 import eventHub from '../event_hub';
+import loadingIcon from '../../../vue_shared/components/loading_icon.vue';
 import issueToken from './issue_token.vue';
 import addIssuableForm from './add_issuable_form.vue';
 
@@ -50,6 +51,7 @@ export default {
   },
 
   components: {
+    loadingIcon,
     addIssuableForm,
     issueToken,
   },
@@ -123,12 +125,10 @@ export default {
             </div>
           </div>
           <div>
-            <i
+            <loadingIcon
               ref="loadingIcon"
               v-if="isFetching"
-              class="fa fa-spinner fa-spin"
-              aria-label="Fetching related issues">
-            </i>
+              label="Fetching related issues" />
           </div>
         </h3>
       </div>
