@@ -58,6 +58,7 @@ describe('Filtered Search Manager', () => {
     input = document.querySelector('.filtered-search');
     tokensContainer = document.querySelector('.tokens-container');
     manager = new gl.FilteredSearchManager();
+    manager.setup();
   });
 
   afterEach(() => {
@@ -73,6 +74,7 @@ describe('Filtered Search Manager', () => {
       spyOn(recentSearchesStoreSrc, 'default');
 
       filteredSearchManager = new gl.FilteredSearchManager();
+      filteredSearchManager.setup();
 
       return filteredSearchManager;
     });
@@ -89,6 +91,7 @@ describe('Filtered Search Manager', () => {
       spyOn(window, 'Flash');
 
       filteredSearchManager = new gl.FilteredSearchManager();
+      filteredSearchManager.setup();
 
       expect(window.Flash).not.toHaveBeenCalled();
     });
