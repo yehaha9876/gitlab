@@ -53,4 +53,8 @@ class GitlabUploader < CarrierWave::Uploader::Base
   def exists?
     file.try(:exists?)
   end
+
+  def filename
+    super || file&.filename
+  end
 end
