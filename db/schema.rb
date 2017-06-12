@@ -12,11 +12,15 @@
 # It's strongly recommended that you check this file into your version control system.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20170606202615) do
 =======
 ActiveRecord::Schema.define(version: 20170603200744) do
 
 >>>>>>> 6f8b754522... Merge branch 'sync-email-from-omniauth-ee' into 'master'
+=======
+ActiveRecord::Schema.define(version: 20170606202615) do
+>>>>>>> e15551e2c0... Merge branch '9-2-5-security-update-master' into 'master'
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pg_trgm"
