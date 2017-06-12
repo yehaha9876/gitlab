@@ -24,8 +24,6 @@ describe 'New/edit issue', feature: true, js: true do
       visit new_namespace_project_issue_path(project.namespace, project)
     end
 
-<<<<<<< HEAD
-=======
     describe 'shorten users API pagination limit' do
       before do
         # Using `allow_any_instance_of`/`and_wrap_original`, `original` would
@@ -45,7 +43,7 @@ describe 'New/edit issue', feature: true, js: true do
 
         click_button 'Unassigned'
 
-        wait_for_requests
+        wait_for_ajax
       end
 
       it 'should display selected users even if they are not part of the original API call' do
@@ -65,7 +63,6 @@ describe 'New/edit issue', feature: true, js: true do
       end
     end
 
->>>>>>> 03c7b54... Merge branch '2472-assignee-dropdown-does-not-display-selected-assignee' into 'master'
     describe 'multiple assignees' do
       before do
         click_button 'Unassigned'
