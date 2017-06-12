@@ -52,8 +52,8 @@ describe Geo::GeoBackfillWorker, services: true do
       subject.perform
     end
 
-    it 'does not perform Geo::RepositoryBackfillService when tracking DB is not available' do
-      allow(Rails.configuration).to receive(:respond_to?).with(:geo_database) { false }
+    it 'does not perform Geo::RepositoryBackfillService when secondary role is disabled' do
+      allow(Gitlab::Geo).to receive(:secondary_role_enabled?) { false }
 
       expect(Geo::RepositoryBackfillService).not_to receive(:new)
 

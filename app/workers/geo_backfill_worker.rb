@@ -7,7 +7,7 @@ class GeoBackfillWorker
   LAST_SYNC_INTERVAL = 24.hours
 
   def perform
-    return unless Gitlab::Geo.configured?
+    return unless Gitlab::Geo.secondary_role_enabled?
     return unless Gitlab::Geo.primary_node.present?
 
     start_time = Time.now
@@ -20,7 +20,7 @@ class GeoBackfillWorker
     project_ids.each do |project_id|
       begin
         break if over_time?(start_time)
-        break unless Gitlab::Geo.current_node_enabled?
+        break unless node_enabled?
 
         # We try to obtain a lease here for the entire backfilling process
         # because backfill the repositories continuously at a controlled rate
@@ -71,6 +71,16 @@ class GeoBackfillWorker
 
   def over_time?(start_time)
     Time.now - start_time >= RUN_TIME
+  end
+
+  def node_enabled?
+    # Only check every minute to avoid polling the DB excessively
+    unless @last_enabled_check.present? && @last_enabled_check > 1.minute.ago
+      @last_enabled_check = Time.now
+      @current_node_enabled = nil
+    end
+
+    @current_node_enabled ||= Gitlab::Geo.current_node_enabled?
   end
 
   def try_obtain_lease
