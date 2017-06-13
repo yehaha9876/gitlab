@@ -1962,7 +1962,34 @@ describe User, models: true do
     end
   end
 
-<<<<<<< HEAD
+  context '#invalidate_issue_cache_counts' do
+    let(:user) { build_stubbed(:user) }
+
+    it 'invalidates cache for issue counter' do
+      cache_mock = double
+
+      expect(cache_mock).to receive(:delete).with(['users', user.id, 'assigned_open_issues_count'])
+
+      allow(Rails).to receive(:cache).and_return(cache_mock)
+
+      user.invalidate_issue_cache_counts
+    end
+  end
+
+  context '#invalidate_merge_request_cache_counts' do
+    let(:user) { build_stubbed(:user) }
+
+    it 'invalidates cache for Merge Request counter' do
+      cache_mock = double
+
+      expect(cache_mock).to receive(:delete).with(['users', user.id, 'assigned_open_merge_requests_count'])
+
+      allow(Rails).to receive(:cache).and_return(cache_mock)
+
+      user.invalidate_merge_request_cache_counts
+    end
+  end
+
   describe '#forget_me!' do
     subject { create(:user, remember_created_at: Time.now) }
 
@@ -1992,33 +2019,6 @@ describe User, models: true do
       allow(Gitlab::Geo).to receive(:secondary?) { true }
 
       expect { subject.remember_me! }.not_to change(subject, :remember_created_at)
-=======
-  context '#invalidate_issue_cache_counts' do
-    let(:user) { build_stubbed(:user) }
-
-    it 'invalidates cache for issue counter' do
-      cache_mock = double
-
-      expect(cache_mock).to receive(:delete).with(['users', user.id, 'assigned_open_issues_count'])
-
-      allow(Rails).to receive(:cache).and_return(cache_mock)
-
-      user.invalidate_issue_cache_counts
-    end
-  end
-
-  context '#invalidate_merge_request_cache_counts' do
-    let(:user) { build_stubbed(:user) }
-
-    it 'invalidates cache for Merge Request counter' do
-      cache_mock = double
-
-      expect(cache_mock).to receive(:delete).with(['users', user.id, 'assigned_open_merge_requests_count'])
-
-      allow(Rails).to receive(:cache).and_return(cache_mock)
-
-      user.invalidate_merge_request_cache_counts
->>>>>>> ce/9-2-stable
     end
   end
 end
