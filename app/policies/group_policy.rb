@@ -13,13 +13,8 @@ class GroupPolicy < BasePolicy
 
     can_read = false
     can_read ||= globally_viewable
-<<<<<<< HEAD
-    can_read ||= member
-    can_read ||= @user.admin?
-    can_read ||= @user.auditor?
-=======
     can_read ||= access_level >= GroupMember::GUEST
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
+    can_read ||= @user.auditor?
     can_read ||= GroupProjectsFinder.new(group: @subject, current_user: @user).execute.any?
     can! :read_group if can_read
 
