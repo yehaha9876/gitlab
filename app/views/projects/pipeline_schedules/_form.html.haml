@@ -14,7 +14,7 @@
       #interval-pattern-input{ data: { initial_interval: @schedule.cron } }
   .form-group
     .col-md-9
-      = f.label :cron_timezone, 'Cron Timezone', class: 'label-light'
+      = f.label :cron_timezone, 'Timezone', class: 'label-light'
       = dropdown_tag("Select a timezone", options: { toggle_class: 'btn js-timezone-dropdown', title: "Select a timezone", filter: true, placeholder: "Filter", data: { data: timezone_data } } )
       = f.text_field :cron_timezone, value: @schedule.cron_timezone, id: 'schedule_cron_timezone', class: 'hidden', name: 'schedule[cron_timezone]', required: true
   .form-group
