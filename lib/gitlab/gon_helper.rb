@@ -1,3 +1,5 @@
+# rubocop:disable Metrics/AbcSize
+
 module Gitlab
   module GonHelper
     def add_gon_variables
@@ -14,6 +16,7 @@ module Gitlab
       gon.gitlab_url             = Gitlab.config.gitlab.url
       gon.test                   = Rails.env.test?
       gon.revision               = Gitlab::REVISION
+      gon.gitlab_logo            = ActionController::Base.helpers.asset_path('gitlab_logo.png')
 
       if current_user
         gon.current_user_id = current_user.id
