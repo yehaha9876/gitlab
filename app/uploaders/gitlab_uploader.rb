@@ -19,8 +19,8 @@ class GitlabUploader < CarrierWave::Uploader::Base
     File.join(root_dir, 'system')
   end
 
-  def file_storage?
-    storage.is_a?(CarrierWave::Storage::File)
+  def self.file_storage?
+    self.storage == CarrierWave::Storage::File
   end
 
   def file_cache_storage?
