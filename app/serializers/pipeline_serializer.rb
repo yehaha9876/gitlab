@@ -19,17 +19,11 @@ class PipelineSerializer < BaseSerializer
         :cancelable_statuses,
         :trigger_requests,
         :project,
-<<<<<<< HEAD
         { triggered_by_pipeline: [:project, :user] },
         { triggered_pipelines: [:project, :user] },
         { pending_builds: :project },
-        { manual_actions: :project },
-        { artifacts: :project }
-=======
         :manual_actions,
-        :artifacts,
-        { pending_builds: :project }
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
+        :artifacts
       ])
     end
 
