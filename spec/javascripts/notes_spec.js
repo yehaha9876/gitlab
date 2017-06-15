@@ -583,8 +583,6 @@ import '~/notes';
         const stripedComment = this.notes.stripSlashCommands(sampleComment);
 
         expect(stripedComment).toBe(sampleComment);
-<<<<<<< HEAD
-=======
       });
     });
 
@@ -612,7 +610,6 @@ import '~/notes';
       it('should return generic slash command description when available slash commands list is not populated', () => {
         const sampleComment = '/close\n/title [Duplicate] Issue foobar';
         expect(this.notes.getSlashCommandDescription(sampleComment)).toBe('Applying command');
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
       });
     });
 

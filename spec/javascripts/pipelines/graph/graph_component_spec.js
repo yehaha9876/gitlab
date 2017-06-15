@@ -95,7 +95,6 @@ describe('graph component', function () {
     });
   });
 
-<<<<<<< HEAD
   describe('when linked pipelines are not present', function () {
     beforeEach(function () {
       const pipeline = Object.assign(graphJSON, { triggered: [], triggeredBy: [] });
@@ -123,7 +122,9 @@ describe('graph component', function () {
       it('it returns left-margin when no triggerer and not the first stage', function () {
         expect(this.component.stageConnectorClass(99, { groups: ['job'] })).toBe('left-margin');
       });
-=======
+    });
+  });
+
   describe('with data', () => {
     it('should render the graph', () => {
       const component = new GraphComponent({
@@ -150,7 +151,6 @@ describe('graph component', function () {
       expect(component.$el.querySelector('loading-icon')).toBe(null);
 
       expect(component.$el.querySelector('.stage-column-list')).toBeDefined();
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
     });
   });
 });
