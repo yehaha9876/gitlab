@@ -236,8 +236,11 @@ class IssuableBaseService < BaseService
         )
 
         if old_assignees != issuable.assignees
-          assignees = old_assignees + issuable.assignees.to_a
-          invalidate_cache_counts(assignees.compact, issuable)
+          ## EE-specific
+          new_assignees = issuable.assignees.to_a
+          affected_assignees = (old_assignees + new_assignees) - (old_assignees & new_assignees)
+          invalidate_cache_counts(affected_assignees.compact, issuable)
+          ## EE-specific
         end
 
         after_update(issuable)
