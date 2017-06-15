@@ -49,10 +49,7 @@ module API
     end
 
     before { allow_access_with_scope :api }
-<<<<<<< HEAD
-=======
     before { header['X-Frame-Options'] = 'SAMEORIGIN' }
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
     before { Gitlab::I18n.locale = current_user&.preferred_language }
 
     after { Gitlab::I18n.use_default_locale }
