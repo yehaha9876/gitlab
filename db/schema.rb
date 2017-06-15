@@ -135,6 +135,7 @@ ActiveRecord::Schema.define(version: 20170606202615) do
     t.integer "cached_markdown_version"
     t.boolean "clientside_sentry_enabled", default: false, null: false
     t.string "clientside_sentry_dsn"
+    t.boolean "prometheus_metrics_enabled", default: false, null: false
     t.boolean "check_namespace_plan", default: false, null: false
     t.integer "mirror_max_delay", default: 5, null: false
     t.integer "mirror_max_capacity", default: 100, null: false
@@ -157,7 +158,6 @@ ActiveRecord::Schema.define(version: 20170606202615) do
     t.integer "group_id", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean "prometheus_metrics_enabled", default: false, null: false
   end
 
   add_index "approver_groups", ["group_id"], name: "index_approver_groups_on_group_id", using: :btree
