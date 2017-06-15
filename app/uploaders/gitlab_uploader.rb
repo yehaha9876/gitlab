@@ -21,13 +21,6 @@ class GitlabUploader < CarrierWave::Uploader::Base
 
   def self.file_storage?
     self.storage == CarrierWave::Storage::File
-<<<<<<< HEAD
-  end
-
-  def file_cache_storage?
-    cache_storage.is_a?(CarrierWave::Storage::File)
-=======
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
   end
 
   delegate :base_dir, :file_storage?, to: :class
