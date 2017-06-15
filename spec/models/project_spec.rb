@@ -1887,7 +1887,6 @@ describe Project, models: true do
         project.add_import_job
       end
 
-<<<<<<< HEAD
       context 'without mirror' do
         it 'returns nil' do
           project = create(:project)
@@ -1899,13 +1898,6 @@ describe Project, models: true do
       context 'without repository' do
         it 'schedules RepositoryImportWorker' do
           project = create(:empty_project, import_url: generate(:url))
-=======
-    context 'not forked' do
-      it 'schedules a RepositoryImportWorker job' do
-        project = create(:empty_project, import_url: generate(:url))
-
-        expect(RepositoryImportWorker).to receive(:perform_async).with(project.id)
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
 
           expect(RepositoryImportWorker).to receive(:perform_async).with(project.id)
 
@@ -1921,6 +1913,16 @@ describe Project, models: true do
 
           project.add_import_job
         end
+      end
+    end
+
+    context 'not forked' do
+      it 'schedules a RepositoryImportWorker job' do
+        project = create(:empty_project, import_url: generate(:url))
+
+        expect(RepositoryImportWorker).to receive(:perform_async).with(project.id)
+
+        project.add_import_job
       end
     end
   end
