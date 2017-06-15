@@ -17,26 +17,18 @@ module Members
       return error("Too many users specified (limit is #{user_limit})") if
         user_limit && user_ids.size > user_limit
 
-<<<<<<< HEAD
       members = @source.add_users(
-        params[:user_ids].split(','),
-=======
-      @source.add_users(
         user_ids,
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
         params[:access_level],
         expires_at: params[:expires_at],
         current_user: current_user
       )
 
-<<<<<<< HEAD
       members.compact.each do |member|
         AuditEventService.new(@current_user, @source, action: :create)
           .for_member(member).security_event
       end
 
-      true
-=======
       success
     end
 
@@ -46,7 +38,6 @@ module Members
       limit = params.fetch(:limit, DEFAULT_LIMIT)
 
       limit && limit < 0 ? nil : limit
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
     end
   end
 end
