@@ -109,18 +109,15 @@ pipelines:
 - artifacts
 - pipeline_schedule
 - merge_requests
-<<<<<<< HEAD
 - source_pipeline
 - sourced_pipelines
 - triggered_by_pipeline
 - triggered_pipelines
-=======
 stages:
 - project
 - pipeline
 - statuses
 - builds
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
 statuses:
 - project
 - pipeline
