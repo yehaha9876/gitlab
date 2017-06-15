@@ -48,10 +48,6 @@ class Projects::ProtectedRefsController < Projects::ApplicationController
   protected
 
   def access_level_attributes
-<<<<<<< HEAD
     %i(access_level id user_id _destroy group_id)
-=======
-    %i(access_level id)
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
   end
 end
