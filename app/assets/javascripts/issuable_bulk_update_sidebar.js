@@ -115,6 +115,7 @@ export default class IssuableBulkUpdateSidebar {
     this.$page.toggleClass(SIDEBAR_COLLAPSED_CLASS, !show);
     this.$sidebar.toggleClass(SIDEBAR_EXPANDED_CLASS, show);
     this.$sidebar.toggleClass(SIDEBAR_COLLAPSED_CLASS, !show);
+    this.$sidebar.toggleClass(HIDDEN_CLASS, !show);
   }
 
   toggleBulkEditButtonDisabled(disable) {

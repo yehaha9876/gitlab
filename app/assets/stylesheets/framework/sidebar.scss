@@ -118,5 +118,7 @@
 
   .issuable-sidebar {
     padding: 0 3px;
+    width: calc(100% + 30px);
+    overflow-y: auto;
   }
 }
