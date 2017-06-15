@@ -697,16 +697,12 @@ pre.light-well {
   }
 }
 
-<<<<<<< HEAD
 a.allowed-to-merge,
 a.allowed-to-push {
   cursor: pointer;
 }
 
 .new-protected-branch,
-=======
-.new_protected_branch,
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
 .new-protected-tag {
   label {
     margin-top: 6px;
@@ -714,7 +710,6 @@ a.allowed-to-push {
   }
 }
 
-<<<<<<< HEAD
 .protected-branch-push-access-list,
 .protected-branch-merge-access-list {
   a {
@@ -722,8 +717,6 @@ a.allowed-to-push {
   }
 }
 
-=======
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
 .create-new-protected-branch-button,
 .create-new-protected-tag-button {
   @include dropdown-link;

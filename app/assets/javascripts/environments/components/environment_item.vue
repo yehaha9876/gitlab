@@ -422,9 +422,16 @@ export default {
 };
 </script>
 <template>
-<<<<<<< HEAD
-  <tr :class="{ 'js-child-row': model.isChildren }">
-    <td>
+  <div
+    :class="{ 'js-child-row environment-child-row': model.isChildren, 'folder-row': model.isFolder, 'gl-responsive-table-row': !model.isFolder }"
+    role="row">
+    <div class="table-section section-10" role="gridcell">
+      <div
+        v-if="!model.isFolder"
+        class="table-mobile-header"
+        role="rowheader">
+        Environment
+      </div>
       <span
         class="deploy-board-icon"
         v-if="model.hasDeployBoard"
@@ -440,19 +447,6 @@ export default {
           class="fa fa-caret-down"
           aria-hidden="true" />
       </span>
-
-=======
-  <div
-    :class="{ 'js-child-row environment-child-row': model.isChildren, 'folder-row': model.isFolder, 'gl-responsive-table-row': !model.isFolder }"
-    role="row">
-    <div class="table-section section-10" role="gridcell">
-      <div
-        v-if="!model.isFolder"
-        class="table-mobile-header"
-        role="rowheader">
-        Environment
-      </div>
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
       <a
         v-if="!model.isFolder"
         class="environment-name flex-truncate-parent table-mobile-content"
