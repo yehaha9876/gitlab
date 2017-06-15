@@ -174,17 +174,9 @@ describe CreateDeploymentService, services: true do
         { environment: { name: 'production', url: 'http://gitlab.com' } }
       end
 
-<<<<<<< HEAD
-      context 'when pipeline succeeds' do
-        it_behaves_like 'does create environment and deployment' do
-          let(:deployable) { build }
-
-          subject { build.success }
-=======
       context 'when job succeeds' do
         it_behaves_like 'creates deployment' do
           subject { job.success }
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
         end
       end
 

@@ -42,15 +42,12 @@ FactoryGirl.define do
       import_status :failed
     end
 
-<<<<<<< HEAD
     trait :mirror do
       mirror true
       import_url { generate(:url) }
       mirror_user_id { creator_id }
     end
 
-=======
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
     trait :archived do
       archived true
     end

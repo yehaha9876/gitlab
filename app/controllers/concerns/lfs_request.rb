@@ -111,7 +111,6 @@ module LfsRequest
   def has_authentication_ability?(capability)
     (authentication_abilities || []).include?(capability)
   end
-<<<<<<< HEAD
 
   module EE
     def lfs_forbidden!
@@ -148,6 +147,4 @@ module LfsRequest
   end
 
   prepend EE
-=======
->>>>>>> 0d9311624754fbc3e0b8f4a28be576e48783bf81
 end
