@@ -8,14 +8,14 @@ describe Gitlab::LDAP::Access, lib: true do
   describe '#find_ldap_user' do
     it 'finds a user by dn first' do
       expect(Gitlab::LDAP::Person).to receive(:find_by_dn).and_return(:ldap_user)
-      expect(user).not_to receive(:ldap_email?)
+      expect(user).not_to receive(:external_email?)
 
       access.find_ldap_user
     end
 
     it 'finds a user by email if the email came from LDAP' do
       expect(Gitlab::LDAP::Person).to receive(:find_by_dn).and_return(nil)
-      expect(user).to receive(:ldap_email?).and_return(true)
+      expect(user).to receive(:external_email?).and_return(true)
       expect(Gitlab::LDAP::Person).to receive(:find_by_email)
 
       access.find_ldap_user
@@ -291,7 +291,9 @@ describe Gitlab::LDAP::Access, lib: true do
     end
 
     context 'user has at least one LDAPKey' do
-      before { user.keys.ldap.create key: ssh_key, title: 'to be removed' }
+      before do
+        user.keys.ldap.create key: ssh_key, title: 'to be removed'
+      end
 
       it "removes a SSH key if it is no longer in LDAP" do
         entry = Net::LDAP::Entry.from_single_ldif_string("dn: cn=foo, dc=bar, dc=com\n#{ssh_key_attribute_name}:\n")

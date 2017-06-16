@@ -23,11 +23,11 @@ class GitlabUploader < CarrierWave::Uploader::Base
     self.storage == CarrierWave::Storage::File
   end
 
+  delegate :base_dir, :file_storage?, to: :class
+
   def file_cache_storage?
     cache_storage.is_a?(CarrierWave::Storage::File)
   end
-
-  delegate :base_dir, :file_storage?, to: :class
 
   # Reduce disk IO
   def move_to_cache

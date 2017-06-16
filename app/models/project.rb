@@ -71,8 +71,6 @@ class Project < ActiveRecord::Base
 
   after_validation :check_pending_delete
 
-  after_validation :check_pending_delete
-
   acts_as_taggable
 
   attr_accessor :new_default_branch
@@ -562,7 +560,11 @@ class Project < ActiveRecord::Base
       ProjectCacheWorker.perform_async(self.id)
     end
 
-    self.import_data&.destroy unless mirror?
+    remove_import_data
+  end
+
+  def remove_import_data
+    import_data&.destroy unless mirror?
   end
 
   def import_url=(value)
@@ -1215,6 +1217,17 @@ class Project < ActiveRecord::Base
     !!repository.exists?
   end
 
+  def update_forks_visibility_level
+    return unless visibility_level < visibility_level_was
+
+    forks.each do |forked_project|
+      if forked_project.visibility_level > visibility_level
+        forked_project.visibility_level = visibility_level
+        forked_project.save!
+      end
+    end
+  end
+
   def create_wiki
     ProjectWiki.new(self, self.owner).wiki
     true
@@ -1225,10 +1238,6 @@ class Project < ActiveRecord::Base
 
   def wiki
     @wiki ||= ProjectWiki.new(self, self.owner)
-  end
-
-  def reference_issue_tracker?
-    default_issues_tracker? || jira_tracker_active?
   end
 
   def jira_tracker_active?
@@ -1403,17 +1412,6 @@ class Project < ActiveRecord::Base
     import_url_changed? && changes['import_url'].first
   end
 
-  def update_forks_visibility_level
-    return unless visibility_level < visibility_level_was
-
-    forks.each do |forked_project|
-      if forked_project.visibility_level > visibility_level
-        forked_project.visibility_level = visibility_level
-        forked_project.save!
-      end
-    end
-  end
-
   def remove_mirror_repository_reference
     repository.remove_remote(Repository::MIRROR_REMOTE)
   end
@@ -1483,6 +1481,7 @@ class Project < ActiveRecord::Base
       { key: 'CI_PROJECT_ID', value: id.to_s, public: true },
       { key: 'CI_PROJECT_NAME', value: path, public: true },
       { key: 'CI_PROJECT_PATH', value: path_with_namespace, public: true },
+      { key: 'CI_PROJECT_PATH_SLUG', value: path_with_namespace.parameterize, public: true },
       { key: 'CI_PROJECT_NAMESPACE', value: namespace.full_path, public: true },
       { key: 'CI_PROJECT_URL', value: web_url, public: true }
     ]

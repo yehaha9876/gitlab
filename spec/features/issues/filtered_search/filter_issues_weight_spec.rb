@@ -4,7 +4,7 @@ describe 'Filter issues weight', js: true, feature: true do
   include FilteredSearchHelpers
 
   let!(:project) { create(:empty_project) }
-  let!(:user) { create(:user, name: 'administrator', username: 'root') }
+  let!(:user) { create(:user, name: 'admin', username: 'root') }
   let(:js_dropdown_weight) { '#js-dropdown-weight' }
 
   def expect_issues_list_count(open_count, closed_count = 0)
@@ -21,7 +21,7 @@ describe 'Filter issues weight', js: true, feature: true do
     login_as(user)
 
     label = create(:label, project: project, title: 'urgent')
-    milestone = create(:milestone, title: 'version1', project: project)
+    milestone = create(:milestone, title: 'v1', project: project)
 
     create(:issue, project: project, weight: 1)
     issue = create(:issue,
@@ -86,7 +86,7 @@ describe 'Filter issues weight', js: true, feature: true do
     end
 
     it 'filters issues by searched weight, author, assignee, label, milestone and text' do
-      search = "weight:2 author:@root assignee:@root label:~urgent milestone:%version1 bug"
+      search = "weight:2 author:@root assignee:@root label:~urgent milestone:%v1 bug"
       input_filtered_search(search)
 
       expect_issues_list_count(1)
