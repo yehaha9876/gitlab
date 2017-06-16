@@ -4,7 +4,7 @@ describe 'Filter issues weight', js: true, feature: true do
   include FilteredSearchHelpers
 
   let!(:project) { create(:empty_project) }
-  let!(:user) { create(:user, name: 'administrator', username: 'root') }
+  let!(:user) { create(:user, name: 'admin', username: 'root') }
   let(:js_dropdown_weight) { '#js-dropdown-weight' }
 
   def expect_issues_list_count(open_count, closed_count = 0)
