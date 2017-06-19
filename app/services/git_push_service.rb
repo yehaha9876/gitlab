@@ -113,22 +113,14 @@ class GitPushService < BaseService
     UpdateMergeRequestsWorker
       .perform_async(@project.id, current_user.id, params[:oldrev], params[:newrev], params[:ref])
 
-<<<<<<< HEAD
     mirror_update = @project.mirror? && @project.repository.up_to_date_with_upstream?(branch_name)
-    SystemHookPushWorker.perform_async(build_push_data.dup, :push_hooks)
 
-=======
->>>>>>> gitlab-ce/9-3-stable
     EventCreateService.new.push(@project, current_user, build_push_data)
-    Ci::CreatePipelineService.new(@project, current_user, build_push_data).execute(:push)
+    Ci::CreatePipelineService.new(@project, current_user, build_push_data).execute(:push, mirror_update: mirror_update)
     
     SystemHookPushWorker.perform_async(build_push_data.dup, :push_hooks)
     @project.execute_hooks(build_push_data.dup, :push_hooks)
     @project.execute_services(build_push_data.dup, :push_hooks)
-<<<<<<< HEAD
-    Ci::CreatePipelineService.new(@project, current_user, build_push_data).execute(:push, mirror_update: mirror_update)
-=======
->>>>>>> gitlab-ce/9-3-stable
 
     if push_remove_branch?
       AfterBranchDeleteService
