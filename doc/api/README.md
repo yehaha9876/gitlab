@@ -56,17 +56,6 @@ following locations:
 - [V3 to V4](v3_to_v4.md)
 - [Version](version.md)
 
-## Road to GraphQL
-
-API v4 will be the last REST API that we support. Going forward, we will start
-on moving to GraphQL and deprecate the use of controller-specific
-endpoints. GraphQL has a number of benefits:
-
-1. We avoid having to maintain two different APIs.
-2. Callers of the API can request only what they need.
-
-### Internal CI API
-
 The following documentation is for the [internal CI API](ci/README.md):
 
 - [Builds](ci/builds.md)
@@ -91,8 +80,32 @@ Most API requests require authentication via a session cookie or token. For
 those cases where it is not required, this will be mentioned in the documentation
 for each individual endpoint. For example, the [`/projects/:id` endpoint](projects.md).
 
+<<<<<<< HEAD
+## Road to GraphQL
+
+Going forward, we will start on moving to
+[GraphQL](http://graphql.org/learn/best-practices/) and deprecate the use of
+controller-specific endpoints. GraphQL has a number of benefits:
+
+1. We avoid having to maintain two different APIs.
+2. Callers of the API can request only what they need.
+3. It is versioned by default.
+
+It will co-exist with the current v4 REST API. If we have a v5 API, this should
+be a compatibility layer on top of GraphQL.
+
+## Authentication
+
+Most API requests require authentication via a session cookie or token. For
+those cases where it is not required, this will be mentioned in the documentation
+for each individual endpoint. For example, the [`/projects/:id` endpoint](projects.md).
+
 There are three types of access tokens available:
 
+=======
+There are three types of access tokens available:
+
+>>>>>>> gitlab-ce/9-3-stable
 1. [OAuth2 tokens](#oauth2-tokens)
 1. [Private tokens](#private-tokens)
 1. [Personal access tokens](#personal-access-tokens)
