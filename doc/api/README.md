@@ -80,7 +80,6 @@ Most API requests require authentication via a session cookie or token. For
 those cases where it is not required, this will be mentioned in the documentation
 for each individual endpoint. For example, the [`/projects/:id` endpoint](projects.md).
 
-<<<<<<< HEAD
 ## Road to GraphQL
 
 Going forward, we will start on moving to
@@ -102,10 +101,6 @@ for each individual endpoint. For example, the [`/projects/:id` endpoint](projec
 
 There are three types of access tokens available:
 
-=======
-There are three types of access tokens available:
-
->>>>>>> gitlab-ce/9-3-stable
 1. [OAuth2 tokens](#oauth2-tokens)
 1. [Private tokens](#private-tokens)
 1. [Personal access tokens](#personal-access-tokens)
