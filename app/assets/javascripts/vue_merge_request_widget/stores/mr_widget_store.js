@@ -1,5 +1,5 @@
 import Timeago from 'timeago.js';
-import { getStateKey } from '../dependencies';
+import { getStateKey, stateMaps } from '../dependencies';
 
 const unmergedStates = [
   'locked',
@@ -26,6 +26,7 @@ export default class MergeRequestStore {
     const pipelineStatus = data.pipeline ? data.pipeline.details.status : null;
 
     // EE specific
+    // FIXME: This belongs in ee/mr_widget_store
     this.squash = data.squash;
 
     this.title = data.title;
@@ -79,7 +80,7 @@ export default class MergeRequestStore {
     this.mergeActionsContentPath = data.commit_change_content_path;
     this.isRemovingSourceBranch = this.isRemovingSourceBranch || false;
     this.isOpen = data.state === 'opened' || data.state === 'reopened' || false;
-    this.isMerged = unmergedStates.indexOf(data.state) === -1;
+    this.isMerged = !this.isOpen && stateMaps.statesToShowHelpWidget.indexOf(data.state) === -1;
     this.hasMergeableDiscussionsState = data.mergeable_discussions_state === false;
     this.canRemoveSourceBranch = currentUser.can_remove_source_branch || false;
     this.canMerge = !!data.merge_path;

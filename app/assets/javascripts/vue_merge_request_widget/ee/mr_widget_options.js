@@ -46,6 +46,7 @@ export default {
         :service="service" />
       <mr-widget-related-links
         v-if="shouldRenderRelatedLinks"
+        :is-merged="mr.isMerged"
         :related-links="mr.relatedLinks" />
       <mr-widget-merge-help v-if="shouldRenderMergeHelp" />
     </div>
