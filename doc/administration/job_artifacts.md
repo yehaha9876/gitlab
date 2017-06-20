@@ -86,13 +86,6 @@ _The artifacts are stored by default in
 1. Save the file and [restart GitLab][] for the changes to take effect.
 
 ### Using object storage
-<<<<<<< HEAD
-
-In [GitLab Enterprise Edition Premium][eep] you can use an object storage like
-AWS S3 to store the artifacts.
-
-[Learn how to use the object storage option.][ee-os]
-=======
 
 >**Notes:**
 - [Introduced][ee-1762] in [GitLab Enterprise Edition Premium][eep] 9.3.
@@ -172,7 +165,6 @@ _The artifacts are stored by default in
       artifacts will still be stored on the local disk. In the future
       you will be given an option to define a default storage artifacts for all
       new files.
->>>>>>> 716ecdc... Merge branch 'docs/object-storage-ee' into 'master'
 
 ## Expiring artifacts
 
@@ -240,11 +232,6 @@ memory and disk I/O.
 [reconfigure gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
 [restart gitlab]: restart_gitlab.md#installations-from-source "How to restart GitLab"
 [gitlab workhorse]: https://gitlab.com/gitlab-org/gitlab-workhorse "GitLab Workhorse repository"
-<<<<<<< HEAD
-[ee-os]: https://docs.gitlab.com/ee/administration/job_artifacts.html#using-object-storage
-[eep]: https://about.gitlab.com/gitlab-ee/ "GitLab Enterprise Edition Premium"
-=======
 [eep]: https://about.gitlab.com/gitlab-ee/ "GitLab Enterprise Edition Premium"
 [ee-1762]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1762
 [browsable]: ../user/project/pipelines/job_artifacts.md#browsing-job-artifacts
->>>>>>> 716ecdc... Merge branch 'docs/object-storage-ee' into 'master'
