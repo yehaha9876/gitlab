@@ -46,9 +46,12 @@ module API
       expose :shared_runners_minutes_limit
     end
 
-    class UserWithPrivateDetails < UserPublic
-      expose :private_token
+    class UserWithAdmin < UserPublic
       expose :admin?, as: :is_admin
+    end
+
+    class UserWithPrivateDetails < UserWithAdmin
+      expose :private_token
     end
 
     class Email < Grape::Entity
