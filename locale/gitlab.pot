@@ -62,6 +62,12 @@ msgstr[1] ""
 msgid "Branch <strong>%{branch_name}</strong> was created. To set up auto deploy, choose a GitLab CI Yaml template and commit your changes. %{link_to_autodeploy_doc}"
 msgstr ""
 
+msgid "BranchSwitcherPlaceholder|Search branches"
+msgstr ""
+
+msgid "BranchSwitcherTitle|Switch branch"
+msgstr ""
+
 msgid "Branches"
 msgstr ""
 
@@ -944,6 +950,9 @@ msgid "Upload New File"
 msgstr ""
 
 msgid "Upload file"
+msgstr ""
+
+msgid "UploadLink|click to upload"
 msgstr ""
 
 msgid "Use your global notification setting"

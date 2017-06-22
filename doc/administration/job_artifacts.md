@@ -87,10 +87,84 @@ _The artifacts are stored by default in
 
 ### Using object storage
 
-In [GitLab Enterprise Edition Premium][eep] you can use an object storage like
-AWS S3 to store the artifacts.
+>**Notes:**
+- [Introduced][ee-1762] in [GitLab Enterprise Edition Premium][eep] 9.3.
+- By enabling this feature the artifacts will **not** be [browsable] anymore
+  through the web interface. This limitation will be removed in one of the
+  upcoming releases.
 
-[Learn how to use the object storage option.][ee-os]
+If you don't want to use the local disk where GitLab is installed to store the
+artifacts, you can use an object storage like AWS S3 instead.
+This configuration relies on valid AWS credentials to be configured already.
+
+**In Omnibus installations:**
+
+_The artifacts are stored by default in
+`/var/opt/gitlab/gitlab-rails/shared/artifacts`._
+
+1. Edit `/etc/gitlab/gitlab.rb` and add the following lines by replacing with
+   the values you want:
+
+    ```ruby
+    gitlab_rails['artifacts_enabled'] = true
+    gitlab_rails['artifacts']['object_store_enabled'] = false
+    gitlab_rails['artifacts']['object_store_directory'] = "artifacts"
+    gitlab_rails['artifacts']['object_store_connection'] = {
+      'provider' => 'AWS',
+      'region' => 'eu-central-1',
+      'aws_access_key_id' => 'AWS_ACCESS_KEY_ID',
+      'aws_secret_access_key' => 'AWS_SECRET_ACCESS_KEY'
+    }
+    ```
+
+1. Save the file and [reconfigure GitLab][] for the changes to take effect.
+1. Migrate any existing local artifacts to the object storage:
+
+      ```bash
+      gitlab-rake gitlab:artifacts:migrate
+      ```
+
+      Currently this has to be executed manually and it will allow you to
+      migrate the existing artifacts to the object storage, but all new
+      artifacts will still be stored on the local disk. In the future
+      you will be given an option to define a default storage artifacts for all
+      new files.
+
+---
+
+**In installations from source:**
+
+_The artifacts are stored by default in
+`/home/git/gitlab/shared/artifacts`._
+
+1. Edit `/home/git/gitlab/config/gitlab.yml` and add or amend the following
+   lines:
+
+    ```yaml
+    artifacts:
+      enabled: true
+      object_store:
+        enabled: true
+        remote_directory: "artifacts" # The bucket name
+        connection:
+          provider: AWS # Only AWS supported at the moment
+          aws_access_key_id: AWS_ACESS_KEY_ID
+          aws_secret_access_key: AWS_SECRET_ACCESS_KEY
+          region: eu-central-1
+    ```
+
+1. Save the file and [restart GitLab][] for the changes to take effect.
+1. Migrate any existing local artifacts to the object storage:
+
+      ```bash
+      sudo -u git -H bundle exec rake gitlab:artifacts:migrate RAILS_ENV=production
+      ```
+
+      Currently this has to be executed manually and it will allow you to
+      migrate the existing artifacts to the object storage, but all new
+      artifacts will still be stored on the local disk. In the future
+      you will be given an option to define a default storage artifacts for all
+      new files.
 
 ## Expiring artifacts
 
@@ -155,8 +229,9 @@ When clicking on a specific file, [GitLab Workhorse] extracts it
 from the archive and the download begins. This implementation saves space,
 memory and disk I/O.
 
-[reconfigure gitlab]: restart_gitlab.md "How to restart GitLab"
-[restart gitlab]: restart_gitlab.md "How to restart GitLab"
+[reconfigure gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
+[restart gitlab]: restart_gitlab.md#installations-from-source "How to restart GitLab"
 [gitlab workhorse]: https://gitlab.com/gitlab-org/gitlab-workhorse "GitLab Workhorse repository"
-[ee-os]: https://docs.gitlab.com/ee/administration/job_artifacts.html#using-object-storage
 [eep]: https://about.gitlab.com/gitlab-ee/ "GitLab Enterprise Edition Premium"
+[ee-1762]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1762
+[browsable]: ../user/project/pipelines/job_artifacts.md#browsing-job-artifacts
