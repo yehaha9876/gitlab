@@ -491,6 +491,7 @@ class FilteredSearchManager {
   }
 
   searchState(e) {
+    e.preventDefault();
     const target = e.currentTarget;
     // remove focus outline after click
     target.blur();
