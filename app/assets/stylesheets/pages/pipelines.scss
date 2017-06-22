@@ -1161,7 +1161,6 @@
 
   &.has-only-one-job:not(:first-child) {
     margin-right: 36px;
-    margin-left: 0;
 
     .left-connector {
       @include flat-connector-before;
