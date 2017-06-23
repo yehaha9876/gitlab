@@ -666,6 +666,10 @@ module API
       expose :tag, as: :tag_name
       expose :description
     end
+  
+    class ReleaseAsset < Grape::Entity
+      expose :id, :project_id, :release_id, :file, :size, :file_type, :file_details
+    end
 
     class RepoTag < Grape::Entity
       expose :name, :message

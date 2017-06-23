@@ -49,7 +49,9 @@ scope format: false do
     resources :branches, only: [:index, :new, :create, :destroy]
     delete :merged_branches, controller: 'branches', action: :destroy_all_merged
     resources :tags, only: [:index, :show, :new, :create, :destroy] do
-      resource :release, only: [:edit, :update]
+      resource :release, only: [:edit, :update] do
+        resources :assets, only: [:show, :update, :destroy], controller: 'release_asset'
+      end
     end
 
     resources :protected_branches, only: [:index, :show, :create, :update, :destroy, :patch], constraints: { id: Gitlab::PathRegex.git_reference_regex } do

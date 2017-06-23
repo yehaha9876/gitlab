@@ -43,3 +43,17 @@
           = markdown_field(@release, :description)
     - else
       This tag has no release notes.
+
+  .table-holder
+    %table.table.ci-table.builds-page
+      %thead
+        %tr
+          %th File
+          %th Size
+      %tbody
+        - @release.assets.each do |asset|
+          %tr
+            %td
+              = link_to asset.file.filename, namespace_project_tag_release_asset_path(@project.namespace, @project, @release.tag, asset.file.filename)
+            %td
+              = asset.size

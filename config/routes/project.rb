@@ -274,6 +274,16 @@ constraints(ProjectUrlConstrainer.new) do
         end
       end
 
+      namespace :packages do
+        resource :deb, only: [] do
+          get :packages, path: 'Packages'
+          get :release, path: 'Release'
+          get :release_gpg, path: 'Release.gpg'
+          get :in_release, path: 'InRelease'
+          get :file, path: 'file/*release/*file', format: false
+        end
+      end
+
       resources :milestones, constraints: { id: /\d+/ } do
         member do
           put :sort_issues

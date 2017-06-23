@@ -159,6 +159,7 @@ class Project < ActiveRecord::Base
   has_many :approvers, as: :target, dependent: :destroy
   has_many :approver_groups, as: :target, dependent: :destroy
   has_many :releases, dependent: :destroy
+  has_many :release_assets, dependent: :destroy
   has_many :lfs_objects_projects, dependent: :destroy
   has_many :lfs_objects, through: :lfs_objects_projects
   has_many :project_group_links, dependent: :destroy

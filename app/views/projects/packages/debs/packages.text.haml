@@ -1,0 +1,9 @@
+- @assets.each do |asset|
+  = raw asset.debian_control
+  Filename: file/#{asset.release.tag}/#{asset.file.filename}
+  Size: #{asset.size.to_s}
+  MD5sum: #{asset.md5sum}
+  SHA1: #{asset.sha1sum}
+  SHA256: #{asset.sha256sum}
+  SHA512: #{asset.sha512sum}
+  = ""

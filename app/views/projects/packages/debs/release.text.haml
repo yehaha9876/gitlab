@@ -1,0 +1,6 @@
+Date: #{Time.now.utc.to_s(:rfc822)}
+- @shas.each do |name, hash|
+  = name.to_s + ":"
+  = precede ' ' do
+    - @files.each do |name, content|
+      = hash.hexdigest(content) + " " + content.size.to_s + " " + name.to_s
