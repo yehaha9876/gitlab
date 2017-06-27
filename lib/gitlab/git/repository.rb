@@ -506,7 +506,6 @@ module Gitlab
       #
       #   +options+ is a Hash of optional arguments to git
       #     :ref is the ref from which to begin (SHA1 or name)
-      #     :contains is the commit contained by the refs from which to begin (SHA1 or name)
       #     :max_count is the maximum number of commits to fetch
       #     :skip is the number of commits to skip
       #     :order is the commits order and allowed value is :none (default), :date,
@@ -517,7 +516,7 @@ module Gitlab
       def find_commits(options = {})
         actual_options = options.dup
 
-        allowed_options = [:ref, :max_count, :skip, :contains, :order]
+        allowed_options = [:ref, :max_count, :skip, :order]
 
         actual_options.keep_if do |key|
           allowed_options.include?(key)
@@ -530,10 +529,6 @@ module Gitlab
 
         if actual_options[:ref]
           walker.push(rugged.rev_parse_oid(actual_options[:ref]))
-        elsif actual_options[:contains]
-          branches_contains(actual_options[:contains]).each do |branch|
-            walker.push(branch.target_id)
-          end
         else
           rugged.references.each("refs/heads/*") do |ref|
             walker.push(ref.target_id)
