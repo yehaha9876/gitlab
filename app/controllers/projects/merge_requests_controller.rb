@@ -340,7 +340,6 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
   def rebase
     return access_denied! unless @merge_request.can_be_merged_by?(current_user)
-    return render_404 unless @merge_request.approved?
 
     RebaseWorker.perform_async(@merge_request.id, current_user.id)
 
