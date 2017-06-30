@@ -1075,7 +1075,7 @@ class Project < ActiveRecord::Base
     merge_requests.where(source_project_id: self.id)
   end
 
-  def create_repository(force = false)
+  def create_repository(force: false)
     # Forked import is handled asynchronously
     return if forked? && !force
 

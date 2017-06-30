@@ -49,7 +49,7 @@ module Geo
 
     def fetch_project_repository
       log('Fetching project repository')
-      project.create_repository unless project.repository_exists?
+      project.create_repository(force: true) unless project.repository_exists?
       project.repository.fetch_geo_mirror(ssh_url_to_repo)
     end
 

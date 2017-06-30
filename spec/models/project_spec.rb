@@ -1571,7 +1571,7 @@ describe Project, models: true do
 
         expect(project.repository).to receive(:after_create)
 
-        expect(project.create_repository(true)).to eq(true)
+        expect(project.create_repository(force: true)).to eq(true)
       end
     end
   end

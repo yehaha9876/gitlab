@@ -10,6 +10,34 @@ describe Geo::RepositorySyncService, services: true do
       allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:try_obtain).and_return(true)
     end
 
+    context 'when repository does not exist' do
+      let(:project) { create(:empty_project) }
+      let(:shell) { Gitlab::Shell.new }
+
+      before do
+        allow_any_instance_of(Project).to receive(:gitlab_shell).and_return(shell)
+      end
+
+      it 'creates the repository if it is a regular repository' do
+        expect(shell).to receive(:add_repository)
+          .with(project.repository_storage_path, project.path_with_namespace)
+          .and_return(true)
+
+        subject.execute
+      end
+
+      it 'creates the repository if it is a fork' do
+        allow(Project).to receive(:find).with(project.id).and_return(project)
+        allow(project).to receive(:forked?).and_return(true)
+
+        expect(shell).to receive(:add_repository)
+          .with(project.repository_storage_path, project.path_with_namespace)
+          .and_return(true)
+
+        subject.execute
+      end
+    end
+
     context 'when repository is empty' do
       let(:project) { create(:project_empty_repo) }
 
