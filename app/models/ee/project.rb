@@ -84,6 +84,20 @@ module EE
       mirror? && self.mirror_last_update_at
     end
 
+    def mirror_waiting_duration
+      return unless mirror?
+
+      (mirror_data.last_update_started_at.to_i -
+        mirror_data.last_update_scheduled_at.to_i).seconds
+    end
+
+    def mirror_update_duration
+      return unless mirror?
+
+      (mirror_last_update_at.to_i -
+        mirror_data.last_update_started_at.to_i).seconds
+    end
+
     def updating_mirror?
       return false unless mirror? && !empty_repo?
       return true if import_in_progress?
@@ -177,6 +191,7 @@ module EE
         super
       elsif mirror?
         ::Gitlab::Mirror.increment_metric(:mirrors_scheduled, 'Mirrors scheduled count')
+        Rails.logger.info("Mirror update for #{full_path} was scheduled.")
 
         RepositoryUpdateMirrorWorker.perform_async(self.id)
       end
