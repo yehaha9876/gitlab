@@ -93,6 +93,7 @@ const template = `
         :mr="mr"
         :service="service" />
       <mr-widget-related-links
+        :state="mr.state"
         :related-links="mr.relatedLinks" />
       <mr-widget-merge-help />
     </div>
