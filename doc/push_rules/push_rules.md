@@ -6,7 +6,7 @@ But there are cases when you need some specific rules like preventing git tag re
 GitLab Enterprise Edition offers a user-friendly interface for such cases.
 
 Push Rules are defined per project so you can have different rules applied to different projects depending on your needs.
-Push Rules settings can be found at Project settings -> Push Rules page.
+Push Rules settings can be found under "Push Rules" at the Project settings -> Repository page.
 
 ## How to use
 
