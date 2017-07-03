@@ -182,7 +182,6 @@ $status-icon-margin: $gl-btn-padding;
   }
 
   .normal {
-    font-size: 15px;
     line-height: 28px;
   }
 
@@ -237,7 +236,7 @@ $status-icon-margin: $gl-btn-padding;
     h4 {
       float: left;
       font-weight: bold;
-      font-size: 15px;
+      font-size: 14px;
       margin: 5px 0;
       color: $gl-text-color;
 
@@ -265,12 +264,10 @@ $status-icon-margin: $gl-btn-padding;
 
     .bold {
       font-weight: bold;
-      font-size: 15px;
       color: $gl-gray-light;
     }
 
     .state-label {
-      font-size: 16px;
       font-weight: bold;
       padding-right: 10px;
     }
