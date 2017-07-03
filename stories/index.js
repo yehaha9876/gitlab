@@ -83,18 +83,19 @@ const template = `
   <div class="mr-state-widget">
     <mr-widget-header
       :mr="mr" />
-    ${// <mr-widget-pipeline :mr="mr" />
-    ''}
+    <mr-widget-pipeline :mr="mr" />
     <mr-widget-deployment
       :mr="mr"
       :service="service" />
-    <component
-      :is="componentName"
-      :mr="mr"
-      :service="service" />
-    <mr-widget-related-links
-      :related-links="mr.relatedLinks" />
-    <mr-widget-merge-help />
+    <div>
+      <component
+        :is="componentName"
+        :mr="mr"
+        :service="service" />
+      <mr-widget-related-links
+        :related-links="mr.relatedLinks" />
+      <mr-widget-merge-help />
+    </div>
   </div>
 `;
 

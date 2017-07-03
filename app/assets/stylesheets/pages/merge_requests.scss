@@ -12,7 +12,7 @@ $status-icon-margin: $gl-btn-padding;
   border-radius: 2px;
 
   > * {
-    padding: $gl-padding;
+    padding: 10px;
   }
 
   > * + * {
@@ -143,6 +143,7 @@ $status-icon-margin: $gl-btn-padding;
 
   .mr-widget-body {
     @include clearfix;
+    margin-bottom: 5px;
   }
 
   .mr-widget-footer {
@@ -500,7 +501,7 @@ $status-icon-margin: $gl-btn-padding;
   position: relative;
 
   p {
-    margin: 6px 0;
+    margin: 0 0 5px 0;
     position: relative;
     padding-left: $status-icon-size + $status-icon-margin;
 
