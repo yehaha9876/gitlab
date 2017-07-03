@@ -36,7 +36,7 @@ export default {
         disabled="true">
         Merge</button>
       <span class="bold">
-        This merge request is currently Work In Progress and therefore unable to merge
+        This is a Work in Progress
       </span>
       <template v-if="mr.removeWIPPath">
         <i
