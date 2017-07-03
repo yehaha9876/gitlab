@@ -100,7 +100,6 @@ export default {
         </a>
       </div>
       <section class="mr-info-list">
-        <div class="legend"></div>
         <p>
           The changes were merged into
           <span class="label-branch">

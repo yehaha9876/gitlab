@@ -24,7 +24,6 @@ export default {
     <section
       v-if="hasLinks"
       class="mr-info-list mr-links">
-      <div class="legend"></div>
       <p v-if="relatedLinks.closing">
         Closes {{issueLabel('closing')}}
         <span v-html="relatedLinks.closing"></span>.

@@ -2,10 +2,22 @@
  * MR -> show: Automerge widget
  *
  */
+
+$status-icon-size: 22px;
+$status-icon-margin: $gl-btn-padding;
+
 .mr-state-widget {
   color: $gl-text-color;
   border: 1px solid $border-color;
   border-radius: 2px;
+
+  > * {
+    padding: $gl-padding;
+  }
+
+  > * + * {
+    border-top: solid 1px $border-color;
+  }
 
   form {
     margin-bottom: 0;
@@ -84,11 +96,8 @@
 
   .ci-widget {
     color: $gl-text-color;
-    display: -webkit-flex;
     display: flex;
-    -webkit-align-items: center;
     align-items: center;
-    padding: $gl-padding-top $gl-padding 0;
 
     svg {
       position: relative;
@@ -115,9 +124,11 @@
     }
   }
 
-  .mr-widget-body,
-  .mr-widget-footer {
+  .mr-widget-body {
     @include clearfix;
+  }
+
+  .mr-widget-footer {
     margin: 16px;
   }
 
@@ -154,8 +165,8 @@
   }
 
   .normal {
-    color: $gl-text-color;
     font-size: 15px;
+    line-height: 28px;
   }
 
   .capitalize {
@@ -197,18 +208,6 @@
   .mr-widget-help {
     margin: $gl-padding;
     color: $ci-skipped-color;
-  }
-
-  .mr-info-list {
-
-    &.mr-links {
-      margin-left: 28px;
-      margin-top: -10px;
-    }
-
-    &.mr-memory-usage {
-      margin: 5px 0 10px 25px;
-    }
   }
 
   .mr-widget-heading {
@@ -364,10 +363,6 @@
       }
     }
 
-    &.mr-state-locked .mr-info-list {
-      margin-left: 12px;
-    }
-
     &.empty-state {
       .artwork {
         margin-bottom: $gl-padding;
@@ -505,54 +500,21 @@
 .mr-info-list {
   clear: left;
   position: relative;
-  margin-left: 12px;
 
   p {
     margin: 6px 0;
     position: relative;
-    padding-left: 15px;
-
-    &::before {
-      content: '';
-      position: absolute;
-      border-top: 2px solid $border-color;
-      height: 1px;
-      top: 9px;
-      width: 8px;
-      left: 0;
-    }
+    padding-left: $status-icon-size + $status-icon-margin;
 
     &:last-child {
       margin-bottom: 0;
     }
   }
-
-  .legend {
-    height: 100%;
-    width: 2px;
-    background: $border-color;
-    position: absolute;
-    top: -9px;
-  }
 }
 
 .mr-info-list.mr-memory-usage {
-  .legend {
-    height: 65%;
-    top: 0;
-
-    @media (max-width: $screen-xs-max) {
-      height: 20px;
-    }
-  }
-
   p {
     float: left;
-    padding-left: 21px;
-
-    &::before {
-      top: 13px;
-    }
   }
 
   .memory-graph-container {
@@ -563,11 +525,8 @@
 
 .mr-source-target {
   background-color: $gray-light;
-  border-radius: 3px 3px 0 0;
-  border-bottom: 1px solid $border-color;
-  padding: 0 $gl-padding;
-  margin-bottom: 6px;
-  line-height: 44px;
+  border-radius: $border-radius-default $border-radius-default 0 0;
+  padding: $gl-padding-top $gl-padding;
 
   .dropdown-toggle .fa {
     color: $gl-text-color;
@@ -792,17 +751,12 @@
   p.usage-info-loading,
   p.usage-info-unavailable,
   p.usage-info-failed {
+    // TODO: don't think this is needed
     margin-bottom: 5px;
   }
 
   p.usage-info-loading .usage-info-load-spinner {
     margin-right: 10px;
     font-size: 16px;
-  }
-
-  @media (max-width: $screen-md-min) {
-    .mr-info-list.mr-memory-usage .legend {
-      height: 80%;
-    }
   }
 }

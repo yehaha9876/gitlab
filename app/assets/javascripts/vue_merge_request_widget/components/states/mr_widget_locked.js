@@ -13,7 +13,6 @@ export default {
           aria-hidden="true" />
       </h4>
       <section class="mr-info-list mr-links">
-        <div class="legend"></div>
         <p>
           The changes will be merged into
           <span class="label-branch">
