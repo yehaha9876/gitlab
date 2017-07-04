@@ -28,7 +28,7 @@ export default {
     },
   },
   template: `
-    <div class="mr-widget-heading">
+    <div class="mr-widget-heading ci-heading">
       <div class="ci-widget">
         <template v-if="hasCIError">
           <div class="ci-status-icon ci-status-icon-failed ci-error js-ci-error">
@@ -41,7 +41,7 @@ export default {
           <span>Could not connect to the CI server. Please check your settings and try again.</span>
         </template>
         <template v-else>
-          <div>
+          <div class="ci-status-icon">
             <a
               class="icon-link"
               :href="this.status.details_path">

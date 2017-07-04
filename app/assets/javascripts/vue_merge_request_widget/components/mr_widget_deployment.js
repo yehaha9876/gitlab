@@ -51,7 +51,7 @@ export default {
     },
   },
   template: `
-    <div class="mr-widget-heading">
+    <div class="mr-widget-heading deploy-heading">
       <div v-for="deployment in mr.deployments">
         <div class="ci-widget">
           <div class="ci-status-icon ci-status-icon-success">
