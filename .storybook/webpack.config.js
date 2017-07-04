@@ -87,10 +87,6 @@ var config = {
         loader: 'babel-loader',
       },
       {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-      },
-      {
         test: /\.svg$/,
         loader: 'raw-loader',
       },

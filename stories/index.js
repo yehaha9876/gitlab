@@ -36,9 +36,12 @@ import {
 } from '../app/assets/javascripts/vue_merge_request_widget/dependencies';
 import mockData from '../spec/javascripts/vue_mr_widget/mock_data';
 import { prometheusMockData } from '../spec/javascripts/monitoring/prometheus_mock_data';
+
 // gl global stuff that isn't imported
 import '../app/assets/javascripts/lib/utils/datetime_utility';
 import '../app/assets/javascripts/lib/utils/common_utils';
+import '../app/assets/javascripts/commons/bootstrap';
+import '../app/assets/javascripts/flash';
 
 const mr = camelize(mockData);
 mr.isOpen = true;
@@ -95,8 +98,8 @@ const template = `
       <mr-widget-related-links
         :state="mr.state"
         :related-links="mr.relatedLinks" />
-      <mr-widget-merge-help />
     </div>
+    <mr-widget-merge-help v-if="shouldRenderMergeHelp" />
   </div>
 `;
 
@@ -131,29 +134,33 @@ const makeWidget = props => ({
   template,
   data: () => ({
     service: {},
-    mr: {
-      ...props,
-      createIssueToResolveDiscussionsPath: text('Create issue', '/create/issue'),
-      isPipelineActive: boolean('Pipeline active', false),
-      shouldRemoveSourceBranch: boolean('shouldRemoveSourceBranch', true),
-      canRemoveSourceBranch: boolean('canRemoveSourceBranch', true),
-      mergeUserId: text('merge user ID', '1'),
-      currentUserId: text('current user ID', '1'),
-    },
+    closesIssues: boolean('Closes issues', true),
+    mentionsIssues: boolean('Mentions issues', false),
   }),
   computed: {
     componentName() {
       return stateMaps.stateToComponentMap[this.mr.state];
     },
+    mr() {
+      return {
+        ...props,
+        relatedLinks: {
+          closing: this.closesIssues ? '<a href="#">#23</a> and <a>#42</a>' : undefined,
+          mentioned: this.mentionsIssues ? '<a href="#">#7</a>' : undefined,
+        },
+        createIssueToResolveDiscussionsPath: text('Create issue', '/create/issue'),
+        isPipelineActive: boolean('Pipeline active', false),
+        shouldRemoveSourceBranch: boolean('shouldRemoveSourceBranch', true),
+        canRemoveSourceBranch: boolean('canRemoveSourceBranch', true),
+        mergeUserId: text('merge user ID', '1'),
+        currentUserId: text('current user ID', '1'),
+      };
+    },
+    shouldRenderMergeHelp() {
+      return stateMaps.statesToShowHelpWidget.indexOf(this.mr.state) > -1;
+    },
   },
 });
-
-const createComponent = () => {
-  delete mrWidgetOptions.el; // Prevent component mounting
-  gl.mrWidgetData = mockData;
-  const Component = Vue.extend(mrWidgetOptions);
-  return new Component();
-};
 
 function makeStory(options) {
   const props = {
