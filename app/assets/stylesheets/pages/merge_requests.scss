@@ -223,8 +223,8 @@ $status-icon-margin: $gl-btn-padding;
   }
 
   .mr-widget-help {
-    margin: $gl-padding;
-    color: $ci-skipped-color;
+    border: 0;
+    margin: 5px 10px;
   }
 
   .mr-widget-heading {
@@ -275,10 +275,6 @@ $status-icon-margin: $gl-btn-padding;
 
     .danger {
       color: $gl-danger;
-    }
-
-    .mr-widget-help {
-      margin: $gl-padding 0;
     }
 
     .spacing,
