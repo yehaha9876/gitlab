@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@storybook/addon-knobs": "^3.2",
-    "@storybook/addons": "^3.2",
+    "@storybook/addons": "^3.1.6",
     "@storybook/vue": "^3.2.0-alpha.5",
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
