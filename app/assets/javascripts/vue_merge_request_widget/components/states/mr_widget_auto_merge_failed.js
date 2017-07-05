@@ -27,7 +27,10 @@ export default {
       <ci-icon :status="{ group: 'failed', icon: 'icon_status_failed' }" />
       <div class="media-body">
         <span class="bold">
-          This merge request failed to be merged automatically
+          This merge request failed to be merged automatically.
+        </span>
+        <span class="merge-error-text bold">
+          {{mr.mergeError}}
         </span>
         <button
           @click="refreshWidget"
@@ -40,9 +43,6 @@ export default {
             aria-hidden="true" />
           Refresh
         </button>
-        <div class="merge-error-text danger bold">
-          {{mr.mergeError}}
-        </div>
       </div>
     </div>
   `,

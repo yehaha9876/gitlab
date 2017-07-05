@@ -48,11 +48,11 @@ export default {
       <div class="media-body">
         <span
           v-if="!isRefreshing"
-          class="bold danger">
+          class="bold">
           <span
             class="has-error-message"
             v-if="mr.mergeError">
-            {{mr.mergeError}}
+            {{mr.mergeError}}.
           </span>
           <span v-else>Merge failed.</span>
           <span
@@ -75,7 +75,10 @@ export default {
         <span
           v-if="isRefreshing"
           class="bold js-refresh-label">
-          Refreshing now...
+          Refreshing now
+          <i
+          class="fa fa-spinner fa-spin"
+          aria-hidden="true" />
         </span>
       </div>
     </div>

@@ -14,6 +14,9 @@ export default {
     missingBranchName() {
       return this.mr.sourceBranchRemoved ? 'source' : 'target';
     },
+    message() {
+      return `If the ${this.missingBranchName} branch exists in your local repository, you can merge this merge request manually using the command line`;
+    },
   },
   template: `
     <div class="mr-widget-body media">
@@ -23,7 +26,10 @@ export default {
           <span class="capitalize">
             {{missingBranchName}}
           </span> branch does not exist.
-          Please restore the {{missingBranchName}} branch or use a different {{missingBranchName}} branch
+          Please restore it or use a different {{missingBranchName}} branch
+          <i
+            class="fa fa-question-circle has-tooltip"
+            :title="message" />
         </span>
         <button
           type="button"
@@ -31,8 +37,6 @@ export default {
           disabled="true">
           Merge
         </button>
-        <mr-widget-merge-help
-          :missing-branch="missingBranchName" />
       </div>
     </div>
   `,

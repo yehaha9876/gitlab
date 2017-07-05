@@ -10,7 +10,7 @@ export default {
       <ci-icon :status="{ group: 'failed', icon: 'icon_status_failed' }" />
       <div class="media-body">
         <span class="bold">
-          The source branch HEAD has recently changed. Please reload the page and review the changes before merging.
+          The source branch HEAD has recently changed. Please reload the page and review the changes before merging
         </span>
         <button
           type="button"

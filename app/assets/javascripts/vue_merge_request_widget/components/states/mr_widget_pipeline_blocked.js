@@ -10,7 +10,7 @@ export default {
       <ci-icon :status="{ group: 'failed', icon: 'icon_status_failed' }" />
       <div class="media-body">
         <span class="bold">
-          Pipeline blocked. The pipeline for this merge request requires a manual action to proceed.
+          Pipeline blocked. The pipeline for this merge request requires a manual action to proceed
         </span>
         <button
           type="button"

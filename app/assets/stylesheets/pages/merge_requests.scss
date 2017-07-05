@@ -41,7 +41,8 @@ $status-icon-margin: $gl-btn-padding;
     }
 
     &.dropdown-toggle {
-      padding: 5px 7px;
+      // SIMON TODO: check other usages. mr_widget_header
+      padding: 5px 10px;
 
       .fa {
         color: inherit;
@@ -119,7 +120,6 @@ $status-icon-margin: $gl-btn-padding;
   .ci-widget {
     color: $gl-text-color;
     display: flex;
-    align-items: center;
 
     @media (max-width: $screen-xs-max) {
       flex-wrap: wrap;
@@ -221,7 +221,8 @@ $status-icon-margin: $gl-btn-padding;
   }
 
   .mr-widget-help {
-    border: 0;
+    padding: 10px 16px 10px 48px;
+    font-style: italic;
   }
 
   .mr-widget-heading {
@@ -257,7 +258,7 @@ $status-icon-margin: $gl-btn-padding;
     }
 
     .spacing {
-      margin: 0 $gl-padding;
+      margin: 0 0 0 10px;
     }
 
     .bold {
@@ -357,7 +358,9 @@ $status-icon-margin: $gl-btn-padding;
       }
     }
 
-    &.empty-state {
+    &.mr-widget-empty-state {
+      line-height: 20px;
+
       .artwork {
         margin-bottom: $gl-padding;
       }
@@ -498,12 +501,12 @@ $status-icon-margin: $gl-btn-padding;
   position: relative;
 
   p {
-    margin: 0 ;
+    margin: 0;
     position: relative;
     padding: 4px 0;
 
     &:last-child {
-      margin-bottom: 0;
+      padding-bottom: 0;
     }
   }
 }
@@ -748,13 +751,6 @@ $status-icon-margin: $gl-btn-padding;
 }
 
 .mr-memory-usage {
-  p.usage-info-loading,
-  p.usage-info-unavailable,
-  p.usage-info-failed {
-    // TODO: don't think this is needed
-    margin-bottom: 5px;
-  }
-
   p.usage-info-loading .usage-info-load-spinner {
     margin-right: 10px;
     font-size: 16px;
