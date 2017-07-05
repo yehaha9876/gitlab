@@ -204,6 +204,7 @@ module Ci
       variables += secret_variables(environment: environment)
       variables += trigger_request.user_variables if trigger_request
       variables += persisted_environment_variables if environment
+      variables += pipeline.pipeline_schedule.job_variables if pipeline.pipeline_schedule
 
       variables
     end

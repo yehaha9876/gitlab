@@ -136,12 +136,12 @@ ActiveRecord::Schema.define(version: 20170627211700) do
     t.integer "cached_markdown_version"
     t.boolean "clientside_sentry_enabled", default: false, null: false
     t.string "clientside_sentry_dsn"
-    t.boolean "prometheus_metrics_enabled", default: false, null: false
     t.boolean "check_namespace_plan", default: false, null: false
     t.integer "mirror_max_delay", default: 5, null: false
     t.integer "mirror_max_capacity", default: 100, null: false
     t.integer "mirror_capacity_threshold", default: 50, null: false
     t.boolean "authorized_keys_enabled", default: true, null: false
+    t.boolean "prometheus_metrics_enabled", default: false, null: false
     t.boolean "help_page_hide_commercial_content", default: false
     t.string "help_page_support_url"
   end
@@ -288,9 +288,9 @@ ActiveRecord::Schema.define(version: 20170627211700) do
     t.string "coverage_regex"
     t.integer "auto_canceled_by_id"
     t.boolean "retried"
-    t.integer "stage_id"
     t.integer "artifacts_file_store", default: 1, null: false
     t.integer "artifacts_metadata_store", default: 1, null: false
+    t.integer "stage_id"
   end
 
   add_index "ci_builds", ["auto_canceled_by_id"], name: "index_ci_builds_on_auto_canceled_by_id", using: :btree
@@ -306,6 +306,19 @@ ActiveRecord::Schema.define(version: 20170627211700) do
   add_index "ci_builds", ["token"], name: "index_ci_builds_on_token", unique: true, using: :btree
   add_index "ci_builds", ["updated_at"], name: "index_ci_builds_on_updated_at", using: :btree
   add_index "ci_builds", ["user_id"], name: "index_ci_builds_on_user_id", using: :btree
+
+  create_table "ci_pipeline_schedule_variables", force: :cascade do |t|
+    t.string "key", null: false
+    t.text "value"
+    t.text "encrypted_value"
+    t.string "encrypted_value_salt"
+    t.string "encrypted_value_iv"
+    t.integer "pipeline_schedule_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "ci_pipeline_schedule_variables", ["pipeline_schedule_id", "key"], name: "index_ci_pipeline_schedule_variables_on_schedule_id_and_key", unique: true, using: :btree
 
   create_table "ci_pipeline_schedules", force: :cascade do |t|
     t.string "description"
@@ -615,8 +628,8 @@ ActiveRecord::Schema.define(version: 20170627211700) do
     t.text "deleted_path", null: false
     t.text "deleted_wiki_path"
     t.text "deleted_project_name", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "geo_repository_deleted_events", ["project_id"], name: "index_geo_repository_deleted_events_on_project_id", using: :btree
@@ -1805,8 +1818,8 @@ ActiveRecord::Schema.define(version: 20170627211700) do
     t.string "token"
     t.boolean "pipeline_events", default: false, null: false
     t.boolean "confidential_issues_events", default: false, null: false
-    t.boolean "repository_update_events", default: false, null: false
     t.boolean "job_events", default: false, null: false
+    t.boolean "repository_update_events", default: false, null: false
   end
 
   add_index "web_hooks", ["project_id"], name: "index_web_hooks_on_project_id", using: :btree
@@ -1817,6 +1830,7 @@ ActiveRecord::Schema.define(version: 20170627211700) do
   add_foreign_key "chat_teams", "namespaces", on_delete: :cascade
   add_foreign_key "ci_builds", "ci_pipelines", column: "auto_canceled_by_id", name: "fk_a2141b1522", on_delete: :nullify
   add_foreign_key "ci_builds", "ci_stages", column: "stage_id", name: "fk_3a9eaa254d", on_delete: :cascade
+  add_foreign_key "ci_pipeline_schedule_variables", "ci_pipeline_schedules", column: "pipeline_schedule_id", name: "fk_41c35fda51", on_delete: :cascade
   add_foreign_key "ci_pipeline_schedules", "projects", name: "fk_8ead60fcc4", on_delete: :cascade
   add_foreign_key "ci_pipeline_schedules", "users", column: "owner_id", name: "fk_9ea99f58d2", on_delete: :nullify
   add_foreign_key "ci_pipelines", "ci_pipeline_schedules", column: "pipeline_schedule_id", name: "fk_3d34ab2e06", on_delete: :nullify
