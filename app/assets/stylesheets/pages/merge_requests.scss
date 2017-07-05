@@ -17,6 +17,7 @@ $status-icon-margin: $gl-btn-padding;
 
   > * + * {
     border-top: solid 1px $border-color;
+    line-height: 28px;
   }
 
   form {
@@ -116,12 +117,6 @@ $status-icon-margin: $gl-btn-padding;
     display: flex;
     align-items: center;
 
-    svg {
-      position: relative;
-      top: 1px;
-      overflow: visible;
-    }
-
     & > span {
       padding-right: 4px;
     }
@@ -130,10 +125,13 @@ $status-icon-margin: $gl-btn-padding;
       flex-wrap: wrap;
     }
 
-    .icon-link > .ci-status-icon > svg {
-      width: 22px;
-      height: 22px;
-      margin-right: 10px;
+    .ci-status-icon > svg {
+      width: $status-icon-size;
+      height: $status-icon-size;
+      margin: 1px $status-icon-margin 1px 0;
+      position: relative;
+      overflow: visible;
+      display: block;
     }
 
     .ci-error {
@@ -151,6 +149,7 @@ $status-icon-margin: $gl-btn-padding;
 
   .mr-widget-pipeline-graph {
     flex-shrink: 0;
+    padding: 0 4px;
 
     .dropdown-menu {
       margin-top: 11px;
@@ -494,11 +493,12 @@ $status-icon-margin: $gl-btn-padding;
 .mr-info-list {
   clear: left;
   position: relative;
+  padding-left: $status-icon-size + $status-icon-margin;
 
   p {
-    margin: 0 0 5px 0;
+    margin: 0 ;
     position: relative;
-    padding-left: $status-icon-size + $status-icon-margin;
+    padding: 4px 0;
 
     &:last-child {
       margin-bottom: 0;
@@ -757,51 +757,4 @@ $status-icon-margin: $gl-btn-padding;
     margin-right: 10px;
     font-size: 16px;
   }
-}
-
-// additional edits dimitrie
-.mr-widget-heading > div > div:first-child {
-  margin-bottom: 5px;
-}
-
-.ci-heading {
-  height: 57px;
-
-  .mr-widget-pipeline-graph {
-    padding: 0 4px;
-  }
-
-  .ci-widget > *:not(.ci-status-icon) {
-    margin-top: -8px;
-  }
-}
-
-.deploy-heading {
-  .ci-widget {
-    margin-bottom: 8px !important;
-
-    & > *:not(.ci-status-icon) {
-      margin-top: -1px;
-    }
-  }
-
-  .usage-info {
-    line-height: 28px;
-    margin-bottom: 0;
-  }
-}
-
-.mr-widget-body {
-  h4 {
-    margin-bottom: 12px !important;
-  }
-
-  section > p {
-    line-height: 28px;
-    margin-bottom: 8px !important;
-  }
-}
-
-.mr-links {
-  line-height: 28px;
 }
