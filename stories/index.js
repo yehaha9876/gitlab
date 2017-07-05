@@ -75,6 +75,11 @@ mr.closedBy = mr.mergedBy;
 mr.setToMWPSAt = mr.mergedAt;
 mr.setToMWPSBy = mr.mergedBy;
 mr.removeWIPPath = '/some/path';
+mr.mergeError = 'something went wrong with auto merge';
+mr.pipeline.commit = {
+  commit_path: 'something',
+  short_id: 'af341ad1',
+};
 
 window.gl.mrWidgetData = mr;
 window.gon = window.gon || {};
