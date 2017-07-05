@@ -1,4 +1,5 @@
 import eventHub from '../../event_hub';
+import ciIcon from '../../../vue_shared/components/ci_icon.vue';
 
 export default {
   name: 'MRWidgetAutoMergeFailed',
@@ -10,6 +11,9 @@ export default {
       isRefreshing: false,
     };
   },
+  components: {
+    ciIcon,
+  },
   methods: {
     refreshWidget() {
       this.isRefreshing = true;
@@ -19,15 +23,12 @@ export default {
     },
   },
   template: `
-    <div class="mr-widget-body">
-      <button
-        class="btn btn-success btn-small"
-        disabled="true"
-        type="button">
-        Merge
-      </button>
-      <span class="bold danger">
-        This merge request failed to be merged automatically.
+    <div class="mr-widget-body media">
+      <ci-icon :status="{ group: 'failed', icon: 'icon_status_failed' }" />
+      <div class="media-body">
+        <span class="bold">
+          This merge request failed to be merged automatically
+        </span>
         <button
           @click="refreshWidget"
           :class="{ disabled: isRefreshing }"
@@ -39,9 +40,9 @@ export default {
             aria-hidden="true" />
           Refresh
         </button>
-      </span>
-      <div class="merge-error-text danger bold">
-        {{mr.mergeError}}
+        <div class="merge-error-text danger bold">
+          {{mr.mergeError}}
+        </div>
       </div>
     </div>
   `,

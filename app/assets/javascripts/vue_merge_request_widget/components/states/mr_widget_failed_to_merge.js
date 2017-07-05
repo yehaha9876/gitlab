@@ -1,3 +1,4 @@
+import ciIcon from '../../../vue_shared/components/ci_icon.vue';
 import eventHub from '../../event_hub';
 
 export default {
@@ -38,39 +39,45 @@ export default {
       }
     },
   },
+  components: {
+    ciIcon,
+  },
   template: `
-    <div class="mr-widget-body">
-      <button
-        class="btn btn-success btn-small"
-        disabled="true"
-        type="button">
-        Merge
-      </button>
-      <span
-        v-if="!isRefreshing"
-        class="bold danger">
+    <div class="mr-widget-body media">
+      <ci-icon :status="{ group: 'failed', icon: 'icon_status_failed' }" />
+      <div class="media-body">
         <span
-          class="has-error-message"
-          v-if="mr.mergeError">
-          {{mr.mergeError}}
+          v-if="!isRefreshing"
+          class="bold danger">
+          <span
+            class="has-error-message"
+            v-if="mr.mergeError">
+            {{mr.mergeError}}
+          </span>
+          <span v-else>Merge failed.</span>
+          <span
+            :class="{ 'has-custom-error': mr.mergeError }">
+            Refreshing in {{timerText}} to show the updated status...
+          </span>
+          <button
+            class="btn btn-success btn-xs"
+            disabled="true"
+            type="button">
+            Merge
+          </button>
+          <button
+            @click="refresh"
+            class="btn btn-default btn-xs js-refresh-button"
+            type="button">
+            Refresh now
+          </button>
         </span>
-        <span v-else>Merge failed.</span>
         <span
-          :class="{ 'has-custom-error': mr.mergeError }">
-          Refreshing in {{timerText}} to show the updated status...
+          v-if="isRefreshing"
+          class="bold js-refresh-label">
+          Refreshing now...
         </span>
-        <button
-          @click="refresh"
-          class="btn btn-default btn-xs js-refresh-button"
-          type="button">
-          Refresh now
-        </button>
-      </span>
-      <span
-        v-if="isRefreshing"
-        class="bold js-refresh-label">
-        Refreshing now...
-      </span>
+      </div>
     </div>
   `,
 };

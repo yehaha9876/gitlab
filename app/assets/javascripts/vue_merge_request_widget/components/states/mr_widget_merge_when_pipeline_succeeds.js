@@ -1,5 +1,5 @@
 /* global Flash */
-
+import ciIcon from '../../../vue_shared/components/ci_icon.vue';
 import MRWidgetAuthor from '../../components/mr_widget_author';
 import eventHub from '../../event_hub';
 
@@ -11,6 +11,7 @@ export default {
   },
   components: {
     'mr-widget-author': MRWidgetAuthor,
+    ciIcon,
   },
   data() {
     return {
@@ -61,53 +62,56 @@ export default {
     },
   },
   template: `
-    <div class="mr-widget-body">
-      <h4>
-        Set by
-        <mr-widget-author :author="mr.setToMWPSBy" />
-        to be merged automatically when the pipeline succeeds.
-        <a
-          v-if="mr.canCancelAutomaticMerge"
-          @click.prevent="cancelAutomaticMerge"
-          :disabled="isCancellingAutoMerge"
-          role="button"
-          href="#"
-          class="btn btn-xs btn-default js-cancel-auto-merge">
-          <i
-            v-if="isCancellingAutoMerge"
-            class="fa fa-spinner fa-spin"
-            aria-hidden="true" />
-            Cancel automatic merge
-        </a>
-      </h4>
-      <section class="mr-info-list">
-        <p>The changes will be merged into
+    <div class="mr-widget-body media">
+      <ci-icon :status="{ group: 'success', icon: 'icon_status_success' }" />
+      <div class="media-body">
+        <h4>
+          Set by
+          <mr-widget-author :author="mr.setToMWPSBy" />
+          to be merged automatically when the pipeline succeeds
           <a
-            :href="mr.targetBranchPath"
-            class="label-branch">
-            {{mr.targetBranch}}
-          </a>.
-        </p>
-        <p v-if="mr.shouldRemoveSourceBranch">
-          The source branch will be removed.
-        </p>
-        <p v-else>
-          The source branch will not be removed.
-          <a
-            v-if="canRemoveSourceBranch"
-            :disabled="isRemovingSourceBranch"
-            @click.prevent="removeSourceBranch"
+            v-if="mr.canCancelAutomaticMerge"
+            @click.prevent="cancelAutomaticMerge"
+            :disabled="isCancellingAutoMerge"
             role="button"
-            class="btn btn-xs btn-default js-remove-source-branch"
-            href="#">
+            href="#"
+            class="btn btn-xs btn-default js-cancel-auto-merge">
             <i
-            v-if="isRemovingSourceBranch"
-            class="fa fa-spinner fa-spin"
-            aria-hidden="true" />
-            Remove source branch
+              v-if="isCancellingAutoMerge"
+              class="fa fa-spinner fa-spin"
+              aria-hidden="true" />
+              Cancel automatic merge
           </a>
-        </p>
-      </section>
+        </h4>
+        <section class="mr-info-list">
+          <p>The changes will be merged into
+            <a
+              :href="mr.targetBranchPath"
+              class="label-branch">
+              {{mr.targetBranch}}
+            </a>
+          </p>
+          <p v-if="mr.shouldRemoveSourceBranch">
+            The source branch will be removed
+          </p>
+          <p v-else>
+            The source branch will not be removed
+            <a
+              v-if="canRemoveSourceBranch"
+              :disabled="isRemovingSourceBranch"
+              @click.prevent="removeSourceBranch"
+              role="button"
+              class="btn btn-xs btn-default js-remove-source-branch"
+              href="#">
+              <i
+              v-if="isRemovingSourceBranch"
+              class="fa fa-spinner fa-spin"
+              aria-hidden="true" />
+              Remove source branch
+            </a>
+          </p>
+        </section>
+      </div>
     </div>
   `,
 };

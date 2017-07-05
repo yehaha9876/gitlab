@@ -31,6 +31,10 @@ $status-icon-margin: $gl-btn-padding;
   .btn {
     font-size: 14px;
 
+    &[disabled] {
+      opacity: 0.3;
+    }
+
     &.btn-xs {
       line-height: 1;
       padding: 5px 10px;
@@ -117,26 +121,22 @@ $status-icon-margin: $gl-btn-padding;
     display: flex;
     align-items: center;
 
-    & > span {
-      padding-right: 4px;
-    }
-
     @media (max-width: $screen-xs-max) {
       flex-wrap: wrap;
-    }
-
-    .ci-status-icon > svg {
-      width: $status-icon-size;
-      height: $status-icon-size;
-      margin: 1px $status-icon-margin 1px 0;
-      position: relative;
-      overflow: visible;
-      display: block;
     }
 
     .ci-error {
       margin-right: $btn-side-margin;
     }
+  }
+
+  .ci-status-icon > svg {
+    width: $status-icon-size;
+    height: $status-icon-size;
+    margin: 3px $status-icon-margin 3px 0;
+    position: relative;
+    overflow: visible;
+    display: block;
   }
 
   .mr-widget-body {
@@ -192,7 +192,7 @@ $status-icon-margin: $gl-btn-padding;
     @extend .ref-name;
 
     color: $gl-text-color;
-    font-weight: bold;
+    font-weight: 600;
     overflow: hidden;
     margin: 0 3px;
     word-break: break-all;
@@ -222,7 +222,6 @@ $status-icon-margin: $gl-btn-padding;
 
   .mr-widget-help {
     border: 0;
-    margin: 5px 10px;
   }
 
   .mr-widget-heading {
@@ -236,8 +235,8 @@ $status-icon-margin: $gl-btn-padding;
       float: left;
       font-weight: 600;
       font-size: 14px;
-      margin: 5px 0;
-      color: $gl-text-color;
+      line-height: inherit;
+      margin: 0 0 4px 0;
 
       &.has-conflicts .fa-exclamation-triangle {
         color: $gl-warning;
@@ -262,12 +261,12 @@ $status-icon-margin: $gl-btn-padding;
     }
 
     .bold {
-      font-weight: bold;
+      font-weight: 600;
       color: $gl-gray-light;
     }
 
     .state-label {
-      font-weight: bold;
+      font-weight: 600;
       padding-right: 10px;
     }
 
@@ -365,7 +364,7 @@ $status-icon-margin: $gl-btn-padding;
 
       .text {
         span {
-          font-weight: bold;
+          font-weight: 600;
         }
 
         p {
@@ -490,10 +489,13 @@ $status-icon-margin: $gl-btn-padding;
   }
 }
 
+.mr-links {
+  padding-left: $status-icon-size + $status-icon-margin;
+}
+
 .mr-info-list {
   clear: left;
   position: relative;
-  padding-left: $status-icon-size + $status-icon-margin;
 
   p {
     margin: 0 ;

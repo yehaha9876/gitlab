@@ -1,4 +1,5 @@
 /* global Flash */
+import ciIcon from '../../../vue_shared/components/ci_icon.vue';
 import eventHub from '../../event_hub';
 
 export default {
@@ -28,32 +29,38 @@ export default {
         });
     },
   },
+  components: {
+    ciIcon,
+  },
   template: `
-    <div class="mr-widget-body">
-      <button
-        type="button"
-        class="btn btn-success btn-small"
-        disabled="true">
-        Merge</button>
-      <span class="bold">
-        This is a Work in Progress
-      </span>
-      <template v-if="mr.removeWIPPath">
-        <i
-          class="fa fa-question-circle has-tooltip"
-          title="When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged." />
-        <button
-          @click="removeWIP"
-          :disabled="isMakingRequest"
-          type="button"
-          class="btn btn-default btn-xs js-remove-wip">
+    <div class="mr-widget-body media">
+      <ci-icon :status="{ group: 'failed', icon: 'icon_status_failed' }" />
+      <div class="media-body">
+        <span class="bold">
+          This is a Work in Progress
+        </span>
+        <template v-if="mr.removeWIPPath">
           <i
-            v-if="isMakingRequest"
-            class="fa fa-spinner fa-spin"
-            aria-hidden="true" />
-            Resolve WIP status
-        </button>
-      </template>
+            class="fa fa-question-circle has-tooltip"
+            title="When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged." />
+          <button
+            type="button"
+            class="btn btn-success btn-xs"
+            disabled="true">
+            Merge</button>
+          <button
+            @click="removeWIP"
+            :disabled="isMakingRequest"
+            type="button"
+            class="btn btn-default btn-xs js-remove-wip">
+            <i
+              v-if="isMakingRequest"
+              class="fa fa-spinner fa-spin"
+              aria-hidden="true" />
+              Resolve WIP status
+          </button>
+        </template>
+      </div>
     </div>
   `,
 };
