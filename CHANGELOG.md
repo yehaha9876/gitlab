@@ -2,6 +2,33 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 9.3.4 (2017-07-03)
+
+- No changes.
+
+## 9.3.3 (2017-06-30)
+
+- Fix head pipeline stored in merge request for external pipelines. !12478
+- Bring back branches badge to main project page. !12548
+- Fix diff of requirements.txt file by not matching newlines as part of package names.
+- Perform housekeeping only when an import of a fresh project is completed.
+- Fixed issue boards closed list not showing all closed issues.
+- Fixed multi-line markdown tooltip buttons in issue edit form.
+
+## 9.3.2 (2017-06-27)
+
+- API: Fix optional arugments for POST :id/variables. !12474
+- Bump premailer-rails gem to 1.9.7 and its dependencies to prevent network retrieval of assets.
+
+## 9.3.1 (2017-06-26)
+
+- Fix reversed breadcrumb order for nested groups. !12322
+- Fix 500 when failing to create private group. !12394
+- Fix linking to line number on side-by-side diff creating empty discussion box.
+- Don't match tilde and exclamation mark as part of requirements.txt package name.
+- Perform project housekeeping after importing projects.
+- Fixed ctrl+enter not submit issue edit form.
+
 ## 9.3.0 (2017-06-22)
 
 - Refactored gitlab:app:check into SystemCheck liberary and improve some checks. !9173

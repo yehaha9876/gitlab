@@ -62,6 +62,16 @@ module LoginHelpers
     Thread.current[:current_user] = user
   end
 
+  def login_via(provider, user, uid, remember_me: false)
+    mock_auth_hash(provider, uid, user.email)
+    visit new_user_session_path
+    expect(page).to have_content('Sign in with')
+
+    check 'Remember Me' if remember_me
+
+    click_link "oauth-login-#{provider}"
+  end
+
   def mock_auth_hash(provider, uid, email)
     # The mock_auth configuration allows you to set per-provider (or default)
     # authentication hashes to return during integration testing.
@@ -88,5 +98,27 @@ module LoginHelpers
       }
     })
     Rails.application.env_config['omniauth.auth'] = OmniAuth.config.mock_auth[:saml]
+  end
+
+  def mock_saml_config
+    OpenStruct.new(name: 'saml', label: 'saml', args: {
+      assertion_consumer_service_url: 'https://localhost:3443/users/auth/saml/callback',
+      idp_cert_fingerprint: '26:43:2C:47:AF:F0:6B:D0:07:9C:AD:A3:74:FE:5D:94:5F:4E:9E:52',
+      idp_sso_target_url: 'https://idp.example.com/sso/saml',
+      issuer: 'https://localhost:3443/',
+      name_identifier_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+    })
+  end
+
+  def stub_omniauth_saml_config(messages)
+    Rails.application.env_config['devise.mapping'] = Devise.mappings[:user]
+    Rails.application.routes.disable_clear_and_finalize = true
+    Rails.application.routes.draw do
+      post '/users/auth/saml' => 'omniauth_callbacks#saml'
+    end
+    allow(Gitlab::OAuth::Provider).to receive_messages(providers: [:saml], config_for: mock_saml_config)
+    stub_omniauth_setting(messages)
+    allow_any_instance_of(Object).to receive(:user_saml_omniauth_authorize_path).and_return('/users/auth/saml')
+    allow_any_instance_of(Object).to receive(:omniauth_authorize_path).with(:user, "saml").and_return('/users/auth/saml')
   end
 end

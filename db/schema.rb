@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170621102400) do
+ActiveRecord::Schema.define(version: 20170703102400) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -374,9 +374,10 @@ ActiveRecord::Schema.define(version: 20170621102400) do
     t.string "encrypted_value_iv"
     t.integer "project_id", null: false
     t.boolean "protected", default: false, null: false
+    t.string "environment_scope", default: "*", null: false
   end
 
-  add_index "ci_variables", ["project_id"], name: "index_ci_variables_on_project_id", using: :btree
+  add_index "ci_variables", ["project_id", "key", "environment_scope"], name: "index_ci_variables_on_project_id_and_key_and_environment_scope", unique: true, using: :btree
 
   create_table "container_repositories", force: :cascade do |t|
     t.integer "project_id", null: false
@@ -770,6 +771,7 @@ ActiveRecord::Schema.define(version: 20170621102400) do
     t.datetime "last_edited_at"
     t.integer "last_edited_by_id"
     t.integer "head_pipeline_id"
+    t.boolean "ref_fetched"
   end
 
   add_index "merge_requests", ["assignee_id"], name: "index_merge_requests_on_assignee_id", using: :btree

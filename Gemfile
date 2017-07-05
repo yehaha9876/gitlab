@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '4.2.8'
 gem 'rails-deprecated_sanitizer', '~> 1.0.3'
+gem 'bootsnap', '~> 1.1'
 
 # Responders respond_to and respond_with
 gem 'responders', '~> 2.0'
@@ -254,7 +255,7 @@ gem 'net-ssh', '~> 3.0.1'
 gem 'base32', '~> 0.3.0'
 
 # Sentry integration
-gem 'sentry-raven', '~> 2.4.0'
+gem 'sentry-raven', '~> 2.5.3'
 
 gem 'premailer-rails', '~> 1.9.7'
 
@@ -284,6 +285,7 @@ group :metrics do
 
   # Prometheus
   gem 'prometheus-client-mmap', '~>0.7.0.beta5'
+  gem 'raindrops', '~> 0.18'
 end
 
 group :development do
@@ -354,7 +356,7 @@ group :test do
   gem 'shoulda-matchers', '~> 2.8.0', require: false
   gem 'email_spec', '~> 1.6.0'
   gem 'json-schema', '~> 2.6.2'
-  gem 'webmock', '~> 1.24.0'
+  gem 'webmock', '~> 2.3.2'
   gem 'test_after_commit', '~> 1.1'
   gem 'sham_rack', '~> 1.3.6'
   gem 'timecop', '~> 0.8.0'
