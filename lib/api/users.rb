@@ -1,11 +1,9 @@
 module API
   class Users < Grape::API
     include PaginationParams
+    include APIGuard
 
-    before do
-      allow_access_with_scope :read_user if request.get?
-      authenticate!
-    end
+    allow_access_with_scope :read_user, if: -> (request) { request.get? }
 
     resource :users, requirements: { uid: /[0-9]*/, id: /[0-9]*/ } do
       helpers do
