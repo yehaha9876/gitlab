@@ -162,6 +162,7 @@ build-package:
     SETUP_DB: "false"
     USE_BUNDLE_INSTALL: "false"
     EE_PACKAGE: "true"
+    OMNIBUS_BRANCH: "fix-triggered-docker-build-tag"
   stage: build
   when: manual
   script:
