@@ -11,11 +11,11 @@ export default {
     },
   },
   methods: {
-    verbLabel() {
-      if (this.state === 'merged') {
+    verbLabel(state) {
+      if (state === 'merged') {
         return 'Closed';
       }
-      if (this.state === 'closed') {
+      if (state === 'closed') {
         return 'Did not close';
       }
       return 'Closes';
@@ -26,7 +26,7 @@ export default {
       v-if="hasLinks"
       class="mr-info-list mr-links">
       <p v-if="relatedLinks.closing">
-        {{verbLabel()}} <span v-html="relatedLinks.closing"></span>
+        {{verbLabel(state)}} <span v-html="relatedLinks.closing"></span>
       </p>
       <p v-if="relatedLinks.mentioned">
         Mentions <span v-html="relatedLinks.mentioned"></span>

@@ -26,15 +26,15 @@ export default {
     <div class="mr-widget-body media">
       <ci-icon :status="{ group: 'failed', icon: 'icon_status_failed' }" />
       <div class="media-body">
-        <span class="bold">
-          This merge request failed to be merged automatically.
-        </span>
         <span class="merge-error-text bold">
-          {{mr.mergeError}}
+          {{mr.mergeError}}.
+        </span>
+        <span class="bold">
+          This merge request failed to be merged automatically
         </span>
         <button
           @click="refreshWidget"
-          :class="{ disabled: isRefreshing }"
+          :disabled="isRefreshing"
           type="button"
           class="btn btn-xs btn-default">
           <i

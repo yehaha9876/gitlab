@@ -35,7 +35,7 @@ export default {
       <div class="ci-widget media">
         <template v-if="!hasPipeline">
           <i class="fa fa-spinner fa-spin append-right-10" aria-hidden="true"></i>
-          Waiting for pipeline...
+          <div class="media-body">Waiting for pipeline...</div>
         </template>
         <template v-else-if="hasCIError">
           <div class="ci-status-icon ci-status-icon-failed ci-error js-ci-error">
@@ -43,10 +43,10 @@ export default {
               <span
                 v-html="svg"
                 aria-hidden="true"></span>
-            </span>
+            </div>
           </div>
           <div class="media-body">
-            Could not connect to the CI server. Please check your settings and try again.
+            Could not connect to the CI server. Please check your settings and try again
           </div>
         </template>
         <template v-else>
