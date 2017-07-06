@@ -35,7 +35,7 @@ import {
   notify,
 } from '../app/assets/javascripts/vue_merge_request_widget/dependencies';
 import mockData from '../spec/javascripts/vue_mr_widget/mock_data';
-import { prometheusMockData } from '../spec/javascripts/monitoring/prometheus_mock_data';
+import { prometheusMockData } from '../spec/javascripts/prometheus_metrics/mock_data';
 
 // gl global stuff that isn't imported
 import '../app/assets/javascripts/lib/utils/datetime_utility';
