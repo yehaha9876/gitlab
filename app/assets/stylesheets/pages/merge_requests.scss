@@ -307,17 +307,8 @@ $status-icon-margin: $gl-btn-padding;
       }
     }
 
-    .has-error-message + .has-custom-error {
-      margin-left: 0;
-    }
-
     .has-custom-error {
       display: inline-block;
-      margin-left: 70px;
-    }
-
-    .merge-error-text {
-      margin-left: 70px;
     }
 
     @media (max-width: $screen-xs-max) {
