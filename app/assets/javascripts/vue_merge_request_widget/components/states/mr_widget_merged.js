@@ -1,7 +1,7 @@
 /* global Flash */
 
 import mrWidgetAuthorTime from '../../components/mr_widget_author_time';
-import ciIcon from '../../../vue_shared/components/ci_icon.vue';
+import statusIcon from '../mr_widget_status_icon';
 import eventHub from '../../event_hub';
 
 export default {
@@ -12,7 +12,7 @@ export default {
   },
   components: {
     'mr-widget-author-and-time': mrWidgetAuthorTime,
-    ciIcon,
+    statusIcon,
   },
   data() {
     return {
@@ -58,7 +58,7 @@ export default {
   },
   template: `
     <div class="mr-widget-body media">
-      <ci-icon :status="{ group: 'success', icon: 'icon_status_success' }" />
+      <status-icon status="success" />
       <div class="media-body">
         <mr-widget-author-and-time
           actionText="Merged by"

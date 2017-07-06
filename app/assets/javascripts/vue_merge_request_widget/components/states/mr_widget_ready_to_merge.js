@@ -1,5 +1,5 @@
 /* global Flash */
-import ciIcon from '../../../vue_shared/components/ci_icon.vue';
+import statusIcon from '../mr_widget_status_icon';
 import successSvg from 'icons/_icon_status_success.svg';
 import warningSvg from 'icons/_icon_status_warning.svg';
 import simplePoll from '~/lib/utils/simple_poll';
@@ -26,7 +26,7 @@ export default {
     };
   },
   components: {
-    ciIcon,
+    statusIcon,
   },
   computed: {
     commitMessageLinkTitle() {
@@ -200,7 +200,7 @@ export default {
   },
   template: `
     <div class="mr-widget-body media">
-      <ci-icon :status="{ group: 'success', icon: 'icon_status_success' }" />
+      <status-icon status="success" />
       <div class="media-body">
         <span class="btn-group">
           <button

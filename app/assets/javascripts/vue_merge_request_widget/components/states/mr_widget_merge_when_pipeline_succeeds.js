@@ -1,5 +1,5 @@
 /* global Flash */
-import ciIcon from '../../../vue_shared/components/ci_icon.vue';
+import statusIcon from '../mr_widget_status_icon';
 import MRWidgetAuthor from '../../components/mr_widget_author';
 import eventHub from '../../event_hub';
 
@@ -11,7 +11,7 @@ export default {
   },
   components: {
     'mr-widget-author': MRWidgetAuthor,
-    ciIcon,
+    statusIcon,
   },
   data() {
     return {
@@ -63,7 +63,7 @@ export default {
   },
   template: `
     <div class="mr-widget-body media">
-      <ci-icon :status="{ group: 'success', icon: 'icon_status_success' }" />
+      <status-icon status="success" />
       <div class="media-body">
         <h4>
           Set by

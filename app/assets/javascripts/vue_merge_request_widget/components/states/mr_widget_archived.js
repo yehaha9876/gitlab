@@ -1,13 +1,13 @@
-import ciIcon from '../../../vue_shared/components/ci_icon.vue';
+import statusIcon from '../mr_widget_status_icon';
 
 export default {
   name: 'MRWidgetArchived',
   components: {
-    ciIcon,
+    statusIcon,
   },
   template: `
     <div class="mr-widget-body media">
-      <ci-icon :status="{ group: 'failed', icon: 'icon_status_failed' }" />
+      <status-icon status="failed" />
       <div class="media-body">
         <span class="bold">
           This project is archived, write access has been disabled

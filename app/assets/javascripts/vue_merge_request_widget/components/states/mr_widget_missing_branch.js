@@ -1,4 +1,4 @@
-import ciIcon from '../../../vue_shared/components/ci_icon.vue';
+import statusIcon from '../mr_widget_status_icon';
 import mrWidgetMergeHelp from '../../components/mr_widget_merge_help';
 
 export default {
@@ -8,7 +8,7 @@ export default {
   },
   components: {
     'mr-widget-merge-help': mrWidgetMergeHelp,
-    ciIcon,
+    statusIcon,
   },
   computed: {
     missingBranchName() {
@@ -20,7 +20,7 @@ export default {
   },
   template: `
     <div class="mr-widget-body media">
-      <ci-icon :status="{ group: 'failed', icon: 'icon_status_failed' }" />
+      <status-icon status="failed" />
       <div class="media-body">
         <span class="bold js-branch-text">
           <span class="capitalize">

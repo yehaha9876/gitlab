@@ -1,4 +1,4 @@
-import ciIcon from '../../../vue_shared/components/ci_icon.vue';
+import statusIcon from '../mr_widget_status_icon';
 
 export default {
   name: 'MRWidgetLocked',
@@ -6,11 +6,11 @@ export default {
     mr: { type: Object, required: true },
   },
   components: {
-    ciIcon,
+    statusIcon,
   },
   template: `
     <div class="mr-widget-body mr-state-locked media">
-      <ci-icon :status="{ group: 'pending', icon: 'icon_status_pending' }" />
+      <status-icon status="pending" />
       <div class="media-body">
         <h4>
           This merge request is in the process of being merged, during which time it is locked and cannot be closed
