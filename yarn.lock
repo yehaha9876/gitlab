@@ -5669,6 +5669,10 @@ react-icon-base@2.0.7:
   dependencies:
     prop-types "15.5.8"
 
+react-icon-base@^2.0.8:
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/react-icon-base/-/react-icon-base-2.0.8.tgz#ed881aa8fea42834d687dc033aa7b1fbe8ee7036"
+
 react-icons@^2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-2.2.5.tgz#f942501c21a4cc0456ce2bbee5032c93f6051dcf"
