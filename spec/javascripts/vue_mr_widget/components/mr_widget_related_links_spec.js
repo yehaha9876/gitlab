@@ -55,17 +55,17 @@ describe('MRWidgetRelatedLinks', () => {
     };
     const vm = createComponent(data);
 
-    describe('verbLabel', () => {
+    describe('closesText', () => {
       it('returns correct text for open merge request', () => {
-        expect(vm.verbLabel('open')).toEqual('Closes');
+        expect(vm.closesText('open')).toEqual('Closes');
       });
 
       it('returns correct text for closed merge request', () => {
-        expect(vm.verbLabel('closed')).toEqual('Did not close');
+        expect(vm.closesText('closed')).toEqual('Did not close');
       });
 
       it('returns correct tense for merged request', () => {
-        expect(vm.verbLabel('merged')).toEqual('Closed');
+        expect(vm.closesText('merged')).toEqual('Closed');
       });
     });
   });

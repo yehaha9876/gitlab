@@ -34,7 +34,7 @@ export default {
     <div class="mr-widget-heading">
       <div class="ci-widget media">
         <template v-if="!hasPipeline">
-          <i class="fa fa-spinner fa-spin append-right-10" aria-hidden="true"></i>
+          <div><i class="fa fa-spinner fa-spin append-right-10" aria-hidden="true"></i></div>
           <div class="media-body">Waiting for pipeline...</div>
         </template>
         <template v-else-if="hasCIError">

@@ -13,14 +13,12 @@ export default {
       <status-icon status="failed" />
       <div class="media-body">
         <span class="bold">
-          There are merge conflicts.
+          There are merge conflicts<span v-if="!mr.canMerge">.</span>
           <span v-if="!mr.canMerge">
             Resolve these conflicts or ask someone with write access to this repository to merge it locally.
           </span>
         </span>
-        <div
-          v-if="mr.canMerge"
-          class="btn-group">
+        <span v-if="mr.canMerge">
           <a
             v-if="mr.conflictResolutionPath"
             :href="mr.conflictResolutionPath"
@@ -40,7 +38,7 @@ export default {
             href="#modal_merge_info">
             Merge locally
           </a>
-        </div>
+        </span>
       </div>
     </div>
   `,

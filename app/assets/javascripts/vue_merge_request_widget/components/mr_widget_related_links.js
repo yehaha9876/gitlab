@@ -11,7 +11,7 @@ export default {
     },
   },
   methods: {
-    verbLabel(state) {
+    closesText(state) {
       if (state === 'merged') {
         return 'Closed';
       }
@@ -26,7 +26,7 @@ export default {
       v-if="hasLinks"
       class="mr-info-list mr-links">
       <p v-if="relatedLinks.closing">
-        {{verbLabel(state)}} <span v-html="relatedLinks.closing"></span>
+        {{closesText(state)}} <span v-html="relatedLinks.closing"></span>
       </p>
       <p v-if="relatedLinks.mentioned">
         Mentions <span v-html="relatedLinks.mentioned"></span>

@@ -13,11 +13,8 @@ $status-icon-margin: $gl-btn-padding;
 
   > * {
     padding: 16px;
-  }
-
-  > * + * {
-    border-top: solid 1px $border-color;
     line-height: 28px;
+    border-top: solid 1px $border-color;
   }
 
   form {
@@ -41,7 +38,6 @@ $status-icon-margin: $gl-btn-padding;
     }
 
     &.dropdown-toggle {
-      // SIMON TODO: check other usages. mr_widget_header
       padding: 5px 10px;
 
       .fa {

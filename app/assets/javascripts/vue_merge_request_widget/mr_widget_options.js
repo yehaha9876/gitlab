@@ -234,14 +234,16 @@ export default {
         v-if="shouldRenderDeployments"
         :mr="mr"
         :service="service" />
-      <component
-        :is="componentName"
-        :mr="mr"
-        :service="service" />
-      <mr-widget-related-links
-        v-if="shouldRenderRelatedLinks"
-        :state="mr.state"
-        :related-links="mr.relatedLinks" />
+      <div>
+        <component
+          :is="componentName"
+          :mr="mr"
+          :service="service" />
+        <mr-widget-related-links
+          v-if="shouldRenderRelatedLinks"
+          :state="mr.state"
+          :related-links="mr.relatedLinks" />
+      </div>
       <mr-widget-merge-help v-if="shouldRenderMergeHelp" />
     </div>
   `,
