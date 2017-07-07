@@ -93,7 +93,7 @@ Manage files and branches from the UI (user interface):
   - [Checkout merge requests locally](user/project/merge_requests/index.md#checkout-merge-requests-locally)
   - [Cherry-pick](user/project/merge_requests/cherry_pick_changes.md)
 - [Milestones](user/project/milestones/index.md): Organize issues and merge requests into a cohesive group, optionally setting a due date.
-  - **(EES/EEP)** [Burndown Charts](user/project/milestones/index.md#burndown-charts): Watch your project's progress throughout a specific milestone.
+  - **(EES/EEP)** [Burndown Charts](user/project/milestones/burndown_charts.md): Watch your project's progress throughout a specific milestone.
 - [Related issues](user/project/issues/related_issues.md)
 - [Todos](workflow/todos.md): A chronological list of to-dos that are waiting for your input, all in a simple dashboard.
 
@@ -193,6 +193,7 @@ have access to GitLab administration tools and settings.
 - [Operations](administration/operations.md): Keeping GitLab up and running.
 - [Polling](administration/polling.md): Configure how often the GitLab UI polls for updates.
 - [Request Profiling](administration/monitoring/performance/request_profiling.md): Get a detailed profile on slow requests.
+- [Performance Bar](administration/monitoring/performance/performance_bar.md): Get performance information for the current page.
 
 ### Customization
 
