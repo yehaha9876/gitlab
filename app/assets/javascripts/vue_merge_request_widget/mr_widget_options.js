@@ -35,8 +35,13 @@ import {
 export default {
   el: '#js-vue-mr-widget',
   name: 'MRWidget',
+  props: {
+    mrData: {
+      type: Object,
+    },
+  },
   data() {
-    const store = new MRWidgetStore(window.gl.mrWidgetData);
+    const store = new MRWidgetStore(this.mrData || window.gl.mrWidgetData);
     const service = this.createService(store);
     return {
       mr: store,

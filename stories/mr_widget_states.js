@@ -1,11 +1,7 @@
 import { storiesOf } from '@storybook/vue';
 import { addonKnobs, boolean, select, text } from '@storybook/addon-knobs';
-import camelize from 'camelize';
-import Vue from 'vue';
-import mrWidgetOptions from '../app/assets/javascripts/vue_merge_request_widget/mr_widget_options';
 import * as mrWidget from '../app/assets/javascripts/vue_merge_request_widget/dependencies';
 import mockData from '../spec/javascripts/vue_mr_widget/mock_data';
-import { prometheusMockData } from '../spec/javascripts/prometheus_metrics/mock_data';
 
 // gl global stuff that isn't imported
 import '../app/assets/javascripts/lib/utils/datetime_utility';
