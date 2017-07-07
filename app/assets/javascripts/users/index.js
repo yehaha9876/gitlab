@@ -1,2 +1,5 @@
 import './calendar';
-import './user';
+import User from './user';
+
+window.gl = window.gl || {};
+window.gl.User = User;
