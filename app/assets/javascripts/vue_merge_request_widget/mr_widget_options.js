@@ -35,14 +35,8 @@ import {
 export default {
   el: '#js-vue-mr-widget',
   name: 'MRWidget',
-  props: {
-    mrData: {
-      type: Object,
-      default: window.gl.mrWidgetData,
-    },
-  },
   data() {
-    const store = new MRWidgetStore(this.mrData);
+    const store = new MRWidgetStore(window.gl.mrWidgetData);
     const service = this.createService(store);
     return {
       mr: store,
@@ -240,7 +234,7 @@ export default {
         v-if="shouldRenderDeployments"
         :mr="mr"
         :service="service" />
-      <div>
+      <div class="mr-widget-section">
         <component
           :is="componentName"
           :mr="mr"
@@ -250,7 +244,9 @@ export default {
           :state="mr.state"
           :related-links="mr.relatedLinks" />
       </div>
-      <mr-widget-merge-help v-if="shouldRenderMergeHelp" />
+      <div class="mr-widget-footer" v-if="shouldRenderMergeHelp">
+        <mr-widget-merge-help />
+      </div>
     </div>
   `,
 };

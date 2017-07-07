@@ -10,11 +10,17 @@ $status-icon-margin: $gl-btn-padding;
   color: $gl-text-color;
   border: 1px solid $border-color;
   border-radius: 2px;
+  line-height: 28px;
 
-  > * {
+  .mr-widget-heading,
+  .mr-widget-section,
+  .mr-widget-footer {
     padding: 16px;
-    line-height: 28px;
     border-top: solid 1px $border-color;
+  }
+
+  .mr-widget-footer {
+    padding: 0;
   }
 
   form {
@@ -137,10 +143,6 @@ $status-icon-margin: $gl-btn-padding;
 
   .mr-widget-body {
     @include clearfix;
-  }
-
-  .mr-widget-footer {
-    margin: 16px;
   }
 
   .mr-widget-pipeline-graph {
@@ -362,10 +364,6 @@ $status-icon-margin: $gl-btn-padding;
         }
       }
     }
-  }
-
-  .mr-widget-footer {
-    border-top: 1px solid $gray-darker;
   }
 
   .ci-coverage {
