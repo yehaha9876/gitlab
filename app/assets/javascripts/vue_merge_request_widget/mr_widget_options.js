@@ -234,7 +234,7 @@ export default {
         v-if="shouldRenderDeployments"
         :mr="mr"
         :service="service" />
-      <div>
+      <div class="mr-widget-section">
         <component
           :is="componentName"
           :mr="mr"
@@ -244,7 +244,9 @@ export default {
           :state="mr.state"
           :related-links="mr.relatedLinks" />
       </div>
-      <mr-widget-merge-help v-if="shouldRenderMergeHelp" />
+      <div class="mr-widget-footer" v-if="shouldRenderMergeHelp">
+        <mr-widget-merge-help />
+      </div>
     </div>
   `,
 };
