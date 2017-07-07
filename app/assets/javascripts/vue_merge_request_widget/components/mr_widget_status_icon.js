@@ -7,7 +7,15 @@ export default {
   components: {
     ciIcon,
   },
+  computed: {
+    statusObj() {
+      return {
+        group: this.status,
+        icon: `icon_status_${this.status}`,
+      };
+    },
+  },
   template: `
-    <ci-icon :status="{ group: status, icon: 'icon_status_' + status }" />
+    <ci-icon :status="statusObj" />
   `,
 };
