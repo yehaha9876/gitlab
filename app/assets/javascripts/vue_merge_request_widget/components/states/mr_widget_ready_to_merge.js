@@ -1,5 +1,5 @@
 /* global Flash */
-
+import statusIcon from '../mr_widget_status_icon';
 import successSvg from 'icons/_icon_status_success.svg';
 import warningSvg from 'icons/_icon_status_warning.svg';
 import simplePoll from '~/lib/utils/simple_poll';
@@ -24,6 +24,9 @@ export default {
       successSvg,
       warningSvg,
     };
+  },
+  components: {
+    statusIcon,
   },
   computed: {
     commitMessageLinkTitle() {
@@ -200,76 +203,78 @@ export default {
     },
   },
   template: `
-    <div class="mr-widget-body">
-      <span class="btn-group">
-        <button
-          @click="handleMergeButtonClick()"
-          :disabled="isMergeButtonDisabled"
-          :class="mergeButtonClass"
-          type="button">
-          <i
-            v-if="isMakingRequest"
-            class="fa fa-spinner fa-spin"
-            aria-hidden="true" />
-          {{mergeButtonText}}
-        </button>
-        <button
-          v-if="shouldShowMergeOptionsDropdown"
-          :disabled="isMergeButtonDisabled"
-          type="button"
-          class="btn btn-small btn-info dropdown-toggle"
-          data-toggle="dropdown">
-          <i
-            class="fa fa-caret-down"
-            aria-hidden="true" />
-          <span class="sr-only">
-            Select merge moment
-          </span>
-        </button>
-        <ul
-          v-if="shouldShowMergeOptionsDropdown"
-          class="dropdown-menu dropdown-menu-right"
-          role="menu">
-          <li>
-            <a
-              @click.prevent="handleMergeButtonClick(true)"
-              class="merge_when_pipeline_succeeds"
-              href="#">
-              <span
-                v-html="successSvg"
-                class="merge-opt-icon"
-                aria-hidden="true"></span>
-              <span class="merge-opt-title">Merge when pipeline succeeds</span>
-            </a>
-          </li>
-          <li>
-            <a
-              @click.prevent="handleMergeButtonClick(false, true)"
-              class="accept-merge-request"
-              href="#">
-              <span
-                v-html="warningSvg"
-                class="merge-opt-icon"
-                aria-hidden="true"></span>
-              <span class="merge-opt-title">Merge immediately</span>
-            </a>
-          </li>
-        </ul>
-      </span>
-      <template v-if="isMergeAllowed()">
-        <label class="spacing">
-          <input
-            id="remove-source-branch-input"
-            v-model="removeSourceBranch"
-            :disabled="isRemoveSourceBranchButtonDisabled"
-            type="checkbox"/> Remove source branch
-        </label>
+    <div class="mr-widget-body media">
+      <status-icon status="success" />
+      <div class="media-body">
+        <span class="btn-group">
+          <button
+            @click="handleMergeButtonClick()"
+            :disabled="isMergeButtonDisabled"
+            :class="mergeButtonClass"
+            type="button">
+            <i
+              v-if="isMakingRequest"
+              class="fa fa-spinner fa-spin"
+              aria-hidden="true" />
+            {{mergeButtonText}}
+          </button>
+          <button
+            v-if="shouldShowMergeOptionsDropdown"
+            :disabled="isMergeButtonDisabled"
+            type="button"
+            class="btn btn-small btn-info dropdown-toggle"
+            data-toggle="dropdown">
+            <i
+              class="fa fa-caret-down"
+              aria-hidden="true" />
+            <span class="sr-only">
+              Select merge moment
+            </span>
+          </button>
+          <ul
+            v-if="shouldShowMergeOptionsDropdown"
+            class="dropdown-menu dropdown-menu-right"
+            role="menu">
+            <li>
+              <a
+                @click.prevent="handleMergeButtonClick(true)"
+                class="merge_when_pipeline_succeeds"
+                href="#">
+                <span
+                  v-html="successSvg"
+                  class="merge-opt-icon"
+                  aria-hidden="true"></span>
+                <span class="merge-opt-title">Merge when pipeline succeeds</span>
+              </a>
+            </li>
+            <li>
+              <a
+                @click.prevent="handleMergeButtonClick(false, true)"
+                class="accept-merge-request"
+                href="#">
+                <span
+                  v-html="warningSvg"
+                  class="merge-opt-icon"
+                  aria-hidden="true"></span>
+                <span class="merge-opt-title">Merge immediately</span>
+              </a>
+            </li>
+          </ul>
+        </span>
+        <template v-if="isMergeAllowed()">
+          <label class="spacing">
+            <input
+              id="remove-source-branch-input"
+              v-model="removeSourceBranch"
+              :disabled="isRemoveSourceBranchButtonDisabled"
+              type="checkbox"/> Remove source branch
+          </label>
 
-        <!-- Placeholder for EE extension of this component -->
-        <squash-before-merge
-          v-if="shouldShowSquashBeforeMerge"
-          :mr="mr"
-          :is-merge-button-disabled="isMergeButtonDisabled" />
+          <!-- Placeholder for EE extension of this component -->
+          <squash-before-merge
+            v-if="shouldShowSquashBeforeMerge"
+            :mr="mr"
+            :is-merge-button-disabled="isMergeButtonDisabled" />
 
         <span v-if="mr.ffOnlyEnabled">
           Fast-forward merge without a merge commit
@@ -283,7 +288,6 @@ export default {
             Modify commit message
           </button>
         </span>
-
         <div
           v-if="showCommitMessageEditor"
           class="prepend-top-default commit-message-editor">
@@ -311,13 +315,13 @@ export default {
               </div>
             </div>
           </div>
-        </div>
-      </template>
-      <template v-else>
-        <span class="bold">
-          The pipeline for this merge request failed. Please retry the job or push a new commit to fix the failure.
-        </span>
-      </template>
+        </template>
+        <template v-else>
+          <span class="bold">
+            The pipeline for this merge request failed. Please retry the job or push a new commit to fix the failure.
+          </span>
+        </template>
+      </div>
     </div>
   `,
 };

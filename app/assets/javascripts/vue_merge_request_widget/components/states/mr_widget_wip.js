@@ -1,4 +1,5 @@
 /* global Flash */
+import statusIcon from '../mr_widget_status_icon';
 import eventHub from '../../event_hub';
 
 export default {
@@ -28,32 +29,38 @@ export default {
         });
     },
   },
+  components: {
+    statusIcon,
+  },
   template: `
-    <div class="mr-widget-body">
-      <button
-        type="button"
-        class="btn btn-success btn-small"
-        disabled="true">
-        Merge</button>
-      <span class="bold">
-        This merge request is currently Work In Progress and therefore unable to merge
-      </span>
-      <template v-if="mr.removeWIPPath">
-        <i
-          class="fa fa-question-circle has-tooltip"
-          title="When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged." />
-        <button
-          @click="removeWIP"
-          :disabled="isMakingRequest"
-          type="button"
-          class="btn btn-default btn-xs js-remove-wip">
+    <div class="mr-widget-body media">
+      <status-icon status="failed" />
+      <div class="media-body">
+        <span class="bold">
+          This is a Work in Progress
+        </span>
+        <template v-if="mr.removeWIPPath">
           <i
-            v-if="isMakingRequest"
-            class="fa fa-spinner fa-spin"
-            aria-hidden="true" />
-            Resolve WIP status
-        </button>
-      </template>
+            class="fa fa-question-circle has-tooltip"
+            title="When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged." />
+          <button
+            type="button"
+            class="btn btn-success btn-xs"
+            disabled="true">
+            Merge</button>
+          <button
+            @click="removeWIP"
+            :disabled="isMakingRequest"
+            type="button"
+            class="btn btn-default btn-xs js-remove-wip">
+            <i
+              v-if="isMakingRequest"
+              class="fa fa-spinner fa-spin"
+              aria-hidden="true" />
+              Resolve WIP status
+          </button>
+        </template>
+      </div>
     </div>
   `,
 };
