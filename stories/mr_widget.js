@@ -85,7 +85,22 @@ function makeStory(options) {
     data() {
       return {
         state: select('State', mrStates, 'opened'),
-        branchMissing: boolean('Branch missing', false)
+        branchMissing: boolean('Branch missing', false),
+        closes: select('Closes issues', {
+          none: null,
+          '<a href="#">#23</a>': 'one',
+          '<a href="#">#23</a> and <a>#42</a>': 'multiple',
+        }),
+        mentions: select('Mentions issues', {
+          none: null,
+          '<a href="#">#23</a>': 'one',
+          '<a href="#">#23</a> and <a>#42</a>': 'multiple',
+        }),
+        assignToMe: select('Assign to me', {
+          none: null,
+          '<a href="#">#23</a>': 'one',
+          '<a href="#">#23</a> and <a>#42</a>': 'multiple',
+        }),
       };
     },
     computed: {
@@ -101,6 +116,12 @@ function makeStory(options) {
           has_conflicts: boolean('Has conflicts', false),
           work_in_progress: boolean('WIP', false),
           only_allow_merge_if_pipeline_succeeds: boolean('Require MWPS', true),
+          issues_links: {
+            closing: this.closes,
+            mentioned_but_not_closing: this.mentions,
+            assign_to_closing: this.assignToMe,
+          },
+
 //   } else if (this.onlyAllowMergeIfPipelineSucceeds && this.isPipelineFailed) {
 //   } else if (this.hasMergeableDiscussionsState) {
 //   } else if (this.isPipelineBlocked) {
@@ -114,6 +135,7 @@ function makeStory(options) {
     },
     template: `
       <div class="container-fluid container-limited limit-container-width">
+        {{mrData.relatedLinks}}
         <div class="content" id="content-body">
           <mr-widget-options :mrData="mrData" />
         </div>
