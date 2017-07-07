@@ -49,7 +49,7 @@ export default {
           v-if="shouldRenderRelatedLinks"
           :related-links="mr.relatedLinks" />
       </div>
-      <div class="mr-widget-section" v-if="shouldRenderMergeHelp">
+      <div class="mr-widget-footer" v-if="shouldRenderMergeHelp">
         <mr-widget-merge-help />
       </div>
     </div>

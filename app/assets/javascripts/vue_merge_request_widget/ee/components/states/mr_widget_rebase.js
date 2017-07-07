@@ -51,32 +51,32 @@ export default {
     <div class="mr-widget-body">
       <div class="rebase-state-find-class-convention">
         <template v-if="mr.rebaseInProgress || isMakingRequest">
-          <button
-            type="button"
-            class="btn btn-success btn-small"
-            disabled="true">
-            Merge
-          </button>
           <span class="bold">
             <i
               class="fa fa-spinner fa-spin"
               aria-hidden="true" />
-            Rebase in progress. This merge request is in the process of being rebased.
+            Rebase in progress
           </span>
-        </template>
-        <template v-if="!mr.rebaseInProgress && !mr.canPushToSourceBranch">
           <button
             type="button"
-            class="btn btn-success btn-small"
+            class="btn btn-success btn-xs"
             disabled="true">
             Merge
           </button>
+        </template>
+        <template v-if="!mr.rebaseInProgress && !mr.canPushToSourceBranch">
           <span class="bold">
             Fast-forward merge is not possible.
             Rebase the source branch onto
             <span class="label-branch">{{mr.targetBranch}}</span>
-            to allow this merge request to be merged.
+            to allow this merge request to be merged
           </span>
+          <button
+            type="button"
+            class="btn btn-success btn-xs"
+            disabled="true">
+            Merge
+          </button>
         </template>
         <template v-if="!mr.rebaseInProgress && mr.canPushToSourceBranch && !isMakingRequest">
           <div class="accept-merge-holder clearfix js-toggle-container accept-action">
@@ -93,7 +93,7 @@ export default {
             <span class="bold">
               Fast-forward merge is not possible.
               Rebase the source branch onto the target branch or merge target
-              branch into source branch to allow this merge request to be merged.
+              branch into source branch to allow this merge request to be merged
             </span>
           </div>
         </template>

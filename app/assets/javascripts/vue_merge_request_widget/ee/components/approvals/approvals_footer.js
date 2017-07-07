@@ -65,7 +65,6 @@ export default {
   },
   template: `
     <div v-if="approvedBy.length" class="approved-by-users approvals-footer clearfix mr-info-list">
-      <div class="legend"></div>
       <div class="approvers-prefix">
         <p>Approved by</p>
         <div class="approvers-list">
@@ -89,7 +88,7 @@ export default {
           <button
             :disabled="unapproving"
             @click="unapproveMergeRequest"
-            class="btn btn-sm">
+            class="btn btn-xs">
             <i
               v-if="unapproving"
               class="fa fa-spinner fa-spin"

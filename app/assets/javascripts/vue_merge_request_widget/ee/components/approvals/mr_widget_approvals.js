@@ -37,12 +37,12 @@ export default {
   template: `
     <div
       v-if="mr.approvalsRequired"
-      class="mr-widget-approvals-container mr-widget-body">
+      class="mr-widget-approvals-container mr-widget-body mr-widget-section">
       <div
         v-show="fetchingApprovals"
         class="mr-approvals-loading-state">
         <span class="approvals-loading-text bold">
-          Checking approval status for this merge request.
+          Checking approval status for this merge request
         </span>
         <i class="fa fa-spinner fa-spin" />
       </div>

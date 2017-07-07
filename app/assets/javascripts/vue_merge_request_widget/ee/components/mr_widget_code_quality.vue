@@ -136,7 +136,7 @@ export default {
         class="fa fa-spinner fa-spin"
         aria-hidden="true">
       </i>
-      Loading codeclimate report.
+      Loading codeclimate report
     </div>
 
     <div v-else-if="!isLoading && !loadingFailed">
@@ -182,7 +182,7 @@ export default {
     <div
       v-else-if="loadingFailed"
       class="padding-left">
-      Failed to load codeclimate report.
+      Failed to load codeclimate report
     </div>
   </section>
 </template>

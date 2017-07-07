@@ -749,13 +749,8 @@ $status-icon-margin: $gl-btn-padding;
 .approvals-footer {
   display: flex;
 
-  .legend {
-    height: 16px;
-    top: 0;
-  }
-
-  .approvers-prefix::before {
-    top: 10px;
+  .approvers-prefix {
+    padding-left: 32px;
   }
 
   .approvers-prefix,
