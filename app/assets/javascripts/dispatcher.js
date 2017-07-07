@@ -57,6 +57,7 @@ import ShortcutsBlob from './shortcuts_blob';
 import initSettingsPanels from './settings_panels';
 import initExperimentalFlags from './experimental_flags';
 import OAuthRememberMe from './oauth_remember_me';
+import PerformanceBar from './performance_bar';
 
 (function() {
   var Dispatcher;
@@ -395,6 +396,7 @@ import OAuthRememberMe from './oauth_remember_me';
           initSettingsPanels();
           break;
         case 'projects:settings:ci_cd:show':
+        case 'groups:settings:ci_cd:show':
           new gl.ProjectVariables();
           break;
         case 'ci:lints:create':
@@ -514,6 +516,10 @@ import OAuthRememberMe from './oauth_remember_me';
       // If we haven't installed a custom shortcut handler, install the default one
       if (!shortcut_handler) {
         new Shortcuts();
+      }
+
+      if (document.querySelector('#peek')) {
+        new PerformanceBar({ container: '#peek' });
       }
     };
 
