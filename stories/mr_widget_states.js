@@ -42,10 +42,12 @@ function makeStory({ component, props }) {
       <div class="container-fluid container-limited limit-container-width">
         <div class="content" id="content-body">
           <div class="mr-state-widget prepend-top-default">
-            <component
-              :is="component"
-              :mr="mr"
-              :service="service" />
+            <div class="mr-widget-section">
+              <component
+                :is="component"
+                :mr="mr"
+                :service="service" />
+            </div>
           </div>
         </div>
       </div>

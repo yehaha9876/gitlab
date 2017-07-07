@@ -1,5 +1,3 @@
-'use strict';
-
 var fs = require('fs');
 var path = require('path');
 var webpack = require('webpack');
@@ -24,61 +22,6 @@ var config = {
     fs: "empty"
   },
   context: path.join(ROOT_PATH, 'app/assets/javascripts'),
-  entry: {
-    balsamiq_viewer:      './blob/balsamiq_viewer.js',
-    blob:                 './blob_edit/blob_bundle.js',
-    boards:               './boards/boards_bundle.js',
-    common:               './commons/index.js',
-    common_vue:           ['vue', './vue_shared/common_vue.js'],
-    common_d3:            ['d3'],
-    cycle_analytics:      './cycle_analytics/cycle_analytics_bundle.js',
-    commit_pipelines:     './commit/pipelines/pipelines_bundle.js',
-    deploy_keys:          './deploy_keys/index.js',
-    diff_notes:           './diff_notes/diff_notes_bundle.js',
-    environments:         './environments/environments_bundle.js',
-    environments_folder:  './environments/folder/environments_folder_bundle.js',
-    filtered_search:      './filtered_search/filtered_search_bundle.js',
-    graphs:               './graphs/graphs_bundle.js',
-    group:                './group.js',
-    groups:               './groups/index.js',
-    groups_list:          './groups_list.js',
-    issue_show:           './issue_show/index.js',
-    integrations:         './integrations',
-    job_details:          './jobs/job_details_bundle.js',
-    locale:               './locale/index.js',
-    main:                 './main.js',
-    merge_conflicts:      './merge_conflicts/merge_conflicts_bundle.js',
-    monitoring:           './monitoring/monitoring_bundle.js',
-    network:              './network/network_bundle.js',
-    notebook_viewer:      './blob/notebook_viewer.js',
-    pdf_viewer:           './blob/pdf_viewer.js',
-    pipelines:            './pipelines/pipelines_bundle.js',
-    pipelines_details:     './pipelines/pipeline_details_bundle.js',
-    profile:              './profile/profile_bundle.js',
-    protected_branches:   './protected_branches/protected_branches_bundle.js',
-    protected_tags:       './protected_tags',
-    sidebar:              './sidebar/sidebar_bundle.js',
-    schedule_form:        './pipeline_schedules/pipeline_schedule_form_bundle.js',
-    schedules_index:      './pipeline_schedules/pipeline_schedules_index_bundle.js',
-    snippet:              './snippet/snippet_bundle.js',
-    sketch_viewer:        './blob/sketch_viewer.js',
-    stl_viewer:           './blob/stl_viewer.js',
-    terminal:             './terminal/terminal_bundle.js',
-    u2f:                  ['vendor/u2f'],
-    users:                './users/users_bundle.js',
-    raven:                './raven/index.js',
-    vue_merge_request_widget: './vue_merge_request_widget/index.js',
-    test:                 './test.js',
-    peek:                 './peek.js',
-  },
-
-  output: {
-    path: path.join(ROOT_PATH, 'public/assets/webpack'),
-    publicPath: '/assets/webpack/',
-    filename: IS_PRODUCTION ? '[name].[chunkhash].bundle.js' : '[name].bundle.js',
-    chunkFilename: IS_PRODUCTION ? '[name].[chunkhash].chunk.js' : '[name].chunk.js',
-  },
-
   module: {
     rules: [
       {
@@ -108,19 +51,6 @@ var config = {
   },
 
   plugins: [
-    // manifest filename must match config.webpack.manifest_filename
-    // webpack-rails only needs assetsByChunkName to function properly
-    new StatsPlugin('manifest.json', {
-      chunkModules: false,
-      source: false,
-      chunks: false,
-      modules: false,
-      assets: true
-    }),
-
-    // prevent pikaday from including moment.js
-    new webpack.IgnorePlugin(/moment/, /pikaday/),
-
     // fix legacy jQuery plugins which depend on globals
     new webpack.ProvidePlugin({
       $: 'jquery',
@@ -130,21 +60,9 @@ var config = {
     // assign deterministic module ids
     new webpack.NamedModulesPlugin(),
     new NameAllModulesPlugin(),
-
-    // assign deterministic chunk ids
-    new webpack.NamedChunksPlugin((chunk) => {
-      if (chunk.name) {
-        return chunk.name;
-      }
-      return chunk.modules.map((m) => {
-        var chunkPath = m.request.split('!').pop();
-        return path.relative(m.context, chunkPath);
-      }).join('_');
-    }),
   ],
 
   resolve: {
-    extensions: ['.js'],
     alias: {
       '~':              path.join(ROOT_PATH, 'app/assets/javascripts'),
       'emojis':         path.join(ROOT_PATH, 'fixtures/emojis'),
@@ -155,61 +73,6 @@ var config = {
       'vue$':           'vue/dist/vue.esm.js',
     }
   }
-}
-
-if (IS_PRODUCTION) {
-  config.devtool = 'source-map';
-  config.plugins.push(
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true,
-      debug: false
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true
-    }),
-    new webpack.DefinePlugin({
-      'process.env': { NODE_ENV: JSON.stringify('production') }
-    })
-  );
-
-  // zopfli requires a lot of compute time and is disabled in CI
-  if (!NO_COMPRESSION) {
-    // gracefully fall back to gzip if `node-zopfli` is unavailable (e.g. in CentOS 6)
-    try {
-      config.plugins.push(new CompressionPlugin({ algorithm: 'zopfli' }));
-    } catch(err) {
-      config.plugins.push(new CompressionPlugin({ algorithm: 'gzip' }));
-    }
-  }
-}
-
-if (IS_DEV_SERVER) {
-  config.devtool = 'cheap-module-eval-source-map';
-  config.devServer = {
-    host: DEV_SERVER_HOST,
-    port: DEV_SERVER_PORT,
-    headers: { 'Access-Control-Allow-Origin': '*' },
-    stats: 'errors-only',
-    inline: DEV_SERVER_LIVERELOAD
-  };
-  config.output.publicPath = '//' + DEV_SERVER_HOST + ':' + DEV_SERVER_PORT + config.output.publicPath;
-  config.plugins.push(
-    // watch node_modules for changes if we encounter a missing module compile error
-    new WatchMissingNodeModulesPlugin(path.join(ROOT_PATH, 'node_modules'))
-  );
-}
-
-if (WEBPACK_REPORT) {
-  config.plugins.push(
-    new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      generateStatsFile: true,
-      openAnalyzer: false,
-      reportFilename: path.join(ROOT_PATH, 'webpack-report/index.html'),
-      statsFilename: path.join(ROOT_PATH, 'webpack-report/stats.json'),
-    })
-  );
 }
 
 module.exports = config;

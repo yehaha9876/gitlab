@@ -1,7 +1,5 @@
 import { storiesOf } from '@storybook/vue';
 import { addonKnobs, boolean, select, number, text } from '@storybook/addon-knobs';
-import camelize from 'camelize';
-import Vue from 'vue';
 import mrWidgetOptions from '../app/assets/javascripts/vue_merge_request_widget/mr_widget_options';
 import * as mrWidget from '../app/assets/javascripts/vue_merge_request_widget/dependencies';
 import mockData from '../spec/javascripts/vue_mr_widget/mock_data';
@@ -135,7 +133,6 @@ function makeStory(options) {
     },
     template: `
       <div class="container-fluid container-limited limit-container-width">
-        {{mrData.relatedLinks}}
         <div class="content" id="content-body">
           <mr-widget-options :mrData="mrData" />
         </div>
