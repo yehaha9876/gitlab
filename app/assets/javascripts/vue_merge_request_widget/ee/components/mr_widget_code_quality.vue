@@ -128,7 +128,7 @@ export default {
 };
 </script>
 <template>
-  <section class="mr-widget-code-quality">
+  <section class="mr-widget-code-quality mr-widget-section">
     <div
       v-if="isLoading"
       class="padding-left">

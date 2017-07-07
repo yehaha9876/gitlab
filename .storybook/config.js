@@ -3,7 +3,7 @@
 import { configure } from '@storybook/vue'
 
 function loadStories() {
-  require('../stories/mr_widget'),
+  require('../stories/ee/mr_widget'),
   require('../stories/mr_widget_states')
 }
 
