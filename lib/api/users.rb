@@ -5,6 +5,10 @@ module API
 
     allow_access_with_scope :read_user, if: -> (request) { request.get? }
 
+    before do
+      authenticate!
+    end
+
     resource :users, requirements: { uid: /[0-9]*/, id: /[0-9]*/ } do
       helpers do
         def find_user(params)
