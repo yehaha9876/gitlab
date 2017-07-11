@@ -3,16 +3,10 @@ import { addonKnobs, boolean, select, text } from '@storybook/addon-knobs';
 import * as mrWidget from '../app/assets/javascripts/vue_merge_request_widget/dependencies';
 import mockData from '../spec/javascripts/vue_mr_widget/mock_data';
 
-// gl global stuff that isn't imported
-import '../app/assets/javascripts/lib/utils/datetime_utility';
-import '../app/assets/javascripts/lib/utils/common_utils';
-import '../app/assets/javascripts/commons/bootstrap';
-import '../app/assets/javascripts/flash';
-
 window.gon = window.gon || {};
 window.gon.current_user_id = 1;
 
-const stories = storiesOf('MR Widget States', module);
+const stories = storiesOf('MR Widget.States', module);
 
 function makeStory({ component, props }) {
   return addonKnobs()(() => ({

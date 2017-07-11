@@ -5,12 +5,6 @@ import * as mrWidget from '../app/assets/javascripts/vue_merge_request_widget/de
 import mockData from '../spec/javascripts/vue_mr_widget/mock_data';
 import { prometheusMockData } from '../spec/javascripts/prometheus_metrics/mock_data';
 
-// gl global stuff that isn't imported
-import '../app/assets/javascripts/lib/utils/datetime_utility';
-import '../app/assets/javascripts/lib/utils/common_utils';
-import '../app/assets/javascripts/commons/bootstrap';
-import '../app/assets/javascripts/flash';
-
 const mr = mockData;
 mr.isOpen = true;
 // copied from mr_widget_deployment_spec
@@ -58,7 +52,7 @@ mr.current_user = {
 window.gon = window.gon || {};
 window.gon.current_user_id = 1;
 
-const stories = storiesOf('MR Widget', module);
+const stories = storiesOf('MR Widget.Widget', module);
 const mrStates = ['opened', 'locked', 'merged', 'closed', 'reopened'];
 
 function makeStory(options) {

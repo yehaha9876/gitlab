@@ -1,17 +1,7 @@
 import { storiesOf } from '@storybook/vue';
 import { addonKnobs, boolean, select, number, text } from '@storybook/addon-knobs';
 import mrWidgetOptions from '../../app/assets/javascripts/vue_merge_request_widget/ee/mr_widget_options';
-import * as mrWidget from '../../app/assets/javascripts/vue_merge_request_widget/dependencies';
 import mockData from '../../spec/javascripts/vue_mr_widget/mock_data';
-import { prometheusMockData } from '../../spec/javascripts/prometheus_metrics/mock_data';
-
-// gl global stuff that isn't imported
-import '../../app/assets/javascripts/lib/utils/datetime_utility';
-import '../../app/assets/javascripts/lib/utils/common_utils';
-import '../../app/assets/javascripts/commons/bootstrap';
-import '../../app/assets/javascripts/flash';
-
-window.gl = window.gl || {};
 
 const mr = mockData;
 mr.isOpen = true;
@@ -63,7 +53,7 @@ mr.approvals = {};
 window.gon = window.gon || {};
 window.gon.current_user_id = 1;
 
-const stories = storiesOf('MR Widget', module);
+const stories = storiesOf('MR Widget EE.Widget', module);
 const mrStates = ['opened', 'locked', 'merged', 'closed', 'reopened'];
 
 function makeStory(options) {
@@ -79,7 +69,9 @@ function makeStory(options) {
     // currentUserId: text('current user ID', '1'),
     // canMerge: boolean('Can merge', false),
 
-  delete mrWidgetOptions.extends.el; // Prevent component mounting
+  if (mrWidgetOptions.extends) {
+    delete mrWidgetOptions.extends.el; // Prevent component mounting
+  }
 
   return addonKnobs()(() => ({
     components: {
@@ -125,11 +117,11 @@ function makeStory(options) {
             mentioned_but_not_closing: this.mentions,
             assign_to_closing: this.assignToMe,
           },
-          approvals: {
-            user_can_approve: boolean('I can approve', true),
-            user_has_approved: boolean('I have approved', false),
-
-          },
+          // approvals: {
+          //   user_can_approve: boolean('I can approve', true),
+          //   user_has_approved: boolean('I have approved', false),
+          // },
+          // is_pipeline_blocked: boolean('Pipeline blocked', false),
 
 //   } else if (this.onlyAllowMergeIfPipelineSucceeds && this.isPipelineFailed) {
 //   } else if (this.hasMergeableDiscussionsState) {
