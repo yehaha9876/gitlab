@@ -2,6 +2,7 @@
 
 import simplePoll from '~/lib/utils/simple_poll';
 import eventHub from '../../../event_hub';
+import statusIcon from '../../../components/mr_widget_status_icon';
 
 export default {
   props: {
@@ -14,10 +15,21 @@ export default {
       required: true,
     },
   },
+  components: {
+    statusIcon,
+  },
   data() {
     return {
       isMakingRequest: false,
     };
+  },
+  computed: {
+    status() {
+      if (!this.mr.canPushToSourceBranch && !this.mr.rebaseInProgress) {
+        return 'failed';
+      }
+      return 'success';
+    },
   },
   methods: {
     rebase() {
@@ -48,8 +60,9 @@ export default {
     },
   },
   template: `
-    <div class="mr-widget-body">
-      <div class="rebase-state-find-class-convention">
+    <div class="mr-widget-body media">
+      <status-icon :status="status" />
+      <div class="rebase-state-find-class-convention media-body">
         <template v-if="mr.rebaseInProgress || isMakingRequest">
           <span class="bold">
             <i

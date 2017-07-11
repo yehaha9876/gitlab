@@ -2,6 +2,7 @@
 
 import ApprovalsBody from './approvals_body';
 import ApprovalsFooter from './approvals_footer';
+import statusIcon from '../../../components/mr_widget_status_icon';
 
 export default {
   name: 'MRWidgetApprovals',
@@ -23,6 +24,7 @@ export default {
   components: {
     'approvals-body': ApprovalsBody,
     'approvals-footer': ApprovalsFooter,
+    statusIcon,
   },
   created() {
     const flashErrorMessage = 'An error occured while retrieving approval data for this merge request.';
@@ -37,18 +39,19 @@ export default {
   template: `
     <div
       v-if="mr.approvalsRequired"
-      class="mr-widget-approvals-container mr-widget-body mr-widget-section">
+      class="mr-widget-approvals-container mr-widget-body mr-widget-section media">
+      <status-icon status="success" />
       <div
         v-show="fetchingApprovals"
-        class="mr-approvals-loading-state">
-        <span class="approvals-loading-text bold">
-          Checking approval status for this merge request
+        class="mr-approvals-loading-state media-body">
+        <span class="approvals-loading-text">
+          Checking approval status
         </span>
         <i class="fa fa-spinner fa-spin" />
       </div>
       <div
         v-if="!fetchingApprovals"
-        class="approvals-components">
+        class="approvals-components media-body">
         <approvals-body
           :mr="mr"
           :service="service"

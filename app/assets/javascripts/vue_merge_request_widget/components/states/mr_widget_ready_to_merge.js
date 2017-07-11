@@ -275,47 +275,48 @@ export default {
             v-if="shouldShowSquashBeforeMerge"
             :mr="mr"
             :is-merge-button-disabled="isMergeButtonDisabled" />
+          <span v-if="mr.ffOnlyEnabled">
+            Fast-forward merge without a merge commit
+          </span>
+          <span v-else>
+            <button
+              @click="toggleCommitMessageEditor"
+              :disabled="isMergeButtonDisabled"
+              class="btn btn-default btn-xs"
+              type="button">
+              Modify commit message
+            </button>
+          </span>
 
-        <span v-if="mr.ffOnlyEnabled">
-          Fast-forward merge without a merge commit
-        </span>
-        <span v-else>
-          <button
-            @click="toggleCommitMessageEditor"
-            :disabled="isMergeButtonDisabled"
-            class="btn btn-default btn-xs"
-            type="button">
-            Modify commit message
-          </button>
-        </span>
-        <div
-          v-if="showCommitMessageEditor"
-          class="prepend-top-default commit-message-editor">
-          <div class="form-group clearfix">
-            <label
-              class="control-label"
-              for="commit-message">
-              Commit message
-            </label>
-            <div class="col-sm-10">
-              <div class="commit-message-container">
-                <div class="max-width-marker"></div>
-                <textarea
-                  v-model="commitMessage"
-                  class="form-control js-commit-message"
-                  required="required"
-                  rows="14"
-                  name="Commit message"></textarea>
-              </div>
-              <p class="hint">Try to keep the first line under 52 characters and the others under 72.</p>
-              <div class="hint">
-                <a
-                  @click.prevent="updateCommitMessage"
-                  href="#">{{commitMessageLinkTitle}}</a>
+          <div
+            v-if="showCommitMessageEditor"
+            class="prepend-top-default commit-message-editor">
+            <div class="form-group clearfix">
+              <label
+                class="control-label"
+                for="commit-message">
+                Commit message
+              </label>
+              <div class="col-sm-10">
+                <div class="commit-message-container">
+                  <div class="max-width-marker"></div>
+                  <textarea
+                    v-model="commitMessage"
+                    class="form-control js-commit-message"
+                    required="required"
+                    rows="14"
+                    name="Commit message"></textarea>
+                </div>
+                <p class="hint">Try to keep the first line under 52 characters and the others under 72.</p>
+                <div class="hint">
+                  <a
+                    @click.prevent="updateCommitMessage"
+                    href="#">{{commitMessageLinkTitle}}</a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </template>
         <template v-else>
           <span class="bold">
             The pipeline for this merge request failed. Please retry the job or push a new commit to fix the failure.

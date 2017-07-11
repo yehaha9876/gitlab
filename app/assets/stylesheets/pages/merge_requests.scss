@@ -77,7 +77,6 @@ $status-icon-margin: $gl-btn-padding;
     }
 
     .accept-control {
-      display: inline-block;
       float: left;
       margin: 0;
       margin-left: 20px;
@@ -331,13 +330,6 @@ $status-icon-margin: $gl-btn-padding;
 
       .accept-action {
         width: 100%;
-        text-align: center;
-      }
-
-      .accept-control {
-        width: 100%;
-        text-align: center;
-        margin: 0;
       }
     }
 
