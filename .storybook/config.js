@@ -1,10 +1,20 @@
-/* eslint-disable import/no-extraneous-dependencies, import/no-unresolved, import/extensions */
+import { configure } from '@storybook/vue';
+import { setOptions } from '@storybook/addon-options';
 
-import { configure } from '@storybook/vue'
+setOptions({
+  name: 'GitLab EE',
+  url: 'https://gitlab.com/gitlab-org/gitlab-ee/',
+  goFullScreen: false,
+  showLeftPanel: true,
+  showDownPanel: true,
+  showSearchBox: false,
+  downPanelInRight: true,
+  sortStoriesByKind: false,
+  hierarchySeparator: '\\/|\\.',
+});
 
 function loadStories() {
-  require('../stories/ee/mr_widget'),
-  require('../stories/mr_widget_states')
+  require('../stories/');
 }
 
-configure(loadStories, module)
+configure(loadStories, module);
