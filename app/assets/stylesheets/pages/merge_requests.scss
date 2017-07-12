@@ -786,22 +786,14 @@ $status-icon-margin: $gl-btn-padding;
   }
 }
 
+
+.mr-widget-icon {
+  font-size: 22px;
+  margin: 0 10px 0 0;
+}
+
 .mr-widget-code-quality {
   padding-top: $gl-padding-top;
-
-  .padding-left {
-    padding-left: $gl-padding;
-  }
-
-  .ci-status-icon {
-    vertical-align: sub;
-
-    svg {
-      width: 22px;
-      height: 22px;
-      margin-right: 4px;
-    }
-  }
 
   .code-quality-container {
     border-top: 1px solid $gray-darker;

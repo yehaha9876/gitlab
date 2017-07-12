@@ -35,7 +35,10 @@ export default {
 
   computed: {
     stateIcon() {
-      return this.mr.codeclimateMetrics.newIssues.length ? errorIcon : successIcon;
+      if (this.loadingFailed || this.mr.codeclimateMetrics.newIssues.length) {
+        return errorIcon;
+      }
+      return successIcon;
     },
 
     hasNoneIssues() {
@@ -55,7 +58,7 @@ export default {
       let text = [];
 
       if (this.hasNoneIssues) {
-        text.push('No changes to code quality so far.');
+        text.push('No changes to code quality so far');
       } else if (this.hasIssues) {
         if (newIssues.length) {
           newIssuesText = ` degraded on ${newIssues.length} ${this.pointsText(newIssues)}`;
@@ -79,8 +82,6 @@ export default {
         if (newIssuesText) {
           text.push(newIssuesText);
         }
-
-        text.push('.');
       }
 
       return text.join('');
@@ -129,60 +130,75 @@ export default {
 </script>
 <template>
   <section class="mr-widget-code-quality mr-widget-section">
+
     <div
       v-if="isLoading"
-      class="padding-left">
-      <i
-        class="fa fa-spinner fa-spin"
-        aria-hidden="true">
-      </i>
-      Loading codeclimate report
+      class="media">
+      <div class="mr-widget-icon">
+      </div>
+      <div class="media-body">
+        Loading codeclimate report
+        <i
+          class="fa fa-spinner fa-spin"
+          aria-hidden="true">
+        </i>
+      </div>
     </div>
 
-    <div v-else-if="!isLoading && !loadingFailed">
-      <span
-        class="padding-left ci-status-icon"
+    <div
+      v-else-if="!isLoading && !loadingFailed"
+      class="media">
+      <div
+        class="ci-status-icon"
         :class="{
           'ci-status-icon-failed': mr.codeclimateMetrics.newIssues.length,
           'ci-status-icon-passed': mr.codeclimateMetrics.newIssues.length === 0
         }"
         v-html="stateIcon">
-      </span>
-      <span>
-        {{codeText}}
-      </span>
+      </div>
+      <div class="media-body">
+        <span>
+          {{codeText}}
+        </span>
 
-      <button
-        type="button"
-        class="btn-link btn-blank"
-        v-if="hasIssues"
-        @click="toggleCollapsed">
-        {{collapseText}}
-      </button>
+        <button
+          type="button"
+          class="btn-link btn-blank"
+          v-if="hasIssues"
+          @click="toggleCollapsed">
+          {{collapseText}}
+        </button>
 
-      <div
-        class="code-quality-container"
-        v-if="hasIssues"
-        v-show="!isCollapsed">
-        <issues-block
-          class="js-mr-code-resolved-issues"
-          v-if="mr.codeclimateMetrics.resolvedIssues.length"
-          type="success"
-          :issues="mr.codeclimateMetrics.resolvedIssues"
-          />
+        <div
+          class="code-quality-container"
+          v-if="hasIssues"
+          v-show="!isCollapsed">
+          <issues-block
+            class="js-mr-code-resolved-issues"
+            v-if="mr.codeclimateMetrics.resolvedIssues.length"
+            type="success"
+            :issues="mr.codeclimateMetrics.resolvedIssues"
+            />
 
-        <issues-block
-          class="js-mr-code-new-issues"
-          v-if="mr.codeclimateMetrics.newIssues.length"
-          type="failed"
-          :issues="mr.codeclimateMetrics.newIssues"
-          />
+          <issues-block
+            class="js-mr-code-new-issues"
+            v-if="mr.codeclimateMetrics.newIssues.length"
+            type="failed"
+            :issues="mr.codeclimateMetrics.newIssues"
+            />
+        </div>
       </div>
     </div>
     <div
       v-else-if="loadingFailed"
-      class="padding-left">
-      Failed to load codeclimate report
+      class="media">
+      <div
+        class="ci-status-icon ci-status-icon-failed"
+        v-html="stateIcon">
+      </div>
+      <div class="media-body">
+        Failed to load codeclimate report
+      </div>
     </div>
   </section>
 </template>

@@ -65,10 +65,10 @@ export default {
       <div class="rebase-state-find-class-convention media-body">
         <template v-if="mr.rebaseInProgress || isMakingRequest">
           <span class="bold">
+            Rebase in progress
             <i
               class="fa fa-spinner fa-spin"
               aria-hidden="true" />
-            Rebase in progress
           </span>
           <button
             type="button"

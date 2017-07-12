@@ -67,7 +67,7 @@ describe('Merge Request Code Quality', () => {
       setTimeout(() => {
         expect(
           vm.$el.querySelector('span:nth-child(2)').textContent.trim(),
-        ).toEqual('Code quality improved on 1 point and degraded on 1 point.');
+        ).toEqual('Code quality improved on 1 point and degraded on 1 point');
         done();
       }, 0);
     });
@@ -80,7 +80,7 @@ describe('Merge Request Code Quality', () => {
           Vue.nextTick(() => {
             expect(
               vm.$el.querySelector('span:nth-child(2)').textContent.trim(),
-            ).toEqual('Code quality improved on 1 point.');
+            ).toEqual('Code quality improved on 1 point');
             done();
           });
         }, 0);
@@ -93,7 +93,7 @@ describe('Merge Request Code Quality', () => {
           Vue.nextTick(() => {
             expect(
               vm.$el.querySelector('span:nth-child(2)').textContent.trim(),
-            ).toEqual('Code quality degraded on 1 point.');
+            ).toEqual('Code quality degraded on 1 point');
             done();
           });
         }, 0);
@@ -162,7 +162,7 @@ describe('Merge Request Code Quality', () => {
       setTimeout(() => {
         expect(
           vm.$el.querySelector('span:nth-child(2)').textContent.trim(),
-        ).toEqual('No changes to code quality so far.');
+        ).toEqual('No changes to code quality so far');
         done();
       }, 0);
     });
@@ -198,7 +198,7 @@ describe('Merge Request Code Quality', () => {
 
     it('should render error indicator', (done) => {
       setTimeout(() => {
-        expect(vm.$el.textContent.trim()).toEqual('Failed to load codeclimate report.');
+        expect(vm.$el.textContent.trim()).toEqual('Failed to load codeclimate report');
         done();
       }, 0);
     });
