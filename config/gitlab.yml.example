@@ -539,10 +539,15 @@ production: &base
     #   enabled: true
     #   host: localhost
     #   port: 3808
-  prometheus:
+
+  ## Monitoring
+  # Built in monitoring settings
+  monitoring:
     # Time between sampling of unicorn socket metrics, in seconds
     # unicorn_sampler_interval: 10
-
+    # IP whitelist to access monitoring endpoints
+    ip_whitelist:
+      - 127.0.0.0/8
 
   #
   # 5. Extra customization
@@ -657,7 +662,10 @@ test:
             client_id: 'YOUR_AUTH0_CLIENT_ID',
             client_secret: 'YOUR_AUTH0_CLIENT_SECRET',
             namespace: 'YOUR_AUTH0_DOMAIN' } }
-
+      - { name: 'authentiq',
+          app_id: 'YOUR_CLIENT_ID',
+          app_secret: 'YOUR_CLIENT_SECRET',
+          args: { scope: 'aq:name email~rs address aq:push' } }
   ldap:
     enabled: false
     servers:

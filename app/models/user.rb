@@ -12,6 +12,7 @@ class User < ActiveRecord::Base
   include TokenAuthenticatable
   include IgnorableColumn
   include FeatureGate
+  include CreatedAtFilterable
 
   DEFAULT_NOTIFICATION_LEVEL = :participating
 
@@ -698,7 +699,7 @@ class User < ActiveRecord::Base
   end
 
   def sanitize_attrs
-    %w[name username skype linkedin twitter].each do |attr|
+    %w[username skype linkedin twitter].each do |attr|
       value = public_send(attr)
       public_send("#{attr}=", Sanitize.clean(value)) if value.present?
     end

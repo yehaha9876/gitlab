@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 
 gem 'rails', '4.2.8'
 gem 'rails-deprecated_sanitizer', '~> 1.0.3'
-gem 'bootsnap', '~> 1.1'
 
 # Responders respond_to and respond_with
 gem 'responders', '~> 2.0'
@@ -251,7 +250,6 @@ gem 'jquery-rails', '~> 4.1.0'
 gem 'request_store', '~> 1.3'
 gem 'select2-rails', '~> 3.5.9'
 gem 'virtus', '~> 1.0.1'
-gem 'net-ssh', '~> 3.0.1'
 gem 'base32', '~> 0.3.0'
 
 # Sentry integration
@@ -336,7 +334,7 @@ group :development, :test do
 
   gem 'rubocop', '~> 0.47.1', require: false
   gem 'rubocop-rspec', '~> 1.15.0', require: false
-  gem 'scss_lint', '~> 0.47.0', require: false
+  gem 'scss_lint', '~> 0.54.0', require: false
   gem 'haml_lint', '~> 0.21.0', require: false
   gem 'simplecov', '~> 0.14.0', require: false
   gem 'flay', '~> 2.8.0', require: false
@@ -386,7 +384,7 @@ gem 'vmstat', '~> 2.3.0'
 gem 'sys-filesystem', '~> 1.1.6'
 
 # Gitaly GRPC client
-gem 'gitaly', '~> 0.9.0'
+gem 'gitaly', '~> 0.14.0'
 
 gem 'toml-rb', '~> 0.3.15', require: false
 

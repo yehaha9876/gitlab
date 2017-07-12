@@ -348,7 +348,7 @@ describe User, models: true do
     end
   end
 
-  describe '#update_tracked_fields!', :redis do
+  describe '#update_tracked_fields!', :clean_gitlab_redis_shared_state do
     let(:request) { OpenStruct.new(remote_ip: "127.0.0.1") }
     let(:user) { create(:user) }
 
@@ -1159,6 +1159,18 @@ describe User, models: true do
     end
   end
 
+  describe '#sanitize_attrs' do
+    let(:user) { build(:user, name: 'test & user', skype: 'test&user') }
+
+    it 'encodes HTML entities in the Skype attribute' do
+      expect { user.sanitize_attrs }.to change { user.skype }.to('test&amp;user')
+    end
+
+    it 'does not encode HTML entities in the name attribute' do
+      expect { user.sanitize_attrs }.not_to change { user.name }
+    end
+  end
+
   describe '#starred?' do
     it 'determines if user starred a project' do
       user = create :user
@@ -1684,7 +1696,7 @@ describe User, models: true do
     end
   end
 
-  describe '#refresh_authorized_projects', redis: true do
+  describe '#refresh_authorized_projects', clean_gitlab_redis_shared_state: true do
     let(:project1) { create(:empty_project) }
     let(:project2) { create(:empty_project) }
     let(:user) { create(:user) }

@@ -6,7 +6,9 @@ Bundler.require(:default, Rails.env)
 
 module Gitlab
   class Application < Rails::Application
-    require_dependency Rails.root.join('lib/gitlab/redis')
+    require_dependency Rails.root.join('lib/gitlab/redis/cache')
+    require_dependency Rails.root.join('lib/gitlab/redis/queues')
+    require_dependency Rails.root.join('lib/gitlab/redis/shared_state')
     require_dependency Rails.root.join('lib/gitlab/request_context')
 
     # Settings in config/environments/* take precedence over those specified here.
@@ -26,7 +28,8 @@ module Gitlab
                                      #{config.root}/app/models/members
                                      #{config.root}/app/models/project_services
                                      #{config.root}/app/workers/concerns
-                                     #{config.root}/app/services/concerns))
+                                     #{config.root}/app/services/concerns
+                                     #{config.root}/app/finders/concerns))
 
     config.generators.templates.push("#{config.root}/generator_templates")
 
@@ -141,15 +144,15 @@ module Gitlab
       end
     end
 
-    # Use Redis caching across all environments
-    redis_config_hash = Gitlab::Redis.params
-    redis_config_hash[:namespace] = Gitlab::Redis::CACHE_NAMESPACE
-    redis_config_hash[:expires_in] = 2.weeks # Cache should not grow forever
+    # Use caching across all environments
+    caching_config_hash = Gitlab::Redis::Cache.params
+    caching_config_hash[:namespace] = Gitlab::Redis::Cache::CACHE_NAMESPACE
+    caching_config_hash[:expires_in] = 2.weeks # Cache should not grow forever
     if Sidekiq.server? # threaded context
-      redis_config_hash[:pool_size] = Sidekiq.options[:concurrency] + 5
-      redis_config_hash[:pool_timeout] = 1
+      caching_config_hash[:pool_size] = Sidekiq.options[:concurrency] + 5
+      caching_config_hash[:pool_timeout] = 1
     end
-    config.cache_store = :redis_store, redis_config_hash
+    config.cache_store = :redis_store, caching_config_hash
 
     config.active_record.raise_in_transactional_callbacks = true
 
@@ -166,9 +169,10 @@ module Gitlab
     config.after_initialize do
       Rails.application.reload_routes!
 
-      named_routes_set = Gitlab::Application.routes.named_routes
       project_url_helpers = Module.new do
-        named_routes_set.helper_names.each do |name|
+        extend ActiveSupport::Concern
+
+        Gitlab::Application.routes.named_routes.helper_names.each do |name|
           next unless name.include?('namespace_project')
 
           define_method(name.sub('namespace_project', 'project')) do |project, *args|
@@ -177,14 +181,7 @@ module Gitlab
         end
       end
 
-      named_routes_set.url_helpers_module.include project_url_helpers
-      named_routes_set.url_helpers_module.extend project_url_helpers
-
-      Gitlab::Routing.url_helpers.include project_url_helpers
-      Gitlab::Routing.url_helpers.extend project_url_helpers
-
-      GitlabRoutingHelper.include project_url_helpers
-      GitlabRoutingHelper.extend project_url_helpers
+      Gitlab::Routing.add_helpers(project_url_helpers)
     end
   end
 end
