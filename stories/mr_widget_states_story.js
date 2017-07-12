@@ -80,4 +80,29 @@ stories.add('Locked', makeStory({
   props: lockedProps,
 }));
 
+import Vue from 'vue';
+import conflictsComponent from '../app/assets/javascripts/vue_merge_request_widget/components/states/mr_widget_conflicts';
+
+const path = '/conflicts';
+export const createComponent = () => {
+  const Component = Vue.extend(conflictsComponent);
+
+  return new Component({
+    propsData: {
+      mr: {
+        canMerge: true,
+        conflictResolutionPath: path,
+      },
+    },
+  });
+};
+
+stories.add('Conflicts', makeStory({
+  component: mrWidget.ConflictsState,
+  props: {
+    canMerge: true,
+    conflictResolutionPath: path,
+  },
+}));
+
 export default stories;
