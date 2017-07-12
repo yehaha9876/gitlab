@@ -452,6 +452,14 @@
       }
     }
   }
+
+  &.activities {
+    border-bottom: 1px solid $border-color;
+
+    .nav-links {
+      border-bottom: none;
+    }
+  }
 }
 
 .page-with-layout-nav {
@@ -466,16 +474,6 @@
       &.affix {
         top: $header-height;
       }
-    }
-  }
-}
-
-.nav-block {
-  &.activities {
-    border-bottom: 1px solid $border-color;
-
-    .nav-links {
-      border-bottom: none;
     }
   }
 }

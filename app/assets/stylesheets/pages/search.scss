@@ -80,9 +80,6 @@ input[type="checkbox"]:hover {
   .search-input-wrap {
     // Fallback if flexbox is not supported
     display: inline-block;
-  }
-
-  .search-input-wrap {
     width: 100%;
 
     .search-icon,

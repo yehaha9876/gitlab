@@ -219,11 +219,6 @@ header.navbar-gitlab-new {
     }
   }
 
-  &.search-active form {
-    background-color: rgba($indigo-200, .3);
-    box-shadow: none;
-  }
-
   .search-input {
     color: $white-light;
     background: none;
@@ -255,6 +250,11 @@ header.navbar-gitlab-new {
   }
 
   &.search-active {
+    form {
+      background-color: rgba($indigo-200, .3);
+      box-shadow: none;
+    }
+
     .location-badge {
       color: $white-light;
       background-color: rgba($indigo-200, .2);

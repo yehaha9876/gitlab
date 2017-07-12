@@ -229,6 +229,25 @@
   .btn-group.open .dropdown-toggle {
     box-shadow: none;
   }
+
+  /**
+   * Play button with icon in dropdowns
+   */
+  .no-btn {
+    border: none;
+    background: none;
+    outline: none;
+    width: 100%;
+    text-align: left;
+
+    .icon-play {
+      position: relative;
+      top: 2px;
+      margin-right: 5px;
+      height: 13px;
+      width: 12px;
+    }
+  }
 }
 
 .stage-cell {
@@ -451,36 +470,37 @@
     white-space: normal;
     color: $gl-text-color-secondary;
 
-    // Action Icons in big pipeline-graph nodes
-    .ci-action-icon-container .ci-action-icon-wrapper {
-      height: 30px;
-      width: 30px;
-      background: $white-light;
-      border: 1px solid $border-color;
-      border-radius: 100%;
-      display: block;
-
-      &:hover {
-        background-color: $stage-hover-bg;
-        border: 1px solid $stage-hover-bg;
-      }
-
-      svg {
-        fill: $border-color;
-        position: relative;
-        left: -1px;
-        top: -1px;
-      }
-
-      &:hover svg {
-        fill: $gl-text-color;
-      }
-    }
-
     .ci-action-icon-container {
       position: absolute;
       right: 5px;
       top: 5px;
+
+      // Action Icons in big pipeline-graph nodes
+      .ci-action-icon-wrapper {
+        height: 30px;
+        width: 30px;
+        background: $white-light;
+        border: 1px solid $border-color;
+        border-radius: 100%;
+        display: block;
+
+        &:hover {
+          background-color: $stage-hover-bg;
+          border: 1px solid $stage-hover-bg;
+
+          svg {
+            fill: $gl-text-color;
+          }
+        }
+
+        svg {
+          fill: $border-color;
+          position: relative;
+          left: -1px;
+          top: -1px;
+        }
+
+      }
     }
 
     .ci-status-icon svg {
@@ -789,7 +809,7 @@
   }
 }
 
-// Dropdown in the big pipeline graph
+// Top arrow in the dropdown in the big pipeline graph
 .big-pipeline-graph-dropdown-menu {
   width: 195px;
   min-width: 195px;
@@ -803,12 +823,6 @@
       top: -1px;
     }
   }
-}
-
-/**
- * Top arrow in the dropdown in the big pipeline graph
- */
-.big-pipeline-graph-dropdown-menu {
 
   &::before,
   &::after {
@@ -871,22 +885,23 @@
     margin-top: 1px;
     border-bottom-color: $white-light;
   }
-}
 
-/**
- * Center dropdown menu in mini graph
- */
-.mini-pipeline-graph-dropdown-menu.dropdown-menu {
-  transform: translate(-80%, 0);
-  min-width: 150px;
+  /**
+   * Center dropdown menu in mini graph
+   */
+  &.dropdown-menu {
+    transform: translate(-80%, 0);
+    min-width: 150px;
 
-  @media(min-width: $screen-md-min) {
-    transform: translate(-50%, 0);
-    right: auto;
-    left: 50%;
-    min-width: 240px;
+    @media(min-width: $screen-md-min) {
+      transform: translate(-50%, 0);
+      right: auto;
+      left: 50%;
+      min-width: 240px;
+    }
   }
 }
+
 /**
  * Terminal
  */
@@ -910,6 +925,7 @@
   }
 }
 
+<<<<<<< HEAD
 /**
  * Play button with icon in dropdowns
  */
@@ -1127,6 +1143,8 @@
   vertical-align: top;
 }
 
+=======
+>>>>>>> 41924b8... Enable MergeableSelector in scss-lint
 .ci-header-container {
   min-height: 55px;
 

@@ -208,6 +208,8 @@ $white-gc-bg: #eaf2f5;
     color: $white-nb;
   }
 
+  // We do not merge `.gd` and `.gd .x` here to keep the original.
+  // scss-lint:disable MergeableSelector
   .hll { background-color: $white-hll-bg; }
   .c { color: $white-c; font-style: italic; }
   .err { color: $white-err; background-color: $white-err-bg; }

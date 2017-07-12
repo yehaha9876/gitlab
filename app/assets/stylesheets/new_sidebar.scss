@@ -106,14 +106,14 @@ $new-sidebar-width: 220px;
       padding: 12px 16px;
       color: $inactive-color;
     }
-  }
 
-  li.active {
-    box-shadow: inset 4px 0 0 $active-border;
+    &.active {
+      box-shadow: inset 4px 0 0 $active-border;
 
-    > a {
-      color: $active-color;
-      font-weight: 700;
+      > a {
+        color: $active-color;
+        font-weight: 700;
+      }
     }
   }
 

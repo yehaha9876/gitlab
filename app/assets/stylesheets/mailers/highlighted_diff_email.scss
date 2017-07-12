@@ -149,6 +149,8 @@ span.highlight_word {
   background-color: $highlighted-highlight-word !important;
 }
 
+// We do not merge `.gd` and `.gd .x` here to keep the original.
+// scss-lint:disable MergeableSelector
 .hll { background-color: $highlighted-hll-bg; }
 .c { color: $highlighted-c; font-style: italic; }
 .err { color: $highlighted-err; background-color: $highlighted-err-bg; }

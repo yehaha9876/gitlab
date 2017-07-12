@@ -90,6 +90,15 @@
 }
 
 .right-sidebar {
+  position: absolute;
+  top: $header-height;
+  bottom: 0;
+  right: 0;
+  transition: width .3s;
+  background: $gray-light;
+  z-index: 200;
+  overflow: hidden;
+
   a,
   .btn-link {
     color: inherit;
@@ -191,17 +200,6 @@
   .btn-clipboard:hover {
     color: $gl-text-color;
   }
-}
-
-.right-sidebar {
-  position: absolute;
-  top: $header-height;
-  bottom: 0;
-  right: 0;
-  transition: width .3s;
-  background: $gray-light;
-  z-index: 200;
-  overflow: hidden;
 
   .issuable-sidebar {
     width: calc(100% + 100px);
