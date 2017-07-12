@@ -48,6 +48,7 @@ mr.current_user = {
   can_revert_on_current_merge_request: null,
   can_cherry_pick_on_current_merge_request: false,
 };
+mr.aprovals_path = null;
 
 window.gon = window.gon || {};
 window.gon.current_user_id = 1;
@@ -56,18 +57,6 @@ const stories = storiesOf('MR Widget.Widget', module);
 const mrStates = ['opened', 'locked', 'merged', 'closed', 'reopened'];
 
 function makeStory(options) {
-    // relatedLinks: {
-    //   closing: window.mrWidgetData.closesIssues ? '<a href="#">#23</a> and <a>#42</a>' : undefined,
-    //   mentioned: window.mrWidgetData.mentionsIssues ? '<a href="#">#7</a>' : undefined,
-    // },
-    // createIssueToResolveDiscussionsPath: text('Create issue', '/create/issue'),
-    // isPipelineActive: boolean('Pipeline active', false),
-    // shouldRemoveSourceBranch: boolean('shouldRemoveSourceBranch', true),
-    // canRemoveSourceBranch: boolean('canRemoveSourceBranch', true),
-    // mergeUserId: text('merge user ID', '1'),
-    // currentUserId: text('current user ID', '1'),
-    // canMerge: boolean('Can merge', false),
-
   delete mrWidgetOptions.el; // Prevent component mounting
 
   return addonKnobs()(() => ({
@@ -100,6 +89,7 @@ function makeStory(options) {
         return {
           ...mr,
           ...options,
+          merge_path: 'test',
           state: this.state,
           project_archived: boolean('Project archived', false),
           branch_missing: boolean('Branch missing', false),

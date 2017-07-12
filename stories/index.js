@@ -1,3 +1,8 @@
+window.gon = window.gon || {};
+window.gon.current_user_id = 1;
+
+window.describe = () => {};
+
 // gl global stuff that isn't imported
 import '../app/assets/javascripts/lib/utils/datetime_utility';
 import '../app/assets/javascripts/lib/utils/common_utils';
