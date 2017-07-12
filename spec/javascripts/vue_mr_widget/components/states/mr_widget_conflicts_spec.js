@@ -33,7 +33,7 @@ describe('MRWidgetConflicts', () => {
       const mergeButton = el.querySelectorAll('.btn-group .btn')[1];
       const mergeLocallyButton = el.querySelectorAll('.btn-group .btn')[2];
 
-      expect(el.textContent).toContain('There are merge conflicts.');
+      expect(el.textContent).toContain('There are merge conflicts');
       expect(el.textContent).not.toContain('ask someone with write access');
       expect(el.querySelector('.btn-success').disabled).toBeTruthy();
       expect(el.querySelectorAll('.btn-group .btn').length).toBe(3);

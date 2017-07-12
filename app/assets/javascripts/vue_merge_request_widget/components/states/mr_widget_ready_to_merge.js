@@ -310,7 +310,7 @@ export default {
         </template>
         <template v-else>
           <span class="bold">
-            The pipeline for this merge request failed. Please retry the job or push a new commit to fix the failure.
+            The pipeline for this merge request failed. Please retry the job or push a new commit to fix the failure
           </span>
         </template>
       </div>
