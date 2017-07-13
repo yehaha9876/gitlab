@@ -140,10 +140,6 @@ $status-icon-margin: $gl-btn-padding;
     @media (max-width: $screen-xs-max) {
       flex-wrap: wrap;
     }
-
-    .ci-error {
-      margin-right: $btn-side-margin;
-    }
   }
 
   .mr-widget-icon {
@@ -151,7 +147,7 @@ $status-icon-margin: $gl-btn-padding;
     margin-right: $status-icon-margin;
   }
 
-  .ci-status-icon > svg {
+  .ci-status-icon svg {
     width: $status-icon-size;
     height: $status-icon-size;
     margin: 3px $status-icon-margin 3px 0;
