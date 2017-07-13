@@ -26,7 +26,7 @@ export default {
         </span>
         <span class="space-children justify-content-start align-items-center">
           <a
-            v-if="mr.conflictResolutionPath"
+            v-if="mr.canMerge && mr.conflictResolutionPath"
             :href="mr.conflictResolutionPath"
             class="btn btn-default btn-xs js-resolve-conflicts-button">
             Resolve conflicts
