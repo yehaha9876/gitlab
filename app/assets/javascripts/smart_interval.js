@@ -154,5 +154,4 @@ class SmartInterval {
   }
 }
 
-window.gl = window.gl || {};
 window.gl.SmartInterval = SmartInterval;
