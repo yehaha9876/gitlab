@@ -10,8 +10,10 @@ module EE
     private
 
     def search_multiple_assignees?(type)
-      type == :issues &&
-        @project.feature_available?(:multiple_issue_assignees)
+      # TODO: Add check for @project and @group
+      type == :issues
+      # type == :issues &&
+      #   @project.feature_available?(:multiple_issue_assignees)
     end
   end
 end

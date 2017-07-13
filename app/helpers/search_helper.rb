@@ -137,13 +137,22 @@ module SearchHelper
   end
 
   def search_filter_input_options(type)
+    if (@project.present?)
+      context = @project
+      path = project_path(@project)
+    else
+      context = @group
+      path = group_path(@group)
+    end
+
     {
       id: "filtered-search-#{type}",
       placeholder: 'Search or filter results...',
       data: {
-        'project-id' => @project.id,
+        # TODO: Rename project-id to context-id
+        'project-id' => context.id,
         'username-params' => @users.to_json(only: [:id, :username]),
-        'base-endpoint' => project_path(@project)
+        'base-endpoint' => path
       }
     }
   end
