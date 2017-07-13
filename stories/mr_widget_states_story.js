@@ -132,7 +132,7 @@ makeStories({
 
 makeStories({
   title: 'Failed to merge',
-  component: mrWidget.FailedToMergeState,
+  component: mrWidget.FailedToMerge,
 });
 
 makeStories({
@@ -247,6 +247,107 @@ makeStories({
 });
 
 makeStories({
+  title: 'Missing branch',
+  component: mrWidget.MissingBranchState,
+  combinations: [
+    {
+      title: 'source branch removed',
+      props: {
+        sourceBranchRemoved: true,
+      },
+    },
+    {
+      title: 'target branch removed',
+    },
+  ],
+});
+
+makeStories({
+  title: 'Not allowed',
+  component: mrWidget.NotAllowedState,
+});
+
+makeStories({
+  title: 'Nothing to merge',
+  component: mrWidget.NothingToMergeState,
+});
+
+makeStories({
+  title: 'Pipeline blocked',
+  component: mrWidget.PipelineBlockedState,
+});
+
+makeStories({
+  title: 'Pipeline failed',
+  component: mrWidget.PipelineFailedState,
+});
+
+makeStories({
+  title: 'Ready to merge',
+  component: mrWidget.ReadyToMergeState,
+  combinations: [
+    {
+      title: 'default',
+      props: {
+        commitMessage: 'a commit message',
+      },
+    },
+    {
+      title: 'with description',
+      props: {
+        commitMessage: 'a commit message',
+        onlyAllowMergeIfPipelineSucceeds: false,
+        commitMessageLinkTitle: 'Commit message description',
+      },
+    },
+    {
+      title: 'has CI with unknown status',
+      props: {
+        commitMessage: 'a commit message',
+        hasCI: true,
+      },
+    },
+    {
+      title: 'Show pipeline options dropdown',
+      props: {
+        commitMessage: 'a commit message',
+        pipeline: {},
+        isPipelineActive: true,
+        onlyAllowMergeIfPipelineSucceeds: false,
+      },
+    },
+    {
+      title: 'Merge not allowed',
+      props: {
+        commitMessage: 'a commit message',
+        onlyAllowMergeIfPipelineSucceeds: true,
+        isPipelineFailed: true,
+      },
+    },
+    {
+      title: 'Show commit message editor (click Modify button)',
+      props: {
+        commitMessage: 'a commit message',
+        showCommitMessageEditor: true,
+      },
+    },
+  ],
+});
+
+makeStories({
+  title: 'SHA Mismatch',
+  component: mrWidget.SHAMismatchState,
+});
+
+makeStories({
+  title: 'Squash before merge',
+  component: mrWidget.SquashBeforeMerge,
+  combinations: [
+    { title: 'EE-only feature' },
+  ],
+});
+
+makeStories({
   title: 'Unresolved Discussions',
   component: mrWidget.UnresolvedDiscussionsState,
   combinations: [
@@ -262,12 +363,21 @@ makeStories({
   ],
 });
 
-// const allStates = mrWidget.stateMaps.stateToComponentMap;
-// Object.keys(allStates).forEach(state => {
-//   stories.add(state, makeStory({
-//     component: allStates[state],
-//     props: lockedProps,
-//   }));
-// });
-
-export default stories;
+makeStories({
+  title: 'Work in progress',
+  component: mrWidget.WipState,
+  service: {
+    removeWIP() {},
+  },
+  combinations: [
+    {
+      title: 'default',
+    },
+    {
+      title: 'Show Resolve button',
+      props: {
+        removeWIPPath: '/remove/wip',
+      },
+    },
+  ],
+});
