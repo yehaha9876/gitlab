@@ -70,14 +70,8 @@ class Projects::ImportsController < Projects::ApplicationController
   end
 
   def safe_import_params
-    return import_params if valid_mirror_user?
+    return import_params if valid_mirror_user?(import_params)
 
     import_params.merge(mirror_user_id: current_user.id)
-  end
-
-  def valid_mirror_user?
-    return true unless import_params[:mirror_user_id].present?
-
-    [@project.mirror_user_id, current_user.id].include?(import_params[:mirror_user_id].to_i)
   end
 end
