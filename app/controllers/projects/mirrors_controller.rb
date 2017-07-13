@@ -54,8 +54,14 @@ class Projects::MirrorsController < Projects::ApplicationController
   end
 
   def safe_mirror_params
-    return mirror_params if valid_mirror_user?(mirror_params)
+    return mirror_params if valid_mirror_user?
 
     mirror_params.merge(mirror_user_id: current_user.id)
+  end
+
+  def valid_mirror_user?
+    return true unless mirror_params[:mirror_user_id].present?
+
+    [@project.mirror_user_id, current_user.id].include?(mirror_params[:mirror_user_id])
   end
 end
