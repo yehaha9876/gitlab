@@ -82,7 +82,7 @@ export default {
               type="button">
               Refresh now
             </button>
-          </div>
+          </span>
         </div>
       </template>
     </div>
