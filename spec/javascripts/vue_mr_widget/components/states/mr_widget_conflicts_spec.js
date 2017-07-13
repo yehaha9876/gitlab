@@ -59,7 +59,7 @@ describe('MRWidgetConflicts', () => {
 
       it('should not have action buttons', (done) => {
         Vue.nextTick(() => {
-          expect(vm.$el.querySelectorAll('.btn').length).toBe(0);
+          expect(vm.$el.querySelectorAll('.btn').length).toBe(1);
           expect(vm.$el.querySelector('.js-resolve-conflicts-button')).toEqual(null);
           expect(vm.$el.querySelector('.js-merge-locally-button')).toEqual(null);
           done();
