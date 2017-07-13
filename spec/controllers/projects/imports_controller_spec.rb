@@ -129,9 +129,15 @@ describe Projects::ImportsController do
         project.add_master(new_user)
 
         post :create, namespace_id: project.namespace.to_param,
+<<<<<<< HEAD
                       project_id: project,
                       project: { mirror: true, mirror_user_id: new_user.id, import_url: 'http://local.dev' },
                       format: :json
+=======
+             project_id: project,
+             project: { mirror: true, mirror_user_id: new_user.id, import_url: 'http://local.dev' },
+             format: :json
+>>>>>>> add imports spec
 
         expect(project.reload.mirror).to eq(true)
         expect(project.reload.mirror_user.id).to eq(user.id)
