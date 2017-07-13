@@ -6,6 +6,6 @@ module MirrorHelper
   end
 
   def options_for_mirror_user
-    options_from_collection_for_select([current_user, @project.mirror_user].uniq, :id, :name, @project.mirror_user_id || current_user.id)
+    options_from_collection_for_select(default_mirror_users, :id, :name, @project.mirror_user_id || current_user.id)
   end
 end
