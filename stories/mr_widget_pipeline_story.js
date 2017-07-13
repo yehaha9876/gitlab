@@ -68,8 +68,18 @@ makeStories({
   component: mrWidget.WidgetPipeline,
   combinations: [
     {
-      title: 'default',
-      props: mockData,
+      title: 'passed',
+      props: {
+        ...mockData,
+      },
+    },
+    {
+      title: 'cannot connect',
+      props: {
+        ...mockData,
+        hasCI: true,
+        ciStatus: false,
+      },
     },
   ],
 });
