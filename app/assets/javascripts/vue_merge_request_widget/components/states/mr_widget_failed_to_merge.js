@@ -44,20 +44,30 @@ export default {
   },
   template: `
     <div class="mr-widget-body media">
-      <status-icon status="failed" />
-      <div class="media-body">
-        <span
-          v-if="!isRefreshing"
-          class="bold">
-          <span
-            class="has-error-message"
-            v-if="mr.mergeError">
-            {{mr.mergeError}}.
-          </span>
-          <span v-else>Merge failed.</span>
-          <span
-            :class="{ 'has-custom-error': mr.mergeError }">
-            Refreshing in {{timerText}} to show the updated status...
+      <template v-if="isRefreshing">
+        <div class="mr-widget-icon">
+          <i
+          class="fa fa-spinner fa-spin"
+          aria-hidden="true" />
+        </div>
+        <span class="media-body bold js-refresh-label">
+          Refreshing now
+        </span>
+      </template>
+      <template v-else>
+        <status-icon status="failed" />
+        <div class="media-body space-children">
+          <span class="bold">
+            <span
+              class="has-error-message"
+              v-if="mr.mergeError">
+              {{mr.mergeError}}.
+            </span>
+            <span v-else>Merge failed.</span>
+            <span
+              :class="{ 'has-custom-error': mr.mergeError }">
+              Refreshing in {{timerText}} to show the updated status...
+            </span>
           </span>
           <button
             class="btn btn-success btn-xs"
@@ -71,16 +81,8 @@ export default {
             type="button">
             Refresh now
           </button>
-        </span>
-        <span
-          v-if="isRefreshing"
-          class="bold js-refresh-label">
-          Refreshing now
-          <i
-          class="fa fa-spinner fa-spin"
-          aria-hidden="true" />
-        </span>
-      </div>
+        </div>
+      </template>
     </div>
   `,
 };

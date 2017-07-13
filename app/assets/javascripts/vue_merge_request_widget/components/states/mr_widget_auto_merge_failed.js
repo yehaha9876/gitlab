@@ -25,24 +25,24 @@ export default {
   template: `
     <div class="mr-widget-body media">
       <status-icon status="failed" />
-      <div class="media-body">
-        <span class="merge-error-text bold">
-          {{mr.mergeError}}.
-        </span>
+      <div class="media-body space-children">
         <span class="bold">
+          <span v-if="mr.mergeError">{{mr.mergeError}}.</span>
           This merge request failed to be merged automatically
         </span>
-        <button
-          @click="refreshWidget"
-          :disabled="isRefreshing"
-          type="button"
-          class="btn btn-xs btn-default">
-          <i
-            v-if="isRefreshing"
-            class="fa fa-spinner fa-spin"
-            aria-hidden="true" />
-          Refresh
-        </button>
+        <div class="space-children">
+          <button
+            @click="refreshWidget"
+            :disabled="isRefreshing"
+            type="button"
+            class="btn btn-xs btn-default">
+            <i
+              v-if="isRefreshing"
+              class="fa fa-spinner fa-spin"
+              aria-hidden="true" />
+            Refresh
+          </button>
+        </div>
       </div>
     </div>
   `,

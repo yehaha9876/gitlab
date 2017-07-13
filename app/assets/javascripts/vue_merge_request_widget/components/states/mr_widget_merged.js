@@ -60,14 +60,12 @@ export default {
     <div class="mr-widget-body media">
       <status-icon status="success" />
       <div class="media-body">
-        <mr-widget-author-and-time
-          actionText="Merged by"
-          :author="mr.mergedBy"
-          :dateTitle="mr.updatedAt"
-          :dateReadable="mr.mergedAt" />
-        <div
-          v-if="shouldShowMergedButtons"
-          class="merged-buttons clearfix">
+        <div class="space-children">
+          <mr-widget-author-and-time
+            actionText="Merged by"
+            :author="mr.mergedBy"
+            :dateTitle="mr.updatedAt"
+            :dateReadable="mr.mergedAt" />
           <a
             v-if="mr.canRevertInCurrentMR"
             class="btn btn-close btn-xs has-tooltip"
@@ -110,7 +108,7 @@ export default {
               <a :href="mr.targetBranchPath">{{mr.targetBranch}}</a>
             </span>
           </p>
-          <p v-if="mr.sourceBranchRemoved">The source branch has been removed.</p>
+          <p v-if="mr.sourceBranchRemoved">The source branch has been removed</p>
           <p v-if="shouldShowRemoveSourceBranch">
             You can remove source branch now
             <button
@@ -121,11 +119,11 @@ export default {
               Remove Source Branch
             </button>
           </p>
-          <p v-if="shouldShowSourceBranchRemoving">
+          <p v-if="shouldShowSourceBranchRemoving" class="space-children">
             <i
               class="fa fa-spinner fa-spin"
               aria-hidden="true" />
-            The source branch is being removed.
+            <span>The source branch is being removed</span>
           </p>
         </section>
       </div>

@@ -6,6 +6,15 @@
 $status-icon-size: 22px;
 $status-icon-margin: $gl-btn-padding;
 
+.space-children {
+  display: flex;
+  flex-wrap: wrap;
+
+  > *:not(:last-child) {
+    margin-right: 10px;
+  }
+}
+
 .mr-state-widget {
   color: $gl-text-color;
   border: 1px solid $border-color;
@@ -50,10 +59,6 @@ $status-icon-margin: $gl-btn-padding;
         color: inherit;
       }
     }
-  }
-
-  * + .btn {
-    margin-left: 10px;
   }
 
   .accept-merge-holder {
@@ -130,6 +135,11 @@ $status-icon-margin: $gl-btn-padding;
     .ci-error {
       margin-right: $btn-side-margin;
     }
+  }
+
+  .mr-widget-icon {
+    font-size: 22px;
+    margin-right: $status-icon-margin;
   }
 
   .ci-status-icon > svg {
@@ -235,7 +245,8 @@ $status-icon-margin: $gl-btn-padding;
       font-weight: 600;
       font-size: 14px;
       line-height: inherit;
-      margin: 0 0 4px 0;
+      margin-top: 0;
+      margin-bottom: 0;
 
       &.has-conflicts .fa-exclamation-triangle {
         color: $gl-warning;
@@ -627,9 +638,6 @@ $status-icon-margin: $gl-btn-padding;
 }
 
 .merged-buttons {
-  float: left;
-  margin-left: 10px;
-
   .btn {
     float: left;
   }

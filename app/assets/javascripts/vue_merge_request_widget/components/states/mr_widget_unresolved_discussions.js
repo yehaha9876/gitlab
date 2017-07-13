@@ -11,22 +11,24 @@ export default {
   template: `
     <div class="mr-widget-body media">
       <status-icon status="failed" />
-      <div class="media-body">
-        <span class="bold">
-          There are unresolved discussions. Please resolve these discussions
-        </span>
+      <div class="media-body space-children">
         <button
           type="button"
-          class="btn btn-success btn-xs"
+          class="btn btn-success btn-small"
           disabled="true">
           Merge
         </button>
-        <a
-          v-if="mr.createIssueToResolveDiscussionsPath"
-          :href="mr.createIssueToResolveDiscussionsPath"
-          class="btn btn-default btn-xs js-create-issue">
-          Create an issue to resolve them later
-        </a>
+        <span class="bold">
+          There are unresolved discussions. Please resolve these discussions
+        </span>
+        <span>
+          <a
+            v-if="mr.createIssueToResolveDiscussionsPath"
+            :href="mr.createIssueToResolveDiscussionsPath"
+            class="btn btn-default btn-xs js-create-issue">
+            Create an issue to resolve them later
+          </a>
+        </span>
       </div>
     </div>
   `,
