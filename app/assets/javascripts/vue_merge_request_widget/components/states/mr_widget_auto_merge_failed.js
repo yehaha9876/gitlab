@@ -30,19 +30,17 @@ export default {
           <span v-if="mr.mergeError">{{mr.mergeError}}.</span>
           This merge request failed to be merged automatically
         </span>
-        <div class="align-items-center">
-          <button
-            @click="refreshWidget"
-            :disabled="isRefreshing"
-            type="button"
-            class="btn btn-xs btn-default">
-            <i
-              v-if="isRefreshing"
-              class="fa fa-spinner fa-spin"
-              aria-hidden="true" />
-            Refresh
-          </button>
-        </div>
+        <button
+          @click="refreshWidget"
+          :disabled="isRefreshing"
+          type="button"
+          class="btn btn-xs btn-default">
+          <i
+            v-if="isRefreshing"
+            class="fa fa-spinner fa-spin"
+            aria-hidden="true" />
+          Refresh
+        </button>
       </div>
     </div>
   `,

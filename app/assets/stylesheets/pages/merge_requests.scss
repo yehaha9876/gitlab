@@ -7,25 +7,17 @@ $status-icon-size: 22px;
 $status-icon-margin: $gl-btn-padding;
 
 .space-children {
-  display: flex;
-  flex-wrap: wrap;
+  > * {
+    display: inline;
+  }
+
+  > .btn {
+    display: inline-block;
+  }
 
   > *:not(:last-child) {
     margin-right: 10px;
   }
-}
-
-.align-self-center {
-  align-self: center;
-}
-
-.align-items-center {
-  display: flex;
-  align-items: center;
-}
-
-.justify-content-start {
-  justify-content: start;
 }
 
 .mr-state-widget {

@@ -21,14 +21,12 @@ export default {
         <span class="bold">
           There are unresolved discussions. Please resolve these discussions
         </span>
-        <span class="align-items-center">
-          <a
-            v-if="mr.createIssueToResolveDiscussionsPath"
-            :href="mr.createIssueToResolveDiscussionsPath"
-            class="btn btn-default btn-xs js-create-issue">
-            Create an issue to resolve them later
-          </a>
-        </span>
+        <a
+          v-if="mr.createIssueToResolveDiscussionsPath"
+          :href="mr.createIssueToResolveDiscussionsPath"
+          class="btn btn-default btn-xs js-create-issue">
+          Create an issue to resolve them later
+        </a>
       </div>
     </div>
   `,

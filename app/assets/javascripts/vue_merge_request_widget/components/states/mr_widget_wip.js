@@ -49,21 +49,18 @@ export default {
             class="fa fa-question-circle has-tooltip"
             title="When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged." />
         </span>
-        <div
+        <button
           v-if="mr.removeWIPPath"
-          class="align-items-center">
-          <button
-            @click="removeWIP"
-            :disabled="isMakingRequest"
-            type="button"
-            class="btn btn-default btn-xs js-remove-wip">
-            <i
-              v-if="isMakingRequest"
-              class="fa fa-spinner fa-spin"
-              aria-hidden="true" />
-              Resolve WIP status
-          </button>
-        </div>
+          @click="removeWIP"
+          :disabled="isMakingRequest"
+          type="button"
+          class="btn btn-default btn-xs js-remove-wip">
+          <i
+            v-if="isMakingRequest"
+            class="fa fa-spinner fa-spin"
+            aria-hidden="true" />
+            Resolve WIP status
+        </button>
       </div>
     </div>
   `,

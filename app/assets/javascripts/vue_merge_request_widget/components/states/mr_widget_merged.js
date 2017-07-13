@@ -66,48 +66,40 @@ export default {
             :author="mr.mergedBy"
             :dateTitle="mr.updatedAt"
             :dateReadable="mr.mergedAt" />
-          <div
-            v-if="mr.canRevertInCurrentMR || mr.revertInForkPath"
-            class="align-items-center">
-            <a
-              v-if="mr.canRevertInCurrentMR"
-              class="btn btn-close btn-xs has-tooltip"
-              href="#modal-revert-commit"
-              data-toggle="modal"
-              data-container="body"
-              title="Revert this merge request in a new merge request">
-              Revert
-            </a>
-            <a
-              v-else-if="mr.revertInForkPath"
-              class="btn btn-close btn-xs has-tooltip"
-              data-method="post"
-              :href="mr.revertInForkPath"
-              title="Revert this merge request in a new merge request">
-              Revert
-            </a>
-          </div>
-          <div
-            v-if="mr.canCherryPickInCurrentMR || mr.cherryPickInForkPath"
-            class="align-items-center">
-            <a
-              v-if="mr.canCherryPickInCurrentMR"
-              class="btn btn-default btn-xs has-tooltip"
-              href="#modal-cherry-pick-commit"
-              data-toggle="modal"
-              data-container="body"
-              title="Cherry-pick this merge request in a new merge request">
-              Cherry-pick
-            </a>
-            <a
-              v-else-if="mr.cherryPickInForkPath"
-              class="btn btn-default btn-xs has-tooltip"
-              data-method="post"
-              :href="mr.cherryPickInForkPath"
-              title="Cherry-pick this merge request in a new merge request">
-              Cherry-pick
-            </a>
-          </div>
+          <a
+            v-if="mr.canRevertInCurrentMR"
+            class="btn btn-close btn-xs has-tooltip"
+            href="#modal-revert-commit"
+            data-toggle="modal"
+            data-container="body"
+            title="Revert this merge request in a new merge request">
+            Revert
+          </a>
+          <a
+            v-else-if="mr.revertInForkPath"
+            class="btn btn-close btn-xs has-tooltip"
+            data-method="post"
+            :href="mr.revertInForkPath"
+            title="Revert this merge request in a new merge request">
+            Revert
+          </a>
+          <a
+            v-if="mr.canCherryPickInCurrentMR"
+            class="btn btn-default btn-xs has-tooltip"
+            href="#modal-cherry-pick-commit"
+            data-toggle="modal"
+            data-container="body"
+            title="Cherry-pick this merge request in a new merge request">
+            Cherry-pick
+          </a>
+          <a
+            v-else-if="mr.cherryPickInForkPath"
+            class="btn btn-default btn-xs has-tooltip"
+            data-method="post"
+            :href="mr.cherryPickInForkPath"
+            title="Cherry-pick this merge request in a new merge request">
+            Cherry-pick
+          </a>
         </div>
         <section class="mr-info-list">
           <p>
@@ -119,15 +111,13 @@ export default {
           <p v-if="mr.sourceBranchRemoved">The source branch has been removed</p>
           <p v-if="shouldShowRemoveSourceBranch" class="space-children">
             <span>You can remove source branch now</span>
-            <span class="align-items-center">
-              <button
-                @click="removeSourceBranch"
-                :class="{ disabled: isMakingRequest }"
-                type="button"
-                class="btn btn-xs btn-default js-remove-branch-button">
-                Remove Source Branch
-              </button>
-            </span>
+            <button
+              @click="removeSourceBranch"
+              :class="{ disabled: isMakingRequest }"
+              type="button"
+              class="btn btn-xs btn-default js-remove-branch-button">
+              Remove Source Branch
+            </button>
           </p>
           <p v-if="shouldShowSourceBranchRemoving">
             <i

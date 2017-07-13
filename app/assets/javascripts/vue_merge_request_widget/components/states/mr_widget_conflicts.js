@@ -24,21 +24,19 @@ export default {
             Resolve these conflicts or ask someone with write access to this repository to merge it locally.
           </span>
         </span>
-        <span class="space-children justify-content-start align-items-center">
-          <a
-            v-if="mr.canMerge && mr.conflictResolutionPath"
-            :href="mr.conflictResolutionPath"
-            class="btn btn-default btn-xs js-resolve-conflicts-button">
-            Resolve conflicts
-          </a>
-          <a
-            v-if="mr.canMerge"
-            class="btn btn-default btn-xs js-merge-locally-button"
-            data-toggle="modal"
-            href="#modal_merge_info">
-            Merge locally
-          </a>
-        </span>
+        <a
+          v-if="mr.canMerge && mr.conflictResolutionPath"
+          :href="mr.conflictResolutionPath"
+          class="btn btn-default btn-xs js-resolve-conflicts-button">
+          Resolve conflicts
+        </a>
+        <a
+          v-if="mr.canMerge"
+          class="btn btn-default btn-xs js-merge-locally-button"
+          data-toggle="modal"
+          href="#modal_merge_info">
+          Merge locally
+        </a>
       </div>
     </div>
   `,

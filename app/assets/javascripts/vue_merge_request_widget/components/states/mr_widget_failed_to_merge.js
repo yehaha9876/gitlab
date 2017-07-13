@@ -75,14 +75,12 @@ export default {
               Refreshing in {{timerText}} to show the updated status...
             </span>
           </span>
-          <span class="align-items-center">
-            <button
-              @click="refresh"
-              class="btn btn-default btn-xs js-refresh-button"
-              type="button">
-              Refresh now
-            </button>
-          </span>
+          <button
+            @click="refresh"
+            class="btn btn-default btn-xs js-refresh-button"
+            type="button">
+            Refresh now
+          </button>
         </div>
       </template>
     </div>
