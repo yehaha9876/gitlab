@@ -3,6 +3,12 @@
 = content_for :meta_tags do
   = auto_discovery_link_tag(:atom, params.merge(rss_url_options), title: "#{@group.name} issues")
 
+
+- content_for :page_specific_javascripts do
+  = webpack_bundle_tag 'common_vue'
+  = webpack_bundle_tag 'filtered_search'
+  = webpack_bundle_tag 'issues'
+
 - if group_issues(@group).exists?
   .top-area
     = render 'shared/issuable/nav', type: :issues

@@ -142,7 +142,7 @@ module SearchHelper
       path = project_path(@project)
     else
       context = @group
-      path = group_path(@group)
+      path = "/groups#{group_path(@group)}"
     end
 
     {
