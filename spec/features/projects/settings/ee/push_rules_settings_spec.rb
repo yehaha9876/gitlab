@@ -46,7 +46,7 @@ describe 'Project settings > [EE] repository', feature: true do
 
         click_button('Save changes')
 
-        expect(find('.select2-chosen')).to have_content(user2.name)
+        expect(find('.select2-chosen')).to have_content(user.name)
       end
     end
   end
