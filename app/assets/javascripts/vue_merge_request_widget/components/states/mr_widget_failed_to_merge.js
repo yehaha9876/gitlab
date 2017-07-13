@@ -57,6 +57,12 @@ export default {
       <template v-else>
         <status-icon status="failed" />
         <div class="media-body space-children">
+          <button
+            class="btn btn-success btn-small"
+            disabled="true"
+            type="button">
+            Merge
+          </button>
           <span class="bold">
             <span
               class="has-error-message"
@@ -69,18 +75,14 @@ export default {
               Refreshing in {{timerText}} to show the updated status...
             </span>
           </span>
-          <button
-            class="btn btn-success btn-xs"
-            disabled="true"
-            type="button">
-            Merge
-          </button>
-          <button
-            @click="refresh"
-            class="btn btn-default btn-xs js-refresh-button"
-            type="button">
-            Refresh now
-          </button>
+          <span class="align-items-center">
+            <button
+              @click="refresh"
+              class="btn btn-default btn-xs js-refresh-button"
+              type="button">
+              Refresh now
+            </button>
+          </div>
         </div>
       </template>
     </div>

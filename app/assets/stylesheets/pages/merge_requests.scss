@@ -15,6 +15,19 @@ $status-icon-margin: $gl-btn-padding;
   }
 }
 
+.align-self-center {
+  align-self: center;
+}
+
+.align-items-center {
+  display: flex;
+  align-items: center;
+}
+
+.justify-content-start {
+  justify-content: start;
+}
+
 .mr-state-widget {
   color: $gl-text-color;
   border: 1px solid $border-color;
@@ -40,6 +53,10 @@ $status-icon-margin: $gl-btn-padding;
     }
   }
 
+  label {
+    margin-bottom: 0;
+  }
+
   .btn {
     font-size: 14px;
 
@@ -53,7 +70,7 @@ $status-icon-margin: $gl-btn-padding;
     }
 
     &.dropdown-toggle {
-      padding: 5px 10px;
+      padding: 4px 10px;
 
       .fa {
         color: inherit;
@@ -495,6 +512,7 @@ $status-icon-margin: $gl-btn-padding;
 .mr-info-list {
   clear: left;
   position: relative;
+  padding-top: 4px;
 
   p {
     margin: 0;

@@ -21,7 +21,7 @@ export default {
         <span class="bold">
           There are unresolved discussions. Please resolve these discussions
         </span>
-        <span>
+        <span class="align-items-center">
           <a
             v-if="mr.createIssueToResolveDiscussionsPath"
             :href="mr.createIssueToResolveDiscussionsPath"

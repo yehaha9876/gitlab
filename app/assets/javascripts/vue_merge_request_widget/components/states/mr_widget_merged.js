@@ -66,40 +66,48 @@ export default {
             :author="mr.mergedBy"
             :dateTitle="mr.updatedAt"
             :dateReadable="mr.mergedAt" />
-          <a
-            v-if="mr.canRevertInCurrentMR"
-            class="btn btn-close btn-xs has-tooltip"
-            href="#modal-revert-commit"
-            data-toggle="modal"
-            data-container="body"
-            title="Revert this merge request in a new merge request">
-            Revert
-          </a>
-          <a
-            v-else-if="mr.revertInForkPath"
-            class="btn btn-close btn-xs has-tooltip"
-            data-method="post"
-            :href="mr.revertInForkPath"
-            title="Revert this merge request in a new merge request">
-            Revert
-          </a>
-          <a
-            v-if="mr.canCherryPickInCurrentMR"
-            class="btn btn-default btn-xs has-tooltip"
-            href="#modal-cherry-pick-commit"
-            data-toggle="modal"
-            data-container="body"
-            title="Cherry-pick this merge request in a new merge request">
-            Cherry-pick
-          </a>
-          <a
-            v-else-if="mr.cherryPickInForkPath"
-            class="btn btn-default btn-xs has-tooltip"
-            data-method="post"
-            :href="mr.cherryPickInForkPath"
-            title="Cherry-pick this merge request in a new merge request">
-            Cherry-pick
-          </a>
+          <div
+            v-if="mr.canRevertInCurrentMR || mr.revertInForkPath"
+            class="align-items-center">
+            <a
+              v-if="mr.canRevertInCurrentMR"
+              class="btn btn-close btn-xs has-tooltip"
+              href="#modal-revert-commit"
+              data-toggle="modal"
+              data-container="body"
+              title="Revert this merge request in a new merge request">
+              Revert
+            </a>
+            <a
+              v-else-if="mr.revertInForkPath"
+              class="btn btn-close btn-xs has-tooltip"
+              data-method="post"
+              :href="mr.revertInForkPath"
+              title="Revert this merge request in a new merge request">
+              Revert
+            </a>
+          </div>
+          <div
+            v-if="mr.canCherryPickInCurrentMR || mr.cherryPickInForkPath"
+            class="align-items-center">
+            <a
+              v-if="mr.canCherryPickInCurrentMR"
+              class="btn btn-default btn-xs has-tooltip"
+              href="#modal-cherry-pick-commit"
+              data-toggle="modal"
+              data-container="body"
+              title="Cherry-pick this merge request in a new merge request">
+              Cherry-pick
+            </a>
+            <a
+              v-else-if="mr.cherryPickInForkPath"
+              class="btn btn-default btn-xs has-tooltip"
+              data-method="post"
+              :href="mr.cherryPickInForkPath"
+              title="Cherry-pick this merge request in a new merge request">
+              Cherry-pick
+            </a>
+          </div>
         </div>
         <section class="mr-info-list">
           <p>
@@ -109,17 +117,19 @@ export default {
             </span>
           </p>
           <p v-if="mr.sourceBranchRemoved">The source branch has been removed</p>
-          <p v-if="shouldShowRemoveSourceBranch">
-            You can remove source branch now
-            <button
-              @click="removeSourceBranch"
-              :class="{ disabled: isMakingRequest }"
-              type="button"
-              class="btn btn-xs btn-default js-remove-branch-button">
-              Remove Source Branch
-            </button>
+          <p v-if="shouldShowRemoveSourceBranch" class="space-children">
+            <span>You can remove source branch now</span>
+            <span class="align-items-center">
+              <button
+                @click="removeSourceBranch"
+                :class="{ disabled: isMakingRequest }"
+                type="button"
+                class="btn btn-xs btn-default js-remove-branch-button">
+                Remove Source Branch
+              </button>
+            </span>
           </p>
-          <p v-if="shouldShowSourceBranchRemoving" class="space-children">
+          <p v-if="shouldShowSourceBranchRemoving">
             <i
               class="fa fa-spinner fa-spin"
               aria-hidden="true" />

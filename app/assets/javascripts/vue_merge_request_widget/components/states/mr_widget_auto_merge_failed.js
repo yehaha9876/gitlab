@@ -30,7 +30,7 @@ export default {
           <span v-if="mr.mergeError">{{mr.mergeError}}.</span>
           This merge request failed to be merged automatically
         </span>
-        <div class="space-children">
+        <div class="align-items-center">
           <button
             @click="refreshWidget"
             :disabled="isRefreshing"

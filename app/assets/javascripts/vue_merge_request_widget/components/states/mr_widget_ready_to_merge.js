@@ -201,7 +201,7 @@ export default {
   template: `
     <div class="mr-widget-body media">
       <status-icon status="success" />
-      <div class="media-body">
+      <div class="media-body space-children">
         <span class="btn-group">
           <button
             @click="handleMergeButtonClick()"
@@ -258,7 +258,7 @@ export default {
           </ul>
         </span>
         <template v-if="isMergeAllowed()">
-          <label class="spacing">
+          <label>
             <input
               id="remove-source-branch-input"
               v-model="removeSourceBranch"
@@ -298,7 +298,7 @@ export default {
                     rows="14"
                     name="Commit message"></textarea>
                 </div>
-                <p class="hint">Try to keep the first line under 52 characters and the others under 72.</p>
+                <p class="hint">Try to keep the first line under 52 characters and the others under 72</p>
                 <div class="hint">
                   <a
                     @click.prevent="updateCommitMessage"

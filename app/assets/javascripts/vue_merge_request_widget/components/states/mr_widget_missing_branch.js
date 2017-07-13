@@ -21,7 +21,7 @@ export default {
   template: `
     <div class="mr-widget-body media">
       <status-icon status="failed" />
-      <div class="media-body">
+      <div class="media-body space-children">
         <button
           type="button"
           class="btn btn-success btn-small"

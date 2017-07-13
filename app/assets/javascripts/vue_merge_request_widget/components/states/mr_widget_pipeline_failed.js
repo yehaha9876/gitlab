@@ -8,16 +8,16 @@ export default {
   template: `
     <div class="mr-widget-body media">
       <status-icon status="failed" />
-      <div class="media-body">
-        <span class="bold">
-          The pipeline for this merge request failed. Please retry the job or push a new commit to fix the failure
-        </span>
+      <div class="media-body space-children">
         <button
-          class="btn btn-success btn-xs"
+          class="btn btn-success btn-small"
           disabled="true"
           type="button">
           Merge
         </button>
+        <span class="bold">
+          The pipeline for this merge request failed. Please retry the job or push a new commit to fix the failure
+        </span>
       </div>
     </div>
   `,
