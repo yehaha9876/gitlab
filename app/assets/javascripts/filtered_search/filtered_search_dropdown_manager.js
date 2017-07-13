@@ -126,7 +126,8 @@ class FilteredSearchDropdownManager {
       const glArguments = Object.assign(defaultArguments, extraArguments);
 
       // Passing glArguments to `new gl[glClass](<arguments>)`
-      mappingKey.reference = new (Function.prototype.bind.apply(gl[glClass], [null, glArguments]))();
+      mappingKey.reference =
+        new (Function.prototype.bind.apply(gl[glClass], [null, glArguments]))();
     }
 
     if (firstLoad) {
