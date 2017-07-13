@@ -62,6 +62,6 @@ class Projects::MirrorsController < Projects::ApplicationController
   def valid_mirror_user?
     return true unless mirror_params[:mirror_user_id].present?
 
-    [@project.mirror_user_id, current_user.id].include?(mirror_params[:mirror_user_id])
+    [@project.mirror_user_id, current_user.id].include?(mirror_params[:mirror_user_id].to_i)
   end
 end
