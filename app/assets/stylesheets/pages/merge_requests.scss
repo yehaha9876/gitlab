@@ -326,18 +326,8 @@ $status-icon-margin: $gl-btn-padding;
     }
 
     @media (max-width: $screen-xs-max) {
-      h4 {
-        font-size: 14px;
-      }
-
       p {
         font-size: 13px;
-      }
-
-      .btn,
-      .btn-group,
-      .accept-action {
-        margin-bottom: 4px;
       }
 
       .btn-grouped {
