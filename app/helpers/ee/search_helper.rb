@@ -10,10 +10,10 @@ module EE
     private
 
     def search_multiple_assignees?(type)
-      # TODO: Add check for @project and @group
-      type == :issues
-      # type == :issues &&
-      #   @project.feature_available?(:multiple_issue_assignees)
+      context = @project.present? ? @project : @group
+
+      type == :issues &&
+        context.feature_available?(:multiple_issue_assignees)
     end
   end
 end
