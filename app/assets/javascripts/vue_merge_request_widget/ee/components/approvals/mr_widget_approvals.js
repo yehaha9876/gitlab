@@ -26,6 +26,14 @@ export default {
     'approvals-footer': ApprovalsFooter,
     statusIcon,
   },
+  computed: {
+    status() {
+      if (this.mr.approvals.approvals_left > 0) {
+        return 'failed';
+      }
+      return 'success';
+    },
+  },
   created() {
     const flashErrorMessage = 'An error occured while retrieving approval data for this merge request.';
 
@@ -40,14 +48,18 @@ export default {
     <div
       v-if="mr.approvalsRequired"
       class="mr-widget-approvals-container mr-widget-body mr-widget-section media">
-      <status-icon status="success" />
+      <div
+        v-if="fetchingApprovals"
+        class="mr-widget-icon">
+        <i class="fa fa-spinner fa-spin" />
+      </div>
+      <status-icon v-else :status="status" />
       <div
         v-show="fetchingApprovals"
         class="mr-approvals-loading-state media-body">
         <span class="approvals-loading-text">
           Checking approval status
         </span>
-        <i class="fa fa-spinner fa-spin" />
       </div>
       <div
         v-if="!fetchingApprovals"

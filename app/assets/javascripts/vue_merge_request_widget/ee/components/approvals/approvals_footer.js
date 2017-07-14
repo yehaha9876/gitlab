@@ -65,7 +65,7 @@ export default {
   },
   template: `
     <div v-if="approvedBy.length" class="approved-by-users approvals-footer clearfix mr-info-list">
-      <div class="approvers-prefix">
+      <div class="approvers-prefix space-children">
         <p>Approved by</p>
         <div class="approvers-list">
           <span v-for="approver in approvedBy">

@@ -61,35 +61,37 @@ export default {
   },
   template: `
     <div class="mr-widget-body media">
-      <status-icon :status="status" />
-      <div class="rebase-state-find-class-convention media-body">
+      <div v-if="mr.rebaseInProgress || isMakingRequest" class="mr-widget-icon">
+        <i
+          class="fa fa-spinner fa-spin"
+          aria-hidden="true" />
+      </div>
+      <status-icon v-else :status="status" />
+      <div class="rebase-state-find-class-convention media-body space-children">
         <template v-if="mr.rebaseInProgress || isMakingRequest">
-          <span class="bold">
-            Rebase in progress
-            <i
-              class="fa fa-spinner fa-spin"
-              aria-hidden="true" />
-          </span>
           <button
             type="button"
-            class="btn btn-success btn-xs"
+            class="btn btn-success btn-small"
             disabled="true">
             Merge
           </button>
+          <span class="bold">
+            Rebase in progress
+          </span>
         </template>
         <template v-if="!mr.rebaseInProgress && !mr.canPushToSourceBranch">
+          <button
+            type="button"
+            class="btn btn-success btn-small"
+            disabled="true">
+            Merge
+          </button>
           <span class="bold">
             Fast-forward merge is not possible.
             Rebase the source branch onto
             <span class="label-branch">{{mr.targetBranch}}</span>
             to allow this merge request to be merged
           </span>
-          <button
-            type="button"
-            class="btn btn-success btn-xs"
-            disabled="true">
-            Merge
-          </button>
         </template>
         <template v-if="!mr.rebaseInProgress && mr.canPushToSourceBranch && !isMakingRequest">
           <div class="accept-merge-holder clearfix js-toggle-container accept-action">

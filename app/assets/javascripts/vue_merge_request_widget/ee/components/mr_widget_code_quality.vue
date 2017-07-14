@@ -135,13 +135,13 @@ export default {
       v-if="isLoading"
       class="media">
       <div class="mr-widget-icon">
-      </div>
-      <div class="media-body">
-        Loading codeclimate report
         <i
           class="fa fa-spinner fa-spin"
           aria-hidden="true">
         </i>
+      </div>
+      <div class="media-body">
+        Loading codeclimate report
       </div>
     </div>
 
@@ -156,7 +156,7 @@ export default {
         }"
         v-html="stateIcon">
       </div>
-      <div class="media-body">
+      <div class="media-body space-children">
         <span>
           {{codeText}}
         </span>
@@ -168,6 +168,8 @@ export default {
           @click="toggleCollapsed">
           {{collapseText}}
         </button>
+      </div>
+      </div>
 
         <div
           class="code-quality-container"
@@ -187,8 +189,6 @@ export default {
             :issues="mr.codeclimateMetrics.newIssues"
             />
         </div>
-      </div>
-    </div>
     <div
       v-else-if="loadingFailed"
       class="media">

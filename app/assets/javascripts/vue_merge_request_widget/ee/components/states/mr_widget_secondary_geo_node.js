@@ -13,7 +13,8 @@ export default {
   template: `
     <div class="media">
       <status-icon status="failed" />
-      <div class="media-body">
+      <div class="media-body space-children">
+        <button type="button" class="btn btn-success btn-small" disabled="true">Merge</button>
         <span class="bold">
           Merge requests are read-only in a secondary Geo node
         </span>
@@ -27,7 +28,6 @@ export default {
           data-container="body">
           <i class="fa fa-question-circle"></i>
         </a>
-        <button type="button" class="btn btn-success btn-xs" disabled="true">Merge</button>
       </div>
     </div>
   `,
