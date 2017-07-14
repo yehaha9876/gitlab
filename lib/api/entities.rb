@@ -284,7 +284,7 @@ module API
 
     class ProjectEntity < Grape::Entity
       expose :id, :iid
-      expose(:project_id) { |entity| entity.project.id }
+      expose(:project_id) { |entity| entity&.project.try(:id) }
       expose :title, :description
       expose :state, :created_at, :updated_at
     end
@@ -296,7 +296,12 @@ module API
       expose :deleted_file?, as: :deleted_file
     end
 
-    class Milestone < ProjectEntity
+    class Milestone < Grape::Entity
+      expose :id, :iid
+      expose(:project_id) { |entity| entity&.project_id }
+      expose(:group_id) { |entity| entity&.group_id }
+      expose :title, :description
+      expose :state, :created_at, :updated_at
       expose :due_date
       expose :start_date
     end
@@ -350,10 +355,26 @@ module API
 
     class MergeRequestBasic < ProjectEntity
       expose :target_branch, :source_branch
-      expose :upvotes, :downvotes
+      expose :upvotes do |merge_request, options|
+        if options[:issuable_metadata]
+          options[:issuable_metadata][merge_request.id].upvotes
+        else
+          merge_request.upvotes
+        end
+      end
+      expose :downvotes do |merge_request, options|
+        if options[:issuable_metadata]
+          options[:issuable_metadata][merge_request.id].downvotes
+        else
+          merge_request.downvotes
+        end
+      end
       expose :author, :assignee, using: Entities::UserBasic
       expose :source_project_id, :target_project_id
-      expose :label_names, as: :labels
+      expose :labels do |merge_request, options|
+        # Avoids an N+1 query since labels are preloaded
+        merge_request.labels.map(&:title).sort
+      end
       expose :work_in_progress?, as: :work_in_progress
       expose :milestone, using: Entities::Milestone
       expose :merge_when_pipeline_succeeds
@@ -989,6 +1010,12 @@ module API
         expose :credentials, using: Credentials
         expose :dependencies, using: Dependency
       end
+    end
+
+    class UserAgentDetail < Grape::Entity
+      expose :user_agent
+      expose :ip_address
+      expose :submitted, as: :akismet_submitted
     end
   end
 end

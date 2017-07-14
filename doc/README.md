@@ -54,6 +54,8 @@ Shortcuts to GitLab's most visited docs:
   - [Create a group](gitlab-basics/create-group.md)
   - [GitLab Subgroups](user/group/subgroups/index.md)
 - [Search through GitLab](user/search/index.md): Search for issues, merge requests, projects, groups, todos, and issues in Issue Boards.
+  - **(EES/EEP)** [Advanced Global Search](user/search/advanced_global_search.md): Leverage Elasticsearch for faster, more advanced code search across your entire GitLab instance.
+  - **(EES/EEP)** [Advanced Syntax Search](user/search/advanced_search_syntax.md): Use advanced queries for more targeted search results.
 - [Snippets](user/snippets.md): Snippets allow you to create little bits of code.
 - [Wikis](user/project/wiki/index.md): Enhance your repository documentation with built-in wikis.
 - [GitLab Pages](user/project/pages/index.md): Build, test, and deploy your static website with GitLab Pages.
@@ -93,7 +95,7 @@ Manage files and branches from the UI (user interface):
   - [Checkout merge requests locally](user/project/merge_requests/index.md#checkout-merge-requests-locally)
   - [Cherry-pick](user/project/merge_requests/cherry_pick_changes.md)
 - [Milestones](user/project/milestones/index.md): Organize issues and merge requests into a cohesive group, optionally setting a due date.
-  - **(EES/EEP)** [Burndown Charts](user/project/milestones/index.md#burndown-charts): Watch your project's progress throughout a specific milestone.
+  - **(EES/EEP)** [Burndown Charts](user/project/milestones/burndown_charts.md): Watch your project's progress throughout a specific milestone.
 - [Related issues](user/project/issues/related_issues.md)
 - [Todos](workflow/todos.md): A chronological list of to-dos that are waiting for your input, all in a simple dashboard.
 
@@ -161,7 +163,7 @@ have access to GitLab administration tools and settings.
 - [User cohorts](user/admin_area/user_cohorts.md) View user activity over time.
 - [Web terminals](administration/integration/terminal.md): Provide terminal access to environments from within GitLab.
 - **(EES/EEP)** [Audit logs and events](administration/audit_events.md): View the changes made within the GitLab server.
-- **(EES/EEP)** [Elasticsearch](integration/elasticsearch.md): A flexible, scalable and powerful search service to keep GitLab's search fast when dealing with huge amount of data.
+- **(EES/EEP)** [Elasticsearch](integration/elasticsearch.md): Enable Elasticsearch which powers GitLab's Advanced Global Search. Useful when you deal with a huge amount of data.
 - **(EES/EEP)** [Email users](tools/email.md): Email GitLab users from within GitLab.
 - **(EES/EEP)** [Limit project size](user/admin_area/settings/account_and_limit_settings.md): Set a hard limit for your repositories' size.
 - **(EEP)** [Auditor users](administration/auditor_users.md): Users with read-only access to all projects, groups, and other resources on the GitLab instance.
@@ -193,6 +195,7 @@ have access to GitLab administration tools and settings.
 - [Operations](administration/operations.md): Keeping GitLab up and running.
 - [Polling](administration/polling.md): Configure how often the GitLab UI polls for updates.
 - [Request Profiling](administration/monitoring/performance/request_profiling.md): Get a detailed profile on slow requests.
+- [Performance Bar](administration/monitoring/performance/performance_bar.md): Get performance information for the current page.
 
 ### Customization
 
@@ -205,6 +208,7 @@ have access to GitLab administration tools and settings.
 
 ### Admin tools
 
+- [Gitaly](administration/gitaly/index.md): Configuring Gitaly, GitLab's Git repository storage service
 - [Raketasks](raketasks/README.md): Backups, maintenance, automatic webhook setup and the importing of projects.
     - [Backup and restore](raketasks/backup_restore.md): Backup and restore your GitLab instance.
 - [Reply by email](administration/reply_by_email.md): Allow users to comment on issues and merge requests by replying to notification emails.

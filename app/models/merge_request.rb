@@ -6,6 +6,7 @@ class MergeRequest < ActiveRecord::Base
   include Sortable
   include Elastic::MergeRequestsSearch
   include IgnorableColumn
+  include CreatedAtFilterable
 
   ignore_column :position
 
@@ -17,7 +18,7 @@ class MergeRequest < ActiveRecord::Base
 
   has_many :merge_request_diffs
   has_one :merge_request_diff,
-    -> { order('merge_request_diffs.id DESC') }
+    -> { order('merge_request_diffs.id DESC') }, inverse_of: :merge_request
 
   belongs_to :head_pipeline, foreign_key: "head_pipeline_id", class_name: "Ci::Pipeline"
 
@@ -34,7 +35,7 @@ class MergeRequest < ActiveRecord::Base
   after_create :ensure_merge_request_diff, unless: :importing?
   after_update :reload_diff_if_branch_changed
 
-  delegate :commits, :real_size, :commits_sha, :commits_count,
+  delegate :commits, :real_size, :commit_shas, :commits_count,
     to: :merge_request_diff, prefix: nil
 
   delegate :codeclimate_artifact, to: :head_pipeline, prefix: :head, allow_nil: true
@@ -542,7 +543,7 @@ class MergeRequest < ActiveRecord::Base
   def related_notes
     # Fetch comments only from last 100 commits
     commits_for_notes_limit = 100
-    commit_ids = commits.last(commits_for_notes_limit).map(&:id)
+    commit_ids = commit_shas.take(commits_for_notes_limit)
 
     Note.where(
       "(project_id = :target_project_id AND noteable_type = 'MergeRequest' AND noteable_id = :mr_id) OR" +
@@ -865,15 +866,18 @@ class MergeRequest < ActiveRecord::Base
     return Ci::Pipeline.none unless source_project
 
     @all_pipelines ||= source_project.pipelines
-      .where(sha: all_commits_sha, ref: source_branch)
+      .where(sha: all_commit_shas, ref: source_branch)
       .order(id: :desc)
   end
 
   # Note that this could also return SHA from now dangling commits
   #
-  def all_commits_sha
+  def all_commit_shas
     if persisted?
-      merge_request_diffs.flat_map(&:commits_sha).uniq
+      column_shas = MergeRequestDiffCommit.where(merge_request_diff: merge_request_diffs).pluck('DISTINCT(sha)')
+      serialised_shas = merge_request_diffs.where.not(st_commits: nil).flat_map(&:commit_shas)
+
+      (column_shas + serialised_shas).uniq
     elsif compare_commits
       compare_commits.to_a.reverse.map(&:id)
     else

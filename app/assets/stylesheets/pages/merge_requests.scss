@@ -164,7 +164,7 @@ $status-icon-margin: $gl-btn-padding;
 
     .dropdown-menu {
       margin-top: 11px;
-      z-index: 200;
+      z-index: 300;
     }
 
     .ci-action-icon-wrapper {
@@ -682,11 +682,11 @@ $status-icon-margin: $gl-btn-padding;
 
 .merge-request-tabs-holder {
   top: $header-height;
-  z-index: 100;
+  z-index: 200;
   background-color: $white-light;
   border-bottom: 1px solid $border-color;
 
-  @media(min-width: $screen-sm-min) {
+  @media (min-width: $screen-sm-min) {
     position: sticky;
     position: -webkit-sticky;
   }
@@ -721,6 +721,12 @@ $status-icon-margin: $gl-btn-padding;
     max-width: $limited-layout-width;
     margin-left: auto;
     margin-right: auto;
+
+    .inner-page-scroll-tabs {
+      background-color: $white-light;
+      margin-left: -$gl-padding;
+      padding-left: $gl-padding;
+    }
   }
 }
 

@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 
 gem 'rails', '4.2.8'
 gem 'rails-deprecated_sanitizer', '~> 1.0.3'
-gem 'bootsnap', '~> 1.1'
 
 # Responders respond_to and respond_with
 gem 'responders', '~> 2.0'
@@ -399,7 +398,7 @@ gem 'sys-filesystem', '~> 1.1.6'
 gem 'net-ntp'
 
 # Gitaly GRPC client
-gem 'gitaly', '~> 0.9.0'
+gem 'gitaly', '~> 0.14.0'
 
 gem 'toml-rb', '~> 0.3.15', require: false
 
