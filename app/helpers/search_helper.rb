@@ -137,7 +137,7 @@ module SearchHelper
   end
 
   def search_filter_input_options(type)
-    if (@project.present?)
+    if @project.present?
       context = @project
       path = project_path(@project)
     else
