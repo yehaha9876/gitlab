@@ -141,8 +141,6 @@ module SearchHelper
       id: "filtered-search-#{type}",
       placeholder: 'Search or filter results...',
       data: {
-        # TODO: Rename project-id to context-id
-        # 'project-id' => context.id,
         'username-params' => @users.to_json(only: [:id, :username])
       }
     }
