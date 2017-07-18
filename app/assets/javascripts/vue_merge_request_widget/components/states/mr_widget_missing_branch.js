@@ -21,7 +21,13 @@ export default {
   template: `
     <div class="mr-widget-body media">
       <status-icon status="failed" />
-      <div class="media-body">
+      <div class="media-body space-children">
+        <button
+          type="button"
+          class="btn btn-success btn-small"
+          disabled="true">
+          Merge
+        </button>
         <span class="bold js-branch-text">
           <span class="capitalize">
             {{missingBranchName}}
@@ -31,12 +37,6 @@ export default {
             class="fa fa-question-circle has-tooltip"
             :title="message" />
         </span>
-        <button
-          type="button"
-          class="btn btn-success btn-small"
-          disabled="true">
-          Merge
-        </button>
       </div>
     </div>
   `,

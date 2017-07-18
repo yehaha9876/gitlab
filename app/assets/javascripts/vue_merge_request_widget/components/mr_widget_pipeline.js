@@ -47,11 +47,9 @@ export default {
       <div class="ci-widget media">
         <template v-if="hasCIError">
           <div class="ci-status-icon ci-status-icon-failed ci-error js-ci-error">
-            <div class="js-icon-link icon-link">
-              <span
-                v-html="svg"
-                aria-hidden="true"></span>
-            </div>
+            <span
+              v-html="svg"
+              aria-hidden="true"></span>
           </div>
           <div class="media-body">
             Could not connect to the CI server. Please check your settings and try again

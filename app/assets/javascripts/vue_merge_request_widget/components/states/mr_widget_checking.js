@@ -12,14 +12,14 @@ export default {
           class="fa fa-spinner fa-spin"
           aria-hidden="true" />
       </div>
-      <div class="media-body">
+      <div class="media-body space-children">
         <button
           type="button"
           class="btn btn-success btn-small"
           disabled="true">
           Merge
         </button>
-        <span class="spacing bold">
+        <span class="bold">
           Checking ability to merge automatically
         </span>
       </div>

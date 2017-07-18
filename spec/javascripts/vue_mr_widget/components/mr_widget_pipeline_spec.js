@@ -12,7 +12,7 @@ const createComponent = (mr) => {
   });
 };
 
-describe('MRWidgetPipeline', () => {
+fdescribe('MRWidgetPipeline', () => {
   describe('props', () => {
     it('should have props', () => {
       const { mr } = pipelineComponent.props;
@@ -94,12 +94,10 @@ describe('MRWidgetPipeline', () => {
     it('should list single stage', (done) => {
       pipeline.details.stages.splice(0, 1);
 
-      Vue.nextTick()
-        .then(() => {
-          expect(el.querySelectorAll('.stage-container button').length).toEqual(1);
-        })
-        .then(done)
-        .catch(done.fail);
+      Vue.nextTick(() => {
+        expect(el.querySelectorAll('.stage-container button').length).toEqual(1);
+        done();
+      });
     });
 
     it('should not have stages when there is no stage', (done) => {

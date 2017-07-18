@@ -45,6 +45,10 @@ $status-icon-margin: $gl-btn-padding;
     }
   }
 
+  label {
+    margin-bottom: 0;
+  }
+
   .btn {
     font-size: 14px;
 
@@ -58,16 +62,12 @@ $status-icon-margin: $gl-btn-padding;
     }
 
     &.dropdown-toggle {
-      padding: 5px 10px;
+      padding: 4px 10px;
 
       .fa {
         color: inherit;
       }
     }
-  }
-
-  * + .btn {
-    margin-left: 10px;
   }
 
   .accept-merge-holder {
@@ -139,13 +139,14 @@ $status-icon-margin: $gl-btn-padding;
     @media (max-width: $screen-xs-max) {
       flex-wrap: wrap;
     }
-
-    .ci-error {
-      margin-right: $btn-side-margin;
-    }
   }
 
-  .ci-status-icon > svg {
+  .mr-widget-icon {
+    font-size: 22px;
+    margin-right: $status-icon-margin;
+  }
+
+  .ci-status-icon svg {
     width: $status-icon-size;
     height: $status-icon-size;
     margin: 3px $status-icon-margin 3px 0;
@@ -248,7 +249,8 @@ $status-icon-margin: $gl-btn-padding;
       font-weight: 600;
       font-size: 14px;
       line-height: inherit;
-      margin: 0 0 4px 0;
+      margin-top: 0;
+      margin-bottom: 0;
 
       &.has-conflicts .fa-exclamation-triangle {
         color: $gl-warning;
@@ -323,18 +325,8 @@ $status-icon-margin: $gl-btn-padding;
     }
 
     @media (max-width: $screen-xs-max) {
-      h4 {
-        font-size: 14px;
-      }
-
       p {
         font-size: 13px;
-      }
-
-      .btn,
-      .btn-group,
-      .accept-action {
-        margin-bottom: 4px;
       }
 
       .btn-grouped {
@@ -490,6 +482,7 @@ $status-icon-margin: $gl-btn-padding;
 .mr-info-list {
   clear: left;
   position: relative;
+  padding-top: 4px;
 
   p {
     margin: 0;
@@ -633,9 +626,6 @@ $status-icon-margin: $gl-btn-padding;
 }
 
 .merged-buttons {
-  float: left;
-  margin-left: 10px;
-
   .btn {
     float: left;
   }

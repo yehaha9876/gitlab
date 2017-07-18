@@ -8,16 +8,16 @@ export default {
   template: `
     <div class="mr-widget-body media">
       <status-icon status="failed" />
-      <div class="media-body">
-        <span class="bold">
-          Pipeline blocked. The pipeline for this merge request requires a manual action to proceed
-        </span>
+      <div class="media-body space-children">
         <button
           type="button"
-          class="btn btn-success btn-xs"
+          class="btn btn-success btn-small"
           disabled="true">
           Merge
         </button>
+        <span class="bold">
+          Pipeline blocked. The pipeline for this merge request requires a manual action to proceed
+        </span>
       </div>
     </div>
   `,

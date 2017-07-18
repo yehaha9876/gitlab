@@ -56,7 +56,7 @@ feature 'Only allow merge requests to be merged if the pipeline succeeds', featu
           wait_for_requests
 
           expect(page).to have_css('button[disabled="disabled"]', text: 'Merge')
-          expect(page).to have_content('Please retry the job or push a new commit to fix the failure.')
+          expect(page).to have_content('Please retry the job or push a new commit to fix the failure')
         end
       end
 
@@ -69,7 +69,7 @@ feature 'Only allow merge requests to be merged if the pipeline succeeds', featu
           wait_for_requests
 
           expect(page).not_to have_button 'Merge'
-          expect(page).to have_content('Please retry the job or push a new commit to fix the failure.')
+          expect(page).to have_content('Please retry the job or push a new commit to fix the failure')
         end
       end
 

@@ -1,8 +1,8 @@
 /* global Flash */
-import statusIcon from '../mr_widget_status_icon';
 import successSvg from 'icons/_icon_status_success.svg';
 import warningSvg from 'icons/_icon_status_warning.svg';
 import simplePoll from '~/lib/utils/simple_poll';
+import statusIcon from '../mr_widget_status_icon';
 import eventHub from '../../event_hub';
 
 export default {
@@ -205,7 +205,7 @@ export default {
   template: `
     <div class="mr-widget-body media">
       <status-icon status="success" />
-      <div class="media-body">
+      <div class="media-body space-children">
         <span class="btn-group">
           <button
             @click="handleMergeButtonClick()"
@@ -262,7 +262,7 @@ export default {
           </ul>
         </span>
         <template v-if="isMergeAllowed()">
-          <label class="spacing">
+          <label>
             <input
               id="remove-source-branch-input"
               v-model="removeSourceBranch"
@@ -307,7 +307,7 @@ export default {
                     rows="14"
                     name="Commit message"></textarea>
                 </div>
-                <p class="hint">Try to keep the first line under 52 characters and the others under 72.</p>
+                <p class="hint">Try to keep the first line under 52 characters and the others under 72</p>
                 <div class="hint">
                   <a
                     @click.prevent="updateCommitMessage"
@@ -319,7 +319,7 @@ export default {
         </template>
         <template v-else>
           <span class="bold">
-            The pipeline for this merge request failed. Please retry the job or push a new commit to fix the failure.
+            The pipeline for this merge request failed. Please retry the job or push a new commit to fix the failure
           </span>
         </template>
       </div>

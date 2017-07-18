@@ -26,7 +26,7 @@ export default {
             <a
               :href="mr.targetBranchPath"
               class="label-branch">
-              {{mr.targetBranch}}</a>.
+              {{mr.targetBranch}}</a>
           </p>
         </section>
       </div>

@@ -10,6 +10,13 @@ import '../app/assets/javascripts/commons/bootstrap';
 import '../app/assets/javascripts/flash';
 
 import './mr_widget_story';
+import './mr_widget_header_story';
 import './mr_widget_states_story';
+import './mr_widget_pipeline_story';
+import './mr_widget_deployment_story';
 
-import './ee';
+try {
+  require('./ee');
+} catch(e) {
+  // no ee
+}
