@@ -94,7 +94,7 @@ export default {
           </span>
         </template>
         <template v-if="!mr.rebaseInProgress && mr.canPushToSourceBranch && !isMakingRequest">
-          <div class="accept-merge-holder clearfix js-toggle-container accept-action">
+          <div class="accept-merge-holder clearfix js-toggle-container accept-action space-children">
             <button
               class="btn btn-small btn-reopen btn-success"
               :disabled="isMakingRequest"
