@@ -10,7 +10,7 @@ module EE
     private
 
     def search_multiple_assignees?(type)
-      context = @project.present? ? @project : @group
+      context = @project.presence || @group
 
       type == :issues &&
         context.feature_available?(:multiple_issue_assignees)
