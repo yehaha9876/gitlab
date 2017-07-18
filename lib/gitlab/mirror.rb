@@ -28,7 +28,7 @@ module Gitlab
       end
 
       def available_capacity
-        current_capacity = Gitlab::Redis::SharedState.with { |redis| redis.scard(PULL_CAPACITY_KEY) }.to_i
+        current_capacity = Gitlab::Redis.with { |redis| redis.scard(PULL_CAPACITY_KEY) }.to_i
 
         available = max_capacity - current_capacity
         if available < 0
