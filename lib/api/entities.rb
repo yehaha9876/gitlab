@@ -353,6 +353,13 @@ module API
       expose :id
     end
 
+    class MergeRequestSimple < ProjectEntity
+      expose :title
+      expose :web_url do |merge_request, options|
+        Gitlab::UrlBuilder.build(merge_request)
+      end
+    end
+
     class MergeRequestBasic < ProjectEntity
       expose :target_branch, :source_branch
       expose :upvotes do |merge_request, options|
@@ -688,7 +695,8 @@ module API
       expose :id
       expose :default_projects_limit
       expose :signup_enabled
-      expose :signin_enabled
+      expose :password_authentication_enabled
+      expose :password_authentication_enabled, as: :signin_enabled
       expose :gravatar_enabled
       expose :sign_in_text
       expose :after_sign_up_text

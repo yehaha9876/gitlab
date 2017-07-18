@@ -1206,6 +1206,18 @@ describe User, models: true do
     end
   end
 
+  describe '#sanitize_attrs' do
+    let(:user) { build(:user, name: 'test & user', skype: 'test&user') }
+
+    it 'encodes HTML entities in the Skype attribute' do
+      expect { user.sanitize_attrs }.to change { user.skype }.to('test&amp;user')
+    end
+
+    it 'does not encode HTML entities in the name attribute' do
+      expect { user.sanitize_attrs }.not_to change { user.name }
+    end
+  end
+
   describe '#starred?' do
     it 'determines if user starred a project' do
       user = create :user
@@ -2043,35 +2055,25 @@ describe User, models: true do
     end
   end
 
-  describe '#forget_me!' do
-    subject { create(:user, remember_created_at: Time.now) }
+  describe '#allow_password_authentication?' do
+    context 'regular user' do
+      let(:user) { build(:user) }
 
-    it 'clears remember_created_at' do
-      subject.forget_me!
+      it 'returns true when sign-in is enabled' do
+        expect(user.allow_password_authentication?).to be_truthy
+      end
 
-      expect(subject.reload.remember_created_at).to be_nil
+      it 'returns false when sign-in is disabled' do
+        stub_application_setting(password_authentication_enabled: false)
+
+        expect(user.allow_password_authentication?).to be_falsey
+      end
     end
 
-    it 'does not clear remember_created_at when in a Geo secondary node' do
-      allow(Gitlab::Geo).to receive(:secondary?) { true }
+    it 'returns false for ldap user' do
+      user = create(:omniauth_user, provider: 'ldapmain')
 
-      expect { subject.forget_me! }.not_to change(subject, :remember_created_at)
-    end
-  end
-
-  describe '#remember_me!' do
-    subject { create(:user, remember_created_at: nil) }
-
-    it 'updates remember_created_at' do
-      subject.remember_me!
-
-      expect(subject.reload.remember_created_at).not_to be_nil
-    end
-
-    it 'does not update remember_created_at when in a Geo secondary node' do
-      allow(Gitlab::Geo).to receive(:secondary?) { true }
-
-      expect { subject.remember_me! }.not_to change(subject, :remember_created_at)
+      expect(user.allow_password_authentication?).to be_falsey
     end
   end
 end
