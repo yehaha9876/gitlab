@@ -42,7 +42,9 @@ describe 'Project settings > [EE] repository' do
 
     it 'shows pull mirror settings' do
       expect(page).to have_selector('#project_mirror')
-      expect(page).to have_selector('#project_import_url')
+      expect(page).to have_selector('#project_username_only_import_url')
+      expect(page).to have_selector('#project_import_data_attributes_ssh_known_hosts')
+      expect(page).to have_selector('#project_import_data_attributes_password')
       expect(page).to have_selector('#project_mirror_user_id', visible: false)
       expect(page).to have_selector('#project_mirror_trigger_builds')
     end

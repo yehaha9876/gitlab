@@ -13,8 +13,6 @@
     = form_for @project, url: project_mirror_path(@project) do |f|
       %div
         = form_errors(@project)
-      %h5
-        Set up mirror repository
       = render "shared/mirror_update_button"
       - if @project.mirror_last_update_failed?
         .panel.panel-danger
@@ -30,10 +28,73 @@
         = f.check_box :mirror, class: "pull-left"
         .prepend-left-20
           = f.label :mirror, "Mirror repository", class: "label-light append-bottom-0"
+
       .form-group
-        = f.label :import_url, "Git repository URL", class: "label-light"
-        = f.text_field :import_url, class: 'form-control', placeholder: 'https://username:password@gitlab.company.com/group/project.git'
-        = render "projects/mirrors/instructions"
+        = f.label :username_only_import_url, "Git repository URL", class: "label-light"
+        = f.text_field :username_only_import_url, class: 'form-control', placeholder: 'https://username@gitlab.company.com/group/project.git'
+
+      = render 'projects/mirrors/instructions'
+
+      - import_data = @project.import_data || @project.build_import_data
+      = f.fields_for :import_data, import_data do |import_form|
+        = import_form.hidden_field :id
+
+        -# FIXME(kushalpandya): Only show this / fingerprints for ssh:// URLs
+        .form-group
+          = import_form.label :ssh_known_hosts, 'SSH host keys', class: 'label-light'
+          = import_form.text_area :ssh_known_hosts, class: 'form-control'
+          -# TODO(kushalpandya): confirmation that the SSH host key is correct.
+          -# We can store arbitrary data in import_data.credentials
+          .help-block
+            This fingerprint was verified manually just now
+          = link_to 'Detect host keys', '#todo', class: 'btn btn-success'
+
+        - ssh_key_auth = import_data.ssh_key_auth?
+        - basic_auth_class = 'active' unless ssh_key_auth
+        - ssh_pubkey_class = 'active' if ssh_key_auth
+        -# FIXME(nick.thomas): inline styling is bad
+        %div{ style: 'border: 1px solid #eee; padding: 1em; margin-bottom: 1em;' }
+          %ul.nav.nav-links
+            %li{ class: basic_auth_class }
+              %a{ href: '#pull-mirror-http', data: {toggle: 'tab'} } Password authentication
+            %li{ class: ssh_pubkey_class }
+              %a{ href: '#pull-mirror-ssh', data: {toggle: 'tab'} } SSH public key authentication
+
+          -# FIXME(kushalpandya) Replace with an automatic selector based on the
+          -# the active tab
+          .form-group
+            = import_form.radio_button :auth_method, "password", checked: !ssh_key_auth
+            = import_form.label :auth_method, 'Use password authentication'
+            = import_form.radio_button :auth_method, "ssh_public_key"
+            = import_form.label :auth_method, 'Use SSH public key authentication', checked: ssh_key_auth
+
+          .tab-content
+            #pull-mirror-http.tab-pane{ class: basic_auth_class }
+              .form-group
+                = import_form.label :password, "Password", class: "label-light"
+                = import_form.password_field :password, value: import_data.password, class: 'form-control'
+            #pull-mirror-ssh.tab-pane{ class: ssh_pubkey_class }
+              %p
+                - if import_data.ssh_public_key.present?
+                  Here is the public SSH key that needs to be added to the remote
+                  server.
+                - else
+                  An SSH key will be automatically generated when the form is
+                  submitted.
+                For more information, please refer to the documentation.
+
+              - if import_data.ssh_public_key.present?
+                %code.prepend-top-default
+                  = import_data.ssh_public_key
+                %br
+
+              - if import_data.ssh_public_key.present?
+                - regen_data = { id: import_data.id, auth_method: 'ssh_public_key', regenerate_ssh_private_key: true }
+                = link_to 'Regenerate key', project_mirror_path(@project, project: { import_data_attributes: regen_data }),
+                    method: :patch,
+                    data: { confirm: 'ARE YOU SURE?!' },
+                    class: 'btn btn-remove delete-key'
+
       .form-group
         = f.label :mirror_user_id, "Mirror user", class: "label-light"
         = select_tag('project[mirror_user_id]', options_for_mirror_user, class: "select2 lg", required: true)
@@ -44,3 +105,4 @@
       - if @project.builds_enabled?
         = render "shared/mirror_trigger_builds_setting", f: f
       = f.submit 'Save changes', class: 'btn btn-create', name: 'update_remote_mirror'
+
