@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 8.17.7 (2017-07-19)
+
+- Prevent mirror user to be assigned to users other than the current one.
+
 ## 8.17.6 (2017-05-05)
 
 - Respect project features when searching alternative branches with elasticsearch enabled.
