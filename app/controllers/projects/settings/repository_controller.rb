@@ -1,6 +1,8 @@
 module Projects
   module Settings
     class RepositoryController < Projects::ApplicationController
+      include SafeMirrorParams
+
       before_action :authorize_admin_project!
       before_action :remote_mirror, only: [:show]
 
