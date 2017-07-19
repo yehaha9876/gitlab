@@ -10,4 +10,8 @@ module MirrorHelper
       value >= current_application_settings.minimum_mirror_sync_time
     end
   end
+
+  def options_for_mirror_user
+    options_from_collection_for_select(default_mirror_users, :id, :name, @project.mirror_user_id || current_user.id)
+  end
 end
