@@ -161,35 +161,14 @@ $status-icon-margin: $gl-btn-padding;
   }
 
   .mr-widget-pipeline-graph {
-    flex-shrink: 0;
     padding: 0 4px;
 
     .dropdown-menu {
-      margin-top: 11px;
       z-index: 300;
     }
 
     .ci-action-icon-wrapper {
       line-height: 16px;
-    }
-
-    @media (max-width: $screen-xs-max) {
-      order: 1;
-      margin-top: $gl-padding-top;
-      border-radius: 3px;
-      background-color: $white-light;
-      border: 1px solid $gray-darker;
-      width: 100%;
-      text-align: center;
-
-      .dropdown-menu {
-        margin-left: -97.5px;
-      }
-
-      .arrow-up::before,
-      .arrow-up::after, {
-        margin-left: 97.5px;
-      }
     }
   }
 
@@ -236,12 +215,6 @@ $status-icon-margin: $gl-btn-padding;
   .mr-widget-help {
     padding: 10px 16px 10px 48px;
     font-style: italic;
-  }
-
-  .mr-widget-heading {
-    .btn-default.btn-xs {
-      margin-left: 5px;
-    }
   }
 
   .mr-widget-body {

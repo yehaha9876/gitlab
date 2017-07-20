@@ -61,7 +61,7 @@ export default {
                 aria-hidden="true"></span>
             </span>
           </div>
-          <div class="media-body">
+          <div class="media-body space-children">
             <span>
               <span
                 v-if="hasDeploymentMeta(deployment)">
@@ -98,14 +98,14 @@ export default {
                 data-placement="top">
                 {{formatDate(deployment.deployed_at)}}
               </span>
-              <button
-                type="button"
-                v-if="deployment.stop_url"
-                @click="stopEnvironment(deployment)"
-                class="btn btn-default btn-xs">
-                Stop environment
-              </button>
             </span>
+            <button
+              type="button"
+              v-if="deployment.stop_url"
+              @click="stopEnvironment(deployment)"
+              class="btn btn-default btn-xs">
+              Stop environment
+            </button>
             <mr-widget-memory-usage
               v-if="deployment.metrics_url"
               :metricsUrl="deployment.metrics_url"
