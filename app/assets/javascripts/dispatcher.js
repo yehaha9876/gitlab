@@ -1,4 +1,5 @@
 /* eslint-disable func-names, space-before-function-paren, no-var, prefer-arrow-callback, wrap-iife, no-shadow, consistent-return, one-var, one-var-declaration-per-line, camelcase, default-case, no-new, quotes, no-duplicate-case, no-case-declarations, no-fallthrough, max-len */
+/* global ProjectSelect */
 /* global ShortcutsNavigation */
 /* global IssuableIndex */
 /* global ShortcutsIssuable */
@@ -164,6 +165,9 @@ import AuditLogs from './audit_logs';
           shortcut_handler = new ShortcutsIssuable();
           new ZenMode();
           break;
+        case 'dashboard:milestones:index':
+          new ProjectSelect();
+          break;
         case 'projects:milestones:show':
         case 'groups:milestones:show':
         case 'dashboard:milestones:show':
@@ -173,6 +177,7 @@ import AuditLogs from './audit_logs';
         case 'groups:issues':
         case 'groups:merge_requests':
           new UsersSelect();
+          new ProjectSelect();
           break;
         case 'dashboard:todos:index':
           new Todos();
@@ -267,6 +272,7 @@ import AuditLogs from './audit_logs';
           break;
         case 'dashboard:issues':
         case 'dashboard:merge_requests':
+          new ProjectSelect();
           new UsersSelect();
           break;
         case 'projects:commit:show':
