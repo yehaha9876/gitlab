@@ -6,8 +6,8 @@ Related issues are a bi-directional relationship between any two issues
 and appear in a block below the issue description. Issues can be across groups
 and projects.
 
-The relationship only shows up in the UI if the user has write [permissions]
-to see both issues (`> Guest`).
+The relationship only shows up in the UI if the user has read [permissions]
+to see both issues.
 
 ## Adding a related issue
 
@@ -28,6 +28,10 @@ either issue.
 
 ![Removing a related issue](img/related_issues_remove.png)
 
+As an addition, you are also able to manage related issues through [our API].
+
 [ee]: https://about.gitlab.com/gitlab-ee/
 [ee-1797]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1797
 [permissions]: ../../permissions.md
+[EE]: ../../permissions.md
+[Our API]: https://docs.gitlab.com/ee/api/issue_links.html
