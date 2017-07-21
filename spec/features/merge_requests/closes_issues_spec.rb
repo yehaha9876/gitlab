@@ -46,7 +46,7 @@ feature 'Merge Request closing issues message', feature: true, js: true do
     let(:merge_request_title) { "closes #{issue_1.to_reference}\n\n refers to #{issue_2.to_reference}" }
 
     it 'does not display closing issue message' do
-      expect(page).to have_content("Closes #{issue_1.to_reference}.")
+      expect(page).to have_content("Closes #{issue_1.to_reference}")
       expect(page).to have_content("Mentions #{issue_2.to_reference}")
     end
   end

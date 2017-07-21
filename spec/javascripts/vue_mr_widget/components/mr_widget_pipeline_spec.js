@@ -12,7 +12,7 @@ const createComponent = (mr) => {
   });
 };
 
-fdescribe('MRWidgetPipeline', () => {
+describe('MRWidgetPipeline', () => {
   describe('props', () => {
     it('should have props', () => {
       const { mr } = pipelineComponent.props;

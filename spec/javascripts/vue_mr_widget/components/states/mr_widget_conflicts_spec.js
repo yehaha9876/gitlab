@@ -31,7 +31,7 @@ describe('MRWidgetConflicts', () => {
       const el = createComponent().$el;
       const resolveButton = el.querySelector('.js-resolve-conflicts-button');
       const mergeButton = el.querySelector('.mr-widget-body .btn');
-      const mergeLocallyButton = el.querySelector('js-merge-locally-button');
+      const mergeLocallyButton = el.querySelector('.js-merge-locally-button');
 
       expect(el.textContent).toContain('There are merge conflicts');
       expect(el.textContent).not.toContain('ask someone with write access');
