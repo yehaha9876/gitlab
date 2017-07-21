@@ -34,4 +34,4 @@ As an addition, you are also able to manage related issues through [our API].
 [ee-1797]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1797
 [permissions]: ../../permissions.md
 [EE]: ../../permissions.md
-[Our API]: https://docs.gitlab.com/ee/api/issue_links.html
+[Our API]: ../../../api/issue_links.md
