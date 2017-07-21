@@ -791,7 +791,7 @@ describe User, models: true do
       end
 
       it 'returns users with a partially matching name' do
-        expect(described_class.search(user.name[0..2])).to eq([user2, user])
+        expect(described_class.search(user.name[0..2])).to eq([user, user2])
       end
 
       it 'returns users with a matching name regardless of the casing' do
@@ -805,7 +805,7 @@ describe User, models: true do
       end
 
       it 'returns users with a partially matching Email' do
-        expect(described_class.search(user.email[0..2])).to eq([user2, user])
+        expect(described_class.search(user.email[0..2])).to eq([user, user2])
       end
 
       it 'returns users with a matching Email regardless of the casing' do
@@ -819,7 +819,7 @@ describe User, models: true do
       end
 
       it 'returns users with a partially matching username' do
-        expect(described_class.search(user.username[0..2])).to eq([user2, user])
+        expect(described_class.search(user.username[0..2])).to eq([user, user2])
       end
 
       it 'returns users with a matching username regardless of the casing' do
@@ -1056,7 +1056,7 @@ describe User, models: true do
 
     context 'when avatar file is uploaded' do
       let(:gitlab_host) { "http://#{Gitlab.config.gitlab.host}" }
-      let(:avatar_path) { "/uploads/system/user/avatar/#{user.id}/dk.png" }
+      let(:avatar_path) { "/uploads/-/system/user/avatar/#{user.id}/dk.png" }
 
       it 'shows correct avatar url' do
         expect(user.avatar_url).to eq(avatar_path)
