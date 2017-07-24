@@ -52,11 +52,7 @@ module IssuableCollections
       # @filter_params[:authorized_only] = true
     end
 
-<<<<<<< HEAD
     @filter_params.permit(IssuableFinder::VALID_PARAMS)
-=======
-    @filter_params
->>>>>>> 9-4-stable-patch-1
   end
 
   def set_default_state
