@@ -150,7 +150,7 @@ module SearchHelper
       opts[:data]['base-endpoint'] = project_path(@project)
     else
       # Group context
-      opts[:data]['base-endpoint'] = "/groups#{group_path(@group)}"
+      opts[:data]['base-endpoint'] = group_canonical_path(@group)
     end
 
     opts
