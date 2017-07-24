@@ -1,6 +1,8 @@
 class License < ActiveRecord::Base
   include ActionView::Helpers::NumberHelper
 
+  ADMIN_AUDIT_LOG_FEATURE = 'GitLab_AdminAuditLog'.freeze
+  AUDIT_EVENTS_FEATURE = 'GitLab_AuditEvents'.freeze
   AUDITOR_USER_FEATURE = 'GitLab_Auditor_User'.freeze
   BURNDOWN_CHARTS_FEATURE = 'GitLab_BurndownCharts'.freeze
   CONTRIBUTION_ANALYTICS_FEATURE = 'GitLab_ContributionAnalytics'.freeze
@@ -15,27 +17,33 @@ class License < ActiveRecord::Base
   ISSUE_BOARD_FOCUS_MODE_FEATURE = 'GitLab_IssueBoardFocusMode'.freeze
   ISSUE_BOARD_MILESTONE_FEATURE = 'GitLab_IssueBoardMilestone'.freeze
   ISSUE_WEIGHTS_FEATURE = 'GitLab_IssueWeights'.freeze
+  JENKINS_INTEGRATION_FEATURE = 'GitLab_JenkinsIntegration'.freeze
   MERGE_REQUEST_APPROVERS_FEATURE = 'GitLab_MergeRequestApprovers'.freeze
   MERGE_REQUEST_REBASE_FEATURE = 'GitLab_MergeRequestRebase'.freeze
   MERGE_REQUEST_SQUASH_FEATURE = 'GitLab_MergeRequestSquash'.freeze
   MULTIPLE_ISSUE_ASSIGNEES_FEATURE = 'GitLab_MultipleIssueAssignees'.freeze
   MULTIPLE_ISSUE_BOARDS_FEATURE = 'GitLab_MultipleIssueBoards'.freeze
   OBJECT_STORAGE_FEATURE = 'GitLab_ObjectStorage'.freeze
+  PROTECTED_REFS_FOR_USERS_FEATURE = 'GitLab_RefPermissionsForUsers'.freeze
   PUSH_RULES_FEATURE = 'GitLab_PushRules'.freeze
   RELATED_ISSUES_FEATURE = 'GitLab_RelatedIssues'.freeze
+  REPOSITORY_SIZE_LIMIT_FEATURE = 'GitLab_RepositorySizeLimit'.freeze
   SERVICE_DESK_FEATURE = 'GitLab_ServiceDesk'.freeze
   VARIABLE_ENVIRONMENT_SCOPE_FEATURE = 'GitLab_VariableEnvironmentScope'.freeze
 
   FEATURE_CODES = {
+    admin_audit_log: ADMIN_AUDIT_LOG_FEATURE,
     auditor_user: AUDITOR_USER_FEATURE,
     elastic_search: ELASTIC_SEARCH_FEATURE,
     geo: GEO_FEATURE,
     object_storage: OBJECT_STORAGE_FEATURE,
     related_issues: RELATED_ISSUES_FEATURE,
+    repository_size_limit: REPOSITORY_SIZE_LIMIT_FEATURE,
     service_desk: SERVICE_DESK_FEATURE,
     variable_environment_scope: VARIABLE_ENVIRONMENT_SCOPE_FEATURE,
 
     # Features that make sense to Namespace:
+    audit_events: AUDIT_EVENTS_FEATURE,
     burndown_charts: BURNDOWN_CHARTS_FEATURE,
     contribution_analytics: CONTRIBUTION_ANALYTICS_FEATURE,
     deploy_board: DEPLOY_BOARD_FEATURE,
@@ -47,11 +55,13 @@ class License < ActiveRecord::Base
     issue_board_focus_mode: ISSUE_BOARD_FOCUS_MODE_FEATURE,
     issue_board_milestone: ISSUE_BOARD_MILESTONE_FEATURE,
     issue_weights: ISSUE_WEIGHTS_FEATURE,
+    jenkins_integration: JENKINS_INTEGRATION_FEATURE,
     merge_request_approvers: MERGE_REQUEST_APPROVERS_FEATURE,
     merge_request_rebase: MERGE_REQUEST_REBASE_FEATURE,
     merge_request_squash: MERGE_REQUEST_SQUASH_FEATURE,
     multiple_issue_assignees: MULTIPLE_ISSUE_ASSIGNEES_FEATURE,
     multiple_issue_boards: MULTIPLE_ISSUE_BOARDS_FEATURE,
+    protected_refs_for_users: PROTECTED_REFS_FOR_USERS_FEATURE,
     push_rules: PUSH_RULES_FEATURE
   }.freeze
 
@@ -61,6 +71,7 @@ class License < ActiveRecord::Base
   EARLY_ADOPTER_PLAN = 'early_adopter'.freeze
 
   EES_FEATURES = [
+    { AUDIT_EVENTS_FEATURE => 1 },
     { BURNDOWN_CHARTS_FEATURE => 1 },
     { CONTRIBUTION_ANALYTICS_FEATURE => 1 },
     { ELASTIC_SEARCH_FEATURE => 1 },
@@ -71,17 +82,21 @@ class License < ActiveRecord::Base
     { ISSUE_BOARD_FOCUS_MODE_FEATURE => 1 },
     { ISSUE_BOARD_MILESTONE_FEATURE => 1 },
     { ISSUE_WEIGHTS_FEATURE => 1 },
+    { JENKINS_INTEGRATION_FEATURE => 1 },
     { MERGE_REQUEST_APPROVERS_FEATURE => 1 },
     { MERGE_REQUEST_REBASE_FEATURE => 1 },
     { MERGE_REQUEST_SQUASH_FEATURE => 1 },
     { MULTIPLE_ISSUE_ASSIGNEES_FEATURE => 1 },
     { MULTIPLE_ISSUE_BOARDS_FEATURE => 1 },
     { PUSH_RULES_FEATURE => 1 },
-    { RELATED_ISSUES_FEATURE => 1 }
+    { PROTECTED_REFS_FOR_USERS_FEATURE => 1 },
+    { RELATED_ISSUES_FEATURE => 1 },
+    { REPOSITORY_SIZE_LIMIT_FEATURE => 1 }
   ].freeze
 
   EEP_FEATURES = [
     *EES_FEATURES,
+    { ADMIN_AUDIT_LOG_FEATURE => 1 },
     { AUDITOR_USER_FEATURE => 1 },
     { DEPLOY_BOARD_FEATURE => 1 },
     { FILE_LOCKS_FEATURE => 1 },
@@ -103,6 +118,7 @@ class License < ActiveRecord::Base
   # Early adopters should not earn new features as they're
   # introduced.
   EARLY_ADOPTER_FEATURES = [
+    { AUDIT_EVENTS_FEATURE => 1 },
     { AUDITOR_USER_FEATURE => 1 },
     { BURNDOWN_CHARTS_FEATURE => 1 },
     { CONTRIBUTION_ANALYTICS_FEATURE => 1 },
@@ -122,6 +138,7 @@ class License < ActiveRecord::Base
     { MULTIPLE_ISSUE_ASSIGNEES_FEATURE => 1 },
     { MULTIPLE_ISSUE_BOARDS_FEATURE => 1 },
     { OBJECT_STORAGE_FEATURE => 1 },
+    { PROTECTED_REFS_FOR_USERS_FEATURE => 1 },
     { PUSH_RULES_FEATURE => 1 },
     { SERVICE_DESK_FEATURE => 1 }
   ].freeze
@@ -258,7 +275,7 @@ class License < ActiveRecord::Base
   end
 
   def plan
-    restricted_attr(:plan, STARTER_PLAN)
+    restricted_attr(:plan).presence || STARTER_PLAN
   end
 
   def current_active_users_count

@@ -35,14 +35,6 @@ module API
           end
         end
 
-        def issue_entity(project)
-          if project.has_external_issue_tracker?
-            Entities::ExternalIssue
-          else
-            Entities::IssueBasic
-          end
-        end
-
         def find_merge_requests(args = {})
           args = params.merge(args)
 
@@ -50,9 +42,14 @@ module API
           args[:label_name] = args.delete(:labels)
 
           merge_requests = MergeRequestsFinder.new(current_user, args).execute
-          merge_requests = merge_requests.reorder(args[:order_by] => args[:sort])
-          paginate(merge_requests)
-            .preload(:notes, :target_project, :author, :assignee, :milestone, :merge_request_diff, :labels)
+                             .reorder(args[:order_by] => args[:sort])
+          merge_requests = paginate(merge_requests)
+                             .preload(:target_project)
+
+          return merge_requests if args[:view] == 'simple'
+
+          merge_requests
+            .preload(:notes, :author, :assignee, :milestone, :merge_request_diff, :labels)
         end
 
         params :optional_params_ce do
@@ -89,15 +86,25 @@ module API
         optional :labels, type: String, desc: 'Comma-separated list of label names'
         optional :created_after, type: DateTime, desc: 'Return merge requests created after the specified time'
         optional :created_before, type: DateTime, desc: 'Return merge requests created before the specified time'
+        optional :view, type: String, values: %w[simple], desc: 'If simple, returns the `iid`, URL, title, description, and basic state of merge request'
         use :pagination
       end
       get ":id/merge_requests" do
         authorize! :read_merge_request, user_project
 
         merge_requests = find_merge_requests(project_id: user_project.id)
-        issuable_metadata = issuable_meta_data(merge_requests, 'MergeRequest')
 
-        present merge_requests, with: Entities::MergeRequestBasic, current_user: current_user, project: user_project, issuable_metadata: issuable_metadata
+        options = { with: Entities::MergeRequestBasic,
+                    current_user: current_user,
+                    project: user_project }
+
+        if params[:view] == 'simple'
+          options[:with] = Entities::MergeRequestSimple
+        else
+          options[:issuable_metadata] = issuable_meta_data(merge_requests, 'MergeRequest')
+        end
+
+        present merge_requests, options
       end
 
       desc 'Create a merge request' do
@@ -134,6 +141,7 @@ module API
         merge_request = find_project_merge_request(params[:merge_request_iid])
 
         authorize!(:destroy_merge_request, merge_request)
+        status 204
         merge_request.destroy
       end
 
@@ -344,7 +352,14 @@ module API
       get ':id/merge_requests/:merge_request_iid/closes_issues' do
         merge_request = find_merge_request_with_access(params[:merge_request_iid])
         issues = ::Kaminari.paginate_array(merge_request.closes_issues(current_user))
-        present paginate(issues), with: issue_entity(user_project), current_user: current_user
+        issues = paginate(issues)
+
+        external_issues, internal_issues = issues.partition { |issue| issue.is_a?(ExternalIssue) }
+
+        data = Entities::IssueBasic.represent(internal_issues, current_user: current_user)
+        data += Entities::ExternalIssue.represent(external_issues, current_user: current_user)
+
+        data.as_json
       end
     end
   end
