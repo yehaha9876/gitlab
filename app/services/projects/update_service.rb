@@ -9,11 +9,15 @@ module Projects
         return error('New visibility level not allowed!')
       end
 
+<<<<<<< HEAD
       if changing_storage_size?
         project.change_repository_storage(params.delete(:repository_storage))
       end
 
       if project.has_container_registry_tags?
+=======
+      if renaming_project_with_container_registry_tags?
+>>>>>>> 9-4-stable-patch-1
         return error('Cannot rename project because it contains container registry tags!')
       end
 
@@ -52,11 +56,19 @@ module Projects
       true
     end
 
+<<<<<<< HEAD
     def changing_storage_size?
       new_repository_storage = params[:repository_storage]
 
       new_repository_storage && project.repository.exists? &&
         can?(current_user, :change_repository_storage, project)
+=======
+    def renaming_project_with_container_registry_tags?
+      new_path = params[:path]
+
+      new_path && new_path != project.path &&
+        project.has_container_registry_tags?
+>>>>>>> 9-4-stable-patch-1
     end
 
     def changing_default_branch?
