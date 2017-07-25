@@ -2,14 +2,13 @@ import DropLab from '~/droplab/drop_lab';
 import FilteredSearchContainer from './container';
 
 class FilteredSearchDropdownManager {
-  constructor(baseEndpoint = '', tokenizer, page, mergeDuplicateLabels = false) {
+  constructor(baseEndpoint = '', tokenizer, page) {
     this.container = FilteredSearchContainer.container;
     this.baseEndpoint = baseEndpoint.replace(/\/$/, '');
     this.tokenizer = tokenizer;
     this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeys;
     this.filteredSearchInput = this.container.querySelector('.filtered-search');
     this.page = page;
-    this.mergeDuplicateLabels = mergeDuplicateLabels;
 
     if (this.page === 'issues' || this.page === 'boards') {
       this.filteredSearchTokenKeys = gl.FilteredSearchTokenKeysIssuesEE;
@@ -59,6 +58,7 @@ class FilteredSearchDropdownManager {
         extraArguments: {
           endpoint: `${this.baseEndpoint}/labels.json`,
           symbol: '~',
+          preprocessing: gl.DropdownUtils.duplicateLabelPreprocessing,
         },
         element: this.container.querySelector('#js-dropdown-label'),
       },
@@ -75,11 +75,6 @@ class FilteredSearchDropdownManager {
         gl: 'DropdownNonUser',
         element: this.container.querySelector('#js-dropdown-weight'),
       };
-    }
-
-    if (this.mergeDuplicateLabels) {
-      this.mapping.label.extraArguments.preprocessing =
-        gl.DropdownUtils.duplicateLabelPreprocessing;
     }
   }
 

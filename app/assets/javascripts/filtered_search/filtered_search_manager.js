@@ -6,9 +6,8 @@ import eventHub from './event_hub';
 import { addClassIfElementExists } from '../lib/utils/dom_utils';
 
 class FilteredSearchManager {
-  constructor(page, mergeDuplicateLabels = false) {
+  constructor(page) {
     this.page = page;
-    this.mergeDuplicateLabels = mergeDuplicateLabels;
     this.container = FilteredSearchContainer.container;
     this.filteredSearchInput = this.container.querySelector('.filtered-search');
     this.filteredSearchInputForm = this.filteredSearchInput.form;
@@ -64,7 +63,7 @@ class FilteredSearchManager {
 
     if (this.filteredSearchInput) {
       this.tokenizer = gl.FilteredSearchTokenizer;
-      this.dropdownManager = new gl.FilteredSearchDropdownManager(this.filteredSearchInput.getAttribute('data-base-endpoint') || '', this.tokenizer, this.page, this.mergeDuplicateLabels);
+      this.dropdownManager = new gl.FilteredSearchDropdownManager(this.filteredSearchInput.getAttribute('data-base-endpoint') || '', this.tokenizer, this.page);
 
       this.recentSearchesRoot = new RecentSearchesRoot(
         this.recentSearchesStore,
