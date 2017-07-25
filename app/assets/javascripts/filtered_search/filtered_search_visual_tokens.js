@@ -64,23 +64,28 @@ class FilteredSearchVisualTokens {
     const labelsEndpoint = `${baseEndpoint}/labels.json`;
 
     return AjaxCache.retrieve(labelsEndpoint)
-    .then((labels) => {
-      const matchingLabel = (labels || []).find(label => `~${gl.DropdownUtils.getEscapedText(label.title)}` === tokenValue);
+      .then(gl.DropdownUtils.duplicateLabelPreprocessing)
+      .then((labels) => {
+        const matchingLabel = (labels || []).find(label => `~${gl.DropdownUtils.getEscapedText(label.title)}` === tokenValue);
 
-      if (!matchingLabel) {
-        return;
-      }
+        if (!matchingLabel) {
+          return;
+        }
 
-      const tokenValueStyle = tokenValueContainer.style;
-      tokenValueStyle.backgroundColor = matchingLabel.color;
-      tokenValueStyle.color = matchingLabel.text_color;
+        const tokenValueStyle = tokenValueContainer.style;
 
-      if (matchingLabel.text_color === '#FFFFFF') {
-        const removeToken = tokenValueContainer.querySelector('.remove-token');
-        removeToken.classList.add('inverted');
-      }
-    })
-    .catch(() => new Flash('An error occurred while fetching label colors.'));
+        // Labels with linear gradient should not override default background color
+        if (matchingLabel.color.indexOf('linear-gradient') === -1) {
+          tokenValueStyle.backgroundColor = matchingLabel.color;
+        }
+        tokenValueStyle.color = matchingLabel.text_color;
+
+        if (matchingLabel.text_color === '#FFFFFF') {
+          const removeToken = tokenValueContainer.querySelector('.remove-token');
+          removeToken.classList.add('inverted');
+        }
+      })
+      .catch(() => new Flash('An error occurred while fetching label colors.'));
   }
 
   static updateUserTokenAppearance(tokenValueContainer, tokenValueElement, tokenValue) {

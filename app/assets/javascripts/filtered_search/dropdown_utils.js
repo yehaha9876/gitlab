@@ -115,6 +115,7 @@ class DropdownUtils {
         }).join(',');
 
         label.color = `linear-gradient(${color})`;
+        label.text_color = '#000000';
       }
 
       results.push(label);
