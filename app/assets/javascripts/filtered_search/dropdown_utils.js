@@ -91,10 +91,11 @@ class DropdownUtils {
       dataMap.set(key, previous);
     }
 
-    return dataMap
+    return dataMap;
   }
 
-  static duplicateLabelColor(colors) {
+  static duplicateLabelColor(labelColors) {
+    const colors = labelColors;
     const spacing = 100 / colors.length;
 
     // Reduce the colors to 4
@@ -106,7 +107,7 @@ class DropdownUtils {
       return `${c} ${percentFirst}%, ${c} ${percentSecond}%`;
     }).join(',');
 
-    return `linear-gradient(${color})`;;
+    return `linear-gradient(${color})`;
   }
 
   static duplicateLabelPreprocessing(data) {
@@ -119,7 +120,6 @@ class DropdownUtils {
       const label = value;
 
       if (label.multipleColors) {
-        const colors = label.multipleColors;
         label.color = DropdownUtils.duplicateLabelColor(label.multipleColors);
         label.text_color = '#000000';
       }
