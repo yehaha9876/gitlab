@@ -121,6 +121,8 @@ class DropdownUtils {
       results.push(label);
     });
 
+    results.preprocessed = true;
+
     return results;
   }
 

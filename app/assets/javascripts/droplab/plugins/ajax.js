@@ -32,7 +32,16 @@ const Ajax = {
     }
 
     AjaxCache.retrieve(config.endpoint)
-      .then(data => config.preprocessing ? config.preprocessing(data) : data)
+      .then((data) => {
+        let results = data;
+
+        if (config.preprocessing && !data.preprocessed) {
+          results = config.preprocessing(data);
+          AjaxCache.override(config.endpoint, results);
+        }
+
+        return results;
+      })
       .then((data) => self._loadData(data, config, self))
       .catch(config.onError);
   },
