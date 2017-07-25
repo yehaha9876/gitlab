@@ -3,6 +3,7 @@
 /* global ListLabel */
 
 import IssuableBulkUpdateActions from './issuable_bulk_update_actions';
+import DropdownUtils from './filtered_search/dropdown_utils';
 
 (function() {
   this.LabelsSelect = (function() {
