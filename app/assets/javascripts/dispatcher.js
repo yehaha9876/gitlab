@@ -175,7 +175,7 @@ import AuditLogs from './audit_logs';
           break;
         case 'groups:issues':
           if (gl.FilteredSearchManager && document.querySelector('.filtered-search')) {
-            const filteredSearchManager = new gl.FilteredSearchManager('issues');
+            const filteredSearchManager = new gl.FilteredSearchManager('issues', true);
             filteredSearchManager.setup();
           }
 

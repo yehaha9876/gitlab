@@ -75,6 +75,54 @@ class DropdownUtils {
     return updatedItem;
   }
 
+  static duplicateLabelPreprocessing(data) {
+    const results = [];
+
+    // Merge duplicates
+    const dataMap = new Map();
+    data.forEach((d) => {
+      const key = d.title;
+      if (!dataMap.has(key)) {
+        dataMap.set(key, d);
+      } else {
+        const previous = dataMap.get(key);
+
+        if (!previous.multipleColors) {
+          previous.multipleColors = [previous.color];
+        }
+
+        previous.multipleColors.push(d.color);
+        dataMap.set(key, previous);
+      }
+    });
+
+    dataMap.forEach((value) => {
+      const label = value;
+
+      // Generate color linear-gradient from duplicates
+      if (label.multipleColors) {
+        const colors = label.multipleColors;
+
+        const spacing = 100 / colors.length;
+
+        // Reduce the colors to 4
+        colors.length = Math.min(colors.length, 4);
+
+        const color = colors.map((c, i) => {
+          const percentFirst = Math.floor(spacing * i);
+          const percentSecond = Math.floor(spacing * (i + 1));
+          return `${c} ${percentFirst}%, ${c} ${percentSecond}%`;
+        }).join(',');
+
+        label.color = `linear-gradient(${color})`;
+      }
+
+      results.push(label);
+    });
+
+    return results;
+  }
+
   static setDataValueIfSelected(filter, selected) {
     const dataValue = selected.getAttribute('data-value');
 

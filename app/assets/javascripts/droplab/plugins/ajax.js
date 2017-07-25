@@ -32,6 +32,7 @@ const Ajax = {
     }
 
     AjaxCache.retrieve(config.endpoint)
+      .then(data => config.preprocessing ? config.preprocessing(data) : data)
       .then((data) => self._loadData(data, config, self))
       .catch(config.onError);
   },
