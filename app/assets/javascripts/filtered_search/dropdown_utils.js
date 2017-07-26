@@ -75,23 +75,25 @@ class DropdownUtils {
     return updatedItem;
   }
 
-  static mergeDuplicateLabels(dataMap, label) {
-    const key = label.title;
+  static mergeDuplicateLabels(dataMap, newLabel) {
+    const updatedMap = dataMap;
+    const key = newLabel.title;
 
-    if (!dataMap.has(key)) {
-      dataMap.set(key, label);
+    const hasKeyProperty = Object.prototype.hasOwnProperty.call(updatedMap, key);
+
+    if (!hasKeyProperty) {
+      updatedMap[key] = newLabel;
     } else {
-      const previous = dataMap.get(key);
+      const existing = updatedMap[key];
 
-      if (!previous.multipleColors) {
-        previous.multipleColors = [previous.color];
+      if (!existing.multipleColors) {
+        existing.multipleColors = [existing.color];
       }
 
-      previous.multipleColors.push(label.color);
-      dataMap.set(key, previous);
+      existing.multipleColors.push(newLabel.color);
     }
 
-    return dataMap;
+    return updatedMap;
   }
 
   static duplicateLabelColor(labelColors) {
@@ -112,20 +114,21 @@ class DropdownUtils {
 
   static duplicateLabelPreprocessing(data) {
     const results = [];
-    const dataMap = new Map();
+    const dataMap = {};
 
     data.forEach(DropdownUtils.mergeDuplicateLabels.bind(null, dataMap));
 
-    dataMap.forEach((value) => {
-      const label = value;
+    Object.keys(dataMap)
+      .forEach((key) => {
+        const label = dataMap[key];
 
-      if (label.multipleColors) {
-        label.color = DropdownUtils.duplicateLabelColor(label.multipleColors);
-        label.text_color = '#000000';
-      }
+        if (label.multipleColors) {
+          label.color = DropdownUtils.duplicateLabelColor(label.multipleColors);
+          label.text_color = '#000000';
+        }
 
-      results.push(label);
-    });
+        results.push(label);
+      });
 
     results.preprocessed = true;
 
