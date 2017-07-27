@@ -16,6 +16,7 @@ gem 'mysql2', '~> 0.4.5', group: :mysql
 gem 'pg', '~> 0.18.2', group: :postgres
 
 gem 'rugged', '~> 0.25.1.1'
+gem 'grape-route-helpers', '~> 2.0.0'
 
 gem 'faraday', '~> 0.12'
 
@@ -63,7 +64,7 @@ gem 'browser', '~> 2.2'
 # LDAP Auth
 # GitLab fork with several improvements to original library. For full list of changes
 # see https://github.com/intridea/omniauth-ldap/compare/master...gitlabhq:master
-gem 'gitlab_omniauth-ldap', '~> 1.2.1', require: 'omniauth-ldap'
+gem 'gitlab_omniauth-ldap', '~> 2.0.3', require: 'omniauth-ldap'
 gem 'net-ldap'
 
 # Git Wiki
@@ -175,7 +176,7 @@ gem 'rainbow', '~> 2.2'
 gem 'settingslogic', '~> 2.0.9'
 
 # Linear-time regex library for untrusted regular expressions
-gem 're2', '~> 1.0.0'
+gem 're2', '~> 1.1.0'
 
 # Misc
 

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ProjectPolicy, models: true do
+describe ProjectPolicy do
   let(:guest) { create(:user) }
   let(:reporter) { create(:user) }
   let(:dev) { create(:user) }
@@ -136,6 +136,24 @@ describe ProjectPolicy, models: true do
 
         expect_disallowed :read_issue, :create_issue, :update_issue, :admin_issue
       end
+    end
+  end
+
+  context 'when a project has pending invites, and the current user is anonymous' do
+    let(:group) { create(:group, :public) }
+    let(:project) { create(:empty_project, :public, namespace: group) }
+    let(:user_permissions) { [:read_issue_link, :create_project, :create_issue, :create_note, :upload_file] }
+    let(:anonymous_permissions) { guest_permissions - user_permissions }
+
+    subject { described_class.new(nil, project) }
+
+    before do
+      create(:group_member, :invited, group: group)
+    end
+
+    it 'does not grant owner access' do
+      expect_allowed(*anonymous_permissions)
+      expect_disallowed(*user_permissions)
     end
   end
 

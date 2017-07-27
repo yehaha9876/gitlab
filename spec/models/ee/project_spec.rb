@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Project, models: true do
+describe Project do
   describe 'associations' do
     it { is_expected.to delegate_method(:shared_runners_minutes).to(:statistics) }
     it { is_expected.to delegate_method(:shared_runners_seconds).to(:statistics) }
@@ -214,6 +214,62 @@ describe Project, models: true do
       project.update_attributes(mirror_last_update_at: project.mirror_data.last_update_started_at + 5.minutes)
 
       expect(project.mirror_update_duration).to eq(300)
+    end
+  end
+
+  describe '#has_remote_mirror?' do
+    let(:project) { create(:empty_project, :remote_mirror, :import_started) }
+    subject { project.has_remote_mirror? }
+
+    before do
+      allow_any_instance_of(RemoteMirror).to receive(:refresh_remote)
+    end
+
+    it 'returns true when a remote mirror is enabled' do
+      is_expected.to be_truthy
+    end
+
+    it 'returns false when unlicensed' do
+      stub_licensed_features(repository_mirrors: false)
+
+      is_expected.to be_falsy
+    end
+
+    it 'returns false when remote mirror is disabled' do
+      project.remote_mirrors.first.update_attributes(enabled: false)
+
+      is_expected.to be_falsy
+    end
+  end
+
+  describe '#update_remote_mirrors' do
+    let(:project) { create(:empty_project, :remote_mirror, :import_started) }
+    delegate :update_remote_mirrors, to: :project
+
+    before do
+      allow_any_instance_of(RemoteMirror).to receive(:refresh_remote)
+    end
+
+    it 'syncs enabled remote mirror' do
+      expect_any_instance_of(RemoteMirror).to receive(:sync)
+
+      update_remote_mirrors
+    end
+
+    it 'does nothing when unlicensed' do
+      stub_licensed_features(repository_mirrors: false)
+
+      expect_any_instance_of(RemoteMirror).not_to receive(:sync)
+
+      update_remote_mirrors
+    end
+
+    it 'does not sync disabled remote mirrors' do
+      project.remote_mirrors.first.update_attributes(enabled: false)
+
+      expect_any_instance_of(RemoteMirror).not_to receive(:sync)
+
+      update_remote_mirrors
     end
   end
 
@@ -707,7 +763,7 @@ describe Project, models: true do
           .and_return(true)
 
         expect(Geo::RepositoryRenamedEventStore).to receive(:new)
-          .with(instance_of(Project), old_path: 'foo', old_path_with_namespace: "#{project.namespace.full_path}/foo")
+          .with(instance_of(described_class), old_path: 'foo', old_path_with_namespace: "#{project.namespace.full_path}/foo")
           .and_call_original
 
         expect { project.rename_repo }.to change(Geo::RepositoryRenamedEvent, :count).by(1)

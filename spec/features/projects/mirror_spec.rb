@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'Project mirror', feature: true do
+feature 'Project mirror' do
   let(:project) { create(:project, :mirror, :import_finished, creator: user, name: 'Victorialand') }
   let(:user) { create(:user) }
 
@@ -8,6 +8,18 @@ feature 'Project mirror', feature: true do
     before do
       project.team << [user, :master]
       sign_in user
+    end
+
+    context 'unlicensed' do
+      before do
+        stub_licensed_features(repository_mirrors: false)
+      end
+
+      it 'returns 404' do
+        visit project_mirror_path(project)
+
+        expect(page.status_code).to eq(404)
+      end
     end
 
     context 'with Update now button' do
