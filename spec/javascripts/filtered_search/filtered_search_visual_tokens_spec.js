@@ -797,6 +797,39 @@ describe('Filtered Search Visual Tokens', () => {
     });
   });
 
+  describe('setTokenStyle', () => {
+    let originalTextColor;
+
+    beforeEach(() => {
+      originalTextColor = bugLabelToken.style.color;
+    });
+
+    it('should set backgroundColor', () => {
+      const originalBackgroundColor = bugLabelToken.style.backgroundColor;
+      const token = subject.setTokenStyle(bugLabelToken, 'blue', 'white');
+      expect(token.style.backgroundColor).toEqual('blue');
+      expect(token.style.backgroundColor).not.toEqual(originalBackgroundColor);
+    });
+
+    it('should not set backgroundColor when it is a linear-gradient', () => {
+      const token = subject.setTokenStyle(bugLabelToken, 'linear-gradient(135deg, red, blue)', 'white');
+      expect(token.style.backgroundColor).toEqual(bugLabelToken.style.backgroundColor);
+    });
+
+    it('should set textColor', () => {
+      const token = subject.setTokenStyle(bugLabelToken, 'white', 'black');
+      expect(token.style.color).toEqual('black');
+      expect(token.style.color).not.toEqual(originalTextColor);
+    });
+
+    it('should add inverted class when textColor is #FFFFFF', () => {
+      const token = subject.setTokenStyle(bugLabelToken, 'black', '#FFFFFF');
+      expect(token.style.color).toEqual('rgb(255, 255, 255)');
+      expect(token.style.color).not.toEqual(originalTextColor);
+      expect(token.querySelector('.remove-token').classList.contains('inverted')).toEqual(true);
+    });
+  });
+
   describe('updateLabelTokenColor', () => {
     const jsonFixtureName = 'labels/project_labels.json';
     const dummyEndpoint = '/dummy/endpoint';
