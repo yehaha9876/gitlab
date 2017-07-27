@@ -133,6 +133,8 @@ import AuditLogs from './audit_logs';
           .init();
       }
 
+      const filteredSearchEnabled = gl.FilteredSearchManager && document.querySelector('.filtered-search');
+
       switch (page) {
         case 'profiles:preferences:show':
           initExperimentalFlags();
@@ -149,7 +151,7 @@ import AuditLogs from './audit_logs';
           break;
         case 'projects:merge_requests:index':
         case 'projects:issues:index':
-          if (gl.FilteredSearchManager && document.querySelector('.filtered-search')) {
+          if (filteredSearchEnabled) {
             const filteredSearchManager = new gl.FilteredSearchManager(page === 'projects:issues:index' ? 'issues' : 'merge_requests');
             filteredSearchManager.setup();
           }
@@ -174,7 +176,7 @@ import AuditLogs from './audit_logs';
           new Sidebar();
           break;
         case 'groups:issues':
-          if (gl.FilteredSearchManager && document.querySelector('.filtered-search')) {
+          if (filteredSearchEnabled) {
             const filteredSearchManager = new gl.FilteredSearchManager('issues');
             filteredSearchManager.setup();
           }
