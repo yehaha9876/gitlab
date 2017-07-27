@@ -107,7 +107,7 @@ class DropdownUtils {
       const percentFirst = Math.floor(spacing * i);
       const percentSecond = Math.floor(spacing * (i + 1));
       return `${c} ${percentFirst}%, ${c} ${percentSecond}%`;
-    }).join(',');
+    }).join(', ');
 
     return `linear-gradient(${color})`;
   }
