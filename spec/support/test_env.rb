@@ -43,6 +43,7 @@ module TestEnv
     'v1.1.0'                             => 'b83d6e3',
     'add-ipython-files'                  => '93ee732',
     'add-pdf-file'                       => 'e774ebd',
+    'add-pdf-text-binary'                => '79faa7b',
     'squash-large-files'                 => '54cec52'
   }.freeze
 
