@@ -178,8 +178,6 @@ import AuditLogs from './audit_logs';
             const filteredSearchManager = new gl.FilteredSearchManager('issues');
             filteredSearchManager.setup();
           }
-
-          new UsersSelect();
           break;
         case 'groups:merge_requests':
           new UsersSelect();
