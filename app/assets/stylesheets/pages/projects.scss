@@ -989,3 +989,21 @@ a.allowed-to-push {
     border-color: $border-color;
   }
 }
+
+/* EE-specific styles */
+.panel-auth-type {
+  .panel-body {
+    padding-top: 0;
+  }
+
+  .nav-links li {
+    a:hover,
+    a:focus {
+      background-color: $white-light;
+    }
+  }
+
+  .tab-content {
+    padding-top: $gl-padding-top;
+  }
+}
