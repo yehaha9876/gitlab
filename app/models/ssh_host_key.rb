@@ -60,12 +60,7 @@ class SshHostKey
   end
 
   def fingerprints
-    @fingerprints ||=
-      known_hosts&.each_line&.each_with_index&.map do |line, index|
-        next if line.empty?
-        fp = Fingerprint.new(line, index: index)
-        fp if fp.valid?
-      end.compact
+    @fingerprints ||= self.class.fingerprint_host_keys(known_hosts)
   end
 
   def error

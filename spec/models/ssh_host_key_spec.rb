@@ -16,6 +16,27 @@ describe SshHostKey do
 
   subject(:ssh_host_key) { described_class.new(project_id: 1, url: 'ssh://example.com:2222') }
 
+  describe '#fingerprints', use_clean_rails_memory_store_caching: true do
+    it 'returns an array of indexed fingerprints when the cache is filled' do
+      key1 = SSHKeygen.generate
+      key2 = SSHKeygen.generate
+
+      known_hosts = "example.com #{key1} git@localhost\n\n\n@revoked other.example.com #{key2} git@localhost\n"
+      stub_reactive_cache(ssh_host_key, known_hosts: known_hosts)
+
+      expect(ssh_host_key.fingerprints.as_json).to eq(
+        [
+          { bits: 2048, fingerprint: Gitlab::KeyFingerprint.new(key1).fingerprint, type: 'RSA', index: 0 },
+          { bits: 2048, fingerprint: Gitlab::KeyFingerprint.new(key2).fingerprint, type: 'RSA', index: 3 }
+        ]
+      )
+    end
+
+    it 'returns an empty array when the cache is empty' do
+      expect(ssh_host_key.fingerprints).to eq([])
+    end
+  end
+
   describe '#calculate_reactive_cache' do
     subject(:cache) { ssh_host_key.calculate_reactive_cache }
 
