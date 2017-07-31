@@ -991,19 +991,8 @@ a.allowed-to-push {
 }
 
 /* EE-specific styles */
-.panel-auth-type {
-  .panel-body {
-    padding-top: 0;
-  }
-
-  .nav-links li {
-    a:hover,
-    a:focus {
-      background-color: $white-light;
-    }
-  }
-
-  .tab-content {
-    padding-top: $gl-padding-top;
+.project-mirror-settings {
+  .fingerprint-verified {
+    color: $green-500;
   }
 }
