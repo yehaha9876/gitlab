@@ -11,7 +11,7 @@ import '~/abuse_reports';
     const assertMaxLength = $message => expect($message.text().length).toEqual(MAX_MESSAGE_LENGTH);
     const findMessage = searchText => messages.filter(
       (index, element) => element.innerText.indexOf(searchText) > -1,
-    ).first();
+    )[0];
 
     preloadFixtures(FIXTURE);
 
