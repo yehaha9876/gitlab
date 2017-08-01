@@ -834,11 +834,11 @@ describe('Filtered Search Visual Tokens', () => {
     const endpoint = 'endpoint';
 
     it('does not preprocess more than once', () => {
-      const labels = [];
+      let labels = [];
 
       spyOn(gl.DropdownUtils, 'duplicateLabelPreprocessing').and.callFake(() => []);
 
-      gl.FilteredSearchVisualTokens.preprocessLabel(endpoint, labels);
+      labels = gl.FilteredSearchVisualTokens.preprocessLabel(endpoint, labels);
       gl.FilteredSearchVisualTokens.preprocessLabel(endpoint, labels);
 
       expect(gl.DropdownUtils.duplicateLabelPreprocessing.calls.count()).toEqual(1);
@@ -846,9 +846,9 @@ describe('Filtered Search Visual Tokens', () => {
 
     describe('not preprocessed before', () => {
       it('returns preprocessed labels', () => {
-        const labels = [];
+        let labels = [];
         expect(labels.preprocessed).not.toEqual(true);
-        gl.FilteredSearchVisualTokens.preprocessLabel(endpoint, labels);
+        labels = gl.FilteredSearchVisualTokens.preprocessLabel(endpoint, labels);
         expect(labels.preprocessed).toEqual(true);
       });
 
