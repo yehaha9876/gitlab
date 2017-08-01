@@ -995,4 +995,18 @@ a.allowed-to-push {
   .fingerprint-verified {
     color: $green-500;
   }
+
+  .ssh-public-key {
+    display: block;
+    width: 100%;
+    word-wrap: break-word;
+  }
+
+  .known-hosts {
+    font-family: $monospace_font;
+  }
+
+  .fingerprints-list.invalidate {
+    text-decoration: line-through;
+  }
 }
