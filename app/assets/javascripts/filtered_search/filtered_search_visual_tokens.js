@@ -83,6 +83,16 @@ class FilteredSearchVisualTokens {
 
     return AjaxCache.retrieve(labelsEndpoint)
       .then((labels) => {
+        let processed = labels;
+
+        if (!labels.preprocessed) {
+          processed = gl.DropdownUtils.duplicateLabelPreprocessing(labels);
+          AjaxCache.override(labelsEndpoint, processed);
+        }
+
+        return processed;
+      })
+      .then((labels) => {
         const matchingLabel = (labels || []).find(label => `~${gl.DropdownUtils.getEscapedText(label.title)}` === tokenValue);
 
         if (!matchingLabel) {
