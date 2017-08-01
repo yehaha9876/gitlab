@@ -76,22 +76,25 @@ class FilteredSearchVisualTokens {
     return token;
   }
 
+  static preprocessLabel(labelsEndpoint, labels) {
+    let processed = labels;
+
+    if (!labels.preprocessed) {
+      processed = gl.DropdownUtils.duplicateLabelPreprocessing(labels);
+      AjaxCache.override(labelsEndpoint, processed);
+      processed.preprocessed = true;
+    }
+
+    return processed;
+  }
+
   static updateLabelTokenColor(tokenValueContainer, tokenValue) {
     const filteredSearchInput = FilteredSearchContainer.container.querySelector('.filtered-search');
     const baseEndpoint = filteredSearchInput.dataset.baseEndpoint;
     const labelsEndpoint = `${baseEndpoint}/labels.json`;
 
     return AjaxCache.retrieve(labelsEndpoint)
-      .then((labels) => {
-        let processed = labels;
-
-        if (!labels.preprocessed) {
-          processed = gl.DropdownUtils.duplicateLabelPreprocessing(labels);
-          AjaxCache.override(labelsEndpoint, processed);
-        }
-
-        return processed;
-      })
+      .then(FilteredSearchVisualTokens.preprocessLabel.bind(null, labelsEndpoint))
       .then((labels) => {
         const matchingLabel = (labels || []).find(label => `~${gl.DropdownUtils.getEscapedText(label.title)}` === tokenValue);
 

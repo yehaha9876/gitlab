@@ -830,6 +830,36 @@ describe('Filtered Search Visual Tokens', () => {
     });
   });
 
+  describe('preprocessLabel', () => {
+    const endpoint = 'endpoint';
+
+    it('does not preprocess more than once', () => {
+      const labels = [];
+
+      spyOn(gl.DropdownUtils, 'duplicateLabelPreprocessing').and.callFake(() => []);
+
+      gl.FilteredSearchVisualTokens.preprocessLabel(endpoint, labels);
+      gl.FilteredSearchVisualTokens.preprocessLabel(endpoint, labels);
+
+      expect(gl.DropdownUtils.duplicateLabelPreprocessing.calls.count()).toEqual(1);
+    });
+
+    describe('not preprocessed before', () => {
+      it('returns preprocessed labels', () => {
+        const labels = [];
+        expect(labels.preprocessed).not.toEqual(true);
+        gl.FilteredSearchVisualTokens.preprocessLabel(endpoint, labels);
+        expect(labels.preprocessed).toEqual(true);
+      });
+
+      it('overrides AjaxCache with preprocessed results', () => {
+        spyOn(AjaxCache, 'override').and.callFake(() => {});
+        gl.FilteredSearchVisualTokens.preprocessLabel(endpoint, []);
+        expect(AjaxCache.override.calls.count()).toEqual(1);
+      });
+    });
+  });
+
   describe('updateLabelTokenColor', () => {
     const jsonFixtureName = 'labels/project_labels.json';
     const dummyEndpoint = '/dummy/endpoint';
