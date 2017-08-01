@@ -37,18 +37,24 @@
 
       - import_data = @project.import_data || @project.build_import_data
       = f.fields_for :import_data, import_data do |import_form|
-        = import_form.hidden_field :id
+        = import_form.hidden_field :id, class: 'js-import-data-id'
 
-        .form-group.js-ssh-host-keys.hidden
+        .form-group.js-ssh-host-keys-section{ class: "#{ 'hidden' unless import_data.ssh_known_hosts }" }
           %button.btn.btn-inverted.btn-success.append-bottom-15.js-detect-host-keys{ type: 'button' } Detect host keys
-          %div
-            = import_form.label :ssh_known_hosts, 'SSH host keys', class: 'label-light'
-            = import_form.text_area :ssh_known_hosts, class: 'form-control'
-            -# TODO(kushalpandya): confirmation that the SSH host key is correct.
-            -# We can store arbitrary data in import_data.credentials
-            .help-block.hidden
-              %i.fa.fa-check.fingerprint-verified
-              This fingerprint was verified manually just now
+          .fingerprint-ssh-info.js-fingerprint-ssh-info{ class: "#{ 'hidden' unless import_data.ssh_known_hosts_fingerprints }" }
+            %label.label-light
+              Fingerprints
+            %ul.fingerprints-list.js-fingerprints-list
+              - import_data.ssh_known_hosts_fingerprints.each do |fp|
+                %li
+                  %code= fp.fingerprint
+            %button.btn.btn-sm.btn-default.append-bottom-15.js-ssh-hosts-advanced{ type: 'button' } Show advanced
+            .js-ssh-known-hosts.hidden
+              = import_form.label :ssh_known_hosts, 'SSH host keys', class: 'label-light'
+              = import_form.text_area :ssh_known_hosts, class: 'form-control known-hosts js-known-hosts'
+              .help-block.hidden
+                %i.fa.fa-check.fingerprint-verified
+                This fingerprint was verified manually just now
 
         - ssh_key_auth = import_data.ssh_key_auth?
         .form-group
@@ -71,17 +77,16 @@
                 submitted.
               For more information, please refer to the documentation.
 
-              - if import_data.ssh_public_key.present?
-                %code.prepend-top-default
-                  = import_data.ssh_public_key
-                %br
+            - if import_data.ssh_public_key.present?
+              %code.prepend-top-10.ssh-public-key.js-ssh-public-key
+                = import_data.ssh_public_key
 
-              - if import_data.ssh_public_key.present?
-                - regen_data = { id: import_data.id, auth_method: 'ssh_public_key', regenerate_ssh_private_key: true }
-                = link_to 'Regenerate key', project_mirror_path(@project, project: { import_data_attributes: regen_data }),
-                    method: :patch,
-                    data: { confirm: 'ARE YOU SURE?!' },
-                    class: 'btn btn-remove delete-key'
+            - if import_data.ssh_public_key.present?
+              - regen_data = { id: import_data.id, auth_method: 'ssh_public_key', regenerate_ssh_private_key: true }
+              = link_to 'Regenerate key', project_mirror_path(@project, project: { import_data_attributes: regen_data }),
+                  method: :patch,
+                  data: { confirm: 'Are you sure you want to regenerate public key?' },
+                  class: 'btn btn-remove delete-key prepend-top-10'
 
       .form-group
         = f.label :mirror_user_id, "Mirror user", class: "label-light"
