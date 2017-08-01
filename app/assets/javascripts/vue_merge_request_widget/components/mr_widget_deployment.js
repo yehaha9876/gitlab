@@ -1,8 +1,8 @@
 /* global Flash */
 
 import '~/lib/utils/datetime_utility';
-import { statusIconEntityMap } from '../../vue_shared/ci_status_icons';
 import MemoryUsage from './mr_widget_memory_usage';
+import StatusIcon from './mr_widget_status_icon';
 import MRWidgetService from '../services/mr_widget_service';
 
 export default {
@@ -13,11 +13,7 @@ export default {
   },
   components: {
     'mr-widget-memory-usage': MemoryUsage,
-  },
-  computed: {
-    svg() {
-      return statusIconEntityMap.icon_status_success;
-    },
+    'status-icon': StatusIcon,
   },
   methods: {
     formatDate(date) {
@@ -56,9 +52,7 @@ export default {
         <div class="ci-widget media">
           <div class="ci-status-icon ci-status-icon-success">
             <span class="js-icon-link icon-link">
-              <span class="ci-status-icon"
-                v-html="svg"
-                aria-hidden="true"></span>
+              <status-icon status="success" />
             </span>
           </div>
           <div class="media-body space-children">

@@ -264,7 +264,7 @@ export default {
               </li>
             </ul>
           </span>
-          <div class="media-body">
+          <div class="media-body space-children">
             <template v-if="isMergeAllowed()">
               <label>
                 <input

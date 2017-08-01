@@ -46,7 +46,7 @@ export default {
     <div class="mr-widget-heading">
       <div class="ci-widget media">
         <template v-if="hasCIError">
-          <div class="ci-status-icon ci-status-icon-failed ci-error js-ci-error">
+          <div class="ci-status-icon ci-status-icon-failed ci-error js-ci-error append-right-10">
             <span
               v-html="svg"
               aria-hidden="true"></span>
@@ -56,7 +56,7 @@ export default {
           </div>
         </template>
         <template v-else>
-          <div class="ci-status-icon">
+          <div class="ci-status-icon append-right-10">
             <a
               class="icon-link"
               :href="this.status.details_path">
