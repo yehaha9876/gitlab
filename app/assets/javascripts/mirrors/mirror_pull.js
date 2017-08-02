@@ -12,12 +12,15 @@ export default class MirrorPull {
 
     this.$repositoryUrl = this.$form.find('.js-repo-url');
     this.$importDataIdEl = this.$form.find('.js-import-data-id');
+
     this.$sectionSSHHostKeys = this.$form.find('.js-ssh-host-keys-section');
     this.$hostKeysInformation = this.$form.find('.js-fingerprint-ssh-info');
     this.$btnDetectHostKeys = this.$form.find('.js-detect-host-keys');
     this.$btnSSHHostsAdvanced = this.$form.find('.js-ssh-hosts-advanced');
     this.$sshKnownHosts = this.$form.find('.js-known-hosts');
     this.$dropdownAuthType = this.$form.find('.js-pull-mirror-auth-type');
+
+    this.$wellAuthTypeChanging = this.$form.find('.js-well-changing-auth');
     this.$wellPasswordAuth = this.$form.find('.js-well-password-auth');
     this.$wellSSHAuth = this.$form.find('.js-well-ssh-auth');
     this.$sshPublicKey = this.$form.find('.js-ssh-public-key');
@@ -42,6 +45,10 @@ export default class MirrorPull {
 
   handleDetectHostKeys() {
     const repositoryUrl = this.$repositoryUrl.val();
+    const $btnLoadSpinner = this.$btnDetectHostKeys.find('.detect-host-keys-load-spinner');
+
+    this.$btnDetectHostKeys.disable();
+    $btnLoadSpinner.removeClass('hidden');
     gl.utils.backOff((next, stop) => {
       $.getJSON(`${this.projectMirrorSSHEndpoint}?ssh_url=${repositoryUrl}`)
         .done((res, statusText, header) => {
@@ -59,6 +66,7 @@ export default class MirrorPull {
         .fail(stop);
     })
     .then((res) => {
+      $btnLoadSpinner.addClass('hidden');
       if (res.known_hosts && res.fingerprints) {
         this.showSSHInformation(res);
       }
@@ -72,8 +80,9 @@ export default class MirrorPull {
 
   handleSSHHostsAdvanced() {
     const $knownHost = this.$sectionSSHHostKeys.find('.js-ssh-known-hosts');
+
     $knownHost.toggleClass('hidden');
-    this.$btnSSHHostsAdvanced.text($knownHost.hasClass('hidden') ? 'Show advanced' : 'Hide advanced');
+    this.$btnSSHHostsAdvanced.toggleClass('show-advanced', $knownHost.hasClass('hidden'));
   }
 
   handleAuthTypeChange() {
@@ -87,6 +96,9 @@ export default class MirrorPull {
 
     authTypeData[this.$dropdownAuthType.attr('name')] = selectedAuthType;
 
+    this.$wellAuthTypeChanging.removeClass('hidden');
+    this.$wellPasswordAuth.addClass('hidden');
+    this.$wellSSHAuth.addClass('hidden');
     $.ajax({
       type: 'PUT',
       url: this.projectMirrorAuthTypeEndpoint,
@@ -98,18 +110,23 @@ export default class MirrorPull {
         this.$sshPublicKey.text(res.import_data_attributes.ssh_public_key);
       }
       this.toggleAuthWell(selectedAuthType);
+    })
+    .always(() => {
+      this.$wellAuthTypeChanging.addClass('hidden');
     });
   }
 
   showSSHInformation(sshHostKeys) {
+    const $fingerprintsList = this.$hostKeysInformation.find('.js-fingerprints-list');
     let fingerprints = '';
     sshHostKeys.fingerprints.forEach((fingerprint) => {
-      fingerprints += `<li><code>${fingerprint.fingerprint}</code></li>`;
+      const escFingerprints = _.escape(fingerprint.fingerprint);
+      fingerprints += `<code>${escFingerprints}</code>`;
     });
 
     this.$hostKeysInformation.removeClass('hidden');
-    this.$hostKeysInformation.find('.js-fingerprints-list').removeClass('invalidate');
-    this.$hostKeysInformation.find('.js-fingerprints-list').html(fingerprints);
+    $fingerprintsList.removeClass('invalidate');
+    $fingerprintsList.html(fingerprints);
     this.$hostKeysInformation.find('.js-known-hosts').val(sshHostKeys.known_hosts);
   }
 
