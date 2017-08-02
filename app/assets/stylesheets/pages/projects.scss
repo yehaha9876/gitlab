@@ -1006,7 +1006,50 @@ a.allowed-to-push {
     font-family: $monospace_font;
   }
 
-  .fingerprints-list.invalidate {
-    text-decoration: line-through;
+  .ssh-hosts-advanced {
+    min-width: 135px;
+
+    .label-show {
+      display: none;
+    }
+
+    .label-hide {
+      display: inline;
+    }
+
+    .fa.fa-chevron:before {
+      content: "\f077";
+    }
+
+    &.show-advanced {
+      .label-show {
+        display: inline;
+      }
+
+      .label-hide {
+        display: none;
+      }
+
+      .fa.fa-chevron:before {
+        content: "\f078";
+      }
+    }
+  }
+
+  .fingerprints-list {
+    code {
+      display: block;
+      padding: 8px;
+      margin-bottom: 5px;
+    }
+
+    &.invalidate {
+      text-decoration: line-through;
+    }
+  }
+
+  .changing-auth-method {
+    display: flex;
+    justify-content: center;
   }
 }

@@ -40,18 +40,24 @@
         = import_form.hidden_field :id, class: 'js-import-data-id'
 
         .form-group.js-ssh-host-keys-section{ class: "#{ 'hidden' unless import_data.ssh_known_hosts }" }
-          %button.btn.btn-inverted.btn-success.append-bottom-15.js-detect-host-keys{ type: 'button' } Detect host keys
+          %button.btn.btn-inverted.btn-success.append-bottom-15.js-detect-host-keys{ type: 'button' }
+            = icon('spinner spin', class: 'detect-host-keys-load-spinner hidden')
+            Detect host keys
           .fingerprint-ssh-info.js-fingerprint-ssh-info{ class: "#{ 'hidden' unless import_data.ssh_known_hosts_fingerprints }" }
             %label.label-light
               Fingerprints
-            %ul.fingerprints-list.js-fingerprints-list
+            .fingerprints-list.js-fingerprints-list
               - import_data.ssh_known_hosts_fingerprints.each do |fp|
-                %li
-                  %code= fp.fingerprint
-            %button.btn.btn-sm.btn-default.append-bottom-15.js-ssh-hosts-advanced{ type: 'button' } Show advanced
+                %code= fp.fingerprint
+            %button.btn.btn-sm.btn-default.prepend-top-10.append-bottom-15.ssh-hosts-advanced.js-ssh-hosts-advanced.show-advanced{ type: 'button' }
+              %span.label-show
+                Show advanced
+              %span.label-hide
+                Hide advanced
+              = icon('chevron')
             .js-ssh-known-hosts.hidden
               = import_form.label :ssh_known_hosts, 'SSH host keys', class: 'label-light'
-              = import_form.text_area :ssh_known_hosts, class: 'form-control known-hosts js-known-hosts'
+              = import_form.text_area :ssh_known_hosts, class: 'form-control known-hosts js-known-hosts', rows: '10'
               .help-block.hidden
                 %i.fa.fa-check.fingerprint-verified
                 This fingerprint was verified manually just now
@@ -64,6 +70,8 @@
             %option{ value: 'ssh_public_key', selected: "#{'selected' if ssh_key_auth}" } SSH public key authentication
 
         .form-group
+          .account-well.changing-auth-method.hidden.js-well-changing-auth
+            = icon('spinner spin lg')
           .account-well.well-password-auth.hidden.js-well-password-auth
             = import_form.label :password, "Password", class: "label-light"
             = import_form.password_field :password, value: import_data.password, class: 'form-control'
@@ -86,7 +94,7 @@
               = link_to 'Regenerate key', project_mirror_path(@project, project: { import_data_attributes: regen_data }),
                   method: :patch,
                   data: { confirm: 'Are you sure you want to regenerate public key?' },
-                  class: 'btn btn-remove delete-key prepend-top-10'
+                  class: 'btn btn-inverted btn-warning delete-key prepend-top-10'
 
       .form-group
         = f.label :mirror_user_id, "Mirror user", class: "label-light"
