@@ -67,7 +67,7 @@
           = f.label :auth_method, 'Authentication method', class: 'label-light'
           %select.form-control.js-pull-mirror-auth-type{ name: 'project[import_data_attributes][auth_method]' }
             %option{ value: 'password' } Password authentication
-            %option{ value: 'ssh_public_key', selected: "#{'selected' if ssh_key_auth}" } SSH public key authentication
+            %option{ value: 'ssh_public_key', selected: "#{'selected' if ssh_key_auth}", class: 'js-auth-type-ssh' } SSH public key authentication
 
         .form-group
           .account-well.changing-auth-method.hidden.js-well-changing-auth
