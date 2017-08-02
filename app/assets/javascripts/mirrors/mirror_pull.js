@@ -40,6 +40,12 @@ export default class MirrorPull {
     const protocol = this.$repositoryUrl.val().split('://')[0];
     if (this.$form.get(0).checkValidity()) {
       this.$sectionSSHHostKeys.toggleClass('hidden', protocol !== 'ssh');
+      this.$dropdownAuthType.find('.js-auth-type-ssh').toggleClass('hidden', /http/.test(protocol));
+      if (/http/.test(protocol) &&
+          this.$dropdownAuthType.val() !== AUTH_METHOD.PASSWORD) {
+        this.$dropdownAuthType.val(AUTH_METHOD.PASSWORD);
+        this.handleAuthTypeChange();
+      }
     }
   }
 
@@ -71,7 +77,12 @@ export default class MirrorPull {
         this.showSSHInformation(res);
       }
     })
-    .catch(res => new Flash(res.responseJSON.message));
+    .catch((res) => {
+      const failureMessage = res.responseJSON ? res.responseJSON.message : 'Something went wrong on our end.';
+      new Flash(failureMessage);
+      $btnLoadSpinner.addClass('hidden');
+      this.$btnDetectHostKeys.enable();
+    });
   }
 
   handleSSHKnownHostsInput() {
