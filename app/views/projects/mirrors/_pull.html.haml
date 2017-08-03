@@ -1,5 +1,6 @@
 - expanded = Rails.env.test?
 - import_data = @project.import_data || @project.build_import_data
+- protocols = AddressableUrlValidator::DEFAULT_OPTIONS[:protocols].join('|')
 %section.settings.project-mirror-settings
   .settings-header
     %h4
@@ -23,7 +24,7 @@
 
       .form-group
         = f.label :username_only_import_url, "Git repository URL", class: "label-light"
-        = f.text_field :username_only_import_url, class: 'form-control js-repo-url', placeholder: 'https://username@gitlab.company.com/group/project.git', required: 'required', pattern: '(http|ssh|https|git):\/\/.+', title: 'URL must have protocol present (eg; ssh://...)'
+        = f.text_field :username_only_import_url, class: 'form-control js-repo-url', placeholder: 'https://username@gitlab.company.com/group/project.git', required: 'required', pattern: "(#{protocols}):\/\/.+", title: 'URL must have protocol present (eg; ssh://...)'
 
       = render "projects/mirrors/pull/repo_url_instructions"
 
