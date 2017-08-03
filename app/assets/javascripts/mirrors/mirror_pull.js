@@ -79,7 +79,7 @@ export default class MirrorPull {
     })
     .catch((res) => {
       const failureMessage = res.responseJSON ? res.responseJSON.message : 'Something went wrong on our end.';
-      new Flash(failureMessage);
+      new Flash(failureMessage); // eslint-disable-line
       $btnLoadSpinner.addClass('hidden');
       this.$btnDetectHostKeys.enable();
     });
