@@ -120,9 +120,7 @@ export default {
             </button>
           </p>
           <p v-if="shouldShowSourceBranchRemoving">
-            <i
-              class="fa fa-spinner fa-spin"
-              aria-hidden="true" />
+            <loading-icon inline />
             <span>The source branch is being removed</span>
           </p>
         </section>

@@ -66,7 +66,7 @@ export default {
                 :href="deployment.url"
                 target="_blank"
                 rel="noopener noreferrer nofollow"
-                class="js-deploy-meta">
+                class="js-deploy-meta inline">
                 {{deployment.name}}
               </a>
               <span
@@ -78,7 +78,7 @@ export default {
                 :href="deployment.external_url"
                 target="_blank"
                 rel="noopener noreferrer nofollow"
-                class="js-deploy-url">
+                class="js-deploy-url inline">
                 <i
                   class="fa fa-external-link"
                   aria-hidden="true" />
