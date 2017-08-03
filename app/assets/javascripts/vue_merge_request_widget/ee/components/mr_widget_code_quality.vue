@@ -1,7 +1,6 @@
 <script>
-import successIcon from 'icons/_icon_status_success.svg';
-import errorIcon from 'icons/_icon_status_failed.svg';
 import issuesBlock from './mr_widget_code_quality_issues.vue';
+import statusIcon from '../../components/mr_widget_status_icon';
 import loadingIcon from '../../../vue_shared/components/loading_icon.vue';
 import '../../../lib/utils/text_utility';
 
@@ -22,6 +21,7 @@ export default {
   components: {
     issuesBlock,
     loadingIcon,
+    statusIcon,
   },
 
   data() {
@@ -34,11 +34,11 @@ export default {
   },
 
   computed: {
-    stateIcon() {
+    status() {
       if (this.loadingFailed || this.mr.codeclimateMetrics.newIssues.length) {
-        return errorIcon;
+        return 'failed';
       }
-      return successIcon;
+      return 'success';
     },
 
     hasNoneIssues() {
@@ -148,14 +148,7 @@ export default {
     <div
       v-else-if="!isLoading && !loadingFailed"
       class="media">
-      <div
-        class="ci-status-icon"
-        :class="{
-          'ci-status-icon-failed': mr.codeclimateMetrics.newIssues.length,
-          'ci-status-icon-passed': mr.codeclimateMetrics.newIssues.length === 0
-        }"
-        v-html="stateIcon">
-      </div>
+      <status-icon :status="status" />
       <div class="media-body space-children">
         <span>
           {{codeText}}
@@ -192,10 +185,7 @@ export default {
     <div
       v-else-if="loadingFailed"
       class="media">
-      <div
-        class="ci-status-icon ci-status-icon-failed"
-        v-html="stateIcon">
-      </div>
+      <status-icon status="failed" />
       <div class="media-body">
         Failed to load codeclimate report
       </div>

@@ -25,10 +25,16 @@ export default {
   },
   computed: {
     status() {
+      if (this.mr.rebaseInProgress || this.isMakingRequest) {
+        return 'loading';
+      }
       if (!this.mr.canPushToSourceBranch && !this.mr.rebaseInProgress) {
         return 'failed';
       }
       return 'success';
+    },
+    showDisabledButton() {
+      return ['failed', 'loading'].includes(this.status);
     },
   },
   methods: {
@@ -61,31 +67,14 @@ export default {
   },
   template: `
     <div class="mr-widget-body media">
-      <div v-if="mr.rebaseInProgress || isMakingRequest" class="mr-widget-icon">
-        <i
-          class="fa fa-spinner fa-spin"
-          aria-hidden="true" />
-      </div>
-      <status-icon v-else :status="status" />
-      <div class="rebase-state-find-class-convention media-body space-children">
+      <status-icon :status="status" :showDisabledButton="showDisabledButton" />
+      <div class="rebase-state-find-class-convention media media-body space-children">
         <template v-if="mr.rebaseInProgress || isMakingRequest">
-          <button
-            type="button"
-            class="btn btn-success btn-small"
-            disabled="true">
-            Merge
-          </button>
           <span class="bold">
             Rebase in progress
           </span>
         </template>
         <template v-if="!mr.rebaseInProgress && !mr.canPushToSourceBranch">
-          <button
-            type="button"
-            class="btn btn-success btn-small"
-            disabled="true">
-            Merge
-          </button>
           <span class="bold">
             Fast-forward merge is not possible.
             Rebase the source branch onto
@@ -94,7 +83,7 @@ export default {
           </span>
         </template>
         <template v-if="!mr.rebaseInProgress && mr.canPushToSourceBranch && !isMakingRequest">
-          <div class="accept-merge-holder clearfix js-toggle-container accept-action space-children">
+          <div class="accept-merge-holder clearfix js-toggle-container accept-action media space-children">
             <button
               class="btn btn-small btn-reopen btn-success"
               :disabled="isMakingRequest"

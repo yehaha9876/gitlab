@@ -12,9 +12,8 @@ export default {
   },
   template: `
     <div class="media">
-      <status-icon status="failed" />
-      <div class="media-body space-children">
-        <button type="button" class="btn btn-success btn-small" disabled="true">Merge</button>
+      <status-icon status="failed" showDisabledButton />
+      <div class="media-body">
         <span class="bold">
           Merge requests are read-only in a secondary Geo node
         </span>
