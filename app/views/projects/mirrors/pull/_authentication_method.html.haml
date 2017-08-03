@@ -28,6 +28,7 @@
         = import_data.ssh_public_key
 
     - if import_data.ssh_public_key.present?
+      = clipboard_button(text: import_data.ssh_public_key, title: _("Copy SSH public key to clipboard"), class: 'btn-default prepend-top-10')
       = link_to 'Regenerate key', project_mirror_path(@project, project: { import_data_attributes: regen_data }),
           method: :patch,
           data: { confirm: 'Are you sure you want to regenerate public key?' },
