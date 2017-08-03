@@ -49,6 +49,18 @@
             .fingerprints-list.js-fingerprints-list
               - import_data.ssh_known_hosts_fingerprints.each do |fp|
                 %code= fp.fingerprint
+            - verified_by = import_data.ssh_known_hosts_verified_by
+            - verified_at = import_data.ssh_known_hosts_verified_at
+            - if verified_by || verified_at
+              .help-block
+                %i.fa.fa-check.fingerprint-verified
+                Verified by
+                - if verified_by
+                  = link_to verified_by.name, user_path(verified_by)
+                - else
+                  a deleted user
+                #{time_ago_in_words(verified_at)} ago
+
             %button.btn.btn-sm.btn-default.prepend-top-10.append-bottom-15.ssh-hosts-advanced.js-ssh-hosts-advanced.show-advanced{ type: 'button' }
               %span.label-show
                 Show advanced
@@ -58,9 +70,6 @@
             .js-ssh-known-hosts.hidden
               = import_form.label :ssh_known_hosts, 'SSH host keys', class: 'label-light'
               = import_form.text_area :ssh_known_hosts, class: 'form-control known-hosts js-known-hosts', rows: '10'
-              .help-block.hidden
-                %i.fa.fa-check.fingerprint-verified
-                This fingerprint was verified manually just now
 
         - ssh_key_auth = import_data.ssh_key_auth?
         .form-group
