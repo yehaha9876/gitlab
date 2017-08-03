@@ -8,6 +8,9 @@
 /* global LabelsSelect */
 /* global MilestoneSelect */
 /* global Commit */
+/* global CommitsList */
+/* global NewCommitForm */
+/* global NewBranchForm */
 /* global NotificationsForm */
 /* global NotificationsDropdown */
 /* global GroupAvatar */
@@ -21,10 +24,14 @@
 /* global Project */
 /* global ProjectAvatar */
 /* global CompareAutocomplete */
+/* global PathLocks */
+/* global ProjectFindFile */
 /* global ProjectNew */
 /* global ProjectShow */
+/* global ProjectImport */
 /* global Labels */
 /* global Shortcuts */
+/* global ShortcutsFindFile */
 /* global Sidebar */
 /* global WeightSelect */
 /* global AdminEmailSelect */
@@ -65,6 +72,9 @@ import initSettingsPanels from './settings_panels';
 import initExperimentalFlags from './experimental_flags';
 import OAuthRememberMe from './oauth_remember_me';
 import PerformanceBar from './performance_bar';
+import initNotes from './init_notes';
+import initLegacyFilters from './init_legacy_filters';
+import initIssuableSidebar from './init_issuable_sidebar';
 
 // EE-only
 import ApproversSelect from './approvers_select';
@@ -133,6 +143,8 @@ import AuditLogs from './audit_logs';
           .init();
       }
 
+      const filteredSearchEnabled = gl.FilteredSearchManager && document.querySelector('.filtered-search');
+
       switch (page) {
         case 'profiles:preferences:show':
           initExperimentalFlags();
@@ -149,7 +161,7 @@ import AuditLogs from './audit_logs';
           break;
         case 'projects:merge_requests:index':
         case 'projects:issues:index':
-          if (gl.FilteredSearchManager && document.querySelector('.filtered-search')) {
+          if (filteredSearchEnabled) {
             const filteredSearchManager = new gl.FilteredSearchManager(page === 'projects:issues:index' ? 'issues' : 'merge_requests');
             filteredSearchManager.setup();
           }
@@ -163,6 +175,8 @@ import AuditLogs from './audit_logs';
           new Issue();
           shortcut_handler = new ShortcutsIssuable();
           new ZenMode();
+          initIssuableSidebar();
+          initNotes();
           break;
         case 'dashboard:milestones:index':
           new ProjectSelect();
@@ -173,9 +187,17 @@ import AuditLogs from './audit_logs';
           new Milestone();
           new Sidebar();
           break;
-        case 'groups:issues':
+        case 'dashboard:issues':
+        case 'dashboard:merge_requests':
         case 'groups:merge_requests':
-          new UsersSelect();
+          new ProjectSelect();
+          initLegacyFilters();
+          break;
+        case 'groups:issues':
+          if (filteredSearchEnabled) {
+            const filteredSearchManager = new gl.FilteredSearchManager('issues');
+            filteredSearchManager.setup();
+          }
           new ProjectSelect();
           break;
         case 'dashboard:todos:index':
@@ -214,6 +236,10 @@ import AuditLogs from './audit_logs';
         case 'projects:compare:show':
           new gl.Diff();
           break;
+        case 'projects:branches:new':
+        case 'projects:branches:create':
+          new NewBranchForm($('.js-create-branch-form'), JSON.parse(document.getElementById('availableRefs').innerHTML));
+          break;
         case 'projects:branches:index':
           gl.AjaxLoadingSpinner.init();
           new DeleteModal();
@@ -243,7 +269,10 @@ import AuditLogs from './audit_logs';
         case 'projects:tags:new':
           new ZenMode();
           new gl.GLForm($('.tag-form'), true);
-          new RefSelectDropdown($('.js-branch-select'), window.gl.availableRefs);
+          new RefSelectDropdown($('.js-branch-select'));
+          break;
+        case 'projects:snippets:show':
+          initNotes();
           break;
         case 'projects:snippets:new':
         case 'projects:snippets:edit':
@@ -265,14 +294,11 @@ import AuditLogs from './audit_logs';
           new gl.Diff();
           shortcut_handler = new ShortcutsIssuable(true);
           new ZenMode();
+          initIssuableSidebar();
+          initNotes();
           break;
         case 'dashboard:activity':
           new gl.Activities();
-          break;
-        case 'dashboard:issues':
-        case 'dashboard:merge_requests':
-          new ProjectSelect();
-          new UsersSelect();
           break;
         case 'projects:commit:show':
           new Commit();
@@ -282,18 +308,29 @@ import AuditLogs from './audit_logs';
           new MiniPipelineGraph({
             container: '.js-commit-pipeline-graph',
           }).bindEvents();
+          initNotes();
+          $('.commit-info.branches').load(document.querySelector('.js-commit-box').dataset.commitPath);
           break;
         case 'projects:commit:pipelines':
           new MiniPipelineGraph({
             container: '.js-commit-pipeline-graph',
           }).bindEvents();
+          $('.commit-info.branches').load(document.querySelector('.js-commit-box').dataset.commitPath);
+          break;
+        case 'projects:activity':
+          new gl.Activities();
+          shortcut_handler = new ShortcutsNavigation();
           break;
         case 'projects:commits:show':
-        case 'projects:activity':
+          CommitsList.init(document.querySelector('.js-project-commits-show').dataset.commitsLimit);
+          new gl.Activities();
           shortcut_handler = new ShortcutsNavigation();
           break;
         case 'projects:edit':
           new UsersSelect();
+          break;
+        case 'projects:imports:show':
+          new ProjectImport();
           break;
         case 'projects:show':
           shortcut_handler = new ShortcutsNavigation();
@@ -307,6 +344,9 @@ import AuditLogs from './audit_logs';
           break;
         case 'projects:edit':
           setupProjectEdit();
+          break;
+        case 'projects:pipelines:new':
+          new NewBranchForm($('.js-new-pipeline-form'));
           break;
         case 'projects:pipelines:builds':
         case 'projects:pipelines:failures':
@@ -361,8 +401,27 @@ import AuditLogs from './audit_logs';
           shortcut_handler = new ShortcutsNavigation();
           new TreeView();
           new BlobViewer();
+          new NewCommitForm($('.js-create-dir-form'));
+
+          if (document.querySelector('.js-tree-content').dataset.pathLocksAvailable === 'true') {
+            PathLocks.init(
+              document.querySelector('.js-tree-content').dataset.pathLocksToggle,
+              document.querySelector('.js-tree-content').dataset.pathLocksPath,
+            );
+          }
+
+          $('#tree-slider').waitForImages(function() {
+            gl.utils.ajaxGet(document.querySelector('.js-tree-content').dataset.logsPath);
+          });
           break;
         case 'projects:find_file:show':
+          const findElement = document.querySelector('.js-file-finder');
+          const projectFindFile = new ProjectFindFile($(".file-finder-holder"), {
+            url: findElement.dataset.fileFindUrl,
+            treeUrl: findElement.dataset.findTreeUrl,
+            blobUrlTemplate: findElement.dataset.blobUrlTemplate,
+          });
+          new ShortcutsFindFile(projectFindFile);
           shortcut_handler = true;
           break;
         case 'projects:blob:show':
@@ -378,10 +437,20 @@ import AuditLogs from './audit_logs';
         case 'projects:labels:edit':
           new Labels();
           break;
+        case 'groups:labels:index':
         case 'projects:labels:index':
           if ($('.prioritized-labels').length) {
             new gl.LabelManager();
           }
+          $('.label-subscription').each((i, el) => {
+            const $el = $(el);
+
+            if ($el.find('.dropdown-group-label').length) {
+              new gl.GroupLabelSubscription($el);
+            } else {
+              new gl.ProjectLabelSubscription($el);
+            }
+          });
           break;
         case 'projects:network:show':
           // Ensure we don't create a particular shortcut handler here. This is
@@ -416,9 +485,6 @@ import AuditLogs from './audit_logs';
           new AuditLogs();
           break;
         case 'projects:settings:repository:show':
-          // Initialize Protected Branch Settings
-          new gl.ProtectedBranchCreate();
-          new gl.ProtectedBranchEditList();
           new UsersSelect();
           // Initialize expandable settings panels
           initSettingsPanels();
@@ -440,9 +506,14 @@ import AuditLogs from './audit_logs';
         case 'snippets:show':
           new LineHighlighter();
           new BlobViewer();
+          initNotes();
           break;
         case 'import:fogbugz:new_user_map':
           new UsersSelect();
+          break;
+        case 'profiles:personal_access_tokens:index':
+        case 'admin:impersonation_tokens:index':
+          new gl.DueDateSelectors();
           break;
       }
       switch (path.first()) {
@@ -521,6 +592,7 @@ import AuditLogs from './audit_logs';
               shortcut_handler = new ShortcutsWiki();
               new ZenMode();
               new gl.GLForm($('.wiki-form'), true);
+              new Sidebar();
               break;
             case 'snippets':
               shortcut_handler = new ShortcutsNavigation();

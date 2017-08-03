@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 module Ci
-  describe GitlabCiYamlProcessor, :lib do
+  describe GitlabCiYamlProcessor do
     subject { described_class.new(config, path) }
     let(:path) { 'path' }
 
@@ -28,6 +28,28 @@ module Ci
           it 'includes coverage regexp in build attributes' do
             expect(subject)
               .to include(coverage_regex: 'Code coverage: \d+\.\d+')
+          end
+        end
+      end
+
+      describe 'retry entry' do
+        context 'when retry count is specified' do
+          let(:config) do
+            YAML.dump(rspec: { script: 'rspec', retry: 1 })
+          end
+
+          it 'includes retry count in build options attribute' do
+            expect(subject[:options]).to include(retry: 1)
+          end
+        end
+
+        context 'when retry count is not specified' do
+          let(:config) do
+            YAML.dump(rspec: { script: 'rspec' })
+          end
+
+          it 'does not persist retry count in the database' do
+            expect(subject[:options]).not_to have_key(:retry)
           end
         end
       end

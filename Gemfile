@@ -16,6 +16,7 @@ gem 'mysql2', '~> 0.4.5', group: :mysql
 gem 'pg', '~> 0.18.2', group: :postgres
 
 gem 'rugged', '~> 0.25.1.1'
+gem 'grape-route-helpers', '~> 2.0.0'
 
 gem 'faraday', '~> 0.12'
 
@@ -33,14 +34,16 @@ gem 'omniauth-gitlab', '~> 1.0.2'
 gem 'omniauth-google-oauth2', '~> 0.4.1'
 gem 'omniauth-kerberos', '~> 0.3.0', group: :kerberos
 gem 'omniauth-oauth2-generic', '~> 0.2.2'
-gem 'omniauth-saml',          '~> 1.7.0'
-gem 'omniauth-shibboleth',    '~> 1.2.0'
-gem 'omniauth-twitter',       '~> 1.2.0'
-gem 'omniauth_crowd',         '~> 2.2.0'
+gem 'omniauth-saml', '~> 1.7.0'
+gem 'omniauth-shibboleth', '~> 1.2.0'
+gem 'omniauth-twitter', '~> 1.2.0'
+gem 'omniauth_crowd', '~> 2.2.0'
+gem 'omniauth-authentiq', '~> 0.3.1'
+gem 'rack-oauth2', '~> 1.2.1'
+gem 'jwt', '~> 1.5.6'
+
+# Kerberos authentication. EE-only
 gem 'gssapi', group: :kerberos
-gem 'omniauth-authentiq',     '~> 0.3.0'
-gem 'rack-oauth2',            '~> 1.2.1'
-gem 'jwt',                    '~> 1.5.6'
 
 # Spam and anti-bot protection
 gem 'recaptcha', '~> 3.0', require: 'recaptcha/rails'
@@ -61,7 +64,7 @@ gem 'browser', '~> 2.2'
 # LDAP Auth
 # GitLab fork with several improvements to original library. For full list of changes
 # see https://github.com/intridea/omniauth-ldap/compare/master...gitlabhq:master
-gem 'gitlab_omniauth-ldap', '~> 1.2.1', require: 'omniauth-ldap'
+gem 'gitlab_omniauth-ldap', '~> 2.0.3', require: 'omniauth-ldap'
 gem 'net-ldap'
 
 # Git Wiki
@@ -73,7 +76,7 @@ gem 'gollum-rugged_adapter', '~> 0.4.4', require: false
 gem 'github-linguist', '~> 4.7.0', require: 'linguist'
 
 # API
-gem 'grape', '~> 0.19.0'
+gem 'grape', '~> 0.19.2'
 gem 'grape-entity', '~> 0.6.0'
 gem 'rack-cors', '~> 0.4.0', require: 'rack/cors'
 
@@ -173,7 +176,7 @@ gem 'rainbow', '~> 2.2'
 gem 'settingslogic', '~> 2.0.9'
 
 # Linear-time regex library for untrusted regular expressions
-gem 're2', '~> 1.0.0'
+gem 're2', '~> 1.1.1'
 
 # Misc
 
@@ -364,7 +367,7 @@ group :development, :test do
 end
 
 group :test do
-  gem 'shoulda-matchers', '~> 2.8.0', require: false
+  gem 'shoulda-matchers', '~> 3.1.2', require: false
   gem 'email_spec', '~> 1.6.0'
   gem 'json-schema', '~> 2.6.2'
   gem 'webmock', '~> 2.3.2'
@@ -400,7 +403,7 @@ gem 'sys-filesystem', '~> 1.1.6'
 gem 'net-ntp'
 
 # Gitaly GRPC client
-gem 'gitaly', '~> 0.14.0'
+gem 'gitaly', '~> 0.19.0'
 
 gem 'toml-rb', '~> 0.3.15', require: false
 

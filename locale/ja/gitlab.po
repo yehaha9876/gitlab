@@ -3,7 +3,7 @@
 # Kohei Ota <inductor@kela.jp>, 2017. #zanata
 # Taisuke Inoue <taisuke.inoue.jp@gmail.com>, 2017. #zanata
 # Takuya Noguchi <takninnovationresearch@gmail.com>, 2017. #zanata
-# YANO  TETTER <tetuyano+zana@gmail.com>, 2017. #zanata
+# YANO  Tethurou <tetuyano+zana@gmail.com>, 2017. #zanata
 msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
@@ -12,9 +12,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language-Team: Japanese (https://translate.zanata.org/project/view/GitLab)\n"
-"PO-Revision-Date: 2017-07-18 09:27-0400\n"
 "Last-Translator: YANO  TETTER <tetuyano+zana@gmail.com>\n"
+"PO-Revision-Date: 2017-07-19 09:45-0400\n"
+"Last-Translator: YANO  Tethurou <tetuyano+zana@gmail.com>\n"
 "Language: ja\n"
 "X-Generator: Zanata 3.9.6\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -33,7 +33,8 @@ msgstr "%{commit_author_link}は%{commit_timeago}前、コミットしました�
 
 msgid "1 pipeline"
 msgid_plural "%d pipelines"
-msgstr[0] "%d 個のパイプライン"
+msgstr[0] "1 個のパイプライン"
+msgstr[1] "%d 個のパイプライン"
 
 msgid "A collection of graphs regarding Continuous Integration"
 msgstr "CIについてのグラフ"
@@ -628,6 +629,12 @@ msgstr "全件"
 msgid "PipelineSchedules|Inactive"
 msgstr "無効"
 
+msgid "PipelineSchedules|Input variable key"
+msgstr "変数の名前を入力"
+
+msgid "PipelineSchedules|Input variable value"
+msgstr "変数の値を入力"
+
 msgid "PipelineSchedules|Next Run"
 msgstr "次の実行"
 
@@ -637,11 +644,17 @@ msgstr "なし"
 msgid "PipelineSchedules|Provide a short description for this pipeline"
 msgstr "このパイプラインについて簡単に記述してください。"
 
+msgid "PipelineSchedules|Remove variable row"
+msgstr "変数を削除"
+
 msgid "PipelineSchedules|Take ownership"
 msgstr "権限を取得する"
 
 msgid "PipelineSchedules|Target"
 msgstr "ターゲット"
+
+msgid "PipelineSchedules|Variables"
+msgstr "変数"
 
 msgid "PipelineSheduleIntervalPattern|Custom"
 msgstr "カスタム"
@@ -1104,6 +1117,14 @@ msgid "Withdraw Access Request"
 msgstr "アクセスリクエストを取り消す"
 
 msgid ""
+"You are going to remove %{group_name}.\n"
+"Removed groups CANNOT be restored!\n"
+"Are you ABSOLUTELY sure?"
+msgstr "%{group_name} グループを削除しようとしています。\n"
+"削除されたグループは絶対に元に戻せません！\n"
+"本当によろしいですか？"
+
+msgid ""
 "You are going to remove %{project_name_with_namespace}.\n"
 "Removed project CANNOT be restored!\n"
 "Are you ABSOLUTELY sure?"
@@ -1115,8 +1136,7 @@ msgstr ""
 msgid ""
 "You are going to remove the fork relationship to source project "
 "%{forked_from_project}. Are you ABSOLUTELY sure?"
-msgstr "元のプロジェクト (%{forked_from_project}) とのリレーションを削除しようとしています。\n"
-"本当によろしいですか？"
+msgstr "元のプロジェクト (%{forked_from_project}) とのリレーションを削除しようとしています。本当によろしいですか？"
 
 msgid ""
 "You are going to transfer %{project_name_with_namespace} to another owner. "
@@ -1181,4 +1201,3 @@ msgstr "メール通知"
 msgid "parent"
 msgid_plural "parents"
 msgstr[0] "親"
-

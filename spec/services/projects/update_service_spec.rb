@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Projects::UpdateService, '#execute', :services do
+describe Projects::UpdateService, '#execute' do
   let(:user) { create(:user) }
   let(:admin) { create(:admin) }
 
   let(:project) do
-    create(:empty_project, creator: user, namespace: user.namespace)
+    create(:project, creator: user, namespace: user.namespace)
   end
 
   context 'when changing visibility level' do
@@ -59,7 +59,7 @@ describe Projects::UpdateService, '#execute', :services do
   end
 
   describe 'when updating project that has forks' do
-    let(:project) { create(:empty_project, :internal) }
+    let(:project) { create(:project, :internal) }
     let(:forked_project) { create(:forked_project_with_submodules, :internal) }
 
     before do
@@ -103,7 +103,7 @@ describe Projects::UpdateService, '#execute', :services do
     end
   end
 
-  context 'when renaming project that contains container images' do
+  context 'when updating a project that contains container images' do
     before do
       stub_container_registry_config(enabled: true)
       stub_container_registry_tags(repository: /image/, tags: %w[rc1])
@@ -115,6 +115,13 @@ describe Projects::UpdateService, '#execute', :services do
 
       expect(result).to include(status: :error)
       expect(result[:message]).to match(/contains container registry tags/)
+    end
+
+    it 'allows to update other settings' do
+      result = update_project(project, admin, public_builds: true)
+
+      expect(result[:status]).to eq :success
+      expect(project.reload.public_builds).to be true
     end
   end
 
@@ -130,7 +137,7 @@ describe Projects::UpdateService, '#execute', :services do
   describe 'repository_storage' do
     let(:admin_user) { create(:user, admin: true) }
     let(:user) { create(:user) }
-    let(:project) { create(:project, repository_storage: 'a') }
+    let(:project) { create(:project, :repository, repository_storage: 'a') }
     let(:opts) { { repository_storage: 'b' } }
 
     before do
@@ -149,13 +156,13 @@ describe Projects::UpdateService, '#execute', :services do
       FileUtils.rm_rf('tmp/tests/storage_b')
     end
 
-    it 'calls the change repository storage method if the storage changed' do
+    it 'calls the change repository storage method if the storage changed', skip_gitaly_mock: true do
       expect(project).to receive(:change_repository_storage).with('b')
 
       update_project(project, admin_user, opts).inspect
     end
 
-    it "doesn't call the change repository storage for non-admin users" do
+    it "doesn't call the change repository storage for non-admin users", skip_gitaly_mock: true do
       expect(project).not_to receive(:change_repository_storage)
 
       update_project(project, user, opts).inspect
@@ -164,7 +171,7 @@ describe Projects::UpdateService, '#execute', :services do
 
   context 'repository_size_limit assignment as Bytes' do
     let(:admin_user) { create(:user, admin: true) }
-    let(:project) { create(:empty_project, repository_size_limit: 0) }
+    let(:project) { create(:project, repository_size_limit: 0) }
 
     context 'when param present' do
       let(:opts) { { repository_size_limit: '100' } }

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Boards::CreateService, services: true do
+describe Boards::CreateService do
   describe '#execute' do
-    let(:project) { create(:empty_project) }
+    let(:project) { create(:project) }
 
     context 'With the feature available' do
       before do
