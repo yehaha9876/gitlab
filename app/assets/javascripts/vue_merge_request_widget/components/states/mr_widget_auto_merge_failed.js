@@ -27,7 +27,7 @@ export default {
       <status-icon status="failed" />
       <div class="media-body space-children">
         <span class="bold">
-          <span v-if="mr.mergeError">{{mr.mergeError}}.</span>
+          <template v-if="mr.mergeError">{{mr.mergeError}}.</template>
           This merge request failed to be merged automatically
         </span>
         <button

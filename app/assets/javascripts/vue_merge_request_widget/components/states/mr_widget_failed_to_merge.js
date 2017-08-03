@@ -45,24 +45,14 @@ export default {
   template: `
     <div class="mr-widget-body media">
       <template v-if="isRefreshing">
-        <div class="mr-widget-icon">
-          <i
-          class="fa fa-spinner fa-spin"
-          aria-hidden="true" />
-        </div>
+        <status-icon status="loading" />
         <span class="media-body bold js-refresh-label">
           Refreshing now
         </span>
       </template>
       <template v-else>
-        <status-icon status="failed" />
+        <status-icon status="failed" showDisabledButton />
         <div class="media-body space-children">
-          <button
-            class="btn btn-success btn-small"
-            disabled="true"
-            type="button">
-            Merge
-          </button>
           <span class="bold">
             <span
               class="has-error-message"

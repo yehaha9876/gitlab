@@ -7,18 +7,8 @@ export default {
   },
   template: `
     <div class="mr-widget-body media">
-      <div class="mr-widget-icon">
-        <i
-          class="fa fa-spinner fa-spin"
-          aria-hidden="true" />
-      </div>
+      <status-icon status="loading" showDisabledButton />
       <div class="media-body space-children">
-        <button
-          type="button"
-          class="btn btn-success btn-small"
-          disabled="true">
-          Merge
-        </button>
         <span class="bold">
           Checking ability to merge automatically
         </span>

@@ -10,14 +10,8 @@ export default {
   },
   template: `
     <div class="mr-widget-body media">
-      <status-icon status="failed" />
+      <status-icon status="failed" showDisabledButton />
       <div class="media-body space-children">
-        <button
-          type="button"
-          class="btn btn-success btn-small"
-          disabled="true">
-          Merge
-        </button>
         <span class="bold">
           There are merge conflicts<span v-if="!mr.canMerge">.</span>
           <span v-if="!mr.canMerge">

@@ -34,15 +34,8 @@ export default {
   },
   template: `
     <div class="mr-widget-body media">
-      <status-icon status="failed" />
+      <status-icon status="failed" showDisabledButton="mr.removeWIPPath" />
       <div class="media-body space-children">
-        <button
-          v-if="mr.removeWIPPath"
-          type="button"
-          class="btn btn-success btn-small"
-          disabled="true">
-          Merge
-        </button>
         <span class="bold">
           This is a Work in Progress
           <i
