@@ -72,6 +72,7 @@ export default class MirrorPull {
     })
     .then((res) => {
       $btnLoadSpinner.addClass('hidden');
+      this.$hostKeysInformation.find('.js-fingerprint-verification').addClass('hidden');
       if (res.known_hosts && res.fingerprints) {
         this.showSSHInformation(res);
       }
@@ -86,6 +87,7 @@ export default class MirrorPull {
 
   handleSSHKnownHostsInput() {
     this.$hostKeysInformation.find('.js-fingerprints-list').addClass('invalidate');
+    this.$hostKeysInformation.find('.js-fingerprint-verification').addClass('hidden');
   }
 
   handleSSHHostsAdvanced() {
