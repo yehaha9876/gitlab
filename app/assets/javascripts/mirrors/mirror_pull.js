@@ -40,12 +40,11 @@ export default class MirrorPull {
     const protocol = this.$repositoryUrl.val().split('://')[0];
     if (this.$form.get(0).checkValidity()) {
       this.$sectionSSHHostKeys.toggleClass('hidden', protocol !== 'ssh');
-      this.$dropdownAuthType.find('.js-auth-type-ssh').toggleClass('hidden', /http/.test(protocol));
-      if (/http/.test(protocol) &&
-          this.$dropdownAuthType.val() !== AUTH_METHOD.PASSWORD) {
-        this.$dropdownAuthType.val(AUTH_METHOD.PASSWORD);
-        this.handleAuthTypeChange();
-      }
+      this.$btnDetectHostKeys.enable();
+
+      this.$dropdownAuthType.val(/http/.test(protocol) ? AUTH_METHOD.PASSWORD : AUTH_METHOD.SSH);
+      this.$dropdownAuthType.toggleClass('hidden', /http/.test(protocol));
+      this.handleAuthTypeChange();
     }
   }
 
@@ -98,12 +97,7 @@ export default class MirrorPull {
 
   handleAuthTypeChange() {
     const selectedAuthType = this.$dropdownAuthType.val();
-    const importDataId = this.$importDataIdEl.val();
     const authTypeData = {};
-
-    if (importDataId) {
-      authTypeData[this.$importDataIdEl.attr('name')] = importDataId;
-    }
 
     authTypeData[this.$dropdownAuthType.attr('name')] = selectedAuthType;
 
