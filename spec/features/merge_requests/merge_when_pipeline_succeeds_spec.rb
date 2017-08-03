@@ -97,7 +97,7 @@ feature 'Merge When Pipeline Succeeds', :js do
 
     describe 'enabling Merge when pipeline succeeds via dropdown' do
       it 'activates the Merge when pipeline succeeds feature' do
-        click_button 'Select merge moment'
+        find('.js-merge-moment').click
         click_link 'Merge when pipeline succeeds'
 
         expect(page).to have_content "Set by #{user.name} to be merged automatically when the pipeline succeeds"

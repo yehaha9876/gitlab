@@ -43,7 +43,7 @@ feature 'Only allow merge requests to be merged if the pipeline succeeds', js: t
           wait_for_requests
 
           expect(page).to have_button 'Merge when pipeline succeeds'
-          expect(page).not_to have_button 'Select merge moment'
+          expect(page).to have_button '.js-merge-moment'
         end
       end
 
@@ -113,7 +113,7 @@ feature 'Only allow merge requests to be merged if the pipeline succeeds', js: t
 
           expect(page).to have_button 'Merge when pipeline succeeds'
 
-          click_button 'Select merge moment'
+          page.find('.js-merge-moment').click
           expect(page).to have_content 'Merge immediately'
         end
       end

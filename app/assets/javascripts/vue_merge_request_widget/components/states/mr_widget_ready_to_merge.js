@@ -223,7 +223,7 @@ export default {
               v-if="shouldShowMergeOptionsDropdown"
               :disabled="isMergeButtonDisabled"
               type="button"
-              class="btn btn-small btn-info dropdown-toggle"
+              class="btn btn-small btn-info dropdown-toggle js-merge-moment"
               data-toggle="dropdown"
               aria-label="Select merge moment">
               <i
@@ -327,12 +327,7 @@ export default {
               </div>
             </div>
           </div>
-        </template>
-        <template v-else>
-          <span class="bold">
-            The pipeline for this merge request failed. Please retry the job or push a new commit to fix the failure
-          </span>
-        </template>
+        </div>
       </div>
     </div>
   `,
