@@ -1018,7 +1018,7 @@ a.allowed-to-push {
       display: inline;
     }
 
-    .fa.fa-chevron:before {
+    .fa.fa-chevron::before {
       content: "\f077";
     }
 
@@ -1031,7 +1031,7 @@ a.allowed-to-push {
         display: none;
       }
 
-      .fa.fa-chevron:before {
+      .fa.fa-chevron::before {
         content: "\f078";
       }
     }
