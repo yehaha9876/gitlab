@@ -1,0 +1,34 @@
+- import_data = @project.import_data || @project.build_import_data
+- regen_data = { id: import_data.id, auth_method: 'ssh_public_key', regenerate_ssh_private_key: true }
+- ssh_key_auth = import_data.ssh_key_auth?
+.form-group
+  = f.label :auth_method, 'Authentication method', class: 'label-light'
+  %select.form-control.js-pull-mirror-auth-type{ name: 'project[import_data_attributes][auth_method]' }
+    %option{ value: 'password', selected: "#{'selected' unless ssh_key_auth}" } Password authentication
+    %option{ value: 'ssh_public_key', selected: "#{'selected' if ssh_key_auth}" } SSH public key authentication
+
+.form-group
+  .account-well.changing-auth-method.hidden.js-well-changing-auth
+    = icon('spinner spin lg')
+  .account-well.well-password-auth.hidden.js-well-password-auth
+    = import_form.label :password, "Password", class: "label-light"
+    = import_form.password_field :password, value: import_data.password, class: 'form-control'
+  .account-well.well-ssh-auth.hidden.js-well-ssh-auth
+    %p
+      - if import_data.ssh_public_key.present?
+        Here is the public SSH key that needs to be added to the remote
+        server.
+      - else
+        An SSH key will be automatically generated when the form is
+        submitted.
+      For more information, please refer to the documentation.
+
+    - if import_data.ssh_public_key.present?
+      %code.prepend-top-10.ssh-public-key.js-ssh-public-key
+        = import_data.ssh_public_key
+
+    - if import_data.ssh_public_key.present?
+      = link_to 'Regenerate key', project_mirror_path(@project, project: { import_data_attributes: regen_data }),
+          method: :patch,
+          data: { confirm: 'Are you sure you want to regenerate public key?' },
+          class: 'btn btn-inverted btn-warning delete-key prepend-top-10'
