@@ -1,4 +1,5 @@
 - expanded = Rails.env.test?
+- import_data = @project.import_data || @project.build_import_data
 %section.settings.project-mirror-settings
   .settings-header
     %h4
@@ -14,16 +15,7 @@
       %div
         = form_errors(@project)
       = render "shared/mirror_update_button"
-      - if @project.mirror_last_update_failed?
-        .panel.panel-danger
-          .panel-heading
-            The repository failed to update #{time_ago_with_tooltip(@project.mirror_last_update_at)}.
-            - if @project.mirror_ever_updated_successfully?
-              Last successful update #{time_ago_with_tooltip(@project.mirror_last_successful_update_at)}.
-          .panel-body
-            %pre
-              :preserve
-                #{h(@project.import_error.try(:strip))}
+      = render "projects/mirrors/pull/mirror_update_fail"
       .form-group
         = f.check_box :mirror, class: "pull-left"
         .prepend-left-20
@@ -33,77 +25,12 @@
         = f.label :username_only_import_url, "Git repository URL", class: "label-light"
         = f.text_field :username_only_import_url, class: 'form-control js-repo-url', placeholder: 'https://username@gitlab.company.com/group/project.git', required: 'required', pattern: '(http|ssh|https|git):\/\/.+', title: 'URL must have protocol present (eg; ssh://...)'
 
-      = render 'projects/mirrors/instructions'
+      = render "projects/mirrors/pull/repo_url_instructions"
 
-      - import_data = @project.import_data || @project.build_import_data
       = f.fields_for :import_data, import_data do |import_form|
-        = import_form.hidden_field :id, class: 'js-import-data-id'
+        = render partial: "projects/mirrors/pull/ssh_host_keys", locals: { import_form: import_form }
 
-        .form-group.js-ssh-host-keys-section{ class: "#{ 'hidden' unless import_data.ssh_known_hosts }" }
-          %button.btn.btn-inverted.btn-success.append-bottom-15.js-detect-host-keys{ type: 'button' }
-            = icon('spinner spin', class: 'detect-host-keys-load-spinner hidden')
-            Detect host keys
-          .fingerprint-ssh-info.js-fingerprint-ssh-info{ class: "#{ 'hidden' unless import_data.ssh_known_hosts_fingerprints }" }
-            %label.label-light
-              Fingerprints
-            .fingerprints-list.js-fingerprints-list
-              - import_data.ssh_known_hosts_fingerprints.each do |fp|
-                %code= fp.fingerprint
-            - verified_by = import_data.ssh_known_hosts_verified_by
-            - verified_at = import_data.ssh_known_hosts_verified_at
-            - if verified_by || verified_at
-              .help-block
-                %i.fa.fa-check.fingerprint-verified
-                Verified by
-                - if verified_by
-                  = link_to verified_by.name, user_path(verified_by)
-                - else
-                  a deleted user
-                #{time_ago_in_words(verified_at)} ago
-
-            %button.btn.btn-sm.btn-default.prepend-top-10.append-bottom-15.ssh-hosts-advanced.js-ssh-hosts-advanced.show-advanced{ type: 'button' }
-              %span.label-show
-                Show advanced
-              %span.label-hide
-                Hide advanced
-              = icon('chevron')
-            .js-ssh-known-hosts.hidden
-              = import_form.label :ssh_known_hosts, 'SSH host keys', class: 'label-light'
-              = import_form.text_area :ssh_known_hosts, class: 'form-control known-hosts js-known-hosts', rows: '10'
-
-        - ssh_key_auth = import_data.ssh_key_auth?
-        .form-group
-          = f.label :auth_method, 'Authentication method', class: 'label-light'
-          %select.form-control.js-pull-mirror-auth-type{ name: 'project[import_data_attributes][auth_method]' }
-            %option{ value: 'password' } Password authentication
-            %option.js-auth-type-ssh{ value: 'ssh_public_key', selected: "#{'selected' if ssh_key_auth}" } SSH public key authentication
-
-        .form-group
-          .account-well.changing-auth-method.hidden.js-well-changing-auth
-            = icon('spinner spin lg')
-          .account-well.well-password-auth.hidden.js-well-password-auth
-            = import_form.label :password, "Password", class: "label-light"
-            = import_form.password_field :password, value: import_data.password, class: 'form-control'
-          .account-well.well-ssh-auth.hidden.js-well-ssh-auth
-            %p
-              - if import_data.ssh_public_key.present?
-                Here is the public SSH key that needs to be added to the remote
-                server.
-              - else
-                An SSH key will be automatically generated when the form is
-                submitted.
-              For more information, please refer to the documentation.
-
-            - if import_data.ssh_public_key.present?
-              %code.prepend-top-10.ssh-public-key.js-ssh-public-key
-                = import_data.ssh_public_key
-
-            - if import_data.ssh_public_key.present?
-              - regen_data = { id: import_data.id, auth_method: 'ssh_public_key', regenerate_ssh_private_key: true }
-              = link_to 'Regenerate key', project_mirror_path(@project, project: { import_data_attributes: regen_data }),
-                  method: :patch,
-                  data: { confirm: 'Are you sure you want to regenerate public key?' },
-                  class: 'btn btn-inverted btn-warning delete-key prepend-top-10'
+        = render partial: "projects/mirrors/pull/authentication_method", locals: { f: f, import_form: import_form }
 
       .form-group
         = f.label :mirror_user_id, "Mirror user", class: "label-light"
