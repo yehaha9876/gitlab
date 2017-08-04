@@ -95,6 +95,10 @@ FactoryGirl.define do
       archived true
     end
 
+    trait :hashed do
+      storage_version 1
+    end
+
     trait :access_requestable do
       request_access_enabled true
     end
