@@ -36,7 +36,6 @@
   }
 
   select {
-    background: transparent;
     transition: background 2s ease-out;
 
     &.highlight-changes {
@@ -290,6 +289,8 @@
 }
 
 .project-repo-buttons {
+  @include new-style-dropdown;
+
   .project-action-button .dropdown-menu {
     max-height: 250px;
     overflow-y: auto;
@@ -727,6 +728,7 @@ a.allowed-to-push {
   background-color: transparent;
   border: 0;
   text-align: left;
+  text-overflow: ellipsis;
 }
 
 .protected-branches-list,

@@ -615,8 +615,10 @@ $status-icon-margin: $gl-btn-padding;
 }
 
 .mr-version-controls {
+  position: relative;
   background: $gray-light;
   color: $gl-text-color;
+  z-index: 199;
 
   .mr-version-menus-container {
     display: -webkit-flex;

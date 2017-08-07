@@ -21,8 +21,12 @@
 /* global Search */
 /* global Admin */
 /* global NamespaceSelects */
+/* global NewCommitForm */
+/* global NewBranchForm */
 /* global Project */
 /* global ProjectAvatar */
+/* global MergeRequest */
+/* global Compare */
 /* global CompareAutocomplete */
 /* global PathLocks */
 /* global ProjectFindFile */
@@ -72,6 +76,7 @@ import initSettingsPanels from './settings_panels';
 import initExperimentalFlags from './experimental_flags';
 import OAuthRememberMe from './oauth_remember_me';
 import PerformanceBar from './performance_bar';
+import GpgBadges from './gpg_badges';
 import initNotes from './init_notes';
 import initLegacyFilters from './init_legacy_filters';
 import initIssuableSidebar from './init_issuable_sidebar';
@@ -79,13 +84,11 @@ import initIssuableSidebar from './init_issuable_sidebar';
 // EE-only
 import ApproversSelect from './approvers_select';
 import AuditLogs from './audit_logs';
+import initGeoInfoModal from './init_geo_info_modal';
+import initGroupAnalytics from './init_group_analytics';
 
 (function() {
   var Dispatcher;
-
-  $(function() {
-    return new Dispatcher();
-  });
 
   Dispatcher = (function() {
     function Dispatcher() {
@@ -116,6 +119,19 @@ import AuditLogs from './audit_logs';
         });
       });
 
+      function initBlobEE() {
+        const dataEl = document.getElementById('js-file-lock');
+
+        if (dataEl) {
+          const {
+            toggle_path,
+            path,
+           } = JSON.parse(dataEl.innerHTML);
+
+          PathLocks.init(toggle_path, path);
+        }
+      }
+
       function initBlob() {
         new LineHighlighter();
 
@@ -141,6 +157,8 @@ import AuditLogs from './audit_logs';
           actionTextPieces: document.querySelectorAll('.js-file-fork-suggestion-section-action'),
         })
           .init();
+
+        initBlobEE();
       }
 
       const filteredSearchEnabled = gl.FilteredSearchManager && document.querySelector('.filtered-search');
@@ -213,7 +231,6 @@ import AuditLogs from './audit_logs';
           break;
         case 'explore:groups:index':
           new GroupsList();
-
           const landingElement = document.querySelector('.js-explore-groups-landing');
           if (!landingElement) break;
           const exploreGroupsLanding = new Landing(
@@ -255,6 +272,19 @@ import AuditLogs from './audit_logs';
           new gl.IssuableTemplateSelectors();
           break;
         case 'projects:merge_requests:creations:new':
+          const mrNewCompareNode = document.querySelector('.js-merge-request-new-compare');
+          if (mrNewCompareNode) {
+            new Compare({
+              targetProjectUrl: mrNewCompareNode.dataset.targetProjectUrl,
+              sourceBranchUrl: mrNewCompareNode.dataset.sourceBranchUrl,
+              targetBranchUrl: mrNewCompareNode.dataset.targetBranchUrl,
+            });
+          } else {
+            const mrNewSubmitNode = document.querySelector('.js-merge-request-new-submit');
+            new MergeRequest({
+              action: mrNewSubmitNode.dataset.mrSubmitAction,
+            });
+          }
         case 'projects:merge_requests:creations:diffs':
         case 'projects:merge_requests:edit':
           new gl.Diff();
@@ -294,8 +324,14 @@ import AuditLogs from './audit_logs';
           new gl.Diff();
           shortcut_handler = new ShortcutsIssuable(true);
           new ZenMode();
+
           initIssuableSidebar();
           initNotes();
+
+          const mrShowNode = document.querySelector('.merge-request');
+          window.mergeRequest = new MergeRequest({
+            action: mrShowNode.dataset.mrAction,
+          });
           break;
         case 'dashboard:activity':
           new gl.Activities();
@@ -325,9 +361,7 @@ import AuditLogs from './audit_logs';
           CommitsList.init(document.querySelector('.js-project-commits-show').dataset.commitsLimit);
           new gl.Activities();
           shortcut_handler = new ShortcutsNavigation();
-          break;
-        case 'projects:edit':
-          new UsersSelect();
+          GpgBadges.fetch();
           break;
         case 'projects:imports:show':
           new ProjectImport();
@@ -341,9 +375,18 @@ import AuditLogs from './audit_logs';
           if ($('.blob-viewer').length) {
             new BlobViewer();
           }
+          initGeoInfoModal();
           break;
         case 'projects:edit':
+          new UsersSelect();
+          new GroupsSelect();
           setupProjectEdit();
+          // Initialize expandable settings panels
+          initSettingsPanels();
+          new UsersSelect();
+          break;
+        case 'projects:imports:show':
+          new ProjectImport();
           break;
         case 'projects:pipelines:new':
           new NewBranchForm($('.js-new-pipeline-form'));
@@ -515,8 +558,25 @@ import AuditLogs from './audit_logs';
         case 'admin:impersonation_tokens:index':
           new gl.DueDateSelectors();
           break;
+        case 'admin:licenses:new':
+          const $licenseFile = $('.license-file');
+          const $licenseKey = $('.license-key');
+
+          const showLicenseType = () => {
+            const $checkedFile = $('input[name="license_type"]:checked').val() === 'file';
+
+            $licenseFile.toggle($checkedFile);
+            $licenseKey.toggle(!$checkedFile);
+          };
+
+          $('input[name="license_type"]').on('change', showLicenseType);
+          showLicenseType();
+          break;
+        case 'groups:analytics:show':
+          initGroupAnalytics();
+          break;
       }
-      switch (path.first()) {
+      switch (path[0]) {
         case 'sessions':
         case 'omniauth_callbacks':
           if (!gon.u2f) break;
@@ -616,6 +676,13 @@ import AuditLogs from './audit_logs';
             case 'repository':
               shortcut_handler = new ShortcutsNavigation();
           }
+          break;
+        case 'users':
+          const action = path[1];
+          import(/* webpackChunkName: 'user_profile' */ './users')
+            .then(user => user.default(action))
+            .catch(() => {});
+          break;
       }
       // If we haven't installed a custom shortcut handler, install the default one
       if (!shortcut_handler) {
@@ -642,4 +709,8 @@ import AuditLogs from './audit_logs';
 
     return Dispatcher;
   })();
+
+  $(function() {
+    new Dispatcher();
+  });
 }).call(window);

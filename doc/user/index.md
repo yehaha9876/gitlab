@@ -66,10 +66,15 @@ For more use cases please check our [Technical Articles](../articles/index.md).
 
 ## Projects
 
-In GitLab, you can create projects for numerous reasons, such as, host
+In GitLab, you can create [projects](project/index.md) for numerous reasons, such as, host
 your code, use it as an issue tracker, collaborate on code, and continuously
 build, test, and deploy your app with built-in GitLab CI/CD. Or, you can do
 it all at once, from one single project.
+
+### Repository
+
+Host your codebase in [GitLab repositories](project/repository/index.md) with version control
+and as part of a fully integrated platform.
 
 ### Issues
 
@@ -121,8 +126,8 @@ Groups can also be nested in [subgroups](group/subgroups/index.md).
 There is a lot you can customize and configure
 to enjoy the best of GitLab.
 
-Manage your user settings to change your personal info,
-personal access tokens, authorized applications, integrations, etc.
+[Manage your user settings](profile/index.md) to change your personal info,
+personal access tokens, authorized applications, etc.
 
 ### Authentication
 

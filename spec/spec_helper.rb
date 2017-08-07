@@ -29,6 +29,9 @@ end
 # require rainbow gem String monkeypatch, so we can test SystemChecks
 require 'rainbow/ext/string'
 
+# EE specific support
+Dir[Rails.root.join("spec/ee/support/**/*.rb")].each { |f| require f }
+
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
@@ -49,7 +52,7 @@ RSpec.configure do |config|
   config.include SearchHelpers, type: :feature
   config.include WaitForRequests, :js
   config.include StubConfiguration
-  config.include EmailHelpers, type: :mailer
+  config.include EmailHelpers, :mailer, type: :mailer
   config.include TestEnv
   config.include ActiveJob::TestHelper
   config.include ActiveSupport::Testing::TimeHelpers
@@ -59,6 +62,9 @@ RSpec.configure do |config|
   config.include Gitlab::Routing, type: :routing
   config.include MigrationsHelpers, :migration
   config.include StubFeatureFlags
+  config.include StubENV
+
+  # EE only
   config.include EE::LicenseHelpers
   config.include Rails.application.routes.url_helpers, type: :routing
 
@@ -99,6 +105,10 @@ RSpec.configure do |config|
     RequestStore.clear!
   end
 
+  config.before(:example, :mailer) do
+    reset_delivered_emails!
+  end
+
   if ENV['CI']
     config.around(:each) do |ex|
       ex.run_with_retry retry: 2
@@ -135,10 +145,14 @@ RSpec.configure do |config|
   config.before(:example, :migration) do
     ActiveRecord::Migrator
       .migrate(migrations_paths, previous_migration.version)
+
+    ActiveRecord::Base.descendants.each(&:reset_column_information)
   end
 
   config.after(:example, :migration) do
     ActiveRecord::Migrator.migrate(migrations_paths)
+
+    ActiveRecord::Base.descendants.each(&:reset_column_information)
   end
 
   config.around(:each, :nested_groups) do |example|

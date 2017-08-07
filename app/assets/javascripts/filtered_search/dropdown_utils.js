@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import FilteredSearchContainer from './container';
 
 class DropdownUtils {
@@ -46,31 +47,6 @@ class DropdownUtils {
     const match = title.indexOf(`${symbol}${value}`) !== -1;
 
     updatedItem.droplab_hidden = !match && !matchWithoutSymbol;
-
-    return updatedItem;
-  }
-
-  static filterHint(config, item) {
-    const { input, allowedKeys } = config;
-    const updatedItem = item;
-    const searchInput = gl.DropdownUtils.getSearchQuery(input);
-    const { lastToken, tokens } =
-      gl.FilteredSearchTokenizer.processTokens(searchInput, allowedKeys);
-    const lastKey = lastToken.key || lastToken || '';
-    const allowMultiple = item.type === 'array';
-    const itemInExistingTokens = tokens.some(t => t.key === item.hint);
-
-    if (!allowMultiple && itemInExistingTokens) {
-      updatedItem.droplab_hidden = true;
-    } else if (!lastKey || searchInput.split('').last() === ' ') {
-      updatedItem.droplab_hidden = false;
-    } else if (lastKey) {
-      const split = lastKey.split(':');
-      const tokenName = split[0].split(' ').last();
-
-      const match = updatedItem.hint.indexOf(tokenName.toLowerCase()) === -1;
-      updatedItem.droplab_hidden = tokenName ? match : false;
-    }
 
     return updatedItem;
   }
@@ -133,6 +109,31 @@ class DropdownUtils {
     results.preprocessed = true;
 
     return results;
+  }
+
+  static filterHint(config, item) {
+    const { input, allowedKeys } = config;
+    const updatedItem = item;
+    const searchInput = gl.DropdownUtils.getSearchQuery(input);
+    const { lastToken, tokens } =
+      gl.FilteredSearchTokenizer.processTokens(searchInput, allowedKeys);
+    const lastKey = lastToken.key || lastToken || '';
+    const allowMultiple = item.type === 'array';
+    const itemInExistingTokens = tokens.some(t => t.key === item.hint);
+
+    if (!allowMultiple && itemInExistingTokens) {
+      updatedItem.droplab_hidden = true;
+    } else if (!lastKey || _.last(searchInput.split('')) === ' ') {
+      updatedItem.droplab_hidden = false;
+    } else if (lastKey) {
+      const split = lastKey.split(':');
+      const tokenName = _.last(split[0].split(' '));
+
+      const match = updatedItem.hint.indexOf(tokenName.toLowerCase()) === -1;
+      updatedItem.droplab_hidden = tokenName ? match : false;
+    }
+
+    return updatedItem;
   }
 
   static setDataValueIfSelected(filter, selected) {

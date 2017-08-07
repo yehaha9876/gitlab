@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170726111039) do
+ActiveRecord::Schema.define(version: 20170803130232) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -313,19 +313,6 @@ ActiveRecord::Schema.define(version: 20170726111039) do
   add_index "ci_builds", ["updated_at"], name: "index_ci_builds_on_updated_at", using: :btree
   add_index "ci_builds", ["user_id"], name: "index_ci_builds_on_user_id", using: :btree
 
-  create_table "ci_pipeline_schedule_variables", force: :cascade do |t|
-    t.string "key", null: false
-    t.text "value"
-    t.text "encrypted_value"
-    t.string "encrypted_value_salt"
-    t.string "encrypted_value_iv"
-    t.integer "pipeline_schedule_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  add_index "ci_pipeline_schedule_variables", ["pipeline_schedule_id", "key"], name: "index_ci_pipeline_schedule_variables_on_schedule_id_and_key", unique: true, using: :btree
-
   create_table "ci_group_variables", force: :cascade do |t|
     t.string "key", null: false
     t.text "value"
@@ -339,6 +326,19 @@ ActiveRecord::Schema.define(version: 20170726111039) do
   end
 
   add_index "ci_group_variables", ["group_id", "key"], name: "index_ci_group_variables_on_group_id_and_key", unique: true, using: :btree
+
+  create_table "ci_pipeline_schedule_variables", force: :cascade do |t|
+    t.string "key", null: false
+    t.text "value"
+    t.text "encrypted_value"
+    t.string "encrypted_value_salt"
+    t.string "encrypted_value_iv"
+    t.integer "pipeline_schedule_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "ci_pipeline_schedule_variables", ["pipeline_schedule_id", "key"], name: "index_ci_pipeline_schedule_variables_on_schedule_id_and_key", unique: true, using: :btree
 
   create_table "ci_pipeline_schedules", force: :cascade do |t|
     t.string "description"
@@ -701,6 +701,36 @@ ActiveRecord::Schema.define(version: 20170726111039) do
     t.datetime "updated_at"
   end
 
+  create_table "gpg_keys", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.binary "primary_keyid"
+    t.binary "fingerprint"
+    t.text "key"
+  end
+
+  add_index "gpg_keys", ["fingerprint"], name: "index_gpg_keys_on_fingerprint", unique: true, using: :btree
+  add_index "gpg_keys", ["primary_keyid"], name: "index_gpg_keys_on_primary_keyid", unique: true, using: :btree
+  add_index "gpg_keys", ["user_id"], name: "index_gpg_keys_on_user_id", using: :btree
+
+  create_table "gpg_signatures", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "project_id"
+    t.integer "gpg_key_id"
+    t.boolean "valid_signature"
+    t.binary "commit_sha"
+    t.binary "gpg_key_primary_keyid"
+    t.text "gpg_key_user_name"
+    t.text "gpg_key_user_email"
+  end
+
+  add_index "gpg_signatures", ["commit_sha"], name: "index_gpg_signatures_on_commit_sha", unique: true, using: :btree
+  add_index "gpg_signatures", ["gpg_key_id"], name: "index_gpg_signatures_on_gpg_key_id", using: :btree
+  add_index "gpg_signatures", ["gpg_key_primary_keyid"], name: "index_gpg_signatures_on_gpg_key_primary_keyid", using: :btree
+  add_index "gpg_signatures", ["project_id"], name: "index_gpg_signatures_on_project_id", using: :btree
+
   create_table "identities", force: :cascade do |t|
     t.string "extern_uid"
     t.string "provider"
@@ -786,12 +816,13 @@ ActiveRecord::Schema.define(version: 20170726111039) do
   add_index "issues", ["assignee_id"], name: "index_issues_on_assignee_id", using: :btree
   add_index "issues", ["author_id"], name: "index_issues_on_author_id", using: :btree
   add_index "issues", ["confidential"], name: "index_issues_on_confidential", using: :btree
-  add_index "issues", ["created_at"], name: "index_issues_on_created_at", using: :btree
   add_index "issues", ["deleted_at"], name: "index_issues_on_deleted_at", using: :btree
   add_index "issues", ["description"], name: "index_issues_on_description_trigram", using: :gin, opclasses: {"description"=>"gin_trgm_ops"}
-  add_index "issues", ["due_date"], name: "index_issues_on_due_date", using: :btree
   add_index "issues", ["milestone_id"], name: "index_issues_on_milestone_id", using: :btree
+  add_index "issues", ["project_id", "created_at", "id", "state"], name: "index_issues_on_project_id_and_created_at_and_id_and_state", using: :btree
+  add_index "issues", ["project_id", "due_date", "id", "state"], name: "index_issues_on_project_id_and_due_date_and_id_and_state", using: :btree
   add_index "issues", ["project_id", "iid"], name: "index_issues_on_project_id_and_iid", unique: true, using: :btree
+  add_index "issues", ["project_id", "updated_at", "id", "state"], name: "index_issues_on_project_id_and_updated_at_and_id_and_state", using: :btree
   add_index "issues", ["relative_position"], name: "index_issues_on_relative_position", using: :btree
   add_index "issues", ["state"], name: "index_issues_on_state", using: :btree
   add_index "issues", ["title"], name: "index_issues_on_title_trigram", using: :gin, opclasses: {"title"=>"gin_trgm_ops"}
@@ -951,6 +982,7 @@ ActiveRecord::Schema.define(version: 20170726111039) do
     t.text "new_path", null: false
     t.text "old_path", null: false
     t.text "diff", null: false
+    t.boolean "binary"
   end
 
   add_index "merge_request_diff_files", ["merge_request_diff_id", "relative_order"], name: "index_merge_request_diff_files_on_mr_diff_id_and_order", unique: true, using: :btree
@@ -1164,7 +1196,6 @@ ActiveRecord::Schema.define(version: 20170726111039) do
     t.integer "level", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "events"
     t.boolean "new_note"
     t.boolean "new_issue"
     t.boolean "reopen_issue"
@@ -1914,8 +1945,8 @@ ActiveRecord::Schema.define(version: 20170726111039) do
   add_foreign_key "ci_builds", "ci_pipelines", column: "auto_canceled_by_id", name: "fk_a2141b1522", on_delete: :nullify
   add_foreign_key "ci_builds", "ci_stages", column: "stage_id", name: "fk_3a9eaa254d", on_delete: :cascade
   add_foreign_key "ci_builds", "projects", name: "fk_befce0568a", on_delete: :cascade
-  add_foreign_key "ci_pipeline_schedule_variables", "ci_pipeline_schedules", column: "pipeline_schedule_id", name: "fk_41c35fda51", on_delete: :cascade
   add_foreign_key "ci_group_variables", "namespaces", column: "group_id", name: "fk_33ae4d58d8", on_delete: :cascade
+  add_foreign_key "ci_pipeline_schedule_variables", "ci_pipeline_schedules", column: "pipeline_schedule_id", name: "fk_41c35fda51", on_delete: :cascade
   add_foreign_key "ci_pipeline_schedules", "projects", name: "fk_8ead60fcc4", on_delete: :cascade
   add_foreign_key "ci_pipeline_schedules", "users", column: "owner_id", name: "fk_9ea99f58d2", on_delete: :nullify
   add_foreign_key "ci_pipeline_variables", "ci_pipelines", column: "pipeline_id", name: "fk_f29c5f4380", on_delete: :cascade
@@ -1946,6 +1977,9 @@ ActiveRecord::Schema.define(version: 20170726111039) do
   add_foreign_key "geo_repository_renamed_events", "projects", on_delete: :cascade
   add_foreign_key "geo_repository_updated_events", "projects", on_delete: :cascade
   add_foreign_key "index_statuses", "projects", name: "fk_74b2492545", on_delete: :cascade
+  add_foreign_key "gpg_keys", "users", on_delete: :cascade
+  add_foreign_key "gpg_signatures", "gpg_keys", on_delete: :nullify
+  add_foreign_key "gpg_signatures", "projects", on_delete: :cascade
   add_foreign_key "issue_assignees", "issues", name: "fk_b7d881734a", on_delete: :cascade
   add_foreign_key "issue_assignees", "users", name: "fk_5e0c8d9154", on_delete: :cascade
   add_foreign_key "issue_links", "issues", column: "source_id", name: "fk_c900194ff2", on_delete: :cascade

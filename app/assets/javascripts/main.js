@@ -16,9 +16,6 @@ import 'mousetrap';
 import 'mousetrap/plugins/pause/mousetrap-pause';
 import 'vendor/fuzzaldrin-plus';
 
-// extensions
-import './extensions/array';
-
 // expose common libraries as globals (TODO: remove these)
 window.jQuery = jQuery;
 window.$ = jQuery;
@@ -36,9 +33,6 @@ import './shortcuts_find_file';
 import './shortcuts_issuable';
 import './shortcuts_network';
 
-// behaviors
-import './behaviors/';
-
 // templates
 import './templates/issuable_template_selector';
 import './templates/issuable_template_selectors';
@@ -55,6 +49,9 @@ import './lib/utils/datetime_utility';
 import './lib/utils/pretty_time';
 import './lib/utils/text_utility';
 import './lib/utils/url_utility';
+
+// behaviors
+import './behaviors/';
 
 // u2f
 import './u2f/authenticate';
@@ -86,7 +83,6 @@ import './copy_as_gfm';
 import './copy_to_clipboard';
 import './create_label';
 import './diff';
-import './dispatcher';
 import './dropzone_input';
 import './due_date_select';
 import './files_comment_button';
@@ -158,14 +154,20 @@ import './ldap_groups_select';
 import './path_locks';
 import './weight_select';
 
+import './dispatcher';
+
 // eslint-disable-next-line global-require, import/no-commonjs
 if (process.env.NODE_ENV !== 'production') require('./test_utils/');
+
+Dropzone.autoDiscover = false;
 
 document.addEventListener('beforeunload', function () {
   // Unbind scroll events
   $(document).off('scroll');
   // Close any open tooltips
   $('.has-tooltip, [data-toggle="tooltip"]').tooltip('destroy');
+  // Close any open popover
+  $('[data-toggle="popover"]').popover('destroy');
 });
 
 window.addEventListener('hashchange', gl.utils.handleLocationHash);
@@ -253,6 +255,11 @@ $(function () {
     placement: function (tip, el) {
       return $(el).data('placement') || 'bottom';
     }
+  });
+  // Initialize popovers
+  $body.popover({
+    selector: '[data-toggle="popover"]',
+    trigger: 'focus'
   });
   $('.trigger-submit').on('change', function () {
     return $(this).parents('form').submit();

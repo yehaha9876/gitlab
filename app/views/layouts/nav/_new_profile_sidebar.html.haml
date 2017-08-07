@@ -65,6 +65,12 @@
           = custom_icon('key')
         %span.nav-item-name
           SSH Keys
+    = nav_link(controller: :gpg_keys) do
+      = link_to profile_gpg_keys_path, title: 'GPG Keys' do
+        .nav-icon-container
+          = custom_icon('key_2')
+        %span.nav-item-name
+          GPG Keys
     = nav_link(controller: :preferences) do
       = link_to profile_preferences_path, title: 'Preferences' do
         .nav-icon-container

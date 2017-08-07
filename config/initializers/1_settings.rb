@@ -1,5 +1,4 @@
 require_dependency Rails.root.join('lib/gitlab') # Load Gitlab as soon as possible
-require_dependency Rails.root.join('lib/ee') # Load EE as soon as possible
 
 class Settings < Settingslogic
   source ENV.fetch('GITLAB_CONFIG') { "#{Rails.root}/config/gitlab.yml" }
@@ -179,6 +178,24 @@ if Settings.ldap['enabled'] || Rails.env.test?
     server['external_groups'] = [] if server['external_groups'].nil?
     server['sync_ssh_keys'] = 'sshPublicKey' if server['sync_ssh_keys'].to_s == 'true'
     Settings.ldap['servers'][key] = server
+
+    # For backwards compatibility
+    server['encryption'] ||= server['method']
+    server['encryption'] = 'simple_tls' if server['encryption'] == 'ssl'
+    server['encryption'] = 'start_tls' if server['encryption'] == 'tls'
+
+    # Certificates are not verified for backwards compatibility.
+    # This default should be flipped to true in 9.5.
+    if server['verify_certificates'].nil?
+      server['verify_certificates'] = false
+
+      message = <<-MSG.strip_heredoc
+        LDAP SSL certificate verification is disabled for backwards-compatibility.
+        Please add the "verify_certificates" option to gitlab.yml for each LDAP
+        server. Certificate verification will be enabled by default in GitLab 9.5.
+      MSG
+      Rails.logger.warn(message)
+    end
   end
 end
 
@@ -239,7 +256,7 @@ Settings.gitlab['default_can_create_group'] = true if Settings.gitlab['default_c
 Settings.gitlab['host']       ||= ENV['GITLAB_HOST'] || 'localhost'
 Settings.gitlab['ssh_host']   ||= Settings.gitlab.host
 Settings.gitlab['https']        = false if Settings.gitlab['https'].nil?
-Settings.gitlab['port']       ||= Settings.gitlab.https ? 443 : 80
+Settings.gitlab['port']       ||= ENV['GITLAB_PORT'] || (Settings.gitlab.https ? 443 : 80)
 Settings.gitlab['relative_url_root'] ||= ENV['RAILS_RELATIVE_URL_ROOT'] || ''
 Settings.gitlab['protocol'] ||= Settings.gitlab.https ? "https" : "http"
 Settings.gitlab['email_enabled'] ||= true if Settings.gitlab['email_enabled'].nil?
@@ -518,10 +535,6 @@ Settings.backup['pg_schema']    = nil
 Settings.backup['path']         = Settings.absolute(Settings.backup['path'] || "tmp/backups/")
 Settings.backup['archive_permissions'] ||= 0600
 Settings.backup['upload'] ||= Settingslogic.new({ 'remote_directory' => nil, 'connection' => nil })
-# Convert upload connection settings to use symbol keys, to make Fog happy
-if Settings.backup['upload']['connection']
-  Settings.backup['upload']['connection'] = Hash[Settings.backup['upload']['connection'].map { |k, v| [k.to_sym, v] }]
-end
 Settings.backup['upload']['multipart_chunk_size'] ||= 104857600
 Settings.backup['upload']['encryption'] ||= nil
 Settings.backup['upload']['storage_class'] ||= nil

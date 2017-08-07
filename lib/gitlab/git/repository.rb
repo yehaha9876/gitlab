@@ -168,20 +168,13 @@ module Gitlab
       #
       # Gitaly migration: https://gitlab.com/gitlab-org/gitaly/issues/390
       def tags
-        rugged.references.each("refs/tags/*").map do |ref|
-          message = nil
-
-          if ref.target.is_a?(Rugged::Tag::Annotation)
-            tag_message = ref.target.message
-
-            if tag_message.respond_to?(:chomp)
-              message = tag_message.chomp
-            end
+        gitaly_migrate(:tags) do |is_enabled|
+          if is_enabled
+            tags_from_gitaly
+          else
+            tags_from_rugged
           end
-
-          target_commit = Gitlab::Git::Commit.find(self, ref.target)
-          Gitlab::Git::Tag.new(self, ref.name, ref.target, target_commit, message)
-        end.sort_by(&:name)
+        end
       end
 
       # Returns true if the given tag exists
@@ -307,17 +300,14 @@ module Gitlab
         raw_log(options).map { |c| Commit.decorate(c) }
       end
 
-      # Gitaly migration: https://gitlab.com/gitlab-org/gitaly/issues/382
       def count_commits(options)
-        cmd = %W[#{Gitlab.config.git.bin_path} --git-dir=#{path} rev-list]
-        cmd << "--after=#{options[:after].iso8601}" if options[:after]
-        cmd << "--before=#{options[:before].iso8601}" if options[:before]
-        cmd += %W[--count #{options[:ref]}]
-        cmd += %W[-- #{options[:path]}] if options[:path].present?
-
-        raw_output = IO.popen(cmd) { |io| io.read }
-
-        raw_output.to_i
+        gitaly_migrate(:count_commits) do |is_enabled|
+          if is_enabled
+            count_commits_by_gitaly(options)
+          else
+            count_commits_by_shelling_out(options)
+          end
+        end
       end
 
       def sha_from_ref(ref)
@@ -650,6 +640,33 @@ module Gitlab
         @attributes.attributes(path)
       end
 
+      def languages(ref = nil)
+        Gitlab::GitalyClient.migrate(:commit_languages) do |is_enabled|
+          if is_enabled
+            gitaly_commit_client.languages(ref)
+          else
+            ref ||= rugged.head.target_id
+            languages = Linguist::Repository.new(rugged, ref).languages
+            total = languages.map(&:last).sum
+
+            languages = languages.map do |language|
+              name, share = language
+              color = Linguist::Language[name].color || "##{Digest::SHA256.hexdigest(name)[0...6]}"
+              {
+                value: (share.to_f * 100 / total).round(2),
+                label: name,
+                color: color,
+                highlight: color
+              }
+            end
+
+            languages.sort do |x, y|
+              y[:value] <=> x[:value]
+            end
+          end
+        end
+      end
+
       def gitaly_repository
         Gitlab::GitalyClient::Util.repository(@storage, @relative_path)
       end
@@ -962,6 +979,43 @@ module Gitlab
         else
           branches
         end
+      end
+
+      def tags_from_rugged
+        rugged.references.each("refs/tags/*").map do |ref|
+          message = nil
+
+          if ref.target.is_a?(Rugged::Tag::Annotation)
+            tag_message = ref.target.message
+
+            if tag_message.respond_to?(:chomp)
+              message = tag_message.chomp
+            end
+          end
+
+          target_commit = Gitlab::Git::Commit.find(self, ref.target)
+          Gitlab::Git::Tag.new(self, ref.name, ref.target, target_commit, message)
+        end.sort_by(&:name)
+      end
+
+      def tags_from_gitaly
+        gitaly_ref_client.tags
+      end
+
+      def count_commits_by_gitaly(options)
+        gitaly_commit_client.commit_count(options[:ref], options)
+      end
+
+      def count_commits_by_shelling_out(options)
+        cmd = %W[#{Gitlab.config.git.bin_path} --git-dir=#{path} rev-list]
+        cmd << "--after=#{options[:after].iso8601}" if options[:after]
+        cmd << "--before=#{options[:before].iso8601}" if options[:before]
+        cmd += %W[--count #{options[:ref]}]
+        cmd += %W[-- #{options[:path]}] if options[:path].present?
+
+        raw_output = IO.popen(cmd) { |io| io.read }
+
+        raw_output.to_i
       end
 
       def gitaly_migrate(method, &block)
