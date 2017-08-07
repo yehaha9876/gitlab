@@ -151,6 +151,7 @@ ActiveRecord::Schema.define(version: 20170811203342) do
     t.boolean "password_authentication_enabled"
     t.boolean "allow_group_owners_to_manage_ldap", default: true, null: false
     t.boolean "project_export_enabled", default: true, null: false
+    t.boolean "hashed_storage_enabled", default: false, null: false
   end
 
   create_table "approvals", force: :cascade do |t|
