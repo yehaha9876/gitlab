@@ -1,6 +1,6 @@
 module Gitlab
   module Elastic
-    class SnippetProcessor
+    class CodeSnippet
       def initialize(document, snippet)
         @document = document
         @snippet = snippet
@@ -8,8 +8,15 @@ module Gitlab
 
       def startline
         index = @document.rindex(clean_snippet)
-        # byebug if index.nil?
         @document[0, index].count("\n") + 1
+      end
+
+      def line_range
+        startline..last_line_number
+      end
+
+      def last_line_number
+        startline + snippet_processed.count("\n") + 1
       end
 
       # Returns the origin snippet without any highlight tags
@@ -26,7 +33,7 @@ module Gitlab
 
       # Removes a first line if it does not have the highlight tags
       # It's needed because ES can return non-complite code line which is
-      # unthinkable to keep as is. We should treat code lines as atomic entitties.
+      # unthinkable to keep as is. We should treat code lines as atomic entities.
       def snippet_processed
         @snippet_processed ||= @snippet.sub(/\A((?!gitlabelasticsearch→).)*[\n\r]/, '')
       end

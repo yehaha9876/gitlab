@@ -1,6 +1,12 @@
 module Gitlab
   module Elastic
     class SearchResults
+      # There is probability that we have one huge line where there is a huge number of
+      # highlighted snippets. To not have any performance problems we need to limit the number
+      # of snippets we will consider as all the calculation related to snippets is
+      # pretty expensive.
+      MAX_SNIPPETS_TO_CONSIDER = 10
+
       attr_reader :current_user, :query, :public_and_internal_projects
 
       # Limit search results by passed project ids
@@ -77,22 +83,25 @@ module Gitlab
         highlighted_content = result['highlight']['blob.content']
         blobs_found_by_filename = result['highlight']['blob.file_name']
         found_file = { filename: filename, ref: ref, blobs: []}
-        
+
         if highlighted_content
-          found_file[:blobs] = highlighted_content.map do |snippet|
-            snippet_processor = ::Gitlab::Elastic::SnippetProcessor.new(content, snippet)
-            
+          # byebug
+          snippets = highlighted_content.take(MAX_SNIPPETS_TO_CONSIDER).map{ |s| ::Gitlab::Elastic::CodeSnippet.new(content, s)}
+
+          snippets = ::Gitlab::Elastic::CodeSnippetCollection.new(snippets).order.remove_overlapped_snippets
+
+          found_file[:blobs] = snippets.map do |snippet|
             ::Gitlab::SearchResults::FoundBlob.new(
               filename: filename,
               basename: basename,
               ref: ref,
-              startline: snippet_processor.startline,
-              data: snippet_processor.clean_snippet,
-              highlighted_terms: snippet_processor.highlighted_terms
+              startline: snippet.startline,
+              data: snippet.clean_snippet,
+              highlighted_terms: snippet.highlighted_terms
             )
           end
         end
-        
+
         if blobs_found_by_filename
           found_file[:blobs] << ::Gitlab::SearchResults::FoundBlob.new(
               filename: filename,
