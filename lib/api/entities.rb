@@ -69,7 +69,6 @@ module API
       expose :job_events
     end
 
-<<<<<<< HEAD
     class ProjectPushRule < Grape::Entity
       expose :id, :project_id, :created_at
       expose :commit_message_regex, :branch_name_regex, :deny_delete_tag
@@ -84,8 +83,6 @@ module API
       expose :path, :path_with_namespace
     end
 
-=======
->>>>>>> ce/9-5-stable
     class SharedGroup < Grape::Entity
       expose :group_id
       expose :group_name do |group_link, options|
@@ -103,7 +100,7 @@ module API
       expose :created_at, :last_activity_at
     end
 
-    class Project < BasicProjectDetails 
+    class Project < BasicProjectDetails
       include ::API::Helpers::RelatedResourcesHelpers
 
       expose :_links do
