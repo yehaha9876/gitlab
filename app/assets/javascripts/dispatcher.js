@@ -81,17 +81,12 @@ import GpgBadges from './gpg_badges';
 import initNotes from './init_notes';
 import initLegacyFilters from './init_legacy_filters';
 import initIssuableSidebar from './init_issuable_sidebar';
-<<<<<<< HEAD
-
+import UserFeatureHelper from './helpers/user_feature_helper';
 // EE-only
 import ApproversSelect from './approvers_select';
 import AuditLogs from './audit_logs';
 import initGeoInfoModal from './init_geo_info_modal';
 import initGroupAnalytics from './init_group_analytics';
-=======
-import GpgBadges from './gpg_badges';
-import UserFeatureHelper from './helpers/user_feature_helper';
->>>>>>> ce/9-5-stable
 
 (function() {
   var Dispatcher;
@@ -375,20 +370,10 @@ import UserFeatureHelper from './helpers/user_feature_helper';
         case 'projects:show':
           shortcut_handler = new ShortcutsNavigation();
           new NotificationsForm();
-<<<<<<< HEAD
-          if ($('#tree-slider').length) {
-            new TreeView();
-          }
-          if ($('.blob-viewer').length) {
-            new BlobViewer();
-          }
-          initGeoInfoModal();
-=======
-
           if ($('#tree-slider').length) new TreeView();
           if ($('.blob-viewer').length) new BlobViewer();
           if ($('.project-show-activity').length) new gl.Activities();
->>>>>>> ce/9-5-stable
+          initGeoInfoModal();
           break;
         case 'projects:edit':
           new UsersSelect();

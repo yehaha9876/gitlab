@@ -41,12 +41,9 @@ linters:
   ImplicitDiv:
     enabled: true
 
-<<<<<<< HEAD
-=======
   InlineJavaScript:
     enabled: true
 
->>>>>>> ce/9-5-stable
   InlineStyles:
     enabled: false
 

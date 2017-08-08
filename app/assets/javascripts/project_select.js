@@ -103,16 +103,11 @@ import ProjectSelectComboButton from './project_select_combo_button';
               }
             };
           })(this),
-<<<<<<< HEAD
-          id: function (project) {
-            return project[idAttribute];
-=======
           id: function(project) {
             return JSON.stringify({
               name: project.name,
               url: project.web_url,
             });
->>>>>>> ce/9-5-stable
           },
           text: function (project) {
             return project.name_with_namespace || project.name;
