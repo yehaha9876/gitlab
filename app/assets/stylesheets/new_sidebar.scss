@@ -15,13 +15,9 @@ $new-sidebar-width: 220px;
 $new-sidebar-collapsed-width: 50px;
 
 .page-with-new-sidebar {
-<<<<<<< HEAD
-  padding-left: $new-sidebar-collapsed-width;
-=======
   @media (min-width: $screen-md-min) {
     padding-left: $new-sidebar-collapsed-width;
   }
->>>>>>> ce/9-5-stable
 
   @media (min-width: $screen-lg-min) {
     padding-left: $new-sidebar-width;
@@ -321,33 +317,19 @@ $new-sidebar-collapsed-width: 50px;
 
 // Collapsed nav
 
-<<<<<<< HEAD
-.toggle-sidebar-button {
-=======
 .toggle-sidebar-button,
 .close-nav-button {
->>>>>>> ce/9-5-stable
   width: $new-sidebar-width - 2px;
   position: fixed;
   bottom: 0;
   padding: 16px;
   background-color: $gray-normal;
-<<<<<<< HEAD
-=======
   border: 0;
->>>>>>> ce/9-5-stable
   border-top: 2px solid $border-color;
   color: $gl-text-color-secondary;
   display: flex;
   align-items: center;
 
-<<<<<<< HEAD
-  @media (max-width: $screen-xs-max) {
-    display: none;
-  }
-
-=======
->>>>>>> ce/9-5-stable
   i {
     font-size: 20px;
     margin-right: 8px;
@@ -363,8 +345,6 @@ $new-sidebar-collapsed-width: 50px;
   }
 }
 
-<<<<<<< HEAD
-=======
 .toggle-sidebar-button {
   @media (max-width: $screen-xs-max) {
     display: none;
@@ -372,7 +352,6 @@ $new-sidebar-collapsed-width: 50px;
 }
 
 
->>>>>>> ce/9-5-stable
 .sidebar-icons-only {
   .context-header {
     height: 60px;
@@ -404,10 +383,7 @@ $new-sidebar-collapsed-width: 50px;
 
   .toggle-sidebar-button {
     width: $new-sidebar-collapsed-width - 2px;
-<<<<<<< HEAD
-=======
     padding: 16px 18px;
->>>>>>> ce/9-5-stable
 
     .collapse-text,
     .fa-angle-double-left {
@@ -423,13 +399,10 @@ $new-sidebar-collapsed-width: 50px;
 
 // Mobile nav
 
-<<<<<<< HEAD
-=======
 .close-nav-button {
   display: none;
 }
 
->>>>>>> ce/9-5-stable
 .toggle-mobile-nav {
   display: none;
   background-color: transparent;
