@@ -76,13 +76,6 @@ module API
       expose :file_name_regex, :max_file_size
     end
 
-    class BasicProjectDetails < Grape::Entity
-      expose :id
-      expose :http_url_to_repo, :web_url
-      expose :name, :name_with_namespace
-      expose :path, :path_with_namespace
-    end
-
     class SharedGroup < Grape::Entity
       expose :group_id
       expose :group_name do |group_link, options|
