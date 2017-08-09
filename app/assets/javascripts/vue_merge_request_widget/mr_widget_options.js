@@ -38,10 +38,7 @@ export default {
   props: {
     mrData: {
       type: Object,
-<<<<<<< HEAD
-=======
       required: false,
->>>>>>> ce/9-5-stable
     },
   },
   data() {
@@ -251,13 +248,9 @@ export default {
           :state="mr.state"
           :related-links="mr.relatedLinks" />
       </div>
-<<<<<<< HEAD
-      <div class="mr-widget-footer" v-if="shouldRenderMergeHelp">
-=======
       <div
         class="mr-widget-footer"
         v-if="shouldRenderMergeHelp">
->>>>>>> ce/9-5-stable
         <mr-widget-merge-help />
       </div>
     </div>

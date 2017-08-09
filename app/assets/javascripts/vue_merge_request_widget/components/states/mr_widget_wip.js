@@ -1,9 +1,6 @@
 /* global Flash */
 import statusIcon from '../mr_widget_status_icon';
-<<<<<<< HEAD
-=======
 import tooltip from '../../../vue_shared/directives/tooltip';
->>>>>>> ce/9-5-stable
 import eventHub from '../../event_hub';
 
 export default {
@@ -46,16 +43,11 @@ export default {
         <span class="bold">
           This is a Work in Progress
           <i
-<<<<<<< HEAD
-            class="fa fa-question-circle has-tooltip"
-            title="When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged." />
-=======
             v-tooltip
             class="fa fa-question-circle"
             title="When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged"
             aria-label="When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged">
            </i>
->>>>>>> ce/9-5-stable
         </span>
         <button
           v-if="mr.removeWIPPath"
