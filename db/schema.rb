@@ -28,14 +28,13 @@ ActiveRecord::Schema.define(version: 20170815060945) do
   end
 
   create_table "appearances", force: :cascade do |t|
-    t.string "title"
-    t.text "description"
-    t.string "logo"
-    t.integer "updated_by"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.string "title", null: false
+    t.text "description", null: false
     t.string "header_logo"
-    t.text "description_html"
+    t.string "logo"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "description_html", null: false
     t.integer "cached_markdown_version"
   end
 
