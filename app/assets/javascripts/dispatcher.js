@@ -82,6 +82,7 @@ import initNotes from './init_notes';
 import initLegacyFilters from './init_legacy_filters';
 import initIssuableSidebar from './init_issuable_sidebar';
 import UserFeatureHelper from './helpers/user_feature_helper';
+import initChangesDropdown from './init_changes_dropdown';
 // EE-only
 import ApproversSelect from './approvers_select';
 import AuditLogs from './audit_logs';
@@ -254,6 +255,7 @@ import initGroupAnalytics from './init_group_analytics';
           break;
         case 'projects:compare:show':
           new gl.Diff();
+          initChangesDropdown();
           break;
         case 'projects:branches:new':
         case 'projects:branches:create':
@@ -347,6 +349,7 @@ import initGroupAnalytics from './init_group_analytics';
             container: '.js-commit-pipeline-graph',
           }).bindEvents();
           initNotes();
+          initChangesDropdown();
           $('.commit-info.branches').load(document.querySelector('.js-commit-box').dataset.commitPath);
           break;
         case 'projects:commit:pipelines':
@@ -373,6 +376,9 @@ import initGroupAnalytics from './init_group_analytics';
           if ($('#tree-slider').length) new TreeView();
           if ($('.blob-viewer').length) new BlobViewer();
           if ($('.project-show-activity').length) new gl.Activities();
+          $('#tree-slider').waitForImages(function() {
+            gl.utils.ajaxGet(document.querySelector('.js-tree-content').dataset.logsPath);
+          });
           initGeoInfoModal();
           break;
         case 'projects:edit':
