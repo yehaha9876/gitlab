@@ -37,6 +37,7 @@ feature 'Profile > Pipeline Quota' do
 
   context 'with no projects using shared runners' do
     let(:namespace) { create(:namespace, :with_not_used_build_minutes_limit, owner: user) }
+
     let!(:project) { create(:project, namespace: namespace, shared_runners_enabled: false) }
 
     it 'shows correct group quota info' do
@@ -69,6 +70,7 @@ feature 'Profile > Pipeline Quota' do
 
   context 'minutes over quota' do
     let(:namespace) { create(:namespace, :with_used_build_minutes_limit, owner: user) }
+
     let!(:other_project) { create(:project, namespace: namespace, shared_runners_enabled: false) }
 
     it 'shows correct group quota and projects info' do
