@@ -718,7 +718,7 @@ import initGroupAnalytics from './init_group_analytics';
     return Dispatcher;
   })();
 
-  $(function() {
+  $(window).on('load', function() {
     new Dispatcher();
   });
 }).call(window);
