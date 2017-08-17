@@ -8,7 +8,6 @@ describe Groups::AnalyticsController do
   let(:project) { create(:project, :repository, group: group) }
   let(:issue) { create(:issue, project: project) }
   let(:merge_request) { create(:merge_request, :simple, source_project: project) }
-  let(:push_data) { Gitlab::DataBuilder::Push.build_sample(project, user) }
 
   def create_event(author, project, target, action)
     Event.create!(
@@ -20,9 +19,15 @@ describe Groups::AnalyticsController do
   end
 
   def create_push_event(author, project)
-    event = create_event(author, project, nil, Event::PUSHED)
-    event.data = push_data
-    event.save
+    event = create(:push_event, project: project, author: author)
+
+    create(:push_event_payload,
+           event: event,
+           commit_to: '1cf19a015df3523caf0a1f9d40c98a267d6a2fc2',
+           commit_count: 0,
+           ref: 'master')
+
+    event
   end
 
   before do
