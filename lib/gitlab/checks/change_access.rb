@@ -4,18 +4,26 @@ module Gitlab
       include PathLocksHelper
 
       ERROR_MESSAGES = {
-        push_code: 'You are not allowed to push code to this project.',
+        change_existing_tags: 'You are not allowed to change existing tags on this project.',
+        create_protected_tag: 'You are not allowed to create this tag as it is protected.',
         delete_default_branch: 'The default branch of a project cannot be deleted.',
+        delete_protected_tag: 'Protected tags cannot be deleted.',
+        file_name_blacklisted: "File name %{path} was blacklisted by the pattern %{blacklisted_regex}.",
+        file_size: "File %{path} is larger than the allowed size of %{max_file_size} MB",
         force_push_protected_branch: 'You are not allowed to force push code to a protected branch on this project.',
+        merge_protected_branch: 'You are not allowed to merge code into protected branches on this project.',
         non_master_delete_protected_branch: 'You are not allowed to delete protected branches from this project. Only a project master or owner can delete a protected branch.',
         non_web_delete_protected_branch: 'You can only delete protected branches using the web interface.',
-        merge_protected_branch: 'You are not allowed to merge code into protected branches on this project.',
+        path_lock: "The path '%{path}' is locked by %{user_name}",
+        push_code: 'You are not allowed to push code to this project.',
         push_protected_branch: 'You are not allowed to push code to protected branches on this project.',
-        change_existing_tags: 'You are not allowed to change existing tags on this project.',
-        update_protected_tag: 'Protected tags cannot be updated.',
-        delete_protected_tag: 'Protected tags cannot be deleted.',
-        create_protected_tag: 'You are not allowed to create this tag as it is protected.',
-        push_rule_branch_name: "Branch name does not follow the pattern '%{branch_name_regex}'"
+        push_rule_author_email: "Author's email '%{author_email}' does not follow the pattern '%{author_email_regex}'",
+        push_rule_author_no_member: "Author '%{author_email}' is not a member of team",
+        push_rule_branch_name: "Branch name does not follow the pattern '%{branch_name_regex}'",
+        push_rule_commit_message: "Commit message does not follow the pattern '%{commit_message_regex}'",
+        push_rule_committer_email: "Committer's email '%{committer_email}' does not follow the pattern '%{committer_email_regex}'",
+        push_rule_committer_no_member: "Committer '%{committer_email}' is not a member of team",
+        update_protected_tag: 'Protected tags cannot be updated.'
       }.freeze
 
       # protocol is currently used only in EE
@@ -194,26 +202,37 @@ module Gitlab
       # In case of errors - all other checks will be canceled and push will be rejected.
       def check_commit(commit, push_rule)
         unless push_rule.commit_message_allowed?(commit.safe_message)
-          return "Commit message does not follow the pattern '#{push_rule.commit_message_regex}'"
+          message = ERROR_MESSAGES[:push_rule_commit_message] % { commit_message_regex: push_rule.commit_message_regex }
+          return message
         end
 
         unless push_rule.author_email_allowed?(commit.committer_email)
-          return "Committer's email '#{commit.committer_email}' does not follow the pattern '#{push_rule.author_email_regex}'"
+          message = ERROR_MESSAGES[:push_rule_committer_email] % {
+            committer_email: commit.committer_email,
+            committer_email_regex: push_rule.author_email_regex
+          }
+          return message
         end
 
         unless push_rule.author_email_allowed?(commit.author_email)
-          return "Author's email '#{commit.author_email}' does not follow the pattern '#{push_rule.author_email_regex}'"
+          message = ERROR_MESSAGES[:push_rule_author_email] % {
+            author_email: commit.author_email,
+            author_email_regex: push_rule.author_email_regex
+          }
+          return message
         end
 
         # Check whether author is a GitLab member
         if push_rule.member_check
           unless User.existing_member?(commit.author_email.downcase)
-            return "Author '#{commit.author_email}' is not a member of team"
+            message = ERROR_MESSAGES[:push_rule_author_no_member] % { author_email: commit.author_email }
+            return message
           end
 
           if commit.author_email.casecmp(commit.committer_email) == -1
             unless User.existing_member?(commit.committer_email.downcase)
-              return "Committer '#{commit.committer_email}' is not a member of team"
+              message = ERROR_MESSAGES[:push_rule_committer_no_member] % { committer_email: commit.committer_email }
+              return message
             end
           end
         end
@@ -268,7 +287,8 @@ module Gitlab
           lock_info = project.find_path_lock(path)
 
           if lock_info && lock_info.user != user_access.user
-            return "The path '#{lock_info.path}' is locked by #{lock_info.user.name}"
+            message = ERROR_MESSAGES[:path_lock] % { path: lock_info.path, user_name: lock_info.user.name }
+            return message
           end
         end
       end
@@ -278,7 +298,7 @@ module Gitlab
           if (diff.renamed_file || diff.new_file) && blacklisted_regex = push_rule.filename_blacklisted?(diff.new_path)
             return nil unless blacklisted_regex.present?
 
-            "File name #{diff.new_path} was blacklisted by the pattern #{blacklisted_regex}."
+            ERROR_MESSAGES[:file_name_blacklisted] % { path: diff.new_path, blacklisted_regex: blacklisted_regex }
           end
         end
       end
@@ -289,7 +309,8 @@ module Gitlab
 
           blob = project.repository.blob_at(commit.id, diff.new_path)
           if blob && blob.size && blob.size > max_file_size.megabytes
-            return "File #{diff.new_path.inspect} is larger than the allowed size of #{max_file_size} MB"
+            message = ERROR_MESSAGES[:file_size] % { path: diff.new_path.inspect, max_file_size: max_file_size }
+            return message
           end
         end
       end
