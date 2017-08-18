@@ -92,11 +92,35 @@
             = link_to project_issues_path(@project), title: 'Issues' do
               %span
                 List
+              .feature-highlight.js-feature-highlight{ data: { trigger: 'manual', container: 'body', toggle: 'popover', animation: 'false', placement: 'right', highlight: 'issue-list' } }
+            .feature-highlight-popover-content
+              Use
+              = link_to 'Issue List', project_boards_path(@project)
+              to test this
+              %hr
+              %button.btn.btn-link.dismiss-feature-highlight{ type: 'button'}
+                Got it! Don't show this again
+                = render 'shared/icons/icon_thumbs_up.svg'
 
           = nav_link(controller: :boards) do
             = link_to project_boards_path(@project), title: 'Boards' do
               %span
                 Boards
+              .feature-highlight.js-feature-highlight{ data: { trigger: 'manual', container: 'body', toggle: 'popover', animation: 'false', placement: 'right', highlight: 'issue-boards' } }
+            .feature-highlight-popover-content
+              Use
+              = link_to 'Issue Boards', project_boards_path(@project)
+              to create customized software development workflows like
+              %strong
+                Scrum
+              or
+              %strong
+                Kanban
+              %hr
+              %button.btn.btn-link.dismiss-feature-highlight{ type: 'button'}
+                Got it! Don't show this again
+                = render 'shared/icons/icon_thumbs_up.svg'
+
 
           = nav_link(controller: :labels) do
             = link_to project_labels_path(@project), title: 'Labels' do

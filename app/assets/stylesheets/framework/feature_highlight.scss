@@ -1,0 +1,66 @@
+.feature-highlight {
+  display: none;
+  margin-left: 16px;
+  width: 8px;
+  height: 8px;
+  background-color: $blue-500;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 0 rgba(31, 120, 209, 0.4);
+  @include webkit-prefix(animation, pulse-highlight 2s infinite);
+
+  &:hover {
+    @include webkit-prefix(animation, none);
+  }
+}
+
+.feature-highlight-popover-content {
+  display: none;
+
+  hr {
+    margin: $gl-padding*0.5 0;
+  }
+
+  // Extend btn-link because it is being overriden by default
+  .btn-link {
+    @extend .btn-link;
+
+    &:hover {
+      @extend .btn-link:hover;
+    }
+
+    &:focus {
+      @extend .btn-link:focus;
+    }
+
+    &:active {
+      @extend .btn-link:active;
+    }
+
+    svg path {
+      fill: currentColor;
+    }
+  }
+
+  .dismiss-feature-highlight {
+    padding: 0;
+  }
+}
+
+.popover .feature-highlight-popover-content {
+  display: block;
+}
+
+@include keyframes(pulse-highlight) {
+  0% {
+    @include webkit-prefix(box-shadow, 0 0 0 0 rgba(31, 120, 209, 0.4));
+  }
+
+  70% {
+    @include webkit-prefix(box-shadow, 0 0 0 10px rgba(31, 120, 209, 0));
+  }
+
+  100% {
+    @include webkit-prefix(box-shadow, 0 0 0 0 rgba(31, 120, 209, 0));
+  }
+}
