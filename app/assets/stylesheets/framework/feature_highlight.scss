@@ -1,5 +1,4 @@
 .feature-highlight {
-  display: none;
   margin-left: 16px;
   width: 8px;
   height: 8px;
@@ -11,6 +10,16 @@
 
   &:hover {
     @include webkit-prefix(animation, none);
+  }
+
+  &[disabled] {
+    display: none;
+  }
+}
+
+.is-showing-fly-out {
+  .feature-highlight {
+    display: none;
   }
 }
 

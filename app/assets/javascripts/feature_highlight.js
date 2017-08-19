@@ -43,9 +43,8 @@ const initFeatureHighlight = (id) => {
   $selector.on('mouseleave', mouseleave);
   $selector.on('inserted.bs.popover', setupDismissButton);
 
-  // Override css as we are now ready to explicitly show
-  // the feature highlight
-  $selector.show();
+  // Display feature highlight
+  $selector.removeAttr('disabled')
 }
 
 const featureHighlightManager = () => {

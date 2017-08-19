@@ -92,7 +92,7 @@
             = link_to project_issues_path(@project), title: 'Issues' do
               %span
                 List
-              .feature-highlight.js-feature-highlight{ data: { trigger: 'manual', container: 'body', toggle: 'popover', animation: 'false', placement: 'right', highlight: 'issue-list' } }
+              .feature-highlight.js-feature-highlight{ disabled: true, data: { trigger: 'manual', container: 'body', toggle: 'popover', animation: 'false', placement: 'right', highlight: 'issue-list' } }
             .feature-highlight-popover-content
               Use
               = link_to 'Issue List', project_boards_path(@project)
@@ -106,7 +106,7 @@
             = link_to project_boards_path(@project), title: 'Boards' do
               %span
                 Boards
-              .feature-highlight.js-feature-highlight{ data: { trigger: 'manual', container: 'body', toggle: 'popover', animation: 'false', placement: 'right', highlight: 'issue-boards' } }
+              .feature-highlight.js-feature-highlight{ disabled: true, data: { trigger: 'manual', container: 'body', toggle: 'popover', animation: 'false', placement: 'right', highlight: 'issue-boards' } }
             .feature-highlight-popover-content
               Use
               = link_to 'Issue Boards', project_boards_path(@project)
