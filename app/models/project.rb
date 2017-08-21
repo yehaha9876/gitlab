@@ -1470,6 +1470,10 @@ class Project < ActiveRecord::Base
     Projects::ForksCountService.new(self).count
   end
 
+  def legacy_storage?
+    self.storage_version.nil?
+  end
+
   private
 
   def storage
