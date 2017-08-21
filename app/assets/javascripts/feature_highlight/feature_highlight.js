@@ -3,24 +3,34 @@ import Cookies from 'js-cookie';
 export const getCookieName = cookieId => `feature-highlighted-${cookieId}`;
 export const getSelector = highlightId => `.js-feature-highlight[data-highlight=${highlightId}]`;
 
-const dismiss = function dismiss(cookieId) {
-  Cookies.set(getCookieName(cookieId), true);
+export const showPopover = function showPopover() {
+  this.popover('show');
+  this.addClass('disable-animation');
+};
+
+export const hidePopover = function hidePopover() {
   this.popover('hide');
+  this.removeClass('disable-animation');
+};
+
+export const dismiss = function dismiss(cookieId) {
+  Cookies.set(getCookieName(cookieId), true);
+  hidePopover.call(this);
   this.hide();
 };
 
 export const mouseenter = function mouseenter() {
   const $featureHighlight = $(this);
-  $featureHighlight.popover('show');
+  showPopover.call($featureHighlight);
 
   document.querySelector('.popover')
-    .addEventListener('mouseleave', () => $featureHighlight.popover('hide'));
+    .addEventListener('mouseleave', hidePopover.bind($featureHighlight));
 };
 
 export const mouseleave = function mouseleave() {
   if (!document.querySelector('.popover:hover')) {
     const $featureHighlight = $(this);
-    $featureHighlight.popover('hide');
+    hidePopover.call($featureHighlight);
   }
 };
 

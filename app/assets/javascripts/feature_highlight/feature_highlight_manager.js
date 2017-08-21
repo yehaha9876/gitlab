@@ -2,6 +2,7 @@ import Cookies from 'js-cookie';
 import {
   getCookieName,
   getSelector,
+  hidePopover,
   setupDismissButton,
   mouseenter,
   mouseleave,
@@ -19,7 +20,7 @@ export default class FeatureHighlightManager {
       FeatureHighlightManager.highlightFeature(featureId);
       window.addEventListener('scroll', () => {
         const $featureHighlight = $(getSelector(featureId));
-        $featureHighlight.popover('hide');
+        hidePopover.call($featureHighlight);
       });
     }
   }
