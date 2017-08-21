@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 export const getCookieName = cookieId => `feature-highlighted-${cookieId}`;
 export const getSelector = highlightId => `.js-feature-highlight[data-highlight=${highlightId}]`;
 
-export const dismiss = function dismiss(cookieId) {
+const dismiss = function dismiss(cookieId) {
   Cookies.set(getCookieName(cookieId), true);
   this.popover('hide');
   this.hide();

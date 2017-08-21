@@ -17,6 +17,10 @@ export default class FeatureHighlightManager {
 
     if (featureId) {
       FeatureHighlightManager.highlightFeature(featureId);
+      window.addEventListener('scroll', () => {
+        const $featureHighlight = $(getSelector(featureId));
+        $featureHighlight.popover('hide');
+      });
     }
   }
 
@@ -32,9 +36,18 @@ export default class FeatureHighlightManager {
     const $parent = $selector.parent();
     const $popoverContent = $parent.siblings('.feature-highlight-popover-content');
 
-    // Setup popover, load template from HTML
+    // Setup popover
     $selector.data('content', $popoverContent[0].outerHTML);
-    $selector.popover({ html: true });
+    $selector.popover({
+      html: true,
+      // Override the existing template to add custom CSS classes
+      template: `
+        <div class="popover feature-highlight-popover" role="tooltip">
+          <div class="arrow"></div>
+          <div class="popover-content"></div>
+        </div>
+      `,
+    });
 
     $selector.on('mouseenter', mouseenter);
     $selector.on('mouseleave', mouseleave);

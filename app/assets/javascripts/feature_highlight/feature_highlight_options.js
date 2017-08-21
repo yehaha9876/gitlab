@@ -1,6 +1,6 @@
 import FeatureHighlightManager from './feature_highlight_manager';
 
-const highlightOrder = ['issue-list', 'issue-boards'];
+const highlightOrder = ['issue-boards'];
 
 document.addEventListener('DOMContentLoaded', () => {
   const featureHighlight = new FeatureHighlightManager(highlightOrder);
