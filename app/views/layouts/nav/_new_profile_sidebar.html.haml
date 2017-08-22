@@ -62,35 +62,35 @@
           %span.nav-item-name
             Notifications
 
-    = nav_link(controller: :keys) do
-      = link_to profile_keys_path, title: 'SSH Keys' do
-        .nav-icon-container
-          = custom_icon('key')
-        %span.nav-item-name
-          SSH Keys
-    = nav_link(controller: :gpg_keys) do
-      = link_to profile_gpg_keys_path, title: 'GPG Keys' do
-        .nav-icon-container
-          = custom_icon('key_2')
-        %span.nav-item-name
-          GPG Keys
-    = nav_link(controller: :preferences) do
-      = link_to profile_preferences_path, title: 'Preferences' do
-        .nav-icon-container
-          = custom_icon('preferences')
-        %span.nav-item-name
-          Preferences
-    = nav_link(path: 'profiles#audit_log') do
-      = link_to audit_log_profile_path, title: 'Authentication log' do
-        .nav-icon-container
-          = custom_icon('authentication_log')
-        %span.nav-item-name
-          Authentication log
-    = nav_link(path: 'profiles#pipeline_quota') do
-      = link_to profile_pipeline_quota_path, title: 'Pipeline quota' do
-        .nav-icon-container
-          = custom_icon('pipeline')
-        %span.nav-item-name
-          Pipeline quota
+      = nav_link(controller: :keys) do
+        = link_to profile_keys_path, title: 'SSH Keys' do
+          .nav-icon-container
+            = custom_icon('key')
+          %span.nav-item-name
+            SSH Keys
+      = nav_link(controller: :gpg_keys) do
+        = link_to profile_gpg_keys_path, title: 'GPG Keys' do
+          .nav-icon-container
+            = custom_icon('key_2')
+          %span.nav-item-name
+            GPG Keys
+      = nav_link(controller: :preferences) do
+        = link_to profile_preferences_path, title: 'Preferences' do
+          .nav-icon-container
+            = custom_icon('preferences')
+          %span.nav-item-name
+            Preferences
+      = nav_link(path: 'profiles#audit_log') do
+        = link_to audit_log_profile_path, title: 'Authentication log' do
+          .nav-icon-container
+            = custom_icon('authentication_log')
+          %span.nav-item-name
+            Authentication log
+      = nav_link(path: 'profiles#pipeline_quota') do
+        = link_to profile_pipeline_quota_path, title: 'Pipeline quota' do
+          .nav-icon-container
+            = custom_icon('pipeline')
+          %span.nav-item-name
+            Pipeline quota
 
     = render 'shared/sidebar_toggle_button'
