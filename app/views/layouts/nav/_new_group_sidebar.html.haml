@@ -46,16 +46,15 @@
               %span
                 List
 
-          %ul.sidebar-sub-level-items
-            = nav_link(path: ['groups#show', 'groups#subgroups'], html_options: { class: 'home' }) do
-              = link_to group_path(@group), title: 'Group details' do
-                %span
-                  Details
+          = nav_link(path: 'labels#index') do
+            = link_to group_labels_path(@group), title: 'Labels' do
+              %span
+                Labels
 
-            = nav_link(path: 'groups#activity') do
-              = link_to activity_group_path(@group), title: 'Activity' do
-                %span
-                  Activity
+          = nav_link(path: 'milestones#index') do
+            = link_to group_milestones_path(@group), title: 'Milestones' do
+              %span
+                Milestones
 
       = nav_link(path: 'groups#merge_requests') do
         = link_to merge_requests_group_path(@group), title: 'Merge Requests' do
@@ -112,7 +111,7 @@
             %span.nav-item-name
               Members
         - if current_user && can?(current_user, :admin_group, @group)
-          = nav_link(path: %w[groups#projects groups#edit ci_cd#show]) do
+          = nav_link(path: %w[groups#projects groups#edit ci_cd#show ldap_group_links#index hooks#index audit_events#index pipeline_quota#index billings#index]) do
             = link_to edit_group_path(@group), title: 'Settings' do
               .nav-icon-container
                 = custom_icon('settings')
@@ -134,6 +133,6 @@
                   %span
                     CI / CD
 
-            = render "groups/ee/settings_nav"
+              = render "groups/ee/settings_nav"
 
     = render 'shared/sidebar_toggle_button'
