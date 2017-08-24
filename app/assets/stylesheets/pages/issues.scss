@@ -164,11 +164,6 @@ ul.related-merge-requests > li {
   }
 }
 
-.issues-footer {
-  padding-top: $gl-padding;
-  padding-bottom: 37px;
-}
-
 .issues-export-modal {
   .export-svg-container {
     height: 56px;
@@ -184,7 +179,7 @@ ul.related-merge-requests > li {
   }
 }
 
-.issue-email-modal-btn {
+.issuable-email-modal-btn {
   padding: 0;
   color: $gl-link-color;
   background-color: transparent;
