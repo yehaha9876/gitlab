@@ -4,17 +4,9 @@ module EE
 
     class_methods do
       def protected_ref_access_levels(*types)
+        super
+
         types.each do |type|
-          # We need to set `inverse_of` to make sure the `belongs_to`-object is set
-          # when creating children using `accepts_nested_attributes_for`.
-          #
-          # If we don't `protected_branch` or `protected_tag` would be empty and
-          # `project` cannot be delegated to it, which in turn would cause validations
-          # to fail.
-          has_many :"#{type}_access_levels", inverse_of: self.model_name.singular # rubocop:disable Cop/ActiveRecordDependent
-
-          accepts_nested_attributes_for :"#{type}_access_levels", allow_destroy: true
-
           # Overwrite the validation for access levels
           #
           # EE Needs to allow more access levels in the relation:
