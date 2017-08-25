@@ -90,15 +90,18 @@ module Gitlab
               Gitlab::GitalyClient::BlobService.new(repository).get_blob(oid: sha, limit: MAX_DATA_DISPLAY_SIZE)
             else
               blob = repository.lookup(sha)
-
-              new(
-                id: blob.oid,
-                size: blob.size,
-                data: blob.content(MAX_DATA_DISPLAY_SIZE),
-                binary: blob.binary?
-              )
+              from_rugged_blob(blob)
             end
           end
+        end
+
+        def from_rugged_blob(blob)
+          new(
+            id: blob.oid,
+            size: blob.size,
+            data: blob.content(MAX_DATA_DISPLAY_SIZE),
+            binary: blob.binary?
+          )
         end
 
         def binary?(data)

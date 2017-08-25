@@ -14,7 +14,8 @@ module Gitlab
         change_existing_tags: 'You are not allowed to change existing tags on this project.',
         update_protected_tag: 'Protected tags cannot be updated.',
         delete_protected_tag: 'Protected tags cannot be deleted.',
-        create_protected_tag: 'You are not allowed to create this tag as it is protected.'
+        create_protected_tag: 'You are not allowed to create this tag as it is protected.',
+        lfs_objects_missing: 'LFS objects are missing. Ensure LFS is properly set up or try a manual "git lfs push --all".'
       }.freeze
 
       # protocol is currently used only in EE
@@ -40,6 +41,7 @@ module Gitlab
         branch_checks
         tag_checks
         push_rule_check
+        lfs_objects_exist_check
 
         true
       end
@@ -170,6 +172,25 @@ module Gitlab
         end
       end
 
+      def lfs_objects_exist_check
+        return unless @newrev
+
+        # return if lfs not enabled for the repo
+
+        #TODO: Is there a need to check files actually exist when
+        # they have an LfsObject?
+
+        #TODO: Do we need a way to bypass this if `git lfs push --all` fails to work?
+
+        new_lfs_blobs = new_blobs.select(&:lfs_oid)
+
+        existing_count = LfsObject.where(oid: new_lfs_blobs.map(&:lfs_oid)).count
+
+        if existing_count != new_lfs_blobs.count
+          raise GitAccess::UnauthorizedError, ERROR_MESSAGES[:lfs_objects_missing]
+        end
+      end
+
       def tag_deletion_denied_by_push_rule?(push_rule)
         push_rule.try(:deny_delete_tag) &&
           protocol != 'web' &&
@@ -288,6 +309,10 @@ module Gitlab
 
       def commits
         project.repository.new_commits(@newrev)
+      end
+
+      def new_blobs
+        project.repository.new_blobs(@newrev)
       end
     end
   end

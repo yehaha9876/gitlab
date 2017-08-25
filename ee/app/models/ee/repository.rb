@@ -21,5 +21,13 @@ module EE
 
       refs.map { |sha| commit(sha.strip) }
     end
+
+    def new_blobs(newrev)
+      rev_list = ::Gitlab::Git::RevList.new(
+        path_to_repo: path_to_repo,
+        newrev: newrev)
+
+      rev_list.new_blobs(project)
+    end
   end
 end

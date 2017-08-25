@@ -16,6 +16,46 @@ module Gitlab
         execute([*base_args, newrev, '--not', '--all'])
       end
 
+      # Find newly added blobs
+      # Returns array of Gitlab::Git::Blob
+      def new_blobs(project)
+        new_objects.map do |output_line|
+          sha, path = output_line.split(' ', 2)
+
+          Addition.new(sha, path, project)
+        end.map(&:blob).compact
+      end
+
+      class Addition
+        def initialize(sha, path, project)
+          @sha = sha
+          @path = path
+          @project = project
+        end
+
+        def blob
+          return unless @path
+          return @blob if defined?(@blob)
+
+          @blob = if object.is_a?(Rugged::Blob)
+            Gitlab::Git::Blob.from_rugged_blob(object)
+          else
+            nil
+          end
+        end
+
+        alias_method :blob?, :blob
+
+        def object
+          return @object if defined?(@object)
+
+          #TODO: Use Gitlab::Git::Blob.raw(repository, sha)
+          # Would need to make it return nil for Tree objects with
+          # both Rugged and with Gitaly
+          @object = @project.repository.lookup(@sha)
+        end
+      end
+
       # This methods returns an array of missed references
       #
       # Should become obsolete after https://gitlab.com/gitlab-org/gitaly/issues/348.
@@ -41,6 +81,10 @@ module Gitlab
           "--git-dir=#{path_to_repo}",
           'rev-list'
         ]
+      end
+
+      def new_objects
+        output = execute([*base_args, newrev, '--not', '--all', '--objects'])
       end
     end
   end
