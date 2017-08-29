@@ -282,13 +282,21 @@ describe Gitlab::GitAccess, lib: true do
     end
 
     describe 'geo node key permissions' do
-      let(:key) { build(:geo_node_key) }
+      let(:key) { build(:geo_node_key, geo_node: geo_node) }
       let(:actor) { key }
 
-      context 'pull code' do
-        subject { access.send(:check_download_access!) }
+      context 'assigned to primary geo node' do
+        let(:geo_node) { build(:geo_node, primary: true) }
 
-        it { expect { subject }.not_to raise_error }
+        it { expect { pull_access_check }.to raise_not_found('The project you were looking for could not be found.') }
+        it { expect { push_access_check }.to raise_not_found('The project you were looking for could not be found.') }
+      end
+
+      context 'assigned to secondary geo node' do
+        let(:geo_node) { build(:geo_node, primary: false) }
+
+        it { expect { pull_access_check }.not_to raise_error }
+        it { expect { push_access_check }.to raise_unauthorized(described_class::ERROR_MESSAGES[:upload]) }
       end
     end
 
