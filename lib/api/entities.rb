@@ -875,7 +875,7 @@ module API
 
     class Variable < Grape::Entity
       expose :key, :value
-      expose :protected?, as: :protected
+      expose :protected?, as: :protected, if: -> (entity, _) { entity.respond_to?(:protected?) }
 
       # EE
       expose :environment_scope, if: ->(variable, options) {
@@ -903,6 +903,7 @@ module API
 
     class PipelineScheduleDetails < PipelineSchedule
       expose :last_pipeline, using: Entities::PipelineBasic
+      expose :variables, using: Entities::Variable
     end
 
     class EnvironmentBasic < Grape::Entity
