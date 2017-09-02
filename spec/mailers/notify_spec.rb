@@ -13,11 +13,11 @@ describe Notify do
   set(:assignee) { create(:user, email: 'assignee@example.com', name: 'John Doe') }
 
   set(:merge_request) do
-    create(:merge_request, source_project: project,
-                           target_project: project,
-                           author: current_user,
-                           assignee: assignee,
-                           description: 'Awesome description')
+    create(:merge_request_with_approver, source_project: project,
+                                         target_project: project,
+                                         author: current_user,
+                                         assignee: assignee,
+                                         description: 'Awesome description')
   end
 
   set(:issue) do
@@ -205,12 +205,6 @@ describe Notify do
       end
 
       context 'for merge requests' do
-        let(:project) { create(:project, :repository) }
-        let(:merge_author) { create(:user) }
-        let(:merge_request) { create(:merge_request, author: current_user, assignee: assignee, source_project: project, target_project: project) }
-        let(:merge_request_with_description) { create(:merge_request, author: current_user, assignee: assignee, source_project: project, target_project: project, description: 'My awesome description') }
-        let(:merge_request_with_approver) { create(:merge_request_with_approver, author: current_user, assignee: assignee, source_project: project, target_project: project) }
-
         describe 'that are new' do
           subject { described_class.new_merge_request_email(merge_request.assignee_id, merge_request.id) }
 
@@ -249,24 +243,24 @@ describe Notify do
         describe "that are new with approver" do
           subject do
             described_class.new_merge_request_email(
-              merge_request_with_approver.assignee_id,
-              merge_request_with_approver.id
+              merge_request.assignee_id,
+              merge_request.id
             )
           end
 
           it "contains the approvers list" do
-            is_expected.to have_body_text /#{merge_request_with_approver.approvers.first.user.name}/
+            is_expected.to have_body_text /#{merge_request.approvers.first.user.name}/
           end
         end
 
         describe 'that are new with a description' do
-          subject { described_class.new_merge_request_email(merge_request_with_description.assignee_id, merge_request_with_description.id) }
+          subject { described_class.new_merge_request_email(merge_request.assignee_id, merge_request.id) }
 
           it_behaves_like 'it should show Gmail Actions View Merge request link'
           it_behaves_like "an unsubscribeable thread"
 
           it 'contains the description' do
-            is_expected.to have_html_escaped_body_text merge_request_with_description.description
+            is_expected.to have_html_escaped_body_text merge_request.description
           end
         end
 
