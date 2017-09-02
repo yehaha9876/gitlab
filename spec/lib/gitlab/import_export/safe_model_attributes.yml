@@ -282,6 +282,7 @@ CommitStatus:
 - coverage_regex
 - auto_canceled_by_id
 - retried
+- failure_reason
 Ci::Variable:
 - id
 - project_id
