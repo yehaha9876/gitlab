@@ -190,9 +190,12 @@ class Project < ActiveRecord::Base
 
   has_many :active_runners, -> { active }, through: :runner_projects, source: :runner, class_name: 'Ci::Runner'
 
+  has_one :auto_devops, class_name: 'ProjectAutoDevops'
+
   accepts_nested_attributes_for :variables, allow_destroy: true
   accepts_nested_attributes_for :project_feature
   accepts_nested_attributes_for :import_data
+  accepts_nested_attributes_for :auto_devops
 
   delegate :name, to: :owner, allow_nil: true, prefix: true
   delegate :members, to: :team, prefix: true
@@ -461,6 +464,14 @@ class Project < ActiveRecord::Base
     return namespace.lfs_enabled? if self[:lfs_enabled].nil?
 
     self[:lfs_enabled] && Gitlab.config.lfs.enabled
+  end
+
+  def auto_devops_enabled?
+    if auto_devops
+      auto_devops.enabled?
+    else
+      current_application_settings.auto_devops_enabled?
+    end
   end
 
   def repository_storage_path

@@ -63,6 +63,11 @@ module Ci
       pipeline: 7
     }
 
+    enum config_source: {
+      repository: nil,
+      auto_devops: 1
+    }
+
     state_machine :status, initial: :created do
       event :enqueue do
         transition created: :pending
@@ -355,11 +360,13 @@ module Ci
     def ci_yaml_file
       return @ci_yaml_file if defined?(@ci_yaml_file)
 
-      @ci_yaml_file = begin
-        project.repository.gitlab_ci_yml_for(sha, ci_yaml_file_path)
-      rescue Rugged::ReferenceError, GRPC::NotFound, GRPC::Internal
-        self.yaml_errors =
-          "Failed to load CI/CD config file at #{ci_yaml_file_path}"
+      @ci_yaml_file = ci_yaml_from_repo
+      @ci_yaml_file ||= implied_ci_yaml_file&.tap { self.auto_devops! }
+
+      if @ci_yaml_file
+        @ci_yaml_file
+      else
+        self.yaml_errors = "Failed to load CI/CD config file for #{sha}"
         nil
       end
     end
@@ -450,6 +457,18 @@ module Ci
     end
 
     private
+
+    def implied_ci_yaml_file
+      if project.auto_devops_enabled?
+        Gitlab::Template::GitlabCiYmlTemplate.find('Auto-DevOps').content
+      end
+    end
+
+    def ci_yaml_from_repo
+      project.repository.gitlab_ci_yml_for(sha, ci_yaml_file_path)
+    rescue GRPC::NotFound, Rugged::ReferenceError, GRPC::Internal
+      nil
+    end
 
     def pipeline_data
       Gitlab::DataBuilder::Pipeline.build(self)

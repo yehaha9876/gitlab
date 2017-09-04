@@ -228,6 +228,8 @@ Ci::Pipeline:
 - lock_version
 - auto_canceled_by_id
 - pipeline_schedule_id
+- protected
+- config_source
 Ci::Stage:
 - id
 - name
@@ -482,3 +484,7 @@ Timelog:
 - user_id
 - created_at
 - updated_at
+ProjectAutoDevops:
+- id
+- enabled
+- domain
