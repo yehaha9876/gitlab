@@ -139,3 +139,7 @@ methods:
     - :diff_head_sha
   project:
     - :description_html
+  events:
+    - :action
+  push_event_payload:
+    - :action
