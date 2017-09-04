@@ -183,6 +183,9 @@ import initGroupAnalytics from './init_group_analytics';
           new UsersSelect();
           break;
         case 'projects:merge_requests:index':
+          new UserCallout();
+          break;
+        case 'projects:merge_requests:index':
         case 'projects:issues:index':
           if (filteredSearchEnabled) {
             const filteredSearchManager = new gl.FilteredSearchManager(page === 'projects:issues:index' ? 'issues' : 'merge_requests');
@@ -377,6 +380,7 @@ import initGroupAnalytics from './init_group_analytics';
         case 'projects:show':
           shortcut_handler = new ShortcutsNavigation();
           new NotificationsForm();
+          new UserCallout();
 
           if ($('#tree-slider').length) new TreeView();
           if ($('.blob-viewer').length) new BlobViewer();
@@ -402,6 +406,9 @@ import initGroupAnalytics from './init_group_analytics';
           break;
         case 'projects:pipelines:new':
           new NewBranchForm($('.js-new-pipeline-form'));
+          break;
+        case 'projects:pipelines:index':
+          new UserCallout();
           break;
         case 'projects:pipelines:builds':
         case 'projects:pipelines:failures':
@@ -460,6 +467,7 @@ import initGroupAnalytics from './init_group_analytics';
           new TreeView();
           new BlobViewer();
           new NewCommitForm($('.js-create-dir-form'));
+          new UserCallout();
 
           if (document.querySelector('.js-tree-content').dataset.pathLocksAvailable === 'true') {
             PathLocks.init(
