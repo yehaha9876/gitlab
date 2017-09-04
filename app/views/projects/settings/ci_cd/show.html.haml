@@ -6,7 +6,48 @@
 
 = render "projects/settings/head"
 
-= render 'projects/runners/index'
-= render 'ci/variables/index'
-= render 'projects/triggers/index'
-= render 'projects/pipelines_settings/show'
+- expanded = Rails.env.test?
+
+%section.settings
+  .settings-header
+    %h4
+      General pipelines settings
+    %button.btn.js-settings-toggle
+      = expanded ? 'Collapse' : 'Expand'
+    %p
+      Update your CI/CD configuration, like job timeout.
+  .settings-content.no-animate{ class: ('expanded' if expanded) }
+    = render 'projects/pipelines_settings/show'
+
+%section.settings
+  .settings-header
+    %h4
+      Runners settings
+    %button.btn.js-settings-toggle
+      = expanded ? 'Collapse' : 'Expand'
+    %p
+      Register and see your runners for this project.
+  .settings-content.no-animate{ class: ('expanded' if expanded) }
+    = render 'projects/runners/index'
+
+%section.settings
+  .settings-header
+    %h4
+      Secret variables
+    %button.btn.js-settings-toggle
+      = expanded ? 'Collapse' : 'Expand'
+    %p
+      Define variables accessible in your jobs.
+  .settings-content.no-animate{ class: ('expanded' if expanded) }
+    = render 'ci/variables/index'
+
+%section.settings
+  .settings-header
+    %h4
+      Pipeline triggers
+    %button.btn.js-settings-toggle
+      = expanded ? 'Collapse' : 'Expand'
+    %p
+      Define external triggers for your pipelines.
+  .settings-content.no-animate{ class: ('expanded' if expanded) }
+    = render 'projects/triggers/index'
