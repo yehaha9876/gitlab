@@ -33,6 +33,111 @@ describe Projects::CreateService, '#execute' do
     end
   end
 
+<<<<<<< HEAD
+=======
+  context 'without repository mirror' do
+    before do
+      stub_licensed_features(repository_mirrors: true)
+      opts.merge!(import_url: 'http://foo.com')
+    end
+
+    it 'sets the mirror to false' do
+      project = create_project(user, opts)
+
+      expect(project).to be_persisted
+      expect(project.mirror).to be false
+    end
+  end
+
+  context 'with repository mirror' do
+    before do
+      opts.merge!(import_url: 'http://foo.com',
+                  mirror: true,
+                  mirror_user_id: user.id)
+    end
+
+    context 'when licensed' do
+      before do
+        stub_licensed_features(repository_mirrors: true)
+      end
+
+      it 'sets the correct attributes' do
+        project = create_project(user, opts)
+
+        expect(project).to be_persisted
+        expect(project.mirror).to be true
+        expect(project.mirror_user_id).to eq(user.id)
+      end
+
+      context 'with mirror trigger builds' do
+        before do
+          opts.merge!(mirror_trigger_builds: true)
+        end
+
+        it 'sets the mirror trigger builds' do
+          project = create_project(user, opts)
+
+          expect(project).to be_persisted
+          expect(project.mirror_trigger_builds).to be true
+        end
+      end
+
+      context 'with checks on the namespace' do
+        before do
+          enable_namespace_license_check!
+        end
+
+        context 'when not licensed on a namespace' do
+          it 'does not allow enabeling mirrors' do
+            project = create_project(user, opts)
+
+            expect(project).to be_persisted
+            expect(project.mirror).to be_falsey
+          end
+        end
+
+        context 'when licensed on a namespace' do
+          it 'allows enabling mirrors' do
+            user.namespace.update!(plan: Plan.find_by(name: 'gold'))
+
+            project = create_project(user, opts)
+
+            expect(project).to be_persisted
+            expect(project.mirror).to be_truthy
+          end
+        end
+      end
+    end
+
+    context 'when unlicensed' do
+      before do
+        stub_licensed_features(repository_mirrors: false)
+      end
+
+      it 'does not set mirror attributes' do
+        project = create_project(user, opts)
+
+        expect(project).to be_persisted
+        expect(project.mirror).to be false
+        expect(project.mirror_user_id).to be_nil
+      end
+
+      context 'with mirror trigger builds' do
+        before do
+          opts.merge!(mirror_trigger_builds: true)
+        end
+
+        it 'sets the mirror trigger builds' do
+          project = create_project(user, opts)
+
+          expect(project).to be_persisted
+          expect(project.mirror_trigger_builds).to be false
+        end
+      end
+    end
+  end
+
+>>>>>>> d47d37737d... Merge branch 'ce-37407-error-500-when-creating-a-project-createservice-returns-a-nil-object' into 'master'
   context 'git hook sample' do
     let!(:sample) { create(:push_rule_sample) }
 
@@ -58,6 +163,51 @@ describe Projects::CreateService, '#execute' do
     end
   end
 
+<<<<<<< HEAD
+=======
+  context 'when running on a primary node' do
+    let!(:geo_node) { create(:geo_node, :primary, :current) }
+
+    it 'logs an event to the Geo event log' do
+      expect { create_project(user, opts) }.to change(Geo::RepositoryCreatedEvent, :count).by(1)
+    end
+
+    it 'does not log event to the Geo log if project creation fails' do
+      failing_opts = {
+        name: nil,
+        namespace: user.namespace
+      }
+
+      expect { create_project(user, failing_opts) }.not_to change(Geo::RepositoryCreatedEvent, :count)
+    end
+  end
+
+  context 'when importing Project by repo URL' do
+    context 'and check namespace plan is enabled' do
+      before do
+        allow_any_instance_of(EE::Project).to receive(:add_import_job)
+        enable_namespace_license_check!
+      end
+
+      it 'creates the project' do
+        opts = {
+          name: 'GitLab',
+          import_url: 'https://www.gitlab.com/gitlab-org/gitlab-ce',
+          visibility_level: Gitlab::VisibilityLevel::PRIVATE,
+          namespace_id: user.namespace.id,
+          mirror: true,
+          mirror_user_id: user.id,
+          mirror_trigger_builds: true
+        }
+
+        project = create_project(user, opts)
+
+        expect(project).to be_persisted
+      end
+    end
+  end
+
+>>>>>>> d47d37737d... Merge branch 'ce-37407-error-500-when-creating-a-project-createservice-returns-a-nil-object' into 'master'
   def create_project(user, opts)
     Projects::CreateService.new(user, opts).execute
   end
