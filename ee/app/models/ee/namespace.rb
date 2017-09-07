@@ -30,7 +30,7 @@ module EE
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :namespace_statistics, allow_nil: true
 
-      validate :validate_plan_name
+      validate :validate_plan_name, if: ->(namespace) { namespace.has_attribute?(:plan_id) }
     end
 
     def root_ancestor
