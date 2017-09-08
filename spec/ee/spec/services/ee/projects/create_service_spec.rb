@@ -33,8 +33,6 @@ describe Projects::CreateService, '#execute' do
     end
   end
 
-<<<<<<< HEAD
-=======
   context 'without repository mirror' do
     before do
       stub_licensed_features(repository_mirrors: true)
@@ -137,7 +135,6 @@ describe Projects::CreateService, '#execute' do
     end
   end
 
->>>>>>> d47d37737d... Merge branch 'ce-37407-error-500-when-creating-a-project-createservice-returns-a-nil-object' into 'master'
   context 'git hook sample' do
     let!(:sample) { create(:push_rule_sample) }
 
@@ -163,8 +160,6 @@ describe Projects::CreateService, '#execute' do
     end
   end
 
-<<<<<<< HEAD
-=======
   context 'when running on a primary node' do
     let!(:geo_node) { create(:geo_node, :primary, :current) }
 
@@ -207,7 +202,6 @@ describe Projects::CreateService, '#execute' do
     end
   end
 
->>>>>>> d47d37737d... Merge branch 'ce-37407-error-500-when-creating-a-project-createservice-returns-a-nil-object' into 'master'
   def create_project(user, opts)
     Projects::CreateService.new(user, opts).execute
   end
