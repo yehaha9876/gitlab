@@ -1,12 +1,10 @@
 import { highlightFeatures } from './feature_highlight';
 import bp from '../breakpoints';
 
-const highlightOrder = ['issue-boards'];
+export const highlightOrder = ['issue-boards'];
 
-export default function domContentLoaded(order) {
+export function initHighlightOrder(order) {
   if (bp.getBreakpointSize() === 'lg') {
     highlightFeatures(order);
   }
 }
-
-document.addEventListener('DOMContentLoaded', domContentLoaded.bind(this, highlightOrder));

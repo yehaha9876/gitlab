@@ -1,8 +1,8 @@
-import domContentLoaded from '~/feature_highlight/feature_highlight_options';
+import { initHighlightOrder } from '~/feature_highlight/feature_highlight_options';
 import bp from '~/breakpoints';
 
 describe('feature highlight options', () => {
-  describe('domContentLoaded', () => {
+  describe('initHighlightOrder', () => {
     const highlightOrder = [];
 
     beforeEach(() => {
@@ -13,7 +13,7 @@ describe('feature highlight options', () => {
     it('should not call highlightFeatures when breakpoint is xs', () => {
       spyOn(bp, 'getBreakpointSize').and.returnValue('xs');
 
-      domContentLoaded(highlightOrder);
+      initHighlightOrder(highlightOrder);
       expect(bp.getBreakpointSize).toHaveBeenCalled();
       expect(highlightOrder.find).not.toHaveBeenCalled();
     });
@@ -21,7 +21,7 @@ describe('feature highlight options', () => {
     it('should not call highlightFeatures when breakpoint is sm', () => {
       spyOn(bp, 'getBreakpointSize').and.returnValue('sm');
 
-      domContentLoaded(highlightOrder);
+      initHighlightOrder(highlightOrder);
       expect(bp.getBreakpointSize).toHaveBeenCalled();
       expect(highlightOrder.find).not.toHaveBeenCalled();
     });
@@ -29,7 +29,7 @@ describe('feature highlight options', () => {
     it('should not call highlightFeatures when breakpoint is md', () => {
       spyOn(bp, 'getBreakpointSize').and.returnValue('md');
 
-      domContentLoaded(highlightOrder);
+      initHighlightOrder(highlightOrder);
       expect(bp.getBreakpointSize).toHaveBeenCalled();
       expect(highlightOrder.find).not.toHaveBeenCalled();
     });
@@ -37,7 +37,7 @@ describe('feature highlight options', () => {
     it('should call highlightFeatures when breakpoint is lg', () => {
       spyOn(bp, 'getBreakpointSize').and.returnValue('lg');
 
-      domContentLoaded(highlightOrder);
+      initHighlightOrder(highlightOrder);
       expect(bp.getBreakpointSize).toHaveBeenCalled();
       expect(highlightOrder.find).toHaveBeenCalled();
     });

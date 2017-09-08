@@ -150,7 +150,20 @@
             - if EE::Gitlab::ServiceDesk.enabled?(project: @project)
               = nav_link(controller: :issues, action: :service_desk ) do
                 = link_to service_desk_project_issues_path(@project), title: 'Service Desk' do
-                  %span Service Desk
+                  %span
+                    Service Desk
+                  .feature-highlight.js-feature-highlight{ disabled: true, data: { trigger: 'manual', container: 'body', toggle: 'popover', placement: 'right', highlight: 'service-desk' } }
+                .feature-highlight-popover-content
+                  = render 'feature_highlight/service_desk.svg'
+                  .feature-highlight-popover-sub-content
+                    = link_to 'Service Desk', service_desk_project_issues_path(@project)
+                    %span= _('provides efficient')
+                    %strong= _('email support')
+                    %span= _('to your customers')
+                    %hr
+                    %button.btn-link.dismiss-feature-highlight{ type: 'button' }
+                      %span= _("Got it! Don't show this again")
+                      = custom_icon('thumbs_up')
 
             = nav_link(controller: :milestones) do
               = link_to project_milestones_path(@project), title: 'Milestones' do
