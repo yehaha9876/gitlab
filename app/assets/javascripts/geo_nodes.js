@@ -65,10 +65,21 @@ class GeoNodeStatus {
       this.$repositoriesFailed.text(status.repositories_failed_count);
       this.$lfsObjectsSynced.text(`${status.lfs_objects_synced_count}/${status.lfs_objects_count} (${status.lfs_objects_synced_in_percentage})`);
       this.$attachmentsSynced.text(`${status.attachments_synced_count}/${status.attachments_count} (${status.attachments_synced_in_percentage})`);
-      const eventDate = gl.utils.formatDate(new Date(status.last_event_date));
-      const cursorDate = gl.utils.formatDate(new Date(status.cursor_last_event_date));
-      this.$lastEventSeen.text(`${status.last_event_id} (${eventDate})`);
-      this.$lastCursorEvent.text(`${status.cursor_last_event_id} (${cursorDate})`);
+
+      if (status.last_event_id) {
+        const eventDate = gl.utils.formatDate(new Date(status.last_event_date));
+        this.$lastEventSeen.text(`${status.last_event_id} (${eventDate})`);
+      } else {
+        this.$lastEventSeen.text(`No Geo log events`);
+      }
+
+      if (status.cursor_last_event_id) {
+        const cursorDate = gl.utils.formatDate(new Date(status.cursor_last_event_date));
+        this.$lastCursorEvent.text(`${status.cursor_last_event_id} (${cursorDate})`);
+      } else {
+        this.$lastCursorEvent.text(`None`);
+      }
+
       if (status.health === 'Healthy') {
         this.$health.text('');
       } else {
