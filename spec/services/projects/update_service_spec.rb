@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe Projects::UpdateService, '#execute' do
-  include StubConfiguration
-
   let(:gitlab_shell) { Gitlab::Shell.new }
   let(:user) { create(:user) }
   let(:admin) { create(:admin) }
@@ -233,12 +231,6 @@ describe Projects::UpdateService, '#execute' do
         expect(project.reload.repository_size_limit).to be_nil
       end
     end
-  end
-
-  it 'returns an error result when record cannot be updated' do
-    result = update_project(project, admin, { name: 'foo&bar' })
-
-    expect(result).to eq({ status: :error, message: 'Project could not be updated!' })
   end
 
   def update_project(project, user, opts)
