@@ -36,7 +36,9 @@ module EE
         end
 
         def member_uids
-          entry.memberuid
+          entry.memberuid.map do |uid|
+            ::Gitlab::LDAP::Person.normalize_uid(uid)
+          end
         end
 
         delegate :dn, to: :entry
