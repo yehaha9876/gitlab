@@ -60,7 +60,7 @@ module EE
             Rails.logger.warn("Could not find member DNs for LDAP group #{entry.inspect}")
           end
 
-          dns.uniq
+          normalize_dns(dns).uniq
         end
 
         private
@@ -173,6 +173,12 @@ module EE
             rescue RuntimeError
               Rails.logger.warn "Received invalid member DN from LDAP group '#{cn}': '#{dn}'. Skipping"
             end
+          end
+        end
+
+        def normalize_dns(dns)
+          dns.map do |dn|
+            ::Gitlab::LDAP::Person.normalize_dn(dn)
           end
         end
       end
