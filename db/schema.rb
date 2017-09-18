@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170910051507) do
+ActiveRecord::Schema.define(version: 20170918174043) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -33,8 +33,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
     t.string "logo"
     t.integer "updated_by"
     t.string "header_logo"
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text "description_html"
     t.integer "cached_markdown_version"
   end
@@ -317,7 +317,7 @@ ActiveRecord::Schema.define(version: 20170910051507) do
   add_index "ci_builds", ["commit_id", "status", "type"], name: "index_ci_builds_on_commit_id_and_status_and_type", using: :btree
   add_index "ci_builds", ["commit_id", "type", "name", "ref"], name: "index_ci_builds_on_commit_id_and_type_and_name_and_ref", using: :btree
   add_index "ci_builds", ["commit_id", "type", "ref"], name: "index_ci_builds_on_commit_id_and_type_and_ref", using: :btree
-  add_index "ci_builds", ["id"], name: "index_for_ci_builds_retried_migration", where: "(retried IS NULL)", using: :btree, opclasses: {"id)"=>"WHERE"}
+  add_index "ci_builds", ["id"], name: "index_for_ci_builds_retried_migration", where: "(retried IS NULL)", using: :btree
   add_index "ci_builds", ["project_id"], name: "index_ci_builds_on_project_id", using: :btree
   add_index "ci_builds", ["protected"], name: "index_ci_builds_on_protected", using: :btree
   add_index "ci_builds", ["runner_id"], name: "index_ci_builds_on_runner_id", using: :btree
@@ -336,8 +336,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
     t.string "encrypted_value_iv"
     t.integer "group_id", null: false
     t.boolean "protected", default: false, null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "ci_group_variables", ["group_id", "key"], name: "index_ci_group_variables_on_group_id_and_key", unique: true, using: :btree
@@ -349,8 +349,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
     t.string "encrypted_value_salt"
     t.string "encrypted_value_iv"
     t.integer "pipeline_schedule_id", null: false
-    t.datetime_with_timezone "created_at"
-    t.datetime_with_timezone "updated_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "ci_pipeline_schedule_variables", ["pipeline_schedule_id", "key"], name: "index_ci_pipeline_schedule_variables_on_schedule_id_and_key", unique: true, using: :btree
@@ -591,7 +591,7 @@ ActiveRecord::Schema.define(version: 20170910051507) do
     t.datetime "updated_at"
   end
 
-  add_index "emails", ["email"], name: "index_emails_on_email", unique: true, using: :btree
+  add_index "emails", ["email"], name: "emails_email_key", unique: true, using: :btree
   add_index "emails", ["user_id"], name: "index_emails_on_user_id", using: :btree
 
   create_table "environments", force: :cascade do |t|
@@ -612,8 +612,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
     t.integer "project_id"
     t.integer "author_id", null: false
     t.integer "target_id"
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "action", limit: 2, null: false
     t.string "target_type"
   end
@@ -648,7 +648,7 @@ ActiveRecord::Schema.define(version: 20170910051507) do
     t.datetime "updated_at"
   end
 
-  add_index "forked_project_links", ["forked_to_project_id"], name: "index_forked_project_links_on_forked_to_project_id", unique: true, using: :btree
+  add_index "forked_project_links", ["forked_to_project_id"], name: "forked_project_links_forked_to_project_id_key", unique: true, using: :btree
 
   create_table "geo_event_log", id: :bigserial, force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -668,8 +668,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
   create_table "geo_node_namespace_links", force: :cascade do |t|
     t.integer "geo_node_id", null: false
     t.integer "namespace_id", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "geo_node_namespace_links", ["geo_node_id", "namespace_id"], name: "index_geo_node_namespace_links_on_geo_node_id_and_namespace_id", unique: true, using: :btree
@@ -750,8 +750,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
   add_index "geo_repository_updated_events", ["source"], name: "index_geo_repository_updated_events_on_source", using: :btree
 
   create_table "gpg_keys", force: :cascade do |t|
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "user_id"
     t.binary "primary_keyid"
     t.binary "fingerprint"
@@ -763,8 +763,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
   add_index "gpg_keys", ["user_id"], name: "index_gpg_keys_on_user_id", using: :btree
 
   create_table "gpg_signatures", force: :cascade do |t|
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "project_id"
     t.integer "gpg_key_id"
     t.binary "commit_sha"
@@ -1012,8 +1012,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
   add_index "members", ["user_id"], name: "index_members_on_user_id", using: :btree
 
   create_table "merge_request_diff_commits", id: false, force: :cascade do |t|
-    t.datetime_with_timezone "authored_date"
-    t.datetime_with_timezone "committed_date"
+    t.datetime "authored_date"
+    t.datetime "committed_date"
     t.integer "merge_request_diff_id", null: false
     t.integer "relative_order", null: false
     t.binary "sha", null: false
@@ -1361,8 +1361,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
   add_index "personal_access_tokens", ["user_id"], name: "index_personal_access_tokens_on_user_id", using: :btree
 
   create_table "plans", force: :cascade do |t|
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "name"
     t.string "title"
   end
@@ -1380,8 +1380,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
 
   create_table "project_auto_devops", force: :cascade do |t|
     t.integer "project_id", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "enabled"
     t.string "domain"
   end
@@ -1429,9 +1429,9 @@ ActiveRecord::Schema.define(version: 20170910051507) do
     t.integer "retry_count", default: 0, null: false
     t.datetime "last_update_started_at"
     t.datetime "last_update_scheduled_at"
-    t.datetime_with_timezone "next_execution_timestamp"
-    t.datetime_with_timezone "created_at"
-    t.datetime_with_timezone "updated_at"
+    t.datetime "next_execution_timestamp"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "project_mirror_data", ["project_id"], name: "index_project_mirror_data_on_project_id", unique: true, using: :btree
@@ -1615,6 +1615,7 @@ ActiveRecord::Schema.define(version: 20170910051507) do
     t.string "branch_name_regex"
   end
 
+  add_index "push_rules", ["is_sample"], name: "index_push_rules_on_is_sample", where: "is_sample", using: :btree
   add_index "push_rules", ["project_id"], name: "index_push_rules_on_project_id", using: :btree
 
   create_table "redirect_routes", force: :cascade do |t|
@@ -1721,8 +1722,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
     t.string "team_name", null: false
     t.string "alias", null: false
     t.string "user_id", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "slack_integrations", ["service_id"], name: "index_slack_integrations_on_service_id", using: :btree
@@ -1975,16 +1976,16 @@ ActiveRecord::Schema.define(version: 20170910051507) do
   end
 
   add_index "users", ["admin"], name: "index_users_on_admin", using: :btree
-  add_index "users", ["authentication_token"], name: "index_users_on_authentication_token", unique: true, using: :btree
-  add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
+  add_index "users", ["authentication_token"], name: "users_authentication_token_key", unique: true, using: :btree
+  add_index "users", ["confirmation_token"], name: "users_confirmation_token_key", unique: true, using: :btree
   add_index "users", ["created_at"], name: "index_users_on_created_at", using: :btree
-  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["email"], name: "index_users_on_email_trigram", using: :gin, opclasses: {"email"=>"gin_trgm_ops"}
+  add_index "users", ["email"], name: "users_email_key", unique: true, using: :btree
   add_index "users", ["ghost"], name: "index_users_on_ghost", using: :btree
   add_index "users", ["incoming_email_token"], name: "index_users_on_incoming_email_token", using: :btree
   add_index "users", ["name"], name: "index_users_on_name", using: :btree
   add_index "users", ["name"], name: "index_users_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+  add_index "users", ["reset_password_token"], name: "users_reset_password_token_key", unique: true, using: :btree
   add_index "users", ["rss_token"], name: "index_users_on_rss_token", using: :btree
   add_index "users", ["state"], name: "index_users_on_state", using: :btree
   add_index "users", ["support_bot"], name: "index_users_on_support_bot", using: :btree
@@ -2144,8 +2145,8 @@ ActiveRecord::Schema.define(version: 20170910051507) do
   add_foreign_key "protected_tag_create_access_levels", "protected_tags", name: "fk_f7dfda8c51", on_delete: :cascade
   add_foreign_key "protected_tag_create_access_levels", "users"
   add_foreign_key "protected_tags", "projects", name: "fk_8e4af87648", on_delete: :cascade
-  add_foreign_key "push_rules", "projects", name: "fk_83b29894de", on_delete: :cascade
   add_foreign_key "push_event_payloads", "events", name: "fk_36c74129da", on_delete: :cascade
+  add_foreign_key "push_rules", "projects", name: "fk_83b29894de", on_delete: :cascade
   add_foreign_key "releases", "projects", name: "fk_47fe2a0596", on_delete: :cascade
   add_foreign_key "remote_mirrors", "projects", name: "fk_43a9aa4ca8", on_delete: :cascade
   add_foreign_key "services", "projects", name: "fk_71cce407f9", on_delete: :cascade
