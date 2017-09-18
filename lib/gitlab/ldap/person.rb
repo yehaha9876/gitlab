@@ -64,6 +64,13 @@ module Gitlab
       # 1. Excess spaces around attribute names and values are stripped
       # 2. The string is downcased (for case-insensitivity)
       def self.normalize_dn(dn)
+        begin
+          return Net::LDAP::DN.new(*Net::LDAP::DN.new(dn).to_a).to_s.downcase
+        rescue RuntimeError => e
+          # Swallow "DN badly formed" error and return original string
+          return dn
+        end
+
         dn.split(/(?<!\\)([,+=])/).map do |part|
           normalize_dn_part(part)
         end.join('')
