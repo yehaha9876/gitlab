@@ -228,9 +228,16 @@ After reconfigure successfully runs, the following steps must be completed to ge
 
 1. Exit the database prompt by typing `\q` and Enter.
 
+1. Initialize the cluster with current node: 
+   
+   ```
+   # gitlab-ctl repmgr master register
+   ```
+
 1. Verify the cluster is initialized with one node
    ```
    # gitlab-ctl repmgr cluster show
+   
    Role      | Name        | Upstream | Connection String
    ----------+-------------|----------|----------------------------------------
    * master  | HOSTNAME    |          | host=HOSTNAME user=gitlab_repmgr dbname=gitlab_repmgr
