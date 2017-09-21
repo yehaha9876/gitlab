@@ -239,6 +239,10 @@ On each database node perform the following:
 
     ```
     sudo /opt/gitlab/embedded/bin/consul members
+    Node         Address              Status  Type    Build  Protocol  DC
+    NODE_ONE    XXX.XXX.XXX.YYY:8301  alive   server  0.9.2  2         gitlab_cluster
+    NODE_TWO    XXX.XXX.XXX.YYY:8301  alive   server  0.9.2  2         gitlab_cluster
+    NODE_THREE  XXX.XXX.XXX.YYY:8301  alive   server  0.9.2  2         gitlab_cluster
     ```
 
 1. [Reconfigure GitLab] for the changes to take effect.
