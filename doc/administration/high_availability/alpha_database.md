@@ -234,6 +234,11 @@ On each database node perform the following:
     }
     #
     # END user configuration
+
+1. Verify the nodes are all communicating:
+
+    ```
+    sudo /opt/gitlab/embedded/bin/consul members
     ```
 
 1. [Reconfigure GitLab] for the changes to take effect.
