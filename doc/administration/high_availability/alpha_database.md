@@ -234,15 +234,6 @@ On each database node perform the following:
     }
     #
     # END user configuration
-
-1. Verify the nodes are all communicating:
-
-    ```
-    sudo /opt/gitlab/embedded/bin/consul members
-    Node         Address              Status  Type    Build  Protocol  DC
-    NODE_ONE    XXX.XXX.XXX.YYY:8301  alive   server  0.9.2  2         gitlab_cluster
-    NODE_TWO    XXX.XXX.XXX.YYY:8301  alive   server  0.9.2  2         gitlab_cluster
-    NODE_THREE  XXX.XXX.XXX.YYY:8301  alive   server  0.9.2  2         gitlab_cluster
     ```
 
 1. [Reconfigure GitLab] for the changes to take effect.
@@ -271,7 +262,7 @@ get the cluster up and running.
 Verify the nodes are all communicating:
 
 ```sh
-sudo consul members
+sudo /opt/gitlab/embedded/bin/consul members
 ```
 
 The output should be similar to:
