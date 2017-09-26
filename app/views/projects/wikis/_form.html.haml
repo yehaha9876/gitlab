@@ -42,6 +42,6 @@
       .pull-right
         = link_to _("Cancel"), project_wiki_path(@project, @page), class: 'btn btn-cancel btn-grouped'
     - else
-      = f.submit _("Create page"), class: 'btn-create btn'
+      = f.submit s_("Wiki|Create page"), class: 'btn-create btn'
       .pull-right
         = link_to _("Cancel"), project_wiki_path(@project, :home), class: 'btn btn-cancel'
