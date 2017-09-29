@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 9.5.6 (2017-09-29)
+
+- [FIXED] Show group tab if member lock is enabled.
+
 ## 9.5.5 (2017-09-18)
 
 - [FIXED] Fixes activation of project mirror when new project is created. !2756
