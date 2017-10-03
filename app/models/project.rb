@@ -80,6 +80,7 @@ class Project < ActiveRecord::Base
   attr_accessor :old_path_with_namespace
   attr_accessor :template_name
   attr_writer :pipeline_status
+  attr_accessor :skip_disk_validation
 
   alias_attribute :title, :name
 
@@ -1006,6 +1007,7 @@ class Project < ActiveRecord::Base
 
   # Check if repository already exists on disk
   def can_create_repository?
+    return true if skip_disk_validation
     return false unless repository_storage_path
 
     if gitlab_shell.exists?(repository_storage_path, "#{build_full_path}.git")
