@@ -24,15 +24,15 @@
     props: {
       endpoint: {
         type: String,
-        required: true,
+        required: false,
       },
       helpPath: {
         type: String,
-        required: true,
+        required: false,
       },
       noData: {
         type: Boolean,
-        required: true,
+        required: false,
       },
       cssClass: {
         type: String,
@@ -155,7 +155,7 @@
   };
 </script>
 <template>
-<div :class="cssClass" id="cycle-analytics">
+  <div :class="cssClass" id="cycle-analytics">
     <banner
       v-if="noData && !isOverviewDialogDismissed"
       @dimissBanner="dismissOverviewDialog"
@@ -244,5 +244,4 @@
       </div>
     </template>
   </div>
-
 </template>
