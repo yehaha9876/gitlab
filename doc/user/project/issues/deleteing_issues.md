@@ -4,7 +4,7 @@ Please read through the [GitLab Issue Documentation](index.md) for an overview o
 
 You can delete an issue by editing it and clicking on the delete button. 
 
-//screenshot here
+![delete issue - button](doc/user/project/issues/img/delete_issue.png)
 
 Only [owners](https://docs.gitlab.com/ee/university/glossary/README.html#owner) can delete issues. 
 
