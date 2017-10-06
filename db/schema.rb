@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171006114203) do
+ActiveRecord::Schema.define(version: 20171006121407) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1529,6 +1529,7 @@ ActiveRecord::Schema.define(version: 20171006114203) do
   add_index "projects", ["last_activity_at"], name: "index_projects_on_last_activity_at", using: :btree
   add_index "projects", ["last_repository_check_failed"], name: "index_projects_on_last_repository_check_failed", using: :btree
   add_index "projects", ["last_repository_updated_at"], name: "index_projects_on_last_repository_updated_at", using: :btree
+  add_index "projects", ["mirror", "mirror_last_update_at"], name: "index_projects_on_mirror_and_mirror_last_update_at", where: "mirror", using: :btree
   add_index "projects", ["mirror_last_successful_update_at"], name: "index_projects_on_mirror_last_successful_update_at", using: :btree
   add_index "projects", ["name"], name: "index_projects_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
   add_index "projects", ["namespace_id"], name: "index_projects_on_namespace_id", using: :btree
