@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171002105019) do
+ActiveRecord::Schema.define(version: 20171006114203) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1441,6 +1441,7 @@ ActiveRecord::Schema.define(version: 20171002105019) do
     t.datetime_with_timezone "updated_at"
   end
 
+  add_index "project_mirror_data", ["next_execution_timestamp"], name: "index_project_mirror_data_on_next_execution_timestamp", using: :btree
   add_index "project_mirror_data", ["project_id"], name: "index_project_mirror_data_on_project_id", unique: true, using: :btree
 
   create_table "project_statistics", force: :cascade do |t|
