@@ -293,6 +293,7 @@ project:
 - source_pipelines
 - sourced_pipelines
 - members_and_requesters
+- build_trace_section_names
 award_emoji:
 - awardable
 - user
