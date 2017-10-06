@@ -585,7 +585,6 @@ import initGroupAnalytics from './init_group_analytics';
         case 'admin:impersonation_tokens:index':
           new gl.DueDateSelectors();
           break;
-<<<<<<< HEAD
         case 'admin:licenses:new':
           const $licenseFile = $('.license-file');
           const $licenseKey = $('.license-key');
@@ -603,14 +602,11 @@ import initGroupAnalytics from './init_group_analytics';
         case 'groups:analytics:show':
           initGroupAnalytics();
           break;
-
-=======
         case 'projects:clusters:show':
           import(/* webpackChunkName: "clusters" */ './clusters')
             .then(cluster => new cluster.default()) // eslint-disable-line new-cap
             .catch(() => {});
           break;
->>>>>>> 083e7b0b254... Squashed commit of the following:
       }
       switch (path[0]) {
         case 'sessions':
