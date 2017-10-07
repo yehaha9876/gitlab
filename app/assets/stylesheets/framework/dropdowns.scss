@@ -745,7 +745,11 @@
   #{$selector}.dropdown-menu-nav {
     margin-bottom: 24px;
 
-    li {
+    &.dropdown-open-top {
+      margin-bottom: $dropdown-vertical-offset;
+    }
+
+    li:not(.dropdown-bold-header) {
       display: block;
       padding: 0 1px;
 
