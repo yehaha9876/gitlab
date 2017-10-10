@@ -287,6 +287,18 @@ Finally, it's possible that the browser or client machine lack Kerberos support
 completely. Ensure that the Kerberos libraries are installed and that you can
 authenticate to other Kerberos services.
 
+### Cannot sign in with Kerberos in Chrome browser
+
+A customer reported that they could not sign in with Kerberos in a Chrome 
+browser while HTTP/2 was enabled in Nginx. HTTP/2 is enabled by default in
+GitLab Omnibus when using the built-in Nginx service. Disable HTTP/2 with
+the following configuration change. Be sure to [reconfigure GitLab] for the 
+changes to take effect. 
+
+```ruby
+nginx['http2_enabled'] = false
+```
+
 ## Helpful links
 
 - <https://help.ubuntu.com/community/Kerberos>
