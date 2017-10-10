@@ -25,7 +25,7 @@ module Geo
     # 5. Quit when we have scheduled all jobs or exceeded MAX_RUNTIME.
     def perform
       return unless Gitlab::Geo.geo_database_configured?
-      return unless Gitlab::Geo.secondary?
+      return unless Gitlab::Geo.secondary?(true)
 
       @start_time = Time.now.utc
       @loops = 0

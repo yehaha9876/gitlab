@@ -81,6 +81,14 @@ describe Gitlab::Geo do
       end
     end
 
+    context 'when force_connection is true' do
+      it 'skips the connected? check' do
+        expect(GeoNode).not_to receive(:connected?)
+
+        expect(described_class.enabled?(true)).to be_truthy
+      end
+    end
+
     context 'when there is a database issue' do
       it 'returns false when database connection is down' do
         allow(GeoNode).to receive(:connected?) { false }
@@ -119,7 +127,7 @@ describe Gitlab::Geo do
     end
 
     context 'current node is primary' do
-      it 'returns false ' do
+      it 'returns false' do
         expect(described_class.secondary?).to be_falsey
       end
     end
