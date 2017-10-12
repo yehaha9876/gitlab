@@ -82,6 +82,8 @@ import initChangesDropdown from './init_changes_dropdown';
 import AbuseReports from './abuse_reports';
 import { ajaxGet, convertPermissionToBoolean } from './lib/utils/common_utils';
 import AjaxLoadingSpinner from './ajax_loading_spinner';
+import Members from './members';
+import memberExpirationDate from './member_expiration_date';
 
 // EE-only
 import ApproversSelect from './approvers_select';
@@ -432,15 +434,15 @@ import initGroupAnalytics from './init_group_analytics';
           new ProjectsList();
           break;
         case 'groups:group_members:index':
-          new gl.MemberExpirationDate();
-          new gl.Members();
+          memberExpirationDate();
+          new Members();
           new UsersSelect();
           break;
         case 'projects:project_members:index':
-          new gl.MemberExpirationDate('.js-access-expiration-date-groups');
+          memberExpirationDate('.js-access-expiration-date-groups');
           new GroupsSelect();
-          new gl.MemberExpirationDate();
-          new gl.Members();
+          memberExpirationDate();
+          new Members();
           new UsersSelect();
           break;
         case 'groups:new':
