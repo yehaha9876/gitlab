@@ -1,12 +1,14 @@
 <script>
   import epicHeader from './epic_header.vue';
   import issuableApp from '../../../issue_show/components/app.vue';
+  import relatedIssuesRoot from '../../../issuable/related_issues/components/related_issues_root.vue';
 
   export default {
     name: 'epicShowApp',
     components: {
       epicHeader,
       issuableApp,
+      relatedIssuesRoot,
     },
     created() {
       // TODO: Get mock data from backend
@@ -63,6 +65,11 @@
         :updated-by-name="updatedByName"
         :updated-by-path="updatedByPath"
         :show-inline-edit-button="true"
+      />
+      <related-issues-root
+        endpoint= "/"
+        canAddRelatedIssues
+        helpPath= "/"
       />
     </div>
   </div>
