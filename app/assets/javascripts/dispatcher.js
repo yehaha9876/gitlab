@@ -12,7 +12,8 @@
 /* global NotificationsDropdown */
 /* global GroupAvatar */
 /* global LineHighlighter */
-/* global BuildArtifacts */
+import BuildArtifacts from './build_artifacts';
+import CILintEditor from './ci_lint_editor';
 /* global GroupsSelect */
 /* global Search */
 /* global Admin */
@@ -29,7 +30,8 @@
 /* global ProjectNew */
 /* global ProjectShow */
 /* global ProjectImport */
-/* global Labels */
+import Labels from './labels';
+import LabelManager from './label_manager';
 /* global Shortcuts */
 /* global ShortcutsFindFile */
 /* global Sidebar */
@@ -84,6 +86,7 @@ import { ajaxGet, convertPermissionToBoolean } from './lib/utils/common_utils';
 import AjaxLoadingSpinner from './ajax_loading_spinner';
 import Members from './members';
 import memberExpirationDate from './member_expiration_date';
+import U2FAuthenticate from './u2f/authenticate';
 
 // EE-only
 import ApproversSelect from './approvers_select';
@@ -102,8 +105,8 @@ import initGroupAnalytics from './init_group_analytics';
     }
 
     Dispatcher.prototype.initPageScripts = function() {
-      var page, path, shortcut_handler, fileBlobPermalinkUrlElement, fileBlobPermalinkUrl;
-      page = $('body').attr('data-page');
+      var path, shortcut_handler, fileBlobPermalinkUrlElement, fileBlobPermalinkUrl;
+      const page = $('body').attr('data-page');
       if (!page) {
         return false;
       }
@@ -505,7 +508,7 @@ import initGroupAnalytics from './init_group_analytics';
         case 'groups:labels:index':
         case 'projects:labels:index':
           if ($('.prioritized-labels').length) {
-            new gl.LabelManager();
+            new LabelManager();
           }
           $('.label-subscription').each((i, el) => {
             const $el = $(el);
@@ -566,7 +569,7 @@ import initGroupAnalytics from './init_group_analytics';
           break;
         case 'ci:lints:create':
         case 'ci:lints:show':
-          new gl.CILintEditor();
+          new CILintEditor();
           break;
         case 'users:show':
           new UserCallout();
@@ -613,14 +616,16 @@ import initGroupAnalytics from './init_group_analytics';
         case 'sessions':
         case 'omniauth_callbacks':
           if (!gon.u2f) break;
-          gl.u2fAuthenticate = new gl.U2FAuthenticate(
+          const u2fAuthenticate = new U2FAuthenticate(
             $('#js-authenticate-u2f'),
             '#js-login-u2f-form',
             gon.u2f,
             document.querySelector('#js-login-2fa-device'),
             document.querySelector('.js-2fa-form'),
           );
-          gl.u2fAuthenticate.start();
+          u2fAuthenticate.start();
+          // needed in rspec
+          gl.u2fAuthenticate = u2fAuthenticate;
         case 'admin':
           new Admin();
           switch (path[1]) {
