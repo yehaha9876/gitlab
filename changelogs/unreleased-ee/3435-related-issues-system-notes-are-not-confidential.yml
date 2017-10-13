@@ -1,5 +1,5 @@
 ---
 title: Prevent Related Issues from leaking confidential issues
-merge_request: 541
+merge_request:
 author:
 type: security
