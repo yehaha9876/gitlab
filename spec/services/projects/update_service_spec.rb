@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe Projects::UpdateService, '#execute' do
-  include StubConfiguration
-
   let(:gitlab_shell) { Gitlab::Shell.new }
   let(:user) { create(:user) }
   let(:admin) { create(:admin) }
@@ -57,6 +55,21 @@ describe Projects::UpdateService, '#execute' do
             expect(project).to be_public
           end
         end
+      end
+    end
+
+    context 'when project visibility is higher than parent group' do
+      let(:group) { create(:group, visibility_level: Gitlab::VisibilityLevel::INTERNAL) }
+
+      before do
+        project.update(namespace: group, visibility_level: group.visibility_level)
+      end
+
+      it 'does not update project visibility level' do
+        result = update_project(project, admin, visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+
+        expect(result).to eq({ status: :error, message: 'Visibility level public is not allowed in a internal group.' })
+        expect(project.reload).to be_internal
       end
     end
   end
@@ -153,8 +166,10 @@ describe Projects::UpdateService, '#execute' do
     it 'returns an error result when record cannot be updated' do
       result = update_project(project, admin, { name: 'foo&bar' })
 
-      expect(result).to eq({ status: :error,
-                             message: 'Project could not be updated!' })
+      expect(result).to eq({
+        status: :error,
+        message: "Name can contain only letters, digits, emojis, '_', '.', dash, space. It must start with letter, digit, emoji or '_'."
+      })
     end
   end
 
@@ -216,12 +231,6 @@ describe Projects::UpdateService, '#execute' do
         expect(project.reload.repository_size_limit).to be_nil
       end
     end
-  end
-
-  it 'returns an error result when record cannot be updated' do
-    result = update_project(project, admin, { name: 'foo&bar' })
-
-    expect(result).to eq({ status: :error, message: 'Project could not be updated!' })
   end
 
   def update_project(project, user, opts)

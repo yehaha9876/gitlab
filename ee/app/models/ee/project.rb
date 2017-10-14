@@ -156,7 +156,15 @@ module EE
     def fetch_mirror
       return unless mirror?
 
-      repository.fetch_upstream(self.import_url)
+      # Only send the password if it's needed
+      url =
+        if import_data&.password_auth?
+          import_url
+        else
+          username_only_import_url
+        end
+
+      repository.fetch_upstream(url)
     end
 
     def can_override_approvers?
@@ -384,7 +392,8 @@ module EE
     def username_only_import_url=(value)
       unless ::Gitlab::UrlSanitizer.valid?(value)
         self.import_url = value
-        return
+        self.import_data&.user = nil
+        return value
       end
 
       url = ::Gitlab::UrlSanitizer.new(value)
@@ -506,7 +515,7 @@ module EE
     def load_licensed_feature_available(feature)
       globally_available = License.feature_available?(feature)
 
-      if current_application_settings.should_check_namespace_plan?
+      if namespace && current_application_settings.should_check_namespace_plan?
         globally_available &&
           (public? && namespace.public? || namespace.feature_available_in_plan?(feature))
       else
