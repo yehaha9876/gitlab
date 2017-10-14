@@ -1,5 +1,0 @@
----
-title: Validate branch name push rule when pushing branch without commits
-merge_request: 2685
-author:
-type: fixed
