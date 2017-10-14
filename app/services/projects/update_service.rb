@@ -1,5 +1,7 @@
 module Projects
   class UpdateService < BaseService
+    prepend ::EE::Projects::UpdateService
+
     def execute
       # Repository size limit comes as MB from the view
       limit = params.delete(:repository_size_limit)
@@ -36,7 +38,10 @@ module Projects
 
         success
       else
-        error('Project could not be updated!')
+        model_errors = project.errors.full_messages.to_sentence
+        error_message = model_errors.presence || 'Project could not be updated!'
+
+        error(error_message)
       end
     end
 

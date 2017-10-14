@@ -1,5 +1,35 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 9.5.8 (2017-10-04)
+
+- [FIXED] Fix EE delta size check handling with annotated tags.
+- [FIXED] Fix delta size check to handle commit or nil objects.
+
+## 9.5.7 (2017-10-03)
+
+- No changes.
+
+## 9.5.6 (2017-09-29)
+
+- [FIXED] Show group tab if member lock is enabled.
+
+## 9.5.5 (2017-09-18)
+
+- [FIXED] Fixes activation of project mirror when new project is created. !2756
+- [FIXED] Geo - Whitelist LFS requests to download objects on a secondary node. !2758
+- [FIXED] Fix unsetting credentials data for pull mirrors. !2810
+- [FIXED] Fix a regression breaking projects with an empty import URL. !2824
+- [FIXED] Fix a 500 error in the SSH host keys lookup action. !2827
+- [FIXED] Ensure #route_setting is available before calling it. !2908
+- [FIXED] Fix branch name regex not saving in /admin/push_rule config.
+- [FIXED] Fix the gap in approvals in merge request widget.
+- [FIXED] Fix merges not working when project is not licensed for squash.
+- Don't put the password in the SSH remote if using public-key authentication. !2837
+
+## 9.5.4 (2017-09-06)
+
+- [FIXED] Validate branch name push rule when pushing branch without commits. !2685
+
 ## 9.5.3 (2017-09-03)
 
 - [FIXED] Check if table exists before loading the current license. !2783

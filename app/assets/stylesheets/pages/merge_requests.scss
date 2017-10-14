@@ -353,6 +353,14 @@
   }
 }
 
+.mr-widget-body-controls {
+  flex-wrap: wrap;
+}
+
+.mr-widget-body-controls {
+  flex-wrap: wrap;
+}
+
 .mr_source_commit,
 .mr_target_commit {
   margin-bottom: 0;
@@ -720,7 +728,14 @@
   .approvers-list {
     display: flex;
     align-items: center;
-    margin-right: 5px;
+  }
+
+  .approvers-list {
+    .link-to-member-avatar:not(:first-child) {
+      img {
+        margin-left: 0;
+      }
+    }
   }
 
   .unapprove-btn {

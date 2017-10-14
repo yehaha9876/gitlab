@@ -15,7 +15,6 @@
 /* global NotificationsDropdown */
 /* global GroupAvatar */
 /* global LineHighlighter */
-/* global ProjectFork */
 /* global BuildArtifacts */
 /* global GroupsSelect */
 /* global Search */
@@ -509,7 +508,9 @@ import initGroupAnalytics from './init_group_analytics';
           shortcut_handler = true;
           break;
         case 'projects:forks:new':
-          new ProjectFork();
+          import(/* webpackChunkName: 'project_fork' */ './project_fork')
+            .then(fork => fork.default())
+            .catch(() => {});
           break;
         case 'projects:artifacts:browse':
           new ShortcutsNavigation();

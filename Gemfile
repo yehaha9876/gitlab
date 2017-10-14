@@ -138,7 +138,7 @@ gem 'asciidoctor-plantuml', '0.0.7'
 gem 'rouge', '~> 2.0'
 gem 'truncato', '~> 0.7.9'
 gem 'bootstrap_form', '~> 2.7.0'
-gem 'nokogiri', '~> 1.8.0'
+gem 'nokogiri', '~> 1.8.1'
 
 # Diffs
 gem 'diffy', '~> 3.1.0'
@@ -331,6 +331,7 @@ group :development, :test do
   gem 'spinach-rerun-reporter', '~> 0.0.2'
   gem 'rspec_profiling', '~> 0.0.5'
   gem 'rspec-set', '~> 0.1.3'
+  gem 'rspec-parameterized'
 
   # Prevent occasions where minitest is not bundled in packaged versions of ruby (see #3826)
   gem 'minitest', '~> 5.7.0'

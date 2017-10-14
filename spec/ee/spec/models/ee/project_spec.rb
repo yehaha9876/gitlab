@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Project do
+  using RSpec::Parameterized::TableSyntax
+
   describe 'associations' do
     it { is_expected.to delegate_method(:shared_runners_minutes).to(:statistics) }
     it { is_expected.to delegate_method(:shared_runners_seconds).to(:statistics) }
@@ -192,6 +194,24 @@ describe Project do
         expect(project.project_feature).to receive(:feature_available?).with(feature, user)
 
         subject
+      end
+    end
+  end
+
+  describe '#fetch_mirror' do
+    where(:import_url, :auth_method, :expected) do
+      'http://foo:bar@example.com' | 'password'       | 'http://foo:bar@example.com'
+      'ssh://foo:bar@example.com'  | 'password'       | 'ssh://foo:bar@example.com'
+      'ssh://foo:bar@example.com'  | 'ssh_public_key' | 'ssh://foo@example.com'
+    end
+
+    with_them do
+      let(:project) { build(:project, :mirror, import_url: import_url, import_data_attributes: { auth_method: auth_method } ) }
+
+      it do
+        expect(project.repository).to receive(:fetch_upstream).with(expected)
+
+        project.fetch_mirror
       end
     end
   end
@@ -639,102 +659,98 @@ describe Project do
   end
 
   describe '#approvals_before_merge' do
-    [
-      { license: true,  database: 5,  expected: 5 },
-      { license: true,  database: 0,  expected: 0 },
-      { license: false, database: 5,  expected: 0 },
-      { license: false, database: 0,  expected: 0 }
-    ].each do |spec|
-      context spec.inspect do
-        let(:spec) { spec }
-        let(:project) { build(:project, approvals_before_merge: spec[:database]) }
+    where(:license_value, :db_value, :expected) do
+      true  | 5 | 5
+      true  | 0 | 0
+      false | 5 | 0
+      false | 0 | 0
+    end
 
-        subject { project.approvals_before_merge }
+    with_them do
+      let(:project) { build(:project, approvals_before_merge: db_value) }
 
-        before do
-          stub_licensed_features(merge_request_approvers: spec[:license])
-        end
+      subject { project.approvals_before_merge }
 
-        it { is_expected.to eq(spec[:expected]) }
+      before do
+        stub_licensed_features(merge_request_approvers: license_value)
       end
+
+      it { is_expected.to eq(expected) }
     end
   end
 
   describe "#reset_approvals_on_push?" do
-    [
-      { license: true,  database: true,  expected: true },
-      { license: true,  database: false, expected: false },
-      { license: false, database: true,  expected: false },
-      { license: false, database: false, expected: false }
-    ].each do |spec|
-      context spec.inspect do
-        let(:spec) { spec }
-        let(:project) { build(:project, reset_approvals_on_push: spec[:database]) }
+    where(:license_value, :db_value, :expected) do
+      true  | true  | true
+      true  | false | false
+      false | true  | false
+      false | false | false
+    end
 
-        subject { project.reset_approvals_on_push? }
+    with_them do
+      let(:project) { build(:project, reset_approvals_on_push: db_value) }
 
-        before do
-          stub_licensed_features(merge_request_approvers: spec[:license])
-        end
+      subject { project.reset_approvals_on_push? }
 
-        it { is_expected.to eq(spec[:expected]) }
+      before do
+        stub_licensed_features(merge_request_approvers: license_value)
       end
+
+      it { is_expected.to eq(expected) }
     end
   end
 
   describe '#approvals_before_merge' do
-    [
-      { license: true,  database: 5,  expected: 5 },
-      { license: true,  database: 0,  expected: 0 },
-      { license: false, database: 5,  expected: 0 },
-      { license: false, database: 0,  expected: 0 }
-    ].each do |spec|
-      context spec.inspect do
-        let(:spec) { spec }
-        let(:project) { build(:project, approvals_before_merge: spec[:database]) }
+    where(:license_value, :db_value, :expected) do
+      true  | 5 | 5
+      true  | 0 | 0
+      false | 5 | 0
+      false | 0 | 0
+    end
 
-        subject { project.approvals_before_merge }
+    with_them do
+      let(:project) { build(:project, approvals_before_merge: db_value) }
 
-        before do
-          stub_licensed_features(merge_request_approvers: spec[:license])
-        end
+      subject { project.approvals_before_merge }
 
-        it { is_expected.to eq(spec[:expected]) }
+      before do
+        stub_licensed_features(merge_request_approvers: license_value)
       end
+
+      it { is_expected.to eq(expected) }
     end
   end
 
   describe '#merge_method' do
-    [
-      { ff: true,  rebase: true,  ff_licensed: true,  rebase_licensed: true,  method: :ff },
-      { ff: true,  rebase: true,  ff_licensed: true,  rebase_licensed: false, method: :ff },
-      { ff: true,  rebase: true,  ff_licensed: false, rebase_licensed: true,  method: :rebase_merge },
-      { ff: true,  rebase: true,  ff_licensed: false, rebase_licensed: false, method: :merge },
-      { ff: true,  rebase: false, ff_licensed: true,  rebase_licensed: true,  method: :ff },
-      { ff: true,  rebase: false, ff_licensed: true,  rebase_licensed: false, method: :ff },
-      { ff: true,  rebase: false, ff_licensed: false, rebase_licensed: true,  method: :merge },
-      { ff: true,  rebase: false, ff_licensed: false, rebase_licensed: false, method: :merge },
-      { ff: false, rebase: true,  ff_licensed: true,  rebase_licensed: true,  method: :rebase_merge },
-      { ff: false, rebase: true,  ff_licensed: true,  rebase_licensed: false, method: :merge },
-      { ff: false, rebase: true,  ff_licensed: false, rebase_licensed: true,  method: :rebase_merge },
-      { ff: false, rebase: true,  ff_licensed: false, rebase_licensed: false, method: :merge },
-      { ff: false, rebase: false, ff_licensed: true,  rebase_licensed: true,  method: :merge },
-      { ff: false, rebase: false, ff_licensed: true,  rebase_licensed: false, method: :merge },
-      { ff: false, rebase: false, ff_licensed: false, rebase_licensed: true,  method: :merge },
-      { ff: false, rebase: false, ff_licensed: false, rebase_licensed: false, method: :merge }
-    ].each do |spec|
-      context spec.inspect do
-        let(:project) { build(:project, merge_requests_rebase_enabled: spec[:rebase], merge_requests_ff_only_enabled: spec[:ff]) }
-        let(:spec) { spec }
+    where(:ff, :rebase, :ff_licensed, :rebase_licensed, :method) do
+      true  | true  | true  | true  | :ff
+      true  | true  | true  | false | :ff
+      true  | true  | false | true  | :rebase_merge
+      true  | true  | false | false | :merge
+      true  | false | true  | true  | :ff
+      true  | false | true  | false | :ff
+      true  | false | false | true  | :merge
+      true  | false | false | false | :merge
+      false | true  | true  | true  | :rebase_merge
+      false | true  | true  | false | :merge
+      false | true  | false | true  | :rebase_merge
+      false | true  | false | false | :merge
+      false | false | true  | true  | :merge
+      false | false | true  | false | :merge
+      false | false | false | true  | :merge
+      false | false | false | false | :merge
+    end
 
-        subject { project.merge_method }
+    with_them do
+      let(:project) { build(:project, merge_requests_rebase_enabled: rebase, merge_requests_ff_only_enabled: ff) }
 
-        before do
-          stub_licensed_features(merge_request_rebase: spec[:rebase_licensed], fast_forward_merge: spec[:ff_licensed])
-        end
+      subject { project.merge_method }
 
-        it { is_expected.to eq(spec[:method]) }
+      before do
+        stub_licensed_features(merge_request_rebase: rebase_licensed, fast_forward_merge: ff_licensed)
       end
+
+      it { is_expected.to eq(method) }
     end
   end
 
@@ -816,28 +832,24 @@ describe Project do
   end
 
   describe '#username_only_import_url' do
-    def build_project(username: 'user', password: 'password')
-      build(:project, import_url: 'http://example.com').tap do |project|
-        project.build_import_data(credentials: { user: username, password: password })
-      end
+    where(:import_url, :username, :expected_import_url) do
+      '' | 'foo' | ''
+      '' | ''    | ''
+      '' | nil   | ''
+
+      nil | 'foo' | nil
+      nil | ''    | nil
+      nil | nil   | nil
+
+      'http://example.com' | 'foo' | 'http://foo@example.com'
+      'http://example.com' | ''    | 'http://example.com'
+      'http://example.com' | nil   | 'http://example.com'
     end
 
-    it 'shows the bare url when no username is present' do
-      project = build_project(username: nil)
+    with_them do
+      let(:project) { build(:project, import_url: import_url, import_data_attributes: { user: username, password: 'password' }) }
 
-      expect(project.username_only_import_url).to eq('http://example.com')
-    end
-
-    it 'shows the URL with username when present' do
-      project = build_project(password: nil)
-
-      expect(project.username_only_import_url).to eq('http://user@example.com')
-    end
-
-    it 'excludes the pasword when present' do
-      project = build_project
-
-      expect(project.username_only_import_url).to eq('http://user@example.com')
+      it { expect(project.username_only_import_url).to eq(expected_import_url) }
     end
   end
 
@@ -855,6 +867,16 @@ describe Project do
 
       expect(project.username_only_import_url).to eq('http://user@example.com')
       expect(project.import_url).to eq('http://user:pass@example.com')
+      expect(project.import_data.password).to eq('pass')
+    end
+
+    it 'clears the username if passed the empty string' do
+      project = build(:project, import_url: 'http://olduser:pass@old.example.com')
+      project.username_only_import_url = ''
+
+      expect(project.username_only_import_url).to eq('')
+      expect(project.import_url).to eq('')
+      expect(project.import_data.user).to be_nil
       expect(project.import_data.password).to eq('pass')
     end
   end
