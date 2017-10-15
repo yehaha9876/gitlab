@@ -9,6 +9,8 @@ module Gitlab
         end
       end
 
+      attr_reader :repository
+
       def self.default_ref
         'master'
       end

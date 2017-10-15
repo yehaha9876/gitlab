@@ -1648,6 +1648,10 @@ class Project < ActiveRecord::Base
     Gitlab::GlRepository.gl_repository(self, is_wiki)
   end
 
+  def reference_counter(wiki: false)
+    Gitlab::ReferenceCounter.new(gl_repository(is_wiki: wiki))
+  end
+
   private
 
   def storage
@@ -1666,11 +1670,11 @@ class Project < ActiveRecord::Base
   end
 
   def repo_reference_count
-    Gitlab::ReferenceCounter.new(gl_repository(is_wiki: false)).value
+    reference_counter.value
   end
 
   def wiki_reference_count
-    Gitlab::ReferenceCounter.new(gl_repository(is_wiki: true)).value
+    reference_counter(wiki: true).value
   end
 
   def check_repository_absence!
