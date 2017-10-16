@@ -1,5 +1,11 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 9.4.7 (2017-10-16)
+
+- [SECURITY] Prevent Related Issues from leaking confidential issues.
+- Fix when pushing without a branch name. !2879
+- Escape user name in filtered search bar.
+
 ## 9.4.6 (2017-09-06)
 
 - [FIXED] Validate branch name push rule when pushing branch without commits. !2685
