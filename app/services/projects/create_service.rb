@@ -1,5 +1,7 @@
 module Projects
   class CreateService < BaseService
+    include Gitlab::CurrentSettings
+
     prepend ::EE::Projects::CreateService
 
     def initialize(user, params)

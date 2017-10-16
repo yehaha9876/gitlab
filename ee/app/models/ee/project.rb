@@ -13,6 +13,14 @@ module EE
 
       before_validation :mark_remote_mirrors_for_removal
 
+      before_save :set_override_pull_mirror_enabled, if: -> do |project|
+        !current_application_settings.pull_mirror_enabled && mirror? == project.pull_mirror_enabled_overridden
+      end
+
+      before_save :unset_override_pull_mirror_enabled, if: -> do |project|
+        current_application_settings.pull_mirror_enabled && !project.pull_mirror_enabled_overridden
+      end
+
       after_save :create_mirror_data, if: ->(project) { project.mirror? && project.mirror_changed? }
       after_save :destroy_mirror_data, if: ->(project) { !project.mirror? && project.mirror_changed? }
 
@@ -463,7 +471,21 @@ module EE
       @disabled_services
     end
 
+    def pull_mirror_enabled_by_admin?
+      pull_mirror_enabled_overridden ||
+        current_application_settings.pull_mirror_enabled
+    end
+
     private
+
+    def set_override_pull_mirror_enabled
+      project.pull_mirror_enabled_overridden = mirror?
+    end
+
+    def unset_override_remote_mirror_enabled
+      project.pull_mirror_enabled_overridden = false
+    end
+
 
     def licensed_feature_available?(feature)
       @licensed_feature_available ||= Hash.new do |h, feature|

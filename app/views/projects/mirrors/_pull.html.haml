@@ -19,7 +19,7 @@
       = render "shared/mirror_update_button"
       = render "projects/mirrors/pull/mirror_update_fail"
       .form-group
-        = f.check_box :mirror, class: "pull-left"
+        = f.check_box :mirror, checked: pull_mirror_enabled?, class: "pull-left"
         .prepend-left-20
           = f.label :mirror, "Mirror repository", class: "label-light append-bottom-0"
 

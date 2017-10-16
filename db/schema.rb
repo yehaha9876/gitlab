@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171006091000) do
+ActiveRecord::Schema.define(version: 20171016130726) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -157,6 +157,7 @@ ActiveRecord::Schema.define(version: 20171006091000) do
     t.boolean "hashed_storage_enabled", default: false, null: false
     t.boolean "project_export_enabled", default: true, null: false
     t.boolean "auto_devops_enabled", default: false, null: false
+    t.boolean "pull_mirror_enabled", default: true, null: false
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -1601,6 +1602,7 @@ ActiveRecord::Schema.define(version: 20171006091000) do
     t.boolean "disable_overriding_approvers_per_merge_request"
     t.integer "storage_version", limit: 2
     t.boolean "resolve_outdated_diff_discussions"
+    t.boolean "pull_mirror_enabled_overridden"
   end
 
   add_index "projects", ["ci_id"], name: "index_projects_on_ci_id", using: :btree

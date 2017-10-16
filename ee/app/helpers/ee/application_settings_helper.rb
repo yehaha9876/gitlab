@@ -22,7 +22,8 @@ module EE
         :slack_app_id,
         :slack_app_secret,
         :slack_app_verification_token,
-        :allow_group_owners_to_manage_ldap
+        :allow_group_owners_to_manage_ldap,
+        :pull_mirror_enabled
       ]
     end
 

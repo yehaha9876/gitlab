@@ -1,6 +1,18 @@
-- if Gitlab.com? && License.feature_available?(:repository_mirrors)
+- if License.feature_available?(:repository_mirrors)
   %fieldset
-    %legend Repository mirror settings
+  %legend Repository mirror settings
+  .form-group
+    = f.label :pull_mirror_enabled, 'Enable Pull mirrors', class: 'control-label col-sm-2'
+    .col-sm-10
+      .checkbox
+        = f.label :pull_mirror_enabled do
+          = f.check_box :pull_mirror_enabled
+          Enable the setup of a pull mirror in a project
+      %span.help-block
+        If disabled only admins will be able to setup a pull mirror in a project
+        = link_to icon('question-circle'), help_page_path('workflow/repository_mirroring', anchor: 'pulling-from-a-remote-repository')
+
+  - if Gitlab.com?
     .form-group
       = f.label :mirror_max_delay, class: 'control-label col-sm-2' do
         Maximum delay (Minutes)

@@ -13,4 +13,8 @@ module MirrorHelper
   def options_for_mirror_user
     options_from_collection_for_select(default_mirror_users, :id, :name, @project.mirror_user_id || current_user.id)
   end
+
+  def pull_mirror_enabled?
+    @project.pull_mirror_enabled_by_admin? && @project.mirror?
+  end
 end

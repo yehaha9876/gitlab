@@ -1,4 +1,4 @@
-- if License.feature_available?(:repository_mirrors)
+- if License.feature_available?(:repository_mirrors) && can?(current_user, :setup_pull_mirror, @project)
   .form-group
     = f.label :mirror, class: 'label-light' do
       = f.check_box :mirror, disabled: true

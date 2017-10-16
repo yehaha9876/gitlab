@@ -20,7 +20,15 @@ module EE
         !PushRule.global&.reject_unsigned_commits
       end
 
-      rule { admin }.enable :change_repository_storage
+      with_scope :global
+      condition(:pull_mirror_enabled) do
+        ::Gitlab::CurrentSettings.current_application_settings.pull_mirror_enabled
+      end
+
+      rule { admin }.policy do
+        enable :change_repository_storage
+        enable :override_remote_mirror_enabled_setting
+      end
 
       rule { support_bot }.enable :guest_access
       rule { support_bot & ~service_desk_enabled }.policy do
@@ -48,6 +56,8 @@ module EE
       end
 
       rule { can?(:developer_access) }.enable :admin_board
+
+      rule { pull_mirror_enabled | admin }.enable :setup_pull_mirror
 
       rule { deploy_board_disabled & ~is_development }.prevent :read_deploy_board
 

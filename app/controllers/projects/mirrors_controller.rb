@@ -62,6 +62,9 @@ class Projects::MirrorsController < Projects::ApplicationController
       @project.update_remote_mirrors
       flash[:notice] = "The remote repository is being updated..."
     else
+      return render_404 unless @project.pull_mirror_enabled_by_admin?
+      return render_403 unless can?(current_user, :setup_pull_mirror, @project)
+
       @project.force_import_job!
       flash[:notice] = "The repository is being updated..."
     end
@@ -92,6 +95,9 @@ class Projects::MirrorsController < Projects::ApplicationController
     params = mirror_params
 
     params[:mirror_user_id] = current_user.id unless valid_mirror_user?(params)
+
+    params.delete(:pull_mirror_enabled_overridden) unless can?(current_user, :override_pull_mirror_enabled_setting, project)
+    # TODO: Remove pull mirror attributes if not allowed to setup a pull mirror
 
     import_data = params[:import_data_attributes]
     if import_data.present?
