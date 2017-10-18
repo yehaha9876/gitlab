@@ -39,6 +39,7 @@ module Gitlab
     config.eager_load_paths.push(*%W[
       #{config.root}/ee/lib
       #{config.root}/ee/app/controllers
+      #{config.root}/ee/app/controllers/concerns
       #{config.root}/ee/app/helpers
       #{config.root}/ee/app/mailers
       #{config.root}/ee/app/models
@@ -47,7 +48,9 @@ module Gitlab
       #{config.root}/ee/app/serializers
       #{config.root}/ee/app/presenters
       #{config.root}/ee/app/services
+      #{config.root}/ee/app/services/concerns
       #{config.root}/ee/app/workers
+      #{config.root}/ee/app/workers/concerns
     ])
 
     config.paths['app/views'].push(*%W[
