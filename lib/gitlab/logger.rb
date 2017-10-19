@@ -13,7 +13,7 @@ module Gitlab
     end
 
     def self.read_latest
-      path = Rails.root.join("log", file_name)
+      path = self.full_log_path
 
       return [] unless File.readable?(path)
 
@@ -22,7 +22,11 @@ module Gitlab
     end
 
     def self.build
-      new(Rails.root.join("log", file_name))
+      RequestStore[self.full_log_path] ||= new(self.full_log_path)
+    end
+
+    def self.full_log_path
+      Rails.root.join("log", file_name)
     end
   end
 end
