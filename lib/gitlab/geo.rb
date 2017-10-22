@@ -12,7 +12,7 @@ module Gitlab
       geo_oauth_application
     ).freeze
 
-    SECONDARY_JOBS = %i(repository_sync_job file_download_job).freeze
+    SECONDARY_JOBS = %i(repository_sync_job file_download_job metrics_updater).freeze
 
     FDW_SCHEMA = 'gitlab_secondary'.freeze
 
@@ -94,6 +94,10 @@ module Gitlab
 
     def self.file_download_job
       Sidekiq::Cron::Job.find('geo_file_download_dispatch_worker')
+    end
+
+    def self.metrics_updater
+      Sidekiq::Cron::Job.find('geo_metrics_updater')
     end
 
     def self.configure_primary_jobs!
