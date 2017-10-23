@@ -31,7 +31,7 @@ module Geo
     end
 
     def metric_name(name)
-      METRIC_PREFIX + name
+      METRIC_PREFIX + name.to_s
     end
   end
 end
