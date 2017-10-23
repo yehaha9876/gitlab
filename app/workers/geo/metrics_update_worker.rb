@@ -9,5 +9,9 @@ module Geo
 
       try_obtain_lease { Geo::MetricsUpdateService.new.execute }
     end
+
+    def lease_timeout
+      LEASE_TIMEOUT
+    end
   end
 end
