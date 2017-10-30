@@ -77,7 +77,7 @@ module Gitlab
 
         if has_auth?
           opts.merge!(
-            bind_dn: options['bind_dn'],
+            bind_dn: bind_dn,
             password: options['password']
           )
         end
@@ -118,7 +118,7 @@ module Gitlab
       end
 
       def group_base
-        options['group_base']
+        @group_base ||= Person.normalize_dn(options['group_base'])
       end
 
       def admin_group
@@ -146,7 +146,13 @@ module Gitlab
       end
 
       def has_auth?
-        options['password'] || options['bind_dn']
+        options['password'] || bind_dn
+      end
+
+      def bind_dn
+        return @bind_dn if defined?(@bind_dn)
+
+        @bind_dn = Person.normalize_dn(options['bind_dn']).presence
       end
 
       def allow_username_or_email_login
@@ -225,7 +231,7 @@ module Gitlab
         {
           auth: {
             method: :simple,
-            username: options['bind_dn'],
+            username: bind_dn,
             password: options['password']
           }
         }

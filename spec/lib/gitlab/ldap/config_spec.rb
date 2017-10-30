@@ -396,4 +396,80 @@ describe Gitlab::LDAP::Config do
       end
     end
   end
+
+  describe '#group_base' do
+    context 'when the configured group_base is not normalized' do
+      it 'returns the normalized group_base' do
+        stub_ldap_config(options: { 'group_base' => 'OU =groups, DC=example, DC= com' })
+
+        expect(config.group_base).to eq('ou=groups,dc=example,dc=com')
+      end
+    end
+
+    context 'when the configured group_base is normalized' do
+      it 'returns the group_base unaltered' do
+        stub_ldap_config(options: { 'group_base' => 'ou=groups,dc=example,dc=com' })
+
+        expect(config.group_base).to eq('ou=groups,dc=example,dc=com')
+      end
+    end
+
+    context 'when the configured group_base is malformed' do
+      it 'returns the group_base unaltered' do
+        stub_ldap_config(options: { 'group_base' => 'invalid,dc=example,dc=com' })
+
+        expect(config.group_base).to eq('invalid,dc=example,dc=com')
+      end
+    end
+
+    context 'when the configured group_base is blank' do
+      it 'returns the group_base unaltered' do
+        stub_ldap_config(options: { 'group_base' => '' })
+
+        expect(config.group_base).to eq('')
+      end
+    end
+  end
+
+  describe '#bind_dn' do
+    context 'when the configured bind_dn is not normalized' do
+      it 'returns the normalized bind_dn' do
+        stub_ldap_config(options: { 'bind_dn' => 'UID= John C. Smith, OU =users, DC=example, DC= com' })
+
+        expect(config.bind_dn).to eq('uid=john c. smith,ou=users,dc=example,dc=com')
+      end
+    end
+
+    context 'when the configured bind_dn is normalized' do
+      it 'returns the bind_dn unaltered' do
+        stub_ldap_config(options: { 'bind_dn' => 'uid=john c. smith,ou=users,dc=example,dc=com' })
+
+        expect(config.bind_dn).to eq('uid=john c. smith,ou=users,dc=example,dc=com')
+      end
+    end
+
+    context 'when the configured bind_dn is malformed' do
+      it 'returns the bind_dn unaltered' do
+        stub_ldap_config(options: { 'bind_dn' => 'john c. smith,ou=users,dc=example,dc=com' })
+
+        expect(config.bind_dn).to eq('john c. smith,ou=users,dc=example,dc=com')
+      end
+    end
+
+    context 'when the configured bind_dn is empty string' do
+      it 'returns nil' do
+        stub_ldap_config(options: { 'bind_dn' => '' })
+
+        expect(config.bind_dn).to eq(nil)
+      end
+    end
+
+    context 'when bind_dn is not configured' do
+      it 'returns nil' do
+        stub_ldap_config(options: { 'bind_dn' => nil })
+
+        expect(config.bind_dn).to eq(nil)
+      end
+    end
+  end
 end
