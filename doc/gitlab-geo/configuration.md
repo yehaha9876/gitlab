@@ -1,11 +1,7 @@
 # GitLab Geo configuration
 
->**Note:**
-This is the documentation for the Omnibus GitLab packages. For installations
-from source, follow the [**GitLab Geo nodes configuration for installations
-from source**](configuration_source.md) guide.
-
-1. [Install GitLab Enterprise Edition][install-ee] on the server that will serve
+1. Install GitLab Enterprise Edition from the [Omnibus package][install-ee]
+   or [source][install-ee-source] on the server that will serve
    as the secondary Geo node. Do not login or set up anything else in the
    secondary node for the moment.
 1. [Setup the database replication](database.md)  (`primary (read-write) <-> secondary (read-only)` topology).
@@ -14,6 +10,7 @@ from source**](configuration_source.md) guide.
 1. [Follow the after setup steps](after_setup.md).
 
 [install-ee]: https://about.gitlab.com/downloads-ee/ "GitLab Enterprise Edition Omnibus packages downloads page"
+[install-ee-source]: https://docs.gitlab.com/ee/install/installation.html "GitLab Enterprise Edition installation from source"
 
 This is the final step you need to follow in order to setup a Geo node.
 
@@ -67,10 +64,18 @@ logins opened on all nodes as we will be moving back and forth.
     sudo -i
     ```
 
-1. Execute the command below to define the node as primary Geo node:
+1. Define this node as the primary Geo node.
 
-    ```
+    For installations from **Omnibus GitLab packages** execute the command:
+
+    ```bash
     gitlab-ctl set-geo-primary-node
+    ```
+
+    For installations from **source** execute the command:
+
+    ```bash
+    bundle exec rake geo:set_primary_node
     ```
 
     This command will use your defined `external_url` in `gitlab.rb`
@@ -87,11 +92,21 @@ sensitive data in the database. Any secondary node must have the
     sudo -i
     ```
 
-1. Execute the command below to display the current encryption key and copy it:
+1. Retrieve the current database encryption key and copy it.
 
-     ```
-     gitlab-rake geo:db:show_encryption_key
-     ```
+    For installations from **Omnibus GitLab packages** execute the command
+    below and copy the encryption key:
+
+    ```bash
+    gitlab-rake geo:db:show_encryption_key
+    ```
+
+    For installations from **source** execute the command below and copy the
+    encryption key:
+
+    ```bash
+    bundle exec rake geo:db:show_encryption_key
+    ```
 
 1. SSH into the **secondary** node and login as root:
 
@@ -102,14 +117,16 @@ sensitive data in the database. Any secondary node must have the
 1. Open the secrets file and paste the value of `db_key_base` you copied in the
    previous step:
 
-     ```
-     editor /etc/gitlab/gitlab-secrets.json
-     ```
+    ```
+    editor /etc/gitlab/gitlab-secrets.json
+    ```
 
 1. Save and close the file.
 
-1. Reconfigure for the change to take effect.
-    ```
+1. For installations from **Omnibus GitLab packages** reconfigure for the
+   change to take effect.
+
+    ```bash
     gitlab-ctl reconfigure
     ```
 
@@ -133,12 +150,19 @@ used for all GitLab Geo installations.
    'This is a primary node'.
 1. Added in GitLab 9.5: Choose which namespaces should be replicated by the secondary node. Leave blank to replicate all. Read more in [selective replication](#selective-replication).
 1. Click the **Add node** button.
-1. Restart GitLab on the secondary:
+1. Restart GitLab on the secondary.
 
-    ```
+    For installations from **Omnibus GitLab packages**:
+
+    ```bash
     gitlab-ctl restart
     ```
 
+    For installations from **source**
+
+    ```bash
+    sudo service gitlab restart
+    ```
 ---
 
 After the **Add Node** button is pressed, the secondary will start automatically
