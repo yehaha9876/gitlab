@@ -153,7 +153,7 @@ If you installed GitLab from source:
    will serve as the **secondary** Geo node. Do not login or set up anything
    else in the secondary node for the moment.
 1. [Upload the GitLab License](../user/admin_area/license.md) you purchased for GitLab Enterprise Edition to unlock GitLab Geo.
-1. [Setup the database replication](database_source.md)  (`primary (read-write) <-> secondary (read-only)` topology).
+1. [Setup the database replication](database.md)  (`primary (read-write) <-> secondary (read-only)` topology).
 1. [Configure SSH authorizations to use the database](ssh.md)
 1. [Configure GitLab](configuration.md) to set the primary and secondary
    nodes.
