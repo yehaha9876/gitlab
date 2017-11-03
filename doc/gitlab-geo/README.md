@@ -129,13 +129,12 @@ In order to set up one or more GitLab Geo instances, follow the steps below in
 the **exact order** they appear. **Make sure the GitLab version is the same on
 all nodes.**
 
-### Using Omnibus GitLab
-
 If you installed GitLab using the Omnibus packages (highly recommended):
 
-1. [Install GitLab Enterprise Edition][install-ee] on the server that will serve
-   as the **secondary** Geo node. Do not login or set up anything else in the
-   secondary node for the moment.
+1. [Install GitLab Enterprise Edition from Omnibus packages (highly recommended)][install-ee]
+   or [install GitLab Enterprise Edition from source][install-ee-source] on the
+   server that will serve as the **secondary** Geo node. Do not login or set up
+   anything else in the secondary node for the moment.
 1. [Upload the GitLab License](../user/admin_area/license.md) to the **primary** Geo Node to unlock GitLab Geo.
 1. [Setup the database replication](database.md)  (`primary (read-write) <-> secondary (read-only)` topology).
 1. [Configure SSH authorizations to use the database](ssh.md)
@@ -144,21 +143,6 @@ If you installed GitLab using the Omnibus packages (highly recommended):
 1. [Follow the after setup steps](after_setup.md).
 
 [install-ee]: https://about.gitlab.com/downloads-ee/ "GitLab Enterprise Edition Omnibus packages downloads page"
-
-### Using GitLab installed from source
-
-If you installed GitLab from source:
-
-1. [Install GitLab Enterprise Edition][install-ee-source] on the server that
-   will serve as the **secondary** Geo node. Do not login or set up anything
-   else in the secondary node for the moment.
-1. [Upload the GitLab License](../user/admin_area/license.md) you purchased for GitLab Enterprise Edition to unlock GitLab Geo.
-1. [Setup the database replication](database.md)  (`primary (read-write) <-> secondary (read-only)` topology).
-1. [Configure SSH authorizations to use the database](ssh.md)
-1. [Configure GitLab](configuration.md) to set the primary and secondary
-   nodes.
-1. [Follow the after setup steps](after_setup.md).
-
 [install-ee-source]: https://docs.gitlab.com/ee/install/installation.html "GitLab Enterprise Edition installation from source"
 
 ## Configuring GitLab Geo
