@@ -1,4 +1,4 @@
-import '~/filtered_search/filtered_search_token_keys_issues_ee';
+import 'ee/filtered_search/filtered_search_token_keys_issues';
 
 (() => {
   describe('Filtered Search Token Keys (Issues EE)', () => {

@@ -1,3 +1,6 @@
+// EE-only
+import 'ee/filtered_search/filtered_search_token_keys_issues';
+
 import './dropdown_emoji';
 import './dropdown_hint';
 import './dropdown_non_user';
@@ -9,6 +12,3 @@ import './filtered_search_dropdown';
 import './filtered_search_manager';
 import './filtered_search_tokenizer';
 import './filtered_search_visual_tokens';
-
-// EE-only
-import './filtered_search_token_keys_issues_ee';

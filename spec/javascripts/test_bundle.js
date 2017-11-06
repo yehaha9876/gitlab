@@ -59,18 +59,26 @@ beforeEach(() => {
 });
 
 // render all of our tests
-const testsContext = require.context('.', true, /_spec$/);
-testsContext.keys().forEach(function (path) {
-  try {
-    testsContext(path);
-  } catch (err) {
-    console.error('[ERROR] Unable to load spec: ', path);
-    describe('Test bundle', function () {
-      it(`includes '${path}'`, function () {
-        expect(err).toBeNull();
+const testContexts = [
+  '~',
+  'ee',
+].map(function (testRoot) {
+  return require.context(testRoot, true, /_spec$/);
+});
+
+testContexts.forEach(function (context) {
+  context.keys().forEach(function (path) {
+    try {
+      context(path);
+    } catch (err) {
+      console.error('[ERROR] Unable to load spec: ', path);
+      describe('Test bundle', function () {
+        it(`includes '${path}'`, function () {
+          expect(err).toBeNull();
+        });
       });
-    });
-  }
+    }
+  });
 });
 
 describe('test errors', () => {
@@ -131,22 +139,24 @@ if (process.env.BABEL_ENV === 'coverage') {
     './issue_show/index.js',
   ];
 
-  describe('Uncovered files', function () {
-    const sourceFiles = require.context('~', true, /\.js$/);
-    sourceFiles.keys().forEach(function (path) {
-      // ignore if there is a matching spec file
-      if (testsContext.keys().indexOf(`${path.replace(/\.js$/, '')}_spec`) > -1) {
-        return;
-      }
-
-      it(`includes '${path}'`, function () {
-        try {
-          sourceFiles(path);
-        } catch (err) {
-          if (troubleMakers.indexOf(path) === -1) {
-            expect(err).toBeNull();
-          }
+  testContexts.forEach(function (context) {
+    describe('Uncovered files', function () {
+      const sourceFiles = require.context(context(), true, /\.js$/);
+      sourceFiles.keys().forEach(function (path) {
+        // ignore if there is a matching spec file
+        if (context.keys().indexOf(`${path.replace(/\.js$/, '')}_spec`) > -1) {
+          return;
         }
+
+        it(`includes '${path}'`, function () {
+          try {
+            sourceFiles(path);
+          } catch (err) {
+            if (troubleMakers.indexOf(path) === -1) {
+              expect(err).toBeNull();
+            }
+          }
+        });
       });
     });
   });
