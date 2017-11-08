@@ -34,13 +34,19 @@ sed -i 's/username: root/username: gitlab/g' config/database.yml
 
 if [ "$GITLAB_DATABASE" = 'postgresql' ]; then
     sed -i 's/localhost/postgres/g' config/database.yml
-    . scripts/create_postgres_user.sh
+
+    if [ "$USE_DB" != 'false' ]; then
+        . scripts/create_postgres_user.sh
+    fi
 
     # EE-only
     sed -i 's/localhost/postgres/g' config/database_geo.yml
 else # Assume it's mysql
     sed -i 's/localhost/mysql/g' config/database.yml
-    . scripts/create_mysql_user.sh
+
+    if [ "$USE_DB" != 'false' ]; then
+        . scripts/create_mysql_user.sh
+    fi
 
     # EE-only
     sed -i 's/localhost/mysql/g' config/database_geo.yml
