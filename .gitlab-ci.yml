@@ -696,5 +696,6 @@ gitlab_git_test:
   <<: *except-docs
   variables:
     SETUP_DB: "false"
+    USE_DB: "false"
   script:
     - spec/support/prepare-gitlab-git-test-for-commit --check-for-changes
