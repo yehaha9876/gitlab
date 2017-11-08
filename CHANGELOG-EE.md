@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 9.5.10 (2017-11-08)
+
+- No changes.
+
 ## 9.5.9 (2017-10-16)
 
 - [SECURITY] Prevent Related Issues from leaking confidential issues.
