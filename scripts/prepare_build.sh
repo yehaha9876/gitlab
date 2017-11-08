@@ -29,13 +29,18 @@ cp config/database.yml.$GITLAB_DATABASE config/database.yml
 # EE-only
 cp config/database_geo.yml.$GITLAB_DATABASE config/database_geo.yml
 
+# Set user to a non-superuser to ensure we test permissions
+sed -i 's/username: root/username: gitlab/g' config/database.yml
+
 if [ "$GITLAB_DATABASE" = 'postgresql' ]; then
     sed -i 's/localhost/postgres/g' config/database.yml
+    . scripts/create_postgres_user.sh
 
     # EE-only
     sed -i 's/localhost/postgres/g' config/database_geo.yml
 else # Assume it's mysql
     sed -i 's/localhost/mysql/g' config/database.yml
+    . scripts/create_mysql_user.sh
 
     # EE-only
     sed -i 's/localhost/mysql/g' config/database_geo.yml
