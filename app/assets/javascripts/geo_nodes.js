@@ -1,5 +1,5 @@
 /* eslint-disable no-new*/
-import './smart_interval';
+import SmartInterval from './smart_interval';
 import { parseSeconds, stringifyTime } from './lib/utils/pretty_time';
 
 const healthyClass = 'geo-node-healthy';
@@ -31,7 +31,7 @@ class GeoNodeStatus {
     this.$advancedStatus = $('.js-advanced-geo-node-status-toggler', this.$status);
     this.$advancedStatus.on('click', GeoNodeStatus.toggleShowAdvancedStatus);
 
-    this.statusInterval = new gl.SmartInterval({
+    this.statusInterval = new SmartInterval({
       callback: this.getStatus.bind(this),
       startingInterval: 30000,
       maxInterval: 120000,
@@ -66,7 +66,7 @@ class GeoNodeStatus {
   }
 
   getStatus() {
-    $.getJSON(this.endpoint, (status) => {
+    return $.getJSON(this.endpoint, (status) => {
       this.setStatusIcon(status.healthy);
       this.setHealthStatus(status.healthy);
 
