@@ -387,6 +387,7 @@ spinach-mysql 3 4: *spinach-metadata-mysql
   variables:
     SIMPLECOV: "false"
     SETUP_DB: "false"
+    USE_DB: "false"
 
 .rake-exec: &rake-exec
   <<: *ruby-static-analysis
