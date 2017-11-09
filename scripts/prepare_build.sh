@@ -60,7 +60,7 @@ if [ "$SETUP_DB" != "false" ]; then
     if [ "$GITLAB_DATABASE" = 'postgresql' ]; then
         . scripts/create_postgres_user.sh
     else
-        . scripts/create_myql_user.sh
+        . scripts/create_mysql_user.sh
     fi
 
     bundle exec rake db:drop db:create db:schema:load db:migrate
