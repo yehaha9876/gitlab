@@ -35,18 +35,10 @@ sed -i 's/username: root/username: gitlab/g' config/database.yml
 if [ "$GITLAB_DATABASE" = 'postgresql' ]; then
     sed -i 's/localhost/postgres/g' config/database.yml
 
-    if [ "$USE_DB" != 'false' ]; then
-        . scripts/create_postgres_user.sh
-    fi
-
     # EE-only
     sed -i 's/localhost/postgres/g' config/database_geo.yml
 else # Assume it's mysql
     sed -i 's/localhost/mysql/g' config/database.yml
-
-    if [ "$USE_DB" != 'false' ]; then
-        . scripts/create_mysql_user.sh
-    fi
 
     # EE-only
     sed -i 's/localhost/mysql/g' config/database_geo.yml
@@ -65,6 +57,12 @@ cp config/redis.shared_state.yml.example config/redis.shared_state.yml
 sed -i 's/localhost/redis/g' config/redis.shared_state.yml
 
 if [ "$SETUP_DB" != "false" ]; then
+    if [ "$GITLAB_DATABASE" = 'postgresql' ]; then
+        . scripts/create_postgres_user.sh
+    else
+        . scripts/create_myql_user.sh
+    fi
+
     bundle exec rake db:drop db:create db:schema:load db:migrate
 
     if [ "$GITLAB_DATABASE" = "mysql" ]; then
