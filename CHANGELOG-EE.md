@@ -2,7 +2,9 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 ## 9.5.10 (2017-11-08)
 
-- No changes.
+- [SECURITY] Geo JSON web tokens now expire after two minutes to reduce risk of compromise.
+- [SECURITY] Add X-Content-Type-Options header in API responses to make it more difficult to find other vulnerabilities.
+- [SECURITY] Properly translate IP addresses written in decimal, octal, or other formats in SSRF protections in project imports.
 
 ## 9.5.9 (2017-10-16)
 
