@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::BackgroundMigration::PopulateForkNetworksRange, :migration, schema: 20170929131201 do
+describe Gitlab::BackgroundMigration::PopulateForkNetworksRange, :migration, :sidekiq, schema: 20170929131201 do
   let(:migration) { described_class.new }
   let(:base1) { create(:project) }
   let(:base1_fork1) { create(:project) }
@@ -38,6 +38,12 @@ describe Gitlab::BackgroundMigration::PopulateForkNetworksRange, :migration, sch
                                 forked_to_project_id: base2_fork2.id)
 
     migration.perform(1, 3)
+  end
+
+  around do |example|
+    Sidekiq::Testing.inline! do
+      example.run
+    end
   end
 
   it 'it creates the fork network' do
