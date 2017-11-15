@@ -1,7 +1,13 @@
 class Groups::EpicsController < Groups::ApplicationController
   include IssuableActions
 
+<<<<<<< HEAD
   before_action :epic
+=======
+  before_action :check_epics_available!
+  before_action :epic, except: :index
+  before_action :set_issuables_index, only: :index
+>>>>>>> 74d5422a10... Merge branch '3731-eeu-license' into 'master'
   before_action :authorize_update_issuable!, only: :update
 
   skip_before_action :labels
