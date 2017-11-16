@@ -127,8 +127,7 @@ module EE
           end
 
           def update_identity(dn, uid)
-            identity =
-              Identity.find_by(provider: provider, extern_uid: dn)
+            identity = Identity.with_extern_uid(provider, dn)
 
             # User may not exist in GitLab yet. Skip.
             return unless identity.present?
