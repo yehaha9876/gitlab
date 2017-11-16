@@ -44,7 +44,7 @@ module Gitlab
       private
 
       def find_by_login(login)
-        identity = ::Identity.with_extern_uid(:kerberos, login)
+        identity = ::Identity.with_extern_uid(:kerberos, login).take
         identity && identity.user
       end
     end
