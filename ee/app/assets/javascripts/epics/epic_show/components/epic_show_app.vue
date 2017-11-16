@@ -1,6 +1,8 @@
 <script>
   import issuableApp from '~/issue_show/components/app.vue';
+  import relatedIssuesRoot from '~/issuable/related_issues/components/related_issues_root.vue';
   import epicHeader from './epic_header.vue';
+  import epicSidebar from '../../sidebar/components/sidebar_app.vue';
 
   export default {
     name: 'epicShowApp',
@@ -14,6 +16,10 @@
         type: Boolean,
       },
       canDestroy: {
+        required: true,
+        type: Boolean,
+      },
+      canAdmin: {
         required: true,
         type: Boolean,
       },
@@ -55,10 +61,24 @@
         type: Object,
         required: true,
       },
+      issueLinksEndpoint: {
+        type: String,
+        required: true,
+      },
+      startDate: {
+        type: String,
+        required: false,
+      },
+      endDate: {
+        type: String,
+        required: false,
+      },
     },
     components: {
       epicHeader,
+      epicSidebar,
       issuableApp,
+      relatedIssuesRoot,
     },
     created() {
       // Epics specific configuration
@@ -75,21 +95,35 @@
       :author="author"
       :created="created"
     />
-    <div class="issuable-details detail-page-description content-block">
-      <issuable-app
-        :can-update="canUpdate"
-        :can-destroy="canDestroy"
+    <div class="issuable-details content-block">
+      <div class="detail-page-description">
+        <issuable-app
+          :can-update="canUpdate"
+          :can-destroy="canDestroy"
+          :endpoint="endpoint"
+          :issuable-ref="issuableRef"
+          :initial-title-html="initialTitleHtml"
+          :initial-title-text="initialTitleText"
+          :initial-description-html="initialDescriptionHtml"
+          :initial-description-text="initialDescriptionText"
+          :markdown-preview-path="markdownPreviewPath"
+          :markdown-docs-path="markdownDocsPath"
+          :project-path="projectPath"
+          :project-namespace="projectNamespace"
+          :show-inline-edit-button="true"
+        />
+      </div>
+      <epic-sidebar
         :endpoint="endpoint"
-        :issuable-ref="issuableRef"
-        :initial-title-html="initialTitleHtml"
-        :initial-title-text="initialTitleText"
-        :initial-description-html="initialDescriptionHtml"
-        :initial-description-text="initialDescriptionText"
-        :markdown-preview-path="markdownPreviewPath"
-        :markdown-docs-path="markdownDocsPath"
-        :project-path="projectPath"
-        :project-namespace="projectNamespace"
-        :show-inline-edit-button="true"
+        :editable="canUpdate"
+        :initialStartDate="startDate"
+        :initialEndDate="endDate"
+      />
+      <related-issues-root
+        :endpoint="issueLinksEndpoint"
+        :can-admin="canAdmin"
+        :allow-auto-complete="false"
+        title="Issues"
       />
     </div>
   </div>
