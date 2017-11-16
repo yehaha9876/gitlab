@@ -28,12 +28,6 @@ describe EpicPolicy do
     context 'when an epic is in a private group' do
       let(:group) { create(:group, :private) }
 
-<<<<<<< HEAD
-      expect(permissions(user, group))
-        .to be_allowed(:read_epic, :update_epic, :destroy_epic, :admin_epic, :create_epic)
-    end
-  end
-=======
       it 'anonymous user can not read epics' do
         expect(permissions(nil, group))
           .to be_disallowed(:read_epic, :update_epic, :destroy_epic, :admin_epic, :create_epic)
@@ -46,7 +40,6 @@ describe EpicPolicy do
 
       it 'guest group member can only read epics' do
         group.add_guest(user)
->>>>>>> 74d5422a10... Merge branch '3731-eeu-license' into 'master'
 
         expect(permissions(user, group)).to be_allowed(:read_epic)
         expect(permissions(user, group)).to be_disallowed(:update_epic, :destroy_epic, :admin_epic, :create_epic)
@@ -71,12 +64,6 @@ describe EpicPolicy do
     context 'when an epic is in an internal group' do
       let(:group) { create(:group, :internal) }
 
-<<<<<<< HEAD
-      expect(permissions(user, group))
-        .to be_allowed(:read_epic, :update_epic, :destroy_epic, :admin_epic, :create_epic)
-    end
-  end
-=======
       it 'anonymous user can not read epics' do
         expect(permissions(nil, group))
           .to be_disallowed(:read_epic, :update_epic, :destroy_epic, :admin_epic, :create_epic)
@@ -89,7 +76,6 @@ describe EpicPolicy do
 
       it 'guest group member can only read epics' do
         group.add_guest(user)
->>>>>>> 74d5422a10... Merge branch '3731-eeu-license' into 'master'
 
         expect(permissions(user, group)).to be_allowed(:read_epic)
         expect(permissions(user, group)).to be_disallowed(:update_epic, :destroy_epic, :admin_epic, :create_epic)
@@ -114,10 +100,6 @@ describe EpicPolicy do
     context 'when an epic is in a public group' do
       let(:group) { create(:group, :public) }
 
-<<<<<<< HEAD
-      expect(permissions(user, group))
-        .to be_allowed(:read_epic, :update_epic, :destroy_epic, :admin_epic, :create_epic)
-=======
       it 'anonymous user can only read epics' do
         expect(permissions(nil, group)).to be_allowed(:read_epic)
         expect(permissions(nil, group)).to be_disallowed(:update_epic, :destroy_epic, :admin_epic, :create_epic)
@@ -149,7 +131,6 @@ describe EpicPolicy do
         expect(permissions(user, group))
           .to be_allowed(:read_epic, :update_epic, :destroy_epic, :admin_epic, :create_epic)
       end
->>>>>>> 74d5422a10... Merge branch '3731-eeu-license' into 'master'
     end
   end
 end
