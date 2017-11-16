@@ -251,6 +251,7 @@ See `START user configuration` section in the next step for required information
     #
     # Replace PGBOUNCER_PASSWORD_HASH with a generated md5 value
     postgresql['pgbouncer_user_password'] = 'PGBOUNCER_PASSWORD_HASH'
+    # Replace POSTGRESQL_PASSWORD_HASH with a generated md5 value
     postgresql['sql_user_password'] = 'POSTGRESQL_PASSWORD_HASH'
     # Replace X with value of number of db nodes + 1
     postgresql['max_wal_senders'] = X
@@ -309,8 +310,8 @@ your configuration
 
     # START user configuration
     # Please set the real values as explained in Required Information section
-    # Replace CONSUL_PASSWORD_HASH with with a generated md5 value
-    # Replace PGBOUNCER_PASSWORD_HASH with with a generated md5 value
+    # Replace CONSUL_PASSWORD_HASH with a generated md5 value
+    # Replace PGBOUNCER_PASSWORD_HASH with a generated md5 value
     pgbouncer['users'] = {
       'gitlab-consul': {
         password: 'CONSUL_PASSWORD_HASH'
