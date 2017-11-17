@@ -32,7 +32,8 @@ The recommended configuration for a PostgreSQL HA requires:
     - `repmgrd` - A service to monitor, and handle failover in case of a failure
     - `Consul` agent - Used for service discovery, to alert other nodes when failover occurs
 - A minimum of three `Consul` server nodes
-- A minimum of one `pgbouncer` service node
+- A minimum of one `pgbouncer` service node. If you have multiple application nodes, it is recommended to run a pgbouncer service on each node.
+
 
 You also need to take into consideration the underlying network topology,
 making sure you have redundant connectivity between all Database and GitLab instances,
@@ -279,7 +280,60 @@ you also need to specify: `postgresql['pgbouncer_user'] = PGBOUNCER_USERNAME` in
 your configuration
 `
 
-### Configuring the Pgbouncer node
+### Configuring Pgbouncer
+
+You have the option of running pgbouncer on a dedicated node by itself, or alongside the application nodes.
+
+If you are running multiple application nodes, it is recommended to run pgbouncer on the same nodes.
+
+We do not currently provide a method for HA Pgbouncer. Using dedicated pgbouncer instances will require manual intervention if a node fails.
+
+#### Confguring an application node with Pgbouncer
+
+1. Edit `/etc/gitlab/gitlab.rb`:
+    ```ruby
+    postgresql['enable'] = false
+    gitlab_rails['auto_migrate'] = false
+
+    pgbouncer['enable'] = true
+    consul['enable'] = true
+
+    # Configure Pgbouncer
+    pgbouncer['admin_users'] = %w(pgbouncer gitlab-consul)
+
+    gitlab_rails['db_host'] = '127.0.0.1'
+    gitlab_rails['db_port'] = 6432
+    gitlab_rails['db_password'] = 'POSTGRESQL_USER_PASSWORD'
+
+    # Configure Consul agent
+    consul['watchers'] = %w(postgresql)
+
+    # START user configuration
+    # Please set the real values as explained in Required Information section
+    # Replace CONSUL_PASSWORD_HASH with with a generated md5 value
+    # Replace PGBOUNCER_PASSWORD_HASH with with a generated md5 value
+    pgbouncer['users'] = {
+      'gitlab-consul': {
+        password: 'CONSUL_PASSWORD_HASH'
+      },
+      'pgbouncer': {
+        password: 'PGBOUNCER_PASSWORD_HASH'
+      }
+    }
+    # Replace placeholders:
+    #
+    # Y.Y.Y.Y consul1.gitlab.example.com Z.Z.Z.Z
+    # with the addresses gathered for CONSUL_SERVER_NODES
+    consul['configuration'] = {
+      retry_join: %w(Y.Y.Y.Y consul1.gitlab.example.com Z.Z.Z.Z)
+    }
+    #
+    # END user configuration
+    ```
+
+1. [Reconfigure GitLab] for the changes to take effect.
+
+#### Configuring a standalone Pgbouncer node
 
 1. Edit `/etc/gitlab/gitlab.rb`:
 
@@ -331,7 +385,7 @@ your configuration
 
 1. [Reconfigure GitLab] for the changes to take effect.
 
-### Configuring the Application nodes
+#### Configuring the Application nodes with an external Pgbouncer
 
 These will be the nodes running the `gitlab-rails` service. You may have other
 attributes set, but the following need to be set.
@@ -619,6 +673,24 @@ the previous section:
   1. Ensure `gitlab_rails['db_password']` is set to the plaintext password for
      the `gitlab` database user
   1. [Reconfigure GitLab] for the changes to take effect
+
+## Architecture
+
+![PG HA Architecture](pg_ha_architecture.png)
+
+Database nodes run two services besides PostgreSQL
+1. Repmgrd -- monitors the cluster and handles failover in case of an issue with the master
+
+   The failover consists of
+   * Selecting a new master for the cluster
+   * Promoting the new node to master
+   * Instructing remaining servers to follow the new master node
+
+   On failure, the old master node is automatically evicted from the cluster, and should be rejoined manually once recovered.
+
+1. Consul -- Monitors the status of each node in the database cluster, and tracks its health in a service definiton on the consul cluster.
+
+Alongside pgbouncer, there is a consul agent that watches the status of the PostgreSQL service. If that status changes, consul runs a script which updates the configuration and reloads pgbouncer
 
 ## Troubleshooting
 
