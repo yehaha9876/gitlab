@@ -1,5 +1,4 @@
 @import "./issues/issue_count_badge";
-@import "./issues/related_issues";
 
 .issues-list {
   .issue {
@@ -135,11 +134,24 @@ ul.related-merge-requests > li {
 }
 
 @media (max-width: $screen-xs-max) {
-  .issue-btn-group {
-    width: 100%;
+  .detail-page-header,
+  .issuable-header {
+    display: block;
 
-    .btn {
+    .issuable-meta {
+      line-height: 18px;
+    }
+  }
+
+  .issuable-actions {
+    margin-top: 10px;
+
+    .issue-btn-group {
       width: 100%;
+
+      .btn {
+        width: 100%;
+      }
     }
   }
 }

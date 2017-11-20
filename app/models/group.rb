@@ -30,13 +30,14 @@ class Group < Namespace
   has_many :notification_settings, dependent: :destroy, as: :source # rubocop:disable Cop/ActiveRecordDependent
   has_many :labels, class_name: 'GroupLabel'
   has_many :variables, class_name: 'Ci::GroupVariable'
+  has_many :custom_attributes, class_name: 'GroupCustomAttribute'
 
   has_many :ldap_group_links, foreign_key: 'group_id', dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_many :hooks, dependent: :destroy, class_name: 'GroupHook' # rubocop:disable Cop/ActiveRecordDependent
 
   # We cannot simply set `has_many :audit_events, as: :entity, dependent: :destroy`
   # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.
-  has_many :audit_events, -> { where(entity_type: Group) }, dependent: :delete_all, foreign_key: 'entity_id' # rubocop:disable Cop/ActiveRecordDependent
+  has_many :audit_events, -> { where(entity_type: Group) }, foreign_key: 'entity_id'
 
   validate :avatar_type, if: ->(user) { user.avatar.present? && user.avatar_changed? }
   validate :visibility_level_allowed_by_projects

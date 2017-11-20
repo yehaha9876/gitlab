@@ -289,6 +289,13 @@
       color: $almost-black;
     }
   }
+
+  .file-status-icon {
+    width: 10px;
+    height: 10px;
+    margin-left: 3px;
+  }
+
 }
 
 .render-error {
@@ -297,4 +304,8 @@
   p {
     width: 100%;
   }
+}
+
+.multi-file-table-col-name {
+  width: 350px;
 }

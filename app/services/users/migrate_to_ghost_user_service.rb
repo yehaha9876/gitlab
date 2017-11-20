@@ -6,6 +6,7 @@
 # when the user is destroyed.
 module Users
   class MigrateToGhostUserService
+    prepend EE::Users::MigrateToGhostUserService
     extend ActiveSupport::Concern
 
     attr_reader :ghost_user, :user
@@ -25,7 +26,7 @@ module Users
         user.block
 
         # Reverse the user block if record migration fails
-        if !migrate_records && transition
+        if !migrate_records_in_transaction && transition
           transition.rollback
           user.save!
         end
@@ -36,16 +37,20 @@ module Users
 
     private
 
-    def migrate_records
+    def migrate_records_in_transaction
       user.transaction(requires_new: true) do
         @ghost_user = User.ghost
 
-        migrate_issues
-        migrate_merge_requests
-        migrate_notes
-        migrate_abuse_reports
-        migrate_award_emojis
+        migrate_records
       end
+    end
+
+    def migrate_records
+      migrate_issues
+      migrate_merge_requests
+      migrate_notes
+      migrate_abuse_reports
+      migrate_award_emojis
     end
 
     def migrate_issues

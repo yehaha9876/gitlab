@@ -5,6 +5,7 @@ module EE
     prepended do
       with_scope :subject
       condition(:ldap_synced) { @subject.ldap_synced? }
+      condition(:epics_disabled) { !@subject.feature_available?(:epics) }
 
       rule { reporter }.policy do
         enable :admin_list
@@ -27,10 +28,17 @@ module EE
         enable :create_epic
         enable :admin_epic
         enable :update_epic
-        enable :destroy_epic
       end
 
-      rule { auditor }.enable :read_group
+      rule { owner }.enable :destroy_epic
+
+      rule { auditor }.policy do
+        enable  :read_group
+        enable  :read_epic
+      end
+
+      rule { admin }.enable :read_epic
+      rule { has_projects }.enable :read_epic
 
       rule { admin | (can_owners_manage_ldap & owner) }.enable :admin_ldap_group_links
 
@@ -39,6 +47,14 @@ module EE
       rule { ldap_synced & (admin | owner) }.enable :update_group_member
 
       rule { ldap_synced & (admin | (can_owners_manage_ldap & owner)) }.enable :override_group_member
+
+      rule { epics_disabled }.policy do
+        prevent :read_epic
+        prevent :create_epic
+        prevent :admin_epic
+        prevent :update_epic
+        prevent :destroy_epic
+      end
     end
   end
 end

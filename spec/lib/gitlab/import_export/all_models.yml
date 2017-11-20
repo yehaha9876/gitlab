@@ -18,6 +18,8 @@ issues:
 - metrics
 - timelogs
 - issue_assignees
+- epic_issue
+- epic
 events:
 - author
 - project
@@ -155,10 +157,6 @@ deploy_keys:
 - user
 - deploy_keys_projects
 - projects
-cluster:
-- project
-- user
-- service
 services:
 - project
 - service_hook
@@ -194,6 +192,8 @@ project:
 - tags
 - chat_services
 - cluster
+- clusters
+- cluster_project
 - creator
 - group
 - namespace
@@ -303,6 +303,7 @@ project:
 - root_of_fork_network
 - fork_network_member
 - fork_network
+- custom_attributes
 award_emoji:
 - awardable
 - user
@@ -317,3 +318,6 @@ push_event_payload:
 issue_assignees:
 - issue
 - assignee
+epic_issues:
+- issue
+- epic

@@ -8,12 +8,10 @@ class Issue < ActiveRecord::Base
   include Issuable
   include Noteable
   include Referable
-  include Sortable
   include Spammable
   include Elastic::IssuesSearch
   include FasterCacheKeys
   include RelativePositioning
-  include CreatedAtFilterable
   include TimeTrackable
 
   WEIGHT_RANGE = 1..9
@@ -39,6 +37,9 @@ class Issue < ActiveRecord::Base
 
   has_many :issue_assignees
   has_many :assignees, class_name: "User", through: :issue_assignees
+
+  has_one :epic_issue
+  has_one :epic, through: :epic_issue
 
   validates :project, presence: true
 

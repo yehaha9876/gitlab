@@ -17,8 +17,9 @@ class Repository
   ].freeze
 
   include Gitlab::ShellAdapter
-  include Elastic::RepositoriesSearch
+
   prepend EE::Repository
+  include Elastic::RepositoriesSearch
 
   attr_accessor :full_path, :disk_path, :project, :is_wiki
 
@@ -913,13 +914,13 @@ class Repository
     branch = Gitlab::Git::Branch.find(self, branch_or_name)
 
     if branch
-      root_ref_sha = commit(root_ref).sha
-      same_head = branch.target == root_ref_sha
+      @root_ref_sha ||= commit(root_ref).sha
+      same_head = branch.target == @root_ref_sha
       merged =
         if pre_loaded_merged_branches
           pre_loaded_merged_branches.include?(branch.name)
         else
-          ancestor?(branch.target, root_ref_sha)
+          ancestor?(branch.target, @root_ref_sha)
         end
 
       !same_head && merged
@@ -1024,8 +1025,8 @@ class Repository
     gitlab_shell.fetch_remote(raw_repository, remote, ssh_auth: ssh_auth, forced: forced, no_tags: no_tags)
   end
 
-  def fetch_source_branch(source_repository, source_branch, local_ref)
-    raw_repository.fetch_source_branch(source_repository.raw_repository, source_branch, local_ref)
+  def fetch_source_branch!(source_repository, source_branch, local_ref)
+    raw_repository.fetch_source_branch!(source_repository.raw_repository, source_branch, local_ref)
   end
 
   def remote_exists?(name)
@@ -1121,6 +1122,10 @@ class Repository
 
   def gitlab_ci_yml_for(sha, path = '.gitlab-ci.yml')
     blob_data_at(sha, path)
+  end
+
+  def fetch_ref(source_repository, source_ref:, target_ref:)
+    raw_repository.fetch_ref(source_repository.raw_repository, source_ref: source_ref, target_ref: target_ref)
   end
 
   private

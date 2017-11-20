@@ -1,7 +1,10 @@
 import Vue from 'vue';
 import epicShowApp from 'ee/epics/epic_show/components/epic_show_app.vue';
 import epicHeader from 'ee/epics/epic_show/components/epic_header.vue';
+import epicSidebar from 'ee/epics/sidebar/components/sidebar_app.vue';
 import issuableApp from '~/issue_show/components/app.vue';
+import issuableAppEventHub from '~/issue_show/event_hub';
+import '~/lib/utils/url_utility';
 import mountComponent from '../../../helpers/vue_mount_component_helper';
 import { props } from '../mock_data';
 import issueShowData from '../../../issue_show/mock_data';
@@ -10,11 +13,18 @@ describe('EpicShowApp', () => {
   let vm;
   let headerVm;
   let issuableAppVm;
+  let sidebarVm;
 
   const interceptor = (request, next) => {
-    next(request.respondWith(JSON.stringify(issueShowData.initialRequest), {
-      status: 200,
-    }));
+    if (request.url === '/realtime_changes') {
+      next(request.respondWith(JSON.stringify(issueShowData.initialRequest), {
+        status: 200,
+      }));
+    } else {
+      next(request.respondWith(null, {
+        status: 404,
+      }));
+    }
   };
 
   beforeEach(() => {
@@ -26,6 +36,8 @@ describe('EpicShowApp', () => {
       endpoint,
       initialTitleHtml,
       initialTitleText,
+      startDate,
+      endDate,
       markdownPreviewPath,
       markdownDocsPath,
       author,
@@ -39,6 +51,7 @@ describe('EpicShowApp', () => {
     headerVm = mountComponent(EpicHeader, {
       author,
       created,
+      canDelete: canDestroy,
     });
 
     const IssuableApp = Vue.extend(issuableApp);
@@ -57,6 +70,14 @@ describe('EpicShowApp', () => {
       projectNamespace: '',
       showInlineEditButton: true,
     });
+
+    const EpicSidebar = Vue.extend(epicSidebar);
+    sidebarVm = mountComponent(EpicSidebar, {
+      endpoint,
+      editable: canUpdate,
+      initialStartDate: startDate,
+      initialEndDate: endDate,
+    });
   });
 
   afterEach(() => {
@@ -69,5 +90,19 @@ describe('EpicShowApp', () => {
 
   it('should render issuable-app', () => {
     expect(vm.$el.innerHTML.indexOf(issuableAppVm.$el.innerHTML) !== -1).toEqual(true);
+  });
+
+  it('should render epic-sidebar', () => {
+    expect(vm.$el.innerHTML.indexOf(sidebarVm.$el.innerHTML) !== -1).toEqual(true);
+  });
+
+  it('should emit delete.issuable when epic is deleted', () => {
+    const deleteIssuable = jasmine.createSpy();
+    issuableAppEventHub.$on('delete.issuable', deleteIssuable);
+    spyOn(window, 'confirm').and.returnValue(true);
+    spyOn(gl.utils, 'visitUrl').and.callFake(() => {});
+
+    vm.$el.querySelector('.detail-page-header .btn-remove').click();
+    expect(deleteIssuable).toHaveBeenCalled();
   });
 });

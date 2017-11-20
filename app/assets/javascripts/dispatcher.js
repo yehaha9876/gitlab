@@ -1,5 +1,6 @@
 /* eslint-disable func-names, space-before-function-paren, no-var, prefer-arrow-callback, wrap-iife, no-shadow, consistent-return, one-var, one-var-declaration-per-line, camelcase, default-case, no-new, quotes, no-duplicate-case, no-case-declarations, no-fallthrough, max-len */
-/* global ProjectSelect */
+import { s__ } from './locale';
+import projectSelect from './project_select';
 import IssuableIndex from './issuable_index';
 /* global Milestone */
 import IssuableForm from './issuable_form';
@@ -19,21 +20,22 @@ import groupsSelect from './groups_select';
 import NamespaceSelect from './namespace_select';
 /* global NewCommitForm */
 /* global NewBranchForm */
-/* global Project */
-/* global ProjectAvatar */
+import Project from './project';
+import projectAvatar from './project_avatar';
 /* global MergeRequest */
 /* global Compare */
 /* global CompareAutocomplete */
 /* global PathLocks */
 /* global ProjectFindFile */
-/* global ProjectNew */
-/* global ProjectShow */
-/* global ProjectImport */
+import ProjectNew from './project_new';
+import projectImport from './project_import';
 import Labels from './labels';
 import LabelManager from './label_manager';
 /* global Sidebar */
 /* global WeightSelect */
 /* global AdminEmailSelect */
+
+import Flash from './flash';
 import CommitsList from './commits';
 import Issue from './issue';
 import BindInOut from './behaviors/bind_in_out';
@@ -92,6 +94,8 @@ import Members from './members';
 import memberExpirationDate from './member_expiration_date';
 import DueDateSelectors from './due_date_select';
 import Diff from './diff';
+import ProjectLabelSubscription from './project_label_subscription';
+import ProjectVariables from './project_variables';
 
 // EE-only
 import ApproversSelect from './approvers_select';
@@ -209,7 +213,7 @@ import initGroupAnalytics from './init_group_analytics';
           initIssuableSidebar();
           break;
         case 'dashboard:milestones:index':
-          new ProjectSelect();
+          projectSelect();
           break;
         case 'projects:milestones:show':
           new UserCallout();
@@ -220,7 +224,7 @@ import initGroupAnalytics from './init_group_analytics';
           break;
         case 'dashboard:issues':
         case 'dashboard:merge_requests':
-          new ProjectSelect();
+          projectSelect();
           initLegacyFilters();
           break;
         case 'groups:issues':
@@ -229,7 +233,7 @@ import initGroupAnalytics from './init_group_analytics';
             const filteredSearchManager = new gl.FilteredSearchManager(page === 'groups:issues' ? 'issues' : 'merge_requests');
             filteredSearchManager.setup();
           }
-          new ProjectSelect();
+          projectSelect();
           break;
         case 'dashboard:todos:index':
           new Todos();
@@ -383,7 +387,7 @@ import initGroupAnalytics from './init_group_analytics';
           GpgBadges.fetch();
           break;
         case 'projects:imports:show':
-          new ProjectImport();
+          projectImport();
           break;
         case 'projects:show':
           shortcut_handler = new ShortcutsNavigation();
@@ -413,7 +417,7 @@ import initGroupAnalytics from './init_group_analytics';
           new UserCallout({ className: 'js-mr-approval-callout' });
           break;
         case 'projects:imports:show':
-          new ProjectImport();
+          projectImport();
           break;
         case 'projects:pipelines:new':
           new NewBranchForm($('.js-new-pipeline-form'));
@@ -527,7 +531,7 @@ import initGroupAnalytics from './init_group_analytics';
             if ($el.find('.dropdown-group-label').length) {
               new GroupLabelSubscription($el);
             } else {
-              new gl.ProjectLabelSubscription($el);
+              new ProjectLabelSubscription($el);
             }
           });
           break;
@@ -576,7 +580,7 @@ import initGroupAnalytics from './init_group_analytics';
           // Initialize expandable settings panels
           initSettingsPanels();
         case 'groups:settings:ci_cd:show':
-          new gl.ProjectVariables();
+          new ProjectVariables();
           break;
         case 'ci:lints:create':
         case 'ci:lints:show':
@@ -601,9 +605,12 @@ import initGroupAnalytics from './init_group_analytics';
           new DueDateSelectors();
           break;
         case 'projects:clusters:show':
-          import(/* webpackChunkName: "clusters" */ './clusters')
+          import(/* webpackChunkName: "clusters" */ './clusters/clusters_bundle')
             .then(cluster => new cluster.default()) // eslint-disable-line new-cap
-            .catch(() => {});
+            .catch((err) => {
+              Flash(s__('ClusterIntegration|Problem setting up the cluster JavaScript'));
+              throw err;
+            });
           break;
         case 'admin:licenses:new':
           const $licenseFile = $('.license-file');
@@ -680,7 +687,7 @@ import initGroupAnalytics from './init_group_analytics';
           break;
         case 'projects':
           new Project();
-          new ProjectAvatar();
+          projectAvatar();
           switch (path[1]) {
             case 'compare':
               new CompareAutocomplete();
@@ -700,7 +707,6 @@ import initGroupAnalytics from './init_group_analytics';
             case 'show':
               new Star();
               new ProjectNew();
-              new ProjectShow();
               new NotificationsDropdown();
               break;
             case 'wikis':

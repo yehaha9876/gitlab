@@ -43,6 +43,9 @@
                 %span
                   Contribution Analytics
 
+
+      = render "layouts/nav/ee/epic_link", group: @group
+
       = nav_link(path: issues_sub_menu_items) do
         = link_to issues_group_path(@group) do
           .nav-icon-container

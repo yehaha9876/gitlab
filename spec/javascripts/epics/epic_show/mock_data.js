@@ -1,12 +1,16 @@
 export const contentProps = {
   endpoint: '',
+  canAdmin: true,
   canUpdate: true,
-  canDestroy: false,
+  canDestroy: true,
   markdownPreviewPath: '',
   markdownDocsPath: '',
+  issueLinksEndpoint: '/',
   groupPath: '',
   initialTitleHtml: '',
   initialTitleText: '',
+  startDate: '2017-01-01',
+  endDate: '2017-10-10',
 };
 
 export const headerProps = {

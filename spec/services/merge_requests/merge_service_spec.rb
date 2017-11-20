@@ -38,22 +38,6 @@ describe MergeRequests::MergeService do
       end
     end
 
-    context 'project has exceeded size limit' do
-      let(:service) { described_class.new(project, user, commit_message: 'Awesome message') }
-
-      before do
-        allow(project).to receive(:above_size_limit?).and_return(true)
-
-        perform_enqueued_jobs do
-          service.execute(merge_request)
-        end
-      end
-
-      it 'returns the correct error message' do
-        expect(merge_request.merge_error).to include('This merge request cannot be merged')
-      end
-    end
-
     context 'closes related issues' do
       let(:service) { described_class.new(project, user, commit_message: 'Awesome message') }
 
@@ -297,58 +281,28 @@ describe MergeRequests::MergeService do
           expect(merge_request.merge_error).to include(error_message)
           expect(Rails.logger).to have_received(:error).with(a_string_matching(error_message))
         end
-      end
-    end
-  end
 
-  describe '#hooks_validation_pass?' do
-    shared_examples 'hook validations are skipped when push rules unlicensed' do
-      subject { service.hooks_validation_pass?(merge_request) }
+        context "when fast-forward merge is not allowed" do
+          before do
+            allow_any_instance_of(Repository).to receive(:ancestor?).and_return(nil)
+          end
 
-      before do
-        stub_licensed_features(push_rules: false)
-      end
+          %w(semi-linear ff).each do |merge_method|
+            it "logs and saves error if merge is #{merge_method} only" do
+              merge_method = 'rebase_merge' if merge_method == 'semi-linear'
+              merge_request.project.update(merge_method: merge_method)
+              error_message = 'Only fast-forward merge is allowed for your project. Please update your source branch'
+              allow(service).to receive(:execute_hooks)
 
-      it { is_expected.to be_truthy }
-    end
+              service.execute(merge_request)
 
-    let(:service) { described_class.new(project, user, commit_message: 'Awesome message') }
-
-    it 'returns true when valid' do
-      expect(service.hooks_validation_pass?(merge_request)).to be_truthy
-    end
-
-    context 'commit message validation' do
-      before do
-        allow(project).to receive(:push_rule) { build(:push_rule, commit_message_regex: 'unmatched pattern .*') }
-      end
-
-      it_behaves_like 'hook validations are skipped when push rules unlicensed'
-
-      it 'returns false and saves error when invalid' do
-        expect(service.hooks_validation_pass?(merge_request)).to be_falsey
-        expect(merge_request.merge_error).not_to be_empty
-      end
-    end
-
-    context 'authors email validation' do
-      before do
-        allow(project).to receive(:push_rule) { build(:push_rule, author_email_regex: '.*@unmatchedemaildomain.com') }
-      end
-
-      it_behaves_like 'hook validations are skipped when push rules unlicensed'
-
-      it 'returns false and saves error when invalid' do
-        expect(service.hooks_validation_pass?(merge_request)).to be_falsey
-        expect(merge_request.merge_error).not_to be_empty
-      end
-    end
-
-    context 'fast forward merge request' do
-      it 'returns true when fast forward is enabled' do
-        allow(project).to receive(:merge_requests_ff_only_enabled) { true }
-
-        expect(service.hooks_validation_pass?(merge_request)).to be_truthy
+              expect(merge_request).to be_open
+              expect(merge_request.merge_commit_sha).to be_nil
+              expect(merge_request.merge_error).to include(error_message)
+              expect(Rails.logger).to have_received(:error).with(a_string_matching(error_message))
+            end
+          end
+        end
       end
     end
   end
