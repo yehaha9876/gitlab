@@ -270,7 +270,7 @@ The prerequisites for a HA Redis setup are the following:
     ```ruby
     # Specify server role as 'redis_master_role'
     roles ['redis_master_role']
-    
+
     # IP address pointing to a local IP that the other machines can reach to.
     # You can also set bind to '0.0.0.0' which listen in all interfaces.
     # If you really need to bind to an external accessible IP, make
@@ -284,7 +284,7 @@ The prerequisites for a HA Redis setup are the following:
     # Set up password authentication for Redis (use the same password in all nodes).
     redis['password'] = 'redis-password-goes-here'
     ```
-    
+
 
 1. Only the primary GitLab application server should handle migrations. To
    prevent database migrations from running on upgrade, add the following
@@ -296,8 +296,8 @@ The prerequisites for a HA Redis setup are the following:
 
 1. [Reconfigure Omnibus GitLab][reconfigure] for the changes to take effect.
 
-> Note: You can specify multiple roles like sentinel and redis as: 
-> roles ['redis_sentinel_role', 'redis_master_role']. Read more about high 
+> Note: You can specify multiple roles like sentinel and redis as:
+> roles ['redis_sentinel_role', 'redis_master_role']. Read more about high
 > availability roles at https://docs.gitlab.com/omnibus/roles/
 
 ### Step 2. Configuring the slave Redis instances
@@ -314,7 +314,7 @@ The prerequisites for a HA Redis setup are the following:
     ```ruby
     # Specify server role as 'redis_slave_role'
     roles ['redis_slave_role']
-    
+
     # IP address pointing to a local IP that the other machines can reach to.
     # You can also set bind to '0.0.0.0' which listen in all interfaces.
     # If you really need to bind to an external accessible IP, make
@@ -347,8 +347,8 @@ The prerequisites for a HA Redis setup are the following:
 1. [Reconfigure Omnibus GitLab][reconfigure] for the changes to take effect.
 1. Go through the steps again for all the other slave nodes.
 
-> Note: You can specify multiple roles like sentinel and redis as: 
-> roles ['redis_sentinel_role', 'redis_slave_role']. Read more about high 
+> Note: You can specify multiple roles like sentinel and redis as:
+> roles ['redis_sentinel_role', 'redis_slave_role']. Read more about high
 > availability roles at https://docs.gitlab.com/omnibus/roles/
 
 ---
