@@ -18,7 +18,7 @@ describe Issuable::CommonSystemNotesService do
 
       note = Note.last
       expect(note.note).to match(note_text)
-      expect(note.noteable_type).to eq('Issue')
+      expect(note.noteable_type).to eq(issuable.class.name)
     end
   end
 
@@ -44,6 +44,20 @@ describe Issuable::CommonSystemNotesService do
       end
 
       it_behaves_like 'system note creation', {}, 'changed milestone'
+    end
+
+    context 'with merge requests WIP note' do
+      context 'adding WIP note' do
+        let(:issuable) { create(:merge_request, title: "merge request") }
+
+        it_behaves_like 'system note creation', { title: "WIP merge request" }, 'marked as a **Work In Progress**'
+      end
+
+      context 'adding WIP note' do
+        let(:issuable) { create(:merge_request, title: "WIP merge request") }
+
+        it_behaves_like 'system note creation', { title: "merge request" }, 'unmarked as a **Work In Progress**'
+      end
     end
   end
 end

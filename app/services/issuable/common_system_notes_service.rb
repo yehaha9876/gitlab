@@ -41,6 +41,23 @@ module Issuable
       end
     end
 
+    def handle_wip_note(old_title)
+      return unless issuable.is_a?(MergeRequest)
+
+      changed_title = MergeRequest.wipless_title(old_title) != issuable.wipless_title
+
+      return if changed_title
+
+      removed_wip = MergeRequest.work_in_progress?(old_title) && !issuable.work_in_progress?
+      added_wip = !MergeRequest.work_in_progress?(old_title) && issuable.work_in_progress?
+
+      if removed_wip
+        SystemNoteService.remove_merge_request_wip(issuable, issuable.project, current_user)
+      elsif added_wip
+        SystemNoteService.add_merge_request_wip(issuable, issuable.project, current_user)
+      end
+    end
+
     def create_labels_note(old_labels)
       added_labels = issuable.labels - old_labels
       removed_labels = old_labels - issuable.labels
@@ -49,6 +66,8 @@ module Issuable
     end
 
     def create_title_change_note(old_title)
+      return if handle_wip_note(old_title)
+
       SystemNoteService.change_title(issuable, issuable.project, current_user, old_title)
     end
 
