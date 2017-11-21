@@ -14,8 +14,10 @@ feature 'Environments page', :js do
     it 'shows "Available" and "Stopped" tab with links' do
       visit_environments(project)
 
-      expect(page).to have_link('Available')
-      expect(page).to have_link('Stopped')
+      expect(page).to have_selector('.js-environments-tab-available')
+      expect(page).to have_content('Available')
+      expect(page).to have_selector('.js-environments-tab-stopped')
+      expect(page).to have_content('Stopped')
     end
 
     describe 'with one available environment' do
@@ -75,8 +77,8 @@ feature 'Environments page', :js do
     it 'does not show environments and counters are set to zero' do
       expect(page).to have_content('You don\'t have any environments right now.')
 
-      expect(page.find('.js-available-environments-count').text).to eq('0')
-      expect(page.find('.js-stopped-environments-count').text).to eq('0')
+      expect(page.find('.js-environments-tab-available .badge').text).to eq('0')
+      expect(page.find('.js-environments-tab-stopped .badge').text).to eq('0')
     end
   end
 
@@ -93,8 +95,8 @@ feature 'Environments page', :js do
       it 'shows environments names and counters' do
         expect(page).to have_link(environment.name)
 
-        expect(page.find('.js-available-environments-count').text).to eq('1')
-        expect(page.find('.js-stopped-environments-count').text).to eq('0')
+        expect(page.find('.js-environments-tab-available .badge').text).to eq('1')
+        expect(page.find('.js-environments-tab-stopped .badge').text).to eq('0')
       end
 
       it 'does not show deployments' do
@@ -300,5 +302,6 @@ feature 'Environments page', :js do
 
   def visit_environments(project, **opts)
     visit project_environments_path(project, **opts)
+    wait_for_requests
   end
 end
