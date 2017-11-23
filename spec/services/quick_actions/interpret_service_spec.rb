@@ -341,6 +341,36 @@ describe QuickActions::InterpretService do
       end
     end
 
+    shared_examples 'create branch command' do
+      context 'without params' do
+        it 'creates a new branch with issue title as branch name' do
+          _content, updates, results = service.execute('/create_branch', issuable)
+
+          expect(project.repository.branch_names).to include(issuable.to_branch_name)
+          expect(updates).to be_empty
+          expect(results[:create_branch]).to include({ status: :success })
+        end
+      end
+
+      context 'with params' do
+        it 'creates a new branch if the params is a valid branch name' do
+          _content, updates, results = service.execute("/create_branch #{valid_branch_name}", issuable)
+
+          expect(project.repository.branch_names).to include(valid_branch_name)
+          expect(updates).to be_empty
+          expect(results[:create_branch]).to include({ status: :success })
+        end
+
+        it 'does not create a new branch if the params is an invalid branch name' do
+          _content, updates, results = service.execute("/create_branch #{invalid_branch_name}", issuable)
+
+          expect(project.repository.branch_names).not_to include(invalid_branch_name)
+          expect(updates).to be_empty
+          expect(results[:create_branch]).to include({ status: :error })
+        end
+      end
+    end
+
     it_behaves_like 'reopen command' do
       let(:content) { '/reopen' }
       let(:issuable) { issue }
@@ -995,6 +1025,35 @@ describe QuickActions::InterpretService do
       end
     end
 
+    context '/create_branch command' do
+      let(:project) { create(:project, :repository) }
+      let(:service) { described_class.new(project, developer) }
+      let(:issue) { create(:issue, title: 'Some Big Issue', project: project) }
+      let(:valid_branch_name) { 'valid/branch-Name' }
+
+      it_behaves_like 'create branch command' do
+        let(:issuable) { issue }
+        let(:invalid_branch_name) { 'Invalid Name For A Branch' }
+      end
+
+      context 'unprivileged user' do
+        let(:other_user) { create(:user) }
+        let(:service) { described_class.new(project, other_user)}
+
+        it_behaves_like 'empty command' do
+          let(:content) { "/create_branch #{valid_branch_name}" }
+          let(:issuable) { issue }
+        end
+      end
+
+      context 'on merge requests' do
+        it_behaves_like 'empty command' do
+          let(:content) { "/create_branch #{valid_branch_name}" }
+          let(:issuable) { create(:merge_request, source_project: project) }
+        end
+      end
+    end
+
     context '/board_move command' do
       let(:todo) { create(:label, project: project, title: 'To Do') }
       let(:inreview) { create(:label, project: project, title: 'In Review') }
@@ -1255,12 +1314,36 @@ describe QuickActions::InterpretService do
     end
 
     describe 'target branch command' do
-      let(:content) { '/target_branch my-feature ' }
+      let(:content) { '/target_branch my-feature' }
 
       it 'includes the branch name' do
         _, explanations = service.explain(content, merge_request)
 
-        expect(explanations).to eq(['Sets target branch to my-feature.'])
+        expect(explanations).to eq(['Sets target branch to `my-feature`.'])
+      end
+    end
+
+    describe 'create branch command' do
+      let(:project) { create(:project, :repository, :public) }
+
+      context 'without a branch name' do
+        let(:content) { '/create_branch' }
+
+        it 'includes the branch name' do
+          _, explanations = service.explain(content, issue)
+
+          expect(explanations).to eq(["Creates a `#{issue.to_branch_name}` branch."])
+        end
+      end
+
+      context 'with a branch name' do
+        let(:content) { '/create_branch my-branch' }
+
+        it 'includes the branch name' do
+          _, explanations = service.explain(content, issue)
+
+          expect(explanations).to eq(["Creates a `my-branch` branch."])
+        end
       end
     end
 

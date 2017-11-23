@@ -15,11 +15,12 @@ module QuickActions
 
       @issuable = issuable
       @updates = {}
+      @results = {}
 
       content, commands = extractor.extract_commands(content, context)
       extract_updates(commands, context)
 
-      [content, @updates]
+      [content, @updates, @results]
     end
 
     # Takes a text and interprets the commands that are extracted from it.
@@ -451,7 +452,7 @@ module QuickActions
 
     desc 'Set target branch'
     explanation do |branch_name|
-      "Sets target branch to #{branch_name}."
+      "Sets target branch to `#{branch_name}`."
     end
     params '<Local branch name>'
     condition do
@@ -464,6 +465,23 @@ module QuickActions
     end
     command :target_branch do |branch_name|
       @updates[:target_branch] = branch_name if project.repository.branch_exists?(branch_name)
+    end
+
+    desc 'Creates a new branch'
+    explanation do |branch_name = nil|
+      "Creates a `#{branch_name || issuable.to_branch_name}` branch."
+    end
+    params '<new-branch-name>'
+    condition do
+      issuable.is_a?(Issue) &&
+        issuable.persisted? &&
+        Ability.can_create_branch_from_issue?(current_user, project, issuable)
+    end
+    command :create_branch do |branch_name = nil|
+      branch_name ||= issuable.to_branch_name
+      ref = project.default_branch || 'master'
+      result = Issues::CreateBranchService.new(project, current_user).execute(issuable, branch_name, ref)
+      @results[:create_branch] = result
     end
 
     desc 'Move issue from one column of the board to another'

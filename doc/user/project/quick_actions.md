@@ -15,9 +15,9 @@ do.
 | `/close`                   | Close the issue or merge request |
 | `/reopen`                  | Reopen the issue or merge request |
 | `/merge`                   | Merge (when pipeline succeeds) |
-| `/title <New title>`       | Change title |
-| `/assign @user1 @user2 `   | Add assignee(s) |
-| `/reassign @user1 @user2 ` | Change assignee(s) |
+| `/title New title`         | Change title |
+| `/assign @user1 @user2`    | Assign the issue or merge request to @user1 and @user2. You can also use `me` to assign the issue or merge request to yourself. |
+| `/reassign @user1 @user2`  | Assign the issue or merge request to @user1 and @user2. You can also use `me` to assign the issue or merge request to yourself. |
 | `/unassign @user1 @user2`  | Remove all or specific assignee(s) |
 | `/milestone %milestone`    | Set milestone |
 | `/remove_milestone`        | Remove milestone |
@@ -28,14 +28,15 @@ do.
 | `/done`                    | Mark todo as done |
 | `/subscribe`               | Subscribe |
 | `/unsubscribe`             | Unsubscribe |
-| <code>/due &lt;in 2 days &#124; this Friday &#124; December 31st&gt;</code> | Set due date |
-| `/remove_due_date`         | Remove due date |
+| <code>/due &lt;in 2 days &#124; this Friday &#124; December 31st&gt;</code> | Set a due date |
+| `/remove_due_date`         | Remove the due date |
 | `/wip`                     | Toggle the Work In Progress status |
 | <code>/estimate &lt;1w 3d 2h 14m&gt;</code> | Set time estimate |
 | `/remove_estimate`       | Remove estimated time |
 | <code>/spend &lt;time(1h 30m &#124; -1h 5m)&gt; &lt;date(YYYY-MM-DD)&gt;</code> | Add or subtract spent time; optionally, specify the date that time was spent on |
 | `/remove_time_spent`       | Remove time spent |
-| `/target_branch <Branch Name>` | Set target branch for current merge request |
+| `/target_branch branch-name` | Set target branch for the current merge request |
+| `/create_branch branch-name` | Create a new branch. If you don't pass a branch name, it automatically generates it based on the issue IID and title. |
 | `/award :emoji:`  | Toggle award for :emoji: |
 | `/weight <1-9>` | Set the weight of the issue |
 | `/clear_weight` | Clears the issue weight |

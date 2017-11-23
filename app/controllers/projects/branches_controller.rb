@@ -38,18 +38,18 @@ class Projects::BranchesController < Projects::ApplicationController
   end
 
   def create
-    branch_name = sanitize(strip_tags(params[:branch_name]))
-    branch_name = Addressable::URI.unescape(branch_name)
-
     redirect_to_autodeploy = project.empty_repo? && project.deployment_platform.present?
-
-    result = CreateBranchService.new(project, current_user)
-        .execute(branch_name, ref)
-
-    if params[:issue_iid]
-      issue = IssuesFinder.new(current_user, project_id: @project.id).find_by(iid: params[:issue_iid])
-      SystemNoteService.new_issue_branch(issue, @project, current_user, branch_name) if issue
-    end
+    issue =
+      if params[:issue_iid]
+        IssuesFinder.new(current_user, project_id: project.id).find_by(iid: params[:issue_iid])
+      end
+    result =
+      if issue
+        Issues::CreateBranchService.new(project, current_user).execute(issue, params[:branch_name], ref)
+      else
+        ::CreateBranchService.new(project, current_user).execute(params[:branch_name], ref)
+      end
+    branch_name = result[:branch]&.name
 
     respond_to do |format|
       format.html do
@@ -58,7 +58,7 @@ class Projects::BranchesController < Projects::ApplicationController
             redirect_to url_to_autodeploy_setup(project, branch_name),
               notice: view_context.autodeploy_flash_notice(branch_name)
           else
-            redirect_to project_tree_path(@project, branch_name)
+            redirect_to project_tree_path(project, branch_name)
           end
         else
           @error = result[:message]

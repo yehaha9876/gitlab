@@ -340,5 +340,49 @@ feature 'Issues > User uses quick actions', :js do
         end
       end
     end
+
+    describe 'branch creation' do
+      let(:project) { create(:project, :public, :repository) }
+      let(:issue) { create(:issue, project: project) }
+
+      context 'when the user can create a branch' do
+        it 'creates the branch' do
+          write_note("/create_branch")
+
+          expect(page).not_to have_content '/create_branch'
+          expect(page).to have_content 'Commands applied'
+          expect(page).to have_content "created branch #{issue.to_branch_name}"
+        end
+      end
+
+      context 'when the user specifies an invalid branch name' do
+        it 'creates the branch' do
+          write_note("/create_branch A New Feature")
+
+          expect(page).not_to have_content '/create_branch'
+          expect(page).to have_content "The branch 'A New Feature' could not be created!"
+        end
+      end
+
+      context 'when the user cannot create a branch' do
+        let(:guest) { create(:user) }
+
+        before do
+          project.add_guest(guest)
+          sign_out(user)
+          sign_in(guest)
+          visit project_issue_path(project, issue)
+        end
+
+        it 'does not create a branch' do
+          write_note("/create_branch")
+
+          expect(page).not_to have_content '/create_branch'
+          expect(page).not_to have_content 'Commands applied'
+
+          expect(project.repository.branch_names).not_to include(issue.to_branch_name)
+        end
+      end
+    end
   end
 end
