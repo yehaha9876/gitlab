@@ -91,7 +91,7 @@ describe 'Commits' do
 
         context 'Download artifacts' do
           before do
-            build.update_attributes(artifacts_file: artifacts_file)
+            build.update_attributes(legacy_artifacts_file: artifacts_file)
           end
 
           it do
@@ -148,8 +148,8 @@ describe 'Commits' do
       context "when logged as reporter" do
         before do
           project.team << [user, :reporter]
-          build.update_attributes(artifacts_file: artifacts_file)
-          visit ci_status_path(pipeline)
+          build.update_attributes(legacy_artifacts_file: artifacts_file)
+          visit pipeline_path(pipeline)
         end
 
         it 'Renders header', :js do
@@ -170,8 +170,8 @@ describe 'Commits' do
           project.update(
             visibility_level: Gitlab::VisibilityLevel::INTERNAL,
             public_builds: false)
-          build.update_attributes(artifacts_file: artifacts_file)
-          visit ci_status_path(pipeline)
+          build.update_attributes(legacy_artifacts_file: artifacts_file)
+          visit pipeline_path(pipeline)
         end
 
         it do
