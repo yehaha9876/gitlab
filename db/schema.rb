@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171114104051) do
+ActiveRecord::Schema.define(version: 20171120145444) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,9 +32,9 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.text "description", null: false
     t.string "logo"
     t.integer "updated_by"
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
     t.string "header_logo"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text "description_html"
     t.integer "cached_markdown_version"
   end
@@ -151,7 +151,6 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.string "slack_app_id"
     t.string "slack_app_secret"
     t.string "slack_app_verification_token"
-    t.boolean "password_authentication_enabled"
     t.integer "performance_bar_allowed_group_id"
     t.boolean "allow_group_owners_to_manage_ldap", default: true, null: false
     t.boolean "hashed_storage_enabled", default: false, null: false
@@ -173,6 +172,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.boolean "throttle_authenticated_web_enabled", default: false, null: false
     t.integer "throttle_authenticated_web_requests_per_period", default: 7200, null: false
     t.integer "throttle_authenticated_web_period_in_seconds", default: 3600, null: false
+    t.boolean "password_authentication_enabled_for_web"
+    t.boolean "password_authentication_enabled_for_git", default: true
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -306,8 +307,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
 
   create_table "ci_build_trace_sections", force: :cascade do |t|
     t.integer "project_id", null: false
-    t.datetime_with_timezone "date_start", null: false
-    t.datetime_with_timezone "date_end", null: false
+    t.datetime "date_start", null: false
+    t.datetime "date_end", null: false
     t.integer "byte_start", limit: 8, null: false
     t.integer "byte_end", limit: 8, null: false
     t.integer "build_id", null: false
@@ -386,8 +387,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.string "encrypted_value_iv"
     t.integer "group_id", null: false
     t.boolean "protected", default: false, null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "ci_group_variables", ["group_id", "key"], name: "index_ci_group_variables_on_group_id_and_key", unique: true, using: :btree
@@ -415,8 +416,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.string "encrypted_value_salt"
     t.string "encrypted_value_iv"
     t.integer "pipeline_schedule_id", null: false
-    t.datetime_with_timezone "created_at"
-    t.datetime_with_timezone "updated_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "ci_pipeline_schedule_variables", ["pipeline_schedule_id", "key"], name: "index_ci_pipeline_schedule_variables_on_schedule_id_and_key", unique: true, using: :btree
@@ -468,8 +469,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.integer "auto_canceled_by_id"
     t.integer "pipeline_schedule_id"
     t.integer "source"
-    t.boolean "protected"
     t.integer "config_source"
+    t.boolean "protected"
     t.integer "failure_reason"
   end
 
@@ -580,8 +581,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
 
   create_table "cluster_platforms_kubernetes", force: :cascade do |t|
     t.integer "cluster_id", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text "api_url"
     t.text "ca_cert"
     t.string "namespace"
@@ -597,8 +598,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   create_table "cluster_projects", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "cluster_id", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "cluster_projects", ["cluster_id"], name: "index_cluster_projects_on_cluster_id", using: :btree
@@ -608,8 +609,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.integer "cluster_id", null: false
     t.integer "status"
     t.integer "num_nodes", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text "status_reason"
     t.string "gcp_project_id", null: false
     t.string "zone", null: false
@@ -626,8 +627,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.integer "user_id"
     t.integer "provider_type"
     t.integer "platform_type"
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "enabled", default: true
     t.string "name", null: false
   end
@@ -637,8 +638,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
 
   create_table "clusters_applications_helm", force: :cascade do |t|
     t.integer "cluster_id", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "status", null: false
     t.string "version", null: false
     t.text "status_reason"
@@ -646,8 +647,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
 
   create_table "clusters_applications_ingress", force: :cascade do |t|
     t.integer "cluster_id", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "status", null: false
     t.integer "ingress_type", null: false
     t.string "version", null: false
@@ -735,8 +736,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "confirmation_token"
-    t.datetime_with_timezone "confirmed_at"
-    t.datetime_with_timezone "confirmation_sent_at"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
   end
 
   add_index "emails", ["confirmation_token"], name: "index_emails_on_confirmation_token", unique: true, using: :btree
@@ -767,8 +768,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
 
   create_table "epic_metrics", force: :cascade do |t|
     t.integer "epic_id", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "epic_metrics", ["epic_id"], name: "index_epic_metrics", using: :btree
@@ -785,9 +786,9 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.integer "lock_version"
     t.date "start_date"
     t.date "end_date"
-    t.datetime_with_timezone "last_edited_at"
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "last_edited_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "title", null: false
     t.string "title_html", null: false
     t.text "description"
@@ -804,8 +805,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.integer "project_id"
     t.integer "author_id", null: false
     t.integer "target_id"
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "action", limit: 2, null: false
     t.string "target_type"
   end
@@ -864,8 +865,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.integer "service_id"
     t.integer "status"
     t.integer "gcp_cluster_size", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "enabled", default: true
     t.text "status_reason"
     t.string "project_namespace"
@@ -895,6 +896,7 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.integer "repositories_changed_event_id", limit: 8
     t.integer "repository_created_event_id", limit: 8
     t.integer "hashed_storage_migrated_event_id", limit: 8
+    t.integer "lfs_object_deleted_event_id", limit: 8
   end
 
   add_index "geo_event_log", ["repositories_changed_event_id"], name: "index_geo_event_log_on_repositories_changed_event_id", using: :btree
@@ -917,11 +919,19 @@ ActiveRecord::Schema.define(version: 20171114104051) do
 
   add_index "geo_hashed_storage_migrated_events", ["project_id"], name: "index_geo_hashed_storage_migrated_events_on_project_id", using: :btree
 
+  create_table "geo_lfs_object_deleted_events", id: :bigserial, force: :cascade do |t|
+    t.integer "lfs_object_id", null: false
+    t.string "oid", null: false
+    t.string "file_path", null: false
+  end
+
+  add_index "geo_lfs_object_deleted_events", ["lfs_object_id"], name: "index_geo_lfs_object_deleted_events_on_lfs_object_id", using: :btree
+
   create_table "geo_node_namespace_links", force: :cascade do |t|
     t.integer "geo_node_id", null: false
     t.integer "namespace_id", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "geo_node_namespace_links", ["geo_node_id", "namespace_id"], name: "index_geo_node_namespace_links_on_geo_node_id_and_namespace_id", unique: true, using: :btree
@@ -940,12 +950,12 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.integer "attachments_synced_count"
     t.integer "attachments_failed_count"
     t.integer "last_event_id"
-    t.datetime_with_timezone "last_event_date"
+    t.datetime "last_event_date"
     t.integer "cursor_last_event_id"
-    t.datetime_with_timezone "cursor_last_event_date"
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
-    t.datetime_with_timezone "last_successful_status_check_at"
+    t.datetime "cursor_last_event_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "last_successful_status_check_at"
     t.string "status_message"
   end
 
@@ -1039,8 +1049,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   add_index "gpg_key_subkeys", ["keyid"], name: "index_gpg_key_subkeys_on_keyid", unique: true, using: :btree
 
   create_table "gpg_keys", force: :cascade do |t|
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "user_id"
     t.binary "primary_keyid"
     t.binary "fingerprint"
@@ -1052,8 +1062,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   add_index "gpg_keys", ["user_id"], name: "index_gpg_keys_on_user_id", using: :btree
 
   create_table "gpg_signatures", force: :cascade do |t|
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "project_id"
     t.integer "gpg_key_id"
     t.binary "commit_sha"
@@ -1071,8 +1081,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   add_index "gpg_signatures", ["project_id"], name: "index_gpg_signatures_on_project_id", using: :btree
 
   create_table "group_custom_attributes", force: :cascade do |t|
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "group_id", null: false
     t.string "key", null: false
     t.string "value", null: false
@@ -1167,7 +1177,7 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.datetime "last_edited_at"
     t.integer "last_edited_by_id"
     t.boolean "discussion_locked"
-    t.datetime_with_timezone "closed_at"
+    t.datetime "closed_at"
   end
 
   add_index "issues", ["assignee_id"], name: "index_issues_on_assignee_id", using: :btree
@@ -1318,8 +1328,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   add_index "members", ["user_id"], name: "index_members_on_user_id", using: :btree
 
   create_table "merge_request_diff_commits", id: false, force: :cascade do |t|
-    t.datetime_with_timezone "authored_date"
-    t.datetime_with_timezone "committed_date"
+    t.datetime "authored_date"
+    t.datetime "committed_date"
     t.integer "merge_request_diff_id", null: false
     t.integer "relative_order", null: false
     t.binary "sha", null: false
@@ -1382,7 +1392,7 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   create_table "merge_requests", force: :cascade do |t|
     t.string "target_branch", null: false
     t.string "source_branch", null: false
-    t.integer "source_project_id", null: false
+    t.integer "source_project_id"
     t.integer "author_id"
     t.integer "assignee_id"
     t.string "title"
@@ -1425,6 +1435,7 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   add_index "merge_requests", ["description"], name: "index_merge_requests_on_description_trigram", using: :gin, opclasses: {"description"=>"gin_trgm_ops"}
   add_index "merge_requests", ["head_pipeline_id"], name: "index_merge_requests_on_head_pipeline_id", using: :btree
   add_index "merge_requests", ["latest_merge_request_diff_id"], name: "index_merge_requests_on_latest_merge_request_diff_id", using: :btree
+  add_index "merge_requests", ["merge_user_id"], name: "index_merge_requests_on_merge_user_id", where: "(merge_user_id IS NOT NULL)", using: :btree
   add_index "merge_requests", ["milestone_id"], name: "index_merge_requests_on_milestone_id", using: :btree
   add_index "merge_requests", ["source_branch"], name: "index_merge_requests_on_source_branch", using: :btree
   add_index "merge_requests", ["source_project_id", "source_branch"], name: "index_merge_requests_on_source_project_id_and_source_branch", using: :btree
@@ -1433,6 +1444,7 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   add_index "merge_requests", ["target_project_id", "merge_commit_sha", "id"], name: "index_merge_requests_on_tp_id_and_merge_commit_sha_and_id", using: :btree
   add_index "merge_requests", ["title"], name: "index_merge_requests_on_title", using: :btree
   add_index "merge_requests", ["title"], name: "index_merge_requests_on_title_trigram", using: :gin, opclasses: {"title"=>"gin_trgm_ops"}
+  add_index "merge_requests", ["updated_by_id"], name: "index_merge_requests_on_updated_by_id", where: "(updated_by_id IS NOT NULL)", using: :btree
 
   create_table "merge_requests_closing_issues", force: :cascade do |t|
     t.integer "merge_request_id", null: false
@@ -1670,8 +1682,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   add_index "personal_access_tokens", ["user_id"], name: "index_personal_access_tokens_on_user_id", using: :btree
 
   create_table "plans", force: :cascade do |t|
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "name"
     t.string "title"
     t.integer "active_pipelines_limit"
@@ -1691,8 +1703,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
 
   create_table "project_auto_devops", force: :cascade do |t|
     t.integer "project_id", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "enabled"
     t.string "domain"
   end
@@ -1700,8 +1712,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   add_index "project_auto_devops", ["project_id"], name: "index_project_auto_devops_on_project_id", unique: true, using: :btree
 
   create_table "project_custom_attributes", force: :cascade do |t|
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "project_id", null: false
     t.string "key", null: false
     t.string "value", null: false
@@ -1751,9 +1763,9 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.integer "retry_count", default: 0, null: false
     t.datetime "last_update_started_at"
     t.datetime "last_update_scheduled_at"
-    t.datetime_with_timezone "next_execution_timestamp"
-    t.datetime_with_timezone "created_at"
-    t.datetime_with_timezone "updated_at"
+    t.datetime "next_execution_timestamp"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "project_mirror_data", ["next_execution_timestamp", "retry_count"], name: "index_mirror_data_on_next_execution_and_retry_count", using: :btree
@@ -1790,12 +1802,12 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.string "import_status"
     t.text "merge_requests_template"
     t.integer "star_count", default: 0, null: false
-    t.boolean "merge_requests_rebase_enabled", default: false, null: false
+    t.boolean "merge_requests_rebase_enabled", default: false
     t.string "import_type"
     t.string "import_source"
     t.integer "approvals_before_merge", default: 0, null: false
     t.boolean "reset_approvals_on_push", default: true
-    t.boolean "merge_requests_ff_only_enabled", default: false, null: false
+    t.boolean "merge_requests_ff_only_enabled", default: false
     t.text "issues_template"
     t.boolean "mirror", default: false, null: false
     t.datetime "mirror_last_update_at"
@@ -1984,6 +1996,7 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "last_update_started_at"
+    t.boolean "only_protected_branches", default: false, null: false
   end
 
   add_index "remote_mirrors", ["last_successful_update_at"], name: "index_remote_mirrors_on_last_successful_update_at", using: :btree
@@ -2049,8 +2062,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.string "team_name", null: false
     t.string "alias", null: false
     t.string "user_id", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "slack_integrations", ["service_id"], name: "index_slack_integrations_on_service_id", using: :btree
@@ -2143,7 +2156,7 @@ ActiveRecord::Schema.define(version: 20171114104051) do
     t.datetime "updated_at", null: false
     t.integer "issue_id"
     t.integer "merge_request_id"
-    t.datetime_with_timezone "spent_at"
+    t.datetime "spent_at"
   end
 
   add_index "timelogs", ["issue_id"], name: "index_timelogs_on_issue_id", using: :btree
@@ -2218,8 +2231,8 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   add_index "user_agent_details", ["subject_id", "subject_type"], name: "index_user_agent_details_on_subject_id_and_subject_type", using: :btree
 
   create_table "user_custom_attributes", force: :cascade do |t|
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.string "key", null: false
     t.string "value", null: false
@@ -2448,6 +2461,7 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   add_foreign_key "gcp_clusters", "services", on_delete: :nullify
   add_foreign_key "gcp_clusters", "users", on_delete: :nullify
   add_foreign_key "geo_event_log", "geo_hashed_storage_migrated_events", column: "hashed_storage_migrated_event_id", name: "fk_27548c6db3", on_delete: :cascade
+  add_foreign_key "geo_event_log", "geo_lfs_object_deleted_events", column: "lfs_object_deleted_event_id", name: "fk_d5af95fcd9", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_repositories_changed_events", column: "repositories_changed_event_id", name: "fk_4a99ebfd60", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_repository_created_events", column: "repository_created_event_id", name: "fk_9b9afb1916", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_repository_deleted_events", column: "repository_deleted_event_id", name: "fk_c4b1c1f66e", on_delete: :cascade
@@ -2491,7 +2505,13 @@ ActiveRecord::Schema.define(version: 20171114104051) do
   add_foreign_key "merge_request_metrics", "merge_requests", on_delete: :cascade
   add_foreign_key "merge_requests", "ci_pipelines", column: "head_pipeline_id", name: "fk_fd82eae0b9", on_delete: :nullify
   add_foreign_key "merge_requests", "merge_request_diffs", column: "latest_merge_request_diff_id", name: "fk_06067f5644", on_delete: :nullify
+  add_foreign_key "merge_requests", "milestones", name: "fk_6a5165a692", on_delete: :nullify
+  add_foreign_key "merge_requests", "projects", column: "source_project_id", name: "fk_3308fe130c", on_delete: :nullify
   add_foreign_key "merge_requests", "projects", column: "target_project_id", name: "fk_a6963e8447", on_delete: :cascade
+  add_foreign_key "merge_requests", "users", column: "assignee_id", name: "fk_6149611a04", on_delete: :nullify
+  add_foreign_key "merge_requests", "users", column: "author_id", name: "fk_e719a85f8a", on_delete: :nullify
+  add_foreign_key "merge_requests", "users", column: "merge_user_id", name: "fk_ad525e1f87", on_delete: :nullify
+  add_foreign_key "merge_requests", "users", column: "updated_by_id", name: "fk_641731faff", on_delete: :nullify
   add_foreign_key "merge_requests_closing_issues", "issues", on_delete: :cascade
   add_foreign_key "merge_requests_closing_issues", "merge_requests", on_delete: :cascade
   add_foreign_key "milestones", "namespaces", column: "group_id", name: "fk_95650a40d4", on_delete: :cascade

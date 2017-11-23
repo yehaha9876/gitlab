@@ -2272,6 +2272,24 @@ describe Project do
         expect(second_fork.fork_source).to eq(project)
       end
     end
+
+    describe '#lfs_storage_project' do
+      it 'returns self for non-forks' do
+        expect(project.lfs_storage_project).to eq project
+      end
+
+      it 'returns the fork network root for forks' do
+        second_fork = fork_project(forked_project)
+
+        expect(second_fork.lfs_storage_project).to eq project
+      end
+
+      it 'returns self when fork_source is nil' do
+        expect(forked_project).to receive(:fork_source).and_return(nil)
+
+        expect(forked_project.lfs_storage_project).to eq forked_project
+      end
+    end
   end
 
   describe '#pushes_since_gc' do
@@ -3454,6 +3472,29 @@ describe Project do
       project = create(:project)
 
       expect(project.wiki_repository_exists?).to eq(false)
+    end
+  end
+
+  describe '#root_namespace' do
+    let(:project) { build(:project, namespace: parent) }
+
+    subject { project.root_namespace }
+
+    context 'when namespace has parent group' do
+      let(:root_ancestor) { create(:group) }
+      let(:parent) { build(:group, parent: root_ancestor) }
+
+      it 'returns root ancestor' do
+        is_expected.to eq(root_ancestor)
+      end
+    end
+
+    context 'when namespace is root ancestor' do
+      let(:parent) { build(:group) }
+
+      it 'returns current namespace' do
+        is_expected.to eq(parent)
+      end
     end
   end
 end

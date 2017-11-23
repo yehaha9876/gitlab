@@ -500,6 +500,14 @@ class Project < ActiveRecord::Base
       .base_and_ancestors(upto: top)
   end
 
+  def root_namespace
+    if namespace.has_parent?
+      namespace.root_ancestor
+    else
+      namespace
+    end
+  end
+
   def lfs_enabled?
     return namespace.lfs_enabled? if self[:lfs_enabled].nil?
 
@@ -703,10 +711,6 @@ class Project < ActiveRecord::Base
 
   def gitea_import?
     import_type == 'gitea'
-  end
-
-  def github_import?
-    import_type == 'github'
   end
 
   def check_limit
@@ -1046,6 +1050,18 @@ class Project < ActiveRecord::Base
 
   def fork_source
     forked_from_project || fork_network&.root_project
+  end
+
+  def lfs_storage_project
+    @lfs_storage_project ||= begin
+      result = self
+
+      # TODO: Make this go to the fork_network root immeadiatly
+      # dependant on the discussion in: https://gitlab.com/gitlab-org/gitlab-ce/issues/39769
+      result = result.fork_source while result&.forked?
+
+      result || self
+    end
   end
 
   def personal?

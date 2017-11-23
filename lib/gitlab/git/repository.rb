@@ -984,6 +984,10 @@ module Gitlab
         @attributes.attributes(path)
       end
 
+      def gitattribute(path, name)
+        attributes(path)[name]
+      end
+
       def languages(ref = nil)
         Gitlab::GitalyClient.migrate(:commit_languages) do |is_enabled|
           if is_enabled
@@ -1218,11 +1222,21 @@ module Gitlab
         sort_branches(branches, sort_by)
       end
 
+      # Gitaly migration: https://gitlab.com/gitlab-org/gitaly/issues/695
       def git_merged_branch_names(branch_names = [])
-        lines = run_git(['branch', '--merged', root_ref] + branch_names)
-          .first.lines
+        root_sha = find_branch(root_ref).target
 
-        lines.map(&:strip)
+        git_arguments =
+          %W[branch --merged #{root_sha}
+             --format=%(refname:short)\ %(objectname)] + branch_names
+
+        lines = run_git(git_arguments).first.lines
+
+        lines.each_with_object([]) do |line, branches|
+          name, sha = line.strip.split(' ', 2)
+
+          branches << name if sha != root_sha
+        end
       end
 
       def log_using_shell?(options)
@@ -1376,6 +1390,7 @@ module Gitlab
             end
 
             return nil unless tmp_entry.type == :tree
+
             tmp_entry = tmp_entry[dir]
           end
         end
@@ -1496,6 +1511,7 @@ module Gitlab
       # Ref names must start with `refs/`.
       def rugged_ref_exists?(ref_name)
         raise ArgumentError, 'invalid refname' unless ref_name.start_with?('refs/')
+
         rugged.references.exist?(ref_name)
       rescue Rugged::ReferenceError
         false
@@ -1562,6 +1578,7 @@ module Gitlab
         Gitlab::Git::Branch.new(self, rugged_ref.name, rugged_ref.target, target_commit)
       rescue Rugged::ReferenceError => e
         raise InvalidRef.new("Branch #{ref} already exists") if e.to_s =~ /'refs\/heads\/#{ref}'/
+
         raise InvalidRef.new("Invalid reference #{start_point}")
       end
 

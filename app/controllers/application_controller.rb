@@ -96,6 +96,7 @@ class ApplicationController < ActionController::Base
   # (e.g. tokens) to authenticate the user, whereas Devise sets current_user
   def auth_user
     return current_user if current_user.present?
+
     return try(:authenticated_user)
   end
 
@@ -203,7 +204,8 @@ class ApplicationController < ActionController::Base
   end
 
   def check_password_expiration
-    return if session[:impersonator_id] || current_user&.ldap_user?
+    return if session[:impersonator_id]
+    return unless current_user&.allow_password_authentication?
 
     password_expires_at = current_user&.password_expires_at
 

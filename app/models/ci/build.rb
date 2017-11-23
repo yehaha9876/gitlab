@@ -204,6 +204,10 @@ module Ci
       project.build_timeout
     end
 
+    def triggered_by?(current_user)
+      user == current_user
+    end
+
     # A slugified version of the build ref, suitable for inclusion in URLs and
     # domain names. Rules:
     #
@@ -325,6 +329,7 @@ module Ci
 
     def execute_hooks
       return unless project
+
       build_data = Gitlab::DataBuilder::Build.build(self)
       project.execute_hooks(build_data.dup, :job_hooks)
       project.execute_services(build_data.dup, :job_hooks)
