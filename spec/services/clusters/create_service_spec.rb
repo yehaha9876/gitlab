@@ -81,9 +81,26 @@ describe Clusters::CreateService do
         Clusters::Cluster.create(params.merge(user: user, projects: [project]))
       end
 
-      it 'does not create a cluster' do
-        expect(ClusterProvisionWorker).not_to receive(:perform_async)
-        expect { result }.to change { Clusters::Cluster.count }.by(0)
+      context 'when project does not have multiple cluster available' do
+        before do
+          allow(License).to receive(:feature_available?).with(:multiple_clusters).and_return(false)
+        end
+
+        it 'does not create a cluster' do
+          expect(ClusterProvisionWorker).not_to receive(:perform_async)
+          expect { result }.to change { Clusters::Cluster.count }.by(0)
+        end
+      end
+
+      context 'when project has multiple clusters available' do
+        before do
+          allow(License).to receive(:feature_available?).with(:multiple_clusters).and_return(true)
+        end
+
+        it 'creates a cluster' do
+          expect(ClusterProvisionWorker).to receive(:perform_async)
+          expect { result }.to change { Clusters::Cluster.count }.by(1)
+        end
       end
     end
   end

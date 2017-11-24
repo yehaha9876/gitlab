@@ -29,11 +29,9 @@ module Clusters
     end
 
     def can_create_cluster?
-      if project.clusters.empty?
-        true
-      else
-        false
-      end
+      return true if project.clusters.empty?
+
+      project.feature_available?(:multiple_clusters)
     end
   end
 end
