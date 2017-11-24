@@ -83,7 +83,8 @@ describe Clusters::CreateService do
 
       context 'when project does not have multiple cluster available' do
         before do
-          allow(License).to receive(:feature_available?).with(:multiple_clusters).and_return(false)
+          allow(project).to receive(:feature_available?).and_call_original
+          allow(project).to receive(:feature_available?).with(:multiple_clusters).and_return(false)
         end
 
         it 'does not create a cluster' do
@@ -94,7 +95,8 @@ describe Clusters::CreateService do
 
       context 'when project has multiple clusters available' do
         before do
-          allow(License).to receive(:feature_available?).with(:multiple_clusters).and_return(true)
+          allow(project).to receive(:feature_available?).and_call_original
+          allow(project).to receive(:feature_available?).with(:multiple_clusters).and_return(true)
         end
 
         it 'creates a cluster' do
