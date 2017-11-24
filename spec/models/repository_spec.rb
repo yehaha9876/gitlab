@@ -299,24 +299,6 @@ describe Repository do
 
       it { is_expected.to be_falsey }
     end
-
-    context 'when pre-loaded merged branches are provided' do
-      using RSpec::Parameterized::TableSyntax
-
-      where(:branch, :pre_loaded, :expected) do
-        'not-merged-branch' | ['branch-merged']     | false
-        'branch-merged'     | ['not-merged-branch'] | false
-        'branch-merged'     | ['branch-merged']     | true
-        'not-merged-branch' | ['not-merged-branch'] | false
-        'master'            | ['master']            | false
-      end
-
-      with_them do
-        subject { repository.merged_to_root_ref?(branch, pre_loaded) }
-
-        it { is_expected.to eq(expected) }
-      end
-    end
   end
 
   describe '#can_be_merged?' do
@@ -2133,7 +2115,7 @@ describe Repository do
   describe '#push_remote_branches' do
     it 'push branches to the remote repo' do
       expect_any_instance_of(Gitlab::Shell).to receive(:push_remote_branches)
-        .with(repository.storage_path, repository.disk_path, 'remote_name', ['branch'])
+        .with(repository.repository_storage_path, repository.disk_path, 'remote_name', ['branch'])
 
       repository.push_remote_branches('remote_name', ['branch'])
     end
@@ -2142,7 +2124,7 @@ describe Repository do
   describe '#delete_remote_branches' do
     it 'delete branches to the remote repo' do
       expect_any_instance_of(Gitlab::Shell).to receive(:delete_remote_branches)
-        .with(repository.storage_path, repository.disk_path, 'remote_name', ['branch'])
+        .with(repository.repository_storage_path, repository.disk_path, 'remote_name', ['branch'])
 
       repository.delete_remote_branches('remote_name', ['branch'])
     end

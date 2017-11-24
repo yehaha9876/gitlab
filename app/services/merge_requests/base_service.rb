@@ -16,9 +16,9 @@ module MergeRequests
       hook_data
     end
 
-    def execute_hooks(merge_request, action = 'open', old_rev: nil, old_labels: [], old_assignees: [])
+    def execute_hooks(merge_request, action = 'open', old_rev: nil, old_labels: [], old_assignees: [], old_total_time_spent: nil)
       if merge_request.project
-        merge_data = hook_data(merge_request, action, old_rev: old_rev, old_labels: old_labels, old_assignees: old_assignees)
+        merge_data = hook_data(merge_request, action, old_rev: old_rev, old_labels: old_labels, old_assignees: old_assignees, old_total_time_spent: old_total_time_spent)
         merge_request.project.execute_hooks(merge_data, :merge_request_hooks)
         merge_request.project.execute_services(merge_data, :merge_request_hooks)
       end

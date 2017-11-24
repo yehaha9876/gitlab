@@ -984,6 +984,10 @@ module Gitlab
         @attributes.attributes(path)
       end
 
+      def gitattribute(path, name)
+        attributes(path)[name]
+      end
+
       def languages(ref = nil)
         Gitlab::GitalyClient.migrate(:commit_languages) do |is_enabled|
           if is_enabled
@@ -1141,10 +1145,12 @@ module Gitlab
         @has_visible_content = has_local_branches?
       end
 
-      def fetch(remote = 'origin')
-        args = %W(#{Gitlab.config.git.bin_path} fetch #{remote})
-
-        popen(args, @path).last.zero?
+      # Like all public `Gitlab::Git::Repository` methods, this method is part
+      # of `Repository`'s interface through `method_missing`.
+      # `Repository` has its own `fetch_remote` which uses `gitlab-shell` and
+      # takes some extra attributes, so we qualify this method name to prevent confusion.
+      def fetch_remote_without_shell(remote = 'origin')
+        run_git(['fetch', remote]).last.zero?
       end
 
       def blob_at(sha, path)
@@ -1218,11 +1224,21 @@ module Gitlab
         sort_branches(branches, sort_by)
       end
 
+      # Gitaly migration: https://gitlab.com/gitlab-org/gitaly/issues/695
       def git_merged_branch_names(branch_names = [])
-        lines = run_git(['branch', '--merged', root_ref] + branch_names)
-          .first.lines
+        root_sha = find_branch(root_ref).target
 
-        lines.map(&:strip)
+        git_arguments =
+          %W[branch --merged #{root_sha}
+             --format=%(refname:short)\ %(objectname)] + branch_names
+
+        lines = run_git(git_arguments).first.lines
+
+        lines.each_with_object([]) do |line, branches|
+          name, sha = line.strip.split(' ', 2)
+
+          branches << name if sha != root_sha
+        end
       end
 
       def log_using_shell?(options)
