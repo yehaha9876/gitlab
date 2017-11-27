@@ -2,6 +2,28 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 10.2.2 (2017-11-23)
+
+### Fixed (5 changes)
+
+- Label addition/removal are not going to be redacted wrongfully in the API. !15080
+- Fix bitbucket wiki import with hashed storage enabled. !15490
+- Impersonation no longer gets stuck on password change. !15497
+- Fix blank states using old css.
+- Fix promoting milestone updating all issuables without milestone.
+
+### Performance (3 changes)
+
+- Update Issue Boards to fetch the notification subscription status asynchronously.
+- Update composite pipelines index to include "id".
+- Use arrays in Pipeline#latest_builds_with_artifacts.
+
+### Other (2 changes)
+
+- Don't move repositories and attachments for projects using hashed storage. !15479
+- Add logs for monitoring the merge process.
+
+
 ## 10.2.1 (2017-11-22)
 
 ### Fixed (1 change)
@@ -69,6 +91,7 @@ entry.
 - Update container repository path reference and allow using double underscore. !15417
 - Fix crash when navigating to second page of the group dashbaord when there are projects and groups on the first page. !15456
 - Fix flash errors showing up on a non configured prometheus integration. !35652
+- Fix timezone bug in Pikaday and upgrade Pikaday version.
 - Fix arguments Import/Export error importing project merge requests.
 - Moves mini graph of pipeline to the end of sentence in MR widget. Cleans HTML and tests.
 - Fix user autocomplete in subgroups.
@@ -102,7 +125,6 @@ entry.
 - Only set Auto-Submitted header once for emails on push.
 - Fix overlap of right-sidebar and main content when creating a Wiki page.
 - Enables scroll to bottom once user has scrolled back to bottom in job log.
-- Fix timezone bug in Pikaday and upgrade Pikaday version.
 
 ### Changed (21 changes, 7 of them are from the community)
 
@@ -145,9 +167,8 @@ entry.
 - Optimise getting the pipeline status of commits.
 - Improve performance of commits list by fully using DB index when getting commit note counts.
 
-### Added (27 changes, 10 of them are from the community)
+### Added (26 changes, 10 of them are from the community)
 
-- Add new push rule to enforce that only the author of a commit can push to the repository. !3086
 - Expose duration in Job entity. !13644 (Mehdi Lahmam (@mehlah))
 - Prevent git push when LFS objects are missing. !13837
 - Automatic configuration settings page. !13850 (Francisco Lopez)
