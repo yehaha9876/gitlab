@@ -306,6 +306,7 @@ primary before the database is replicated.
 
 
     # Self-signed certificate and key
+    mkdir -p ~gitlab-psql/.postgresql
     install -o gitlab-psql -g gitlab-psql -m 0400 -T server.crt ~gitlab-psql/.postgresql/root.crt
     ```
 
