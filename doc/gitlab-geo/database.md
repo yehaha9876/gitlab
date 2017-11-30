@@ -225,6 +225,10 @@ will not be able to perform all necessary configuration steps. Refer to
     gitlab-ctl restart postgresql
     ```
 
+    Why not modify `listen_address` at the same time? Because `reconfigure`
+    would fail since Rails would try to connect to postgresql at the new
+    location, but postgresql will not listen there until it is restarted.
+
 1. Configure PostgreSQL to listen on an external network interface
 
     Edit `/etc/gitlab/gitlab.rb` and add the following.
