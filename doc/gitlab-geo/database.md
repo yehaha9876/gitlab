@@ -146,14 +146,13 @@ will not be able to perform all necessary configuration steps. Refer to
     postgresql['ssl'] = 'on'
     ```
 
-1. Configure PostgreSQL to listen on an external network interface
+1. Configure PostgreSQL to prepare for listening on an external network interface
 
     Edit `/etc/gitlab/gitlab.rb` and add the following. Note that GitLab 9.1 added
     the `geo_primary_role` configuration variable:
 
     ```ruby
     geo_primary_role['enable'] = true
-    postgresql['listen_address'] = '1.2.3.4'
     postgresql['trust_auth_cidr_addresses'] = ['127.0.0.1/32','1.2.3.4/32']
     postgresql['md5_auth_cidr_addresses'] = ['5.6.7.8/32']
     # New for 9.4: Set this to be the number of Geo secondary nodes you have
@@ -172,11 +171,6 @@ will not be able to perform all necessary configuration steps. Refer to
     between the primary and secondary nodes over a common network, such as a
     corporate LAN or the public Internet. For this reason, we need to
     configure PostgreSQL to listen on more interfaces.
-
-    The `listen_address` option opens PostgreSQL up to external connections
-    with the interface corresponding to the given IP. See [the PostgreSQL
-    documentation](https://www.postgresql.org/docs/9.6/static/runtime-config-connection.html)
-    for more details.
 
     Note that if you are running GitLab Geo with a cloud provider (e.g. Amazon
     Web Services), the internal interface IP (as provided by `ifconfig`) may
@@ -202,7 +196,6 @@ will not be able to perform all necessary configuration steps. Refer to
     ```ruby
     # Example configuration using internal IPs for a cloud configuration
     geo_primary_role['enable'] = true
-    postgresql['listen_address'] = '10.1.5.3'
     postgresql['trust_auth_cidr_addresses'] = ['127.0.0.1/32','10.1.5.3/32']
     postgresql['md5_auth_cidr_addresses'] = ['10.1.10.5/32']
     postgresql['max_replication_slots'] = 1 # Number of Geo secondary nodes
@@ -223,23 +216,49 @@ will not be able to perform all necessary configuration steps. Refer to
     match your database replication requirements. Consult the [PostgreSQL - Replication documentation](https://www.postgresql.org/docs/9.6/static/runtime-config-replication.html)
     for more information.
 
-1. Save the file and [reconfigure GitLab][] for the database listen changes to
-   take effect.
+1. Save the file and [reconfigure GitLab][] for the database changes to be
+   applied.
 
-    **This step will fail.** This is caused by
-    [Omnibus#2797](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/2797).
-
-    Restart PostgreSQL:
+    Restart PostgreSQL for the changes to take effect:
 
     ```bash
     gitlab-ctl restart postgresql
     ```
 
-    [Reconfigure GitLab][reconfigure GitLab] again. It should complete cleanly.
+1. Configure PostgreSQL to listen on an external network interface
 
-1. New for 9.4: Restart your primary PostgreSQL server to ensure the
-   replication slot changes take effect (`sudo gitlab-ctl restart postgresql`
-   for Omnibus-provided PostgreSQL).
+    Edit `/etc/gitlab/gitlab.rb` and add the following.
+
+    ```ruby
+    postgresql['listen_address'] = '1.2.3.4'
+    ```
+
+    The `listen_address` option opens PostgreSQL up to external connections
+    with the interface corresponding to the given IP. See [the PostgreSQL
+    documentation](https://www.postgresql.org/docs/9.6/static/runtime-config-connection.html)
+    for more details.
+
+    Using the example IPs above, the configuration now looks like:
+
+    ```ruby
+    # Example configuration using internal IPs for a cloud configuration
+    geo_primary_role['enable'] = true
+    postgresql['trust_auth_cidr_addresses'] = ['127.0.0.1/32','10.1.5.3/32']
+    postgresql['md5_auth_cidr_addresses'] = ['10.1.10.5/32']
+    postgresql['max_replication_slots'] = 1 # Number of Geo secondary nodes
+    # postgresql['max_wal_senders'] = 10
+    # postgresql['wal_keep_segments'] = 10
+    postgresql['listen_address'] = '10.1.5.3'
+    ```
+
+1. Save the file and [reconfigure GitLab][] for the database listen address to
+   be applied.
+
+    Restart PostgreSQL for the change to take effect:
+
+    ```bash
+    gitlab-ctl restart postgresql
+    ```
 
 1. Now that the PostgreSQL server is set up to accept remote connections, run
    `netstat -plnt` to make sure that PostgreSQL is listening on port `5432` to
