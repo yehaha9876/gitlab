@@ -547,11 +547,11 @@ PUT /projects/:id/merge_requests/:merge_request_iid
 | `merge_request_iid`    | integer | yes      | The ID of a merge request                                                       |
 | `target_branch`        | string  | no       | The target branch                                                               |
 | `title`                | string  | no       | Title of MR                                                                     |
-| `assignee_id`          | integer | no       | Assignee user ID                                                                |
+| `assignee_id`          | integer | no       | The ID of the user to assign the merge request to. Set to `nil` to unassign the assignee.                     |
 | `description`          | string  | no       | Description of MR                                                               |
 | `state_event`          | string  | no       | New state (close/reopen)                                                        |
-| `labels`               | string  | no       | Labels for MR as a comma-separated list                                         |
-| `milestone_id`         | integer | no       | The ID of a milestone                                                           |
+| `labels`               | string  | no       | Comma-separated label names for a merge request. Set to `nil` to unassign all labels.                             |
+| `milestone_id`         | integer | no       | The ID of a milestone to assign the merge request to. Set to `nil` to unassign a milestone.                        |
 | `remove_source_branch` | boolean | no       | Flag indicating if a merge request should remove the source branch when merging |
 | `squash` | boolean| no | Squash commits into a single commit when merging |
 | `discussion_locked`    | boolean | no       | Flag indicating if the merge request's discussion is locked. If the discussion is locked only project members can add, edit or resolve comments. |
