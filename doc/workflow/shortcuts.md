@@ -79,6 +79,13 @@ You can see GitLab's keyboard shortcuts by using 'shift + ?'
 | <kbd>e</kbd> | Edit issue/merge request |
 | <kbd>l</kbd> | Change label |
 
+## Epics
+
+| Keyboard Shortcut | Description |
+| ----------------- | ----------- |
+| <kbd>e</kbd> | Edit epic|
+| <kbd>=</kbd> | Add issue to epic|
+
 ## Wiki pages
 
 | Keyboard Shortcut | Description |

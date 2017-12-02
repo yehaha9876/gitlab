@@ -88,6 +88,7 @@ import Shortcuts from './shortcuts';
 import ShortcutsNavigation from './shortcuts_navigation';
 import ShortcutsFindFile from './shortcuts_find_file';
 import ShortcutsIssuable from './shortcuts_issuable';
+import ShortcutsEpics from './shortcuts_epics';
 import U2FAuthenticate from './u2f/authenticate';
 import Members from './members';
 import memberExpirationDate from './member_expiration_date';
@@ -271,6 +272,7 @@ import initGroupAnalytics from './init_group_analytics';
           new GLForm($('.milestone-form'), false);
           break;
         case 'groups:epics:show':
+          shortcut_handler = new ShortcutsEpics();
           new ZenMode();
           break;
         case 'projects:compare:show':
