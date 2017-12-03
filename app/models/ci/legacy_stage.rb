@@ -27,8 +27,8 @@ module Ci
       name
     end
 
-    def statuses_count
-      @statuses_count ||= jobs.count
+    def jobs_count
+      @jobs_count ||= jobs.count
     end
 
     def status

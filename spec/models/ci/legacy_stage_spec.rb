@@ -74,7 +74,7 @@ describe Ci::LegacyStage do
       create_job(:ci_build, stage: 'other stage')
     end
 
-    subject { stage.statuses_count }
+    subject { stage.jobs_count }
 
     it "counts jobs only from current stage" do
       is_expected.to eq(1)

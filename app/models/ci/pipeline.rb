@@ -249,7 +249,7 @@ module Ci
 
     def legacy_stage(name)
       stage = Ci::LegacyStage.new(self, name: name)
-      stage unless stage.statuses_count.zero?
+      stage unless stage.jobs_count.zero?
     end
 
     def legacy_stages
