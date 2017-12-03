@@ -1,5 +1,5 @@
 module Ci
-  class Build < CommitStatus
+  class Build < Job
     include TokenAuthenticatable
     include AfterCommitQueue
     include Presentable

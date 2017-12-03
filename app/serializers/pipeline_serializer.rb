@@ -10,7 +10,7 @@ class PipelineSerializer < BaseSerializer
 
       resource = resource.preload([
         :retryable_builds,
-        :cancelable_statuses,
+        :cancelable_jobs,
         :trigger_requests,
         :project,
         { triggered_by_pipeline: [:project, :user] },
