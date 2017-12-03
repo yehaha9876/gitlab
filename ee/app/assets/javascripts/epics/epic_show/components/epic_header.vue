@@ -69,7 +69,7 @@
       :loading="deleteLoading"
       @click="deleteEpic"
       :label="s__('Delete')"
-      container-class="btn btn-remove btn-inverted flex-right"
+      container-class="btn btn-remove btn-inverted flex-right pull-right"
     />
   </div>
 </template>
