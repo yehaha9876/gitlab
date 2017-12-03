@@ -50,7 +50,7 @@ module Ci
         .where('taggable_id = ci_builds.id')
         .where.not(tag_id: tags_matcher).select('1')
 
-      where("NOT EXISTS (#{matcher.to_sql})")
+      where("NOT EXISTS (?)", matcher)
     end
 
     scope :with_any_tags, -> do
@@ -59,7 +59,7 @@ module Ci
         .where(context: 'tags')
         .where('taggable_id = ci_builds.id').select('1')
 
-      where("EXISTS (#{matcher.to_sql})")
+      where("EXISTS (?)", matcher)
     end
 
     mount_uploader :artifacts_file, ArtifactUploader
