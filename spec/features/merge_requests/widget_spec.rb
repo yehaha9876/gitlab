@@ -84,12 +84,12 @@ describe 'Merge request', :js do
 
   context 'view merge request with failed GitLab CI pipelines' do
     before do
-      commit_status = create(:commit_status, project: project, status: 'failed')
+      job = create(:ci_job, project: project, status: 'failed')
       pipeline = create(:ci_pipeline, project: project,
                                       sha: merge_request.diff_head_sha,
                                       ref: merge_request.source_branch,
                                       status: 'failed',
-                                      statuses: [commit_status],
+                                      jobs: [job],
                                       head_pipeline_of: merge_request)
       create(:ci_build, :pending, pipeline: pipeline)
 
@@ -126,12 +126,12 @@ describe 'Merge request', :js do
 
   context 'view merge request with MWBS button' do
     before do
-      commit_status = create(:commit_status, project: project, status: 'pending')
+      job = create(:ci_job, project: project, status: 'pending')
       pipeline = create(:ci_pipeline, project: project,
                                       sha: merge_request.diff_head_sha,
                                       ref: merge_request.source_branch,
                                       status: 'pending',
-                                      statuses: [commit_status],
+                                      jobs: [job],
                                       head_pipeline_of: merge_request)
       create(:ci_build, :pending, pipeline: pipeline)
 

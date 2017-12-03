@@ -22,7 +22,7 @@ Committed by: <%= commit.committer_name %>
 <% end -%>
 <% end -%>
 
-<% build_count = @pipeline.statuses.latest.size -%>
+<% build_count = @pipeline.jobs.latest.size -%>
 <% stage_count = @pipeline.stages_count -%>
 <% if @pipeline.user -%>
 Pipeline #<%= @pipeline.id %> ( <%= pipeline_url(@pipeline) %> ) triggered by <%= @pipeline.user.name %> ( <%= user_url(@pipeline.user) %> )

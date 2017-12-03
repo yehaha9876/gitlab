@@ -107,7 +107,7 @@ pipelines:
 - project
 - user
 - stages
-- statuses
+- jobs
 - builds
 - trigger_requests
 - variables
@@ -130,9 +130,9 @@ pipeline_variables:
 stages:
 - project
 - pipeline
-- statuses
+- jobs
 - builds
-statuses:
+jobs:
 - project
 - pipeline
 - stage
@@ -264,7 +264,7 @@ project:
 - todos
 - notification_settings
 - import_data
-- commit_statuses
+- jobs
 - pipelines
 - builds
 - runner_projects

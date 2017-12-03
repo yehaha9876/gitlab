@@ -1158,7 +1158,7 @@ describe Ci::Build do
   describe '#stuck?' do
     subject { build.stuck? }
 
-    context "when commit_status.status is pending" do
+    context "when job.status is pending" do
       before do
         build.status = 'pending'
       end
@@ -1178,7 +1178,7 @@ describe Ci::Build do
     end
 
     %w[success failed canceled running].each do |state|
-      context "when commit_status.status is #{state}" do
+      context "when job.status is #{state}" do
         before do
           build.status = state
         end

@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :commit_status, class: CommitStatus do
+  factory :ci_job, class: Ci::Job do
     name 'default'
     stage 'test'
     status 'success'

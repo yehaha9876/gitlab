@@ -25,7 +25,7 @@ module Ci
     has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
 
     has_many :stages
-    has_many :statuses, class_name: 'CommitStatus', foreign_key: :commit_id
+    has_many :jobs, class_name: 'Ci::Job', foreign_key: :commit_id
     has_many :builds, foreign_key: :commit_id
     has_many :trigger_requests, dependent: :destroy, foreign_key: :commit_id # rubocop:disable Cop/ActiveRecordDependent
     has_many :variables, class_name: 'Ci::PipelineVariable'
@@ -239,11 +239,11 @@ module Ci
     end
 
     def stages_count
-      statuses.select(:stage).distinct.count
+      jobs.select(:stage).distinct.count
     end
 
     def stages_names
-      statuses.order(:stage_idx).distinct
+      jobs.order(:stage_idx).distinct
         .pluck(:stage, :stage_idx).map(&:first)
     end
 
@@ -255,12 +255,12 @@ module Ci
     def legacy_stages
       # TODO, this needs refactoring, see gitlab-ce#26481.
 
-      stages_query = statuses
+      stages_query = jobs
         .group('stage').select(:stage).order('max(stage_idx)')
 
-      status_sql = statuses.latest.where('stage=sg.stage').status_sql
+      status_sql = jobs.latest.where('stage=sg.stage').status_sql
 
-      warnings_sql = statuses.latest.select('COUNT(*)')
+      warnings_sql = jobs.latest.select('COUNT(*)')
         .where('stage=sg.stage').failed_but_allowed.to_sql
 
       stages_with_statuses = CommitStatus.from(stages_query, :sg)
@@ -357,11 +357,11 @@ module Ci
     end
 
     def retried
-      @retried ||= (statuses.order(id: :desc) - statuses.latest)
+      @retried ||= (jobs.order(id: :desc) - jobs.latest)
     end
 
     def coverage
-      coverage_array = statuses.latest.map(&:coverage).compact
+      coverage_array = jobs.latest.map(&:coverage).compact
       if coverage_array.size >= 1
         '%.2f' % (coverage_array.reduce(:+) / coverage_array.size)
       end
@@ -552,7 +552,7 @@ module Ci
     def latest_builds_status
       return 'failed' unless yaml_errors.blank?
 
-      statuses.latest.status || 'skipped'
+      jobs.latest.status || 'skipped'
     end
 
     def keep_around_commits
