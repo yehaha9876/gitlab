@@ -9,21 +9,17 @@ import findAndFollowLink from './shortcuts_dashboard_navigation';
 export default class ShortcutsEpics extends ShortcutsNavigation {
   constructor() {
     super();
-    Mousetrap.bind('e', this.editEpic);
-    Mousetrap.bind('=', this.addIssue);
+    Mousetrap.bind('e', () => ShortcutsEpics.editEpic());
+    Mousetrap.bind('=', () => ShortcutsEpics.addIssue());
 
     this.enabledHelp.push('.hidden-shortcut.epics');
   }
 
-  editEpic() {
+  static editEpic() {
     document.querySelector('.btn-edit').click();
-    
-    return false;
   }
 
-  addIssue() {
+  static addIssue() {
     document.querySelector('.js-issue-count-badge-add-button').click();
-
-    return false;
   }
 }
