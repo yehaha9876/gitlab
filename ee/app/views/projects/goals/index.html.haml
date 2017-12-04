@@ -1,0 +1,6 @@
+- page_title "Goals"
+
+- if @goals.to_a.any?
+  = render 'shared/goals'
+- else
+  NO GOALS

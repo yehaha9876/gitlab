@@ -342,6 +342,8 @@ constraints(ProjectUrlConstrainer.new) do
         end
       end
 
+      resources :goals, constraints: { id: /\d+/ }
+
       resources :labels, except: [:show], constraints: { id: /\d+/ } do
         collection do
           post :generate

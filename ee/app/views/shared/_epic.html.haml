@@ -1,0 +1,10 @@
+%li
+  .issue-box
+    .issue-info-container
+      .issue-main-info
+        .issue-title.title
+          %span.issue-title-text
+            = link_to goal.title, goal_path(goal)
+        .issuable-info
+          %span.issuable-reference
+            = goal.iid

@@ -32,6 +32,7 @@ module EE
       has_many :audit_events, as: :entity
       has_many :remote_mirrors, inverse_of: :project
       has_many :path_locks
+      has_many :goals
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
 

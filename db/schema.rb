@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171124165823) do
+ActiveRecord::Schema.define(version: 20171204164249) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,9 +32,9 @@ ActiveRecord::Schema.define(version: 20171124165823) do
     t.text "description", null: false
     t.string "logo"
     t.integer "updated_by"
-    t.string "header_logo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "header_logo"
     t.text "description_html"
     t.integer "cached_markdown_version"
   end
@@ -105,18 +105,14 @@ ActiveRecord::Schema.define(version: 20171124165823) do
     t.text "help_page_text_html"
     t.text "shared_runners_text_html"
     t.text "after_sign_up_text_html"
-    t.integer "rsa_key_restriction", default: 0, null: false
-    t.integer "dsa_key_restriction", default: 0, null: false
-    t.integer "ecdsa_key_restriction", default: 0, null: false
-    t.integer "ed25519_key_restriction", default: 0, null: false
+    t.boolean "sidekiq_throttling_enabled", default: false
+    t.string "sidekiq_throttling_queues"
+    t.decimal "sidekiq_throttling_factor"
     t.boolean "housekeeping_enabled", default: true, null: false
     t.boolean "housekeeping_bitmaps_enabled", default: true, null: false
     t.integer "housekeeping_incremental_repack_period", default: 10, null: false
     t.integer "housekeeping_full_repack_period", default: 50, null: false
     t.integer "housekeeping_gc_period", default: 200, null: false
-    t.boolean "sidekiq_throttling_enabled", default: false
-    t.string "sidekiq_throttling_queues"
-    t.decimal "sidekiq_throttling_factor"
     t.boolean "html_emails_enabled", default: true
     t.string "plantuml_url"
     t.boolean "plantuml_enabled"
@@ -143,10 +139,14 @@ ActiveRecord::Schema.define(version: 20171124165823) do
     t.integer "mirror_max_delay", default: 300, null: false
     t.integer "mirror_max_capacity", default: 100, null: false
     t.integer "mirror_capacity_threshold", default: 50, null: false
-    t.boolean "prometheus_metrics_enabled", default: false, null: false
     t.boolean "authorized_keys_enabled", default: true, null: false
+    t.boolean "prometheus_metrics_enabled", default: false, null: false
     t.boolean "help_page_hide_commercial_content", default: false
     t.string "help_page_support_url"
+    t.integer "rsa_key_restriction", default: 0, null: false
+    t.integer "dsa_key_restriction", default: 0, null: false
+    t.integer "ecdsa_key_restriction", default: 0, null: false
+    t.integer "ed25519_key_restriction", default: 0, null: false
     t.boolean "slack_app_enabled", default: false
     t.string "slack_app_id"
     t.string "slack_app_secret"
@@ -156,11 +156,11 @@ ActiveRecord::Schema.define(version: 20171124165823) do
     t.boolean "hashed_storage_enabled", default: false, null: false
     t.boolean "project_export_enabled", default: true, null: false
     t.boolean "auto_devops_enabled", default: false, null: false
+    t.boolean "remote_mirror_available", default: true, null: false
     t.integer "circuitbreaker_failure_count_threshold", default: 160
     t.integer "circuitbreaker_failure_wait_time", default: 30
     t.integer "circuitbreaker_failure_reset_time", default: 1800
     t.integer "circuitbreaker_storage_timeout", default: 30
-    t.boolean "remote_mirror_available", default: true, null: false
     t.integer "circuitbreaker_access_retries", default: 3
     t.integer "circuitbreaker_backoff_threshold", default: 80
     t.boolean "throttle_unauthenticated_enabled", default: false, null: false
@@ -173,7 +173,7 @@ ActiveRecord::Schema.define(version: 20171124165823) do
     t.integer "throttle_authenticated_web_requests_per_period", default: 7200, null: false
     t.integer "throttle_authenticated_web_period_in_seconds", default: 3600, null: false
     t.boolean "password_authentication_enabled_for_web"
-    t.boolean "password_authentication_enabled_for_git", default: true
+    t.boolean "password_authentication_enabled_for_git", default: true, null: false
     t.integer "gitaly_timeout_default", default: 55, null: false
     t.integer "gitaly_timeout_medium", default: 30, null: false
     t.integer "gitaly_timeout_fast", default: 10, null: false
@@ -360,9 +360,9 @@ ActiveRecord::Schema.define(version: 20171124165823) do
     t.string "coverage_regex"
     t.integer "auto_canceled_by_id"
     t.boolean "retried"
+    t.integer "artifacts_file_store", default: 1, null: false
+    t.integer "artifacts_metadata_store", default: 1, null: false
     t.integer "stage_id"
-    t.integer "artifacts_file_store"
-    t.integer "artifacts_metadata_store"
     t.boolean "protected"
     t.integer "failure_reason"
   end
@@ -456,8 +456,8 @@ ActiveRecord::Schema.define(version: 20171124165823) do
     t.integer "auto_canceled_by_id"
     t.integer "pipeline_schedule_id"
     t.integer "source"
-    t.integer "config_source"
     t.boolean "protected"
+    t.integer "config_source"
     t.integer "failure_reason"
   end
 
@@ -1032,6 +1032,29 @@ ActiveRecord::Schema.define(version: 20171124165823) do
   add_index "geo_repository_updated_events", ["project_id"], name: "index_geo_repository_updated_events_on_project_id", using: :btree
   add_index "geo_repository_updated_events", ["source"], name: "index_geo_repository_updated_events_on_source", using: :btree
 
+  create_table "goals", force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "group_id"
+    t.integer "cached_markdown_version"
+    t.integer "updated_by_id"
+    t.integer "last_edited_by_id"
+    t.integer "lock_version"
+    t.integer "completion_threshold"
+    t.date "start_date"
+    t.date "end_date"
+    t.datetime "last_edited_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "title", null: false
+    t.string "title_html", null: false
+    t.text "description"
+    t.text "description_html"
+    t.string "state", null: false
+  end
+
+  add_index "goals", ["group_id"], name: "index_goals_on_group_id", using: :btree
+  add_index "goals", ["project_id"], name: "index_goals_on_project_id", using: :btree
+
   create_table "gpg_key_subkeys", force: :cascade do |t|
     t.integer "gpg_key_id", null: false
     t.binary "keyid"
@@ -1498,8 +1521,8 @@ ActiveRecord::Schema.define(version: 20171124165823) do
     t.datetime "ldap_sync_last_successful_update_at"
     t.datetime "ldap_sync_last_sync_at"
     t.datetime "deleted_at"
-    t.text "description_html"
     t.boolean "lfs_enabled"
+    t.text "description_html"
     t.integer "parent_id"
     t.integer "shared_runners_minutes_limit"
     t.integer "repository_size_limit", limit: 8
@@ -1514,6 +1537,7 @@ ActiveRecord::Schema.define(version: 20171124165823) do
   add_index "namespaces", ["ldap_sync_last_successful_update_at"], name: "index_namespaces_on_ldap_sync_last_successful_update_at", using: :btree
   add_index "namespaces", ["ldap_sync_last_update_at"], name: "index_namespaces_on_ldap_sync_last_update_at", using: :btree
   add_index "namespaces", ["name", "parent_id"], name: "index_namespaces_on_name_and_parent_id", unique: true, using: :btree
+  add_index "namespaces", ["name"], name: "index_namespaces_on_name", unique: true, using: :btree
   add_index "namespaces", ["name"], name: "index_namespaces_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
   add_index "namespaces", ["owner_id"], name: "index_namespaces_on_owner_id", using: :btree
   add_index "namespaces", ["parent_id", "id"], name: "index_namespaces_on_parent_id_and_id", unique: true, using: :btree
@@ -1821,21 +1845,21 @@ ActiveRecord::Schema.define(version: 20171124165823) do
     t.boolean "only_allow_merge_if_pipeline_succeeds", default: false, null: false
     t.boolean "has_external_issue_tracker"
     t.string "repository_storage", default: "default", null: false
-    t.boolean "repository_read_only"
     t.boolean "request_access_enabled", default: false, null: false
     t.boolean "has_external_wiki"
-    t.string "ci_config_path"
+    t.boolean "repository_read_only"
     t.boolean "lfs_enabled"
     t.text "description_html"
     t.boolean "only_allow_merge_if_all_discussions_are_resolved"
     t.integer "repository_size_limit", limit: 8
     t.boolean "printing_merge_request_link_enabled", default: true, null: false
-    t.integer "auto_cancel_pending_pipelines", default: 1, null: false
     t.boolean "service_desk_enabled", default: true
     t.string "import_jid"
+    t.integer "auto_cancel_pending_pipelines", default: 1, null: false
     t.integer "cached_markdown_version"
-    t.text "delete_error"
     t.datetime "last_repository_updated_at"
+    t.string "ci_config_path"
+    t.text "delete_error"
     t.boolean "disable_overriding_approvers_per_merge_request"
     t.integer "storage_version", limit: 2
     t.boolean "resolve_outdated_diff_discussions"
@@ -2300,15 +2324,15 @@ ActiveRecord::Schema.define(version: 20171124165823) do
     t.string "unlock_token"
     t.datetime "otp_grace_period_started_at"
     t.boolean "external", default: false
-    t.string "incoming_email_token"
     t.string "organization"
+    t.string "incoming_email_token"
     t.boolean "auditor", default: false, null: false
+    t.boolean "ghost"
+    t.boolean "notified_of_own_activity"
+    t.date "last_activity_on"
+    t.boolean "support_bot"
     t.boolean "require_two_factor_authentication_from_group", default: false, null: false
     t.integer "two_factor_grace_period", default: 48, null: false
-    t.boolean "ghost"
-    t.date "last_activity_on"
-    t.boolean "notified_of_own_activity"
-    t.boolean "support_bot"
     t.string "preferred_language"
     t.string "rss_token"
     t.boolean "email_opted_in"
@@ -2375,8 +2399,8 @@ ActiveRecord::Schema.define(version: 20171124165823) do
     t.integer "group_id"
     t.boolean "note_events", default: false, null: false
     t.boolean "enable_ssl_verification", default: true
-    t.boolean "wiki_page_events", default: false, null: false
     t.string "token"
+    t.boolean "wiki_page_events", default: false, null: false
     t.boolean "pipeline_events", default: false, null: false
     t.boolean "confidential_issues_events", default: false, null: false
     t.boolean "repository_update_events", default: false, null: false
