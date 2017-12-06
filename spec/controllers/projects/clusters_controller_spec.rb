@@ -19,19 +19,13 @@ describe Projects::ClustersController do
         let(:project) { create(:project) }
         let!(:enabled_cluster) { create(:cluster, :provided_by_gcp, projects: [project]) }
         let!(:disabled_cluster) { create(:cluster, :disabled, :provided_by_gcp, projects: [project]) }
+
         it 'lists available clusters' do
           go
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template(:index)
           expect(assigns(:clusters)).to match_array([enabled_cluster, disabled_cluster])
-        end
-
-        it 'assigns counters to correct values' do
-          go
-
-          expect(assigns(:active_count)).to eq(1)
-          expect(assigns(:inactive_count)).to eq(1)
         end
 
         context 'when page is specified' do
@@ -48,20 +42,6 @@ describe Projects::ClustersController do
             expect(assigns(:clusters).current_page).to eq(last_page)
           end
         end
-
-        context 'when only enabled clusters are requested' do
-          it 'returns only enabled clusters' do
-            get :index, namespace_id: project.namespace, project_id: project, scope: 'active'
-            expect(assigns(:clusters)).to all(have_attributes(enabled: true))
-          end
-        end
-
-        context 'when only disabled clusters are requested' do
-          it 'returns only disabled clusters' do
-            get :index, namespace_id: project.namespace, project_id: project, scope: 'inactive'
-            expect(assigns(:clusters)).to all(have_attributes(enabled: false))
-          end
-        end
       end
 
       context 'when project does not have a cluster' do
@@ -73,13 +53,6 @@ describe Projects::ClustersController do
           expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template(:index, partial: :empty_state)
           expect(assigns(:clusters)).to eq([])
-        end
-
-        it 'assigns counters to zero' do
-          go
-
-          expect(assigns(:active_count)).to eq(0)
-          expect(assigns(:inactive_count)).to eq(0)
         end
       end
     end
