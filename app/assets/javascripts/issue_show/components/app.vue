@@ -285,6 +285,7 @@ export default {
       :title-html="state.titleHtml"
       :title-text="state.titleText"
       :show-inline-edit-button="showInlineEditButton"
+      :issuable-type="issuableType"
     />
     <description-component
       v-if="state.descriptionHtml"
