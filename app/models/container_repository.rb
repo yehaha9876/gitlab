@@ -1,6 +1,8 @@
 class ContainerRepository < ActiveRecord::Base
   belongs_to :project
-  has_many :container_repository_tag
+
+  # This relation should not be used directly while 'synced' field exists
+  has_many :container_tags, class_name: 'ContainerRepositoryTag', inverse_of: :repository
 
   validates :name, length: { minimum: 0, allow_nil: false }
   validates :name, uniqueness: { scope: :project_id }
@@ -30,18 +32,30 @@ class ContainerRepository < ActiveRecord::Base
   end
 
   def tag(tag)
-    ContainerRegistry::Tag.new(self, tag)
+    if synced?
+      container_tags.find_by_name(tag)
+    else
+      ContainerRegistry::Tag.new(self, tag)
+    end
   end
 
-  def manifest
-    @manifest ||= client.repository_tags(path)
+  def tag_list
+    @tag_list ||= client.repository_tags(path)
   end
 
   def tags
-    return @tags if defined?(@tags)
-    return [] unless manifest && manifest['tags']
+    if synced?
+      container_tags
+    else
+      load_tags
+    end
+  end
 
-    @tags = manifest['tags'].map do |tag|
+  def load_tags
+    return @tags if defined?(@tags)
+    return [] unless tag_list && tag_list['tags']
+
+    @tags = tag_list['tags'].map do |tag|
       ContainerRegistry::Tag.new(self, tag)
     end
   end
@@ -70,6 +84,11 @@ class ContainerRepository < ActiveRecord::Base
 
   def self.build_from_path(path)
     self.new(project: path.repository_project,
+             name: path.repository_name)
+  end
+
+  def self.find_or_create_from_path(path)
+    self.find_or_create_by(project: path.repository_project,
              name: path.repository_name)
   end
 

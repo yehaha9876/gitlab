@@ -32,9 +32,9 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.text "description", null: false
     t.string "logo"
     t.integer "updated_by"
-    t.string "header_logo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "header_logo"
     t.text "description_html"
     t.integer "cached_markdown_version"
     t.text "new_project_guidelines"
@@ -107,10 +107,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.text "help_page_text_html"
     t.text "shared_runners_text_html"
     t.text "after_sign_up_text_html"
-    t.integer "rsa_key_restriction", default: 0, null: false
-    t.integer "dsa_key_restriction", default: 0, null: false
-    t.integer "ecdsa_key_restriction", default: 0, null: false
-    t.integer "ed25519_key_restriction", default: 0, null: false
     t.boolean "housekeeping_enabled", default: true, null: false
     t.boolean "housekeeping_bitmaps_enabled", default: true, null: false
     t.integer "housekeeping_incremental_repack_period", default: 10, null: false
@@ -141,11 +137,11 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.integer "cached_markdown_version"
     t.boolean "clientside_sentry_enabled", default: false, null: false
     t.string "clientside_sentry_dsn"
+    t.boolean "prometheus_metrics_enabled", default: false, null: false
     t.boolean "check_namespace_plan", default: false, null: false
     t.integer "mirror_max_delay", default: 300, null: false
     t.integer "mirror_max_capacity", default: 100, null: false
     t.integer "mirror_capacity_threshold", default: 50, null: false
-    t.boolean "prometheus_metrics_enabled", default: false, null: false
     t.boolean "authorized_keys_enabled", default: true, null: false
     t.boolean "help_page_hide_commercial_content", default: false
     t.string "help_page_support_url"
@@ -155,8 +151,12 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.string "slack_app_verification_token"
     t.integer "performance_bar_allowed_group_id"
     t.boolean "allow_group_owners_to_manage_ldap", default: true, null: false
-    t.boolean "hashed_storage_enabled", default: false, null: false
     t.boolean "project_export_enabled", default: true, null: false
+    t.integer "rsa_key_restriction", default: 0, null: false
+    t.integer "dsa_key_restriction", default: 0, null: false
+    t.integer "ecdsa_key_restriction", default: 0, null: false
+    t.integer "ed25519_key_restriction", default: 0, null: false
+    t.boolean "hashed_storage_enabled", default: false, null: false
     t.boolean "auto_devops_enabled", default: false, null: false
     t.integer "circuitbreaker_failure_count_threshold", default: 3
     t.integer "circuitbreaker_failure_reset_time", default: 1800
@@ -171,12 +171,12 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.boolean "throttle_authenticated_web_enabled", default: false, null: false
     t.integer "throttle_authenticated_web_requests_per_period", default: 7200, null: false
     t.integer "throttle_authenticated_web_period_in_seconds", default: 3600, null: false
-    t.integer "circuitbreaker_check_interval", default: 1, null: false
     t.boolean "password_authentication_enabled_for_web"
-    t.boolean "password_authentication_enabled_for_git", default: true
+    t.boolean "password_authentication_enabled_for_git", default: true, null: false
     t.integer "gitaly_timeout_default", default: 55, null: false
     t.integer "gitaly_timeout_medium", default: 30, null: false
     t.integer "gitaly_timeout_fast", default: 10, null: false
+    t.integer "circuitbreaker_check_interval", default: 1, null: false
     t.boolean "mirror_available", default: true, null: false
   end
 
@@ -402,9 +402,9 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.integer "job_id", null: false
     t.integer "file_type", null: false
     t.integer "size", limit: 8
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
-    t.datetime_with_timezone "expire_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "expire_at"
     t.string "file"
     t.integer "file_store"
   end
@@ -472,8 +472,8 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.integer "auto_canceled_by_id"
     t.integer "pipeline_schedule_id"
     t.integer "source"
-    t.integer "config_source"
     t.boolean "protected"
+    t.integer "config_source"
     t.integer "failure_reason"
   end
 
@@ -526,11 +526,11 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.integer "source_pipeline_id"
   end
 
-  add_index "ci_sources_pipelines", ["pipeline_id"], name: "index_ci_sources_pipelines_on_pipeline_id", using: :btree
-  add_index "ci_sources_pipelines", ["project_id"], name: "index_ci_sources_pipelines_on_project_id", using: :btree
-  add_index "ci_sources_pipelines", ["source_job_id"], name: "index_ci_sources_pipelines_on_source_job_id", using: :btree
-  add_index "ci_sources_pipelines", ["source_pipeline_id"], name: "index_ci_sources_pipelines_on_source_pipeline_id", using: :btree
-  add_index "ci_sources_pipelines", ["source_project_id"], name: "index_ci_sources_pipelines_on_source_project_id", using: :btree
+  add_index "ci_sources_pipelines", ["pipeline_id"], name: "index_ci_pipeline_source_pipelines_on_pipeline_id", using: :btree
+  add_index "ci_sources_pipelines", ["project_id"], name: "index_ci_pipeline_source_pipelines_on_project_id", using: :btree
+  add_index "ci_sources_pipelines", ["source_job_id"], name: "index_ci_pipeline_source_pipelines_on_source_job_id", using: :btree
+  add_index "ci_sources_pipelines", ["source_pipeline_id"], name: "index_ci_pipeline_source_pipelines_on_source_pipeline_id", using: :btree
+  add_index "ci_sources_pipelines", ["source_project_id"], name: "index_ci_pipeline_source_pipelines_on_source_project_id", using: :btree
 
   create_table "ci_stages", force: :cascade do |t|
     t.integer "project_id"
@@ -674,6 +674,7 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "synced"
   end
 
   add_index "container_repositories", ["project_id", "name"], name: "index_container_repositories_on_project_id_and_name", unique: true, using: :btree
@@ -682,8 +683,10 @@ ActiveRecord::Schema.define(version: 20171230123729) do
   create_table "container_repository_tag_versions", id: :bigserial, force: :cascade do |t|
     t.integer "container_repository_tag_id", null: false
     t.string "digest", null: false
-    t.integer "size", null: false
-    t.integer "layers", null: false
+    t.integer "size"
+    t.integer "layers"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "container_repository_tag_versions", ["container_repository_tag_id"], name: "container_repository_tag_versions_id", using: :btree
@@ -692,6 +695,8 @@ ActiveRecord::Schema.define(version: 20171230123729) do
   create_table "container_repository_tags", id: :bigserial, force: :cascade do |t|
     t.integer "container_repository_id", null: false
     t.string "name", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "container_repository_tags", ["container_repository_id"], name: "container_repository_tags_id", using: :btree
@@ -1873,7 +1878,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.boolean "repository_read_only"
     t.boolean "request_access_enabled", default: false, null: false
     t.boolean "has_external_wiki"
-    t.string "ci_config_path"
     t.boolean "lfs_enabled"
     t.text "description_html"
     t.boolean "only_allow_merge_if_all_discussions_are_resolved"
@@ -1883,9 +1887,10 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.boolean "service_desk_enabled", default: true
     t.string "import_jid"
     t.integer "cached_markdown_version"
-    t.text "delete_error"
     t.datetime "last_repository_updated_at"
+    t.string "ci_config_path"
     t.boolean "disable_overriding_approvers_per_merge_request"
+    t.text "delete_error"
     t.integer "storage_version", limit: 2
     t.boolean "resolve_outdated_diff_discussions"
     t.boolean "remote_mirror_available_overridden"
@@ -1983,6 +1988,7 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.string "force_push_regex"
     t.string "delete_branch_regex"
     t.string "commit_message_regex"
+    t.string "branch_name_regex"
     t.boolean "deny_delete_tag"
     t.integer "project_id"
     t.datetime "created_at"
@@ -1993,7 +1999,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.boolean "is_sample", default: false
     t.integer "max_file_size", default: 0, null: false
     t.boolean "prevent_secrets", default: false, null: false
-    t.string "branch_name_regex"
     t.boolean "reject_unsigned_commits"
     t.boolean "commit_committer_check"
   end
@@ -2108,8 +2113,8 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.string "team_name", null: false
     t.string "alias", null: false
     t.string "user_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "slack_integrations", ["service_id"], name: "index_slack_integrations_on_service_id", using: :btree
@@ -2357,9 +2362,9 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.string "incoming_email_token"
     t.string "organization"
     t.boolean "auditor", default: false, null: false
+    t.boolean "ghost"
     t.boolean "require_two_factor_authentication_from_group", default: false, null: false
     t.integer "two_factor_grace_period", default: 48, null: false
-    t.boolean "ghost"
     t.date "last_activity_on"
     t.boolean "notified_of_own_activity"
     t.boolean "support_bot"
@@ -2467,11 +2472,11 @@ ActiveRecord::Schema.define(version: 20171230123729) do
   add_foreign_key "ci_pipelines", "ci_pipelines", column: "auto_canceled_by_id", name: "fk_262d4c2d19", on_delete: :nullify
   add_foreign_key "ci_pipelines", "projects", name: "fk_86635dbd80", on_delete: :cascade
   add_foreign_key "ci_runner_projects", "projects", name: "fk_4478a6f1e4", on_delete: :cascade
-  add_foreign_key "ci_sources_pipelines", "ci_builds", column: "source_job_id", name: "fk_be5624bf37", on_delete: :cascade
-  add_foreign_key "ci_sources_pipelines", "ci_pipelines", column: "pipeline_id", name: "fk_e1bad85861", on_delete: :cascade
-  add_foreign_key "ci_sources_pipelines", "ci_pipelines", column: "source_pipeline_id", name: "fk_d4e29af7d7", on_delete: :cascade
-  add_foreign_key "ci_sources_pipelines", "projects", column: "source_project_id", name: "fk_acd9737679", on_delete: :cascade
-  add_foreign_key "ci_sources_pipelines", "projects", name: "fk_1e53c97c0a", on_delete: :cascade
+  add_foreign_key "ci_sources_pipelines", "ci_builds", column: "source_job_id", name: "fk_3f0c88d7dc", on_delete: :cascade
+  add_foreign_key "ci_sources_pipelines", "ci_pipelines", column: "pipeline_id", name: "fk_b8c0fac459", on_delete: :cascade
+  add_foreign_key "ci_sources_pipelines", "ci_pipelines", column: "source_pipeline_id", name: "fk_3a3e3cb83a", on_delete: :cascade
+  add_foreign_key "ci_sources_pipelines", "projects", column: "source_project_id", name: "fk_8868d0f3e4", on_delete: :cascade
+  add_foreign_key "ci_sources_pipelines", "projects", name: "fk_83b4346e48", on_delete: :cascade
   add_foreign_key "ci_stages", "ci_pipelines", column: "pipeline_id", name: "fk_fb57e6cc56", on_delete: :cascade
   add_foreign_key "ci_stages", "projects", name: "fk_2360681d1d", on_delete: :cascade
   add_foreign_key "ci_trigger_requests", "ci_triggers", column: "trigger_id", name: "fk_b8ec8b7245", on_delete: :cascade
