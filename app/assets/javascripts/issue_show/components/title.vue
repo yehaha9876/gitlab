@@ -36,6 +36,11 @@
         required: false,
         default: false,
       },
+      issuableType: {
+        type: String,
+        required: false,
+        default: 'issue'
+      }
     },
     directives: {
       tooltip,
@@ -80,6 +85,7 @@
       v-if="showInlineEditButton && canUpdate"
       type="button"
       class="btn btn-default btn-edit btn-svg"
+      v-bind:class="'js-edit-' + issuableType"
       v-html="pencilIcon"
       title="Edit title and description"
       data-placement="bottom"
