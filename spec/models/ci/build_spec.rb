@@ -1887,6 +1887,74 @@ describe Ci::Build do
     end
   end
 
+  describe 'state transition: any => [:running]' do
+    before do
+      stub_feature_flags(ci_validates_dependencies: true)
+    end
+
+    let(:build) { create(:ci_build, :pending, pipeline: pipeline, stage_idx: 1, options: options) }
+
+    context 'when "dependencies" keyword is not defined' do
+      let(:options) { {} }
+
+      it { expect { build.run! }.not_to raise_error }
+    end
+
+    context 'when "dependencies" keyword is empty' do
+      let(:options) { { dependencies: [] } }
+
+      it { expect { build.run! }.not_to raise_error }
+    end
+
+    context 'when "dependencies" keyword is specified' do
+      let(:options) { { dependencies: ['test'] } }
+
+      context 'when a depended job exists' do
+        context 'when depended job has artifacts' do
+          let!(:pre_stage_job) do
+            create(:ci_build,
+                   :success,
+                   :artifacts,
+                   pipeline: pipeline,
+                   name: 'test',
+                   stage_idx: 0,
+                   options: { artifacts: { paths: ['binaries/'] } } )
+          end
+
+          it { expect { build.run! }.not_to raise_error }
+        end
+
+        context 'when depended job does not have artifacts' do
+          let!(:pre_stage_job) { create(:ci_build, :success, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+          it { expect { build.run! }.not_to raise_error }
+        end
+
+        context 'when depended job has not been completed yet' do
+          let!(:pre_stage_job) { create(:ci_build, :running, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+          it { expect { build.run! }.to raise_error(Ci::Build::MissingDependenciesError) }
+        end
+
+        context 'when artifacts of depended job has been expired' do
+          let!(:pre_stage_job) { create(:ci_build, :success, :expired, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+          it { expect { build.run! }.to raise_error(Ci::Build::MissingDependenciesError) }
+        end
+
+        context 'when artifacts of depended job has been erased' do
+          let!(:pre_stage_job) { create(:ci_build, :success, pipeline: pipeline, name: 'test', stage_idx: 0, erased_at: 1.minute.ago) }
+
+          before do
+            pre_stage_job.erase
+          end
+
+          it { expect { build.run! }.to raise_error(Ci::Build::MissingDependenciesError) }
+        end
+      end
+    end
+  end
+
   describe 'state transition when build fails' do
     let(:service) { MergeRequests::AddTodoWhenBuildFailsService.new(project, user) }
 
