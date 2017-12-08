@@ -59,6 +59,12 @@ describe Service do
 
   describe "Available services" do
     it { expect(described_class.available_services_names).to include("jenkins", "jira") }
+
+    it 'supports external plugins' do
+      stub_const("PLUGINS", ['example'])
+
+      expect(described_class.available_services_names).to include("example")
+    end
   end
 
   describe "Template" do
