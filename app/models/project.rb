@@ -138,6 +138,11 @@ class Project < ActiveRecord::Base
   has_one :microsoft_teams_service
   has_one :packagist_service
 
+  # Initialize external services from /plugins directory
+  PLUGINS.each do |plugin|
+    has_one "#{plugin}_service".to_sym
+  end
+
   # TODO: replace these relations with the fork network versions
   has_one  :forked_project_link,  foreign_key: "forked_to_project_id"
   has_one  :forked_from_project,  through:   :forked_project_link

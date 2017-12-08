@@ -264,6 +264,9 @@ class Service < ActiveRecord::Base
       service_names += %w[mock_ci mock_deployment mock_monitoring]
     end
 
+    # Include external plugins
+    service_names += PLUGINS
+
     if Gitlab.com? || Rails.env.development?
       service_names.push('gitlab_slack_application')
     end
