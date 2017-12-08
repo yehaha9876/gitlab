@@ -9,7 +9,7 @@ module EE
 
       included do
         scope :codequality, ->() { where(name: %w[codequality codeclimate]) }
-        scope :performance, ->() { where(name: %w[performance deploy]) }
+        scope :performance, ->() { where(name: 'performance') }
         scope :sast, ->() { where(name: 'sast') }
 
         after_save :stick_build_if_status_changed
