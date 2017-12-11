@@ -22,8 +22,8 @@ import NewCommitForm from './new_commit_form';
 import Project from './project';
 import projectAvatar from './project_avatar';
 /* global MergeRequest */
-/* global Compare */
-/* global CompareAutocomplete */
+import Compare from './compare';
+import initCompareAutocomplete from './compare_autocomplete';
 /* global PathLocks */
 /* global ProjectFindFile */
 import ProjectNew from './project_new';
@@ -330,18 +330,21 @@ import initGroupAnalytics from './init_group_analytics';
           break;
         case 'projects:snippets:show':
           initNotes();
+          new ZenMode();
           break;
         case 'projects:snippets:new':
         case 'projects:snippets:edit':
         case 'projects:snippets:create':
         case 'projects:snippets:update':
           new GLForm($('.snippet-form'), true);
+          new ZenMode();
           break;
         case 'snippets:new':
         case 'snippets:edit':
         case 'snippets:create':
         case 'snippets:update':
           new GLForm($('.snippet-form'), false);
+          new ZenMode();
           break;
         case 'projects:releases:edit':
           new ZenMode();
@@ -609,6 +612,7 @@ import initGroupAnalytics from './init_group_analytics';
           new LineHighlighter();
           new BlobViewer();
           initNotes();
+          new ZenMode();
           break;
         case 'import:fogbugz:new_user_map':
           new UsersSelect();
@@ -711,7 +715,7 @@ import initGroupAnalytics from './init_group_analytics';
           projectAvatar();
           switch (path[1]) {
             case 'compare':
-              new CompareAutocomplete();
+              initCompareAutocomplete();
               break;
             case 'edit':
               shortcut_handler = new ShortcutsNavigation();
