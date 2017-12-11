@@ -158,6 +158,42 @@ describe API::Geo do
     end
   end
 
+  describe 'GET /geo/transfers/ci_trace/1' do
+    let(:ci_build) { create(:ci_build, :success, :trace) }
+    let(:req_header) do
+      transfer = Gitlab::Geo::CiTraceTransfer.new(ci_build)
+      Gitlab::Geo::TransferRequest.new(transfer.request_data).headers
+    end
+
+    before do
+      allow_any_instance_of(Gitlab::Geo::TransferRequest).to receive(:requesting_node).and_return(secondary_node)
+    end
+
+    it 'responds with 401 with invalid auth header' do
+      get api("/geo/transfers/ci_trace/#{ci_build.id}"), nil, Authorization: 'Test'
+
+      expect(response).to have_gitlab_http_status(401)
+    end
+
+    context 'CI build trace file exists' do
+      it 'responds with 200 with X-Sendfile' do
+        get api("/geo/transfers/ci_trace/#{ci_build.id}"), nil, req_header
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.headers['Content-Type']).to eq('application/octet-stream')
+        expect(response.headers['X-Sendfile']).to eq(ci_build.trace.default_path)
+      end
+    end
+
+    context 'CI build does not exist' do
+      it 'responds with 404' do
+        get api("/geo/transfers/ci_trace/100000"), nil, req_header
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
   describe 'GET /geo/status', :postgresql do
     let(:request) { Gitlab::Geo::BaseRequest.new }
 

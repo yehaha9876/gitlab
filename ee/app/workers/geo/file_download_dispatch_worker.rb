@@ -26,6 +26,10 @@ module Geo
       @lfs_objects_finder ||= LfsObjectRegistryFinder.new(current_node: current_node)
     end
 
+    def ci_traces_finder
+      @ci_traces_finder ||= CiTraceRegistryFinder.new(current_node: current_node)
+    end
+
     # Pools for new resources to be transferred
     #
     # @return [Array] resources to be transferred
@@ -36,15 +40,16 @@ module Geo
       if remaining_capacity.zero?
         resources
       else
-        resources + find_failed_upload_object_ids(batch_size: remaining_capacity)
+        resources + file_registry_finder.find_failed_upload_object_ids(batch_size: remaining_capacity)
       end
     end
 
     def find_unsynced_objects(batch_size:)
       lfs_object_ids = find_unsynced_lfs_objects_ids(batch_size: batch_size)
       attachment_ids = find_unsynced_attachments_ids(batch_size: batch_size)
+      ci_trace_ids = find_unsynced_ci_traces_ids(batch_size: batch_size)
 
-      interleave(lfs_object_ids, attachment_ids)
+      take_batch(lfs_object_ids, attachment_ids, ci_trace_ids)
     end
 
     def find_unsynced_lfs_objects_ids(batch_size:)
@@ -59,9 +64,10 @@ module Geo
                         .map { |id, uploader| [id, uploader.sub(/Uploader\z/, '').underscore] }
     end
 
-    def find_failed_upload_object_ids(batch_size:)
-      file_registry_finder.find_failed_file_registries(batch_size: batch_size)
-                          .pluck(:file_id, :file_type)
+    def find_unsynced_ci_traces_ids(batch_size:)
+      ci_traces_finder.find_unsynced_ci_traces(batch_size: batch_size, except_registry_ids: scheduled_file_ids(:ci_trace))
+                      .pluck(:id)
+                      .map { |id| [id, :ci_trace] }
     end
 
     def scheduled_file_ids(file_types)

@@ -99,12 +99,26 @@ module Geo
       (Time.now.utc - start_time) >= run_time
     end
 
-    def interleave(first, second)
-      if first.length >= second.length
-        first.zip(second)
-      else
-        second.zip(first).map(&:reverse)
-      end.flatten(1).uniq.compact.take(db_retrieve_batch_size)
+    def take_batch(*arrays)
+      interleave(*arrays).uniq.compact.take(db_retrieve_batch_size)
+    end
+
+    def interleave(*arrays)
+      elements = []
+      coefficients = []
+      arrays.each_with_index do |e, index|
+        elements += e
+        coefficients += interleave_coefficients(e, index)
+      end
+
+      combined = elements.zip(coefficients)
+      combined.sort_by { |zipped| zipped[1] }.map { |zipped| zipped[0] }
+    end
+
+    def interleave_coefficients(array, array_index)
+      (1..array.size).map do |i|
+        (i - 0.5 + array_index / 1000.0) / (array.size + 1e-6)
+      end
     end
 
     def update_jobs_in_progress

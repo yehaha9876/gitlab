@@ -3,22 +3,14 @@ require 'spec_helper'
 describe Geo::FileDownloadDispatchWorker, :geo do
   include ::EE::GeoHelpers
 
-  let(:primary)   { create(:geo_node, :primary, host: 'primary-geo-node') }
-  let(:secondary) { create(:geo_node) }
-
-  before do
-    stub_current_geo_node(secondary)
-    allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:try_obtain).and_return(true)
-    allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:renew).and_return(true)
-    allow_any_instance_of(described_class).to receive(:over_time?).and_return(false)
-    WebMock.stub_request(:get, /primary-geo-node/).to_return(status: 200, body: "", headers: {})
-  end
-
   subject { described_class.new }
 
   shared_examples '#perform' do |skip_tests|
+    let!(:secondary) { create(:geo_node) }
+
     before do
       skip('FDW is not configured') if skip_tests
+      stub_current_geo_node(secondary)
     end
 
     it 'does not schedule anything when tracking database is not configured' do
@@ -63,6 +55,48 @@ describe Geo::FileDownloadDispatchWorker, :geo do
       end
     end
 
+    context 'with CI traces' do
+      it 'performs Geo::FileDownloadWorker for unsynced CI traces' do
+        build = create(:ci_build, :success, :trace)
+
+        expect(Geo::FileDownloadWorker).to receive(:perform_async)
+          .with(:ci_trace, build.id).once.and_return(spy)
+
+        subject.perform
+      end
+
+      it 'performs Geo::FileDownloadWorker for failed-sync CI traces' do
+        build = create(:ci_build, :success, :trace)
+
+        Geo::FileRegistry.create!(file_type: :ci_trace, file_id: build.id, bytes: 0, success: false)
+
+        expect(Geo::FileDownloadWorker).to receive(:perform_async)
+          .with('ci_trace', build.id).once.and_return(spy)
+
+        subject.perform
+      end
+
+      it 'does not perform Geo::FileDownloadWorker for synced CI traces' do
+        build = create(:ci_build, :success, :trace)
+
+        Geo::FileRegistry.create!(file_type: :ci_trace, file_id: build.id, bytes: 1234, success: true)
+
+        expect(Geo::FileDownloadWorker).not_to receive(:perform_async)
+
+        subject.perform
+      end
+
+      it 'does not perform Geo::FileDownloadWorker for synced CI traces even with 0 bytes downloaded' do
+        build = create(:ci_build, :success, :trace)
+
+        Geo::FileRegistry.create!(file_type: :ci_trace, file_id: build.id, bytes: 0, success: true)
+
+        expect(Geo::FileDownloadWorker).not_to receive(:perform_async)
+
+        subject.perform
+      end
+    end
+
     # Test the case where we have:
     #
     # 1. A total of 10 files in the queue, and we can load a maximimum of 5 and send 2 at a time.
@@ -76,7 +110,8 @@ describe Geo::FileDownloadDispatchWorker, :geo do
       create_list(:lfs_object, 2, :with_file)
       create_list(:user, 2, avatar: avatar)
       create_list(:note, 2, :with_attachment)
-      create_list(:upload, 2, :personal_snippet)
+      create_list(:upload, 1, :personal_snippet)
+      create_list(:ci_build, 1, :success, :trace)
       create(:appearance, logo: avatar, header_logo: avatar)
 
       expect(Geo::FileDownloadWorker).to receive(:perform_async).exactly(10).times.and_call_original
@@ -141,17 +176,17 @@ describe Geo::FileDownloadDispatchWorker, :geo do
         secondary.update_attribute(:namespaces, [synced_group])
       end
 
-      it 'does not perform Geo::FileDownloadWorker for LFS object that does not belong to selected namespaces to replicate' do
-        lfs_objec_in_synced_group = create(:lfs_objects_project, project: project_in_synced_group)
+      it 'does not perform Geo::FileDownloadWorker for LFS objects that do not belong to selected namespaces to replicate' do
+        lfs_object_in_synced_group = create(:lfs_objects_project, project: project_in_synced_group)
         create(:lfs_objects_project, project: unsynced_project)
 
         expect(Geo::FileDownloadWorker).to receive(:perform_async)
-          .with(:lfs, lfs_objec_in_synced_group.lfs_object_id).once.and_return(spy)
+          .with(:lfs, lfs_object_in_synced_group.lfs_object_id).once.and_return(spy)
 
         subject.perform
       end
 
-      it 'does not perform Geo::FileDownloadWorker for upload objects that do not belong to selected namespaces to replicate' do
+      it 'does not perform Geo::FileDownloadWorker for uploads that do not belong to selected namespaces to replicate' do
         avatar = fixture_file_upload(Rails.root.join('spec/fixtures/dk.png'))
         avatar_in_synced_group = create(:upload, model: synced_group, path: avatar)
         create(:upload, model: create(:group), path: avatar)
@@ -163,6 +198,22 @@ describe Geo::FileDownloadDispatchWorker, :geo do
 
         expect(Geo::FileDownloadWorker).to receive(:perform_async)
           .with('avatar', avatar_in_synced_group.id).once.and_return(spy)
+
+        subject.perform
+      end
+
+      it 'does not perform Geo::FileDownloadWorker for CI traces that do not belong to selected namespaces to replicate' do
+        # Trace that should not be synced
+        trace_to_not_sync = create(:ci_build, :success, :trace, project: unsynced_project)
+
+        # Trace that should be synced
+        trace_to_sync = create(:ci_build, :success, :trace, project: project_in_synced_group)
+
+        expect(Geo::FileDownloadWorker).not_to receive(:perform_async)
+          .with(:ci_trace, trace_to_not_sync.id)
+
+        expect(Geo::FileDownloadWorker).to receive(:perform_async)
+          .with(:ci_trace, trace_to_sync.id).once.and_return(spy)
 
         subject.perform
       end
@@ -182,5 +233,36 @@ describe Geo::FileDownloadDispatchWorker, :geo do
     end
 
     it_behaves_like '#perform', false
+  end
+
+  describe '#take_batch' do
+    it 'returns a batch of jobs' do
+      a = [[2, :lfs], [3, :lfs]]
+      b = []
+      c = [[3, :ci_trace], [8, :ci_trace], [9, :ci_trace]]
+      expect(subject).to receive(:db_retrieve_batch_size).and_return(4)
+
+      expect(subject.send(:take_batch, a, b, c)).to eq([
+        [3, :ci_trace],
+        [2, :lfs],
+        [8, :ci_trace],
+        [3, :lfs]
+      ])
+    end
+  end
+
+  describe '#interleave' do
+    it 'interleaves 2 arrays' do
+      a = %w{1 2 3}
+      b = %w{4 5 6}
+      expect(subject.send(:interleave, a, b)).to eq(%w{1 4 2 5 3 6})
+    end
+
+    it 'interleaves 3 arrays' do
+      a = %w{1 2 3}
+      b = %w{4 5 6}
+      c = %w{7 8 9}
+      expect(subject.send(:interleave, a, b, c)).to eq(%w{1 4 7 2 5 8 3 6 9})
+    end
   end
 end

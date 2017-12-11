@@ -89,6 +89,16 @@ module Gitlab
         job.erase_old_trace!
       end
 
+      def current_path
+        @current_path ||= paths.find do |trace_path|
+          File.exist?(trace_path)
+        end
+      end
+
+      def default_path
+        File.join(default_directory, "#{job.id}.log")
+      end
+
       private
 
       def ensure_path
@@ -101,12 +111,6 @@ module Gitlab
       def ensure_directory
         unless Dir.exist?(default_directory)
           FileUtils.mkdir_p(default_directory)
-        end
-      end
-
-      def current_path
-        @current_path ||= paths.find do |trace_path|
-          File.exist?(trace_path)
         end
       end
 
@@ -123,10 +127,6 @@ module Gitlab
           job.created_at.utc.strftime("%Y_%m"),
           job.project_id.to_s
         )
-      end
-
-      def default_path
-        File.join(default_directory, "#{job.id}.log")
       end
 
       def deprecated_path

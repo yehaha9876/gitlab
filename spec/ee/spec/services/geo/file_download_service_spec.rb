@@ -187,6 +187,32 @@ describe Geo::FileDownloadService do
       end
     end
 
+    context 'CI traces' do
+      let(:build) { create(:ci_build, :success, :trace) }
+
+      subject { described_class.new(:ci_trace, build.id) }
+
+      it 'downloads a CI build trace' do
+        stub_downloader(Gitlab::Geo::CiTraceDownloader, 100)
+
+        expect { subject.execute }.to change { Geo::FileRegistry.synced.count }.by(1)
+      end
+
+      it 'registers when the download fails' do
+        stub_downloader(Gitlab::Geo::CiTraceDownloader, -1)
+
+        expect { subject.execute }.to change { Geo::FileRegistry.failed.count }.by(1)
+      end
+
+      it 'logs a message' do
+        stub_downloader(Gitlab::Geo::CiTraceDownloader, 100)
+
+        expect(Gitlab::Geo::Logger).to receive(:info).with(hash_including(:message, :download_time_s, success: true, bytes_downloaded: 100)).and_call_original
+
+        subject.execute
+      end
+    end
+
     context 'bad object type' do
       it 'raises an error' do
         expect { described_class.new(:bad, 1).execute }.to raise_error(NameError)
@@ -195,6 +221,11 @@ describe Geo::FileDownloadService do
 
     def stub_transfer(kls, result)
       instance = double("(instance of #{kls})", download_from_primary: result)
+      allow(kls).to receive(:new).and_return(instance)
+    end
+
+    def stub_downloader(kls, result)
+      instance = double("(instance of #{kls})", execute: result)
       allow(kls).to receive(:new).and_return(instance)
     end
   end

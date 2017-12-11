@@ -41,5 +41,10 @@ module Geo
 
       joined_relation.where(registry: { registry_present: [nil, false] })
     end
+
+    def legacy_pluck_registry_ids(file_types:, except_registry_ids:)
+      ids = Geo::FileRegistry.where(file_type: file_types).pluck(:file_id)
+      (ids + except_registry_ids).uniq
+    end
   end
 end
