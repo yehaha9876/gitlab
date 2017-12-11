@@ -31,7 +31,7 @@ export default {
     showInlineEditButton: {
       type: Boolean,
       required: false,
-      default: false,
+      default: true,
     },
     showDeleteButton: {
       type: Boolean,
