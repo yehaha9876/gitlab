@@ -195,17 +195,7 @@ feature 'image diff notes', :js do
       find('.view-modes-menu .onion-skin').click
 
       # Simulate dragging onion-skin slider
-      page.execute_script <<-JS.strip_heredoc
-        const padding = parseInt($('.onion-skin .frame.added').css('right').replace('px', ''), 10);
-        const leftOffset = $('.dragger').parent().offset().left;
-
-        const mousemove = $.Event('mousemove');
-        mousemove.pageX = leftOffset + padding;
-
-        $('.dragger')
-          .trigger('mousedown')
-          .trigger(mousemove);
-      JS
+      drag_and_drop_by(find('.dragger'), 30, 0)
 
       expect(find('.onion-skin-frame .frame.added', visible: false)['style']).to match('opacity: 0;')
 
@@ -215,12 +205,16 @@ feature 'image diff notes', :js do
       expect(find('.onion-skin-frame .frame.added', visible: false)['style']).to match('opacity: 1;')
     end
   end
-end
 
-def create_image_diff_note
-  find('.js-add-image-diff-note-button', match: :first).click
-  page.all('.js-add-image-diff-note-button')[0].trigger('click')
-  find('.diff-content .note-textarea').native.send_keys('image diff test comment')
-  click_button 'Comment'
-  wait_for_requests
+  def drag_and_drop_by(element, right_by, down_by)
+    page.driver.browser.action.drag_and_drop_by(element.native, right_by, down_by).perform
+  end
+
+  def create_image_diff_note
+    find('.js-add-image-diff-note-button', match: :first).click
+    page.all('.js-add-image-diff-note-button')[0].trigger('click')
+    find('.diff-content .note-textarea').native.send_keys('image diff test comment')
+    click_button 'Comment'
+    wait_for_requests
+  end
 end
