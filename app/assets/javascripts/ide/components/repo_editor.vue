@@ -97,8 +97,8 @@ export default {
       'activeFileExtension',
     ]),
     ...mapState([
-     'leftPanelCollapsed',
-     'rightPanelCollapsed',
+      'leftPanelCollapsed',
+      'rightPanelCollapsed',
     ]),
     shouldHideEditor() {
       return this.activeFile && this.activeFile.binary && !this.activeFile.raw;
