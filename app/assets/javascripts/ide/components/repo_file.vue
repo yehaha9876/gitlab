@@ -3,6 +3,7 @@
   import timeAgoMixin from '../../vue_shared/mixins/timeago';
   import skeletonLoadingContainer from '../../vue_shared/components/skeleton_loading_container.vue';
   import fileStatusIcon from './repo_file_status_icon.vue';
+  import newDropdown from './new_dropdown/index.vue';
 
   export default {
     mixins: [
@@ -36,9 +37,6 @@
           [this.file.icon]: !this.file.loading,
           'fa-folder-open': !this.file.loading && this.file.opened,
         };
-      },
-      isSubmodule() {
-        return this.file.type === 'submodule';
       },
       isTree() {
         return this.file.type === 'tree';
