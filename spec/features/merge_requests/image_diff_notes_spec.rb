@@ -10,8 +10,6 @@ feature 'image diff notes', :js do
     project.team << [user, :master]
     sign_in user
 
-    page.driver.set_cookie('sidebar_collapsed', 'true')
-
     # Stub helper to return any blob file as image from public app folder.
     # This is necessary to run this specs since we don't display repo images in capybara.
     allow_any_instance_of(DiffHelper).to receive(:diff_file_blob_raw_path).and_return('/apple-touch-icon.png')
@@ -141,13 +139,13 @@ feature 'image diff notes', :js do
         end
 
         it 'allows expanding/collapsing the discussion notes' do
-          page.all('.js-diff-notes-toggle')[0].trigger('click')
-          page.all('.js-diff-notes-toggle')[1].trigger('click')
+          page.all('.js-diff-notes-toggle')[0].click
+          page.all('.js-diff-notes-toggle')[1].click
 
           expect(page).not_to have_content('image diff test comment')
 
-          page.all('.js-diff-notes-toggle')[0].trigger('click')
-          page.all('.js-diff-notes-toggle')[1].trigger('click')
+          page.all('.js-diff-notes-toggle')[0].click
+          page.all('.js-diff-notes-toggle')[1].click
 
           expect(page).to have_content('image diff test comment')
         end
@@ -212,7 +210,7 @@ feature 'image diff notes', :js do
 
   def create_image_diff_note
     find('.js-add-image-diff-note-button', match: :first).click
-    page.all('.js-add-image-diff-note-button')[0].trigger('click')
+    page.all('.js-add-image-diff-note-button')[0].click
     find('.diff-content .note-textarea').native.send_keys('image diff test comment')
     click_button 'Comment'
     wait_for_requests
