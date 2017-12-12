@@ -185,6 +185,36 @@ feature 'image diff notes', :js do
       expect(page).to have_content(diff_note.note)
     end
   end
+
+  describe 'image view nodes' do
+    before do
+      visit project_commit_path(project, '2f63565e7aac07bcdadb654e253078b727143ec4')
+    end
+
+    it 'resets onion skin view mode opacity when toggling between view modes' do
+      find('.view-modes-menu .onion-skin').click
+
+      # Simulate dragging onion-skin slider
+      page.execute_script <<-JS.strip_heredoc
+        const padding = parseInt($('.onion-skin .frame.added').css('right').replace('px', ''), 10);
+        const leftOffset = $('.dragger').parent().offset().left;
+
+        const mousemove = $.Event('mousemove');
+        mousemove.pageX = leftOffset + padding;
+
+        $('.dragger')
+          .trigger('mousedown')
+          .trigger(mousemove);
+      JS
+
+      expect(find('.onion-skin-frame .frame.added', visible: false)['style']).to match('opacity: 0;')
+
+      find('.view-modes-menu .swipe').click
+      find('.view-modes-menu .onion-skin').click
+
+      expect(find('.onion-skin-frame .frame.added', visible: false)['style']).to match('opacity: 1;')
+    end
+  end
 end
 
 def create_image_diff_note
