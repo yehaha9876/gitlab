@@ -45,14 +45,7 @@ module Elastic
       end
 
       after_commit on: :update do
-        if current_application_settings.elasticsearch_indexing? && self.searchable?
-          ElasticIndexerWorker.perform_async(
-            :update,
-            self.class.to_s,
-            self.id,
-            changed_fields: self.previous_changes.keys
-          )
-        end
+        schedule_elastic_search_index_for_update
       end
 
       after_commit on: :destroy do
@@ -62,6 +55,17 @@ module Elastic
             self.class.to_s,
             self.id,
             project_id: self.es_parent
+          )
+        end
+      end
+
+      def schedule_elastic_search_index_for_update
+        if current_application_settings.elasticsearch_indexing? && self.searchable?
+          ElasticIndexerWorker.perform_async(
+            :update,
+            self.class.to_s,
+            self.id,
+            changed_fields: self.previous_changes.keys
           )
         end
       end
