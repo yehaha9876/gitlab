@@ -407,6 +407,9 @@ class Note < ActiveRecord::Base
       end
 
     noteable_object&.touch
+
+    # We return the noteable object so we can re-use it in EE for ElasticSearch.
+    noteable_object
   end
 
   def banzai_render_context(field)
