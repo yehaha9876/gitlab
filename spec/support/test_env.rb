@@ -92,6 +92,7 @@ module TestEnv
 
   def cleanup
     stop_gitaly
+    clean_test_path
   end
 
   def disable_mailer
