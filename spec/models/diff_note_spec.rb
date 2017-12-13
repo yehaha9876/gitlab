@@ -9,14 +9,13 @@ describe DiffNote do
 
   let(:path) { "files/ruby/popen.rb" }
 
-  let(:diff_refs) { merge_request.diff_refs }
   let!(:position) do
     Gitlab::Diff::Position.new(
       old_path: path,
       new_path: path,
       old_line: nil,
       new_line: 14,
-      diff_refs: diff_refs
+      diff_refs: merge_request.diff_refs
     )
   end
 
@@ -26,7 +25,7 @@ describe DiffNote do
       new_path: path,
       old_line: 16,
       new_line: 22,
-      diff_refs: diff_refs
+      diff_refs: merge_request.diff_refs
     )
   end
 
@@ -159,21 +158,25 @@ describe DiffNote do
   describe "creation" do
     describe "updating of position" do
       context "when noteable is a commit" do
-        let(:diff_refs) { commit.diff_refs }
-
-        subject { create(:diff_note_on_commit, project: project, position: position, commit_id: commit.id) }
+        let(:diff_note) { create(:diff_note_on_commit, project: project, position: position) }
 
         it "doesn't update the position" do
-          is_expected.to have_attributes(original_position: position,
-                                         position: position)
+          diff_note
+
+          expect(diff_note.original_position).to eq(position)
+          expect(diff_note.position).to eq(position)
         end
       end
 
       context "when noteable is a merge request" do
+        let(:diff_note) { create(:diff_note_on_merge_request, project: project, position: position, noteable: merge_request) }
+
         context "when the note is active" do
           it "doesn't update the position" do
-            expect(subject.original_position).to eq(position)
-            expect(subject.position).to eq(position)
+            diff_note
+
+            expect(diff_note.original_position).to eq(position)
+            expect(diff_note.position).to eq(position)
           end
         end
 
@@ -183,8 +186,10 @@ describe DiffNote do
           end
 
           it "updates the position" do
-            expect(subject.original_position).to eq(position)
-            expect(subject.position).not_to eq(position)
+            diff_note
+
+            expect(diff_note.original_position).to eq(position)
+            expect(diff_note.position).not_to eq(position)
           end
         end
       end
