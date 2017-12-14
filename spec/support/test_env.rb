@@ -93,6 +93,7 @@ module TestEnv
   def cleanup
     stop_gitaly
     clean_test_path
+    puts "=== Current time: #{Time.now}"
   end
 
   def disable_mailer

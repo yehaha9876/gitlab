@@ -100,6 +100,7 @@ RSpec.configure do |config|
   end
 
   config.before(:suite) do
+    puts "=== Start time time: #{Time.now}"
     Timecop.safe_mode = true
     TestEnv.init
   end
@@ -110,6 +111,7 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
+    puts "=== Current time: #{Time.now}"
     TestEnv.cleanup
   end
 

@@ -209,6 +209,7 @@ FactoryGirl.define do
 
     trait :test_repo do
       after :create do |project|
+        puts "=== factory/test_repo: #{project.id}"
         TestEnv.copy_repo(project,
           bare_repo: TestEnv.factory_repo_path_bare,
           refs: TestEnv::BRANCH_SHA)

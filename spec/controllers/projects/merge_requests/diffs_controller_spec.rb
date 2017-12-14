@@ -96,6 +96,7 @@ describe Projects::MergeRequests::DiffsController do
       context 'when the user can view the merge request' do
         context 'when the path exists in the diff' do
           it 'enables diff notes' do
+            puts "=== start project here #{project.id}"
             diff_for_path(old_path: existing_path, new_path: existing_path)
 
             expect(assigns(:diff_notes_disabled)).to be_falsey
