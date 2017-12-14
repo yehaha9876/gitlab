@@ -6,7 +6,10 @@ FactoryGirl.define do
   # Project does not have bare repository.
   # Use this factory if you don't need repository in tests
   factory :project, class: 'Project' do
-    sequence(:name) { |n| "project#{n}" }
+    sequence(:name) do |n|
+      puts "=== project #{n}"
+      "project#{n}"
+    end
     path { name.downcase.gsub(/\s/, '_') }
     # Behaves differently to nil due to cache_has_external_issue_tracker
     has_external_issue_tracker false

@@ -218,10 +218,16 @@ module TestEnv
 
   def copy_repo(project, bare_repo:, refs:)
     target_repo_path = File.expand_path(project.repository_storage_path + "/#{project.full_path}.git")
+
+    puts "=== copying repo #{target_repo_path} from #{File.expand_path(bare_repo)}"
+
     FileUtils.mkdir_p(target_repo_path)
     FileUtils.cp_r("#{File.expand_path(bare_repo)}/.", target_repo_path)
     FileUtils.chmod_R 0755, target_repo_path
     set_repo_refs(target_repo_path, refs)
+
+    contents = `ls -al #{target_repo_path}`
+    puts "=== contents of #{target_repo_path}, #{contents}"
   end
 
   def repos_path
