@@ -95,6 +95,11 @@ describe Projects::MergeRequests::DiffsController do
     context 'when the merge request exists' do
       context 'when the user can view the merge request' do
         context 'when the path exists in the diff' do
+          before do
+            puts "=== starting here #{project.id}"
+            puts "=== diff_for_path is defined as #{diff_for_path.parameters}"
+          end
+
           it 'enables diff notes' do
             puts "=== start project here #{project.id}"
             diff_for_path(old_path: existing_path, new_path: existing_path)
@@ -106,6 +111,8 @@ describe Projects::MergeRequests::DiffsController do
           end
 
           it 'only renders the diffs for the path given' do
+            puts "=== start only renders the diffs project here #{project.id}"
+
             expect(controller).to receive(:render_diff_for_path).and_wrap_original do |meth, diffs|
               expect(diffs.diff_files.map(&:new_path)).to contain_exactly(existing_path)
               meth.call(diffs)
