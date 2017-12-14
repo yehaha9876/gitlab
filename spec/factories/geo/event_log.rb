@@ -27,6 +27,10 @@ FactoryBot.define do
     trait :lfs_object_deleted_event do
       lfs_object_deleted_event factory: :geo_lfs_object_deleted_event
     end
+
+    trait :build_erased_event do
+      build_erased_event factory: :geo_build_erased_event
+    end
   end
 
   factory :geo_repository_created_event, class: Geo::RepositoryCreatedEvent do
@@ -99,5 +103,9 @@ FactoryBot.define do
       event.oid = event.lfs_object.oid
       event.file_path = event.lfs_object.file.path
     end
+  end
+
+  factory :geo_build_erased_event, class: Geo::BuildErasedEvent do
+    build { create(:ci_build, :success, :trace) }
   end
 end

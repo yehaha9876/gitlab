@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171213160445) do
+ActiveRecord::Schema.define(version: 20171214220901) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -892,6 +892,12 @@ ActiveRecord::Schema.define(version: 20171213160445) do
 
   add_index "gcp_clusters", ["project_id"], name: "index_gcp_clusters_on_project_id", unique: true, using: :btree
 
+  create_table "geo_build_erased_events", id: :bigserial, force: :cascade do |t|
+    t.integer "build_id", null: false
+  end
+
+  add_index "geo_build_erased_events", ["build_id"], name: "index_geo_build_erased_events_on_build_id", using: :btree
+
   create_table "geo_event_log", id: :bigserial, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "repository_updated_event_id", limit: 8
@@ -902,6 +908,7 @@ ActiveRecord::Schema.define(version: 20171213160445) do
     t.integer "hashed_storage_migrated_event_id", limit: 8
     t.integer "lfs_object_deleted_event_id", limit: 8
     t.integer "hashed_storage_attachments_event_id", limit: 8
+    t.integer "build_erased_event_id", limit: 8
   end
 
   add_index "geo_event_log", ["repositories_changed_event_id"], name: "index_geo_event_log_on_repositories_changed_event_id", using: :btree
@@ -2468,6 +2475,7 @@ ActiveRecord::Schema.define(version: 20171213160445) do
   add_foreign_key "gcp_clusters", "projects", on_delete: :cascade
   add_foreign_key "gcp_clusters", "services", on_delete: :nullify
   add_foreign_key "gcp_clusters", "users", on_delete: :nullify
+  add_foreign_key "geo_event_log", "geo_build_erased_events", column: "build_erased_event_id", name: "fk_04241310eb", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_hashed_storage_migrated_events", column: "hashed_storage_migrated_event_id", name: "fk_27548c6db3", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_lfs_object_deleted_events", column: "lfs_object_deleted_event_id", name: "fk_d5af95fcd9", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_repositories_changed_events", column: "repositories_changed_event_id", name: "fk_4a99ebfd60", on_delete: :cascade

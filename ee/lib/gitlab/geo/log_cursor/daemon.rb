@@ -216,6 +216,27 @@ module Gitlab
           ::Geo::FileRegistry.lfs_objects.where(file_id: event.lfs_object_id).delete_all
         end
 
+        def handle_build_erased_event(event, created_at)
+          ci_trace_registry_scope = ::Geo::FileRegistry.ci_traces.where(file_id: event.build_id)
+          return if ci_trace_registry_scope.none?
+
+          build = ::Ci::Build.find_by(id: event.build_id)
+
+          if build
+            trace_path = build.trace.default_path
+            FileUtils.rm(trace_path, force: true) if File.exist?(trace_path)
+          else
+            logger.info("Tried to erase build trace, but the build was not found", build_id: event.build_id)
+          end
+
+          logger.event_info(
+            created_at,
+            message: 'Erased build',
+            file_id: event.build_id)
+
+          ci_trace_registry_scope.delete_all
+        end
+
         def find_or_initialize_registry(project_id, attrs)
           registry = ::Geo::ProjectRegistry.find_or_initialize_by(project_id: project_id)
           registry.assign_attributes(attrs)

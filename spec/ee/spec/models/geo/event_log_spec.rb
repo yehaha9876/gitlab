@@ -8,6 +8,9 @@ RSpec.describe Geo::EventLog, type: :model do
     it { is_expected.to belong_to(:repository_renamed_event).class_name('Geo::RepositoryRenamedEvent').with_foreign_key('repository_renamed_event_id') }
     it { is_expected.to belong_to(:repository_updated_event).class_name('Geo::RepositoryUpdatedEvent').with_foreign_key('repository_updated_event_id') }
     it { is_expected.to belong_to(:hashed_storage_migrated_event).class_name('Geo::HashedStorageMigratedEvent').with_foreign_key('hashed_storage_migrated_event_id') }
+    it { is_expected.to belong_to(:hashed_storage_attachments_event).class_name('Geo::HashedStorageAttachmentsEvent').with_foreign_key('hashed_storage_attachments_event_id') }
+    it { is_expected.to belong_to(:lfs_object_deleted_event).class_name('Geo::LfsObjectDeletedEvent').with_foreign_key('lfs_object_deleted_event_id') }
+    it { is_expected.to belong_to(:build_erased_event).class_name('Geo::BuildErasedEvent').with_foreign_key('build_erased_event_id') }
   end
 
   describe '#event' do
@@ -57,11 +60,25 @@ RSpec.describe Geo::EventLog, type: :model do
       expect(subject.event).to eq hashed_storage_migrated_event
     end
 
+    it 'returns hashed_storage_attachments_event when set' do
+      hashed_storage_attachments_event = build(:geo_hashed_storage_attachments_event)
+      subject.hashed_storage_attachments_event = hashed_storage_attachments_event
+
+      expect(subject.event).to eq hashed_storage_attachments_event
+    end
+
     it 'returns lfs_object_deleted_event when set' do
       lfs_object_deleted_event = build(:geo_lfs_object_deleted_event)
       subject.lfs_object_deleted_event = lfs_object_deleted_event
 
       expect(subject.event).to eq lfs_object_deleted_event
+    end
+
+    it 'returns build_erased_event when set' do
+      build_erased_event = build(:geo_build_erased_event)
+      subject.build_erased_event = build_erased_event
+
+      expect(subject.event).to eq build_erased_event
     end
   end
 

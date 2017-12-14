@@ -300,5 +300,48 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
         expect { daemon.run_once! }.to change(Geo::FileRegistry.lfs_objects, :count).by(-1)
       end
     end
+
+    context 'when replaying a build erased event' do
+      let(:event_log) { create(:geo_event_log, :build_erased_event) }
+      let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
+      let(:build_erased_event) { event_log.build_erased_event }
+      let(:build) { build_erased_event.build }
+
+      context 'with a tracking database entry' do
+        before do
+          create(:geo_file_registry, :ci_trace, file_id: build.id)
+        end
+
+        context 'with a trace file' do
+          it 'removes the tracking database entry' do
+            expect { daemon.run_once! }.to change(Geo::FileRegistry.ci_traces, :count).by(-1)
+          end
+
+          it 'deletes the trace' do
+            expect { daemon.run_once! }.to change { File.exist?(build.trace.default_path) }.from(true).to(false)
+          end
+        end
+
+        context 'without a trace file' do
+          before do
+            FileUtils.rm(build.trace.default_path)
+          end
+
+          it 'removes the tracking database entry' do
+            expect { daemon.run_once! }.to change(Geo::FileRegistry.ci_traces, :count).by(-1)
+          end
+        end
+      end
+
+      context 'without a tracking database entry' do
+        it 'does not create a tracking database entry' do
+          expect { daemon.run_once! }.not_to change(Geo::FileRegistry, :count)
+        end
+
+        it 'does not delete the trace (yet, due to possible race condition)' do
+          expect { daemon.run_once! }.not_to change { File.exist?(build.trace.default_path) }.from(true)
+        end
+      end
+    end
   end
 end
