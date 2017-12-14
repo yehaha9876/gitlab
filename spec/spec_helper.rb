@@ -100,14 +100,19 @@ RSpec.configure do |config|
   end
 
   config.before(:suite) do
-    puts "=== Start time time: #{Time.now}"
+    puts "=== Suite start time: #{Time.now}"
     Timecop.safe_mode = true
     TestEnv.init
   end
 
   config.before(:all) do
+    puts "=== Start time: #{Time.now}"
     License.destroy_all
     TestLicense.init
+  end
+
+  config.after(:all) do
+    puts "=== End time: #{Time.now}"
   end
 
   config.after(:suite) do
