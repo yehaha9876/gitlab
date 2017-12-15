@@ -48,11 +48,27 @@ module EE
         has_artifact?(CLAIR_FILE)
       end
 
+      def erase(*args)
+        retval = super(*args)
+
+        after_erase if retval
+
+        retval
+      end
+
       private
 
       def has_artifact?(name)
         options.dig(:artifacts, :paths) == [name] &&
           artifacts_metadata?
+      end
+
+      def after_erase
+        log_geo_erase_event
+      end
+
+      def log_geo_erase_event
+        ::Geo::BuildErasedEventStore.new(self).create
       end
     end
   end

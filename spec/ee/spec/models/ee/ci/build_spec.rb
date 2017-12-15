@@ -168,4 +168,28 @@ describe Ci::Build do
       end
     end
   end
+
+  describe '#erase' do
+    context "when the build is erasable (it doesn't actually erase the trace either)" do
+      let(:build) { create(:ci_build, :running, :trace) }
+
+      it 'does not instantiate ::Geo::BuildErasedEventStore' do
+        expect(::Geo::BuildErasedEventStore).not_to receive(:new)
+
+        build.erase
+      end
+    end
+
+    context 'when the build is not erasable' do
+      let(:build) { create(:ci_build, :success, :trace) }
+
+      it 'calls ::Geo::BuildErasedEventStore#create' do
+        store = double(:event_store)
+        expect(store).to receive(:create)
+        expect(::Geo::BuildErasedEventStore).to receive(:new).and_return(store)
+
+        build.erase
+      end
+    end
+  end
 end
