@@ -323,7 +323,7 @@ group :development, :test do
   gem 'fuubar', '~> 2.2.0'
 
   gem 'database_cleaner', '~> 1.5.0'
-  gem 'factory_girl_rails', '~> 4.7.0'
+  gem 'factory_bot_rails', '~> 4.8.2'
   gem 'rspec-rails', '~> 3.6.0'
   gem 'rspec-retry', '~> 0.4.5'
   gem 'spinach-rails', '~> 0.2.1'
@@ -421,8 +421,9 @@ gem 'gitaly-proto', '~> 0.59.0', require: 'gitaly'
 gem 'toml-rb', '~> 0.3.15', require: false
 
 # Feature toggles
-gem 'flipper', '~> 0.10.2'
-gem 'flipper-active_record', '~> 0.10.2'
+gem 'flipper', '~> 0.11.0'
+gem 'flipper-active_record', '~> 0.11.0'
+gem 'flipper-active_support_cache_store', '~> 0.11.0'
 
 # Structured logging
 gem 'lograge', '~> 0.5'
