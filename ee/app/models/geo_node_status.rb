@@ -16,6 +16,9 @@ class GeoNodeStatus < ActiveRecord::Base
     attachments_count: 'Total number of file attachments available on primary',
     attachments_synced_count: 'Number of attachments synced on secondary',
     attachments_failed_count: 'Number of attachments failed to sync on secondary',
+    ci_traces_count: 'Total number of CI traces available on primary',
+    ci_traces_synced_count: 'Number of CI traces synced on secondary',
+    ci_traces_failed_count: 'Number of CI traces failed to sync on secondary',
     last_event_id: 'Database ID of the latest event log entry on the primary',
     last_event_timestamp: 'Time of the latest event log entry on the primary',
     cursor_last_event_id: 'Last database ID of the event log processed by the secondary',
@@ -65,6 +68,7 @@ class GeoNodeStatus < ActiveRecord::Base
     self.repositories_count = projects_finder.count_projects
     self.lfs_objects_count = lfs_objects_finder.count_lfs_objects
     self.attachments_count = attachments_finder.count_attachments
+    self.ci_traces_count = ci_traces_finder.count_ci_traces
     self.last_successful_status_check_at = Time.now
 
     if Gitlab::Geo.secondary?
@@ -77,6 +81,8 @@ class GeoNodeStatus < ActiveRecord::Base
       self.lfs_objects_failed_count = lfs_objects_finder.count_failed_lfs_objects
       self.attachments_synced_count = attachments_finder.count_synced_attachments
       self.attachments_failed_count = attachments_finder.count_failed_attachments
+      self.ci_traces_synced_count = ci_traces_finder.count_synced_ci_traces
+      self.ci_traces_failed_count = ci_traces_finder.count_failed_ci_traces
     end
 
     self
@@ -128,6 +134,10 @@ class GeoNodeStatus < ActiveRecord::Base
     sync_percentage(attachments_count, attachments_synced_count)
   end
 
+  def ci_traces_synced_in_percentage
+    sync_percentage(ci_traces_count, ci_traces_synced_count)
+  end
+
   def [](key)
     public_send(key) # rubocop:disable GitlabSecurity/PublicSend
   end
@@ -144,6 +154,10 @@ class GeoNodeStatus < ActiveRecord::Base
 
   def projects_finder
     @projects_finder ||= Geo::ProjectRegistryFinder.new(current_node: geo_node)
+  end
+
+  def ci_traces_finder
+    @ci_traces_finder ||= Geo::CiTraceRegistryFinder.new(current_node: geo_node)
   end
 
   def sync_percentage(total, synced)

@@ -25,6 +25,9 @@ describe Geo::MetricsUpdateService, :geo do
       attachments_count: 30,
       attachments_synced_count: 30,
       attachments_failed_count: 25,
+      ci_traces_count: 30,
+      ci_traces_synced_count: 30,
+      ci_traces_failed_count: 25,
       last_event_id: 2,
       last_event_date: event_date,
       cursor_last_event_id: 1,
@@ -107,6 +110,9 @@ describe Geo::MetricsUpdateService, :geo do
         expect(metric_value(:geo_attachments)).to eq(30)
         expect(metric_value(:geo_attachments_synced)).to eq(30)
         expect(metric_value(:geo_attachments_failed)).to eq(25)
+        expect(metric_value(:geo_ci_traces)).to eq(30)
+        expect(metric_value(:geo_ci_traces_synced)).to eq(30)
+        expect(metric_value(:geo_ci_traces_failed)).to eq(25)
         expect(metric_value(:geo_last_event_id)).to eq(2)
         expect(metric_value(:geo_last_event_timestamp)).to eq(event_date.to_i)
         expect(metric_value(:geo_cursor_last_event_id)).to eq(1)

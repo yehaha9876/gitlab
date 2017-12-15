@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171214220901) do
+ActiveRecord::Schema.define(version: 20171215012926) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -977,6 +977,9 @@ ActiveRecord::Schema.define(version: 20171214220901) do
     t.datetime "updated_at", null: false
     t.datetime "last_successful_status_check_at"
     t.string "status_message"
+    t.integer "ci_traces_count"
+    t.integer "ci_traces_synced_count"
+    t.integer "ci_traces_failed_count"
   end
 
   add_index "geo_node_statuses", ["geo_node_id"], name: "index_geo_node_statuses_on_geo_node_id", unique: true, using: :btree

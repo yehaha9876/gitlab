@@ -14,6 +14,9 @@ FactoryBot.define do
       repositories_count 10
       repositories_synced_count 5
       repositories_failed_count 0
+      ci_traces_count 580
+      ci_traces_failed_count 3
+      ci_traces_synced_count 577
       last_event_id 2
       last_event_timestamp Time.now.to_i
       cursor_last_event_id 1

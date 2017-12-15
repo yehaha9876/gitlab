@@ -27,6 +27,7 @@ class GeoNodeStatus {
     this.$repositories = $('.js-repositories', this.$status);
     this.$lfsObjects = $('.js-lfs-objects', this.$status);
     this.$attachments = $('.js-attachments', this.$status);
+    this.$ciTraces = $('.js-ci-traces', this.$status);
     this.$syncSettings = $('.js-sync-settings', this.$status);
     this.$lastEventSeen = $('.js-last-event-seen', this.$status);
     this.$lastCursorEvent = $('.js-last-cursor-event', this.$status);
@@ -235,6 +236,15 @@ class GeoNodeStatus {
         totalCount: status.attachments_count,
       });
       GeoNodeStatus.renderSyncGraph(this.$attachments, attachmentsStats);
+    }
+
+    if (status.ci_traces_count > 0) {
+      const ciTracesStats = GeoNodeStatus.getSyncStatistics({
+        syncedCount: status.ci_traces_synced_count,
+        failedCount: status.ci_traces_failed_count,
+        totalCount: status.ci_traces_count,
+      });
+      GeoNodeStatus.renderSyncGraph(this.$ciTraces, ciTracesStats);
     }
 
     if (status.namespaces) {

@@ -242,6 +242,62 @@ describe GeoNodeStatus, :geo do
     end
   end
 
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  describe '#ci_traces_synced_count', :delete do
+    it 'only counts successful syncs' do
+      create_list(:ci_build, 3, :success, :trace)
+      builds = Ci::Build.all.pluck(:id)
+
+      create(:geo_file_registry, :ci_trace, file_id: builds[0])
+      create(:geo_file_registry, :ci_trace, file_id: builds[1])
+      create(:geo_file_registry, :ci_trace, file_id: builds[2], success: false)
+
+      expect(subject.ci_traces_synced_count).to eq(2)
+    end
+  end
+
+  describe '#ci_traces_failed_count', :delete do
+    it 'counts failed avatars, attachment, personal snippets and files' do
+      create_list(:ci_build, 3, :success, :trace)
+      builds = Ci::Build.all.pluck(:id)
+
+      create(:geo_file_registry, :ci_trace, file_id: builds[0])
+      create(:geo_file_registry, :ci_trace, file_id: builds[1], success: false) # the only failure
+
+      expect(subject.ci_traces_synced_count).to eq(1)
+    end
+  end
+
+  describe '#ci_traces_synced_in_percentage', :delete do
+    let(:ci_build_1) { create(:ci_build, :success, :trace, project: project_1) }
+    let(:ci_build_2) { create(:ci_build, :success, :trace, project: project_2) }
+
+    before do
+      create(:ci_build, :success, :trace, project: project_3)
+      create(:ci_build, :success, :trace)
+    end
+
+    it 'returns 0 when no objects are available' do
+      expect(subject.ci_traces_synced_in_percentage).to eq(0)
+    end
+
+    it 'returns the right percentage with no group restrictions' do
+      create(:geo_file_registry, :ci_trace, file_id: ci_build_1.id)
+      create(:geo_file_registry, :ci_trace, file_id: ci_build_2.id)
+
+      expect(subject.ci_traces_synced_in_percentage).to be_within(0.0001).of(50)
+    end
+
+    it 'returns the right percentage with group restrictions' do
+      secondary.update_attribute(:namespaces, [group])
+      create(:geo_file_registry, :ci_trace, file_id: ci_build_1.id)
+      create(:geo_file_registry, :ci_trace, file_id: ci_build_2.id)
+
+      expect(subject.ci_traces_synced_in_percentage).to be_within(0.0001).of(100)
+    end
+  end
+
   describe '#last_event_id and #last_event_date' do
     it 'returns nil when no events are available' do
       expect(subject.last_event_id).to be_nil

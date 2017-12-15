@@ -32,6 +32,13 @@ class GeoNodeStatusEntity < Grape::Entity
     number_to_percentage(node.repositories_synced_in_percentage, precision: 2)
   end
 
+  expose :ci_traces_count
+  expose :ci_traces_failed_count
+  expose :ci_traces_synced_count
+  expose :ci_traces_synced_in_percentage do |node|
+    number_to_percentage(node.ci_traces_synced_in_percentage, precision: 2)
+  end
+
   expose :last_event_id
   expose :last_event_timestamp
   expose :cursor_last_event_id

@@ -22,6 +22,10 @@ describe GeoNodeStatusEntity, :postgresql do
   it { is_expected.to have_key(:repositories_failed_count) }
   it { is_expected.to have_key(:repositories_synced_count)}
   it { is_expected.to have_key(:repositories_synced_in_percentage) }
+  it { is_expected.to have_key(:ci_traces_count) }
+  it { is_expected.to have_key(:ci_traces_failed_count) }
+  it { is_expected.to have_key(:ci_traces_synced_count)}
+  it { is_expected.to have_key(:ci_traces_synced_in_percentage) }
   it { is_expected.to have_key(:last_successful_status_check_timestamp) }
   it { is_expected.to have_key(:namespaces) }
 
@@ -92,6 +96,16 @@ describe GeoNodeStatusEntity, :postgresql do
                                         repositories_failed_count: 0)
 
       expect(subject[:repositories_synced_in_percentage]).to eq '50.00%'
+    end
+  end
+
+  describe '#ci_traces_synced_in_percentage' do
+    it 'formats as percentage' do
+      geo_node_status.assign_attributes(ci_traces_count: 10,
+                                        ci_traces_synced_count: 5,
+                                        ci_traces_failed_count: 0)
+
+      expect(subject[:ci_traces_synced_in_percentage]).to eq '50.00%'
     end
   end
 

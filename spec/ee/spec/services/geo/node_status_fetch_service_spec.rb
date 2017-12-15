@@ -63,6 +63,9 @@ describe Geo::NodeStatusFetchService, :geo do
                attachments_count: 30,
                attachments_synced_count: 30,
                attachments_failed_count: 25,
+               ci_traces_count: 30,
+               ci_traces_synced_count: 30,
+               ci_traces_failed_count: 25,
                last_event_id: 2,
                last_event_timestamp: Time.now.to_i,
                cursor_last_event_id: 1,
@@ -139,6 +142,9 @@ describe Geo::NodeStatusFetchService, :geo do
       expect(status.repositories_count).to eq(db_status.repositories_count)
       expect(status.repositories_synced_count).to eq(db_status.repositories_synced_count)
       expect(status.repositories_failed_count).to eq(db_status.repositories_failed_count)
+      expect(status.ci_traces_count).to eq(db_status.ci_traces_count)
+      expect(status.ci_traces_failed_count).to eq(db_status.ci_traces_failed_count)
+      expect(status.ci_traces_synced_count).to eq(db_status.ci_traces_synced_count)
       expect(status.last_event_id).to eq(db_status.last_event_id)
       expect(status.last_event_timestamp).to eq(db_status.last_event_timestamp)
       expect(status.cursor_last_event_id).to eq(db_status.cursor_last_event_id)
