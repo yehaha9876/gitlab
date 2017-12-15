@@ -199,9 +199,9 @@ feature 'image diff notes', :js do
       find('.view-modes-menu .onion-skin').click
 
       # Simulate dragging onion-skin slider
-      drag_and_drop_by(find('.dragger'), 30, 0)
+      drag_and_drop_by(find('.dragger'), -30, 0)
 
-      expect(find('.onion-skin-frame .frame.added', visible: false)['style']).to match('opacity: 0;')
+      expect(find('.onion-skin-frame .frame.added', visible: false)['style']).not_to match('opacity: 1;')
 
       find('.view-modes-menu .swipe').click
       find('.view-modes-menu .onion-skin').click
