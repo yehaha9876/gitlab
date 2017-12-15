@@ -1,6 +1,6 @@
 # Connecting GitLab with a Kubernetes cluster
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/35954) in 10.1.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/35954) in GitLab 10.1.
 
 CAUTION: **Warning:**
 The Cluster integration is currently in **Beta**.
@@ -13,13 +13,14 @@ cluster in a few steps.
 
 NOTE: **Note:**
 The Cluster integration will eventually supersede the
-[Kubernetes integration](../integrations/kubernetes.md). For the moment,
-you can create only one cluster.
+[Kubernetes integration](../integrations/kubernetes.md).
 
 ## Prerequisites
 
-In order to be able to manage your GKE cluster through GitLab, the following
-prerequisites must be met:
+In order to be able to manage your Kubernetes cluster through GitLab, the
+following prerequisites must be met.
+
+**For a cluster hosted on GKE:**
 
 - The [Google authentication integration](../../../integration/google.md) must
   be enabled in GitLab at the instance level. If that's not the case, ask your
@@ -28,50 +29,65 @@ prerequisites must be met:
   clusters on GKE. That would mean that a
   [billing account](https://cloud.google.com/billing/docs/how-to/manage-billing-account)
   must be set up.
-- You must have Master [permissions] in order to be able to access the **Cluster**
-  page.
 
-If all of the above requirements are met, you can proceed to add a new GKE
+**For an existing Kubernetes cluster:**
+
+If all of the above requirements are met, you can proceed to add a new Kubernetes
 cluster.
 
-## Adding a cluster
+## Adding a Kubernetes cluster
 
 NOTE: **Note:**
-You need Master [permissions] and above to add a cluster.
+You need Master [permissions] and above to access the Clusters page.
 
 There are two options when adding a new cluster; either use Google Kubernetes
-Engine (GKE) or provide the credentials to your own Kubernetes cluster.
+Engine (GKE) or provide the credentials to your Kubernetes cluster hosted
+elsewhere.
 
-To add a new cluster:
+**To add a new cluster hosted on GKE to your project:**
 
-1. Navigate to your project's **CI/CD > Cluster** page
-1. If you want to let GitLab create a cluster on GKE for you, go through the
-   following steps, otherwise skip to the next one.
-    1. Click on **Create with GKE**
-    1. Connect your Google account if you haven't done already by clicking the
-       **Sign in with Google** button
-    1. Fill in the requested values:
-      - **Cluster name** (required) - The name you wish to give the cluster.
-      - **GCP project ID** (required) - The ID of the project you created in your GCP
-        console that will host the Kubernetes cluster. This must **not** be confused
-        with the project name. Learn more about [Google Cloud Platform projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
-      - **Zone** - The [zone](https://cloud.google.com/compute/docs/regions-zones/)
-        under which the cluster will be created.
-      - **Number of nodes** - The number of nodes you wish the cluster to have.
-      - **Machine type** - The [machine type](https://cloud.google.com/compute/docs/machine-types)
-        of the Virtual Machine instance that the cluster will be based on.
-      - **Project namespace** - The unique namespace for this project. By default you
-        don't have to fill it in; by leaving it blank, GitLab will create one for you.
-1. If you want to use your own existing Kubernetes cluster, click on
-   **Add an existing cluster** and fill in the details as described in the
-   [Kubernetes integration](../integrations/kubernetes.md) documentation.
-1. Finally, click the **Create cluster** button
+1. Navigate to your project's **CI/CD > Cluster** page. If this is your first
+   cluster you're adding, click **Add cluster**.
+1. Click on **Create with GKE**.
+1. Connect your Google account if you haven't done already by clicking the
+   **Sign in with Google** button.
+1. Fill in the requested values:
+  - **Cluster name** (required) - The name you wish to give the cluster.
+  - **GCP project ID** (required) - The ID of the project you created in your GCP
+    console that will host the Kubernetes cluster. This must **not** be confused
+    with the project name. Learn more about [Google Cloud Platform projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
+  - **Zone** - The [zone](https://cloud.google.com/compute/docs/regions-zones/)
+    under which the cluster will be created.
+  - **Number of nodes** - The number of nodes you wish the cluster to have.
+  - **Machine type** - The [machine type](https://cloud.google.com/compute/docs/machine-types)
+    of the Virtual Machine instance that the cluster will be based on.
+  - **Project namespace** - The unique namespace for this project. By default you
+    don't have to fill it in; by leaving it blank, GitLab will create one for you.
+1. Finally, click the **Create cluster** button.
+
+**To add an existing cluster to your project:**
+
+1. Navigate to your project's **CI/CD > Cluster** page. If this is your first
+   cluster you're adding, click **Add cluster**.
+1. Click on **Add an existing cluster** and fill in the details as described
+   in the [Kubernetes integration](../integrations/kubernetes.md#configuration)
+   documentation.
+1. Finally, click the **Create cluster** button.
+
+---
 
 After a few moments, your cluster should be created. If something goes wrong,
 you will be notified.
 
 You can now proceed to install some pre-defined applications and then
 enable the Cluster integration.
+
+## Multiple Kubernetes clusters
+
+> Introduced in GitLab Enterprise Edition Premium 10.3.
+
+With GitLab EEP, you can associate more than one Kubernetes clusters to your
+project.
 
 ## Installing applications
 
