@@ -34,6 +34,50 @@ describe Ci::Build do
     end
   end
 
+  describe '.no_old_trace' do
+    subject { described_class.no_old_trace }
+
+    let!(:job) { create(:ci_build) }
+
+    context 'when the trace attribute is not null' do
+      before do
+        job.update_column(:trace, 'data')
+      end
+
+      it { is_expected.not_to include(job) }
+    end
+
+    context 'when the trace attribute is null' do
+      it { is_expected.to include(job) }
+    end
+  end
+
+  describe '.not_erased' do
+    subject { described_class.not_erased }
+
+    context 'when the build is erasable' do
+      let!(:job) { create(:ci_build, :success, :trace) }
+
+      context 'when the build was erased' do
+        before do
+          job.erase
+        end
+
+        it { is_expected.not_to include(job) }
+      end
+
+      context 'when the build was not erased' do
+        it { is_expected.to include(job) }
+      end
+    end
+
+    context 'when the build is not erasable' do
+      let!(:job) { create(:ci_build, :running, :trace) }
+
+      it { is_expected.to include(job) }
+    end
+  end
+
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { job.shared_runners_minutes_limit_enabled? }
 

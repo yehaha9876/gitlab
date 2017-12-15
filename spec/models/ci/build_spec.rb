@@ -74,24 +74,6 @@ describe Ci::Build do
     end
   end
 
-  describe '.no_old_trace' do
-    subject { described_class.no_old_trace }
-
-    let!(:job) { create(:ci_build) }
-
-    context 'when the trace attribute is not null' do
-      before do
-        job.update_column(:trace, 'data')
-      end
-
-      it { is_expected.not_to include(job) }
-    end
-
-    context 'when the trace attribute is null' do
-      it { is_expected.to include(job) }
-    end
-  end
-
   describe '#actionize' do
     context 'when build is a created' do
       before do

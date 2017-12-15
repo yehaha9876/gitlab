@@ -17,6 +17,8 @@ module EE
         scope :performance, ->() { where(name: %w[performance deploy]) }
         scope :sast, ->() { where(name: 'sast') }
         scope :clair, ->() { where(name: 'clair') }
+        scope :no_old_trace, -> { where(trace: nil) }
+        scope :not_erased, -> { where(erased_at: nil) }
 
         after_save :stick_build_if_status_changed
       end

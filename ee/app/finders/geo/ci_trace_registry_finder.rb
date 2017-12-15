@@ -57,7 +57,9 @@ module Geo
           Ci::Build.all
         end
 
-      relation.finished.no_old_trace
+      relation.finished
+              .no_old_trace # old traces are stored in the DB, not in files
+              .not_erased # after a build is erased, don't try to download it again
     end
 
     private
