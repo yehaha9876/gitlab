@@ -14,36 +14,36 @@ module Geo
       @secondary_token = get_secondary_token
       manifest_response = pull_manifest
 
-      puts "Manifest: #{manifest_response.body.size} Bytes"
+      puts manifest_response.body
 
-      list_of_layer_digests(manifest_response).each do |layer|
-        puts "Processing layer: #{layer}"
+      list_of_layer_digests(manifest_response).each digest|
+        puts "Processing layer: #{digest}"
 
-        response = RestClient.head("#{secondary_registry_url}/v2/#{name}/blobs/#{layer}", {'Authorization' => "Bearer #{@secondary_token}"}) {|response, request, result| response }
+        response = RestClient.head("#{secondary_registry_url}/v2/#{name}/blobs/#{digest}", {'Authorization' => "Bearer #{@secondary_token}"}) {|response, request, result| response }
 
         if response.code != 200
-          puts "The layer does not exists..."
-          puts "Requesting upload URL..."
           response = RestClient.post("#{secondary_registry_url}/v2/#{name}/blobs/uploads/", {}, {'Authorization' => "Bearer #{@secondary_token}"})
           upload_url = URI(response.headers[:location])
 
-          # Download the blob
-          # TODO: be ready for a redirect
-          raw = RestClient::Request.execute(
+          raw_response = RestClient::Request.execute(
             method: :get,
-            url: "#{primary_registry_url}/v2/#{name}/blobs/#{layer}",
+            url: "#{primary_registry_url}/v2/#{name}/blobs/#{digest}",
             headers: {'Authorization' => "Bearer #{token}"},
             raw_response: true
           )
 
-          puts "Pushing layer #{layer}, size: #{raw.file.size} ..."
+          if [301, 302].include? raw_response.code
+            raw_response = raw_response.follow_redirection
+          end
 
-          upload_url.query = "#{upload_url.query}&#{URI.encode_www_form(digest: layer)}"
+          puts "Pushing layer #{digest}, size: #{raw_response.file.size} ..."
 
-          RestClient.put(upload_url.to_s, File.new(raw.file, 'rb'), {'Content-Length' => raw.file.size, 'Content-Type' => 'application/octet-stream', 'Authorization' => "Bearer #{@secondary_token}" })
+          upload_url.query = "#{upload_url.query}&#{URI.encode_www_form(digest: digest)}"
+
+          RestClient.put(upload_url.to_s, File.new(raw_response.file, 'rb'), {'Content-Length' => raw_response.file.size, 'Content-Type' => 'application/octet-stream', 'Authorization' => "Bearer #{@secondary_token}" })
         else
           puts "Layer exists, the size: #{response.headers[:content_length]}"
-          puts "Skip pushing #{layer}"
+          puts "Skip pushing #{digest}"
         end
       end
 
