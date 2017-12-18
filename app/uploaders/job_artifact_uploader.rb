@@ -15,6 +15,14 @@ class JobArtifactUploader < ObjectStoreUploader
     model.size
   end
 
+  def append
+    # TODO:
+  end
+
+  def set
+    # TODO:
+  end
+
   private
 
   def default_path
