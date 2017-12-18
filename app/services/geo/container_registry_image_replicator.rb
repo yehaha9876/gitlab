@@ -41,6 +41,7 @@ module Geo
           upload_url.query = "#{upload_url.query}&#{URI.encode_www_form(digest: digest)}"
 
           RestClient.put(upload_url.to_s, File.new(raw_response.file, 'rb'), {'Content-Length' => raw_response.file.size, 'Content-Type' => 'application/octet-stream', 'Authorization' => "Bearer #{@secondary_token}" })
+          File.delete(raw_response.file.path)
         else
           puts "Layer exists, the size: #{response.headers[:content_length]}"
           puts "Skip pushing #{digest}"
