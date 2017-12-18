@@ -41,7 +41,7 @@ class Repository
   CACHED_METHODS = %i(size commit_count rendered_readme contribution_guide
                       changelog license_blob license_key gitignore koding_yml
                       gitlab_ci_yml branch_names tag_names branch_count
-                      tag_count avatar exists? empty? root_ref has_visible_content?
+                      tag_count avatar exists? root_ref has_visible_content?
                       issue_template_names merge_request_template_names).freeze
 
   # Methods that use cache_method but only memoize the value
@@ -350,7 +350,7 @@ class Repository
   def expire_emptiness_caches
     return unless empty?
 
-    expire_method_caches(%i(empty? has_visible_content?))
+    expire_method_caches(%i(empty_repo? has_visible_content?))
   end
 
   def lookup_cache
