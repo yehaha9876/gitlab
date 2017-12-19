@@ -45,6 +45,7 @@ import './gl_field_error';
 import './gl_field_errors';
 import './gl_form';
 import initTodoToggle from './header';
+import conditionallyLoadProjectDropdown from './projects_dropdown_loader';
 import initImporterStatus from './importer_status';
 import './layout_nav';
 import LazyLoader from './lazy_loader';
@@ -55,8 +56,11 @@ import './notifications_dropdown';
 import './notifications_form';
 import './pager';
 import './preview_markdown';
+<<<<<<< HEAD
 import './project_import';
 import './projects_dropdown';
+=======
+>>>>>>> 790bbe7... Conditionally import loads the projects dropdown when opened.
 import './render_gfm';
 import initBreadcrumbs from './breadcrumb';
 
@@ -110,6 +114,7 @@ $(function () {
   initImporterStatus();
   initTodoToggle();
   initLogoAnimation();
+  conditionallyLoadProjectDropdown();
 
   // Set the default path for all cookies to GitLab's root directory
   Cookies.defaults.path = gon.relative_url_root || '/';
