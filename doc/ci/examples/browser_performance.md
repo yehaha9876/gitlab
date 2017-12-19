@@ -1,7 +1,7 @@
 # Analyze website performance with Sitespeed.io
 
 This example shows how to run [Sitespeed.io][sitespeed] on your code by using
-GitLab CI and Sitespeed using Docker-in-Docker.
+GitLab CI/CD and Sitespeed using Docker-in-Docker.
 
 First, you need a GitLab Runner with the [docker-in-docker executor][dind].
 
