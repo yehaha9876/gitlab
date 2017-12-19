@@ -11,3 +11,4 @@ import 'select2/select2';
 
 // EE-only
 import 'vendor/jquery.tablesorter';
+import './gl_dropdown';

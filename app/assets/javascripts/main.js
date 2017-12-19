@@ -40,7 +40,6 @@ import loadAwardsHandler from './awards_handler';
 import bp from './breakpoints';
 import './confirm_danger_modal';
 import Flash, { removeFlashClickListener } from './flash';
-import './gl_dropdown';
 import './gl_field_error';
 import './gl_field_errors';
 import './gl_form';
