@@ -23,7 +23,7 @@ Once you set up the Runner, add a new job to `.gitlab-ci.yml`, called `performan
     - [performance.json]
 ```
 
-This will create a `performance` job in your CI pipeline and will run Sitespeed against the webpage you define.
+This will create a `performance` job in your CI/CD pipeline and will run Sitespeed against the webpage you define.
 
 For a more detailed example which allows specifying a list of URL's to test as well as passing an environment URL, see the `performance` job included in [Auto DevOps](https://gitlab.com/gitlab-org/gitlab-ci-yml/blob/master/Auto-DevOps.gitlab-ci.yml).
 
