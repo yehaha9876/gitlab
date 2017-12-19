@@ -56,11 +56,7 @@ import './notifications_dropdown';
 import './notifications_form';
 import './pager';
 import './preview_markdown';
-<<<<<<< HEAD
 import './project_import';
-import './projects_dropdown';
-=======
->>>>>>> 790bbe7... Conditionally import loads the projects dropdown when opened.
 import './render_gfm';
 import initBreadcrumbs from './breadcrumb';
 
