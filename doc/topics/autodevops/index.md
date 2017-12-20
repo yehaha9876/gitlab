@@ -216,7 +216,7 @@ Any security warnings are also [shown in the merge request widget](../../user/pr
 
 > Introduced in [GitLab Enterprise Edition Premium][ee] 10.3.
 
-Auto Browser Performance testing utilizes [Sitespeed.io](https://www.sitespeed.io) to measure the performance of a web page. A JSON report is created and uploaded as an artifact, which includes the overall performance score for each page. By default, the root page of Review and Production environments will be tested. If you would like to add additional URL's to test, simply add the paths to a file named `.gitlab-urls.txt`, one per line. For example:
+Auto Browser Performance testing utilizes the [Sitespeed.io container](https://hub.docker.com/r/sitespeedio/sitespeed.io/) to measure the performance of a web page. A JSON report is created and uploaded as an artifact, which includes the overall performance score for each page. By default, the root page of Review and Production environments will be tested. If you would like to add additional URL's to test, simply add the paths to a file named `.gitlab-urls.txt` in the root directory, one per line. For example:
 
 ```
 /
