@@ -1,14 +1,14 @@
 # Browser Performance
 
-> [Introduced][ee-3507] in [GitLab Enterprise Edition Premium][ee] 10.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3507) in [GitLab Enterprise Edition Premium](https://about.gitlab.com/gitlab-ee/) 10.3.
 
 ## Overview
 
-If your application offers a web interface and you are using [GitLab CI/CD][ci], you can quickly determine the performance impact of pending code changes. GitLab uses [Sitespeed.io][sitespeed], a free and open source tool for measuring the performance of web sites, to analyze the performance of specific pages.
+If your application offers a web interface and you are using [GitLab CI/CD](../../../ci/README.md), you can quickly determine the performance impact of pending code changes. GitLab uses [Sitespeed.io](https://www.sitespeed.io), a free and open source tool for measuring the performance of web sites, to analyze the performance of specific pages.
 
-GitLab runs the [Sitespeed.io container][sitespeed-container] and compares the overall scores for each page between the source and target branches of a merge request. The difference for each page is then shown right on the merge request:
+GitLab runs the [Sitespeed.io container](https://hub.docker.com/r/sitespeedio/sitespeed.io/) and compares the overall scores for each page between the source and target branches of a merge request. The difference for each page is then shown right on the merge request:
 
-![Performance Widget][performance-widget]
+![Performance Widget](img/performance_diff.png)
 
 ## Use cases
 
@@ -39,12 +39,4 @@ Consecutive merge requests will have something to compare to and the performance
 report will be shown properly.
 
 For more information on how the `performance` job should look, check the
-example on [analyzing a project's performance with Sitespeed.io][sitespeed-docs].
-
-[ee-3507]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3507
-[ee]: https://about.gitlab.com/gitlab-ee/
-[ci]: ../../../ci/README.md
-[sitespeed]: https://www.sitespeed.io
-[sitespeed-container]: https://hub.docker.com/r/sitespeedio/sitespeed.io/
-[performance-widget]: img/performance_diff.png
-[sitespeed-docs]: ../../../ci/examples/browser_performance.md
+example on [analyzing a project's performance with Sitespeed.io](../../../ci/examples/browser_performance.md).

@@ -1,7 +1,7 @@
-# Analyze website performance with the Sitespeed.io container
+# Browser Performance Testing with the Sitespeed.io container
 
 This example shows how to run the [Sitespeed.io container][sitespeed-container] on your code by using
-GitLab CI/CD and [Sitespeed][sitespeed] using Docker-in-Docker.
+GitLab CI/CD and [Sitespeed.io][sitespeed] using Docker-in-Docker.
 
 First, you need a GitLab Runner with the [docker-in-docker executor][dind].
 

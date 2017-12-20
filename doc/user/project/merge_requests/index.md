@@ -208,7 +208,7 @@ If your application offers a web interface and you are using [GitLab CI/CD][ci],
 
 GitLab runs the [Sitespeed.io container][sitespeed-container] and displays the difference in overall performance scores between the source and target branches.
 
-[Read more about Browser Performance Testing.](performance_diff.md)
+[Read more about Browser Performance Testing.](browser_performance_testing.md)
 
 ## Static Application Security Testing
 
