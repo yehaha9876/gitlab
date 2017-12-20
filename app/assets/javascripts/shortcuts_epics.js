@@ -10,7 +10,7 @@ export default class ShortcutsEpics extends ShortcutsNavigation {
   constructor() {
     super();
     Mousetrap.bind('e', () => ShortcutsEpics.editEpic());
-    Mousetrap.bind('=', () => ShortcutsEpics.addIssue());
+    Mousetrap.bind('shift+=', () => ShortcutsEpics.addIssue());
 
     this.enabledHelp.push('.hidden-shortcut.epics');
   }
