@@ -1,9 +1,9 @@
 # Browser Performance Testing with the Sitespeed.io container
 
-This example shows how to run the [Sitespeed.io container][sitespeed-container] on your code by using
-GitLab CI/CD and [Sitespeed.io][sitespeed] using Docker-in-Docker.
+This example shows how to run the [Sitespeed.io container](https://hub.docker.com/r/sitespeedio/sitespeed.io/) on your code by using
+GitLab CI/CD and [Sitespeed.io](https://www.sitespeed.io) using Docker-in-Docker.
 
-First, you need a GitLab Runner with the [docker-in-docker executor][dind].
+First, you need a GitLab Runner with the [docker-in-docker executor](../docker/using_docker_build.md#use-docker-in-docker-executor).
 
 Once you set up the Runner, add a new job to `.gitlab-ci.yml`, called `performance`:
 
@@ -27,11 +27,5 @@ This will create a `performance` job in your CI/CD pipeline and will run Sitespe
 
 For a more detailed example which allows specifying a list of URL's to test as well as passing an environment URL, see the `performance` job included in [Auto DevOps](https://gitlab.com/gitlab-org/gitlab-ci-yml/blob/master/Auto-DevOps.gitlab-ci.yml).
 
-For GitLab [Enterprise Edition Premium][ee] users, this information can be automatically
-extracted and shown right in the merge request widget. [Learn more on performance
-diffs in merge requests](../../user/project/merge_requests/performance_diff.md).
-
-[sitespeed]: https://www.sitespeed.io
-[sitespeed-container]: https://hub.docker.com/r/sitespeedio/sitespeed.io/
-[dind]: ../docker/using_docker_build.md#use-docker-in-docker-executor
-[ee]: https://about.gitlab.com/gitlab-ee/
+For GitLab [Enterprise Edition Premium](https://about.gitlab.com/gitlab-ee/) users, this information can be automatically
+extracted and shown right in the merge request widget. [Learn more on performance diffs in merge requests](../../user/project/merge_requests/browser_performance_testing.md).
