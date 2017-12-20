@@ -366,6 +366,11 @@ ActiveRecord::Schema.define(version: 20171213160445) do
     t.integer "artifacts_metadata_store"
     t.boolean "protected"
     t.integer "failure_reason"
+    # 1. I need to know which traces were migrated or not,
+    # 2. We have dual logic today: some builds does not yet have artifacts_trace created,
+    # -  created / pending / manual / skipped: does not have trace
+    # 3. column to remove once we migrate all traces...
+    t.boolean "traces_as_artifacts"
   end
 
   add_index "ci_builds", ["auto_canceled_by_id"], name: "index_ci_builds_on_auto_canceled_by_id", using: :btree

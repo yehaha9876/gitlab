@@ -79,6 +79,7 @@ module Gitlab
         end
       ensure
         stream&.close
+        job.artifacts_trace&.update_size
       end
 
       def erase!
@@ -94,8 +95,14 @@ module Gitlab
       def ensure_path
         return current_path if current_path
 
-        ensure_directory
-        default_path
+        job.update(
+          traces_as_artifacts: true,
+          artifacts_trace: Ci::JobArtifact.new(
+            project: job.project,
+            file_type: :job
+          )
+        )
+        job.artifacts_trace.ensure_path
       end
 
       def ensure_directory
@@ -113,11 +120,16 @@ module Gitlab
       def paths
         [
           default_path,
+          legacy_trace_path,
           deprecated_path
         ].compact
       end
 
-      def default_directory
+      def default_path
+        job.artifacts_trace.file.path if job.traces_as_artifacts
+      end
+
+      def legacy_trace_directory
         File.join(
           Settings.gitlab_ci.builds_path,
           job.created_at.utc.strftime("%Y_%m"),
@@ -125,8 +137,8 @@ module Gitlab
         )
       end
 
-      def default_path
-        File.join(default_directory, "#{job.id}.log")
+      def legacy_trace_path
+        File.join(legacy_trace_directory, "#{job.id}.log")
       end
 
       def deprecated_path
