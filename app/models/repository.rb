@@ -125,6 +125,18 @@ class Repository
     @commit_cache[oid] = find_commit(oid)
   end
 
+  def commits_by(oids:)
+    return [] unless oids.present?
+
+    commits = Gitlab::Git::Commit.batch_by_oid(raw_repository, oids)
+
+    if commits.present?
+      Commit.decorate(commits, @project)
+    else
+      []
+    end
+  end
+
   def commits(ref, path: nil, limit: nil, offset: nil, skip_merges: false, after: nil, before: nil)
     options = {
       repo: raw_repository,
@@ -983,7 +995,7 @@ class Repository
   def merge_base(first_commit_id, second_commit_id)
     first_commit_id = commit(first_commit_id).try(:id) || first_commit_id
     second_commit_id = commit(second_commit_id).try(:id) || second_commit_id
-    rugged.merge_base(first_commit_id, second_commit_id)
+    raw_repository.merge_base(first_commit_id, second_commit_id)
   rescue Rugged::ReferenceError
     nil
   end

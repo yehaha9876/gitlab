@@ -239,6 +239,54 @@ describe Repository do
     end
   end
 
+  describe '#commits_by' do
+    set(:project) { create(:project, :repository) }
+
+    shared_examples 'batch commits fetching' do
+      let(:oids) { TestEnv::BRANCH_SHA.values }
+
+      subject { project.repository.commits_by(oids: oids) }
+
+      it 'finds each commit' do
+        expect(subject).not_to include(nil)
+        expect(subject.size).to eq(oids.size)
+      end
+
+      it 'returns only Commit instances' do
+        expect(subject).to all( be_a(Commit) )
+      end
+
+      context 'when some commits are not found ' do
+        let(:oids) do
+          ['deadbeef'] + TestEnv::BRANCH_SHA.values.first(10)
+        end
+
+        it 'returns only found commits' do
+          expect(subject).not_to include(nil)
+          expect(subject.size).to eq(10)
+        end
+      end
+
+      context 'when no oids are passed' do
+        let(:oids) { [] }
+
+        it 'does not call #batch_by_oid' do
+          expect(Gitlab::Git::Commit).not_to receive(:batch_by_oid)
+
+          subject
+        end
+      end
+    end
+
+    context 'when Gitaly list_commits_by_oid is enabled' do
+      it_behaves_like 'batch commits fetching'
+    end
+
+    context 'when Gitaly list_commits_by_oid is enabled', :disable_gitaly do
+      it_behaves_like 'batch commits fetching'
+    end
+  end
+
   describe '#find_commits_by_message' do
     shared_examples 'finding commits by message' do
       it 'returns commits with messages containing a given string' do
@@ -1013,7 +1061,7 @@ describe Repository do
 
       it 'runs without errors' do
         # old_rev is an ancestor of new_rev
-        expect(repository.rugged.merge_base(old_rev, new_rev)).to eq(old_rev)
+        expect(repository.merge_base(old_rev, new_rev)).to eq(old_rev)
 
         # old_rev is not a direct ancestor (parent) of new_rev
         expect(repository.rugged.lookup(new_rev).parent_ids).not_to include(old_rev)
@@ -1035,7 +1083,7 @@ describe Repository do
 
       it 'raises an exception' do
         # The 'master' branch is NOT an ancestor of new_rev.
-        expect(repository.rugged.merge_base(old_rev, new_rev)).not_to eq(old_rev)
+        expect(repository.merge_base(old_rev, new_rev)).not_to eq(old_rev)
 
         # Updating 'master' to new_rev would lose the commits on 'master' that
         # are not contained in new_rev. This should not be allowed.

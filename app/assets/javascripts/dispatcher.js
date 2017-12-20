@@ -7,11 +7,11 @@ import IssuableForm from './issuable_form';
 import LabelsSelect from './labels_select';
 /* global MilestoneSelect */
 import NewBranchForm from './new_branch_form';
-/* global NotificationsForm */
-/* global NotificationsDropdown */
+import NotificationsForm from './notifications_form';
+import notificationsDropdown from './notifications_dropdown';
 import groupAvatar from './group_avatar';
 import GroupLabelSubscription from './group_label_subscription';
-/* global LineHighlighter */
+import LineHighlighter from './line_highlighter';
 import BuildArtifacts from './build_artifacts';
 import CILintEditor from './ci_lint_editor';
 import groupsSelect from './groups_select';
@@ -21,7 +21,7 @@ import NamespaceSelect from './namespace_select';
 import NewCommitForm from './new_commit_form';
 import Project from './project';
 import projectAvatar from './project_avatar';
-/* global MergeRequest */
+import MergeRequest from './merge_request';
 import Compare from './compare';
 import initCompareAutocomplete from './compare_autocomplete';
 /* global PathLocks */
@@ -30,7 +30,7 @@ import ProjectNew from './project_new';
 import projectImport from './project_import';
 import Labels from './labels';
 import LabelManager from './label_manager';
-/* global Sidebar */
+import Sidebar from './right_sidebar';
 /* global WeightSelect */
 /* global AdminEmailSelect */
 
@@ -455,7 +455,7 @@ import initGroupAnalytics from './init_group_analytics';
           const newGroupChildWrapper = document.querySelector('.js-new-project-subgroup');
           shortcut_handler = new ShortcutsNavigation();
           new NotificationsForm();
-          new NotificationsDropdown();
+          notificationsDropdown();
           new ProjectsList();
 
           if (newGroupChildWrapper) {
@@ -712,7 +712,7 @@ import initGroupAnalytics from './init_group_analytics';
           break;
         case 'profiles':
           new NotificationsForm();
-          new NotificationsDropdown();
+          notificationsDropdown();
           break;
         case 'projects':
           new Project();
@@ -736,7 +736,7 @@ import initGroupAnalytics from './init_group_analytics';
             case 'show':
               new Star();
               new ProjectNew();
-              new NotificationsDropdown();
+              notificationsDropdown();
               break;
             case 'wikis':
               new Wikis();

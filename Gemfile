@@ -275,7 +275,7 @@ gem 'gettext_i18n_rails', '~> 1.8.0'
 gem 'gettext_i18n_rails_js', '~> 1.2.0'
 gem 'gettext', '~> 3.2.2', require: false, group: :development
 
-gem 'batch-loader'
+gem 'batch-loader', '~> 1.2.1'
 
 # Perf bar
 gem 'peek', '~> 1.0.1'
@@ -416,7 +416,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC client
-gem 'gitaly-proto', '~> 0.59.0', require: 'gitaly'
+gem 'gitaly-proto', '~> 0.61.0', require: 'gitaly'
 
 gem 'toml-rb', '~> 0.3.15', require: false
 
