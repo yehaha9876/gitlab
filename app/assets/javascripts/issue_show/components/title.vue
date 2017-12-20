@@ -55,6 +55,9 @@
       pencilIcon() {
         return spriteIcon('pencil', 'link-highlight');
       },
+      editButtonClass() {
+        return `js-edit-${this.issuableType}`;
+      }
     },
     methods: {
       setPageTitle() {
@@ -85,7 +88,7 @@
       v-if="showInlineEditButton && canUpdate"
       type="button"
       class="btn btn-default btn-edit btn-svg"
-      v-bind:class="'js-edit-' + issuableType"
+      :class="editButtonClass"
       v-html="pencilIcon"
       title="Edit title and description"
       data-placement="bottom"
