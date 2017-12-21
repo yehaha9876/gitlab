@@ -911,8 +911,7 @@ class Project < ActiveRecord::Base
   end
 
   def deployment_platform(environment: nil)
-    @deployment_platform ||= clusters.find_by(enabled: true)&.platform_kubernetes
-    @deployment_platform ||= services.where(category: :deployment).reorder(nil).find_by(active: true)
+    @deployment_platform ||= Projects::DeploymentPlatformService.new(self).execute
   end
 
   def monitoring_services

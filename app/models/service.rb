@@ -277,6 +277,10 @@ class Service < ActiveRecord::Base
     nil
   end
 
+  def self.find_by_template
+    find_by(template: true)
+  end
+
   private
 
   def cache_project_has_external_issue_tracker
