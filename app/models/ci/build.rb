@@ -315,15 +315,11 @@ module Ci
     end
 
     def trace
-      legacy_trace = Gitlab::Ci::Trace.new(self)
-
-      unless legacy_trace.exist?
-        return job_artifacts_trace.first_or_create(project: job.project,
-                                                   file_type: :trace,
-                                                   file: ???)
+      if traces_as_artifacts?
+        Gitlab::Ci::ArtifactsTrace.new(job_artifacts_trace)
+      else
+        Gitlab::Ci::Trace.new(self)
       end
-
-      legacy_trace
     end
 
     def has_trace?
