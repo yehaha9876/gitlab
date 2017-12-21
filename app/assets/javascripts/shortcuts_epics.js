@@ -16,7 +16,7 @@ export default class ShortcutsEpics extends ShortcutsNavigation {
   }
 
   static editEpic() {
-    document.querySelector('.js-edit-epic').click();
+    document.querySelector('.js-edit-issue').click();
   }
 
   static addIssue() {
