@@ -14,7 +14,11 @@ module Ci
             project.environments.find_or_create_by(name: environment_name)
           end
 
-          build.create_job_artifacts_trace(project: build.project, file_type: :trace, file: 'trace.log')
+          # - This should not create a empty trace
+          # - `artifacts_trace.file.path` should return the expected full path
+          build.create_job_artifacts_trace(project: build.project,
+                                           file_type: :trace,
+                                           file: Ci::JobArtifact::TRACE_FILE_NAME)
         end
       end
     end

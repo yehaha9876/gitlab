@@ -3,9 +3,12 @@ module Ci
     include AfterCommitQueue
     extend Gitlab::Ci::Model
 
+    TRACE_FILE_NAME = 'trace.log'.freeze
+
     belongs_to :project
     belongs_to :job, class_name: "Ci::Build", foreign_key: :job_id
 
+    before_save :touch_trace, if: :new_trace?
     before_save :set_size, if: :file_changed?
 
     mount_uploader :file, JobArtifactUploader
@@ -26,6 +29,10 @@ module Ci
       self.where(project: project).sum(:size)
     end
 
+    def touch_trace
+      job.trace.touch
+    end
+
     def set_size
       self.size = file.size
     end
@@ -39,6 +46,12 @@ module Ci
         if value
           ChronicDuration.parse(value)&.seconds&.from_now
         end
+    end
+
+    private
+
+    def new_trace?
+      file_changed? && trace?
     end
   end
 end

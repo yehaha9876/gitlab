@@ -12,7 +12,7 @@ module Gitlab
       # Override for read/write
       #
       def paths
-        [artifacts_trace.file.path] + super
+        [default_path] + super
       end
 
       def append(data, offset)
@@ -27,7 +27,26 @@ module Gitlab
         end
       end
 
+      def touch
+        ensure_directory
+        FileUtils.touch(default_path)
+      end
+
       private
+
+      ##
+      # Override for ensure_path
+      #
+      def default_directory
+        File.dirname(default_path)
+      end
+
+      ##
+      # Override for ensure_path
+      #
+      def default_path
+        artifacts_trace.file.path
+      end
 
       def update_size(size)
         artifacts_trace.update(size: artifacts_trace.size + size)
