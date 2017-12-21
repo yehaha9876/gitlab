@@ -271,38 +271,32 @@ export default {
       :show-delete-button="showDeleteButton"
       :enable-autocomplete="enableAutocomplete"
     />
-
-    <recaptcha-modal
-      v-show="showRecaptcha"
-      :html="recaptchaHTML"
-      @close="closeRecaptchaModal"
-    />
-  </div>
-  <div v-else>
-    <title-component
-      :issuable-ref="issuableRef"
-      :can-update="canUpdate"
-      :title-html="state.titleHtml"
-      :title-text="state.titleText"
-      :show-inline-edit-button="showInlineEditButton"
-      :issuable-type="issuableType"
-    />
-    <description-component
-      v-if="state.descriptionHtml"
-      :can-update="canUpdate"
-      :description-html="state.descriptionHtml"
-      :description-text="state.descriptionText"
-      :updated-at="state.updatedAt"
-      :task-status="state.taskStatus"
-      :issuable-type="issuableType"
-      :update-url="updateEndpoint"
-    />
-    <edited-component
-      v-if="hasUpdated"
-      :updated-at="state.updatedAt"
-      :updated-by-name="state.updatedByName"
-      :updated-by-path="state.updatedByPath"
-    />
+    <div v-else>
+      <title-component
+        :issuable-ref="issuableRef"
+        :can-update="canUpdate"
+        :title-html="state.titleHtml"
+        :title-text="state.titleText"
+        :show-inline-edit-button="showInlineEditButton"
+        :issuable-type="issuableType"
+      />
+      <description-component
+        v-if="state.descriptionHtml"
+        :can-update="canUpdate"
+        :description-html="state.descriptionHtml"
+        :description-text="state.descriptionText"
+        :updated-at="state.updatedAt"
+        :task-status="state.taskStatus"
+        :issuable-type="issuableType"
+        :update-url="updateEndpoint"
+      />
+      <edited-component
+        v-if="hasUpdated"
+        :updated-at="state.updatedAt"
+        :updated-by-name="state.updatedByName"
+        :updated-by-path="state.updatedByPath"
+      />
+    </div>
   </div>
 </div>
 </template>
