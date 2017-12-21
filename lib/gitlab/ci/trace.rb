@@ -37,6 +37,7 @@ module Gitlab
         write do |stream|
           data = job.hide_secrets(data)
           stream.set(data)
+          stream.size
         end
       end
 

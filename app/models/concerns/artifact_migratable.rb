@@ -40,6 +40,8 @@ module ArtifactMigratable
 
   def artifacts_size
     read_attribute(:artifacts_size).to_i +
-      job_artifacts_archive&.size.to_i + job_artifacts_metadata&.size.to_i
+      Ci::JobArtifact.file_types.keys.inject(0) do |sum, key|
+        sum + public_send(:"job_artifacts_#{key}")&.size.to_i # rubocop:disable GitlabSecurity/PublicSend
+      end
   end
 end

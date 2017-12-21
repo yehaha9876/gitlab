@@ -13,6 +13,8 @@ module Ci
             environment_name = build.expanded_environment_name
             project.environments.find_or_create_by(name: environment_name)
           end
+
+          build.create_job_artifacts_trace(project: build.project, file_type: :trace, file: 'trace.log')
         end
       end
     end
