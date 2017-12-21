@@ -51,7 +51,7 @@ module Ci
     private
 
     def new_trace?
-      file_changed? && trace?
+      new_record? && trace? && file.present?
     end
   end
 end
