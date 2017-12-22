@@ -17,19 +17,14 @@ module Gitlab
 
       def append(data, offset)
         super(data, offset).tap do |size|
-          update_size(size)
+          artifacts_trace.update(size: artifacts_trace.size + size)
         end
       end
 
       def set(data)
         super(data).tap do |size|
-          update_size(size)
+          artifacts_trace.update(size: size)
         end
-      end
-
-      def touch
-        ensure_directory
-        FileUtils.touch(default_path)
       end
 
       private
@@ -46,10 +41,6 @@ module Gitlab
       #
       def default_path
         artifacts_trace.file.path
-      end
-
-      def update_size(size)
-        artifacts_trace.update(size: artifacts_trace.size + size)
       end
     end
   end

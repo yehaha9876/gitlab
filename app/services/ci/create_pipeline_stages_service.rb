@@ -14,11 +14,11 @@ module Ci
             project.environments.find_or_create_by(name: environment_name)
           end
 
-          # - This should not create a empty trace
-          # - `artifacts_trace.file.path` should return the expected full path
-          build.create_job_artifacts_trace(project: build.project,
-                                           file_type: :trace,
-                                           file: Ci::JobArtifact::TRACE_FILE_NAME)
+          # Touch empty trace and move it with CarrierWave
+          build.create_job_artifacts_trace(
+            project: build.project,
+            file_type: :trace,
+            file: File.open(FileUtils.touch(Ci::JobArtifact::TRACE_FILE_NAME).first))
         end
       end
     end
