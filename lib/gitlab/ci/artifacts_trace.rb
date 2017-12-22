@@ -17,7 +17,7 @@ module Gitlab
 
       def append(data, offset)
         super(data, offset).tap do |size|
-          artifacts_trace.update(size: artifacts_trace.size + size)
+          artifacts_trace.update(size: size)
         end
       end
 
