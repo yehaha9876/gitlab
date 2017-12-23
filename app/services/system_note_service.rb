@@ -428,7 +428,7 @@ module SystemNoteService
   #
   # Returns the created Note object
   def cross_reference(noteable, mentioner, author)
-    return if cross_reference_disallowed?(noteable, mentioner)
+    return if noteable.respond_to?(:cross_reference_allowed?) && !noteable.cross_reference_allowed?(mentioner)
 
     gfm_reference = mentioner.gfm_reference(noteable.project)
     body = cross_reference_note_content(gfm_reference)
@@ -438,24 +438,6 @@ module SystemNoteService
     else
       create_note(NoteSummary.new(noteable, noteable.project, author, body, action: 'cross_reference'))
     end
-  end
-
-  # Check if a cross-reference is disallowed
-  #
-  # This method prevents adding a "mentioned in !1" note on every single commit
-  # in a merge request. Additionally, it prevents the creation of references to
-  # external issues (which would fail).
-  #
-  # noteable  - Noteable object being referenced
-  # mentioner - Mentionable object
-  #
-  # Returns Boolean
-  def cross_reference_disallowed?(noteable, mentioner)
-    return true if noteable.is_a?(ExternalIssue) && !noteable.project.jira_tracker_active?
-    return false unless mentioner.is_a?(MergeRequest)
-    return false unless noteable.is_a?(Commit)
-
-    mentioner.commits.include?(noteable)
   end
 
   # Check if a cross reference to a noteable from a mentioner already exists

@@ -1,4 +1,5 @@
 class ExternalIssue
+  include CrossReferable
   include Referable
 
   def initialize(issue_identifier, project)
@@ -46,6 +47,10 @@ class ExternalIssue
     return "##{id}" if id =~ /^\d+$/
 
     id
+  end
+
+  def cross_reference_allowed?(mentioner)
+    project.jira_tracker_active?
   end
 
   def notes

@@ -5,8 +5,9 @@ class Commit
 
   include ActiveModel::Conversion
   include Noteable
-  include Participable
+  include CrossReferable
   include Mentionable
+  include Participable
   include Referable
   include StaticModel
 
@@ -144,6 +145,10 @@ class Commit
 
   def reference_link_text(from = nil, full: false)
     commit_reference(from, short_id, full: full)
+  end
+
+  def cross_reference_allowed?(mentioner)
+    !mentioner.is_a?(MergeRequest) || !mentioner.commits.include?(self)
   end
 
   def diff_line_count

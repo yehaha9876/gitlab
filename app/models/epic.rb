@@ -3,6 +3,8 @@
 class Epic < ActiveRecord::Base
   prepend EE::Epic
 
+  include CrossReferable
+
   def self.reference_prefix
     '&'
   end

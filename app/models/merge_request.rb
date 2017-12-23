@@ -1,4 +1,5 @@
 class MergeRequest < ActiveRecord::Base
+  include CrossReferable
   include InternalId
   include Issuable
   include Noteable
