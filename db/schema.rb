@@ -679,6 +679,24 @@ ActiveRecord::Schema.define(version: 20171230123729) do
   add_index "container_repositories", ["project_id", "name"], name: "index_container_repositories_on_project_id_and_name", unique: true, using: :btree
   add_index "container_repositories", ["project_id"], name: "index_container_repositories_on_project_id", using: :btree
 
+  create_table "container_repository_tag_versions", id: :bigserial, force: :cascade do |t|
+    t.integer "container_repository_tag_id", null: false
+    t.string "digest", null: false
+    t.integer "size", null: false
+    t.integer "layers", null: false
+  end
+
+  add_index "container_repository_tag_versions", ["container_repository_tag_id"], name: "container_repository_tag_versions_id", using: :btree
+  add_index "container_repository_tag_versions", ["digest"], name: "container_repository_tag_versions_digest", using: :btree
+
+  create_table "container_repository_tags", id: :bigserial, force: :cascade do |t|
+    t.integer "container_repository_id", null: false
+    t.string "name", null: false
+  end
+
+  add_index "container_repository_tags", ["container_repository_id"], name: "container_repository_tags_id", using: :btree
+  add_index "container_repository_tags", ["name"], name: "container_repository_tags_name", using: :btree
+
   create_table "conversational_development_index_metrics", force: :cascade do |t|
     t.float "leader_issues", null: false
     t.float "instance_issues", null: false
@@ -2468,6 +2486,8 @@ ActiveRecord::Schema.define(version: 20171230123729) do
   add_foreign_key "clusters_applications_helm", "clusters", on_delete: :cascade
   add_foreign_key "clusters_applications_ingress", "clusters", on_delete: :cascade
   add_foreign_key "container_repositories", "projects"
+  add_foreign_key "container_repository_tag_versions", "container_repository_tags", on_delete: :cascade
+  add_foreign_key "container_repository_tags", "container_repositories", on_delete: :cascade
   add_foreign_key "deploy_keys_projects", "projects", name: "fk_58a901ca7e", on_delete: :cascade
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
   add_foreign_key "environments", "projects", name: "fk_d1c8c1da6a", on_delete: :cascade
