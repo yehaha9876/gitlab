@@ -27,7 +27,7 @@ module Projects
     end
 
     def build_cluster_and_deployment_platform
-      cluster = Clusters::Cluster.create(cluster_attributes)
+      cluster = ::Clusters::Cluster.create(cluster_attributes)
       cluster.platform_kubernetes
     end
 

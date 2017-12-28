@@ -22,8 +22,7 @@ FactoryBot.define do
     active true
     properties({
       api_url: 'https://kubernetes.example.com',
-      token: 'a' * 40,
-      namespace: 'foo'
+      token: 'a' * 40
     })
   end
 

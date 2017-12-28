@@ -2370,25 +2370,33 @@ describe Project do
   end
 
   describe '#deployment_variables' do
-    shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
-      it 'returns variables from this service' do
-        expect(project.deployment_variables).to include(
-          { key: 'KUBE_TOKEN', value: project.deployment_platform.token, public: false }
-        )
+    context 'when project has no deployment service' do
+      let(:project) { create(:project) }
+
+      it 'returns an empty array' do
+        expect(project.deployment_variables).to eq []
       end
     end
 
-    context 'when user configured kubernetes from Integration > Kubernetes' do
-      let(:project) { create(:kubernetes_project) }
+    context 'when project has a deployment service' do
+      shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
+        it 'returns variables from this service' do
+          expect(project.deployment_variables).to include(
+            { key: 'KUBE_TOKEN', value: project.deployment_platform.token, public: false }
+          )
+        end
+      end
 
-      it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
-    end
+      context 'when user configured kubernetes from Integration > Kubernetes' do
+        let(:project) { create(:kubernetes_project) }
 
-    context 'when user configured kubernetes from CI/CD > Clusters' do
-      let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
-      let(:project) { cluster.project }
+        it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
+      end
 
-<<<<<<< HEAD
+      context 'when user configured kubernetes from CI/CD > Clusters' do
+        let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
+        let(:project) { cluster.project }
+
         it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
       end
 
@@ -2440,9 +2448,6 @@ describe Project do
           end
         end
       end
-=======
-      it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
->>>>>>> e9d8799595... Create kubernetes platform from application templates
     end
   end
 
