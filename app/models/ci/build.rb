@@ -148,6 +148,12 @@ module Ci
       end
 
       before_transition any => [:running] do |build|
+        # Touch empty trace and move it with CarrierWave
+        build.create_job_artifacts_trace(
+          project: build.project,
+          file_type: :trace,
+          file: File.open(FileUtils.touch(Ci::JobArtifact::TRACE_FILE_NAME).first))
+
         build.validates_dependencies! unless Feature.enabled?('ci_disable_validates_dependencies')
       end
     end
