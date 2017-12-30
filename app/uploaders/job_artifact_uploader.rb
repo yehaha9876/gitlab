@@ -15,6 +15,22 @@ class JobArtifactUploader < ObjectStoreUploader
     model.size
   end
 
+  def read_stream
+    if file_storage?
+      File.open(file.path, "rb")
+    else
+      HTTP::IO.new(url, size) # https://gitlab.com/snippets/1685610
+    end
+  end
+
+  def write_stream
+    if file_storage?
+      File.open(file.path, "a+b")
+    else
+      raise 'ObjectStorage is not supported'
+    end
+  end
+
   private
 
   def default_path

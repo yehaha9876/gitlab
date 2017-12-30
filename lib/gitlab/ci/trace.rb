@@ -57,7 +57,9 @@ module Gitlab
 
       def read
         stream = Gitlab::Ci::Trace::Stream.new do
-          if current_path
+          if job.traces_as_artifacts?
+            job.job_artifacts_trace.file.read_stream
+          elsif current_path
             File.open(current_path, "rb")
           elsif old_trace
             StringIO.new(old_trace)
@@ -71,7 +73,11 @@ module Gitlab
 
       def write
         stream = Gitlab::Ci::Trace::Stream.new do
-          File.open(ensure_path, "a+b")
+          if job.traces_as_artifacts?
+            job.ensure_job_artifacts_trace.file.write_stream
+          else
+            File.open(ensure_path, "a+b")
+          end
         end
 
         yield(stream).tap do
@@ -82,11 +88,15 @@ module Gitlab
       end
 
       def erase!
-        paths.each do |trace_path|
-          FileUtils.rm(trace_path, force: true)
-        end
+        if job.traces_as_artifacts?
+          job.job_artifacts_trace.destroy
+        else
+          paths.each do |trace_path|
+            FileUtils.rm(trace_path, force: true)
+          end
 
-        job.erase_old_trace!
+          job.erase_old_trace!
+        end
       end
 
       private
