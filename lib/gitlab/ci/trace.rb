@@ -79,7 +79,7 @@ module Gitlab
       def write
         stream = Gitlab::Ci::Trace::Stream.new do
           if job.traces_as_artifacts?
-            job.ensure_job_artifacts_trace.file.write_stream
+            ensure_artifacts_trace.file.write_stream
           else
             File.open(legacy_ensure_path, "a+b")
           end
@@ -94,7 +94,7 @@ module Gitlab
 
       def erase!
         if job.traces_as_artifacts?
-          job.job_artifacts_trace.destroy
+          artifacts_trace.destroy
         else
           legacy_paths.each do |trace_path|
             FileUtils.rm(trace_path, force: true)
@@ -155,6 +155,14 @@ module Gitlab
 
       def artifacts_trace
         job.job_artifacts_trace
+      end
+
+      def ensure_artifacts_trace
+        job.job_artifacts_trace.first_or_create(
+          project: job.project,
+          file_type: :trace,
+          file: File.open(FileUtils.touch(Ci::JobArtifact::TRACE_FILE_NAME).first) # TODO: to fix!
+        )
       end
     end
   end

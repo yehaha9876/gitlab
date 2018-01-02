@@ -314,14 +314,6 @@ module Ci
       ExtractSectionsFromBuildTraceService.new(project, user).execute(self)
     end
 
-    def ensure_job_artifacts_trace
-      job_artifacts_trace || create_job_artifacts_trace(
-        project: build.project,
-        file_type: :trace,
-        file: File.open(FileUtils.touch(Ci::JobArtifact::TRACE_FILE_NAME).first) # TODO: to fix!
-      )
-    end
-
     def trace
       Gitlab::Ci::Trace.new(self)
     end
