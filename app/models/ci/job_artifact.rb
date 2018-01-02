@@ -3,6 +3,8 @@ module Ci
     include AfterCommitQueue
     extend Gitlab::Ci::Model
 
+    TRACE_FILE_NAME = 'trace.log'.freeze
+
     belongs_to :project
     belongs_to :job, class_name: "Ci::Build", foreign_key: :job_id
 
@@ -18,7 +20,8 @@ module Ci
 
     enum file_type: {
       archive: 1,
-      metadata: 2
+      metadata: 2,
+      trace: 3
     }
 
     def self.artifacts_size_for(project)
