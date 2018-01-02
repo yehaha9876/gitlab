@@ -4,15 +4,17 @@ describe 'Auto deploy' do
   let(:user) { create(:user) }
   let(:project) { create(:project, :repository) }
 
-  context 'when user configured kubernetes from CI/CD > Clusters' do
-    before do
-      create(:cluster, :provided_by_gcp, projects: [project])
-      project.add_master(user)
-      sign_in user
-    end
+  shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
+    context 'when no deployment service is active' do
+      before do
+        trun_off
+      end
 
-    let(:trun_on) { project.deployment_platform.cluster.update!(enabled: true) }
-    let(:trun_off) { project.deployment_platform.cluster.update!(enabled: false) }
+      it 'does not show a button to set up auto deploy' do
+        visit project_path(project)
+        expect(page).to have_no_content('Set up auto deploy')
+      end
+    end
 
     context 'when a deployment service is active' do
       before do
@@ -45,5 +47,31 @@ describe 'Auto deploy' do
         expect(page).to have_content('New Merge Request From auto-deploy into master')
       end
     end
+  end
+
+  context 'when user configured kubernetes from Integration > Kubernetes' do
+    before do
+      create :kubernetes_service, project: project
+      project.add_master(user)
+      sign_in user
+    end
+
+    let(:trun_on) { project.deployment_platform.update!(active: true) }
+    let(:trun_off) { project.deployment_platform.update!(active: false) }
+
+    it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
+  end
+
+  context 'when user configured kubernetes from CI/CD > Clusters' do
+    before do
+      create(:cluster, :provided_by_gcp, projects: [project])
+      project.add_master(user)
+      sign_in user
+    end
+
+    let(:trun_on) { project.deployment_platform.cluster.update!(enabled: true) }
+    let(:trun_off) { project.deployment_platform.cluster.update!(enabled: false) }
+
+    it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
   end
 end

@@ -5,7 +5,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
   include ReactiveCachingHelpers
 
   let(:project) { create(:kubernetes_project) }
-  let(:service) { create(:kubernetes_service, project: project) }
+  let(:service) { project.deployment_platform }
 
   describe 'Associations' do
     it { is_expected.to belong_to :project }

@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-describe Projects::DeploymentPlatformService do
+describe DeploymentPlatform do
   let(:project) { create(:project) }
 
-  describe '#execute' do
-    subject { described_class.new(project).execute }
+  describe '#deployment_platform' do
+    subject { project.deployment_platform }
 
-    context 'with no kubernetes configuration on CI/CD section and with no default cluster' do
+    context 'with no Kubernetes configuration on CI/CD, no Kubernetes Service and a Kubernetes template configured' do
       let!(:kubernetes_service) { create(:kubernetes_service, template: true) }
 
       it 'should return a platform kubernetes' do
@@ -37,18 +37,39 @@ describe Projects::DeploymentPlatformService do
       end
     end
 
+    context 'with no Kubernetes configuration on CI/CD, no Kubernetes Service and no Kubernetes template configured' do
+      it 'should return nil' do
+        expect(is_expected.target).to be_nil
+      end
+    end
+
     context 'when user configured kubernetes from CI/CD > Clusters' do
       let!(:cluster) { create(:cluster, :provided_by_gcp, projects: [project]) }
       let(:platform_kubernetes) { cluster.platform_kubernetes }
 
-      it { is_expected.to eq(platform_kubernetes) }
+      it 'should return the Kubernetes platform' do
+        expect(is_expected.target).to eq(platform_kubernetes)
+      end
     end
 
-    context 'with a default cluster' do
-      let!(:cluster) { create(:cluster, :provided_by_gcp, projects: [project], environment_scope: "*") }
-      let(:platform_kubernetes) { cluster.platform_kubernetes }
+    context 'when user configured kubernetes integration from project services' do
+      let!(:kubernetes_service) { create :kubernetes_service, project: project }
 
-      it { is_expected.to eq(platform_kubernetes) }
+      it 'should return the Kubernetes service' do
+        expect(is_expected.target).to eq(kubernetes_service)
+      end
+    end
+
+    context 'when the cluster creation fails' do
+      let!(:kubernetes_service) { create(:kubernetes_service, template: true) }
+
+      before do
+        allow_any_instance_of(Clusters::Cluster).to receive(:persisted?).and_return(false)
+      end
+
+      it 'should return nil' do
+        expect(is_expected.target).to be_nil
+      end
     end
   end
 end

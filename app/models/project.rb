@@ -19,6 +19,7 @@ class Project < ActiveRecord::Base
   include Routable
   include GroupDescendant
   include Gitlab::SQL::Pattern
+  include DeploymentPlatform
 
   # EE specific modules
   prepend EE::Project
@@ -908,10 +909,6 @@ class Project < ActiveRecord::Base
 
   def ci_service
     @ci_service ||= ci_services.reorder(nil).find_by(active: true)
-  end
-
-  def deployment_platform(environment: nil)
-    @deployment_platform ||= Projects::DeploymentPlatformService.new(self).execute
   end
 
   def monitoring_services
