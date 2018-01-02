@@ -891,8 +891,7 @@ describe API::Projects do
           'path' => user.namespace.path,
           'kind' => user.namespace.kind,
           'full_path' => user.namespace.full_path,
-          'parent_id' => nil,
-          'plan' => nil
+          'parent_id' => nil
         })
       end
 
@@ -959,7 +958,7 @@ describe API::Projects do
       describe 'permissions' do
         context 'all projects' do
           before do
-            project.team << [user, :master]
+            project.add_master(user)
           end
 
           it 'contains permission information' do
@@ -974,7 +973,7 @@ describe API::Projects do
 
         context 'personal project' do
           it 'sets project access and returns 200' do
-            project.team << [user, :master]
+            project.add_master(user)
             get api("/projects/#{project.id}", user)
 
             expect(response).to have_gitlab_http_status(200)
@@ -1606,7 +1605,7 @@ describe API::Projects do
 
     context 'user without archiving rights to the project' do
       before do
-        project.team << [user3, :developer]
+        project.add_developer(user3)
       end
 
       it 'rejects the action' do
@@ -1642,7 +1641,7 @@ describe API::Projects do
 
     context 'user without archiving rights to the project' do
       before do
-        project.team << [user3, :developer]
+        project.add_developer(user3)
       end
 
       it 'rejects the action' do
@@ -1717,7 +1716,7 @@ describe API::Projects do
 
       it 'does not remove a project if not an owner' do
         user3 = create(:user)
-        project.team << [user3, :developer]
+        project.add_developer(user3)
         delete api("/projects/#{project.id}", user3)
         expect(response).to have_gitlab_http_status(403)
       end

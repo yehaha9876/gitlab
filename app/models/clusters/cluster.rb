@@ -1,12 +1,14 @@
 module Clusters
   class Cluster < ActiveRecord::Base
     include Presentable
+    prepend HasEnvironmentScope
 
     self.table_name = 'clusters'
 
     APPLICATIONS = {
       Applications::Helm.application_name => Applications::Helm,
-      Applications::Ingress.application_name => Applications::Ingress
+      Applications::Ingress.application_name => Applications::Ingress,
+      Applications::Prometheus.application_name => Applications::Prometheus
     }.freeze
 
     belongs_to :user
@@ -17,27 +19,22 @@ module Clusters
     # we force autosave to happen when we save `Cluster` model
     has_one :provider_gcp, class_name: 'Clusters::Providers::Gcp', autosave: true
 
-    # We have to ":destroy" it today to ensure that we clean also the Kubernetes Integration
-    has_one :platform_kubernetes, class_name: 'Clusters::Platforms::Kubernetes', autosave: true, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+    has_one :platform_kubernetes, class_name: 'Clusters::Platforms::Kubernetes', autosave: true
 
     has_one :application_helm, class_name: 'Clusters::Applications::Helm'
     has_one :application_ingress, class_name: 'Clusters::Applications::Ingress'
+    has_one :application_prometheus, class_name: 'Clusters::Applications::Prometheus'
 
     accepts_nested_attributes_for :provider_gcp, update_only: true
     accepts_nested_attributes_for :platform_kubernetes, update_only: true
 
     validates :name, cluster_name: true
+    validate :unique_environment_scope
     validate :restrict_modification, on: :update
-
-    # TODO: Move back this into Clusters::Platforms::Kubernetes in 10.3
-    # We need callback here because `enabled` belongs to Clusters::Cluster
-    # Callbacks in Clusters::Platforms::Kubernetes will not be called after update
-    after_save :update_kubernetes_integration!
 
     delegate :status, to: :provider, allow_nil: true
     delegate :status_reason, to: :provider, allow_nil: true
     delegate :on_creation?, to: :provider, allow_nil: true
-    delegate :update_kubernetes_integration!, to: :platform, allow_nil: true
 
     delegate :active?, to: :platform_kubernetes, prefix: true, allow_nil: true
     delegate :installed?, to: :application_helm, prefix: true, allow_nil: true
@@ -62,10 +59,15 @@ module Clusters
       end
     end
 
+    def created?
+      status_name == :created
+    end
+
     def applications
       [
         application_helm || build_application_helm,
-        application_ingress || build_application_ingress
+        application_ingress || build_application_ingress,
+        application_prometheus || build_application_prometheus
       ]
     end
 
@@ -75,6 +77,10 @@ module Clusters
 
     def platform
       return platform_kubernetes if kubernetes?
+    end
+
+    def managed?
+      !user?
     end
 
     def first_project
@@ -89,6 +95,15 @@ module Clusters
     end
 
     private
+
+    def unique_environment_scope
+      if project && project.clusters.where(environment_scope: environment_scope).where.not(id: self.id).exists?
+        errors.add(:base, "cannot add duplicated environment scope")
+        return false
+      end
+
+      true
+    end
 
     def restrict_modification
       if provider&.on_creation?

@@ -14,6 +14,20 @@ all you need to do is update GitLab itself:
    the tracking database is enabled.
 1. [Test](#check-status-after-updating) primary and secondary nodes, and check version in each.
 
+## Upgrading to GitLab 10.3
+
+### Support for SSH repository synchronization removed
+
+In GitLab 10.2, synchronizing secondaries over SSH was deprecated. In 10.3,
+support is removed entirely. All installations will switch to the HTTP/HTTPS
+cloning method instead. Before upgrading, ensure that all your Geo nodes are
+configured to use this method and that it works for your installation. In
+particular, ensure that [Git access over HTTP/HTTPS is enabled](configuration.md#step-4-enable-git-access-over-http-https).
+
+Synchronizing repositories over the public Internet using HTTP is insecure, so
+you should ensure that you have HTTPS configured before upgrading. Note that
+file synchronization is **also** insecure in these cases!
+
 ## Upgrading to GitLab 10.2
 
 ### Secure PostgreSQL replication 
@@ -79,7 +93,7 @@ for existing repositories was added in GitLab 10.1.
 ## Upgrading to GitLab 10.0
 
 Since GitLab 10.0, we require all **Geo** systems to [use SSH key lookups via
-the database](ssh.md) to avoid having to maintain consistency of the
+the database](../administration/operations/fast_ssh_key_lookup.md) to avoid having to maintain consistency of the
 `authorized_keys` file for SSH access. Failing to do this will prevent users
 from being able to clone via SSH.
 

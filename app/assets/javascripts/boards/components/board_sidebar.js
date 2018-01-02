@@ -1,9 +1,9 @@
 /* eslint-disable comma-dangle, space-before-function-paren, no-new */
-/* global MilestoneSelect */
-/* global Sidebar */
 
 import Vue from 'vue';
+import weight from 'ee/sidebar/components/weight/weight.vue';
 import Flash from '../../flash';
+import Sidebar from '../../right_sidebar';
 import eventHub from '../../sidebar/event_hub';
 import assigneeTitle from '../../sidebar/components/assignees/assignee_title';
 import assignees from '../../sidebar/components/assignees/assignees';
@@ -12,6 +12,7 @@ import './sidebar/remove_issue';
 import IssuableContext from '../../issuable_context';
 import LabelsSelect from '../../labels_select';
 import subscriptions from '../../sidebar/components/subscriptions/subscriptions.vue';
+import MilestoneSelect from '../../milestone_select';
 
 const Store = gl.issueBoards.BoardsStore;
 
@@ -124,5 +125,6 @@ gl.issueBoards.BoardSidebar = Vue.extend({
     assignees,
     removeBtn: gl.issueBoards.RemoveIssueBtn,
     subscriptions,
+    weight,
   },
 });

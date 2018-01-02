@@ -52,7 +52,6 @@ module Ci
     validates :status, presence: { unless: :importing? }
     validate :valid_commit_sha, unless: :importing?
 
-    after_initialize :set_config_source, if: :new_record?
     after_create :keep_around_commits, unless: :importing?
 
     enum source: {
@@ -242,6 +241,10 @@ module Ci
       statuses.select(:stage).distinct.count
     end
 
+    def total_size
+      statuses.count(:id)
+    end
+
     def stages_names
       statuses.order(:stage_idx).distinct
         .pluck(:stage, :stage_idx).map(&:first)
@@ -297,8 +300,12 @@ module Ci
       Ci::Pipeline.truncate_sha(sha)
     end
 
+    # NOTE: This is loaded lazily and will never be nil, even if the commit
+    # cannot be found.
+    #
+    # Use constructs like: `pipeline.commit.present?`
     def commit
-      @commit ||= project.commit_by(oid: sha)
+      @commit ||= Commit.lazy(project, sha)
     end
 
     def branch?
@@ -348,12 +355,9 @@ module Ci
     end
 
     def latest?
-      return false unless ref
+      return false unless ref && commit.present?
 
-      commit = project.commit(ref)
-      return false unless commit
-
-      commit.sha == sha
+      project.commit(ref) == commit
     end
 
     def retried
@@ -378,7 +382,7 @@ module Ci
     end
 
     def has_kubernetes_active?
-      project.kubernetes_service&.active?
+      project.deployment_platform&.active?
     end
 
     def has_stage_seeds?

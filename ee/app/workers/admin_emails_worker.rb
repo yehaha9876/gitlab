@@ -1,6 +1,5 @@
 class AdminEmailsWorker
-  include Sidekiq::Worker
-  include DedicatedSidekiqQueue
+  include ApplicationWorker
 
   def perform(recipient_id, subject, body)
     recipient_list(recipient_id).pluck(:id).uniq.each do |user_id|
@@ -15,9 +14,9 @@ class AdminEmailsWorker
     when 'all'
       User.active.subscribed_for_admin_email
     when /group-(\d+)\z/
-      Group.find($1).users_with_descendants.subscribed_for_admin_email
+      Group.find(Regexp.last_match(1)).users_with_descendants.subscribed_for_admin_email
     when /project-(\d+)\z/
-      Project.find($1).authorized_users.active.subscribed_for_admin_email
+      Project.find(Regexp.last_match(1)).authorized_users.active.subscribed_for_admin_email
     end
   end
 end

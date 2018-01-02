@@ -1,6 +1,6 @@
 /* global monaco */
-import monacoLoader from '~/repo/monaco_loader';
-import editor from '~/repo/lib/editor';
+import monacoLoader from '~/ide/monaco_loader';
+import editor from '~/ide/lib/editor';
 import { file } from '../helpers';
 
 describe('Multi-file editor library', () => {
@@ -91,34 +91,6 @@ describe('Multi-file editor library', () => {
       instance.attachModel(model);
 
       expect(instance.dirtyDiffController.reDecorate).toHaveBeenCalledWith(model);
-    });
-
-    describe('updateOptions', () => {
-      it('defaults readOnly to false', () => {
-        spyOn(instance.instance, 'updateOptions');
-
-        instance.attachModel(model);
-
-        expect(instance.instance.updateOptions).toHaveBeenCalledWith({
-          readOnly: false,
-        });
-      });
-
-      it('puts editor into readOnly mode when file is locked', () => {
-        spyOn(instance.instance, 'updateOptions');
-
-        Object.assign(model.file, {
-          file_lock: {
-            name: 'test',
-          },
-        });
-
-        instance.attachModel(model);
-
-        expect(instance.instance.updateOptions).toHaveBeenCalledWith({
-          readOnly: true,
-        });
-      });
     });
   });
 

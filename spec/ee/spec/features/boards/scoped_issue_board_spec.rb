@@ -53,6 +53,12 @@ describe 'Scoped issue boards', :js do
           expect(find('.tokens-container')).to have_content("")
           expect(page).to have_selector('.card', count: 3)
         end
+
+        it 'displays dot highlight and tooltip' do
+          create_board_milestone(milestone.title)
+
+          expect_dot_highlight('Edit board')
+        end
       end
 
       context 'labels' do
@@ -101,6 +107,12 @@ describe 'Scoped issue boards', :js do
             end
           end
         end
+
+        it 'displays dot highlight and tooltip' do
+          create_board_label(label_1.title)
+
+          expect_dot_highlight('Edit board')
+        end
       end
 
       context 'assignee' do
@@ -125,6 +137,12 @@ describe 'Scoped issue boards', :js do
 
           expect(page).not_to have_css('.js-visual-token')
           expect(page).to have_selector('.card', count: 3)
+        end
+
+        it 'displays dot highlight and tooltip' do
+          create_board_assignee(user.name)
+
+          expect_dot_highlight('Edit board')
         end
       end
 
@@ -151,6 +169,12 @@ describe 'Scoped issue boards', :js do
 
           expect(page).to have_selector('.card', count: 4)
         end
+
+        it 'displays dot highlight and tooltip' do
+          create_board_weight(1)
+
+          expect_dot_highlight('Edit board')
+        end
       end
     end
 
@@ -160,7 +184,7 @@ describe 'Scoped issue boards', :js do
       it 'edits board name' do
         edit_board.click
 
-        page.within('.popup-dialog') do
+        page.within('.modal') do
           fill_in 'board-new-name', with: 'Testing'
 
           click_button 'Save'
@@ -372,7 +396,7 @@ describe 'Scoped issue boards', :js do
     it 'can view board scope' do
       view_scope.click
 
-      page.within('.popup-dialog') do
+      page.within('.modal') do
         expect(find('.modal-header')).to have_content('Board scope')
         expect(page).not_to have_content('Board name')
         expect(page).not_to have_link('Edit')
@@ -381,17 +405,25 @@ describe 'Scoped issue boards', :js do
         expect(page).not_to have_button('Cancel')
       end
     end
+
+    it 'does not display dot highlight and tooltip' do
+      expect_no_dot_highlight('View scope')
+    end
   end
 
   context 'with scoped_issue_boards feature disabled' do
     before do
       stub_licensed_features(scoped_issue_boards: false)
 
-      project.team << [user, :master]
+      project.add_master(user)
       login_as(user)
 
       visit project_boards_path(project)
       wait_for_requests
+    end
+
+    it 'does not display dot highlight and tooltip' do
+      expect_no_dot_highlight('Edit board')
     end
 
     it "doesn't show the input when creating a board" do
@@ -410,6 +442,20 @@ describe 'Scoped issue boards', :js do
     it "doesn't show the button to edit scope" do
       expect(page).not_to have_button('View Scope')
     end
+  end
+
+  def expect_dot_highlight(button_title)
+    button = first('.filter-dropdown-container .btn.btn-inverted')
+    expect(button.text).to include(button_title)
+    expect(button[:class]).to include('dot-highlight')
+    expect(button['data-original-title']).to include('This board\'s scope is reduced')
+  end
+
+  def expect_no_dot_highlight(button_title)
+    button = first('.filter-dropdown-container .btn.btn-inverted')
+    expect(button.text).to include(button_title)
+    expect(button[:class]).not_to include('dot-highlight')
+    expect(button['data-original-title']).not_to include('This board\'s scope is reduced')
   end
 
   # Create board helper methods
@@ -471,7 +517,9 @@ describe 'Scoped issue boards', :js do
     click_on_board_modal
 
     click_button 'Create'
-    expect(page).to have_selector('.board-list-loading')
+
+    wait_for_requests
+
     expect(page).not_to have_selector('.board-list-loading')
   end
 
@@ -486,7 +534,9 @@ describe 'Scoped issue boards', :js do
     click_on_board_modal
 
     click_button 'Save'
-    expect(page).to have_selector('.board-list-loading')
+
+    wait_for_requests
+
     expect(page).not_to have_selector('.board-list-loading')
   end
 

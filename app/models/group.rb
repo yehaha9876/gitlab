@@ -5,13 +5,13 @@ require 'carrierwave/orm/activerecord'
 class Group < Namespace
   include EE::Group
   include Gitlab::ConfigHelper
+  include AfterCommitQueue
   include AccessRequestable
   include Avatarable
   include Referable
   include SelectForProjectAuthorization
   include LoadedInGroupList
   include GroupDescendant
-  prepend EE::GeoAwareAvatar
 
   has_many :group_members, -> { where(requested_at: nil) }, dependent: :destroy, as: :source # rubocop:disable Cop/ActiveRecordDependent
   alias_method :members, :group_members
@@ -333,6 +333,18 @@ class Group < Namespace
     return path_was unless has_parent?
 
     "#{parent.full_path}/#{path_was}"
+  end
+
+  def group_member(user)
+    if group_members.loaded?
+      group_members.find { |gm| gm.user_id == user.id }
+    else
+      group_members.find_by(user_id: user)
+    end
+  end
+
+  def hashed_storage?(_feature)
+    false
   end
 
   private
