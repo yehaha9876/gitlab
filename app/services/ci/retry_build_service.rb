@@ -3,7 +3,7 @@ module Ci
     CLONE_ACCESSORS = %i[pipeline project ref tag options commands name
                          allow_failure stage_id stage stage_idx trigger_request
                          yaml_variables when environment coverage_regex
-                         description tag_list protected].freeze
+                         description tag_list protected traces_as_artifacts].freeze
 
     def execute(build)
       reprocess!(build).tap do |new_build|

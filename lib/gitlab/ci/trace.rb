@@ -57,13 +57,17 @@ module Gitlab
       end
 
       def exist?
-        artifacts_trace.present? || legacy_current_path.present? || old_trace.present?
+        if job.traces_as_artifacts?
+          artifacts_trace&.file&.exists?
+        else
+          legacy_current_path.present? || old_trace.present?
+        end
       end
 
       def read
         stream = Gitlab::Ci::Trace::Stream.new do
           if job.traces_as_artifacts?
-            artifacts_trace.file.read_stream
+            artifacts_trace&.file&.read_stream
           elsif legacy_current_path
             File.open(legacy_current_path, "rb")
           elsif old_trace
