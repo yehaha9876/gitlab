@@ -57,7 +57,7 @@ module Gitlab
       end
 
       def exist?
-        artifacts_trace.exist? || legacy_current_path.present? || old_trace.present?
+        artifacts_trace.present? || legacy_current_path.present? || old_trace.present?
       end
 
       def read
@@ -165,22 +165,19 @@ module Gitlab
       end
 
       # This directory is used for touching an empty file(trace) in a safe way
-      # Each initial trace file is created in unique location, so other processes don't snatch the file.
+      # Each initial trace file is created at an unique location, so other processes don't snatch the file.
       def ensure_artifacts_trace_tmp_stream
-        puts "#{self.class.name} - #{__callee__}: Dir.exist?(Ci::JobArtifact::TRACE_TMP_DIR_NAME): #{Dir.exist?(Ci::JobArtifact::TRACE_TMP_DIR_NAME)}"
-        unless Dir.exist?(Ci::JobArtifact::TRACE_TMP_DIR_NAME)
-          puts "#{self.class.name} - #{__callee__}: TRACE_TMP_DIR_NAME: #{Ci::JobArtifact::TRACE_TMP_DIR_NAME}"
-          FileUtils.mkdir_p(Ci::JobArtifact::TRACE_TMP_DIR_NAME)
+        tmp_dir_path = File.join(Rails.root, 'tmp', ::Ci::JobArtifact::TRACE_TMP_DIR_NAME)
+
+        unless Dir.exist?(tmp_dir_path)
+          FileUtils.mkdir_p(tmp_dir_path)
         end
 
-        tmp_file_path = File.join(
-          Ci::JobArtifact::TRACE_TMP_DIR_NAME, "#{job.id}.log")
-        puts "#{self.class.name} - #{__callee__}: tmp_file_path: #{tmp_file_path}"
+        empty_trace_path = File.join(tmp_dir_path, "#{job.id}.log")
 
         # Touch a file in tmp directory
-        touched_path = FileUtils.touch(tmp_file_path).first
-        puts "#{self.class.name} - #{__callee__}: touched_path: #{touched_path}"
-        File.open(touched_path, 'rb')
+        FileUtils.touch(empty_trace_path)
+        File.open(empty_trace_path, 'rb')
       end
     end
   end
