@@ -19,7 +19,8 @@ class JobArtifactUploader < ObjectStoreUploader
     if file_storage?
       File.open(file.path, "rb")
     else
-      HTTP::IO.new(url, size) # https://gitlab.com/snippets/1685610
+      raise 'ObjectStorage is not supported for traces'
+      # HTTP::IO.new(url, size) # https://gitlab.com/snippets/1685610
     end
   end
 
@@ -27,7 +28,7 @@ class JobArtifactUploader < ObjectStoreUploader
     if file_storage?
       File.open(file.path, "a+b")
     else
-      raise 'ObjectStorage is not supported'
+      raise 'ObjectStorage is not supported for traces'
     end
   end
 
