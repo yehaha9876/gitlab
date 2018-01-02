@@ -3,7 +3,8 @@ module Ci
     include AfterCommitQueue
     extend Gitlab::Ci::Model
 
-    TRACE_FILE_NAME = 'trace.log'.freeze
+    # TRACE_FILE_NAME = 'trace.log'.freeze
+    TRACE_TMP_DIR_NAME = 'tmp_artifacts_trace'.freeze
 
     belongs_to :project
     belongs_to :job, class_name: "Ci::Build", foreign_key: :job_id

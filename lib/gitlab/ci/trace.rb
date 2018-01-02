@@ -158,11 +158,29 @@ module Gitlab
       end
 
       def ensure_artifacts_trace
-        job.job_artifacts_trace.first_or_create(
+        job.job_artifacts_trace || job.create_job_artifacts_trace(
           project: job.project,
           file_type: :trace,
-          file: File.open(FileUtils.touch(Ci::JobArtifact::TRACE_FILE_NAME).first) # TODO: to fix!
-        )
+          file: ensure_artifacts_trace_tmp_stream)
+      end
+
+      # This directory is used for touching an empty file(trace) in a safe way
+      # Each initial trace file is created in unique location, so other processes don't snatch the file.
+      def ensure_artifacts_trace_tmp_stream
+        puts "#{self.class.name} - #{__callee__}: Dir.exist?(Ci::JobArtifact::TRACE_TMP_DIR_NAME): #{Dir.exist?(Ci::JobArtifact::TRACE_TMP_DIR_NAME)}"
+        unless Dir.exist?(Ci::JobArtifact::TRACE_TMP_DIR_NAME)
+          puts "#{self.class.name} - #{__callee__}: TRACE_TMP_DIR_NAME: #{Ci::JobArtifact::TRACE_TMP_DIR_NAME}"
+          FileUtils.mkdir_p(Ci::JobArtifact::TRACE_TMP_DIR_NAME)
+        end
+
+        tmp_file_path = File.join(
+          Ci::JobArtifact::TRACE_TMP_DIR_NAME, "#{job.id}.log")
+        puts "#{self.class.name} - #{__callee__}: tmp_file_path: #{tmp_file_path}"
+
+        # Touch a file in tmp directory
+        touched_path = FileUtils.touch(tmp_file_path).first
+        puts "#{self.class.name} - #{__callee__}: touched_path: #{touched_path}"
+        File.open(touched_path, 'rb')
       end
     end
   end
