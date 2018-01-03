@@ -121,7 +121,6 @@ class ObjectStoreUploader < CarrierWave::Uploader::Base
     return unless self.class.background_upload_enabled?
     return unless self.licensed?
     return unless self.file_storage?
-    return if model.trace? # ObjectStorage is not supported for traces
 
     ObjectStorageUploadWorker.perform_async(self.class.name, model.class.name, mounted_as, model.id)
   end

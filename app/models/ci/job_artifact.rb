@@ -12,7 +12,7 @@ module Ci
 
     mount_uploader :file, JobArtifactUploader
 
-    after_save if: :file_changed?, on: [:create, :update] do
+    after_save if: :schedule_migration_to_object_storage?, on: [:create, :update] do
       run_after_commit do
         file.schedule_migration_to_object_storage
       end
@@ -41,6 +41,12 @@ module Ci
         if value
           ChronicDuration.parse(value)&.seconds&.from_now
         end
+    end
+
+    private
+
+    def schedule_migration_to_object_storage?
+      file_changed? && !trace? # Trace is not supported for ObjectStorage yet
     end
   end
 end
