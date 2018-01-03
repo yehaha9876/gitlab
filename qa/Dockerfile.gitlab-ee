@@ -1,0 +1,5 @@
+FROM gitlab/gitlab-ee:nightly
+COPY ./app /opt/gitlab/embedded/service/gitlab-rails/app
+COPY ./lib /opt/gitlab/embedded/service/gitlab-rails/lib
+COPY ./db /opt/gitlab/embedded/service/gitlab-rails/db
+COPY ./ee /opt/gitlab/embedded/service/gitlab-rails/ee

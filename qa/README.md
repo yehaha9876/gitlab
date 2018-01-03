@@ -57,4 +57,23 @@ GITLAB_USERNAME=jsmith GITLAB_PASSWORD=password bin/qa Test::Instance https://gi
 
 All [supported environment variables are here](https://gitlab.com/gitlab-org/gitlab-qa#supported-environment-variables).
 
+### Rebuilding docker images
+
+For development purpose, you can patch the `nigthly` images with changed code available in your machine.
+This allows for faster iteration, and allows you to test the changes in the same environment that will be run by GitLab CI.
+
+Locally patched images are tagged as `local`, and can be build by one of the commands bellow:
+
+```bash
+rake dev:build_gitlab_ce_docker  # Build Gitlab CE Docker image based on nightly with local code
+rake dev:build_gitlab_ee_docker  # Build Gitlab EE Docker image based on nightly with local code
+rake dev:build_qa_docker         # Build QA Docker image based on nightly with local code
+```
+
+You can use the custom patched images to execute `gitlab-qa` with local changes, like this example:
+
+```bash
+gitlab-qa Test::Integration::Geo gitlab/gitlab-ee:local
+```
+
 [GDK]: https://gitlab.com/gitlab-org/gitlab-development-kit/

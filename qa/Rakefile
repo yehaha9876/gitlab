@@ -1,0 +1,16 @@
+namespace :dev do
+  desc 'Build QA Docker image based on nightly with local code'
+  task :build_qa_docker do
+    sh 'docker build . -t gitlab/gitlab-ee-qa:local'
+  end
+
+  desc 'Build Gitlab EE Docker image based on nightly with local code'
+  task :build_gitlab_ee_docker do
+    sh 'docker build ./../ -f Dockerfile.gitlab-ee -t gitlab/gitlab-ee:local'
+  end
+
+  desc 'Build Gitlab CE Docker image based on nightly with local code'
+  task :build_gitlab_ce_docker do
+    sh 'docker build ./../ -f Dockerfile.gitlab-ce -t gitlab/gitlab-ce:local'
+  end
+end
