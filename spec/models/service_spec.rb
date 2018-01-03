@@ -281,7 +281,6 @@ describe Service do
     let!(:kubernetes_service) { create(:kubernetes_service, template: true) }
 
     it 'returns service template' do
-      create(:kubernetes_service)
       expect(KubernetesService.find_by_template).to eq(kubernetes_service)
     end
   end

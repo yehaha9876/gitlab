@@ -18,7 +18,7 @@ module DeploymentPlatform
   def build_cluster_and_deployment_platform
     return unless kubernetes_service_template
 
-    cluster = ::Clusters::Cluster.create(cluster_attributes)
+    cluster = ::Clusters::Cluster.create(cluster_attributes_from_service_template)
     cluster.platform_kubernetes if cluster.persisted?
   end
 
@@ -26,17 +26,17 @@ module DeploymentPlatform
     @kubernetes_service_template ||= KubernetesService.active.find_by_template
   end
 
-  def cluster_attributes
+  def cluster_attributes_from_service_template
     {
       name: 'kubernetes-template',
       projects: [self],
       provider_type: 'user',
       platform_type: 'kubernetes',
-      platform_kubernetes_attributes: platform_kubernetes_attributes
+      platform_kubernetes_attributes: platform_kubernetes_attributes_from_service_template
     }
   end
 
-  def platform_kubernetes_attributes
+  def platform_kubernetes_attributes_from_service_template
     {
       api_url:   kubernetes_service_template.api_url,
       ca_pem:    kubernetes_service_template.ca_pem,

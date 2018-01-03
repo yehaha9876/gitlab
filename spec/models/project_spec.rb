@@ -3546,7 +3546,6 @@ describe Project do
       expect(project.wiki_repository_exists?).to eq(false)
     end
   end
-<<<<<<< HEAD
 
   describe '#root_namespace' do
     let(:project) { build(:project, namespace: parent) }
