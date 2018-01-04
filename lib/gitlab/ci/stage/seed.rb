@@ -31,8 +31,7 @@ module Gitlab
                              ref: pipeline.ref,
                              tag: pipeline.tag,
                              trigger_request: trigger,
-                             protected: protected_ref?,
-                             traces_as_artifacts: true)
+                             protected: protected_ref?)
           end
         end
 

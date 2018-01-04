@@ -37,9 +37,6 @@ module Gitlab
         write do |stream|
           data = job.hide_secrets(data)
           stream.set(data)
-          stream.size.tap do |size|
-            artifacts_trace.update(size: size) if job.traces_as_artifacts?
-          end
         end
       end
 
@@ -50,24 +47,18 @@ module Gitlab
 
           data = job.hide_secrets(data)
           stream.append(data, offset)
-          stream.size.tap do |size|
-            artifacts_trace.update(size: size) if job.traces_as_artifacts?
-          end
+          stream.size
         end
       end
 
       def exist?
-        if job.traces_as_artifacts?
-          artifacts_trace&.file&.exists?
-        else
-          legacy_current_path.present? || old_trace.present?
-        end
+        artifacts_trace&.file&.exists? || legacy_current_path.present? || old_trace.present?
       end
 
       def read
         stream = Gitlab::Ci::Trace::Stream.new do
-          if job.traces_as_artifacts?
-            artifacts_trace&.file&.read_stream
+          if artifacts_trace
+            artifacts_trace.file.read_stream
           elsif legacy_current_path
             File.open(legacy_current_path, "rb")
           elsif old_trace
@@ -82,10 +73,12 @@ module Gitlab
 
       def write
         stream = Gitlab::Ci::Trace::Stream.new do
-          if job.traces_as_artifacts?
-            ensure_artifacts_trace.file.write_stream
+          if artifacts_trace
+            artifacts_trace.file.write_stream
+          elsif legacy_current_path
+            File.open(legacy_current_path, "a+b")
           else
-            File.open(legacy_ensure_path, "a+b")
+            ensure_artifacts_trace.file.write_stream
           end
         end
 
@@ -93,11 +86,12 @@ module Gitlab
           job.touch if job.needs_touch?
         end
       ensure
+        update_artifacts_trace_size(stream.size)
         stream&.close
       end
 
       def erase!
-        if job.traces_as_artifacts?
+        if artifacts_trace
           artifacts_trace.destroy
         else
           legacy_paths.each do |trace_path|
@@ -109,19 +103,6 @@ module Gitlab
       end
 
       private
-
-      def legacy_ensure_path
-        return legacy_current_path if legacy_current_path
-
-        legacy_ensure_directory
-        legacy_default_path
-      end
-
-      def legacy_ensure_directory
-        unless Dir.exist?(legacy_default_directory)
-          FileUtils.mkdir_p(legacy_default_directory)
-        end
-      end
 
       def legacy_current_path
         @legacy_current_path ||= legacy_paths.find do |trace_path|
@@ -158,7 +139,13 @@ module Gitlab
       end
 
       def artifacts_trace
-        job.job_artifacts_trace
+        @artifacts_trace ||= job.job_artifacts_trace
+      end
+
+      def update_artifacts_trace_size(size)
+        if artifacts_trace && artifacts_trace.size != size
+          artifacts_trace.update(size: size)
+        end
       end
 
       def ensure_artifacts_trace
