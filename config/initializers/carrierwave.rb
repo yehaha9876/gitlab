@@ -41,3 +41,34 @@ if File.exist?(aws_file)
     connection.directories.create(key: AWS_CONFIG['bucket'])
   end
 end
+
+###
+# Monkye patch for artifacts-trace
+# This allows to create an empty cache file when XXXUploader::store! is called
+module Hack
+  module CarrierWave
+    module SanitizedFile
+      def empty?
+        return false if @allow_empty_file
+
+        super
+      end
+
+      private
+
+      def file=(file)
+        if file.is_a?(Hash)
+          @allow_empty_file = file["allow_empty_file"] || file[:allow_empty_file]
+        end
+
+        super
+      end
+    end
+  end
+end
+
+module CarrierWave
+  class SanitizedFile
+    prepend Hack::CarrierWave::SanitizedFile
+  end
+end

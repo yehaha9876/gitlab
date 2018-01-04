@@ -165,23 +165,11 @@ module Gitlab
         job.job_artifacts_trace || job.create_job_artifacts_trace(
           project: job.project,
           file_type: :trace,
-          file: ensure_artifacts_trace_tmp_stream)
-      end
-
-      # This directory is used for touching an empty file(trace) in a safe way
-      # Each initial trace file is created at an unique location, so other processes don't snatch the file.
-      def ensure_artifacts_trace_tmp_stream
-        tmp_dir_path = File.join(Rails.root, 'tmp', ::Ci::JobArtifact::TRACE_TMP_DIR_NAME)
-
-        unless Dir.exist?(tmp_dir_path)
-          FileUtils.mkdir_p(tmp_dir_path)
-        end
-
-        empty_trace_path = File.join(tmp_dir_path, "#{job.id}.log")
-
-        # Touch a file in tmp directory
-        FileUtils.touch(empty_trace_path)
-        File.open(empty_trace_path, 'rb')
+          file: {
+            tempfile: StringIO.new, # Empty file
+            filename: ::Ci::JobArtifact::TRACE_FILE_NAME,
+            allow_empty_file: true
+            } )
       end
     end
   end
