@@ -42,6 +42,7 @@ module ExportFileHelper
     create(:ci_trigger, project: project)
     key = create(:deploy_key)
     key.projects << project
+    create(:service, project: project)
     create(:project_hook, project: project, token: 'token')
     create(:protected_branch, project: project)
 
