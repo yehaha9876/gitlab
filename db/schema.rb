@@ -1870,9 +1870,11 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.boolean "disable_overriding_approvers_per_merge_request"
     t.integer "storage_version", limit: 2
     t.boolean "resolve_outdated_diff_discussions"
+    # EE-specific start
     t.boolean "remote_mirror_available_overridden"
     t.boolean "only_mirror_protected_branches"
     t.boolean "pull_mirror_available_overridden"
+    # EE-specific end
     t.integer "jobs_cache_index"
   end
 
