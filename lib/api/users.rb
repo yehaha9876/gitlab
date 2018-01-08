@@ -16,7 +16,7 @@ module API
       helpers do
         def find_user_by_id(params)
           id = params[:user_id] || params[:id]
-          User.find_by(id: id) || not_found!('User')
+          find_user(id) || not_found!('User')
         end
 
         def reorder_users(users)
@@ -111,12 +111,11 @@ module API
         success Entities::User
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
-
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         use :with_custom_attributes
       end
-      get ":id" do
-        user = User.find_by(id: params[:id])
+      get ":user_id" do
+        user = find_user(params[:user_id])
         not_found!('User') unless user && can?(current_user, :read_user, user)
 
         opts = current_user&.admin? ? { with: Entities::UserWithAdmin } : { with: Entities::User }
@@ -163,7 +162,7 @@ module API
         success Entities::UserPublic
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         optional :email, type: String, desc: 'The email of the user'
         optional :password, type: String, desc: 'The password of the new user'
         optional :skip_reconfirmation, type: Boolean, desc: 'Flag indicating the account skips the confirmation by email'
@@ -171,10 +170,10 @@ module API
         optional :username, type: String, desc: 'The username of the user'
         use :optional_attributes
       end
-      put ":id" do
+      put ":user_id" do
         authenticated_as_admin!
 
-        user = User.find_by(id: params.delete(:id))
+        user = find_user(params.delete(:user_id))
         not_found!('User') unless user
 
         conflict!('Email has already been taken') if params[:email] &&
@@ -214,14 +213,14 @@ module API
         success Entities::SSHKey
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         requires :key, type: String, desc: 'The new SSH key'
         requires :title, type: String, desc: 'The title of the new SSH key'
       end
-      post ":id/keys" do
+      post ":user_id/keys" do
         authenticated_as_admin!
 
-        user = User.find_by(id: params.delete(:id))
+        user = find_user(params.delete(:user_id))
         not_found!('User') unless user
 
         key = user.keys.new(declared_params(include_missing: false))
@@ -237,13 +236,13 @@ module API
         success Entities::SSHKey
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         use :pagination
       end
-      get ':id/keys' do
+      get ':user_id/keys' do
         authenticated_as_admin!
 
-        user = User.find_by(id: params[:id])
+        user = find_user(params[:user_id])
         not_found!('User') unless user
 
         present paginate(user.keys), with: Entities::SSHKey
@@ -253,13 +252,13 @@ module API
         success Entities::SSHKey
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         requires :key_id, type: Integer, desc: 'The ID of the SSH key'
       end
-      delete ':id/keys/:key_id' do
+      delete ':user_id/keys/:key_id' do
         authenticated_as_admin!
 
-        user = User.find_by(id: params[:id])
+        user = find_user(params[:user_id])
         not_found!('User') unless user
 
         key = user.keys.find_by(id: params[:key_id])
@@ -273,13 +272,13 @@ module API
         success Entities::GPGKey
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         requires :key, type: String, desc: 'The new GPG key'
       end
-      post ':id/gpg_keys' do
+      post ':user_id/gpg_keys' do
         authenticated_as_admin!
 
-        user = User.find_by(id: params.delete(:id))
+        user = find_user(params.delete(:user_id))
         not_found!('User') unless user
 
         key = user.gpg_keys.new(declared_params(include_missing: false))
@@ -296,13 +295,13 @@ module API
         success Entities::GPGKey
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         use :pagination
       end
-      get ':id/gpg_keys' do
+      get ':user_id/gpg_keys' do
         authenticated_as_admin!
 
-        user = User.find_by(id: params[:id])
+        user = find_user(params[:user_id])
         not_found!('User') unless user
 
         present paginate(user.gpg_keys), with: Entities::GPGKey
@@ -312,13 +311,13 @@ module API
         detail 'This feature was added in GitLab 10.0'
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         requires :key_id, type: Integer, desc: 'The ID of the GPG key'
       end
-      delete ':id/gpg_keys/:key_id' do
+      delete ':user_id/gpg_keys/:key_id' do
         authenticated_as_admin!
 
-        user = User.find_by(id: params[:id])
+        user = find_user(params[:user_id])
         not_found!('User') unless user
 
         key = user.gpg_keys.find_by(id: params[:key_id])
@@ -332,13 +331,13 @@ module API
         detail 'This feature was added in GitLab 10.0'
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         requires :key_id, type: Integer, desc: 'The ID of the GPG key'
       end
-      post ':id/gpg_keys/:key_id/revoke' do
+      post ':user_id/gpg_keys/:key_id/revoke' do
         authenticated_as_admin!
 
-        user = User.find_by(id: params[:id])
+        user = find_user(params[:user_id])
         not_found!('User') unless user
 
         key = user.gpg_keys.find_by(id: params[:key_id])
@@ -352,13 +351,13 @@ module API
         success Entities::Email
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         requires :email, type: String, desc: 'The email of the user'
       end
-      post ":id/emails" do
+      post ":user_id/emails" do
         authenticated_as_admin!
 
-        user = User.find_by(id: params.delete(:id))
+        user = find_user(params.delete(:user_id))
         not_found!('User') unless user
 
         email = Emails::CreateService.new(current_user, declared_params(include_missing: false).merge(user: user)).execute
@@ -374,12 +373,12 @@ module API
         success Entities::Email
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         use :pagination
       end
-      get ':id/emails' do
+      get ':user_id/emails' do
         authenticated_as_admin!
-        user = User.find_by(id: params[:id])
+        user = find_user(params[:user_id])
         not_found!('User') unless user
 
         present paginate(user.emails), with: Entities::Email
@@ -389,12 +388,12 @@ module API
         success Entities::Email
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         requires :email_id, type: Integer, desc: 'The ID of the email'
       end
-      delete ':id/emails/:email_id' do
+      delete ':user_id/emails/:email_id' do
         authenticated_as_admin!
-        user = User.find_by(id: params[:id])
+        user = find_user(params[:user_id])
         not_found!('User') unless user
 
         email = user.emails.find_by(id: params[:email_id])
@@ -409,15 +408,14 @@ module API
         success Entities::Email
       end
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
         optional :hard_delete, type: Boolean, desc: "Whether to remove a user's contributions"
       end
-      delete ":id" do
+      delete ":user_id" do
         Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42279')
-
         authenticated_as_admin!
 
-        user = User.find_by(id: params[:id])
+        user = find_user(params[:user_id])
         not_found!('User') unless user
 
         destroy_conditionally!(user) do
@@ -427,11 +425,11 @@ module API
 
       desc 'Block a user. Available only for admins.'
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
       end
-      post ':id/block' do
+      post ':user_id/block' do
         authenticated_as_admin!
-        user = User.find_by(id: params[:id])
+        user = find_user(params[:user_id])
         not_found!('User') unless user
 
         if !user.ldap_blocked?
@@ -443,11 +441,11 @@ module API
 
       desc 'Unblock a user. Available only for admins.'
       params do
-        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
       end
-      post ':id/unblock' do
+      post ':user_id/unblock' do
         authenticated_as_admin!
-        user = User.find_by(id: params[:id])
+        user = find_user(params[:user_id])
         not_found!('User') unless user
 
         if user.ldap_blocked?
@@ -458,7 +456,7 @@ module API
       end
 
       params do
-        requires :user_id, type: Integer, desc: 'The ID of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
       end
       segment ':user_id' do
         resource :impersonation_tokens do

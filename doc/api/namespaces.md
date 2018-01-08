@@ -32,6 +32,7 @@ Example response:
     "path": "user1",
     "kind": "user",
     "full_path": "user1"
+    "user_id": 3,
   },
   {
     "id": 2,
@@ -40,6 +41,7 @@ Example response:
     "kind": "group"
     "full_path": "group1",
     "parent_id": null,
+    "user_id": null,
     "members_count_with_descendants": 2,
     "plan": "bronze"
   },
@@ -50,6 +52,7 @@ Example response:
     "kind": "group",
     "full_path": "foo/bar",
     "parent_id": 9,
+    "user_id": null,
     "members_count_with_descendants": 5
   }
 ]
@@ -86,6 +89,7 @@ Example response:
     "kind": "group",
     "full_path": "twitter",
     "parent_id": null,
+    "user_id": null,
     "members_count_with_descendants": 2
   }
 ]
@@ -119,6 +123,7 @@ Example response:
   "kind": "group",
   "full_path": "group1",
   "parent_id": null,
+  "user_id": null,
   "members_count_with_descendants": 2
 }
 ```
@@ -139,6 +144,50 @@ Example response:
   "kind": "group",
   "full_path": "group1",
   "parent_id": null,
+  "user_id": null,
   "members_count_with_descendants": 2
 }
+```
+
+## Get projects of selected namespace's
+
+Get projects of namespace selected by ID.
+
+```
+GET /namespaces/:id/projects
+```
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id`      | integer/string | yes | ID or path of the namespace |
+
+Example request:
+
+```bash
+curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/namespaces/2/projects
+```
+
+Example response:
+
+```json
+[
+  {
+    "id":3,
+    "description":null,
+    "name":"project1",
+    "name_with_namespace":"group1 / project1",
+    "path":"project1",
+    "path_with_namespace":"group1/project1",
+    "created_at":"2018-01-09T00:12:50.460Z",
+    "default_branch":null,
+    "tag_list":[],
+    "ssh_url_to_repo":"git@gitlab.example.com:group1/project1.git",
+    "http_url_to_repo":"http://gitlab.example.com/group1/project1.git",
+    "web_url":"http://gitlab.example.com/group1/project1",
+    "avatar_url":null,
+    "star_count":0,
+    "forks_count":0,
+    "last_activity_at":"2018-01-09T00:12:50.460Z"
+  }
+]
 ```

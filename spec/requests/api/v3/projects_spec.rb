@@ -797,6 +797,7 @@ describe API::V3::Projects do
           'kind' => user.namespace.kind,
           'full_path' => user.namespace.full_path,
           'parent_id' => nil,
+          'user_id' => user.id,
           'plan' => nil
         })
       end
