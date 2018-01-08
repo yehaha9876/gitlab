@@ -2,7 +2,9 @@ class GeoNodeStatus < ActiveRecord::Base
   belongs_to :geo_node
 
   # Whether we were successful in reaching this node
-  attr_accessor :success, :health_status, :version, :revision
+  attr_accessor :success, :version, :revision
+  attr_writer :health_status
+  attr_accessor :storage_shards
 
   # Be sure to keep this consistent with Prometheus naming conventions
   PROMETHEUS_METRICS = {
@@ -10,12 +12,18 @@ class GeoNodeStatus < ActiveRecord::Base
     repositories_count: 'Total number of repositories available on primary',
     repositories_synced_count: 'Number of repositories synced on secondary',
     repositories_failed_count: 'Number of repositories failed to sync on secondary',
+    wikis_count: 'Total number of wikis available on primary',
+    wikis_synced_count: 'Number of wikis synced on secondary',
+    wikis_failed_count: 'Number of wikis failed to sync on secondary',
     lfs_objects_count: 'Total number of LFS objects available on primary',
     lfs_objects_synced_count: 'Number of LFS objects synced on secondary',
     lfs_objects_failed_count: 'Number of LFS objects failed to sync on secondary',
     attachments_count: 'Total number of file attachments available on primary',
     attachments_synced_count: 'Number of attachments synced on secondary',
     attachments_failed_count: 'Number of attachments failed to sync on secondary',
+    replication_slots_count: 'Total number of replication slots on the primary',
+    replication_slots_used_count: 'Number of replication slots in use on the primary',
+    replication_slots_max_retained_wal_bytes: 'Maximum number of bytes retained in the WAL on the primary',
     last_event_id: 'Database ID of the latest event log entry on the primary',
     last_event_timestamp: 'Time of the latest event log entry on the primary',
     cursor_last_event_id: 'Last database ID of the event log processed by the secondary',
@@ -42,12 +50,12 @@ class GeoNodeStatus < ActiveRecord::Base
   def self.from_json(json_data)
     json_data.slice!(*allowed_params)
 
-    GeoNodeStatus.new(json_data)
+    GeoNodeStatus.new(HashWithIndifferentAccess.new(json_data))
   end
 
   def self.allowed_params
     excluded_params = %w(id created_at updated_at).freeze
-    extra_params = %w(success health health_status last_event_timestamp cursor_last_event_timestamp version revision).freeze
+    extra_params = %w(success health health_status last_event_timestamp cursor_last_event_timestamp version revision storage_shards).freeze
     self.column_names - excluded_params + extra_params
   end
 
@@ -62,17 +70,27 @@ class GeoNodeStatus < ActiveRecord::Base
     latest_event = Geo::EventLog.latest_event
     self.last_event_id = latest_event&.id
     self.last_event_date = latest_event&.created_at
-    self.repositories_count = projects_finder.count_projects
+    self.repositories_count = projects_finder.count_repositories
+    self.wikis_count = projects_finder.count_wikis
     self.lfs_objects_count = lfs_objects_finder.count_lfs_objects
     self.attachments_count = attachments_finder.count_attachments
     self.last_successful_status_check_at = Time.now
+    self.storage_shards = StorageShard.all
+
+    if Gitlab::Geo.primary?
+      self.replication_slots_count = geo_node.replication_slots_count
+      self.replication_slots_used_count = geo_node.replication_slots_used_count
+      self.replication_slots_max_retained_wal_bytes = geo_node.replication_slots_max_retained_wal_bytes
+    end
 
     if Gitlab::Geo.secondary?
       self.db_replication_lag_seconds = Gitlab::Geo::HealthCheck.db_replication_lag_seconds
       self.cursor_last_event_id = Geo::EventLogState.last_processed&.event_id
       self.cursor_last_event_date = Geo::EventLog.find_by(id: self.cursor_last_event_id)&.created_at
-      self.repositories_synced_count = projects_finder.count_synced_project_registries
-      self.repositories_failed_count = projects_finder.count_failed_project_registries
+      self.repositories_synced_count = projects_finder.count_synced_repositories
+      self.repositories_failed_count = projects_finder.count_failed_repositories
+      self.wikis_synced_count = projects_finder.count_synced_wikis
+      self.wikis_failed_count = projects_finder.count_failed_wikis
       self.lfs_objects_synced_count = lfs_objects_finder.count_synced_lfs_objects
       self.lfs_objects_failed_count = lfs_objects_finder.count_failed_lfs_objects
       self.attachments_synced_count = attachments_finder.count_synced_attachments
@@ -117,15 +135,31 @@ class GeoNodeStatus < ActiveRecord::Base
   end
 
   def repositories_synced_in_percentage
-    sync_percentage(repositories_count, repositories_synced_count)
+    calc_percentage(repositories_count, repositories_synced_count)
+  end
+
+  def wikis_synced_in_percentage
+    calc_percentage(wikis_count, wikis_synced_count)
   end
 
   def lfs_objects_synced_in_percentage
-    sync_percentage(lfs_objects_count, lfs_objects_synced_count)
+    calc_percentage(lfs_objects_count, lfs_objects_synced_count)
   end
 
   def attachments_synced_in_percentage
-    sync_percentage(attachments_count, attachments_synced_count)
+    calc_percentage(attachments_count, attachments_synced_count)
+  end
+
+  def replication_slots_used_in_percentage
+    calc_percentage(replication_slots_count, replication_slots_used_count)
+  end
+
+  # This method only is useful when the storage shard information is loaded
+  # from a remote node via JSON.
+  def storage_shards_match?
+    return unless Gitlab::Geo.primary?
+
+    shards_match?(current_shards, primary_shards)
   end
 
   def [](key)
@@ -133,6 +167,26 @@ class GeoNodeStatus < ActiveRecord::Base
   end
 
   private
+
+  def current_shards
+    serialize_storage_shards(storage_shards)
+  end
+
+  def primary_shards
+    serialize_storage_shards(StorageShard.all)
+  end
+
+  def serialize_storage_shards(shards)
+    StorageShardSerializer.new.represent(shards).as_json
+  end
+
+  def shards_match?(first, second)
+    sort_by_name(first) == sort_by_name(second)
+  end
+
+  def sort_by_name(shards)
+    shards.sort_by { |shard| shard['name'] }
+  end
 
   def attachments_finder
     @attachments_finder ||= Geo::AttachmentRegistryFinder.new(current_node: geo_node)
@@ -146,9 +200,9 @@ class GeoNodeStatus < ActiveRecord::Base
     @projects_finder ||= Geo::ProjectRegistryFinder.new(current_node: geo_node)
   end
 
-  def sync_percentage(total, synced)
+  def calc_percentage(total, count)
     return 0 if !total.present? || total.zero?
 
-    (synced.to_f / total.to_f) * 100.0
+    (count.to_f / total.to_f) * 100.0
   end
 end

@@ -72,13 +72,20 @@ module API
     end
 
     def wiki_page
-      page = user_project.wiki.find_page(params[:slug])
+      page = ProjectWiki.new(user_project, current_user).find_page(params[:slug])
 
       page || not_found!('Wiki Page')
     end
 
-    def available_labels
-      @available_labels ||= LabelsFinder.new(current_user, project_id: user_project.id).execute
+    def available_labels_for(label_parent)
+      search_params =
+        if label_parent.is_a?(Project)
+          { project_id: label_parent.id }
+        else
+          { group_id: label_parent.id, only_group_labels: true }
+        end
+
+      LabelsFinder.new(current_user, search_params).execute
     end
 
     def find_user(id)
@@ -153,7 +160,9 @@ module API
     end
 
     def find_project_label(id)
-      label = available_labels.find_by_id(id) || available_labels.find_by_title(id)
+      labels = available_labels_for(user_project)
+      label = labels.find_by_id(id) || labels.find_by_title(id)
+
       label || not_found!('Label')
     end
 
@@ -456,6 +465,7 @@ module API
       warden.try(:authenticate) if verified_request?
     end
 
+    # rubocop:disable Gitlab/ModuleWithInstanceVariables
     def initial_current_user
       return @initial_current_user if defined?(@initial_current_user) # rubocop:disable Gitlab/ModuleWithInstanceVariables
 
@@ -465,6 +475,7 @@ module API
         unauthorized!
       end
     end
+    # rubocop:enable Gitlab/ModuleWithInstanceVariables
 
     def sudo!
       return unless sudo_identifier

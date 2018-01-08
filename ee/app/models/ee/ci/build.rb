@@ -10,15 +10,23 @@ module EE
       CODEQUALITY_FILE = 'codeclimate.json'.freeze
       SAST_FILE = 'gl-sast-report.json'.freeze
       PERFORMANCE_FILE = 'performance.json'.freeze
-      CLAIR_FILE = 'gl-sast-image-report.json'.freeze
+      SAST_CONTAINER_FILE = 'gl-sast-container-report.json'.freeze
+      DAST_FILE = 'gl-dast-report.json'.freeze
 
       included do
-        scope :codequality, ->() { where(name: %w[codequality codeclimate]) }
-        scope :performance, ->() { where(name: %w[performance deploy]) }
-        scope :sast, ->() { where(name: 'sast') }
-        scope :clair, ->() { where(name: 'sast:image') }
+        scope :codequality, -> { where(name: %w[codequality codeclimate]) }
+        scope :performance, -> { where(name: %w[performance deploy]) }
+        scope :sast, -> { where(name: 'sast') }
+        scope :sast_container, -> { where(name: 'sast:container') }
+        scope :dast, -> { where(name: 'dast') }
 
         after_save :stick_build_if_status_changed
+      end
+
+      class_methods do
+        def find_dast
+          dast.find(&:has_dast_json?)
+        end
       end
 
       def shared_runners_minutes_limit_enabled?
@@ -44,8 +52,12 @@ module EE
         has_artifact?(SAST_FILE)
       end
 
-      def has_clair_json?
-        has_artifact?(CLAIR_FILE)
+      def has_sast_container_json?
+        has_artifact?(SAST_CONTAINER_FILE)
+      end
+
+      def has_dast_json?
+        has_artifact?(DAST_FILE)
       end
 
       private

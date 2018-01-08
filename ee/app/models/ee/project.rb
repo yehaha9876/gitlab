@@ -9,8 +9,8 @@ module EE
 
     prepended do
       include Elastic::ProjectsSearch
-      prepend GeoAwareAvatar
       prepend ImportStatusStateMachine
+      include EE::DeploymentPlatform
 
       before_validation :mark_remote_mirrors_for_removal
 
@@ -67,9 +67,9 @@ module EE
         allow_destroy: true,
         reject_if: ->(attrs) { attrs[:id].blank? && attrs[:url].blank? }
 
-      with_options if: :mirror? do |project|
-        project.validates :import_url, presence: true
-        project.validates :mirror_user, presence: true
+      with_options if: :mirror? do
+        validates :import_url, presence: true
+        validates :mirror_user, presence: true
       end
     end
 
@@ -256,16 +256,6 @@ module EE
       end
     end
 
-    def deployment_platform(environment: nil)
-      return super unless environment && feature_available?(:multiple_clusters)
-
-      @deployment_platform ||= # rubocop:disable Gitlab/ModuleWithInstanceVariables
-        clusters.enabled.on_environment(environment.name)
-          .last&.platform_kubernetes
-
-      super # Wildcard or KubernetesService
-    end
-
     def secret_variables_for(ref:, environment: nil)
       return super.where(environment_scope: '*') unless
         environment && feature_available?(:variable_environment_scope)
@@ -358,7 +348,7 @@ module EE
       unless ::Gitlab::UrlSanitizer.valid?(value)
         self.import_url = value
         self.import_data&.user = nil
-        return value
+        value
       end
 
       url = ::Gitlab::UrlSanitizer.new(value)
@@ -419,11 +409,6 @@ module EE
     def remove_import_data
       super unless mirror?
     end
-
-    def merge_requests_rebase_enabled
-      super && feature_available?(:merge_request_rebase)
-    end
-    alias_method :merge_requests_rebase_enabled?, :merge_requests_rebase_enabled
 
     def merge_requests_ff_only_enabled
       super

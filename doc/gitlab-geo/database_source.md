@@ -34,7 +34,8 @@ recover. See below for more details.
 The following guide assumes that:
 
 - You are using PostgreSQL 9.6 or later
-  which includes the [`pg_basebackup` tool][pgback].
+  which includes the
+  [`pg_basebackup` tool][pgback] and improved [Foreign Data Wrapper][FDW] support. 
 - You have a primary node already set up (the GitLab server you are
   replicating from), running PostgreSQL 9.6 or later, and
   you have a new secondary server set up with the same versions of the OS,
@@ -58,10 +59,32 @@ The following guide assumes that:
     bundle exec rake geo:set_primary_node
     ```
 
-1. Create a [replication user](https://wiki.postgresql.org/wiki/Streaming_Replication) named `gitlab_replicator`:
+1. Create a [replication user] named `gitlab_replicator`:
 
     ```bash
     sudo -u postgres psql -c "CREATE USER gitlab_replicator REPLICATION ENCRYPTED PASSWORD 'thepassword';"
+    ```
+    
+1. Make sure your the `gitlab` database user has a password defined
+
+    ```bash
+    sudo -u postgres psql -d template1 -c "ALTER USER gitlab WITH ENCRYPTED PASSWORD 'mydatabasepassword';"
+    ```
+    
+1. Edit the content of `database.yml` in `production:` and add the password like the exemple below:
+
+    ```yaml
+    #
+    # PRODUCTION
+    #
+    production:
+      adapter: postgresql
+      encoding: unicode
+      database: gitlabhq_production
+      pool: 10
+      username: gitlab
+      password: mydatabasepassword
+      host: /var/opt/gitlab/geo-postgresql
     ```
 
 1. Set up TLS support for the PostgreSQL primary server
@@ -166,7 +189,7 @@ The following guide assumes that:
 
 1. Create the replication slot on the primary:
 
-    ```
+    ```bash
     $ sudo -u postgres psql -c "SELECT * FROM pg_create_physical_replication_slot('secondary_example');"
       slot_name         | xlog_position
       ------------------+---------------
@@ -177,23 +200,6 @@ The following guide assumes that:
 1. Now that the PostgreSQL server is set up to accept remote connections, run
    `netstat -plnt` to make sure that PostgreSQL is listening to the server's
    public IP.
-
-1. Verify that clock synchronization is enabled.
-
-    >**Important:**
-    For Geo to work correctly, all nodes must have their clocks
-    synchronized. It is not required for all nodes to be set to the same time
-    zone, but when the respective times are converted to UTC time, the clocks
-    must be synchronized to within 60 seconds of each other.
-
-    Verify NTP sync is enabled, using:
-
-    ```bash
-    timedatectl status | grep 'NTP synchronized'
-    ```
-
-    Refer to your Linux distribution documentation to setup clock
-    synchronization. This can easily be done using any NTP-compatible daemon.
 
 ### Step 2. Add the secondary GitLab node
 
@@ -219,12 +225,6 @@ the primary's database" step, continue here:
     ```
 
 1. Restart PostgreSQL for the changes to take effect.
-
-1. Verify that clock synchronization is enabled, using:
-
-    ```bash
-    timedatectl status | grep 'NTP synchronized'
-    ```
 
 #### Enable tracking database on the secondary server
 
@@ -264,6 +264,33 @@ node.
     bundle exec rake geo:db:migrate
     ```
 
+1. Configure the [PostgreSQL FDW][FDW] connection and credentials:
+
+    Save the script below in a file, ex. `/tmp/geo_fdw.sh` and modify the connection
+    params to match your environment.
+    
+    ```bash
+    #!/bin/bash
+ 
+    # Secondary Database connection params:
+    DB_HOST="/var/opt/gitlab/postgresql"
+    DB_NAME="gitlabhq_production"
+    DB_USER="gitlab"
+    DB_PORT="5432"
+    
+    # Tracking Database connection params:
+    GEO_DB_HOST="/var/opt/gitlab/geo-postgresql"
+    GEO_DB_NAME="gitlabhq_geo_production"
+    GEO_DB_USER="gitlab_geo"
+    GEO_DB_PORT="5432"
+ 
+    sudo -u postgres psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "CREATE EXTENSION postgres_fdw;"
+    sudo -u postgres psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "CREATE SERVER gitlab_secondary FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host '$(DB_HOST)', dbname '$(DB_NAME)', port '$(DB_PORT)' );"
+    sudo -u postgres psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "CREATE USER MAPPING FOR $(GEO_DB_USER) SERVER gitlab_secondary OPTIONS (user '$(DB_USER)');"
+    sudo -u postgres psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "CREATE SCHEMA gitlab_secondary;"
+    sudo -u postgres psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "GRANT USAGE ON FOREIGN SERVER gitlab_secondary TO $(GEO_DB_USER);"
+    ```
+
 ### Step 4. Initiate the replication process
 
 Below we provide a script that connects the database on the secondary node to
@@ -279,7 +306,7 @@ data before running `pg_basebackup`.
 
 1. SSH into your GitLab **secondary** server and login as root:
 
-    ```
+    ```bash
     sudo -i
     ```
 
@@ -333,7 +360,7 @@ data before running `pg_basebackup`.
 
 1. Run it with:
 
-    ```
+    ```bash
     bash /tmp/replica.sh
     ```
 
@@ -361,4 +388,6 @@ MySQL replication is not supported for GitLab Geo.
 Read the [troubleshooting document](troubleshooting.md).
 
 [pgback]: http://www.postgresql.org/docs/9.6/static/app-pgbasebackup.html
+[replication user]:https://wiki.postgresql.org/wiki/Streaming_Replication
+[FDW]: https://www.postgresql.org/docs/9.6/static/postgres-fdw.html
 [toc]: README.md#using-gitlab-installed-from-source

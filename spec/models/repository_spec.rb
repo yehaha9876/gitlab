@@ -582,38 +582,6 @@ describe Repository do
     end
   end
 
-  describe '#get_committer_and_author' do
-    it 'returns the committer and author data' do
-      options = repository.get_committer_and_author(user)
-      expect(options[:committer][:email]).to eq(user.email)
-      expect(options[:author][:email]).to eq(user.email)
-    end
-
-    context 'when the email/name are given' do
-      it 'returns an object containing the email/name' do
-        options = repository.get_committer_and_author(user, email: author_email, name: author_name)
-        expect(options[:author][:email]).to eq(author_email)
-        expect(options[:author][:name]).to eq(author_name)
-      end
-    end
-
-    context 'when the email is given but the name is not' do
-      it 'returns the committer as the author' do
-        options = repository.get_committer_and_author(user, email: author_email)
-        expect(options[:author][:email]).to eq(user.email)
-        expect(options[:author][:name]).to eq(user.name)
-      end
-    end
-
-    context 'when the name is given but the email is not' do
-      it 'returns nil' do
-        options = repository.get_committer_and_author(user, name: author_name)
-        expect(options[:author][:email]).to eq(user.email)
-        expect(options[:author][:name]).to eq(user.name)
-      end
-    end
-  end
-
   describe "search_files_by_content" do
     let(:results) { repository.search_files_by_content('feature', 'master') }
     subject { results }
@@ -1061,7 +1029,7 @@ describe Repository do
 
       it 'runs without errors' do
         # old_rev is an ancestor of new_rev
-        expect(repository.rugged.merge_base(old_rev, new_rev)).to eq(old_rev)
+        expect(repository.merge_base(old_rev, new_rev)).to eq(old_rev)
 
         # old_rev is not a direct ancestor (parent) of new_rev
         expect(repository.rugged.lookup(new_rev).parent_ids).not_to include(old_rev)
@@ -1083,7 +1051,7 @@ describe Repository do
 
       it 'raises an exception' do
         # The 'master' branch is NOT an ancestor of new_rev.
-        expect(repository.rugged.merge_base(old_rev, new_rev)).not_to eq(old_rev)
+        expect(repository.merge_base(old_rev, new_rev)).not_to eq(old_rev)
 
         # Updating 'master' to new_rev would lose the commits on 'master' that
         # are not contained in new_rev. This should not be allowed.
@@ -1112,15 +1080,15 @@ describe Repository do
         allow_any_instance_of(Gitlab::Git::Hook).to receive(:trigger).and_return([true, ''])
       end
 
-      it 'expires branch cache' do
-        expect(repository).not_to receive(:expire_exists_cache)
-        expect(repository).not_to receive(:expire_root_ref_cache)
-        expect(repository).not_to receive(:expire_emptiness_caches)
-        expect(repository).to     receive(:expire_branches_cache)
-
-        repository.with_branch(user, 'new-feature') do
+      subject do
+        Gitlab::Git::OperationService.new(git_user, repository.raw_repository).with_branch('new-feature') do
           new_rev
         end
+      end
+
+      it 'returns branch_created as true' do
+        expect(subject).not_to be_repo_created
+        expect(subject).to     be_branch_created
       end
     end
 
@@ -1208,6 +1176,15 @@ describe Repository do
 
       expect(repository.branch_exists?('foobar')).to eq(true)
       expect(repository.branch_exists?('master')).to eq(false)
+    end
+  end
+
+  describe '#tag_exists?' do
+    it 'uses tag_names' do
+      allow(repository).to receive(:tag_names).and_return(['foobar'])
+
+      expect(repository.tag_exists?('foobar')).to eq(true)
+      expect(repository.tag_exists?('master')).to eq(false)
     end
   end
 
@@ -2012,23 +1989,6 @@ describe Repository do
 
       File.delete(path)
     end
-
-    it "attempting to call keep_around when exists a lock does not fail" do
-      ref = repository.send(:keep_around_ref_name, sample_commit.id)
-      path = File.join(repository.path, ref)
-      lock_path = "#{path}.lock"
-
-      FileUtils.mkdir_p(File.dirname(path))
-      File.open(lock_path, 'w') { |f| f.write('') }
-
-      begin
-        expect { repository.keep_around(sample_commit.id) }.not_to raise_error(Gitlab::Git::Repository::GitError)
-
-        expect(File.exist?(lock_path)).to be_falsey
-      ensure
-        File.delete(path)
-      end
-    end
   end
 
   describe '#update_ref' do
@@ -2226,24 +2186,6 @@ describe Repository do
     end
   end
 
-  describe '#push_remote_branches' do
-    it 'push branches to the remote repo' do
-      expect_any_instance_of(Gitlab::Shell).to receive(:push_remote_branches)
-        .with(repository.repository_storage_path, repository.disk_path, 'remote_name', ['branch'])
-
-      repository.push_remote_branches('remote_name', ['branch'])
-    end
-  end
-
-  describe '#delete_remote_branches' do
-    it 'delete branches to the remote repo' do
-      expect_any_instance_of(Gitlab::Shell).to receive(:delete_remote_branches)
-        .with(repository.repository_storage_path, repository.disk_path, 'remote_name', ['branch'])
-
-      repository.delete_remote_branches('remote_name', ['branch'])
-    end
-  end
-
   describe '#local_branches' do
     it 'returns the local branches' do
       masterrev = repository.find_branch('master').dereferenced_target
@@ -2313,6 +2255,15 @@ describe Repository do
       it 'returns the same count as #commit_count' do
         expect(repository.commit_count_for_ref(repository.root_ref)).to eq(repository.commit_count)
       end
+    end
+  end
+
+  describe '#diverging_commit_counts' do
+    it 'returns the commit counts behind and ahead of default branch' do
+      result = repository.diverging_commit_counts(
+        repository.find_branch('fix'))
+
+      expect(result).to eq(behind: 29, ahead: 2)
     end
   end
 

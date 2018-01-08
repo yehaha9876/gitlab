@@ -65,6 +65,25 @@ describe MergeRequest do
     end
   end
 
+  describe 'callbacks' do
+    describe '#ensure_merge_request_metrics' do
+      it 'creates metrics after saving' do
+        merge_request = create(:merge_request)
+
+        expect(merge_request.metrics).to be_persisted
+        expect(MergeRequest::Metrics.count).to eq(1)
+      end
+
+      it 'does not duplicate metrics for a merge request' do
+        merge_request = create(:merge_request)
+
+        merge_request.mark_as_merged!
+
+        expect(MergeRequest::Metrics.count).to eq(1)
+      end
+    end
+  end
+
   describe 'respond to' do
     it { is_expected.to respond_to(:unchecked?) }
     it { is_expected.to respond_to(:can_be_merged?) }
@@ -195,7 +214,7 @@ describe MergeRequest do
 
   describe '#cache_merge_request_closes_issues!' do
     before do
-      subject.project.team << [subject.author, :developer]
+      subject.project.add_developer(subject.author)
       subject.target_branch = subject.project.default_branch
     end
 
@@ -482,7 +501,7 @@ describe MergeRequest do
     let(:commit2) { double('commit2', safe_message: "Fixes #{issue1.to_reference}") }
 
     before do
-      subject.project.team << [subject.author, :developer]
+      subject.project.add_developer(subject.author)
       allow(subject).to receive(:commits).and_return([commit0, commit1, commit2])
     end
 
@@ -510,7 +529,7 @@ describe MergeRequest do
     let(:commit) { double('commit', safe_message: "Fixes #{closing_issue.to_reference}") }
 
     it 'detects issues mentioned in description but not closed' do
-      subject.project.team << [subject.author, :developer]
+      subject.project.add_developer(subject.author)
       subject.description = "Is related to #{mentioned_issue.to_reference} and #{closing_issue.to_reference}"
 
       allow(subject).to receive(:commits).and_return([commit])
@@ -522,7 +541,7 @@ describe MergeRequest do
 
     context 'when the project has an external issue tracker' do
       before do
-        subject.project.team << [subject.author, :developer]
+        subject.project.add_developer(subject.author)
         commit = double(:commit, safe_message: 'Fixes TEST-3')
 
         create(:jira_service, project: subject.project)
@@ -692,8 +711,8 @@ describe MergeRequest do
     it "excludes blocked users" do
       developer = create(:user)
       blocked_developer = create(:user).tap { |u| u.block! }
-      project.team << [developer, :developer]
-      project.team << [blocked_developer, :developer]
+      project.add_developer(developer)
+      project.add_developer(blocked_developer)
 
       expect(merge_request.reload.number_of_potential_approvers).to eq(2)
     end
@@ -869,7 +888,7 @@ describe MergeRequest do
     it 'includes its closed issues in the body' do
       issue = create(:issue, project: subject.project)
 
-      subject.project.team << [subject.author, :developer]
+      subject.project.add_developer(subject.author)
       subject.description = "This issue Closes #{issue.to_reference}"
 
       allow(subject.project).to receive(:default_branch)
@@ -1348,7 +1367,7 @@ describe MergeRequest do
         allow(subject).to receive(:mergeable_state?).and_return(true)
 
         subject.target_project.update_attributes(approvals_before_merge: 1)
-        project.team << [user, :developer]
+        project.add_developer(user)
       end
 
       it 'return false if not approved' do
@@ -1741,11 +1760,11 @@ describe MergeRequest do
       let(:stranger) { create(:user) }
 
       before do
-        project.team << [author, :developer]
-        project.team << [approver, :developer]
-        project.team << [approver_2, :developer]
-        project.team << [developer, :developer]
-        project.team << [reporter, :reporter]
+        project.add_developer(author)
+        project.add_developer(approver)
+        project.add_developer(approver_2)
+        project.add_developer(developer)
+        project.add_reporter(reporter)
       end
 
       context 'when there is one approver required' do
@@ -2115,7 +2134,7 @@ describe MergeRequest do
     let(:mr_sha)        { merge_request.diff_head_sha }
 
     before do
-      project.team << [developer, :developer]
+      project.add_developer(developer)
     end
 
     context 'when autocomplete_precheck is set to true' do
@@ -2325,6 +2344,52 @@ describe MergeRequest do
         expect(subject.head_pipeline).to eq(pipeline)
         expect(subject.merge_jid).to be_nil
       end
+    end
+  end
+
+  describe '#should_be_rebased?' do
+    let(:project) { create(:project, :repository) }
+
+    it 'returns false for the same source and target branches' do
+      merge_request = create(:merge_request, source_project: project, target_project: project)
+
+      expect(merge_request.should_be_rebased?).to be_falsey
+    end
+  end
+
+  describe '#rebase_in_progress?' do
+    # Create merge request and project before we stub file calls
+    before do
+      subject
+    end
+
+    it 'returns true when there is a current rebase directory' do
+      allow(File).to receive(:exist?).and_return(true)
+      allow(File).to receive(:mtime).and_return(Time.now)
+
+      expect(subject.rebase_in_progress?).to be_truthy
+    end
+
+    it 'returns false when there is no rebase directory' do
+      allow(File).to receive(:exist?).and_return(false)
+
+      expect(subject.rebase_in_progress?).to be_falsey
+    end
+
+    it 'returns false when the rebase directory has expired' do
+      allow(File).to receive(:exist?).and_return(true)
+      allow(File).to receive(:mtime).and_return(20.minutes.ago)
+
+      expect(subject.rebase_in_progress?).to be_falsey
+    end
+
+    it 'returns false when the source project has been removed' do
+      allow(subject).to receive(:source_project).and_return(nil)
+      allow(File).to receive(:exist?).and_return(true)
+      allow(File).to receive(:mtime).and_return(Time.now)
+
+      expect(File).not_to have_received(:exist?)
+      expect(subject.rebase_in_progress?).to be_falsey
     end
   end
 end

@@ -9,6 +9,8 @@ import mockData, {
   parsedSecurityIssuesStore,
   dockerReport,
   dockerReportParsed,
+  dast,
+  parsedDast,
 } from '../mock_data';
 
 describe('MergeRequestStore', () => {
@@ -62,6 +64,18 @@ describe('MergeRequestStore', () => {
         expect(store.isPipelineSkipped).toBe(false);
       });
     });
+
+    describe('isNothingToMergeState', () => {
+      it('returns true when nothingToMerge', () => {
+        store.state = stateKey.nothingToMerge;
+        expect(store.isNothingToMergeState).toEqual(true);
+      });
+
+      it('returns false when not nothingToMerge', () => {
+        store.state = 'state';
+        expect(store.isNothingToMergeState).toEqual(false);
+      });
+    });
   });
 
   describe('compareCodeclimateMetrics', () => {
@@ -113,9 +127,9 @@ describe('MergeRequestStore', () => {
 
   describe('initDockerReport', () => {
     it('sets the defaults', () => {
-      store.initDockerReport({ clair: { path: 'clair.json' } });
+      store.initDockerReport({ sast_container: { path: 'gl-sast-container.json' } });
 
-      expect(store.clair).toEqual({ path: 'clair.json' });
+      expect(store.sastContainer).toEqual({ path: 'gl-sast-container.json' });
       expect(store.dockerReport).toEqual({
         approved: [],
         unapproved: [],
@@ -155,6 +169,23 @@ describe('MergeRequestStore', () => {
       ).toEqual(
         dockerReportParsed.vulnerabilities,
       );
+    });
+  });
+
+  describe('initDastReport', () => {
+    it('sets the defaults', () => {
+      store.initDastReport({ dast: { path: 'dast.json' } });
+
+      expect(store.dast).toEqual({ path: 'dast.json' });
+      expect(store.dastReport).toEqual([]);
+    });
+  });
+
+  describe('setDastReport', () => {
+    it('parsed data and sets the report', () => {
+      store.setDastReport(dast);
+
+      expect(store.dastReport).toEqual(parsedDast);
     });
   });
 });

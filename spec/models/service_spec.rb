@@ -58,7 +58,7 @@ describe Service do
   end
 
   describe "Available services" do
-    it { expect(described_class.available_services_names).to  include("jenkins", "jira")}
+    it { expect(described_class.available_services_names).to include("jenkins", "jira") }
   end
 
   describe "Template" do
@@ -256,6 +256,32 @@ describe Service do
           service.update_attributes(active: false)
         end.to change { service.project.has_external_issue_tracker }.from(true).to(false)
       end
+    end
+  end
+
+  describe "#deprecated?" do
+    let(:project) { create(:project, :repository) }
+
+    it 'should return false by default' do
+      service = create(:service, project: project)
+      expect(service.deprecated?).to be_falsy
+    end
+  end
+
+  describe "#deprecation_message" do
+    let(:project) { create(:project, :repository) }
+
+    it 'should be empty by default' do
+      service = create(:service, project: project)
+      expect(service.deprecation_message).to be_nil
+    end
+  end
+
+  describe '.find_by_template' do
+    let!(:kubernetes_service) { create(:kubernetes_service, template: true) }
+
+    it 'returns service template' do
+      expect(KubernetesService.find_by_template).to eq(kubernetes_service)
     end
   end
 end

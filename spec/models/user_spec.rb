@@ -12,6 +12,7 @@ describe User do
     it { is_expected.to include_module(Referable) }
     it { is_expected.to include_module(Sortable) }
     it { is_expected.to include_module(TokenAuthenticatable) }
+    it { is_expected.to include_module(BlocksJsonSerialization) }
   end
 
   describe 'delegations' do
@@ -25,7 +26,9 @@ describe User do
   describe 'associations' do
     it { is_expected.to have_one(:namespace) }
     it { is_expected.to have_many(:snippets).dependent(:destroy) }
-    it { is_expected.to have_many(:project_members).dependent(:destroy) }
+    it { is_expected.to have_many(:members) }
+    it { is_expected.to have_many(:project_members) }
+    it { is_expected.to have_many(:group_members) }
     it { is_expected.to have_many(:groups) }
     it { is_expected.to have_many(:keys).dependent(:destroy) }
     it { is_expected.to have_many(:deploy_keys).dependent(:destroy) }
@@ -140,6 +143,16 @@ describe User do
           expect(user.errors.messages[:username].first).to match('cannot be changed if a personal project has container registry tags')
         end
       end
+    end
+
+    it 'has a DB-level NOT NULL constraint on projects_limit' do
+      user = create(:user)
+
+      expect(user.persisted?).to eq(true)
+
+      expect do
+        user.update_columns(projects_limit: nil)
+      end.to raise_error(ActiveRecord::StatementInvalid)
     end
 
     it { is_expected.to validate_presence_of(:projects_limit) }
@@ -787,7 +800,7 @@ describe User do
 
     before do
       # add user to project
-      project.team << [user, :master]
+      project.add_master(user)
 
       # create invite to projet
       create(:project_member, :developer, project: project, invite_token: '1234', invite_email: 'inviteduser1@example.com')
@@ -831,6 +844,13 @@ describe User do
         expect(user.projects_limit).to eq(123)
         expect(user.can_create_group).to be_falsey
         expect(user.theme_id).to eq(1)
+      end
+
+      it 'does not undo projects_limit setting if it matches old DB default of 10' do
+        # If the real default project limit is 10 then this test is worthless
+        expect(Gitlab.config.gitlab.default_projects_limit).not_to eq(10)
+        user = described_class.new(projects_limit: 10)
+        expect(user.projects_limit).to eq(10)
       end
     end
 
@@ -1190,26 +1210,6 @@ describe User do
         expect(user.avatar_url).to eq(user.avatar.url)
         expect(user.avatar_url(only_path: false)).to eq([Gitlab.config.gitlab.url, user.avatar.url].join)
       end
-
-      context 'when in a geo secondary node' do
-        let(:avatar_path) { user.avatar_path(only_path: true) }
-        let(:geo_host) { 'http://geo.example.com' }
-        let(:geo_avatar_url) { [geo_host, avatar_path].join }
-
-        before do
-          allow(Gitlab::Geo).to receive(:secondary?) { true }
-          allow(Gitlab::Geo).to receive_message_chain(:primary_node, :url) { geo_host }
-        end
-
-        it 'shows correct avatar url' do
-          expect(user.avatar_url).to eq(geo_avatar_url)
-          expect(user.avatar_url(only_path: false)).to eq(geo_avatar_url)
-
-          allow(ActionController::Base).to receive(:asset_host).and_return(geo_host)
-
-          expect(user.avatar_url).to eq(geo_avatar_url)
-        end
-      end
     end
   end
 
@@ -1516,8 +1516,8 @@ describe User do
     let!(:merge_event) { create(:event, :created, project: project3, target: merge_request, author: subject) }
 
     before do
-      project1.team << [subject, :master]
-      project2.team << [subject, :master]
+      project1.add_master(subject)
+      project2.add_master(subject)
     end
 
     it "includes IDs for projects the user has pushed to" do
@@ -1616,7 +1616,7 @@ describe User do
         user = create(:user)
         project = create(:project, :private)
 
-        project.team << [user, Gitlab::Access::MASTER]
+        project.add_master(user)
 
         expect(user.authorized_projects(Gitlab::Access::REPORTER))
           .to contain_exactly(project)
@@ -1635,7 +1635,7 @@ describe User do
       user2   = create(:user)
       project = create(:project, :private, namespace: user1.namespace)
 
-      project.team << [user2, Gitlab::Access::DEVELOPER]
+      project.add_developer(user2)
 
       expect(user2.authorized_projects).to include(project)
     end
@@ -1680,7 +1680,7 @@ describe User do
       user2   = create(:user)
       project = create(:project, :private, namespace: user1.namespace)
 
-      project.team << [user2, Gitlab::Access::DEVELOPER]
+      project.add_developer(user2)
 
       expect(user2.authorized_projects).to include(project)
 
@@ -1770,7 +1770,7 @@ describe User do
     shared_examples :member do
       context 'when the user is a master' do
         before do
-          add_user(Gitlab::Access::MASTER)
+          add_user(:master)
         end
 
         it 'loads' do
@@ -1780,7 +1780,7 @@ describe User do
 
       context 'when the user is a developer' do
         before do
-          add_user(Gitlab::Access::DEVELOPER)
+          add_user(:developer)
         end
 
         it 'does not load' do
@@ -1804,7 +1804,7 @@ describe User do
       let(:project) { create(:project) }
 
       def add_user(access)
-        project.team << [user, access]
+        project.add_role(user, access)
       end
 
       it_behaves_like :member
@@ -1817,8 +1817,8 @@ describe User do
     let(:user) { create(:user) }
 
     before do
-      project1.team << [user, :reporter]
-      project2.team << [user, :guest]
+      project1.add_reporter(user)
+      project2.add_guest(user)
     end
 
     it 'returns the projects when using a single project ID' do
@@ -1960,8 +1960,8 @@ describe User do
     let(:user) { create(:user) }
 
     before do
-      project1.team << [user, :reporter]
-      project2.team << [user, :guest]
+      project1.add_reporter(user)
+      project2.add_guest(user)
 
       user.project_authorizations.delete_all
       user.refresh_authorized_projects
