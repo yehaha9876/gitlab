@@ -64,8 +64,12 @@ module ContainerTag
   end
 
   def delete
-    return unless digest
+    destroy
 
-    client.delete_repository_tag(repository.path, digest)
+    if digest
+      client.delete_repository_tag(repository.path, digest)
+    end
+
+    true
   end
 end
