@@ -57,12 +57,6 @@ module ContainerTag
     end
   end
 
-  def total_size
-    return unless layers
-
-    layers.map(&:size).sum if v2?
-  end
-
   def delete
     destroy
 

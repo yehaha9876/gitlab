@@ -12,5 +12,11 @@ module ContainerRegistry
     def valid?
       manifest.present?
     end
+
+    def total_size
+      return unless layers
+
+      layers.map(&:size).sum if v2?
+    end
   end
 end
