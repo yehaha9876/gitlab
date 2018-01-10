@@ -20,8 +20,25 @@ module ContainerRegistry
       if manifest_push?(event)
         repository = repository(event)
         tag = repository.container_tags.find_or_create_by(name: event['target']['tag'])
-        tag.versions.find_or_create_by(digest: event['target']['digest'])
+
+        tag_info = get_tag_info(repository, event['target']['digest'])
+
+        tag.versions.find_or_create_by(
+          digest: tag_info[:revision],
+          size: tag_info[:size],
+          layers: tag_info[:layers_count]
+        )
       end
+    end
+
+    def get_tag_info(repository, name)
+      @tag ||= ContainerRegistry::Tag.new(repository, name)
+
+      {
+        revision: @tag.revision,
+        size: @tag.total_size,
+        layers_count: @tag.layers.size
+      }
     end
 
     def manifest_push?(event)

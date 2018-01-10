@@ -10,8 +10,13 @@ class ContainerRepositoryTag < ActiveRecord::Base
   validates :name, uniqueness: { scope: :container_repository_id }
 
   delegate :client, to: :repository
+  delegate :revision, :short_revision, to: :config_blob, allow_nil: true
 
   def total_size
     versions.last.size
+  end
+
+  def digest
+    versions.last.digest
   end
 end

@@ -1,8 +1,6 @@
 module ContainerTag
   extend ActiveSupport::Concern
 
-  delegate :revision, :short_revision, to: :config_blob, allow_nil: true
-
   def v1?
     manifest && manifest['schemaVersion'] == 1
   end
@@ -58,12 +56,10 @@ module ContainerTag
   end
 
   def delete
-    destroy
-
     if digest
       client.delete_repository_tag(repository.path, digest)
     end
 
-    true
+    destroy
   end
 end
