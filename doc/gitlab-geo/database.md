@@ -305,11 +305,13 @@ because we have not yet configured the secondary server. This is the next step.
     connections. The certificate can only be replicated by someone with access
     to the private key, which is **only** present on the primary node.
 
-1. Configure PostgreSQL to listen on network interfaces on secondary
+1. Configure PostgreSQL to listen on network interfaces to enable PostgreSQL
+   Foreign Data Wrapper (FDW) support on the secondary
 
-    This step is similar to how we configured the primary instance.
-    We need to enable this, even if using a single node, to enable FDW support.
-    
+    Refer to the [PostgreSQL listen
+    step](database.md#step-1-configure-the-primary-server) above for more
+    detail about selecting the correct IP addresses.
+
     Edit `/etc/gitlab/gitlab.rb` and add the following, replacing the IP
     addresses with addresses appropriate to your network configuration:
     
