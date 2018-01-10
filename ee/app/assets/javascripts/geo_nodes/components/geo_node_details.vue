@@ -47,12 +47,17 @@ export default {
           itemValueType: VALUE_TYPE.GRAPH,
         },
         {
-          itemTitle: s__('GeoNodes|LFS objects:'),
+          itemTitle: s__('GeoNodes|Local LFS objects:'),
           itemValue: this.nodeDetails.lfs,
           itemValueType: VALUE_TYPE.GRAPH,
         },
         {
-          itemTitle: s__('GeoNodes|Attachments:'),
+          itemTitle: s__('GeoNodes|Local job artifacts:'),
+          itemValue: this.nodeDetails.jobArtifacts,
+          itemValueType: VALUE_TYPE.GRAPH,
+        },
+        {
+          itemTitle: s__('GeoNodes|Local attachments:'),
           itemValue: this.nodeDetails.attachments,
           itemValueType: VALUE_TYPE.GRAPH,
         },
