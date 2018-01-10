@@ -75,7 +75,6 @@ import initIssuableSidebar from './init_issuable_sidebar';
 import initProjectVisibilitySelector from './project_visibility';
 import GpgBadges from './gpg_badges';
 import initChangesDropdown from './init_changes_dropdown';
-import NewGroupChild from './groups/new_group_child';
 import AbuseReports from './abuse_reports';
 import { ajaxGet, convertPermissionToBoolean } from './lib/utils/common_utils';
 import AjaxLoadingSpinner from './ajax_loading_spinner';
@@ -123,6 +122,10 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
       }
 
       const fail = () => Flash('Error loading dynamic module');
+      const callDefault = m => m.default();
+      function rethrow(err) {
+        throw err;
+      }
 
       path = page.split(':');
       shortcut_handler = null;
@@ -232,12 +235,14 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           initLegacyFilters();
           break;
         case 'groups:issues':
+          import('./pages/groups/issues')
+            .then(callDefault, fail)
+            .catch(rethrow);
+          break;
         case 'groups:merge_requests':
-          if (filteredSearchEnabled) {
-            const filteredSearchManager = new gl.FilteredSearchManager(page === 'groups:issues' ? 'issues' : 'merge_requests');
-            filteredSearchManager.setup();
-          }
-          projectSelect();
+          import('./pages/groups/merge_requests')
+            .then(callDefault, fail)
+            .catch(rethrow);
           break;
         case 'dashboard:todos:index':
           new Todos();
@@ -453,23 +458,19 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           });
           break;
         case 'groups:activity':
-          new Activities();
+          import('./pages/groups/activity')
+            .then(callDefault, fail)
+            .catch(rethrow);
           break;
         case 'groups:show':
-          const newGroupChildWrapper = document.querySelector('.js-new-project-subgroup');
-          shortcut_handler = new ShortcutsNavigation();
-          new NotificationsForm();
-          notificationsDropdown();
-          new ProjectsList();
-
-          if (newGroupChildWrapper) {
-            new NewGroupChild(newGroupChildWrapper);
-          }
+          import('./pages/groups/show')
+            .then(callDefault, fail)
+            .catch(rethrow);
           break;
         case 'groups:group_members:index':
-          memberExpirationDate();
-          new Members();
-          new UsersSelect();
+          import('./pages/groups/group_members/index')
+            .then(callDefault, fail)
+            .catch(rethrow);
           break;
         case 'projects:project_members:index':
           memberExpirationDate('.js-access-expiration-date-groups');
@@ -479,14 +480,26 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           new UsersSelect();
           break;
         case 'groups:new':
-        case 'admin:groups:new':
+          import('./pages/groups/new')
+            .then(callDefault, fail)
+            .catch(rethrow);
+          break;
         case 'groups:create':
+          import('./pages/groups/create')
+            .then(callDefault, fail)
+            .catch(rethrow);
+          break;
+        case 'admin:groups:new':
         case 'admin:groups:create':
           BindInOut.initAll();
           new Group();
           groupAvatar();
           break;
         case 'groups:edit':
+          import('./pages/groups/edit')
+            .then(callDefault, fail)
+            .catch(rethrow);
+          break;
         case 'admin:groups:edit':
           groupAvatar();
           break;
@@ -525,12 +538,24 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           initBlob();
           break;
         case 'groups:labels:new':
+          import('./pages/groups/labels/new')
+            .then(callDefault, fail)
+            .catch(rethrow);
+          break;
         case 'groups:labels:edit':
+          import('./pages/groups/labels/edit')
+            .then(callDefault, fail)
+            .catch(rethrow);
+          break;
         case 'projects:labels:new':
         case 'projects:labels:edit':
           new Labels();
           break;
         case 'groups:labels:index':
+          import('./pages/groups/labels/index')
+            .then(callDefault, fail)
+            .catch(rethrow);
+          break;
         case 'projects:labels:index':
           if ($('.prioritized-labels').length) {
             new LabelManager();
@@ -596,11 +621,9 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
             runnerTokenSecretValue.init();
           }
         case 'groups:settings:ci_cd:show':
-          const secretVariableTable = document.querySelector('.js-secret-variable-table');
-          if (secretVariableTable) {
-            const secretVariableTableValues = new SecretValues(secretVariableTable);
-            secretVariableTableValues.init();
-          }
+          import('./pages/groups/settings/ci_cd/show')
+            .then(callDefault, fail)
+            .catch(rethrow);
           break;
         case 'ci:lints:create':
         case 'ci:lints:show':
