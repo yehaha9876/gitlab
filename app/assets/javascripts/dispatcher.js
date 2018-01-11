@@ -365,18 +365,10 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           new GLForm($('.release-form'), true);
           break;
         case 'projects:merge_requests:show':
-          new Diff();
-          new ZenMode();
-
-          initIssuableSidebar();
-          initNotes();
-
-          const mrShowNode = document.querySelector('.merge-request');
-          window.mergeRequest = new MergeRequest({
-            action: mrShowNode.dataset.mrAction,
-          });
-
-          shortcut_handler = new ShortcutsIssuable(true);
+          import('./pages/projects/merge_requests/show')
+            .then(callDefault)
+            .catch(fail);
+          shortcut_handler = true;
           break;
         case 'dashboard:activity':
           new Activities();
