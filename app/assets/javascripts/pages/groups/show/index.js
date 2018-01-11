@@ -7,7 +7,7 @@ import ShortcutsNavigation from '~/shortcuts_navigation';
 
 export default () => {
   const newGroupChildWrapper = document.querySelector('.js-new-project-subgroup');
-  window.gl.shortcut_handler = new ShortcutsNavigation();
+  new ShortcutsNavigation();
   new NotificationsForm();
   notificationsDropdown();
   new ProjectsList();

@@ -475,6 +475,7 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           import('./pages/groups/show')
             .then(callDefault, fail)
             .catch(rethrow);
+          shortcut_handler = true;
           break;
         case 'groups:group_members:index':
           import('./pages/groups/group_members/index')
