@@ -4,6 +4,7 @@ module API
       content_type :json, "application/vnd.docker.distribution.events.v1+json"
       format :json
 
+      # TODO: Auth should be implemented
       # before { authorize! :container_registry, user_project }
 
       params do

@@ -88,8 +88,7 @@ class ContainerRepository < ActiveRecord::Base
   end
 
   def self.find_or_create_from_path(path)
-    self.find_or_create_by(project: path.repository_project,
-             name: path.repository_name)
+    self.find_or_create_by(project: path.repository_project, name: path.repository_name)
   end
 
   def self.create_from_path!(path)

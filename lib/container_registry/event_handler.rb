@@ -46,11 +46,15 @@ module ContainerRegistry
     end
 
     def repository(event)
-      repository_name = event['target']['repository']
+      unless @repository
+        repository_name = event['target']['repository']
 
-      path = ContainerRegistry::Path.new(repository_name)
+        path = ContainerRegistry::Path.new(repository_name)
 
-      ContainerRepository.find_or_create_from_path(path)
+        @repository = ContainerRepository.find_or_create_from_path(path)
+      end
+
+      @repository
     end
   end
 end
