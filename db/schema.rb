@@ -686,7 +686,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.integer "size"
     t.integer "layers"
     t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   add_index "container_repository_tag_versions", ["container_repository_tag_id"], name: "container_repository_tag_versions_id", using: :btree
@@ -695,8 +694,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
   create_table "container_repository_tags", id: :bigserial, force: :cascade do |t|
     t.integer "container_repository_id", null: false
     t.string "name", null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   add_index "container_repository_tags", ["container_repository_id"], name: "container_repository_tags_id", using: :btree

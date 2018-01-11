@@ -10,8 +10,6 @@ class AddContainerTagAndVersion < ActiveRecord::Migration
                                           null: false
       t.string :name, index: { name: :container_repository_tags_name },
                       null: false
-
-      t.timestamps
     end
 
     create_table :container_repository_tag_versions, id: :bigserial do |t|
@@ -23,7 +21,7 @@ class AddContainerTagAndVersion < ActiveRecord::Migration
       t.integer :size
       t.integer :layers
 
-      t.timestamps
+      t.datetime :created_at
     end
   end
 end

@@ -26,7 +26,8 @@ module ContainerRegistry
         tag.versions.find_or_create_by(
           digest: tag_info[:revision],
           size: tag_info[:size],
-          layers: tag_info[:layers_count]
+          layers: tag_info[:layers_count],
+          created_at: tag_info[:created_at]
         )
       end
     end
@@ -37,7 +38,8 @@ module ContainerRegistry
       {
         revision: @tag.revision,
         size: @tag.total_size,
-        layers_count: @tag.layers.size
+        layers_count: @tag.layers.size,
+        created_at: @tag.created_at
       }
     end
 

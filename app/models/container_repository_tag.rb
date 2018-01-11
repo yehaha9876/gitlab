@@ -13,10 +13,18 @@ class ContainerRepositoryTag < ActiveRecord::Base
   delegate :revision, :short_revision, to: :config_blob, allow_nil: true
 
   def total_size
-    versions.last.size
+    last_version.size
   end
 
   def digest
-    versions.last.digest
+    last_version.digest
+  end
+
+  def created_at
+    last_version&.created_at
+  end
+
+  def last_version
+    @last_version ||= versions.last
   end
 end

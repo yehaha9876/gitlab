@@ -23,5 +23,11 @@ module ContainerRegistry
     def digest
       @digest ||= client.repository_tag_digest(repository.path, name)
     end
+
+    def created_at
+      return unless config
+
+      @created_at ||= DateTime.rfc3339(config['created'])
+    end
   end
 end

@@ -38,12 +38,6 @@ module ContainerTag
     @config ||= ContainerRegistry::Config.new(self, config_blob) if config_blob.data
   end
 
-  def created_at
-    return unless config
-
-    @created_at ||= DateTime.rfc3339(config['created'])
-  end
-
   def layers
     return @layers if defined?(@layers)
     return unless manifest
