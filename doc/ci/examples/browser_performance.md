@@ -19,8 +19,7 @@ Once you set up the Runner, add a new job to `.gitlab-ci.yml`, called `performan
     - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io --plugins.add ./gitlab-exporter --outputFolder sitespeed-results https://my.website.com
     - mv sitespeed-results/data/performance.json performance.json
   artifacts:
-    paths:
-    - [performance.json]
+    paths: [performance.json]
 ```
 
 This will create a `performance` job in your CI/CD pipeline and will run Sitespeed.io against the webpage you define. The GitLab plugin for Sitespeed.io downloaded in order to export the results to JSON. For further customization options of Sitespeed.io, including the ability to provide a list of URLs to test, please consult their [documentation](https://www.sitespeed.io/documentation/sitespeed.io/configuration/).
@@ -45,9 +44,10 @@ A simple `performance` job would look like:
     - docker:dind
   script:
     - export CI_ENVIRONMENT_URL=$(cat environment_url.txt)
+    - mkdir gitlab-exporter
+    - wget -O ./gitlab-exporter/index.js https://gitlab.com/gitlab-org/gl-performance/raw/master/index.js
     - mkdir sitespeed-results
-    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io --outputFolder sitespeed-results $CI_ENVIRONMENT_URL
+    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io --plugins.add ./gitlab-exporter --outputFolder sitespeed-results $CI_ENVIRONMENT_URL
   artifacts:
-    paths:
-    - [performance.json]
+    paths: [performance.json]
 ```
