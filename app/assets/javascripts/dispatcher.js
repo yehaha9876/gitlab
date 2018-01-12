@@ -118,9 +118,6 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
 
       const fail = () => Flash('Error loading dynamic module');
       const callDefault = m => m.default();
-      function rethrow(err) {
-        throw err;
-      }
 
       path = page.split(':');
       shortcut_handler = null;
@@ -241,13 +238,13 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           break;
         case 'groups:issues':
           import('./pages/groups/issues')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           break;
         case 'groups:merge_requests':
           import('./pages/groups/merge_requests')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           break;
         case 'dashboard:todos:index':
           import('./pages/dashboard/todos/index').then(callDefault).catch(fail);
@@ -468,19 +465,19 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           break;
         case 'groups:activity':
           import('./pages/groups/activity')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           break;
         case 'groups:show':
           import('./pages/groups/show')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           shortcut_handler = true;
           break;
         case 'groups:group_members:index':
           import('./pages/groups/group_members/index')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           break;
         case 'projects:project_members:index':
           memberExpirationDate('.js-access-expiration-date-groups');
@@ -491,13 +488,13 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           break;
         case 'groups:new':
           import('./pages/groups/new')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           break;
         case 'groups:create':
           import('./pages/groups/create')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           break;
         case 'admin:groups:new':
         case 'admin:groups:create':
@@ -507,8 +504,8 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           break;
         case 'groups:edit':
           import('./pages/groups/edit')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           break;
         case 'admin:groups:edit':
           groupAvatar();
@@ -549,13 +546,13 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           break;
         case 'groups:labels:new':
           import('./pages/groups/labels/new')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           break;
         case 'groups:labels:edit':
           import('./pages/groups/labels/edit')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           break;
         case 'projects:labels:new':
         case 'projects:labels:edit':
@@ -563,8 +560,8 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           break;
         case 'groups:labels:index':
           import('./pages/groups/labels/index')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           break;
         case 'projects:labels:index':
           if ($('.prioritized-labels').length) {
@@ -636,8 +633,8 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
           }
         case 'groups:settings:ci_cd:show':
           import('./pages/groups/settings/ci_cd/show')
-            .then(callDefault, fail)
-            .catch(rethrow);
+            .then(callDefault)
+            .catch(fail);
           break;
         case 'ci:lints:create':
         case 'ci:lints:show':
