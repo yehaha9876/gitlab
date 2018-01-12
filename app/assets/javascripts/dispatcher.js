@@ -471,16 +471,12 @@ import initLDAPGroupsSelect from 'ee/ldap_groups_select'; // eslint-disable-line
             .then(callDefault)
             .catch(fail);
           break;
-        case 'admin:groups:create':
-          BindInOut.initAll();
-          new Group();
-          groupAvatar();
-          break;
         case 'groups:edit':
           import('./pages/groups/edit')
             .then(callDefault)
             .catch(fail);
           break;
+        case 'admin:groups:create':
         case 'admin:groups:new':
           import('./pages/admin/groups/new')
             .then(callDefault)
