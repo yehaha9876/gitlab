@@ -107,13 +107,11 @@ inside GitLab that make that possible.
 It is possible to download the latest artifacts of a job via a well known URL
 so you can use it for scripting purposes.
 
->**Note:**
-The latest artifacts are considered as the artifacts created by jobs in the
+>**Notes:**
+>- The latest artifacts are considered as the artifacts created by jobs in the
 latest pipeline that succeeded for the specific ref.
 Artifacts for other pipelines can be accessed with direct access to them.
-
->**Note:**
-Requests for artifacts stored in [Object Storage](../../../administration/job_artifacts.md#using-object-storage) 
+>- Requests for artifacts stored in [Object Storage](../../../administration/job_artifacts.md#using-object-storage) 
 must be able to follow a 302 redirect, such as using -L with the `curl` command. 
 
 The structure of the URL to download the whole artifacts archive is the following:
