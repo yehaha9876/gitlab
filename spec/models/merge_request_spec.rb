@@ -24,11 +24,6 @@ describe MergeRequest do
     it { is_expected.to include_module(Taskable) }
   end
 
-  describe "act_as_paranoid" do
-    it { is_expected.to have_db_column(:deleted_at) }
-    it { is_expected.to have_db_index(:deleted_at) }
-  end
-
   describe 'validation' do
     it { is_expected.to validate_presence_of(:target_branch) }
     it { is_expected.to validate_presence_of(:source_branch) }
@@ -90,6 +85,39 @@ describe MergeRequest do
     it { is_expected.to respond_to(:cannot_be_merged?) }
     it { is_expected.to respond_to(:merge_params) }
     it { is_expected.to respond_to(:merge_when_pipeline_succeeds) }
+  end
+
+  describe '.by_commit_sha' do
+    subject(:by_commit_sha) { described_class.by_commit_sha(sha) }
+
+    let!(:merge_request) { create(:merge_request, :with_diffs) }
+
+    context 'with sha contained in latest merge request diff' do
+      let(:sha) { 'b83d6e391c22777fca1ed3012fce84f633d7fed0' }
+
+      it 'returns merge requests' do
+        expect(by_commit_sha).to eq([merge_request])
+      end
+    end
+
+    context 'with sha contained not in latest merge request diff' do
+      let(:sha) { 'b83d6e391c22777fca1ed3012fce84f633d7fed0' }
+
+      it 'returns empty requests' do
+        latest_merge_request_diff = merge_request.merge_request_diffs.create
+        latest_merge_request_diff.merge_request_diff_commits.where(sha: 'b83d6e391c22777fca1ed3012fce84f633d7fed0').delete_all
+
+        expect(by_commit_sha).to be_empty
+      end
+    end
+
+    context 'with sha not contained in' do
+      let(:sha) { 'b83d6e3' }
+
+      it 'returns empty result' do
+        expect(by_commit_sha).to be_empty
+      end
+    end
   end
 
   describe '.in_projects' do
@@ -2358,38 +2386,44 @@ describe MergeRequest do
   end
 
   describe '#rebase_in_progress?' do
-    # Create merge request and project before we stub file calls
-    before do
-      subject
+    shared_examples 'checking whether a rebase is in progress' do
+      let(:repo_path) { subject.source_project.repository.path }
+      let(:rebase_path) { File.join(repo_path, "gitlab-worktree", "rebase-#{subject.id}") }
+
+      before do
+        system(*%W(#{Gitlab.config.git.bin_path} -C #{repo_path} worktree add --detach #{rebase_path} master))
+      end
+
+      it 'returns true when there is a current rebase directory' do
+        expect(subject.rebase_in_progress?).to be_truthy
+      end
+
+      it 'returns false when there is no rebase directory' do
+        FileUtils.rm_rf(rebase_path)
+
+        expect(subject.rebase_in_progress?).to be_falsey
+      end
+
+      it 'returns false when the rebase directory has expired' do
+        time = 20.minutes.ago.to_time
+        File.utime(time, time, rebase_path)
+
+        expect(subject.rebase_in_progress?).to be_falsey
+      end
+
+      it 'returns false when the source project has been removed' do
+        allow(subject).to receive(:source_project).and_return(nil)
+
+        expect(subject.rebase_in_progress?).to be_falsey
+      end
     end
 
-    it 'returns true when there is a current rebase directory' do
-      allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:mtime).and_return(Time.now)
-
-      expect(subject.rebase_in_progress?).to be_truthy
+    context 'when Gitaly rebase_in_progress is enabled' do
+      it_behaves_like 'checking whether a rebase is in progress'
     end
 
-    it 'returns false when there is no rebase directory' do
-      allow(File).to receive(:exist?).and_return(false)
-
-      expect(subject.rebase_in_progress?).to be_falsey
-    end
-
-    it 'returns false when the rebase directory has expired' do
-      allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:mtime).and_return(20.minutes.ago)
-
-      expect(subject.rebase_in_progress?).to be_falsey
-    end
-
-    it 'returns false when the source project has been removed' do
-      allow(subject).to receive(:source_project).and_return(nil)
-      allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:mtime).and_return(Time.now)
-
-      expect(File).not_to have_received(:exist?)
-      expect(subject.rebase_in_progress?).to be_falsey
+    context 'when Gitaly rebase_in_progress is enabled', :disable_gitaly do
+      it_behaves_like 'checking whether a rebase is in progress'
     end
   end
 end

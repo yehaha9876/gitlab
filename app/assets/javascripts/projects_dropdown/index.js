@@ -12,15 +12,20 @@ Vue.use(Translate);
 const el = document.getElementById('js-projects-dropdown');
 const navEl = document.getElementById('nav-projects-dropdown');
 
-function dropdownOpened(e) {
-  const dropdownEl = $(e.currentTarget).find('.projects-dropdown-menu');
-  dropdownEl.one('transitionend', () => {
+function dropdownOpened() {
+  // Don't do anything if element doesn't exist (No projects dropdown)
+  // This is for when the user accesses GitLab without logging in
+  if (!el || !navEl) {
+    return;
+  }
+
+  $(navEl).on('shown.bs.dropdown', () => {
     eventHub.$emit('dropdownOpen');
   });
 }
 
-$(navEl).on('show.bs.dropdown', (e) => {
-  dropdownOpened(e);
+$(navEl).on('show.bs.dropdown', () => {
+  dropdownOpened();
 });
 
 // eslint-disable-next-line no-new
