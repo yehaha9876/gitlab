@@ -110,6 +110,10 @@ class Repository
     "#<#{self.class.name}:#{@disk_path}>"
   end
 
+  def create_hooks
+    Gitlab::Git::Repository.create_hooks(path_to_repo, Gitlab.config.gitlab_shell.hooks_path)
+  end
+
   def commit(ref = 'HEAD')
     return nil unless exists?
     return ref if ref.is_a?(::Commit)
@@ -263,7 +267,7 @@ class Repository
 
     # This will still fail if the file is corrupted (e.g. 0 bytes)
     begin
-      write_ref(keep_around_ref_name(sha), sha)
+      raw_repository.write_ref(keep_around_ref_name(sha), sha, shell: false)
     rescue Rugged::ReferenceError => ex
       Rails.logger.error "Unable to create #{REF_KEEP_AROUND} reference for repository #{path}: #{ex}"
     rescue Rugged::OSError => ex
@@ -275,10 +279,6 @@ class Repository
 
   def kept_around?(sha)
     ref_exists?(keep_around_ref_name(sha))
-  end
-
-  def write_ref(ref_path, sha)
-    rugged.references.create(ref_path, sha, force: true)
   end
 
   def diverging_commit_counts(branch)
@@ -902,9 +902,8 @@ class Repository
     branch = Gitlab::Git::Branch.find(self, branch_or_name)
 
     if branch
-      @root_ref_sha ||= commit(root_ref).sha
-      same_head = branch.target == @root_ref_sha
-      merged = ancestor?(branch.target, @root_ref_sha)
+      same_head = branch.target == root_ref_sha
+      merged = ancestor?(branch.target, root_ref_sha)
       !same_head && merged
     else
       nil
@@ -951,6 +950,10 @@ class Repository
     else
       false
     end
+  end
+
+  def root_ref_sha
+    @root_ref_sha ||= commit(root_ref).sha
   end
 
   delegate :merged_branch_names, to: :raw_repository
@@ -1069,6 +1072,7 @@ class Repository
           else
             cache.fetch(key, &block)
           end
+
         instance_variable_set(ivar, value)
       rescue Rugged::ReferenceError, Gitlab::Git::Repository::NoRepository
         # Even if the above `#exists?` check passes these errors might still
