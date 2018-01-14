@@ -35,7 +35,7 @@ new Vue({
     projectsDropdownApp,
   },
   data() {
-    const dataset = this.$options.el.dataset;
+    const dataset = this.$options.el ? this.$options.el.dataset : {};
     const store = new ProjectsStore();
     const service = new ProjectsService(dataset.userName);
 
