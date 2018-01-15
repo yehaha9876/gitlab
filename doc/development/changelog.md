@@ -14,7 +14,7 @@ following format:
 ---
 title: "Going through change[log]s"
 merge_request: 1972
-author: Ozzy Osbourne
+author: Ada Lovelace
 type: added
 ```
 
