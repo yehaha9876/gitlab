@@ -243,6 +243,9 @@ gem 'charlock_holmes', '~> 0.7.5'
 # Faster JSON
 gem 'oj', '~> 2.17.4'
 
+# Faster blank
+gem 'fast_blank'
+
 # Parse time & duration
 gem 'chronic', '~> 0.10.2'
 gem 'chronic_duration', '~> 0.10.6'
@@ -419,7 +422,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC client
-gem 'gitaly-proto', '~> 0.69.0', require: 'gitaly'
+gem 'gitaly-proto', '~> 0.73.0', require: 'gitaly'
 
 gem 'toml-rb', '~> 0.3.15', require: false
 
