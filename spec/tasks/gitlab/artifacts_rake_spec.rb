@@ -109,6 +109,8 @@ describe 'gitlab:artifacts namespace rake task' do
       let(:store) { ObjectStoreUploader::REMOTE_STORE }
 
       it "file stays on remote storage" do
+        expect_any_instance_of(JobArtifactUploader).not_to receive(:migrate!)
+
         subject
 
         expect(artifact.reload.file_store).to eq(ObjectStoreUploader::REMOTE_STORE)
