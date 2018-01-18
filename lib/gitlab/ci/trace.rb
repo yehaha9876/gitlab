@@ -112,7 +112,7 @@ module Gitlab
 
       def paths
         [
-          job.job_artifacts_trace&.file&.path,
+          job.job_artifacts_trace&.file&.path || "",
           default_path,
           deprecated_path
         ].compact

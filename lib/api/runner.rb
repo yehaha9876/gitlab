@@ -122,7 +122,7 @@ module API
 
         if params[:trace]
           job.trace.erase!
-          job.create_job_artifacts_trace(project: job.project, file_type: :trace, file: StringIO.new(params[:trace]))
+          job.create_job_artifacts_trace(project: job.project, file_type: :trace, file: { tempfile: StringIO.new(params[:trace]), filename: 'trace.log' } )
         end
 
         Gitlab::Metrics.add_event(:update_build,
