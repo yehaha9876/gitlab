@@ -19,7 +19,8 @@ module Ci
 
     enum file_type: {
       archive: 1,
-      metadata: 2
+      metadata: 2,
+      trace: 3
     }
 
     def self.artifacts_size_for(project)

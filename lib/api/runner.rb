@@ -120,7 +120,10 @@ module API
       put '/:id' do
         job = authenticate_job!
 
-        job.trace.set(params[:trace]) if params[:trace]
+        if params[:trace]
+          job.trace.erase!
+          job.create_job_artifacts_trace(project: job.project, file_type: :trace, file: StringIO.new(params[:trace]))
+        end
 
         Gitlab::Metrics.add_event(:update_build,
                                   project: job.project.full_path)
