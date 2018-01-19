@@ -203,8 +203,12 @@ Read how to [replicate the Container Registry](docker_registry.md).
 - It does not work for job logs, artifacts, GitLab Pages, and Docker images of the Container
   Registry (by default, but you can configure it separately, see [replicate the Container Registry](docker_registry.md) for details)
 - It does not work for attachments uploaded before GitLab 9.0 because they will
-  not present in the uploads table, until
-  [#29249](https://gitlab.com/gitlab-org/gitlab-ce/issues/29240) is fixed.
+  not be present in the uploads table, until
+  [#29240](https://gitlab.com/gitlab-org/gitlab-ce/issues/29240) is fixed.
+- The installation takes multiple manual steps that together can take about an
+hour depending on circumstances; we are working on improving this experience,
+see [#2978](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/2978) for
+details.
 
 ## Frequently Asked Questions
 
