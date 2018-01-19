@@ -490,11 +490,7 @@ module Gitlab
           return []
         end
 
-        if log_using_shell?(options)
-          log_by_shell(sha, options)
-        else
-          log_by_walk(sha, options)
-        end
+        log_by_shell(sha, options)
       end
 
       def count_commits(options)
@@ -618,37 +614,6 @@ module Gitlab
             # Found -> ["b8d95eb4969eefacb0a58f6a28f6803f8070e7b9 commit\trefs/environments/production/77\n", 0]
             popen(args, @path).first.split.last
           end
-        end
-      end
-
-      # Returns branch names collection that contains the special commit(SHA1
-      # or name)
-      #
-      # Ex.
-      #   repo.branch_names_contains('master')
-      #
-      def branch_names_contains(commit)
-        branches_contains(commit).map { |c| c.name }
-      end
-
-      # Returns branch collection that contains the special commit(SHA1 or name)
-      #
-      # Ex.
-      #   repo.branch_names_contains('master')
-      #
-      def branches_contains(commit)
-        commit_obj = rugged.rev_parse(commit)
-        parent = commit_obj.parents.first unless commit_obj.parents.empty?
-
-        walker = Rugged::Walker.new(rugged)
-
-        rugged.branches.select do |branch|
-          walker.push(branch.target_id)
-          walker.hide(parent) if parent
-          result = walker.any? { |c| c.oid == commit_obj.oid }
-          walker.reset
-
-          result
         end
       end
 
@@ -1537,27 +1502,6 @@ module Gitlab
         end
       end
 
-      def log_using_shell?(options)
-        options[:path].present? ||
-          options[:disable_walk] ||
-          options[:skip_merges] ||
-          options[:after] ||
-          options[:before]
-      end
-
-      def log_by_walk(sha, options)
-        walk_options = {
-          show: sha,
-          sort: Rugged::SORT_NONE,
-          limit: options[:limit],
-          offset: options[:offset]
-        }
-        Rugged::Walker.walk(rugged, walk_options).to_a
-      end
-
-      # Gitaly note: JV: although #log_by_shell shells out to Git I think the
-      # complexity is such that we should migrate it as Ruby before trying to
-      # do it in Go.
       def log_by_shell(sha, options)
         limit = options[:limit].to_i
         offset = options[:offset].to_i

@@ -318,6 +318,7 @@ class Project < ActiveRecord::Base
 
   scope :with_builds_enabled, -> { with_feature_enabled(:builds) }
   scope :with_issues_enabled, -> { with_feature_enabled(:issues) }
+  scope :with_issues_available_for_user, ->(current_user) { with_feature_available_for_user(:issues, current_user) }
   scope :with_merge_requests_enabled, -> { with_feature_enabled(:merge_requests) }
 
   enum auto_cancel_pending_pipelines: { disabled: 0, enabled: 1 }
@@ -977,10 +978,12 @@ class Project < ActiveRecord::Base
 
   def execute_hooks(data, hooks_scope = :push_hooks)
     run_after_commit_or_now do
-      hooks.public_send(hooks_scope).each do |hook| # rubocop:disable GitlabSecurity/PublicSend
+      hooks.hooks_for(hooks_scope).each do |hook|
         hook.async_execute(data, hooks_scope.to_s)
       end
     end
+
+    SystemHooksService.new.execute_hooks(data, hooks_scope)
   end
 
   def execute_services(data, hooks_scope = :push_hooks)

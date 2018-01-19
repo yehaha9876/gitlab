@@ -717,6 +717,7 @@ ActiveRecord::Schema.define(version: 20180105233807) do
     t.integer "project_id", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean "can_push", default: false, null: false
   end
 
   add_index "deploy_keys_projects", ["project_id"], name: "index_deploy_keys_projects_on_project_id", using: :btree
@@ -1234,7 +1235,6 @@ ActiveRecord::Schema.define(version: 20180105233807) do
     t.string "type"
     t.string "fingerprint"
     t.boolean "public", default: false, null: false
-    t.boolean "can_push", default: false, null: false
     t.datetime "last_used_at"
   end
 
@@ -1468,6 +1468,7 @@ ActiveRecord::Schema.define(version: 20180105233807) do
   add_index "merge_requests", ["merge_user_id"], name: "index_merge_requests_on_merge_user_id", where: "(merge_user_id IS NOT NULL)", using: :btree
   add_index "merge_requests", ["milestone_id"], name: "index_merge_requests_on_milestone_id", using: :btree
   add_index "merge_requests", ["source_branch"], name: "index_merge_requests_on_source_branch", using: :btree
+  add_index "merge_requests", ["source_project_id", "source_branch"], name: "index_merge_requests_on_source_project_and_branch_state_opened", where: "((state)::text = 'opened'::text)", using: :btree
   add_index "merge_requests", ["source_project_id", "source_branch"], name: "index_merge_requests_on_source_project_id_and_source_branch", using: :btree
   add_index "merge_requests", ["target_branch"], name: "index_merge_requests_on_target_branch", using: :btree
   add_index "merge_requests", ["target_project_id", "iid"], name: "index_merge_requests_on_target_project_id_and_iid", unique: true, using: :btree
