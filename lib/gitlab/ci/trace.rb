@@ -57,7 +57,10 @@ module Gitlab
 
       def read
         stream = Gitlab::Ci::Trace::Stream.new do
-          if current_path
+          if job.job_artifacts_trace&.file_store == ObjectStoreUploader::REMOTE_STORE
+            full_trace_string = Gitlab::Ci::Trace::HTTP_IO.new(job.job_artifacts_trace.file.url, 10).read # size is not necessary for #read
+            StringIO.new(full_trace_string)
+          elsif current_path
             File.open(current_path, "rb")
           elsif old_trace
             StringIO.new(old_trace)
