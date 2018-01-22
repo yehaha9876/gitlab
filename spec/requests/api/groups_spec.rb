@@ -342,11 +342,12 @@ describe API::Groups do
 
     context 'when authenticated as the group owner' do
       it 'updates the group' do
-        put api("/groups/#{group1.id}", user1), name: new_group_name, request_access_enabled: true
+        put api("/groups/#{group1.id}", user1), name: new_group_name, request_access_enabled: true, require_two_factor_authentication: true
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['name']).to eq(new_group_name)
         expect(json_response['request_access_enabled']).to eq(true)
+        expect(json_response['require_two_factor_authentication']).to eq(true)
       end
 
       it 'returns 404 for a non existing group' do
@@ -718,7 +719,7 @@ describe API::Groups do
 
     context "when authenticated as user with group permissions" do
       it "creates group" do
-        group = attributes_for(:group, { request_access_enabled: false })
+        group = attributes_for(:group, :access_requestable, :require_2fa)
 
         post api("/groups", user3), group
 
@@ -728,6 +729,7 @@ describe API::Groups do
         expect(json_response["path"]).to eq(group[:path])
         expect(json_response["request_access_enabled"]).to eq(group[:request_access_enabled])
         expect(json_response["visibility"]).to eq(Gitlab::VisibilityLevel.string_level(Gitlab::CurrentSettings.current_application_settings.default_group_visibility))
+        expect(json_response["require_two_factor_authentication"]).to eq(group[:require_two_factor_authentication])
       end
 
       it "creates a nested group", :nested_groups do

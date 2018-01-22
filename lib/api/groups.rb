@@ -15,6 +15,7 @@ module API
         optional :lfs_enabled, type: Boolean, desc: 'Enable/disable LFS for the projects in this group'
         optional :request_access_enabled, type: Boolean, desc: 'Allow users to request member access'
         optional :share_with_group_lock, type: Boolean, desc: 'Prevent sharing a project with another group within this group'
+        optional :require_two_factor_authentication, type: Boolean, desc: 'Require all users in this group to setup Two-factor authentication'
       end
 
       params :optional_params_ee do

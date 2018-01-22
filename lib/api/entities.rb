@@ -257,6 +257,7 @@ module API
       end
       expose :web_url
       expose :request_access_enabled
+      expose :require_two_factor_authentication
       expose :full_name, :full_path
 
       if ::Group.supports_nested_groups?

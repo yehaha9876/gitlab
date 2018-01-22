@@ -62,6 +62,10 @@ FactoryBot.define do
       request_access_enabled true
     end
 
+    trait :require_2fa do
+      require_two_factor_authentication true
+    end
+
     trait :nested do
       parent factory: :group
     end

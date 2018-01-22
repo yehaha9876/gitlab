@@ -33,6 +33,7 @@ GET /groups
     "avatar_url": "http://localhost:3000/uploads/group/avatar/1/foo.jpg",
     "web_url": "http://localhost:3000/groups/foo-bar",
     "request_access_enabled": false,
+    "require_two_factor_authentication":false,
     "full_name": "Foobar Group",
     "full_path": "foo-bar",
     "parent_id": null
@@ -58,6 +59,7 @@ GET /groups?statistics=true
     "avatar_url": "http://localhost:3000/uploads/group/avatar/1/foo.jpg",
     "web_url": "http://localhost:3000/groups/foo-bar",
     "request_access_enabled": false,
+    "require_two_factor_authentication":false,
     "full_name": "Foobar Group",
     "full_path": "foo-bar",
     "parent_id": null,
@@ -116,6 +118,7 @@ GET /groups/:id/subgroups
     "avatar_url": "http://gitlab.example.com/uploads/group/avatar/1/foo.jpg",
     "web_url": "http://gitlab.example.com/groups/foo-bar",
     "request_access_enabled": false,
+    "require_two_factor_authentication":false,
     "full_name": "Foobar Group",
     "full_path": "foo-bar",
     "parent_id": 123
@@ -221,6 +224,7 @@ Example response:
   "avatar_url": null,
   "web_url": "https://gitlab.example.com/groups/twitter",
   "request_access_enabled": false,
+  "require_two_factor_authentication":false,
   "full_name": "Twitter",
   "full_path": "twitter",
   "parent_id": null,
@@ -374,6 +378,7 @@ Parameters:
 | `visibility` | string | no | The group's visibility. Can be `private`, `internal`, or `public`. |
 | `lfs_enabled` | boolean | no | Enable/disable Large File Storage (LFS) for the projects in this group |
 | `request_access_enabled` | boolean | no | Allow users to request member access. |
+| `require_two_factor_authentication` | boolean | no | Require all users in this group to setup Two-factor authentication. |
 | `parent_id` | integer | no | The parent group id for creating nested group. |
 | `shared_runners_minutes_limit` | integer | no | (admin-only) Pipeline minutes quota for this group. |
 
@@ -411,6 +416,7 @@ PUT /groups/:id
 | `visibility` | string | no | The visibility level of the group. Can be `private`, `internal`, or `public`. |
 | `lfs_enabled` (optional) | boolean | no | Enable/disable Large File Storage (LFS) for the projects in this group |
 | `request_access_enabled` | boolean | no | Allow users to request member access. |
+| `require_two_factor_authentication` | boolean | no | Require all users in this group to setup Two-factor authentication. |
 | `shared_runners_minutes_limit` | integer | no | (admin-only) Pipeline minutes quota for this group |
 
 ```bash
@@ -430,6 +436,7 @@ Example response:
   "avatar_url": null,
   "web_url": "http://gitlab.example.com/groups/h5bp",
   "request_access_enabled": false,
+  "require_two_factor_authentication":false,
   "full_name": "Foobar Group",
   "full_path": "foo-bar",
   "parent_id": null,
