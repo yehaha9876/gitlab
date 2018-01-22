@@ -80,7 +80,7 @@ describe ProjectCacheWorker do
     context 'when a lease could not be obtained' do
       it 'does not update the repository size' do
         allow(worker).to receive(:try_obtain_lease_for)
-          .with(project.id, :update_statistics)
+          .with(project.id)
           .and_return(false)
 
         expect(statistics).not_to receive(:refresh!)
@@ -92,8 +92,9 @@ describe ProjectCacheWorker do
     context 'when a lease could be obtained' do
       it 'updates the project statistics' do
         allow(worker).to receive(:try_obtain_lease_for)
-          .with(project.id, :update_statistics)
+          .with(project.id)
           .and_return(true)
+          .and_call_original
 
         expect(statistics).to receive(:refresh!)
           .with(only: %i(repository_size))

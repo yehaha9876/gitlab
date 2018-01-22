@@ -7,7 +7,7 @@ describe ProjectMigrateHashedStorageWorker, :clean_gitlab_redis_shared_state do
 
     context 'when have exclusive lease' do
       before do
-        lease = subject.lease_for(project.id)
+        lease = subject.exclusive_lease_for(project.id)
 
         allow(Gitlab::ExclusiveLease).to receive(:new).and_return(lease)
         allow(lease).to receive(:try_obtain).and_return(true)
@@ -37,7 +37,7 @@ describe ProjectMigrateHashedStorageWorker, :clean_gitlab_redis_shared_state do
 
     context 'when dont have exclusive lease' do
       before do
-        lease = subject.lease_for(project.id)
+        lease = subject.exclusive_lease_for(project.id)
 
         allow(Gitlab::ExclusiveLease).to receive(:new).and_return(lease)
         allow(lease).to receive(:try_obtain).and_return(false)
