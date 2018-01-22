@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import initPathLocks from 'ee/path_locks';
+import commitPipelineStatus from '~/projects/tree/components/commit_pipeline_status_component.vue';
 import TreeView from '../../../../tree';
 import ShortcutsNavigation from '../../../../shortcuts_navigation';
 import BlobViewer from '../../../../blob/viewer';
 import NewCommitForm from '../../../../new_commit_form';
 import { ajaxGet } from '../../../../lib/utils/common_utils';
-import commitPipelineStatus from '../components/commit_pipeline_status_component.vue';
 
 export default () => {
   new ShortcutsNavigation(); // eslint-disable-line no-new
@@ -16,6 +16,11 @@ export default () => {
     ajaxGet(document.querySelector('.js-tree-content').dataset.logsPath));
 
   const commitPipelineStatusEl = document.getElementById('commit-pipeline-status');
+  const $statusLink = $('.ci-status-link');
+  if ($statusLink.length > 0) {
+    $statusLink.remove();
+  }
+  commitPipelineStatusEl.classList.remove('hidden');
   // eslint-disable-next-line no-new
   new Vue({
     el: '#commit-pipeline-status',
