@@ -43,13 +43,9 @@ module Gitlab
     end
     config.eager_load_paths.concat(ee_paths)
 
-    config.paths['app/views'].concat(%W[
-      #{config.root}/ee/app/views
-    ])
-
-    config.helpers_paths.push(*%W[
-      #{config.root}/ee/app/helpers
-    ])
+    config.paths['lib/tasks'] << "#{config.root}/ee/lib/tasks"
+    config.paths['app/views'] << "#{config.root}/ee/app/views"
+    config.helpers_paths << "#{config.root}/ee/app/helpers"
 
     # Rake tasks ignore the eager loading settings, so we need to set the
     # autoload paths explicitly
@@ -125,6 +121,7 @@ module Gitlab
     config.assets.paths << "ee/app/assets/stylesheets"
 
     config.assets.precompile << "*.png"
+    config.assets.precompile << "*.ico"
     config.assets.precompile << "print.css"
     config.assets.precompile << "notify.css"
     config.assets.precompile << "mailers/*.css"
