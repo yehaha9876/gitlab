@@ -139,6 +139,14 @@ module ObjectStorage
       end
     end
 
+    def cache_dir
+      if file_cache_storage?
+        File.join(root, base_dir, 'tmp/cache')
+      else
+        'tmp/cache'
+      end
+    end
+
     def file_storage?
       storage.is_a?(CarrierWave::Storage::File)
     end
@@ -268,6 +276,76 @@ module ObjectStorage
         Store::REMOTE => File.join(dynamic_segment)
       }
     end
+
+    # Direct Upload
+
+    def upload_authorize
+      self.cache_id = CarrierWave.generate_cache_id
+      self.original_filename = SecureRandom.hex
+
+      result = {}
+
+      # result['TempPath'] = cache_path
+
+      remote_path = cache_path
+      remote_path.slice!(self.class.local_store_path)
+      remote_path.slice!('/')
+
+      expire_at = ::Fog::Time.now + 24.hours
+      result[:ObjectStore] = {
+        ObjectID: cache_name,
+        GetURL: remote_storage.connection.get_object_https_url(fog_directory, remote_path, expire_at),
+        DeleteURL: remote_storage.connection.delete_object_url(fog_directory, remote_path, expire_at),
+        StoreURL: remote_storage.connection.put_object_url(fog_directory, remote_path, expire_at, {
+            'Content-Type' => 'application/octet-stream'
+          })
+      }
+
+      result
+    end
+
+    def cache!(new_file = nil)
+      unless retrive_uploaded_file!(new_file&.object_id, new_file.original_filename)
+        super
+      end
+    end
+
+    def retrive_uploaded_file!(identifier, filename)
+      return unless identifier
+      return unless filename
+
+      puts "xx: #{identifier}"
+      puts "xx: #{filename}"
+      @use_storage_for_cache = true
+
+      puts "xxy1"
+      self.object_store = REMOTE_STORE
+
+      puts "xxy2"
+      retrieve_from_cache!(identifier)
+      @filename = filename
+    ensure
+      @use_storage_for_cache = false
+    end
+
+    def store_remote_file!(identifier, filename)
+      @use_storage_for_cache = true
+
+      self.object_store = REMOTE_STORE
+      retrieve_from_cache!(identifier)
+      @filename = filename
+      store!
+    ensure
+      @use_storage_for_cache = false
+    end
+
+    def cache_storage
+      if @use_storage_for_cache || cached?
+        storage
+      else
+        super
+      end
+    end    
 
     private
 
