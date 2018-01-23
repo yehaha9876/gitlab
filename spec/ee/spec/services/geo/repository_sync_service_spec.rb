@@ -149,7 +149,7 @@ describe Geo::RepositorySyncService do
         context 'with non empty repositories' do
           let(:project) { create(:project, :repository) }
 
-          it 'syncs gitattributes to info/attriutes' do
+          it 'syncs gitattributes to info/attributes' do
             expect(repository).to receive(:copy_gitattributes)
 
             subject.execute
