@@ -15,6 +15,22 @@ class JobArtifactUploader < ObjectStoreUploader
     model.size
   end
 
+  def open
+    if file_storage?
+      File.open(path, "rb")
+    else
+      Gitlab::Ci::Trace::HTTP_IO.new(url, size)
+    end
+  end
+
+  def exists?
+    if file_storage?
+      super
+    else
+      true # TODO: Carrierwave don't check in ObjectStorage by default
+    end
+  end
+
   private
 
   def default_path

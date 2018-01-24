@@ -1,5 +1,9 @@
 require 'net/http'
 
+##
+#
+# This class is compatible with IO class (https://ruby-doc.org/core-2.3.1/IO.html)
+# source: https://gitlab.com/snippets/1685610
 module Gitlab
   module Ci
     class Trace

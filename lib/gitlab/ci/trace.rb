@@ -52,14 +52,13 @@ module Gitlab
       end
 
       def exist?
-        current_path.present? || old_trace.present?
+        trace_artifact&.exists? || current_path.present? || old_trace.present?
       end
 
       def read
         stream = Gitlab::Ci::Trace::Stream.new do
-          if job.job_artifacts_trace&.file_store == ObjectStoreUploader::REMOTE_STORE
-            full_trace_string = Gitlab::Ci::Trace::HTTP_IO.new(job.job_artifacts_trace.file.url, 10).read # size is not necessary for #read
-            StringIO.new(full_trace_string)
+          if trace_artifact
+            trace_artifact.open
           elsif current_path
             File.open(current_path, "rb")
           elsif old_trace
@@ -115,10 +114,13 @@ module Gitlab
 
       def paths
         [
-          job.job_artifacts_trace&.file&.path || "",
           default_path,
           deprecated_path
         ].compact
+      end
+
+      def trace_artifact
+        job.job_artifacts_trace
       end
 
       def default_directory
