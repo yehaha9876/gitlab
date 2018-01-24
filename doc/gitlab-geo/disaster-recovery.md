@@ -20,6 +20,8 @@ It does not enable GitLab Geo on the newly promoted primary.
 
 ### Step 1. Disabling the primary
 
+> **Note::** If this is a planned failover, and the primary is fully functioning, start with [GitLab Geo Planned Failover](planned-failover.md) to achieve zero data loss.
+
 This step is necessary because any data added to the primary will not be replicated
 to a newly promoted primary, and syncing the two after the secondary has been used as
 a primary is not possible at this time.
