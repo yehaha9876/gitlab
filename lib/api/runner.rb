@@ -121,8 +121,14 @@ module API
         job = authenticate_job!
 
         if params[:trace]
-          job.trace.erase!
-          job.create_job_artifacts_trace(project: job.project, file_type: :trace, file: { tempfile: StringIO.new(params[:trace]), filename: 'trace.log' } )
+          begin
+            job.create_job_artifacts_trace(
+              project: job.project,
+              file_type: :trace,
+              file: { tempfile: StringIO.new(params[:trace]), filename: 'trace.log' } )
+          rescue ActiveRecord::RecordNotUnique => e
+            Rails.logger.warn("GitLab: Full-trace is conflicted with live-trace. Maybe the migration process for legacy artifact traces has a problem") # This should have been avoided by migration side
+          end
         end
 
         Gitlab::Metrics.add_event(:update_build,

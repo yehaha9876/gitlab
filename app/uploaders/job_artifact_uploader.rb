@@ -23,13 +23,13 @@ class JobArtifactUploader < ObjectStoreUploader
     end
   end
 
-  def exists?
-    if file_storage?
-      super
-    else
-      true # TODO: Carrierwave don't check in ObjectStorage by default
-    end
-  end
+  # def exists?
+  #   if file_storage?
+  #     super
+  #   else
+  #     true # TODO: Carrierwave don't check in ObjectStorage by default
+  #   end
+  # end
 
   private
 
