@@ -156,6 +156,38 @@ describe('VariableList', () => {
               </button>
             </div>
 
+            <div class="ci-variable-body-item">
+              <input type="hidden" name="variables[variables_attributes][][environment]" value="*" />
+              <div class="dropdown js-variable-environment-dropdown-wrapper">
+                <button
+                  type="button"
+                  class="dropdown-menu-toggle js-variable-environment-toggle"
+                  data-toggle="dropdown"
+                >
+                  <span class="dropdown-toggle-text js-dropdown-toggle-text"></span>
+                </button>
+                <div class="dropdown-menu dropdown-select dropdown-menu-selectable">
+                  <div class="dropdown-input has-value">
+                    <input type="search" class="dropdown-input-field js-dropdown-input-field">
+                    <button class="dropdown-input-clear js-dropdown-input-clear">
+                      Clear search
+                    </button>
+                  </div>
+                  <div class="dropdown-content js-dropdown-content"></div>
+                  <div class="dropdown-footer">
+                    <ul class="dropdown-footer-list">
+                      <li>
+                        <button class="dropdown-create-new-item-button js-dropdown-create-new-item">
+                          Create wildcard
+                          <code class="js-drodpown-create-new-item-slot"></code>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <button type="button" class="js-row-remove-button"></button>
           </li>
         </ul>
@@ -185,6 +217,38 @@ describe('VariableList', () => {
         })
         .then(done)
         .catch(done.fail);
+    });
+
+    describe('environment dropdown', () => {
+      function addRowByNewEnvironment(newEnv) {
+        const $row = $wrapper.find('.js-row:last-child');
+
+        // Open the dropdown
+        $row.find('.js-variable-environment-toggle').click();
+
+        // Filter for the new item
+        $row.find('.js-variable-environment-dropdown-wrapper .dropdown-input-field')
+          .val(newEnv)
+          .trigger('input');
+
+        // Create the new item
+        $row.find('.js-variable-environment-dropdown-wrapper .js-dropdown-create-new-item').click();
+      }
+
+      it('should add another row when editing the last rows environment dropdown', (done) => {
+        addRowByNewEnvironment('someenv');
+
+        getSetTimeoutPromise()
+          .then(() => {
+            expect($wrapper.find('.js-row').length).toBe(2);
+
+            // Check for the correct default in the new row
+            const $environmentInput = $wrapper.find('.js-row:last-child').find('input[name="variables[variables_attributes][][environment]"]');
+            expect($environmentInput.val()).toBe('*');
+          })
+          .then(done)
+          .catch(done.fail);
+      });
     });
   });
 });
