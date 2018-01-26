@@ -981,9 +981,9 @@ class Project < ActiveRecord::Base
       hooks.hooks_for(hooks_scope).each do |hook|
         hook.async_execute(data, hooks_scope.to_s)
       end
-    end
 
-    SystemHooksService.new.execute_hooks(data, hooks_scope)
+      SystemHooksService.new.execute_hooks(data, hooks_scope)
+    end
   end
 
   def execute_services(data, hooks_scope = :push_hooks)
@@ -1042,6 +1042,8 @@ class Project < ActiveRecord::Base
   end
 
   def fork_source
+    return nil unless forked?
+
     forked_from_project || fork_network&.root_project
   end
 
@@ -1449,7 +1451,7 @@ class Project < ActiveRecord::Base
     # We'd need to keep track of project full path otherwise directory tree
     # created with hashed storage enabled cannot be usefully imported using
     # the import rake task.
-    repository.rugged.config['gitlab.fullpath'] = gl_full_path
+    repository.raw_repository.write_config(full_path: gl_full_path)
   rescue Gitlab::Git::Repository::NoRepository => e
     Rails.logger.error("Error writing to .git/config for project #{full_path} (#{id}): #{e.message}.")
     nil
