@@ -37,7 +37,7 @@
               Automatically update the remote mirror's branches, tags, and commits from this repository every time someone pushes to it.
         .form-group.has-feedback
           = rm_form.label :url, "Git repository URL", class: "label-light"
-          = rm_form.text_field :url, class: "form-control", placeholder: 'https://username:password@gitlab.company.com/group/project.git'
+          = rm_form.text_field :url, class: "form-control", placeholder: 'https://username:password@gitlab.company.com/group/project.git', autocomplete: 'off'
 
           = render "projects/mirrors/instructions"
 

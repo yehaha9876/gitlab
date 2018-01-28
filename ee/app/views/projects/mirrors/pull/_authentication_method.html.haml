@@ -14,7 +14,7 @@
     = icon('spinner spin lg')
   .account-well.well-password-auth.hidden.js-well-password-auth
     = f.label :password, "Password", class: "label-light"
-    = f.password_field :password, value: import_data.password, class: 'form-control'
+    = f.password_field :password, value: import_data.password, class: 'form-control', autocomplete: 'off'
   .account-well.well-ssh-auth.hidden.js-well-ssh-auth
     %p.js-ssh-public-key-present{ class: ('hidden' unless ssh_public_key_present) }
       Here is the public SSH key that needs to be added to the remote
