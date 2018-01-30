@@ -12,7 +12,6 @@ class PluginsSystem
   def valid_plugins
     plugins.select do |plugin|
       klass = Object.const_get("#{plugin.camelize}_service".classify)
-      instance = klass.new
 
       # Just give sample data to method and expect it to not crash.
       begin

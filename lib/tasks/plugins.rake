@@ -1,7 +1,7 @@
 namespace :plugins do
   desc 'Generate sceleton for new plugin'
   task generate: :environment do
-    ARGV.each { |a| task a.to_sym do ; end }
+    ARGV.each { |a| task a.to_sym { } }
     name = ARGV[1]
 
     unless name.present?
@@ -9,7 +9,6 @@ namespace :plugins do
       exit 1
     end
 
-    plugins_dir =
     class_name = name.classify
     param = name.parameterize
 
