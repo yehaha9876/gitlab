@@ -1,36 +1,30 @@
 require 'logger'
 require 'resolv-replace'
 
-desc "GitLab | Migrate files for artifacts to comply with new storage format"
+desc "GitLab | Migrate trace files to trace artifacts"
 namespace :gitlab do
   namespace :artifacts do
-    task :migrate_file_traces, [:src_path] => :environment do |t, args|
+    task :migrate_trace_files, [:filter] => :environment do |t, args|
       logger = Logger.new(STDOUT)
-      logger.info("Starting migration trace files to artifacts")
+      logger.info('Starting migration of trace files to trace artifacts')
 
-      if File.directory?(args.src_path)
-        paths = Dir.glob("#{args.src_path}/**/*").reject { |path| File.directory?(path) }
-      elsif File.exist?(args.src_path)
-        paths = [args.src_path]
+      root_path = Settings.gitlab_ci.builds_path
+
+      if args.filter.present?
+        target_path = File.join(root_path, args.filter)
       else
-        raise "Error: Invalid arguments #{args.src_path}. Please set a correct path for file or directory"
+        target_path = File.join(root_path, '/**/*') # All files
       end
 
-      logger.info("Total target file counts: #{paths.length}")
-      sw_total_start = Time.now
+      logger.info("target_path is #{target_path}")
 
-      paths.each do |path|
-        logger.info("Start migration: #{path}")
-        sw_start = Time.now
+      Dir.glob(target_path) do |full_path|
+        next if File.directory?(full_path)
 
-        status, job = Ci::CreateTraceArtifactService.new(nil, nil).execute_from_file(path)
+        logger.info("Scheduling migration for #{full_path}")
 
-        sw_finish = Time.now
-        logger.info("Finish migration: #{job&.id},#{sw_finish - sw_start},#{status}")
+        BackgroundMigrationWorker.perform_async('MigrateTraceFileToTraceArtifact', [full_path])
       end
-
-      sw_total_finish = Time.now
-      logger.info("Finished all migration for trace artifacts. Total execution time: #{sw_total_finish - sw_total_start}")
     end
   end
 end
