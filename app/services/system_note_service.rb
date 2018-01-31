@@ -24,6 +24,7 @@ module SystemNoteService
     body = "added #{commits_text}\n\n"
     body << existing_commit_summary(noteable, existing_commits, oldrev)
     body << new_commit_summary(new_commits).join("\n")
+    body << "<ul>#{body}</ul>"
     body << "\n\n[Compare with previous version](#{diff_comparison_url(noteable, project, oldrev)})"
 
     create_note(NoteSummary.new(noteable, project, author, body, action: 'commit', commit_count: total_count))
@@ -481,7 +482,7 @@ module SystemNoteService
   # Returns an Array of Strings
   def new_commit_summary(new_commits)
     new_commits.collect do |commit|
-      "* #{commit.short_id} - #{escape_html(commit.title)}"
+      "<li>#{commit.short_id} - #{bypass_markdown(commit.title)}</li>"
     end
   end
 
@@ -746,6 +747,10 @@ module SystemNoteService
     branch = "#{noteable.target_project_namespace}:#{branch}" if noteable.for_fork?
 
     "* #{commit_ids} - #{commits_text} from branch `#{branch}`\n"
+  end
+
+  def bypass_markdown(text)
+    "\n\n<div class='gitlab-markdown-bypass'>#{escape_html(text)}</div>"
   end
 
   def escape_html(text)

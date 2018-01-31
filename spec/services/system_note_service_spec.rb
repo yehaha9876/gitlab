@@ -697,7 +697,8 @@ describe SystemNoteService do
       commit = double(title: '<pre>This is a test</pre>', short_id: '12345678')
       escaped = '&lt;pre&gt;This is a test&lt;&#x2F;pre&gt;'
 
-      expect(described_class.new_commit_summary([commit])).to all(match(%r[- #{escaped}]))
+      expect(described_class.new_commit_summary([commit]))
+        .to all(match(%r[- \n\n<div class='gitlab-markdown-bypassing'>#{escaped}</div>]))
     end
   end
 
