@@ -1,103 +1,111 @@
 # Milestones
 
-Milestones in GitLab are a way to track issues and merge requests created
-to achieve a broader goal in a certain period of time.
-
 ## Overview
 
-Milestones allow you to organize issues and merge requests into a cohesive group,
-optionally setting a start and a due date.
-
-With milestones you can set a deadline for certain achievement you're targeting,
-and assign this milestone to issues and merge requests that together compose
-this broader goal.
-
-Milestones are a valuable tool to track the development of the process of achieving that goal.
-From a milestone, you view the status of issues and merge requests, its contributors,
-and opened and closed issues for each label.
-
-With [GitLab Enterprise Edition Starter](https://about.gitlab.com/gitlab-ee/),
-you will also see a [Burndown Chart](#burndown-charts) for your milestone, which
-gives a visual insight over the progress of the conclusion of that milestone:
-
-![milestones with burndown charts](img/milestones.gif)
+Milestones allow you scope issues or merge requests together in a finite time period, during which you intend to work on. You define a start date and due date per milestone. Each milestone also has a tile and description. A milestone can be scoped to a project or to a group.
 
 ## Use cases
 
-There are numerous cases you can create a milestone for. For example:
+1. Track work to be completed within a single iteration / sprint.
+1. Track work to be released together in a single code release.
+1. Track work to be completed in a quarter or a longer period consisting of multiple code releases.
 
-- Track an upcoming software version
-- Track the launch of a new product
-- Track the progress of achievements per quarter for your team
-- Track the community contribution for a new feature in your open source application
+## Milestone in sidebar
 
-## Creating a project milestone
+Every issue and merge request can be assigned at most one milestone. The milestone is visible in the sidebar of the issue (including in boards) or the merge request. From the sidebar, you can do assignment or unassignment. You can also perform this as a [quick action](doc/user/project/quick_actions.md) in a comment.
+
+![Milestones sidebar](img/milestones_sidebar.png)
+
+![Milestones sidebar assign](img/milestones_sidebar_assign.png)
+
+## Milestone scope
+
+Project milestones can be assigned to issues or merge requests in that project only. Group milestones can be assigned to any issue or merge request of any project in that group. You can [promote a milestone label to a group milestone](#milestone-promotion).
+
+## Milestone state
+
+A milestone is either open or closed.
+
+## Milestone page
+
+From the milestone page, the title and description fields are displayed, as well as the start date and due date. You can also access issues and merge requests that have been assigned that milestone. The total [issue weight](link-to-weights) of issues (project milestone only) in the milestone and the [total issue time spent](link-to-time-tracking) is shown too. A percentage complete value is also displayed, which is calculated as the number of closed/merged merge requests and closed issues divided by the total number of merge requests and issues in the milestone.
+
+### Burndown chart
+
+The milestone page for project milestones also includes a burndown chart.
+
+Group milestone pages will include [a burndown chart in the future](https://gitlab.com/gitlab-org/gitlab-ee/issues/3064).
+
+## Filter by milestone in issue lists and merge request lists
+
+From the project issue list page and the project merge request list page, you can filter by both group milestones and project milestones.
+
+From the group issue list page and the group merge request list page, you can filter by both group labels and project milestones.
+
+![Milestones group issues](img/milestones_group_issues.png)
+
+### Special milestones
+
+You can also filter by special milestones:
+
+- `No Milestone`: Issues or merge requests without an assigned milestone.
+- `Upcoming`: Issues or merge requests with the next due open milestone (open milestone with the closest due date in the future).
+- `Started`: Issues or merge requests from any milestone with a start date before today.
+
+![Milestones dynamic](img/milestones_special.png)
+
+## Filter by milestone in boards 
+
+From [project boards](doc/user/project/issue_board.md), you can filter by both group milestones and project milestones in the search and filter bar.
+
+From [group boards](doc/user/project/issue_board.md#group-issue-boards), you can filter by both group milestones and project milestones in the search and filter bar.
+
+## Limit by milestone in board config
+
+From [project boards](doc/user/project/issue_board.md), you can limit by both group milestones and project labels in the [board config](doc/user/project/issue_board.md#board-with-configuration).
+
+From [group boards](doc/user/project/issue_board.md#group-issue-boards), you can limit by only group milestones in the [board config](doc/user/project/issue_board.md#board-with-configuration).
+
+## Milestone lists
+
+### Project milestone list page
+
+The project milestone list page displays project milestones scoped to that project.
+
+![Milestones project list]()
+
+### Group milestone list page
+
+The group milestone list page displays group milestones scoped to that project.
+
+![Milestones group list]()
 
 >**Note:**
-You need [Master permissions](../../permissions.md) in order to create a milestone.
+Project milestones will *no longer* be displayed on the group milestone list page in a future release.
 
-You can find the milestones page under your project's **Issues ➔ Milestones**.
-To create a new milestone, simply click the **New milestone** button when in the
-milestones page. A milestone can have a title, a description and start/due dates.
-Once you fill in all the details, hit the **Create milestone** button.
+The group milestone list page also displays project milestones that belong to projects that are within this group. If multiple 
+project milestones share the same title, they will appear as one list item in this list page. *This list item will be removed in a future release.* If you click on this list item, you get a special page that combines all those project milestones that share the same title. *This special page will be removed along with the list item in a future release.* After these are removed, the group milestone list page will only display group milestones. These features were previously designed to help users view issues from multiple projects together in a special page mimicking a milestone. Since we now group milestones, users are recommended to [promote their project milestones to group milestones](#milestone-promotion). 
+
+![Milestones group list project]()
+
+![Milestones dynamic milestone]()
+
+### Dashboard milestone list page
+
+![Milestones dashboard list]()
+
+## Milestone management
 
 >**Note:**
-The start/due dates are required if you intend to use [Burndown charts](#burndown-charts).
+Only users with [Developer role](../../permissions.md) or higher can manage milestones.
 
-![Creating a milestone](img/milestone_create.png)
-
-## Creating a group milestone
-
->**Note:**
-You need [Master permissions](../../permissions.md) in order to create a milestone.
-
-You can create a milestone for a group that will be shared across group projects.
-On the group's **Issues ➔ Milestones** page, you will be able to see the state
-of that milestone and the issues/merge requests count that it shares across the group projects. To create a new milestone click the **New milestone** button. The form is the same as when creating a milestone for a specific project which you can find in the previous item.
-
-In addition to that you will be able to filter issues or merge requests by group milestones in all projects that belongs to the milestone group.
+You can create, update, and delete milestones from the milestone list pages or the milestone page itself. You can also open and close milestones.
 
 ## Milestone promotion
 
-Project milestones can be promoted to group milestones if its project belongs to a group. When a milestone is promoted all other milestones across the group projects with the same title will be merged into it, which means all milestone's children like issues, merge requests and boards will be moved into the new promoted milestone.
-The promote button can be found in the milestone view or milestones list.
+From the project milestone page, you can promote it to a group milestone. This will merge all project milestones across all projects in this group with the same name into a single group milestone. All issues and merge requests that previously were assigned one of these project milestones will now be assigned the new group milestones. This action cannot be reversed and the changes are permanent.
 
-## Special milestone filters
+![Milestones promotion](img/milestone_promotion.png)
 
-In addition to the milestones that exist in the project or group, there are some
-special options available when filtering by milestone:
-
-* **No Milestone** - only show issues or merge requests without a milestone.
-* **Upcoming** - show issues or merge request that belong to the next open
-  milestone with a due date, by project. (For example: if project A has
-  milestone v1 due in three days, and project B has milestone v2 due in a week,
-  then this will show issues or merge requests from milestone v1 in project A
-  and milestone v2 in project B.)
-* **Started** - show issues or merge requests from any milestone with a start
-  date less than today. Note that this can return results from several
-  milestones in the same project.
-
-## Milestone sidebar
-
-The milestone sidebar shows percentage complete, start date and due date,
-issues, total issue weight, total issue time spent, and merge requests.
-
-The percentage complete is calculated as: Closed and merged merge requests plus all closed issues divided by
-total merge requests and issues.
-
-![Milestone sidebar](img/sidebar.png)
-
-## Burndown Charts
-
-[Burndown Charts](burndown_charts.md), available in
-[GitLab Enterprise Edition Starter](https://about.gitlab.com/gitlab-ee),
-are visual representations of the progress of completing a milestone.
-
-![burndown chart](img/burndown_chart.png)
-
-Burndown charts are only available for project milestones currently. They will be available for group milestones [in the future](https://gitlab.com/gitlab-org/gitlab-ee/issues/3064).
-
-## Quick actions
-
-[Quick actions](../quick_actions.md) are available for assigning and removing
-project and group milestones.
+>**Note:**
+Not all project milestone features are currently available for group milestones. The [burndown chart](#burndown-chart) and [list pages](#milestone-lists) are incomplete for group milestones. Users should consider this before milestone promotion.
