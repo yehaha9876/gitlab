@@ -119,7 +119,7 @@ module Geo
       Geo::Fdw::Upload.joins("LEFT OUTER JOIN file_registry
                                            ON file_registry.file_id = #{fdw_table}.id
                                           AND file_registry.file_type IN (#{upload_types})")
-        .merge(Geo::Fdw::Upload.with_files_stored_locally)
+        .with_files_stored_locally
         .where(file_registry: { id: nil })
         .where.not(id: except_registry_ids)
     end
