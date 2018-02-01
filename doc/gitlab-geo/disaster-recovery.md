@@ -18,6 +18,8 @@ This process promotes a secondary Geo replica to a primary. To regain
 geographical redundancy as quickly as possible, you should add a new secondary
 immediately after following these instructions.
 
+**Warning: When a promotion occurs, there may be data that successfully saved to the primary but was not replicated to the secondary before the disaster occurred. This data should be treated as lost.**
+
 ### Step 1. Promoting a secondary Geo replica
 
 1. SSH into your **primary** to stop and disable GitLab.
