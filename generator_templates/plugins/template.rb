@@ -23,7 +23,7 @@ class $NAMEService < Service
   end
 
   def description
-    'Replace me with the descrition of the plugin'
+    'Replace me with the description of the plugin'
   end
 
   def self.to_param

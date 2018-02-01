@@ -1,5 +1,5 @@
 namespace :plugins do
-  desc 'Generate sceleton for new plugin'
+  desc 'Generate skeleton for new plugin'
   task generate: :environment do
     ARGV.each { |a| task a.to_sym { } }
     name = ARGV[1]
