@@ -530,6 +530,10 @@ module Ci
 
     private
 
+    def gitlab_edition_variable
+      'libre'
+    end
+
     def update_artifacts_size
       self.artifacts_size = legacy_artifacts_file&.size
     end
@@ -552,6 +556,7 @@ module Ci
       variables = [
         { key: 'CI', value: 'true', public: true },
         { key: 'GITLAB_CI', value: 'true', public: true },
+        { key: 'GITLAB_EDITION', value: gitlab_edition_variable, public: true },
         { key: 'CI_SERVER_NAME', value: 'GitLab', public: true },
         { key: 'CI_SERVER_VERSION', value: Gitlab::VERSION, public: true },
         { key: 'CI_SERVER_REVISION', value: Gitlab::REVISION, public: true },

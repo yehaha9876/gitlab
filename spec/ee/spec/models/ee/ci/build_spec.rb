@@ -126,6 +126,30 @@ describe Ci::Build do
         it { is_expected.not_to include(environment_varialbe) }
       end
     end
+
+    context 'when there is a current license' do
+      before do
+        allow(License).to receive(:current).and_return(instance_double(License, plan: 'ultimate', feature_available?: true))
+      end
+
+      let(:license_gitlab_edition_environment_variable) do
+        { key: 'GITLAB_EDITION', value: 'ultimate', public: true }
+      end
+
+      it { is_expected.to include(license_gitlab_edition_environment_variable) }
+    end
+
+    context 'when there is no current license' do
+      before do
+        allow(License).to receive(:current).and_return(nil)
+      end
+
+      let(:libre_gitlab_edition_environment_variable) do
+        { key: 'GITLAB_EDITION', value: 'libre', public: true }
+      end
+
+      it { is_expected.to include(libre_gitlab_edition_environment_variable) }
+    end
   end
 
   ARTIFACTS_METHODS = {

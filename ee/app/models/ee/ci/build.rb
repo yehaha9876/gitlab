@@ -60,6 +60,10 @@ module EE
         has_artifact?(DAST_FILE)
       end
 
+      def gitlab_edition_variable
+        License.current&.plan || super
+      end
+
       private
 
       def has_artifact?(name)
