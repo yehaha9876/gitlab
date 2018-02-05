@@ -72,5 +72,9 @@ FactoryBot.define do
       wiki_sync_failed
       wiki_retry_count 0
     end
+
+    trait :repository_checksum do
+      repository_checksum 'f079a831cab27bcda7d81cd9b48296d0c3dd92ee'
+    end
   end
 end

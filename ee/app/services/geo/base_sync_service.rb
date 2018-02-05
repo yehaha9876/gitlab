@@ -101,6 +101,7 @@ module Geo
         attrs["last_#{type}_synced_at"] = started_at
         attrs["#{type}_retry_count"] = retry_count + 1
         attrs["#{type}_retry_at"] = next_retry_time(attrs["#{type}_retry_count"])
+        attrs["#{type}_checksum"] = nil
       end
 
       if finished_at
