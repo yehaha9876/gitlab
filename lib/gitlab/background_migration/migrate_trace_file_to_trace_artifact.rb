@@ -38,11 +38,11 @@ module Gitlab
 
         mount_uploader :file, JobArtifactUploader
 
-        after_save if: :file_changed?, on: :create do
-          run_after_commit do
-            file.schedule_migration_to_object_storage
-          end
-        end
+        # after_save if: :file_changed?, on: :create do
+        #   run_after_commit do
+        #     file.schedule_migration_to_object_storage
+        #   end
+        # end
 
         enum file_type: {
           archive: 1,
@@ -56,7 +56,7 @@ module Gitlab
       def perform(path)
         @path = path
 
-        return unless File.exists?(path)
+        raise "File not found: #{path}" unless File.exists?(path)
 
         backup!
         migrate! if status == :migratable
@@ -66,10 +66,15 @@ module Gitlab
 
       def status
         strong_memoize(:status) do
-          :not_found unless job
-          :not_completed unless job.complete?
-          :duplicate if job.artifacts_trace
-          :migratable
+          if !job
+            :not_found
+          elsif !job.complete?
+            :not_completed
+          elsif job.artifacts_trace
+            :duplicate
+          else
+            :migratable
+          end
         end
       end
 
