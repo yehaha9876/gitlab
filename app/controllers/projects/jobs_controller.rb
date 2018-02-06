@@ -1,5 +1,5 @@
 class Projects::JobsController < Projects::ApplicationController
-  prepend EE::Projects::JobsController
+  include SendFileUpload
 
   before_action :build, except: [:index, :cancel_all]
 
@@ -119,13 +119,9 @@ class Projects::JobsController < Projects::ApplicationController
   end
 
   def raw
-    build.trace.read do |stream|
-      if stream.file?
-        send_file stream.path, type: 'text/plain; charset=utf-8', disposition: 'inline'
-      else
-        render_404
-      end
-    end
+    send_upload(raw_file_upload,
+                send_params: raw_send_params,
+                redirect_params: raw_redirect_params)
   end
 
   private
@@ -145,5 +141,25 @@ class Projects::JobsController < Projects::ApplicationController
 
   def build_path(build)
     project_job_path(build.project, build)
+  end
+
+  def raw_file_upload
+    if build.job_artifacts_trace
+      build.job_artifacts_trace&.file
+    else
+      path = nil
+
+      build.trace.read { |stream| path = stream.path if stream.file? }
+
+      path
+    end
+  end
+
+  def raw_send_params
+    { type: 'text/plain; charset=utf-8', disposition: 'inline' }
+  end
+
+  def raw_redirect_params
+    { query: { 'response-content-type' => 'text/plain; charset=utf-8', 'response-content-disposition' => 'inline' } }
   end
 end
