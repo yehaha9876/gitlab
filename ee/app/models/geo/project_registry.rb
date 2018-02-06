@@ -38,7 +38,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   end
 
   def wiki_sync_due?(scheduled_time)
-    project.wiki_enabled? && (never_synced_wiki? || wiki_sync_needed?(scheduled_time))
+    should_be_wiki_synced? && (never_synced_wiki? || wiki_sync_needed?(scheduled_time))
   end
 
   private
@@ -49,6 +49,10 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
 
   def never_synced_wiki?
     last_wiki_successful_sync_at.nil?
+  end
+
+  def should_be_wiki_synced?
+    project.wiki_enabled? && project.wiki_repository_exists?
   end
 
   def repository_sync_needed?(timestamp)

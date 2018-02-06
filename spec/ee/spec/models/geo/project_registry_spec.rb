@@ -113,12 +113,21 @@ describe Geo::ProjectRegistry do
     with_them do
       before do
         registry.update!(resync_wiki: resync_wiki, last_wiki_successful_sync_at: last_successful_sync, last_wiki_synced_at: last_sync)
+        allow_any_instance_of(Project).to receive(:wiki_repository_exists?).and_return(true)
       end
 
       subject { registry.wiki_sync_due?(Time.now) }
 
       context 'wiki enabled' do
         it { is_expected.to eq(expected) }
+
+        context 'wiki does not exist' do
+          before do
+            allow_any_instance_of(Project).to receive(:wiki_repository_exists?).and_return(false)
+          end
+
+          it { is_expected.to be_falsy }
+        end
       end
 
       context 'wiki disabled' do
