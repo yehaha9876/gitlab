@@ -1,5 +1,5 @@
 class Projects::JobsController < Projects::ApplicationController
-  prepend EE::Projects::JobsController
+  include SendFileUpload
 
   before_action :build, except: [:index, :cancel_all]
 
@@ -119,11 +119,17 @@ class Projects::JobsController < Projects::ApplicationController
   end
 
   def raw
-    build.trace.read do |stream|
-      if stream.file?
-        send_file stream.path, type: 'text/plain; charset=utf-8', disposition: 'inline'
-      else
-        render_404
+    if trace_artifact_file
+      send_upload(raw_file_upload,
+                  send_params: raw_send_params,
+                  redirect_params: raw_redirect_params)
+    else
+      build.trace.read do |stream|
+        if stream.file?
+          send_file stream.path, type: 'text/plain; charset=utf-8', disposition: 'inline'
+        else
+          render_404
+        end
       end
     end
   end
@@ -145,5 +151,9 @@ class Projects::JobsController < Projects::ApplicationController
 
   def build_path(build)
     project_job_path(build.project, build)
+  end
+
+  def trace_artifact_file
+    @trace_artifact_file ||= build.job_artifacts_trace&.file
   end
 end
