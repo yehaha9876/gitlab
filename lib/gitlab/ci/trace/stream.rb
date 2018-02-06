@@ -25,6 +25,14 @@ module Gitlab
           self.path.present?
         end
 
+        def remote?
+          @stream.is_a?(Gitlab::Ci::Trace::HttpIO)
+        end
+
+        def url
+          @stream.url
+        end
+
         def limit(last_bytes = LIMIT_SIZE)
           if last_bytes < size
             stream.seek(-last_bytes, IO::SEEK_END)

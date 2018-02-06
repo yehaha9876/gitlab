@@ -120,7 +120,9 @@ class Projects::JobsController < Projects::ApplicationController
 
   def raw
     build.trace.read do |stream|
-      if stream.file?
+      if stream.remote?
+        redirect_to stream.url
+      elsif stream.file?
         send_file stream.path, type: 'text/plain; charset=utf-8', disposition: 'inline'
       else
         render_404
