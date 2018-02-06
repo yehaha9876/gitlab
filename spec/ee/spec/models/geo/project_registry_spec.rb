@@ -121,7 +121,7 @@ describe Geo::ProjectRegistry do
       context 'wiki enabled' do
         it { is_expected.to eq(expected) }
 
-        context 'wiki does not exist' do
+        context 'and wiki does not exist' do
           before do
             allow_any_instance_of(Project).to receive(:wiki_repository_exists?).and_return(false)
           end

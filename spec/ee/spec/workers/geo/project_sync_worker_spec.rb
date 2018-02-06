@@ -12,6 +12,9 @@ RSpec.describe Geo::ProjectSyncWorker do
 
       allow(Geo::WikiSyncService).to receive(:new)
         .with(instance_of(Project)).once.and_return(wiki_sync_service)
+
+      allow_any_instance_of(Project).to receive(:wiki_repository_exists?)
+        .and_return(true)
     end
 
     context 'when project could not be found' do
