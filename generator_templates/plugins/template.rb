@@ -30,6 +30,10 @@ class $NAMEService < Service
     '$PARAM'
   end
 
+  def self.supported_events
+    %w(push tag_push issue confidential_issue merge_request wiki_page)
+  end
+
   def fields
     []
   end
