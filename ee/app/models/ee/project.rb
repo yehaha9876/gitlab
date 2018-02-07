@@ -24,6 +24,7 @@ module EE
 
       belongs_to :mirror_user, foreign_key: 'mirror_user_id', class_name: 'User'
 
+      has_one :state, class_name: 'ProjectState'
       has_one :mirror_data, autosave: true, class_name: 'ProjectMirrorData'
       has_one :push_rule, ->(project) { project&.feature_available?(:push_rules) ? all : none }
       has_one :index_status
