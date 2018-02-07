@@ -61,21 +61,21 @@ module Ci
       old = Ci::Build.select(:id).where(%q[artifacts_file <> ''])
       new = Ci::Build.select(:id).where(%q[(artifacts_file IS NULL OR artifacts_file = '') AND exists (?)],
                                         Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id'))
-      where('id IN (? UNION ALL ?)', old, new)
+      where('ci_builds.id IN (? UNION ALL ?)', old, new)
     end
 
     scope :with_artifacts_not_expired, ->() do
       old = Ci::Build.select(:id).where(%q[artifacts_file <> '' AND (artifacts_expire_at IS NULL OR artifacts_expire_at > ?)], Time.now)
       new = Ci::Build.select(:id).where(%q[(artifacts_file IS NULL OR artifacts_file = '') AND exists (?)],
                                         Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id AND (expire_at IS NULL OR expire_at > ?)', Time.now))
-      where('id IN (? UNION ALL ?)', old, new)
+      where('ci_builds.id IN (? UNION ALL ?)', old, new)
     end
 
     scope :with_expired_artifacts, ->() do
       old = Ci::Build.select(:id).where(%q[artifacts_file <> '' AND artifacts_expire_at < ?], Time.now)
       new = Ci::Build.select(:id).where(%q[(artifacts_file IS NULL OR artifacts_file = '') AND exists (?)],
                                         Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id AND expire_at < ?', Time.now))
-      where('id IN (? UNION ALL ?)', old, new)
+      where('ci_builds.id IN (? UNION ALL ?)', old, new)
     end
 
     scope :with_artifacts_stored_locally, ->() { with_artifacts.where(artifacts_file_store: [nil, LegacyArtifactUploader::Store::LOCAL]) }
