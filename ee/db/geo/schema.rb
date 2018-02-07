@@ -53,10 +53,10 @@ ActiveRecord::Schema.define(version: 20180201154345) do
     t.string "last_repository_sync_failure"
     t.string "last_wiki_sync_failure"
     t.string "repository_checksum"
-    t.datetime "last_repository_verification_at"
+    t.datetime_with_timezone "last_repository_verification_at"
     t.string "last_repository_verification_failure"
     t.string "wiki_checksum"
-    t.datetime "last_wiki_verification_at"
+    t.datetime_with_timezone "last_wiki_verification_at"
     t.string "last_wiki_verification_failure"
   end
 

@@ -6,7 +6,7 @@ module Geo
     include ExclusiveLeaseGuard
     include Gitlab::Geo::LogHelpers
 
-    BATCH_SIZE = 1000
+    BATCH_SIZE    = 1000
     LEASE_TIMEOUT = 60.minutes
 
     def perform(geo_node_id)
@@ -30,15 +30,13 @@ module Geo
     def verify_project(registry)
       project = registry.project
 
-      unless project.repository_checksum.nil?
-        verify_repository(registry, project.disk_path, project.repository_checksum, :repository)
+      if should_verify_repository?(registry, :repository)
+        verify_repository(registry, project.disk_path, project.state&.repository_checksum, :repository)
       end
 
-      unless project.wiki_checksum.nil?
-        verify_repository(registry, project.wiki.disk_path, project.wiki_checksum, :wiki)
+      if should_verify_repository?(registry, :wiki)
+        verify_repository(registry, project.wiki.disk_path, project.state&.wiki_checksum, :wiki)
       end
-
-      return false
     end
 
     def verify_repository(registry, repository, original_checksum, type)
@@ -59,6 +57,19 @@ module Geo
     end
 
     private
+
+    # when should we verify?
+    # - primary repository has not changed in 6 hours
+    # - primary repository was checked after the last repository update
+    # - secondary repository was successfully synced after the last repository update
+    def should_verify_repository?(registry, type)
+      last_checked_at = registry.project.state&.send("last_#{type}_check_at")
+      last_successful_sync_at = registry.send("last_#{type}_successful_sync_at")
+
+      registry.project.last_repository_updated_at < 6.hours.ago &&
+        !last_checked_at.nil? && last_checked_at > registry.project.last_repository_updated_at &&
+        !last_successful_sync_at.nil? && last_successful_sync_at > registry.project.last_repository_updated_at
+    end
 
     def find_registries_without_checksum
       Geo::ProjectRegistry.where('repository_checksum IS NULL')

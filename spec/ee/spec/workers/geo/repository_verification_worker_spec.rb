@@ -40,7 +40,34 @@ describe Geo::RepositoryVerificationWorker do
   end
 
   describe '#verify_project' do
-    # TODO
+    let(:registry) { create(:geo_project_registry, project: create(:project, :repository)) }
+
+    it 'verifies both repository and wiki' do
+      allow(subject).to receive(:should_verify_repository?).with(registry, :repository).and_return(true)
+      allow(subject).to receive(:should_verify_repository?).with(registry, :wiki).and_return(true)
+
+      expect(subject).to receive(:verify_repository).twice
+
+      subject.verify_project(registry)
+    end
+
+    it 'verifies only the repository' do
+      allow(subject).to receive(:should_verify_repository?).with(registry, :repository).and_return(true)
+      allow(subject).to receive(:should_verify_repository?).with(registry, :wiki).and_return(false)
+
+      expect(subject).to receive(:verify_repository).once
+
+      subject.verify_project(registry)
+    end
+
+    it 'verifies only the wiki' do
+      allow(subject).to receive(:should_verify_repository?).with(registry, :repository).and_return(false)
+      allow(subject).to receive(:should_verify_repository?).with(registry, :wiki).and_return(true)
+
+      expect(subject).to receive(:verify_repository).once
+
+      subject.verify_project(registry)
+    end
   end
 
   describe '#verify_repository' do
@@ -68,6 +95,100 @@ describe Geo::RepositoryVerificationWorker do
     registry_3 = create(:geo_project_registry, :repository_checksum)
 
     expect(subject.send(:find_registries_without_checksum).count).to eq 1
+  end
+
+  describe '#should_verify_repository?' do
+    context 'repository' do
+      let(:project_state) { create(:project_state, project: create(:project, :repository))}
+      let(:registry) do
+        registry = create(:geo_project_registry, project: project_state.project)
+        registry.project.last_repository_updated_at     = 7.hours.ago
+        registry.project.state.last_repository_check_at = 5.hours.ago
+        registry.last_repository_successful_sync_at     = 5.hours.ago
+
+        registry
+      end
+
+      it 'verifies the repository' do
+        expect(subject.send(:should_verify_repository?, registry, :repository)).to be_truthy
+      end
+
+      it 'does not verify if repository was updated after checksum' do
+        registry.project.last_repository_updated_at     = 4.hours.ago
+        registry.project.state.last_repository_check_at = 5.hours.ago
+
+        expect(subject.send(:should_verify_repository?, registry, :repository)).to be_falsy
+      end
+
+      it 'does not verify if repository was updated after sync as done' do
+        registry.project.last_repository_updated_at = 4.hours.ago
+        registry.last_repository_successful_sync_at = 5.hours.ago
+
+        expect(subject.send(:should_verify_repository?, registry, :repository)).to be_falsy
+      end
+
+      it 'does not verify if never synced' do
+        registry.last_repository_successful_sync_at = nil
+
+        expect(subject.send(:should_verify_repository?, registry, :repository)).to be_falsy
+      end
+
+      it 'has been at least 6 hours since the primary repository was updated' do
+        registry.project.last_repository_updated_at = 7.hours.ago
+
+        expect(subject.send(:should_verify_repository?, registry, :repository)).to be_truthy
+
+        registry.project.last_repository_updated_at = (5.5).hours.ago
+
+        expect(subject.send(:should_verify_repository?, registry, :repository)).to be_falsy
+      end
+    end
+
+    context 'wiki' do
+      let(:project_state) { create(:project_state, project: create(:project, :repository))}
+      let(:registry) do
+        registry = create(:geo_project_registry, project: project_state.project)
+        registry.project.last_repository_updated_at = 7.hours.ago
+        registry.project.state.last_wiki_check_at = 5.hours.ago
+        registry.last_wiki_successful_sync_at     = 5.hours.ago
+
+        registry
+      end
+
+      it 'verifies the repository' do
+        expect(subject.send(:should_verify_repository?, registry, :wiki)).to be_truthy
+      end
+
+      it 'does not verify if repository was updated after checksum' do
+        registry.project.last_repository_updated_at = 4.hours.ago
+        registry.project.state.last_wiki_check_at   = 5.hours.ago
+
+        expect(subject.send(:should_verify_repository?, registry, :wiki)).to be_falsy
+      end
+
+      it 'does not verify if repository was updated after sync as done' do
+        registry.project.last_repository_updated_at = 4.hours.ago
+        registry.last_wiki_successful_sync_at = 5.hours.ago
+
+        expect(subject.send(:should_verify_repository?, registry, :wiki)).to be_falsy
+      end
+
+      it 'does not verify if never synced' do
+        registry.last_wiki_successful_sync_at = nil
+
+        expect(subject.send(:should_verify_repository?, registry, :wiki)).to be_falsy
+      end
+
+      it 'has been at least 6 hours since the primary repository was updated' do
+        registry.project.last_repository_updated_at = 7.hours.ago
+
+        expect(subject.send(:should_verify_repository?, registry, :wiki)).to be_truthy
+
+        registry.project.last_repository_updated_at = (5.5).hours.ago
+
+        expect(subject.send(:should_verify_repository?, registry, :wiki)).to be_falsy
+      end
+    end
   end
 
   describe '#record_status' do
