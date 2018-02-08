@@ -114,7 +114,7 @@ module EE
     def shared_runners_minutes_limit_enabled?
       shared_runner_minutes_supported? &&
         shared_runners_enabled? &&
-        actual_shared_runners_minutes_limit.nonzero?
+        actual_shared_runners_minutes_limit != 0
     end
 
     def shared_runners_minutes_used?
