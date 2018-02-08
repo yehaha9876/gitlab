@@ -112,6 +112,11 @@ module EE
     end
 
     def shared_runners_minutes_limit_enabled?
+      puts "#{self.class.name} - #{__callee__}: shared_runner_minutes_supported?: #{shared_runner_minutes_supported?}"
+      puts "#{self.class.name} - #{__callee__}: shared_runners_enabled?: #{shared_runners_enabled?}"
+      puts "#{self.class.name} - #{__callee__}: actual_shared_runners_minutes_limit: #{actual_shared_runners_minutes_limit}"
+      puts "#{self.class.name} - #{__callee__}: actual_shared_runners_minutes_limit.nonzero?: #{actual_shared_runners_minutes_limit.nonzero?}"
+
       shared_runner_minutes_supported? &&
         shared_runners_enabled? &&
         actual_shared_runners_minutes_limit.nonzero?
