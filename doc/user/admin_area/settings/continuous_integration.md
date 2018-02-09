@@ -1,4 +1,4 @@
-# Continuous integration Admin settings
+# Continuous integration Admin settings and configurations
 
 ## Maximum artifacts size
 
@@ -94,3 +94,20 @@ the group.
 
 [art-yml]: ../../../administration/job_artifacts.md
 [ee-1078]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1078
+
+## Job Trace location
+
+By default all job traces are saved to `/var/opt/gitlab/gitlab-ci/builds`. The
+job logs are organized by the year and month (for example, `2017_03`) and then
+by project ID.
+
+Currently, there isn't a way to automatically expire old build logs, but it's
+safe to remove these if they're taking up too much space. If you remove these
+logs manually, the job output in the UI will be empty.
+
+To change the location of these logs you can change the following value
+in your `gitlab.rb`:
+
+```
+gitlab_ci['builds_directory'] = '/mnt/to/gitlab-ci/builds'
+```
