@@ -158,23 +158,23 @@ export default class ApproversSelect {
 
     const $form = $('.js-add-approvers').closest('form');
     $loadWrapper.removeClass('hidden');
-    window.$.ajax({
-      url: $form.attr('action'),
-      type: 'POST',
-      data: {
-        _method: 'PATCH',
-        [fieldName]: newValue,
-      },
-      success: ApproversSelect.updateApproverList,
-      complete() {
-        $input.val('');
-        $approverSelect.select2('val', '');
-        $loadWrapper.addClass('hidden');
-      },
-      error() {
-        window.Flash('Failed to add Approver', 'alert');
-      },
-    });
+    // window.$.ajax({
+    //   url: $form.attr('action'),
+    //   type: 'POST',
+    //   data: {
+    //     _method: 'PATCH',
+    //     [fieldName]: newValue,
+    //   },
+    //   success: ApproversSelect.updateApproverList,
+    //   complete() {
+    //     $input.val('');
+    //     $approverSelect.select2('val', '');
+    //     $loadWrapper.addClass('hidden');
+    //   },
+    //   error() {
+    //     window.Flash('Failed to add Approver', 'alert');
+    //   },
+    // });
   }
 
   static removeApprover(e) {
@@ -182,18 +182,18 @@ export default class ApproversSelect {
     const target = e.currentTarget;
     const $loadWrapper = $('.load-wrapper');
     $loadWrapper.removeClass('hidden');
-    $.ajax({
-      url: target.getAttribute('href'),
-      type: 'POST',
-      data: {
-        _method: 'DELETE',
-      },
-      success: ApproversSelect.updateApproverList,
-      complete: () => $loadWrapper.addClass('hidden'),
-      error() {
-        window.Flash('Failed to remove Approver', 'alert');
-      },
-    });
+    // $.ajax({
+    //   url: target.getAttribute('href'),
+    //   type: 'POST',
+    //   data: {
+    //     _method: 'DELETE',
+    //   },
+    //   success: ApproversSelect.updateApproverList,
+    //   complete: () => $loadWrapper.addClass('hidden'),
+    //   error() {
+    //     window.Flash('Failed to remove Approver', 'alert');
+    //   },
+    // });
   }
 
   static updateApproverList(html) {
