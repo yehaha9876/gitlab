@@ -107,7 +107,6 @@ RSpec.configure do |config|
   # EE-specific start
   config.before(:all) do
     License.destroy_all
-    TestLicense.init
   end
   # EE-specific stop
 
