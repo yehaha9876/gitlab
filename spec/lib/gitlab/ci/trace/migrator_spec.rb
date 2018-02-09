@@ -16,13 +16,31 @@ describe Gitlab::Ci::Trace::Migrator do
       context 'when project of job is found' do
         context 'when job is found' do
           context 'when job is complete' do
-            context 'when job has does not trace artifact' do
+            context 'when job does not have trace artifact' do
               it 'migrates' do
                 create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
                   described_class.new(path.remove(builds_path)).perform
 
-                  expect(artifacts_path?(job.job_artifacts_trace.file.path)).to be_truthy
+                  expect(job.job_artifacts_trace).to exist
                   expect(job.trace.raw).to eq(trace_content)
+                  expect(File.exist?(trace_artifact_path(job))).to be_truthy
+                  expect(File.exist?(path)).to be_falsy
+                  expect(File.exist?(extend_path(path, :tmp))).to be_falsy
+                end
+              end
+
+              context 'when checksum is mismatched between trace artifact and src file' do
+                it 'raises an error' do
+                  allow_any_instance_of(JobArtifactUploader).to receive(:read) { 'data is not same' }
+
+                  create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
+                    expect { described_class.new(path.remove(builds_path)).perform }
+                      .to raise_error(Gitlab::Ci::Trace::Migrator::ChecksumMismatchError)
+
+                    expect(job.job_artifacts_trace).to be_nil
+                    expect(File.exist?(path)).to be_truthy
+                    expect(File.exist?(extend_path(path, :tmp))).to be_falsy
+                  end
                 end
               end
             end
@@ -34,8 +52,12 @@ describe Gitlab::Ci::Trace::Migrator do
 
               it 'does not migrates but moves file' do
                 create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
-                  expect { described_class.new(path.remove(builds_path)).perform }
-                    .to  raise_error(Gitlab::Ci::Trace::Migrator::TraceArtifactDuplicateError)
+                  described_class.new(path.remove(builds_path)).perform
+
+                  expect(job.job_artifacts_trace).to exist
+                  expect(File.exist?(path)).to be_falsy
+                  expect(File.exist?(extend_path(path, :duplicate))).to be_truthy
+                  expect(File.exist?(extend_path(path, :tmp))).to be_falsy
                 end
               end
             end
@@ -44,10 +66,14 @@ describe Gitlab::Ci::Trace::Migrator do
           context 'when job is not complete' do
             let!(:job) { create(:ci_build, :running) }
 
-            it 'does not migrates but moves file' do
+            it 'does not migrate' do
               create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
                 expect { described_class.new(path.remove(builds_path)).perform }
-                  .to  raise_error(Gitlab::Ci::Trace::Migrator::JobNotCompletedError)
+                  .to raise_error(Gitlab::Ci::Trace::Migrator::JobNotCompletedError)
+
+                expect(job.job_artifacts_trace).to be_nil
+                expect(File.exist?(path)).to be_truthy
+                expect(File.exist?(extend_path(path, :tmp))).to be_falsy
               end
             end
           end
@@ -60,34 +86,36 @@ describe Gitlab::Ci::Trace::Migrator do
             create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
               described_class.new(path.remove(builds_path)).perform
 
+              expect(job.job_artifacts_trace).to be_nil
               expect(File.exist?(path)).to be_falsy
-              expect(File.exist?(simulate_backup_path(path, :not_found))).to be_truthy
+              expect(File.exist?(extend_path(path, :not_found))).to be_truthy
+              expect(File.exist?(extend_path(path, :tmp))).to be_falsy
             end
           end
         end
       end
 
       context 'when project of job is not found' do
-        let(:project_id) { 3 }
-
-        before do
-          job.update_attribute(:project_id, nil)
-        end
-
         it 'does not migrates but moves file' do
           create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
+            job.update_attribute(:project_id, nil)
+
             described_class.new(path.remove(builds_path)).perform
 
+            expect(job.job_artifacts_trace).to be_nil
             expect(File.exist?(path)).to be_falsy
-            expect(File.exist?(simulate_backup_path(path, :not_found))).to be_truthy
+            expect(File.exist?(extend_path(path, :not_found))).to be_truthy
+            expect(File.exist?(extend_path(path, :tmp))).to be_falsy
           end
         end
       end
     end
 
     context 'when trace file is not found' do
+      let(:path) { File.join(builds_path, yyyy_mm, project_id.to_s, "#{job_id}.log") }
+
       it 'raises error' do
-        expect { described_class.new('invalid_path').perform }.to raise_error("Trace file not found")
+        expect { described_class.new(path).perform }.to raise_error(Errno::ENOENT)
       end
     end
 
@@ -97,7 +125,11 @@ describe Gitlab::Ci::Trace::Migrator do
       it 'raises error' do
         create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
           expect { described_class.new(path.remove(builds_path)).perform }
-            .to  raise_error('Invalid trace path format')
+            .to raise_error('Invalid trace path format')
+
+          expect(job.job_artifacts_trace).to be_nil
+          expect(File.exist?(path)).to be_truthy
+          expect(File.exist?(extend_path(path, :tmp))).to be_falsy
         end
       end
     end

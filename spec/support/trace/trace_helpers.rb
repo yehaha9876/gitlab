@@ -12,20 +12,17 @@ module TraceHelpers
     yield trace_path if block_given?
   end
 
-  def artifacts_path?(path)
-    %r{.{2}/.{2}/.{64}/\d{4}_\d{2}_\d{2}/\d{1,}/\d{1,}/\d{1,}.log} =~ path
+  def trace_artifact_path(job)
+    File.join('tmp/tests/artifacts',
+              JobArtifactUploader.new(job.job_artifacts_trace).send(:dynamic_segment),
+              "#{job.job_artifacts_trace.id}.log")
+  rescue
+    'not_found'
   end
 
-  def simulate_backup_path(path, status)
-    case status
-    when :not_found
-      path.gsub(/(\d{4}_\d{2})/, '\1_not_found')
-    when :migratable
-      path.gsub(/(\d{4}_\d{2})/, '\1_migrated')
-    end
-  end
-
-  def not_completed_path(path)
-    path.gsub(/(\d{4}_\d{2})/, '\1_not_found')
+  def extend_path(path, keyword)
+    Gitlab::Ci::Trace::Migrator.new(path).send(:extend_path, path, keyword)
+  rescue
+    'not_found'
   end
 end

@@ -8,7 +8,7 @@ module Gitlab
           @relative_path = relative_path
         end
 
-        def trace_files
+        def legacy_trace_files
           Dir.chdir(Settings.gitlab_ci.builds_path) do
             unless Dir.exist?(relative_path)
               return yield relative_path

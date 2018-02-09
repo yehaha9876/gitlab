@@ -19,4 +19,6 @@ describe 'gitlab:traces namespace rake task' do
       expect(job1.job_artifacts_trace).not_to be_nil
     end
   end
+
+  # TODO: OS tests
 end

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Gitlab::Ci::Trace::FileIterator do
   include TraceHelpers
 
-  describe '#trace_files' do
+  describe '#legacy_trace_files' do
     let(:builds_path) { Rails.root.join('tmp/tests/builds').to_s }
 
     before do
@@ -22,7 +22,7 @@ describe Gitlab::Ci::Trace::FileIterator do
       let(:relative_path) { '.' }
 
       it 'iterates' do
-        expect { |b| described_class.new(relative_path).trace_files(&b) }
+        expect { |b| described_class.new(relative_path).legacy_trace_files(&b) }
           .to yield_control.exactly(9).times
       end
     end
@@ -31,7 +31,7 @@ describe Gitlab::Ci::Trace::FileIterator do
       let(:relative_path) { '2018_02' }
 
       it 'iterates' do
-        expect { |b| described_class.new(relative_path).trace_files(&b) }
+        expect { |b| described_class.new(relative_path).legacy_trace_files(&b) }
           .to yield_control.exactly(6).times
       end
     end
@@ -40,7 +40,7 @@ describe Gitlab::Ci::Trace::FileIterator do
       let(:relative_path) { '2018_03/2' }
 
       it 'iterates' do
-        expect { |b| described_class.new(relative_path).trace_files(&b) }
+        expect { |b| described_class.new(relative_path).legacy_trace_files(&b) }
           .to yield_control.exactly(2).times
       end
     end
@@ -49,7 +49,7 @@ describe Gitlab::Ci::Trace::FileIterator do
       let(:relative_path) { '2018_03/3/9.log' }
 
       it 'iterates' do
-        expect { |b| described_class.new(relative_path).trace_files(&b) }
+        expect { |b| described_class.new(relative_path).legacy_trace_files(&b) }
           .to yield_control.exactly(1).times
       end
     end
