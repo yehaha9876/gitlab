@@ -1,5 +1,15 @@
 Copyright (c) 2011-2018 GitLab B.V.
 
+What license applies?
+
+If you are licenseing the GitLab open source Libre product, the MIT (Expat) 
+license set out below in the GitLab OSS section will apply.  If you are 
+licensing our GitLab commercial product, the GitLab Subscription license 
+referenced below in the GitLab Closed Source Commercial Software will apply, 
+only to the code that is not part of the GitLab OSS or files that produce 
+client-side Javascript. GitLab OSS and files that produce client-side Javascript
+are covered by the MIT (Expat) license below.
+
 GitLab OSS
 
 The GitLab open source software and associated documentation files (the "GitLab 
@@ -34,13 +44,8 @@ The GitLab closed source commercial software and associated documentation files
 (the "GitLab Software") is governed by the GitLab Subscription Terms, available
 at https://about.gitlab.com/terms/#subscription (the “Subscription Terms”), or 
 other agreement governing the use of the GitLab Software, as agreed by you and 
-GitLab. 
-
-This GitLab License applies only to the part of the GitLab Software that is not
-distributed as part of GitLab OSS, and that is not a file that produces 
-client-side JavaScript, in whole or in part. Any part of this GitLab Software 
-distributed as part of GitLab OSS or that is a file that produces client-side 
-JavaScript, in whole or in part, is copyrighted under the MIT (Expat) license as 
-set forth above. 
+GitLab.  As stated above, the Subscription Terms do not apply to those portions 
+of the GitLab Software that is GitLab OSS or files producing client-side 
+Javascript.
 
 
