@@ -21,9 +21,8 @@ describe Gitlab::Ci::Trace::Migrator do
                 create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
                   described_class.new(path.remove(builds_path)).perform
 
-                  expect(job.job_artifacts_trace).to exist
+                  expect(job.job_artifacts_trace.file.exists?).to be_truthy
                   expect(job.trace.raw).to eq(trace_content)
-                  expect(File.exist?(trace_artifact_path(job))).to be_truthy
                   expect(File.exist?(path)).to be_falsy
                   expect(File.exist?(extend_path(path, :migrated))).to be_truthy
                   expect(File.exist?(extend_path(path, :tmp))).to be_falsy

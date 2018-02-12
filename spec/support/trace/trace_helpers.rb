@@ -12,14 +12,6 @@ module TraceHelpers
     yield trace_path if block_given?
   end
 
-  def trace_artifact_path(job)
-    File.join('tmp/tests/artifacts',
-              JobArtifactUploader.new(job.job_artifacts_trace).send(:dynamic_segment),
-              "#{job.job_artifacts_trace.id}.log")
-  rescue
-    'not_found'
-  end
-
   def extend_path(path, keyword)
     Gitlab::Ci::Trace::Migrator.new(path).send(:extend_path, path, keyword)
   rescue
