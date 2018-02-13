@@ -54,9 +54,9 @@ module ObjectStorage
         return unless schedule_background_upload?
 
         ObjectStorage::BackgroundMoveWorker.perform_async(self.class.name,
-                                                upload.class.to_s,
-                                                mounted_as,
-                                                upload.id)
+                                                          upload.class.to_s,
+                                                          mounted_as,
+                                                          upload.id)
       end
 
       private
@@ -68,6 +68,21 @@ module ObjectStorage
         paths.include?(upload.path) &&
           upload.model_id == model.id &&
           upload.model_type == model.class.base_class.sti_name
+      end
+    end
+
+    # Disable the `move_to_store` and `move_to_cache` for all uploaders that
+    # can migrate! to another store. The logic is not multi-storage aware and
+    # causes data loss with the migration process
+    #
+    # See https://gitlab.com/gitlab-org/gitlab-ee/issues/4927
+    module GitlabUploader
+      def move_to_store
+        false
+      end
+
+      def move_to_cache
+        false
       end
     end
   end
@@ -104,6 +119,7 @@ module ObjectStorage
 
     included do |base|
       base.include(ObjectStorage)
+      base.prepend(Extension::GitlabUploader)
 
       before :store, :verify_license!
       after :migrate, :delete_migrated_file
@@ -195,31 +211,39 @@ module ObjectStorage
     #   new_store: Enum (Store::LOCAL, Store::REMOTE)
     #
     def migrate!(new_store)
-      return unless object_store != new_store
       return unless file
+      return file unless object_store != new_store
 
-      new_file = nil
-      file_to_delete = file
+      new_file = nil # the migrated copy
+      file_to_migrate = file # the original file
       from_object_store = object_store
+
       self.object_store = new_store # changes the storage and file
 
-      cache_stored_file! if file_storage?
+      # we need to cache the file when using the remote store,
+      # because remote -> local copy does not work.
+      cache_stored_file! if from_object_store == Store::REMOTE
 
-      with_callbacks(:migrate, file_to_delete) do
-        with_callbacks(:store, file_to_delete) do # for #store_versions!
-          new_file = storage.store!(file)
+      with_callbacks(:migrate, file_to_migrate) do
+        with_callbacks(:store, file_to_migrate) do # for #store_versions!
+          new_file = storage.store!(file) # either the file (local) or the cached version (remote)
           persist_object_store!
+
           self.file = new_file
         end
       end
 
       file
     rescue => e
-      # in case of failure delete new file
-      new_file.delete unless new_file.nil?
       # revert back to the old file
       self.object_store = from_object_store
-      self.file = file_to_delete
+
+      # in case of failure delete new file
+      if file_to_migrate&.exists?
+        new_file&.delete
+        self.file = file_to_migrate
+      end
+
       raise e
     end
 
@@ -227,9 +251,9 @@ module ObjectStorage
       return unless schedule_background_upload?
 
       ObjectStorage::BackgroundMoveWorker.perform_async(self.class.name,
-                                                          model.class.name,
-                                                          mounted_as,
-                                                          model.id)
+                                                        model.class.name,
+                                                        mounted_as,
+                                                        model.id)
     end
 
     def fog_directory
