@@ -186,7 +186,7 @@ _The artifacts are stored by default in
 From 10.5, each job trace is stored as an artifact. This gives us a lot of
 flexibility, such as uploading traces to ObjectStorage.
 
-Although, legacy traces which had been generated before 10.5 are still
+However, legacy traces which had been generated before 10.5 are still
 stored as non-artifact files. To turn those legacy trace files into artifacts,
 run `gitlab-rake gitlab:artifacts:migrate['.']`.
 
