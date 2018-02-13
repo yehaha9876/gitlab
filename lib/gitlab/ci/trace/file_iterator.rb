@@ -41,11 +41,11 @@ module Gitlab
         end
 
         def project_id?(entry)
-          /^\d{1,}$/ =~ entry
+          /^\d+$/ =~ entry
         end
 
         def trace_file?(entry)
-          /^\d{1,}.log$/ =~ entry
+          /^\d+\.log$/ =~ entry
         end
 
         def sanitized_path(path)
