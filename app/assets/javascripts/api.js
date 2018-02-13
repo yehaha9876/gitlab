@@ -93,6 +93,33 @@ const Api = {
     return axios.get(url);
   },
 
+  // Return Merge Request for project
+  mergeRequest(projectPath, mergeRequestId) {
+    const url = Api.buildUrl(Api.mergeRequestPath)
+            .replace(':id', encodeURIComponent(projectPath))
+            .replace(':mrid', mergeRequestId);
+
+    return axios.get(url);
+  },
+
+  // Return Merge Request Changes
+  mergeRequestChanges(projectPath, mergeRequestId) {
+    const url = Api.buildUrl(Api.mergeRequestChangesPath)
+            .replace(':id', encodeURIComponent(projectPath))
+            .replace(':mrid', mergeRequestId);
+
+    return axios.get(url);
+  },
+
+  // Return Merge Request Notes
+  mergeRequestNotes(projectPath, mergeRequestId) {
+    const url = Api.buildUrl(Api.mergeRequestNotesPath)
+            .replace(':id', encodeURIComponent(projectPath))
+            .replace(':mrid', mergeRequestId);
+
+    return axios.get(url);
+  },
+
   newLabel(namespacePath, projectPath, data, callback) {
     let url;
 

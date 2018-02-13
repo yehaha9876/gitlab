@@ -23,6 +23,16 @@ export default class Model {
       ),
     );
 
+    if (this.file.targetBranch) {
+      this.disposable.add(
+        this.targetModel = this.monaco.editor.createModel(
+          this.file.targetRaw,
+          undefined,
+          new this.monaco.Uri(null, null, `target/${this.file.path}`),
+        ),
+      );
+    }
+
     this.events = new Map();
 
     this.updateContent = this.updateContent.bind(this);
@@ -50,6 +60,10 @@ export default class Model {
 
   getModel() {
     return this.model;
+  }
+
+  getTargetModel() {
+    return this.targetModel;
   }
 
   getOriginalModel() {

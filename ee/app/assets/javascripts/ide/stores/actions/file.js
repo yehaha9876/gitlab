@@ -1,6 +1,9 @@
 import { normalizeHeaders } from '~/lib/utils/common_utils';
 import flash from '~/flash';
 import eventHub from 'ee/ide/eventhub';
+
+import { parsePatch, applyPatches } from 'diff';
+import { revertPatch } from '../../lib/diff/revert_patch';
 import service from '../../services';
 import * as types from '../mutation_types';
 import router from '../../ide_router';
@@ -52,26 +55,36 @@ export const setFileActive = ({ commit, state, getters, dispatch }, file) => {
 };
 
 export const getFileData = ({ state, commit, dispatch }, file) => {
-  commit(types.TOGGLE_LOADING, { entry: file });
+  return new Promise((resolve, reject) => {
+    commit(types.TOGGLE_LOADING, file);
+    service.getFileData(file.url)
+      .then((res) => {
+        const pageTitle = decodeURI(normalizeHeaders(res.headers)['PAGE-TITLE']);
 
-  service.getFileData(file.url)
-    .then((res) => {
-      const pageTitle = decodeURI(normalizeHeaders(res.headers)['PAGE-TITLE']);
+        setPageTitle(pageTitle);
 
-      setPageTitle(pageTitle);
+        return res.json();
+      })
+      .then((data) => {
+        commit(types.SET_FILE_DATA, { data, file });
+        commit(types.TOGGLE_FILE_OPEN, file);
+        dispatch('setFileActive', file);
+        commit(types.TOGGLE_LOADING, file);
+      })
+      .catch(() => {
+        commit(types.TOGGLE_LOADING, file);
+        flash('Error loading file data. Please try again.', 'alert', document, null, false, true);
+      });
+  });
+};
+export const processFileMrDiff = ({ state, commit }, file) => {
+  const patchObj = parsePatch(file.mrDiff);
+  const transformedContent = applyPatch(file.raw, file.mrDiff);
+  debugger;
 
-      return res.json();
-    })
-    .then((data) => {
-      commit(types.SET_FILE_DATA, { data, file });
-      commit(types.TOGGLE_FILE_OPEN, file);
-      dispatch('setFileActive', file);
-      commit(types.TOGGLE_LOADING, { entry: file });
-    })
-    .catch(() => {
-      commit(types.TOGGLE_LOADING, { entry: file });
-      flash('Error loading file data. Please try again.', 'alert', document, null, false, true);
-    });
+
+export const setFileMrDiff = ({ state, commit }, { file, mrDiff }) => {
+  commit(types.SET_FILE_MR_DIFF, { file, mrDiff });
 };
 
 export const getRawFileData = ({ commit, dispatch }, file) => service.getRawFileData(file)
@@ -108,6 +121,10 @@ export const setEditorPosition = ({ state, commit }, { editorRow, editorColumn }
   if (state.selectedFile) {
     commit(types.SET_FILE_POSITION, { file: state.selectedFile, editorRow, editorColumn });
   }
+};
+
+export const setFileViewMode = ({ state, commit }, viewMode) => {
+  commit(types.SET_FILE_VIEWMODE, { file: state.selectedFile, viewMode });
 };
 
 export const createTempFile = ({ state, commit, dispatch }, { projectId, branchId, parent, name, content = '', base64 = '' }) => {

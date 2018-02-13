@@ -63,6 +63,7 @@ export default {
       'changeFileContent',
       'setFileLanguage',
       'setEditorPosition',
+      'setFileViewMode',
       'setFileEOL',
       'updateViewer',
       'updateDelayViewerUpdated',
@@ -151,6 +152,46 @@ export default {
     class="blob-viewer-container blob-editor-container"
   >
     <div
+      class="ide-mode-tabs"
+      v-if="!shouldHideEditor">
+      <ul class="nav nav-links">
+        <li
+          :class="activeFile.viewMode==='edit' ? 'active':''">
+          <a
+            href="javascript:void(0);"
+            @click.prevent="setupViewMode('edit')">
+            Edit
+          </a>
+        </li>
+        <li
+          :class="activeFile.viewMode==='changes' ? 'active':''">
+          <a
+            href="javascript:void(0);"
+            @click.prevent="setupViewMode('changes')">
+            Preview Changes
+          </a>
+        </li>
+        <li
+          v-if="activeFile.mrDiff"
+          :class="activeFile.viewMode==='mrchanges' ? 'active':''">
+          <a
+            href="javascript:void(0);"
+            @click.prevent="setupViewMode('mrchanges')">
+            Merge Request Changes
+          </a>
+        </li>
+        <li
+          :class="activeFile.viewMode==='preview' ? 'active':''">
+          <a
+            v-if="activeFile.previewable"
+            href="javascript:void(0);"
+            @click.prevent="setupViewMode('preview')">
+            Preview
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div
       v-if="shouldHideEditor"
       v-html="activeFile.html"
     >
@@ -159,6 +200,14 @@ export default {
       v-show="!shouldHideEditor"
       ref="editor"
       class="multi-file-editor-holder"
+      style="display:none;"
+    >
+    </div>
+    <div
+      v-show="!shouldHideEditor"
+      ref="diffEditor"
+      class="multi-file-editor-holder"
+      style="display:none;"
     >
     </div>
   </div>

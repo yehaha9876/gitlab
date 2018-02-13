@@ -32,6 +32,8 @@ export default class Editor {
     this.modelManager = new ModelManager(this.monaco);
     this.decorationsController = new DecorationsController(this);
 
+    this.viewMode = 'editor';
+
     this.setupMonacoTheme();
 
     this.debouncedUpdate = _.debounce(() => {
@@ -39,7 +41,7 @@ export default class Editor {
     }, 200);
   }
 
-  createInstance(domElement) {
+  createInstance(editorDomElement, diffEditorDomElement) {
     if (!this.instance) {
       clearDomElement(domElement);
 
@@ -118,6 +120,9 @@ export default class Editor {
     if (this.instance) {
       this.instance.setModel(null);
     }
+    if (this.diffInstance) {
+      this.diffInstance.setModel(null);
+    }
   }
 
   dispose() {
@@ -137,10 +142,17 @@ export default class Editor {
         console.error(e);
       }
     }
+    if (this.diffInstance) {
+      this.diffInstance = null;
+    }
   }
 
   updateDimensions() {
-    this.instance.layout();
+    if (this.instance.domElement.style.display === 'block') {
+      this.instance.layout();
+    } else {
+      this.diffInstance.layout();
+    }
   }
 
   setPosition({ lineNumber, column }) {

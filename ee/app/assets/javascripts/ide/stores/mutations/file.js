@@ -38,6 +38,11 @@ export default {
       raw,
     });
   },
+  [types.SET_FILE_TARGET_RAW_DATA](state, { file, raw }) {
+    Object.assign(file, {
+      targetRaw: raw,
+    });
+  },
   [types.UPDATE_FILE_CONTENT](state, { file, content }) {
     const changed = content !== file.raw;
 
@@ -60,6 +65,11 @@ export default {
     Object.assign(file, {
       editorRow,
       editorColumn,
+    });
+  },
+  [types.SET_FILE_VIEWMODE](state, { file, viewMode }) {
+    Object.assign(file, {
+      viewMode,
     });
   },
   [types.DISCARD_FILE_CHANGES](state, file) {
