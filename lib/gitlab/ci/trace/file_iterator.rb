@@ -26,12 +26,12 @@ module Gitlab
         # Dir.glob should not be used because it loads all entries at first.
         # If the number of target files are over 400M, Dir.glob would consume significant RAM
         # and the iteration won't start until the first scanning is done.
-        def recursive(pos, &block)
-          Dir.entries(pos).each do |entry|
+        def recursive(path, &block)
+          Dir.entries(path).each do |entry|
             if yyyy_mm?(entry) || project_id?(entry)
-              recursive(File.join(pos, entry), &block)
+              recursive(File.join(path, entry), &block)
             elsif trace_file?(entry)
-              yield File.join(pos, entry)
+              yield File.join(path, entry)
             end
           end
         end
