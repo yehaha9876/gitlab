@@ -9,11 +9,9 @@ module Gitlab
         end
 
         def legacy_trace_files
-          Dir.chdir(Settings.gitlab_ci.builds_path) do
-            unless Dir.exist?(relative_path)
-              return yield relative_path
-            end
+          return yield sanitized_path(relative_path) if file_path?
 
+          Dir.chdir(Settings.gitlab_ci.builds_path) do
             recursive(relative_path) do |path|
               yield sanitized_path(path)
             end
@@ -22,6 +20,12 @@ module Gitlab
 
         private
 
+        ##
+        # NOTE:
+        # Iterating files with Dir.entries over Dir.glob for better perfomrance.
+        # Dir.glob should not be used because it loads all entries at first.
+        # If the number of target files are over 400M, Dir.glob would consume significant RAM
+        # and the iteration won't start until the first scanning is done.
         def recursive(pos, &block)
           Dir.entries(pos).each do |entry|
             if yyyy_mm?(entry) || project_id?(entry)
@@ -45,7 +49,15 @@ module Gitlab
         end
 
         def sanitized_path(path)
-          path.sub(/^\./, '').sub(%{^/}, '')
+          path.sub(%{^[/|.]}, '')
+        end
+
+        def file_path?
+          File.exist?(full_path) && File.file?(full_path)
+        end
+
+        def full_path
+          @full_path ||= File.join(Settings.gitlab_ci.builds_path, relative_path)
         end
       end
     end
