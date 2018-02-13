@@ -10,9 +10,9 @@ namespace :gitlab do
 
       Gitlab::Ci::Trace::FileIterator
         .new(args.relative_path).legacy_trace_files do |trace_path|
-        result = Gitlab::Ci::Trace::Migrator.new(trace_path).perform
+        result = Gitlab::Ci::Trace::Migrator.new.perform(trace_path)
 
-        logger.info("Migrated #{trace_path} result: #{result}")
+        logger.info("DONE: #{trace_path} result: #{result}")
       end
     end
   end

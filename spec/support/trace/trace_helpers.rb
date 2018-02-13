@@ -13,8 +13,6 @@ module TraceHelpers
   end
 
   def extend_path(path, keyword)
-    Gitlab::Ci::Trace::Migrator.new(path).send(:extend_path, path, keyword)
-  rescue
-    'not_found'
+    path.gsub(%r{(\d{4}_\d{2}).*(/\d{1,}/\d{1,}.log)}, '\1_' + keyword.to_s + '\2')
   end
 end

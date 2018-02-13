@@ -19,7 +19,7 @@ describe Gitlab::Ci::Trace::Migrator do
             context 'when job does not have trace artifact' do
               it 'migrates' do
                 create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
-                  described_class.new(path.remove(builds_path)).perform
+                  described_class.new.perform(relative_path(path))
 
                   expect(job.job_artifacts_trace.file.exists?).to be_truthy
                   expect(job.trace.raw).to eq(trace_content)
@@ -31,10 +31,12 @@ describe Gitlab::Ci::Trace::Migrator do
 
               context 'when checksum is mismatched between trace artifact and src file' do
                 it 'raises an error' do
-                  allow_any_instance_of(JobArtifactUploader).to receive(:read) { 'data is not same' }
+                  create_trace_file(builds_path, "#{yyyy_mm}_hoge", project_id, job_id, 'data is not same') do |path|
+                    allow_any_instance_of(JobArtifactUploader).to receive(:path) { path } # Mock permanent_path
+                  end
 
                   create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
-                    expect { described_class.new(path.remove(builds_path)).perform }
+                    expect { described_class.new.perform(relative_path(path)) }
                       .to raise_error(Gitlab::Ci::Trace::Migrator::ChecksumMismatchError)
 
                     expect(job.job_artifacts_trace).to be_nil
@@ -52,7 +54,7 @@ describe Gitlab::Ci::Trace::Migrator do
 
               it 'does not migrates but moves file' do
                 create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
-                  described_class.new(path.remove(builds_path)).perform
+                  described_class.new.perform(relative_path(path))
 
                   expect(job.job_artifacts_trace).to exist
                   expect(File.exist?(path)).to be_falsy
@@ -68,7 +70,7 @@ describe Gitlab::Ci::Trace::Migrator do
 
             it 'does not migrate' do
               create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
-                expect { described_class.new(path.remove(builds_path)).perform }
+                expect { described_class.new.perform(relative_path(path)) }
                   .to raise_error(Gitlab::Ci::Trace::Migrator::JobNotCompletedError)
 
                 expect(job.job_artifacts_trace).to be_nil
@@ -84,7 +86,7 @@ describe Gitlab::Ci::Trace::Migrator do
 
           it 'does not migrates but moves file' do
             create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
-              described_class.new(path.remove(builds_path)).perform
+              described_class.new.perform(relative_path(path))
 
               expect(job.job_artifacts_trace).to be_nil
               expect(File.exist?(path)).to be_falsy
@@ -100,7 +102,7 @@ describe Gitlab::Ci::Trace::Migrator do
           create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
             job.update_attribute(:project_id, nil)
 
-            described_class.new(path.remove(builds_path)).perform
+            described_class.new.perform(relative_path(path))
 
             expect(job.job_artifacts_trace).to be_nil
             expect(File.exist?(path)).to be_falsy
@@ -115,17 +117,15 @@ describe Gitlab::Ci::Trace::Migrator do
       let(:path) { File.join(builds_path, yyyy_mm, project_id.to_s, "#{job_id}.log") }
 
       it 'raises error' do
-        expect { described_class.new(path).perform }.to raise_error(Errno::ENOENT)
+        expect { described_class.new.perform(relative_path(path)) }.to raise_error(Errno::ENOENT)
       end
     end
 
     context 'when trace file is in yyyy_mm_migrated directory' do
-      let(:yyyy_mm) { "#{job.created_at.utc.strftime("%Y_%m")}_migrated" }
-
       it 'raises error' do
-        create_trace_file(builds_path, yyyy_mm, project_id, job_id, trace_content) do |path|
-          expect { described_class.new(path.remove(builds_path)).perform }
-            .to raise_error('Invalid trace path format')
+        create_trace_file(builds_path, "#{yyyy_mm}_migrated", project_id, job_id, trace_content) do |path|
+          expect { described_class.new.perform(relative_path(path)) }
+            .to raise_error('Invalid trace path')
 
           expect(job.job_artifacts_trace).to be_nil
           expect(File.exist?(path)).to be_truthy
@@ -133,5 +133,9 @@ describe Gitlab::Ci::Trace::Migrator do
         end
       end
     end
+  end
+
+  def relative_path(path)
+    path.remove(builds_path)
   end
 end

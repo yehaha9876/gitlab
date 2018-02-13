@@ -49,7 +49,7 @@ module Gitlab
         end
 
         def sanitized_path(path)
-          path.sub(%{^[/|.]}, '')
+          path.sub(%r{^[/|\.]}, '')
         end
 
         def file_path?
