@@ -12,7 +12,6 @@ describe Ci::CreateTraceArtifactService do
           allow_any_instance_of(Gitlab::Ci::Trace)
             .to receive(:default_path) { expand_fixture_path('trace/sample_trace') }
 
-          allow_any_instance_of(JobArtifactUploader).to receive(:move_to_cache) { false }
           allow_any_instance_of(JobArtifactUploader).to receive(:move_to_store) { false }
         end
 

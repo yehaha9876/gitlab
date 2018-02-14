@@ -71,16 +71,13 @@ module ObjectStorage
       end
     end
 
-    # Disable the `move_to_store` and `move_to_cache` for all uploaders that
-    # can migrate! to another store. The logic is not multi-storage aware and
-    # causes data loss with the migration process
+    # Disable the `move_to_cache` for all uploaders that can migrate! to another store.
+    #
+    # The logic is not multi-storage aware and can cause
+    # data loss in the migration process
     #
     # See https://gitlab.com/gitlab-org/gitlab-ee/issues/4927
     module GitlabUploader
-      def move_to_store
-        false
-      end
-
       def move_to_cache
         false
       end

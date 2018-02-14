@@ -20,10 +20,6 @@ shared_examples "migrates" do |to_store:, from_store: nil|
     migrate(from)
   end
 
-  it '#move_to_store is false' do
-    expect(subject.move_to_store).to be_falsey
-  end
-
   it '#move_to_cache is false' do
     expect(subject.move_to_cache).to be_falsey
   end
