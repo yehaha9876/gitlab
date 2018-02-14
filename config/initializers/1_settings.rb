@@ -405,7 +405,7 @@ Settings.lfs['object_store']['connection']&.deep_stringify_keys!
 #
 Settings['uploads'] ||= Settingslogic.new({})
 Settings.uploads['storage_path'] = Settings.absolute(Settings.uploads['storage_path'] || 'public')
-Settings.uploads['base_dir'] = Settings.uploads['base_dir'] || 'uploads/-/system'
+Settings.uploads['base_dir'] = Settings.uploads['base_dir'] || 'uploads'
 Settings.uploads['object_store'] ||= Settingslogic.new({})
 Settings.uploads['object_store']['enabled'] = false if Settings.uploads['object_store']['enabled'].nil?
 Settings.uploads['object_store']['remote_directory'] ||= 'uploads'

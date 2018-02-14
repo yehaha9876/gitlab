@@ -4,6 +4,8 @@ class AttachmentUploader < GitlabUploader
   include ObjectStorage::Concern
   prepend ObjectStorage::Extension::RecordsUploads
 
+  system true
+
   private
 
   def dynamic_segment

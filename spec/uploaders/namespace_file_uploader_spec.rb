@@ -23,7 +23,7 @@ describe NamespaceFileUploader do
     include_context 'with storage', described_class::Store::REMOTE
 
     it_behaves_like 'builds correct paths',
-                    store_dir: %r[namespace/\d+/\h+],
+                    store_dir: %r[-/system/namespace/\d+/\h+],
                     upload_path: IDENTIFIER
   end
 

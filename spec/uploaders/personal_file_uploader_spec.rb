@@ -23,7 +23,7 @@ describe PersonalFileUploader do
     include_context 'with storage', described_class::Store::REMOTE
 
     it_behaves_like 'builds correct paths',
-                    store_dir: %r[\d+/\h+],
+                    store_dir: %r[-/system/personal_snippet/\d+/\h+],
                     upload_path: IDENTIFIER
   end
 

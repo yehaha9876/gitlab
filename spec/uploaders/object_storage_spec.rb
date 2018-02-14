@@ -37,30 +37,6 @@ describe ObjectStorage do
     end
   end
 
-  context 'object_store is Store::LOCAL' do
-    before do
-      uploader.object_store = described_class::Store::LOCAL
-    end
-
-    describe '#store_dir' do
-      it 'is the composition of (base_dir, dynamic_segment)' do
-        expect(uploader.store_dir).to start_with("uploads/-/system/user/")
-      end
-    end
-  end
-
-  context 'object_store is Store::REMOTE' do
-    before do
-      uploader.object_store = described_class::Store::REMOTE
-    end
-
-    describe '#store_dir' do
-      it 'is the composition of (dynamic_segment)' do
-        expect(uploader.store_dir).to start_with("user/")
-      end
-    end
-  end
-
   describe '#object_store' do
     it "delegates to <mount>_store on model" do
       expect(object).to receive(:file_store)

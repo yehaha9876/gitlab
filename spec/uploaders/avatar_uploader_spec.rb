@@ -21,8 +21,8 @@ describe AvatarUploader do
     include_context 'with storage', described_class::Store::REMOTE
 
     it_behaves_like 'builds correct paths',
-                    store_dir: %r[user/avatar/],
-                    upload_path: %r[user/avatar/]
+                    store_dir: %r[-/system/user/avatar/],
+                    upload_path: %r[-/system/user/avatar/]
   end
 
   context "with a file" do

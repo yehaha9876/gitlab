@@ -21,8 +21,8 @@ describe AttachmentUploader do
     include_context 'with storage', described_class::Store::REMOTE
 
     it_behaves_like 'builds correct paths',
-                    store_dir: %r[note/attachment/],
-                    upload_path: %r[note/attachment/]
+                    store_dir: %r[-/system/note/attachment/],
+                    upload_path: %r[-/system/note/attachment/]
   end
 
   describe "#migrate!" do

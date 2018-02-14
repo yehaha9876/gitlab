@@ -178,7 +178,7 @@ production: &base
   uploads:
     # The location where uploads objects are stored (default: public/).
     # storage_path: public/
-    # base_dir: uploads/-/system
+    # base_dir: uploads
     object_store:
       enabled: true
       remote_directory: uploads # Bucket name

@@ -4,6 +4,8 @@ class AvatarUploader < GitlabUploader
   include ObjectStorage::Concern
   prepend ObjectStorage::Extension::RecordsUploads
 
+  system true
+
   def exists?
     model.avatar.file && model.avatar.file.present?
   end

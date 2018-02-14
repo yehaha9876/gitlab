@@ -263,9 +263,10 @@ module ObjectStorage
     end
 
     def store_dirs
+      segments = [base_dir, system_dir, dynamic_segment].compact
       {
-        Store::LOCAL => File.join(base_dir, dynamic_segment),
-        Store::REMOTE => File.join(dynamic_segment)
+        Store::LOCAL => File.join(*segments),
+        Store::REMOTE => File.join(*segments[1..-1])
       }
     end
 
