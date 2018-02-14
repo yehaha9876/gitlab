@@ -94,10 +94,10 @@
           </p>
         `;
       },
-      gitlabRunnerDescription() {
+      runnerDescription() {
         return _.escape(s__(
-          `ClusterIntegration|GitLab Runner is the open source project that is used to run your jobs
-          and send the results back to GitLab.`,
+          `ClusterIntegration|GitLab Runner connects to this project's repository and executes CI/CD jobs,
+          pushing results back and deploying applications to production.`,
         ));
       },
       prometheusDescription() {
@@ -163,6 +163,28 @@
           :request-status="applications.prometheus.requestStatus"
           :request-reason="applications.prometheus.requestReason"
         />
+        >
+          <div
+            slot="description"
+            v-html="prometheusDescription"
+          >
+          </div>
+        </application-row>
+        <application-row
+          id="runner"
+          :title="applications.runner.title"
+          title-link="https://docs.gitlab.com/runner/"
+          :status="applications.runner.status"
+          :status-reason="applications.runner.statusReason"
+          :request-status="applications.runner.requestStatus"
+          :request-reason="applications.runner.requestReason"
+        >
+          <div
+            slot="description"
+            v-html="runnerDescription"
+          >
+          </div>
+        </application-row>
         <!--
           NOTE: Don't forget to update `clusters.scss`
           min-height for this block and uncomment `application_spec` tests
