@@ -22,7 +22,7 @@ class GitlabUploader < CarrierWave::Uploader::Base
     end
 
     def system_dir
-      return unless system?
+      return unless store_in_system?
 
       "-/system"
     end
@@ -31,7 +31,7 @@ class GitlabUploader < CarrierWave::Uploader::Base
       storage == CarrierWave::Storage::File
     end
 
-    def system?
+    def store_in_system?
       !!self.system
     end
 
