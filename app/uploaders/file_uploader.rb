@@ -21,7 +21,7 @@ class FileUploader < GitlabUploader
   # enqueue a job after the :store hook.
   after :store, :schedule_background_upload
 
-  system false
+  store_in_system false
 
   def self.root
     File.join(options.storage_path, GitlabUploader.base_dir)

@@ -1,5 +1,5 @@
 class PersonalFileUploader < FileUploader
-  system true
+  store_in_system true
 
   # Re-Override
   def self.root

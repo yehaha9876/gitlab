@@ -92,12 +92,13 @@ describe Gitlab::BackgroundMigration::PrepareUntrackedUploads, :sidekiq, :migrat
         let(:tmp_file) { Rails.root.join(described_class::ABSOLUTE_UPLOAD_DIR, 'tmp', 'some_file.jpg') }
 
         before do
-          FileUtils.mkdir(File.dirname(tmp_file)) rescue Errno::EEXIST
+          tmp_dir = File.dirname(tmp_file)
+          FileUtils.mkdir(tmp_dir) unless File.exist?(tmp_dir)
           FileUtils.touch(tmp_file)
         end
 
         after do
-          FileUtils.rm(tmp_file) rescue Errno::ENOENT
+          FileUtils.rm(tmp_file) if File.exist?(tmp_file)
         end
 
         it 'does not add files from /uploads/tmp' do

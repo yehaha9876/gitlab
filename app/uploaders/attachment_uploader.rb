@@ -4,7 +4,7 @@ class AttachmentUploader < GitlabUploader
   include ObjectStorage::Concern
   prepend ObjectStorage::Extension::RecordsUploads
 
-  system true
+  store_in_system true
 
   private
 

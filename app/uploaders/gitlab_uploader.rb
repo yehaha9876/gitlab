@@ -1,6 +1,6 @@
 class GitlabUploader < CarrierWave::Uploader::Base
   class_attribute :options
-  class_attribute :_system
+  class_attribute :system
 
   class << self
     # DSL setter
@@ -8,8 +8,8 @@ class GitlabUploader < CarrierWave::Uploader::Base
       self.options = options
     end
 
-    def system(system)
-      self._system = !!system
+    def store_in_system(system)
+      self.system = !!system
     end
 
     def root
@@ -32,7 +32,7 @@ class GitlabUploader < CarrierWave::Uploader::Base
     end
 
     def system?
-      !!self._system
+      !!self.system
     end
 
     def absolute_path(upload_record)
