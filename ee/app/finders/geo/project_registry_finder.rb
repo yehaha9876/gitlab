@@ -49,6 +49,10 @@ module Geo
       relation
     end
 
+    def find_registries_to_verify
+      Geo::ProjectRegistry.where('repository_checksum IS NULL OR wiki_checksum IS NULL')
+    end
+
     def find_unsynced_projects(batch_size:)
       relation =
         if use_legacy_queries?

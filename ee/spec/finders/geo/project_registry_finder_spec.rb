@@ -239,6 +239,16 @@ describe Geo::ProjectRegistryFinder, :geo do
     end
   end
 
+  it '#find_registries_to_verify' do
+    create(:geo_project_registry)
+    create(:geo_project_registry, :repository_verified, :wiki_verified)
+    create(:geo_project_registry, :repository_verification_failed)
+    create(:geo_project_registry, :repository_verification_failed, :wiki_verified)
+    create(:geo_project_registry, :repository_verified, :wiki_verification_failed)
+
+    expect(subject.send(:find_registries_to_verify).count).to eq 4
+  end
+
   # Disable transactions via :delete method because a foreign table
   # can't see changes inside a transaction of a different connection.
   context 'FDW', :delete do

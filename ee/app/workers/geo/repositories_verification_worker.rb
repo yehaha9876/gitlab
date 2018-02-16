@@ -13,7 +13,7 @@ module Geo
 
       # Prevent multiple Sidekiq workers from performing verifications
       try_obtain_lease do
-        find_registries_without_checksum.find_in_batches(batch_size: BATCH_SIZE) do |batch|
+        finder.find_registries_to_verify.find_in_batches(batch_size: BATCH_SIZE) do |batch|
           batch.each do |registry|
             verify_project(registry)
           end
@@ -35,8 +35,8 @@ module Geo
 
     private
 
-    def find_registries_without_checksum
-      Geo::ProjectRegistry.where('repository_checksum IS NULL')
+    def finder
+      @finder ||= ProjectRegistryFinder.new
     end
 
     def lease_timeout

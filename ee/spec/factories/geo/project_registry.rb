@@ -73,8 +73,26 @@ FactoryBot.define do
       wiki_retry_count 0
     end
 
-    trait :repository_checksum do
+    trait :repository_verified do
       repository_checksum 'f079a831cab27bcda7d81cd9b48296d0c3dd92ee'
+      last_repository_verification_at { 5.days.ago }
+    end
+
+    trait :wiki_verified do
+      wiki_checksum 'e079a831cab27bcda7d81cd9b48296d0c3dd92ef'
+      last_wiki_verification_at { 5.days.ago }
+    end
+
+    trait :repository_verification_failed do
+      repository_checksum nil
+      last_repository_verification_at nil
+      last_repository_verification_failure 'Repository checksum did not match'
+    end
+
+    trait :wiki_verification_failed do
+      wiki_checksum nil
+      last_wiki_verification_at nil
+      last_wiki_verification_failure 'Wiki checksum did not match'
     end
   end
 end
