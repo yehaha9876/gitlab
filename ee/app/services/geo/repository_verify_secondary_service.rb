@@ -4,13 +4,13 @@ module Geo
 
     def initialize(registry, type)
       @registry, @type   = registry, type
-      @original_checksum = @registry.project.state&.send("#{type}_checksum")
+      @original_checksum = @registry.send("project_#{type}_checksum")
     end
 
     def execute
       return unless Gitlab::Geo.geo_database_configured?
       return unless Gitlab::Geo.secondary?
-      return unless RepositoryVerifySecondaryService.should_verify_repository?(@registry, @type)
+      return unless self.class.should_verify_repository?(@registry, @type)
 
       log_info("Verifying #{@type.to_s.capitalize} at #{repository.path}")
 
@@ -34,8 +34,8 @@ module Geo
     # - primary repository was checked after the last repository update
     # - secondary repository was successfully synced after the last repository update
     def self.should_verify_repository?(registry, type)
-      checksum = registry.project.state&.send("#{type}_checksum")
-      last_checked_at = registry.project.state&.send("last_#{type}_check_at")
+      checksum = registry.send("project_#{type}_checksum")
+      last_checked_at = registry.send("project_#{type}_last_check")
       last_successful_sync_at = registry.send("last_#{type}_successful_sync_at") # rubocop:disable GitlabSecurity/PublicSend
 
       checksum &&
@@ -47,12 +47,7 @@ module Geo
     private
 
     def repository
-      @repository ||= case @type
-                      when :repository
-                        @registry.project.repository
-                      when :wiki
-                        @registry.project.wiki.repository
-                      end
+      @repository ||= @registry.repository(@type)
     end
 
     def record_status(checksum: nil, error: nil)
