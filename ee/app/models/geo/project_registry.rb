@@ -41,6 +41,31 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     project.wiki_enabled? && (never_synced_wiki? || wiki_sync_needed?(scheduled_time))
   end
 
+  def project_repository_checksum
+    project.state&.repository_checksum
+  end
+
+  def project_wiki_checksum
+    project.state&.wiki_checksum
+  end
+
+  def project_repository_last_check
+    project.state&.last_repository_check_at
+  end
+
+  def project_wiki_last_check
+    project.state&.last_wiki_check_at
+  end
+
+  def repository(type)
+    case type
+    when :repository
+      project.repository
+    when :wiki
+      project.wiki.repository
+    end
+  end
+
   private
 
   def never_synced_repository?

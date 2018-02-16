@@ -11,15 +11,15 @@ describe Geo::RepositoriesVerificationWorker do
     allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:try_obtain).and_return(true)
   end
 
-  subject { described_class.new }
+  subject(:worker) { described_class.new }
 
   describe '#perform' do
     it 'only works on the secondary' do
       stub_current_geo_node(primary)
 
-      expect(subject).not_to receive(:try_obtain_lease)
+      expect(worker).not_to receive(:try_obtain_lease)
 
-      subject.perform
+      worker.perform
     end
 
     it 'verifies several projects' do
@@ -27,9 +27,9 @@ describe Geo::RepositoriesVerificationWorker do
       create(:geo_project_registry)
       create(:geo_project_registry, :repository_verified, :wiki_verified)
 
-      expect(subject).to receive(:verify_project).twice
+      expect(worker).to receive(:verify_project).twice
 
-      subject.perform
+      worker.perform
     end
   end
 
@@ -43,7 +43,7 @@ describe Geo::RepositoriesVerificationWorker do
       expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).with(registry, :repository).once
       expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).with(registry, :wiki).once
 
-      subject.verify_project(registry)
+      worker.verify_project(registry)
     end
 
     it 'verifies only the repository' do
@@ -52,7 +52,7 @@ describe Geo::RepositoriesVerificationWorker do
 
       expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).once
 
-      subject.verify_project(registry)
+      worker.verify_project(registry)
     end
 
     it 'verifies only the wiki' do
@@ -61,7 +61,7 @@ describe Geo::RepositoriesVerificationWorker do
 
       expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).once
 
-      subject.verify_project(registry)
+      worker.verify_project(registry)
     end
   end
 end

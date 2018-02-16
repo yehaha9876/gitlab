@@ -97,7 +97,9 @@ describe Geo::RepositoryVerifySecondaryService do
       registry.project.last_repository_updated_at = 7.hours.ago
 
       expect(described_class.should_verify_repository?(registry, type)).to be_truthy
+    end
 
+    it 'does not verify unless at least 6 hours since the primary repository was updated' do
       registry.project.last_repository_updated_at = 5.5.hours.ago
 
       expect(described_class.should_verify_repository?(registry, type)).to be_falsy

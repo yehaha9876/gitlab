@@ -50,6 +50,7 @@ module Geo
     end
 
     def find_registries_to_verify
+      # note that the checksum values get reset when the repository starts syncing
       Geo::ProjectRegistry.where('repository_checksum IS NULL OR wiki_checksum IS NULL')
     end
 
