@@ -25,7 +25,7 @@ describe Geo::RepositoriesVerificationWorker do
     it 'verifies several projects' do
       create(:geo_project_registry)
       create(:geo_project_registry)
-      create(:geo_project_registry, :repository_checksum)
+      create(:geo_project_registry, :repository_verified, :wiki_verified)
 
       expect(subject).to receive(:verify_project).twice
 
@@ -63,13 +63,5 @@ describe Geo::RepositoriesVerificationWorker do
 
       subject.verify_project(registry)
     end
-  end
-
-  it '#find_registries_without_checksum' do
-    create(:geo_project_registry)
-    create(:geo_project_registry, :repository_checksum)
-    create(:geo_project_registry, :repository_checksum)
-
-    expect(subject.send(:find_registries_without_checksum).count).to eq 1
   end
 end
