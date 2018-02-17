@@ -192,17 +192,24 @@ Read through the [Geo High Availability documentation](high_availability.md).
 When you have object storage enabled, please consult the
 [Geo with Object Storage](object_storage.md) documentation.
 
-## Replicating the Container Registry
+### Replicating the Container Registry
 
 Read how to [replicate the Container Registry](docker_registry.md).
 
 ## Current limitations
 
-- You cannot push code to secondary nodes, see [3912](https://gitlab.com/gitlab-org/gitlab-ee/issues/3912) for details.
+> **IMPORTANT**: This list of limitations tracks only the latest version. If you are in an older version, 
+extra limitations may be in place. 
+
+- You cannot push code to secondary nodes, see [gitlab-org/gitlab-ee#3912] for details.
 - The primary node has to be online for OAuth login to happen (existing sessions and Git are not affected)
-- It works for repos, wikis, issues, and merge requests, but it does not work for job logs, artifacts, GitLab Pages, and Docker images of the Container
-  Registry (by default, but you can configure it separately, see [replicate the Container Registry](docker_registry.md) for details)
-- The installation takes multiple manual steps that together can take about an hour depending on circumstances; we are working on improving this experience, see [#2978](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/2978) for details.
+- It works for repos, wikis, issues, merge requests, file attachments, artifacts and job logs but it does not work for, 
+  GitLab Pages, and Docker images of the Container Registry (by default, but you can configure it separately, 
+  see [replicate the Container Registry](docker_registry.md) for details).  
+- The installation takes multiple manual steps that together can take about an hour depending on circumstances; we are 
+  working on improving this experience, see [gitlab-org/omnibus-gitlab#2978] for details.
+- Real-time updates of issues/merge requests (e.g. via long polling) doesn't work on the secondary
+- Broadcast messages set on the primary won't be seen on the secondary without a cache flush (e.g. gitlab-rake cache:clear)
 
 ## Frequently Asked Questions
 
@@ -238,3 +245,5 @@ Read the [troubleshooting document](troubleshooting.md).
 [ee]: https://about.gitlab.com/products/ "GitLab Enterprise Edition landing page"
 [install-ee]: https://about.gitlab.com/downloads-ee/ "GitLab Enterprise Edition Omnibus packages downloads page"
 [install-ee-source]: https://docs.gitlab.com/ee/install/installation.html "GitLab Enterprise Edition installation from source"
+[gitlab-org/gitlab-ee#3912]: https://gitlab.com/gitlab-org/gitlab-ee/issues/3912
+[gitlab-org/omnibus-gitlab#2978]: https://gitlab.com/gitlab-org/omnibus-gitlab/issues/2978

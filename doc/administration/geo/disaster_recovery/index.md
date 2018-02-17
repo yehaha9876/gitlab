@@ -1,6 +1,6 @@
 # Disaster Recovery
 
-Geo replicates your database and your Git repositories. We will
+GitLab Geo replicates your database your Git repositories and few other assets. We will
 support and replicate more data in the future, that will enable you to
 failover with minimal effort, in a disaster situation.
 

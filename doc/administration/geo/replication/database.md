@@ -339,11 +339,8 @@ because we have not yet configured the secondary server. This is the next step.
 
     # enable fdw for the geo tracking database
     geo_secondary['db_fdw'] = true
-    ```
 
-1. Edit `/etc/gitlab/gitlab.rb` and add the following:
-
-    ```ruby
+    # make this a secondary Geo node
     geo_secondary_role['enable'] = true
     ```
 
