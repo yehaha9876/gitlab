@@ -96,6 +96,20 @@ must disable the primary.
    previously for the secondary.
 1. Success! The secondary has now been promoted to primary.
 
+#### Promoting a multi-node setup
+
+The `gitlab-ctl promote-to-primary-node` command cannot be used yet in a multi-node setup.
+
+The command above does the following changes:
+
+- Promotes the PostgreSQL secondary to primary
+- Executes `gitlab-ctl reconfigure` to apply the changes in `/etc/gitlab/gitlab.rb`
+- Runs `gitlab-rake geo:set_secondary_as_primary`
+
+You need to make sure all the affected nodes no longer have `geo_secondary_role['enable'] = true` in 
+`/etc/gitlab/gitlab.rb`, that you execute the database promotion on the required database nodes
+and you execute the `gitlab-rake geo:set_secondary_as_primary` in a node running the application server.
+
 ### Step 4. (Optional) Updating the primary domain DNS record
 
 Updating the DNS records for the primary domain to point to the secondary
