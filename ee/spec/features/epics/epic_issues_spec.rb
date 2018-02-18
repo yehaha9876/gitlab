@@ -55,7 +55,7 @@ describe 'Epic Issues', :js do
     def add_issues(references)
       find('.related-issues-block h3.panel-title button').click
       find('.js-add-issuable-form-input').set(references)
-      find('.js-add-issuable-form-add-button').click
+      click_button 'Add'
 
       wait_for_requests
     end
