@@ -4,7 +4,7 @@ module Geo
 
     def initialize(registry, type)
       @registry, @type   = registry, type
-      @original_checksum = @registry.send("project_#{type}_verification_checksum")
+      @original_checksum = @registry.send("project_#{type}_verification_checksum") # rubocop:disable GitlabSecurity/PublicSend
     end
 
     def execute
@@ -34,8 +34,8 @@ module Geo
     # - primary repository was checked after the last repository update
     # - secondary repository was successfully synced after the last repository update
     def self.should_verify_repository?(registry, type)
-      checksum = registry.send("project_#{type}_verification_checksum")
-      last_checked_at = registry.send("project_#{type}_last_check")
+      checksum = registry.send("project_#{type}_verification_checksum") # rubocop:disable GitlabSecurity/PublicSend
+      last_checked_at = registry.send("project_#{type}_last_check") # rubocop:disable GitlabSecurity/PublicSend
       last_successful_sync_at = registry.send("last_#{type}_successful_sync_at") # rubocop:disable GitlabSecurity/PublicSend
 
       checksum &&
@@ -53,8 +53,7 @@ module Geo
     def record_status(checksum: nil, error: nil)
       attrs = { "#{@type}_verification_checksum" => nil,
                 "last_#{@type}_verification_at" => nil,
-                "last_#{@type}_verification_failure" => nil
-              }
+                "last_#{@type}_verification_failure" => nil }
 
       if checksum
         attrs["#{@type}_verification_checksum"] = checksum
