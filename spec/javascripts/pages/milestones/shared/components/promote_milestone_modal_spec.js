@@ -10,6 +10,7 @@ describe('Promote milestone modal', () => {
   let Component;
   const milestoneMockData = {
     milestoneTitle: 'v1.0',
+    milestoneGroup: 'Group',
     url: `${gl.TEST_HOST}/dummy/endpoint`,
   };
 
@@ -29,9 +30,13 @@ describe('Promote milestone modal', () => {
     });
 
     it('should contain the proper description', () => {
-      expect(vm.text).toContain('Promoting this milestone will make it available for all projects inside the group.');
+      expect(vm.text).toContain('Promoting v1.0 will make it available for all projects inside Group');
       expect(vm.text).toContain('Existing project milestones with the same name will be merged.');
       expect(vm.text).toContain('This action cannot be reversed.');
+    });
+
+    it('should contain a link to the burndown documentation on the description', () => {
+      expect(vm.text).toContain('https://docs.gitlab.com/ee/user/project/milestones/');
     });
 
     it('should contain the correct title', () => {

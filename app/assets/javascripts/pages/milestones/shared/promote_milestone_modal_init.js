@@ -23,6 +23,7 @@ const onDeleteButtonClick = (event) => {
   const button = event.currentTarget;
   const modalProps = {
     milestoneTitle: button.dataset.milestoneTitle,
+    milestoneGroup: button.dataset.milestoneGroup,
     url: button.dataset.url,
   };
   eventHub.$once('promoteMilestoneModal.requestStarted', onRequestStarted);
@@ -50,6 +51,7 @@ export default () => {
       return {
         modalProps: {
           milestoneTitle: '',
+          milestoneGroup: '',
           url: '',
         },
       };

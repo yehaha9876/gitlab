@@ -15,6 +15,10 @@
         type: String,
         required: true,
       },
+      milestoneGroup: {
+        type: String,
+        required: true,
+      },
       url: {
         type: String,
         required: true,
@@ -25,9 +29,19 @@
         return sprintf(s__('Milestones|Promote %{title} to group milestone?'), { title: this.milestoneTitle });
       },
       text() {
-        return s__(`Milestones|Promoting this milestone will make it available for all projects inside the group.
-        Existing project milestones with the same name will be merged.
-        This action cannot be reversed.`);
+        return sprintf(s__(
+          `Milestones|<p>Promoting %{milestone} will make it available for all projects inside %{group}.
+          Existing project milestones with the same name will be merged. </p>
+          <p>Group milestones are currently %{missingFeature}. 
+          You will not have these features once you've promoted a project milestone.
+          They will be available in future releases.</p> This action cannot be reversed.`), {
+            milestone: this.milestoneTitle,
+            group: this.milestoneGroup,
+            missingFeature: `<a href="https://docs.gitlab.com/ee/user/project/milestones/"
+              target="_blank" rel="noopener noreferrer">
+              missing features such as burndown charts
+            </a>`,
+          }, false);
       },
     },
     methods: {
@@ -58,7 +72,10 @@
     >
       {{ title }}
     </div>
-    {{ text }}
+    <div
+      v-html="text"
+    >
+    </div>
   </gl-modal>
 </template>
 
