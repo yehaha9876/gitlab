@@ -39,7 +39,8 @@ module EE
       def after_create_actions
         super
 
-        create_predefined_push_rule
+        create_predefined_push_rule unless project.ci_cd_only?
+        setup_ci_cd_project         if project.ci_cd_only?
 
         project.group&.refresh_members_authorized_projects
       end
@@ -53,6 +54,20 @@ module EE
           push_rule = predefined_push_rule.dup.tap { |gh| gh.is_sample = false }
           project.push_rule = push_rule
         end
+      end
+
+      def setup_ci_cd_project
+        project.update_attributes!(
+          container_registry_enabled: false,
+          mirror: true
+        )
+
+        project.project_feature.update_attributes!(
+          issues_access_level:         ProjectFeature::DISABLED,
+          merge_requests_access_level: ProjectFeature::DISABLED,
+          wiki_access_level:           ProjectFeature::DISABLED,
+          snippets_access_level:       ProjectFeature::DISABLED
+        )
       end
 
       def log_audit_event(project)

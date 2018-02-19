@@ -20,6 +20,7 @@ module EE
         mirror
         mirror_trigger_builds
         mirror_user_id
+        ci_cd_only
       ]
     end
   end
