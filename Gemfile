@@ -443,3 +443,6 @@ gem 'grape_logging', '~> 1.7'
 
 # Asset synchronization
 gem 'asset_sync', '~> 2.2.0'
+
+# Jaeger Tracing with DD APM
+gem 'ddtrace'
