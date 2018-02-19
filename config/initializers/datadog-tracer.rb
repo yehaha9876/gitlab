@@ -3,5 +3,4 @@ Datadog.configure do |c|
     c.use :rails
     c.use :grape
     c.use :sidekiq
-    c.use :redis
 end
