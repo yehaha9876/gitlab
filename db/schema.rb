@@ -1845,10 +1845,12 @@ ActiveRecord::Schema.define(version: 20180216121030) do
 
   create_table "project_states", force: :cascade do |t|
     t.integer "project_id", null: false
-    t.string "repository_checksum", limit: 64
-    t.string "wiki_checksum", limit: 64
-    t.datetime_with_timezone "last_repository_check_at"
-    t.datetime_with_timezone "last_wiki_check_at"
+    t.string "repository_verification_checksum", limit: 64
+    t.string "wiki_verification_checksum", limit: 64
+    t.datetime_with_timezone "last_repository_verification_at"
+    t.datetime_with_timezone "last_wiki_verification_at"
+    t.string "last_repository_verification_failure"
+    t.string "last_wiki_verification_failure"
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
   end
