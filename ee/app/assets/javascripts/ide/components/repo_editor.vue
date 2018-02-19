@@ -21,6 +21,12 @@ export default {
     shouldHideEditor() {
       return this.activeFile && this.activeFile.binary && !this.activeFile.raw;
     },
+    activeFileChanged() {
+      return this.activeFile && this.activeFile.changed;
+    },
+    currentViewMode() {
+      return activeFile.viewMode;
+    },
   },
   watch: {
     activeFile(oldVal, newVal) {
@@ -104,9 +110,9 @@ export default {
     setupEditor() {
       if (!this.activeFile || !this.editor.instance) return;
 
-      this.model = this.editor.createModel(this.activeFile);
+      this.editorModel = this.editor.createModel(this.activeFile);
 
-      this.editor.attachModel(this.model);
+      this.editor.attachModel(this.editorModel);
 
       this.model.onChange((model) => {
         const { file } = model;
@@ -134,13 +140,69 @@ export default {
 
       // Handle File Language
       this.setFileLanguage({
-        fileLanguage: this.model.language,
+        fileLanguage: this.editorModel.language,
       });
 
       // Get File eol
       this.setFileEOL({
-        eol: this.model.eol,
+        eol: this.editorModel.eol,
       });
+    },
+    setupViewMode(selectedMode) {
+      if (selectedMode) this.setFileViewMode(selectedMode);
+
+      this.$refs.editor.style.display = 'none';
+      this.$refs.diffEditor.style.display = 'none';
+
+      const choosenMode = selectedMode || this.activeFile.viewMode;
+      console.log('SETUP VIEW MODE : ' + choosenMode);
+      if (choosenMode === 'edit') {
+        this.$refs.editor.style.display = 'block';
+      } else {
+        this.$refs.diffEditor.style.display = 'block';
+        if (choosenMode === 'changes') {
+          this.editor.setDiffModel(this.editorModel, this.editorModel.getOriginalModel());
+        } else if (choosenMode === 'mrchanges') {
+          this.editor.setDiffModel(this.editorModel, this.editorModel.getTargetModel());
+        }
+      }
+
+      this.editor.updateDimensions();
+    },
+    watch: {
+      activeFile(oldVal, newVal) {
+        if (newVal && !newVal.active) {
+          this.initMonaco();
+        }
+      },
+      leftPanelCollapsed() {
+        this.editor.updateDimensions();
+      },
+      rightPanelCollapsed() {
+        this.editor.updateDimensions();
+      },
+      panelResizing(isResizing) {
+        if (isResizing === false) {
+          this.editor.updateDimensions();
+        }
+      },
+    },
+    computed: {
+      ...mapGetters([
+        'activeFile',
+        'activeFileExtension',
+      ]),
+      ...mapState([
+        'leftPanelCollapsed',
+        'rightPanelCollapsed',
+        'panelResizing',
+      ]),
+      shouldHideEditor() {
+        return this.activeFile.binary && !this.activeFile.raw;
+      },
+      currentViewMode() {
+        return activeFile.viewMode;
+      }
     },
   },
 };

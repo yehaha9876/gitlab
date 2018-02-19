@@ -80,8 +80,7 @@ export const getFileData = ({ state, commit, dispatch }, file) => {
 export const processFileMrDiff = ({ state, commit }, file) => {
   const patchObj = parsePatch(file.mrDiff);
   const transformedContent = applyPatch(file.raw, file.mrDiff);
-  debugger;
-
+};
 
 export const setFileMrDiff = ({ state, commit }, { file, mrDiff }) => {
   commit(types.SET_FILE_MR_DIFF, { file, mrDiff });

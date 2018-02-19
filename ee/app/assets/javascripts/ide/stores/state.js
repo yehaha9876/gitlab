@@ -2,6 +2,7 @@ export default () => ({
   canCommit: false,
   currentProjectId: '',
   currentBranchId: '',
+  currentMergeRequestId: '',
   currentBlobView: 'repo-editor',
   changedFiles: [],
   editMode: true,

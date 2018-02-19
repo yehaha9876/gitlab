@@ -107,6 +107,17 @@ export default class Editor {
     if (this.dirtyDiffController) this.dirtyDiffController.reDecorate(model);
   }
 
+  setDiffModel(model, originalModel) {
+    console.log('Diff INstance ',this.diffInstance);
+    if (this.diffInstance.originalEditor.model !== originalModel) {
+      console.log('Updated Diff Model');
+      this.diffInstance.setModel({
+        modified: model.getModel(),
+        original: originalModel,
+      });
+    }
+  }
+
   setupMonacoTheme() {
     this.monaco.editor.defineTheme(
       gitlabTheme.themeName,

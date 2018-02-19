@@ -81,6 +81,17 @@ export default {
   [types.CREATE_TMP_FILE](state, { file, parent }) {
     parent.tree.push(file);
   },
+  [types.SET_FILE_MR_DIFF](state, { file, mrDiff }) {
+    Object.assign(file, {
+      mrDiff,
+      viewMode: 'mrchanges',
+    });
+  },
+  [types.SET_FILE_TARGET_BRANCH](state, { file, targetBranch }) {
+    Object.assign(file, {
+      targetBranch,
+    });
+  },
   [types.ADD_FILE_TO_CHANGED](state, file) {
     state.changedFiles.push(file);
   },
