@@ -51,7 +51,7 @@ module Geo
 
     def find_registries_to_verify
       # note that the checksum values get reset when the repository starts syncing
-      Geo::ProjectRegistry.where('repository_checksum IS NULL OR wiki_checksum IS NULL')
+      Geo::ProjectRegistry.where('repository_verification_checksum IS NULL OR wiki_verification_checksum IS NULL')
     end
 
     def find_unsynced_projects(batch_size:)

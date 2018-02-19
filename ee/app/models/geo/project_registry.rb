@@ -41,11 +41,11 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     project.wiki_enabled? && (never_synced_wiki? || wiki_sync_needed?(scheduled_time))
   end
 
-  def project_repository_checksum
+  def project_repository_verification_checksum
     project.state&.repository_checksum
   end
 
-  def project_wiki_checksum
+  def project_wiki_verification_checksum
     project.state&.wiki_checksum
   end
 

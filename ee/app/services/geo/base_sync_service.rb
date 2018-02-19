@@ -103,7 +103,7 @@ module Geo
         attrs["#{type}_retry_at"] = next_retry_time(attrs["#{type}_retry_count"])
 
         # indicate that repository verification needs to be done again
-        attrs["#{type}_checksum"] = nil
+        attrs["#{type}_verification_checksum"] = nil
         attrs["last_#{type}_verification_at"] = nil
         attrs["last_#{type}_verification_failure"] = nil
       end
