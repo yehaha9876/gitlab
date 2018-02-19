@@ -1,10 +1,11 @@
 require 'spec_helper'
 
-describe Geo::RepositoriesVerificationWorker do
+describe Geo::RegistryVerificationWorker, :geo do
   include ::EE::GeoHelpers
 
   let(:primary)   { create(:geo_node, :primary) }
   let(:secondary) { create(:geo_node) }
+  let(:registry)  { create(:geo_project_registry, project: create(:project, :repository)) }
 
   before do
     stub_current_geo_node(secondary)
@@ -17,24 +18,18 @@ describe Geo::RepositoriesVerificationWorker do
     it 'only works on the secondary' do
       stub_current_geo_node(primary)
 
-      expect(worker).not_to receive(:try_obtain_lease)
+      expect(worker).not_to receive(:schedule_job)
 
       worker.perform
     end
 
-    it 'verifies several projects' do
-      create(:geo_project_registry)
-      create(:geo_project_registry)
-      create(:geo_project_registry, :repository_verified, :wiki_verified)
+    it 'only works when node is enabled' do
+      allow_any_instance_of(GeoNode).to receive(:enabled?) { false }
 
-      expect(worker).to receive(:verify_project).twice
+      expect(worker).not_to receive(:schedule_job)
 
       worker.perform
     end
-  end
-
-  describe '#verify_project' do
-    let(:registry) { create(:geo_project_registry, project: create(:project, :repository)) }
 
     it 'verifies both repository and wiki' do
       allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).with(registry, :repository).and_return(true)
@@ -43,25 +38,39 @@ describe Geo::RepositoriesVerificationWorker do
       expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).with(registry, :repository).once
       expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).with(registry, :wiki).once
 
-      worker.verify_project(registry)
+      worker.perform
     end
 
     it 'verifies only the repository' do
       allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).with(registry, :repository).and_return(true)
       allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).with(registry, :wiki).and_return(false)
 
-      expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).once
+      expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).with(registry, :repository).once
+      expect(Geo::RepositoryVerifySecondaryWorker).not_to receive(:perform_async).with(registry, :wiki)
 
-      worker.verify_project(registry)
+      worker.perform
     end
 
     it 'verifies only the wiki' do
       allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).with(registry, :repository).and_return(false)
       allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).with(registry, :wiki).and_return(true)
 
-      expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).once
+      expect(Geo::RepositoryVerifySecondaryWorker).not_to receive(:perform_async).with(registry, :repository)
+      expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).with(registry, :wiki).once
 
-      worker.verify_project(registry)
+      worker.perform
+    end
+
+    it 'verifies several projects' do
+      allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).and_return(true)
+
+      create(:geo_project_registry)
+      create(:geo_project_registry)
+      create(:geo_project_registry, :repository_verified, :wiki_verified)
+
+      expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).exactly(4).times
+
+      worker.perform
     end
   end
 end

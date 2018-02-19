@@ -121,7 +121,7 @@ describe Geo::RepositoryVerifySecondaryService do
       service.send(:record_status, checksum: 'my_checksum')
       registry.reload
 
-      expect(registry.send("#{type}_checksum")).to eq 'my_checksum'
+      expect(registry.send("#{type}_verification_checksum")).to eq 'my_checksum'
       expect(registry.send("last_#{type}_verification_at")).not_to be_nil
       expect(registry.send("last_#{type}_verification_failure")).to be_nil
     end
@@ -130,7 +130,7 @@ describe Geo::RepositoryVerifySecondaryService do
       service.send(:record_status, error: 'Repository checksum did not match')
       registry.reload
 
-      expect(registry.send("#{type}_checksum")).to be_nil
+      expect(registry.send("#{type}_verification_checksum")).to be_nil
       expect(registry.send("last_#{type}_verification_at")).to be_nil
       expect(registry.send("last_#{type}_verification_failure")).to eq 'Repository checksum did not match'
     end
