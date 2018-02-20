@@ -446,7 +446,6 @@ gem 'asset_sync', '~> 2.2.0'
 
 # Jaeger Tracing
 gem 'rails-tracer'
-##gem 'rack-tracer'
-## gem 'opentracing'
 gem 'jaeger-client'
 gem 'spanmanager'
+gem 'sidekiq-opentracing'
