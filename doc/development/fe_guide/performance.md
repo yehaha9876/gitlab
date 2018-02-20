@@ -38,8 +38,8 @@ But in general it should be handled automatically through a `MutationObserver` i
 
 ### Animations
 
-Only animate `opacity` & `transform` properties. Other properties (such as `top`, `left`, `margin`, and `padding) all cause
-Layout to be recalculated, which is much more expensive. For details on this, see "Styles that Affect Layout" of
+Only animate `opacity` & `transform` properties. Other properties (such as `top`, `left`, `margin`, and `padding`) all cause
+Layout to be recalculated, which is much more expensive. For details on this, see "Styles that Affect Layout" in
 [High Performance Animations][high-perf-animations].
 
 If you _do_ need to change layout (e.g. a sidebar that pushes main content over), prefer [FLIP][flip] to change expensive
