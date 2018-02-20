@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import graphComponent from '~/pipelines/components/graph/graph_component.vue';
+import linkedPipelineJSON from 'ee_spec/pipelines/graph/linked_pipelines_mock_data';
 import graphJSON from './mock_data';
-import linkedPipelineJSON from './linked_pipelines_mock_data';
 
 const GraphComponent = Vue.extend(graphComponent);
 

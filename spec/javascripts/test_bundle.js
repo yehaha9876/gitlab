@@ -169,13 +169,10 @@ if (process.env.BABEL_ENV === 'coverage') {
     './issue_show/index.js',
   ];
 
-  // render all of our tests
   const sourceFilesContexts = [
-    '~',
-    'ee',
-  ].map(function (testRoot) {
-    return require.context(testRoot, true, /\.js$/);
-  });
+    require.context('~', true, /\.js$/),
+    require.context('ee', true, /\.js$/),
+  ];
   const allTestFiles = testContexts[0].keys() + testContexts[1].keys();
 
   $.holdReady(true);
