@@ -23,6 +23,10 @@ export const closeAllFiles = ({ state, dispatch }) => {
   state.openFiles.forEach(file => dispatch('closeFile', file));
 };
 
+export const setViewMode = ({ state, commit }, viewMode) => {
+  commit(types.SET_VIEWMODE, viewMode);
+};
+
 export const toggleEditMode = ({ commit, dispatch }) => {
   commit(types.TOGGLE_EDIT_MODE);
   dispatch('toggleBlobView');

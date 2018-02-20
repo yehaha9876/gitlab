@@ -131,6 +131,7 @@
 }
 
 .ide-file-tabs {
+  position: relative;
   display: flex;
   background-color: $white-normal;
   box-shadow: inset 0 -1px $white-dark;
@@ -167,8 +168,10 @@
   position: absolute;
   right:0;
   top:0;
-  background-color: $white-normal;
+  background-color: $white-light;
   box-shadow: inset 0 -1px $white-dark;
+  height: 100%;
+  padding: $gl-bar-padding $gl-padding-8;
 }
 
 .multi-file-tab {

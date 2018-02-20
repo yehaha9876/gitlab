@@ -28,7 +28,7 @@ export default {
       return Promise.resolve(file.rawTarget);
     }
 
-    return Vue.http.get(file.rawPath.replace(file.branchId,file.targetBranch), { params: { format: 'json' } })
+    return Vue.http.get(file.rawPath.replace(file.branchId, file.targetBranch), { params: { format: 'json' } })
       .then(res => res.text());
   },
   getProjectData(namespace, project) {

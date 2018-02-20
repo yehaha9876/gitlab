@@ -108,9 +108,7 @@ export default class Editor {
   }
 
   setDiffModel(model, originalModel) {
-    console.log('Diff INstance ',this.diffInstance);
     if (this.diffInstance.originalEditor.model !== originalModel) {
-      console.log('Updated Diff Model');
       this.diffInstance.setModel({
         modified: model.getModel(),
         original: originalModel,

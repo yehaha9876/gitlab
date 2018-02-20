@@ -87,6 +87,7 @@ router.beforeEach((to, from, next) => {
           throw e;
         });
       } else if (to.params.mrid) {
+        store.dispatch('setViewMode', 'mrchanges');
         store.dispatch('getMergeRequestData', {
           projectId: fullProjectId,
           mergeRequestId: to.params.mrid,
@@ -113,17 +114,39 @@ router.beforeEach((to, from, next) => {
               mergeRequestId: to.params.mrid,
             })
             .then((mrChanges) => {
-              mrChanges.changes.forEach((change) => {
-                console.log('CHANGE : ', change);
+              if (mrChanges.changes.length > 0) {
+                
+              }
+              mrChanges.changes.forEach((change, ind) => {
+                console.log('CHANGE : ' + ind + ' : ', change);
 
                 const changeTreeEntry = getTreeEntry(store, `${to.params.namespace}/${to.params.project}/${mr.source_branch}`, change.new_path);
 
-                console.log('Tree ENtry for the change ' , changeTreeEntry, change.diff);
+                console.log('Tree Entry for the change ', changeTreeEntry, change.diff);
 
                 if (changeTreeEntry) {
                   store.dispatch('setFileMrDiff', { file: changeTreeEntry, mrDiff: change.diff });
                   store.dispatch('setFileTargetBranch', { file: changeTreeEntry, targetBranch: mrChanges.target_branch });
-                  store.dispatch('getFileData', changeTreeEntry);
+                  //store.dispatch('getFileData', changeTreeEntry);
+                } else {
+                  console.warn('No Tree Entry for ' + change.new_path);
+                }
+              });
+
+              // Now lets open them
+              mrChanges.changes.forEach((change, ind) => {
+                const changeTreeEntry = getTreeEntry(store, `${to.params.namespace}/${to.params.project}/${mr.source_branch}`, change.new_path);
+                console.log('Tree Entry for the change ', changeTreeEntry, change.diff);
+
+                if (changeTreeEntry) {
+                  if (ind === 0) {
+                    store.dispatch('getFileData', changeTreeEntry);
+                  } else {
+                    // TODO : Implement Tab reloading
+                    store.dispatch('preloadFileTab', changeTreeEntry);
+                  }
+                } else {
+                  console.warn('No Tree Entry for ' + change.new_path);
                 }
               });
             })
@@ -131,19 +154,6 @@ router.beforeEach((to, from, next) => {
               flash('Error while loading the merge request changes. Please try again.');
               throw e;
             });
-
-            store.dispatch('getMergeRequestNotes', {
-              projectId: fullProjectId,
-              mergeRequestId: to.params.mrid,
-            })
-            .then((mrNotes) => {
-              console.log('NOTES : ', mrNotes);
-            })
-            .catch((e) => {
-              flash('Error while loading the merge request notes. Please try again.');
-              throw e;
-            });
-
           })
           .catch((e) => {
             flash('Error while loading the branch files. Please try again.');

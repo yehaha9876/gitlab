@@ -20,6 +20,7 @@
       ...mapState([
         'openFiles',
         'viewer',
+        'currentMergeRequestId',
       ]),
     },
     updated() {
@@ -33,6 +34,7 @@
       ]),
     },
   };
+      
 </script>
 
 <template>

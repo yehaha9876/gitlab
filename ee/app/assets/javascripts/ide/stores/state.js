@@ -4,6 +4,7 @@ export default () => ({
   currentBranchId: '',
   currentMergeRequestId: '',
   currentBlobView: 'repo-editor',
+  currentViewMode: 'edit',
   changedFiles: [],
   editMode: true,
   endpoints: {},

@@ -12,6 +12,7 @@ export default {
       'activeFileExtension',
     ]),
     ...mapState([
+      'currentViewMode',
       'leftPanelCollapsed',
       'rightPanelCollapsed',
       'panelResizing',
@@ -24,14 +25,21 @@ export default {
     activeFileChanged() {
       return this.activeFile && this.activeFile.changed;
     },
-    currentViewMode() {
-      return activeFile.viewMode;
-    },
   },
   watch: {
     activeFile(oldVal, newVal) {
       if (newVal && !newVal.active) {
         this.initMonaco();
+      }
+    },
+    currentViewMode(oldVal, newVal) {
+      this.setupViewMode();
+    },
+    activeFileChanged(newVal) {
+      if (!this.editor) return;
+
+      if (!newVal && this.model) {
+        this.model.setValue(this.model.getOriginalModel().getValue());
       }
     },
     leftPanelCollapsed() {
@@ -77,7 +85,7 @@ export default {
     initMonaco() {
       if (this.shouldHideEditor) return;
 
-      this.editor.clearEditor();
+      if (this.editor) this.editor.clearEditor();
 
       this.getRawFileData(this.activeFile)
         .then(() => {
@@ -149,60 +157,25 @@ export default {
       });
     },
     setupViewMode(selectedMode) {
-      if (selectedMode) this.setFileViewMode(selectedMode);
+      // if (selectedMode) this.setFileViewMode(selectedMode);
 
       this.$refs.editor.style.display = 'none';
       this.$refs.diffEditor.style.display = 'none';
 
       const choosenMode = selectedMode || this.activeFile.viewMode;
       console.log('SETUP VIEW MODE : ' + choosenMode);
-      if (choosenMode === 'edit') {
+      if (this.currentViewMode === 'edit') {
         this.$refs.editor.style.display = 'block';
       } else {
         this.$refs.diffEditor.style.display = 'block';
-        if (choosenMode === 'changes') {
+        if (this.currentViewMode === 'changes') {
           this.editor.setDiffModel(this.editorModel, this.editorModel.getOriginalModel());
-        } else if (choosenMode === 'mrchanges') {
+        } else if (this.currentViewMode === 'mrchanges') {
           this.editor.setDiffModel(this.editorModel, this.editorModel.getTargetModel());
         }
       }
 
       this.editor.updateDimensions();
-    },
-    watch: {
-      activeFile(oldVal, newVal) {
-        if (newVal && !newVal.active) {
-          this.initMonaco();
-        }
-      },
-      leftPanelCollapsed() {
-        this.editor.updateDimensions();
-      },
-      rightPanelCollapsed() {
-        this.editor.updateDimensions();
-      },
-      panelResizing(isResizing) {
-        if (isResizing === false) {
-          this.editor.updateDimensions();
-        }
-      },
-    },
-    computed: {
-      ...mapGetters([
-        'activeFile',
-        'activeFileExtension',
-      ]),
-      ...mapState([
-        'leftPanelCollapsed',
-        'rightPanelCollapsed',
-        'panelResizing',
-      ]),
-      shouldHideEditor() {
-        return this.activeFile.binary && !this.activeFile.raw;
-      },
-      currentViewMode() {
-        return activeFile.viewMode;
-      }
     },
   },
 };
@@ -221,25 +194,8 @@ export default {
           :class="activeFile.viewMode==='edit' ? 'active':''">
           <a
             href="javascript:void(0);"
-            @click.prevent="setupViewMode('edit')">
+            @click.prevent="setFileViewMode('edit')">
             Edit
-          </a>
-        </li>
-        <li
-          :class="activeFile.viewMode==='changes' ? 'active':''">
-          <a
-            href="javascript:void(0);"
-            @click.prevent="setupViewMode('changes')">
-            Preview Changes
-          </a>
-        </li>
-        <li
-          v-if="activeFile.mrDiff"
-          :class="activeFile.viewMode==='mrchanges' ? 'active':''">
-          <a
-            href="javascript:void(0);"
-            @click.prevent="setupViewMode('mrchanges')">
-            Merge Request Changes
           </a>
         </li>
         <li
@@ -247,7 +203,7 @@ export default {
           <a
             v-if="activeFile.previewable"
             href="javascript:void(0);"
-            @click.prevent="setupViewMode('preview')">
+            @click.prevent="setFileViewMode('preview')">
             Preview
           </a>
         </li>

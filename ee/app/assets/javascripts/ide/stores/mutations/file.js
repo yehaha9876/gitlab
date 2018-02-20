@@ -31,6 +31,7 @@ export default {
       rawPath: data.raw_path,
       binary: data.binary,
       renderError: data.render_error,
+      viewMode: 'edit',
     });
   },
   [types.SET_FILE_RAW_DATA](state, { file, raw }) {
@@ -84,7 +85,6 @@ export default {
   [types.SET_FILE_MR_DIFF](state, { file, mrDiff }) {
     Object.assign(file, {
       mrDiff,
-      viewMode: 'mrchanges',
     });
   },
   [types.SET_FILE_TARGET_BRANCH](state, { file, targetBranch }) {
