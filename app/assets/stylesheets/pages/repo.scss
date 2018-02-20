@@ -363,20 +363,21 @@ table.table tr td.multi-file-table-name {
   flex: 1;
 }
 
-.multi-file-commit-empty-state-container {
-  align-items: center;
-  justify-content: center;
+.ide-commit-empty-state-container {
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .multi-file-commit-panel-header {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
   border-bottom: 1px solid $white-dark;
   padding: $gl-btn-padding 0;
 
   &.is-collapsed {
-    border-bottom: 1px solid $white-dark;
+    margin-top: -$gl-padding;
+    margin-left: -$gl-padding;
+    margin-right: -$gl-padding;
 
     svg {
       margin-left: auto;
@@ -413,8 +414,10 @@ table.table tr td.multi-file-table-name {
 
 .multi-file-commit-list-item {
   display: flex;
-  margin-bottom: $grid-size;
+  margin: 0 -8px 8px -8px;
+  padding: $grid-size;
   align-items: center;
+  border-radius: $border-radius-default;
 
   > svg {
     min-width: 16px;
@@ -427,6 +430,8 @@ table.table tr td.multi-file-table-name {
   }
 
   &:hover {
+    background-color: $white-dark;
+
     .multi-file-discard-btn {
       display: block;
     }
@@ -638,4 +643,16 @@ table.table tr td.multi-file-table-name {
   &.dragleft {
     left: 0;
   }
+}
+
+.ide-commit-list-container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+}
+
+.ide-staged-action-btn {
+  margin-left: auto;
+  color: $gl-link-color;
 }

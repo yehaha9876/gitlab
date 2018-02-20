@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import tooltip from '../../vue_shared/directives/tooltip';
 import icon from '../../vue_shared/components/icon.vue';
 import modal from '../../vue_shared/components/modal.vue';
@@ -39,6 +39,10 @@ export default {
       'rightPanelCollapsed',
       'lastCommitMsg',
       'changedFiles',
+      'stagedFiles',
+    ]),
+    ...mapGetters([
+      'unstagedFiles',
     ]),
     commitButtonDisabled() {
       return this.commitMessage === '' || this.submitCommitsLoading || !this.changedFiles.length;
@@ -102,12 +106,6 @@ export default {
           this.submitCommitsLoading = false;
         });
     },
-    toggleCollapsed() {
-      this.setPanelCollapsedStatus({
-        side: 'right',
-        collapsed: !this.rightPanelCollapsed,
-      });
-    },
   },
 };
 </script>
@@ -115,9 +113,6 @@ export default {
 <template>
   <div
     class="multi-file-commit-panel-section"
-    :class="{
-      'multi-file-commit-empty-state-container': !changedFiles.length
-    }"
   >
     <modal
       v-if="showNewBranchModal"
@@ -129,15 +124,24 @@ you started editing. Would you like to create a new branch?`)"
       @cancel="showNewBranchModal = false"
       @submit="makeCommit(true)"
     />
-    <commit-files-list
-      title="Staged"
-      :file-list="changedFiles"
-      :collapsed="rightPanelCollapsed"
-      @toggleCollapsed="toggleCollapsed"
-    />
     <template
       v-if="changedFiles.length"
     >
+      <commit-files-list
+        icon="unstaged"
+        title="Unstaged"
+        :file-list="unstagedFiles"
+        action="stageAllChanges"
+        action-btn-text="Stage all"
+      />
+      <commit-files-list
+        icon="staged"
+        title="Staged"
+        :file-list="stagedFiles"
+        action="unstageAllChanges"
+        action-btn-text="Unstage all"
+        :show-toggle="false"
+      />
       <form
         class="form-horizontal multi-file-commit-form"
         @submit.prevent="tryCommit"
@@ -190,14 +194,12 @@ you started editing. Would you like to create a new branch?`)"
     </template>
     <div
       v-else-if="!rightPanelCollapsed"
-      class="row js-empty-state"
+      class="ide-commit-empty-state-container js-empty-state"
     >
-      <div class="col-xs-10 col-xs-offset-1">
-        <div class="svg-content svg-80">
-          <img :src="statusSvg" />
-        </div>
+      <div class="svg-content svg-80">
+        <img :src="statusSvg" />
       </div>
-      <div class="col-xs-10 col-xs-offset-1">
+      <div class="append-right-default prepend-left-default">
         <div
           class="text-content text-center"
           v-if="!lastCommitMsg"

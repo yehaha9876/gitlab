@@ -4,6 +4,7 @@ export default () => ({
   currentBranchId: '',
   currentBlobView: 'repo-editor',
   changedFiles: [],
+  stagedFiles: [],
   editMode: true,
   endpoints: {},
   isRoot: false,

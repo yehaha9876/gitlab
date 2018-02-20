@@ -165,6 +165,14 @@ export const scrollToTab = () => {
   });
 };
 
+export const stageAllChanges = ({ getters, commit }) => {
+  getters.unstagedFiles.forEach(file => commit(types.STAGE_CHANGE, file));
+};
+
+export const unstageAllChanges = ({ state, commit }) => {
+  state.stagedFiles.forEach(file => commit(types.UNSTAGE_CHANGE, file));
+};
+
 export * from './actions/tree';
 export * from './actions/file';
 export * from './actions/project';

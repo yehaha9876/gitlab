@@ -3,9 +3,20 @@ import ide from './components/ide.vue';
 import store from './stores';
 import router from './ide_router';
 import Translate from '../vue_shared/translate';
+import { dataStructure } from './stores/utils';
 
 function initIde(el) {
   if (!el) return null;
+
+  const f = {
+    ...dataStructure(),
+    changed: true,
+    name: 'testing 123',
+    path: 'testing 123',
+    type: 'blob',
+  };
+
+  store.state.changedFiles.push(f);
 
   return new Vue({
     el,

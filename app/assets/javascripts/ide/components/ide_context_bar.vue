@@ -30,9 +30,6 @@
         'rightPanelCollapsed',
         'changedFiles',
       ]),
-      currentIcon() {
-        return this.rightPanelCollapsed ? 'angle-double-left' : 'angle-double-right';
-      },
       maxSize() {
         return window.innerWidth / 2;
       },
@@ -81,37 +78,6 @@
     <div
       class="multi-file-commit-panel-section"
     >
-      <header
-        class="multi-file-commit-panel-header"
-        :class="{
-          'is-collapsed': rightPanelCollapsed,
-        }"
-      >
-        <div
-          class="multi-file-commit-panel-header-title"
-          v-if="!rightPanelCollapsed"
-        >
-          <div
-            v-if="changedFiles.length"
-          >
-            <icon
-              name="list-bulleted"
-              :size="18"
-            />
-            Staged
-          </div>
-        </div>
-        <button
-          type="button"
-          class="btn btn-transparent multi-file-commit-panel-collapse-btn"
-          @click.stop="toggleCollapsed"
-        >
-          <icon
-            :name="currentIcon"
-            :size="18"
-          />
-        </button>
-      </header>
       <repo-commit-section
         :no-changes-state-svg-path="noChangesStateSvgPath"
         :committed-state-svg-path="committedStateSvgPath"
