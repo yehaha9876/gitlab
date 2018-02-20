@@ -375,10 +375,6 @@ table.table tr td.multi-file-table-name {
   padding: $gl-btn-padding 0;
 
   &.is-collapsed {
-    margin-top: -$gl-padding;
-    margin-left: -$gl-padding;
-    margin-right: -$gl-padding;
-
     svg {
       margin-left: auto;
       margin-right: auto;
@@ -449,10 +445,12 @@ table.table tr td.multi-file-table-name {
 .multi-file-commit-list-collapsed {
   display: flex;
   flex-direction: column;
+  padding: $gl-padding;
 
   > svg {
     margin-left: auto;
     margin-right: auto;
+    color: $theme-gray-700;
   }
 
   .file-status-icon {
@@ -647,9 +645,12 @@ table.table tr td.multi-file-table-name {
 
 .ide-commit-list-container {
   display: flex;
-  flex: 1;
   flex-direction: column;
   width: 100%;
+
+  &:not(.is-collapsed) {
+    flex: 1;
+  }
 }
 
 .ide-staged-action-btn {

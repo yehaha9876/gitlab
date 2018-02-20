@@ -67,6 +67,9 @@
 <template>
   <div
     class="ide-commit-list-container"
+    :class="{
+      'is-collapsed': rightPanelCollapsed,
+    }"
   >
     <header
       class="multi-file-commit-panel-header"
@@ -106,6 +109,8 @@
     </header>
     <list-collapsed
       v-if="rightPanelCollapsed"
+      :files="fileList"
+      :icon="icon"
     />
     <template v-else>
       <ul
