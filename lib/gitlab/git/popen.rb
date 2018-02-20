@@ -6,6 +6,7 @@ module Gitlab
   module Git
     module Popen
       FAST_GIT_PROCESS_TIMEOUT = 15.seconds
+      SLOW_GIT_PROCESS_TIMEOUT = 30.seconds
 
       def popen(cmd, path, vars = {}, lazy_block: nil)
         unless cmd.is_a?(Array)
