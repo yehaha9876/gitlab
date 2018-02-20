@@ -44,6 +44,8 @@ module Gitlab
       delegate :exists?, to: :gitlab_shell
 
       def perform(start_id, stop_id)
+        return unless Gitlab::Geo.primary?
+
         Rails.logger.info("Calculating repository checksum: #{start_id} - #{stop_id}")
 
         Project.where(id: start_id..stop_id).each_batch(of: BATCH_SIZE, column: :last_activity_at) do |batch|

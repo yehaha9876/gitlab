@@ -19,6 +19,8 @@ class ScheduleCalculateProjectRepositoryChecksumMigrations < ActiveRecord::Migra
   end
 
   def up
+    return unless Gitlab::Geo.primary?
+
     relation = Project.joins("LEFT OUTER JOIN project_states on projects.id = project_states.project_id")
                       .merge(ProjectState.where(project_id: nil))
 
