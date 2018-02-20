@@ -49,11 +49,11 @@
         eventHub.$emit('promoteMilestoneModal.requestStarted', this.url);
         return axios.post(this.url)
           .then((response) => {
-            eventHub.$emit('promoteMilestoneModal.requestFinished', { labelUrl: this.url, successful: true });
+            eventHub.$emit('promoteMilestoneModal.requestFinished', { milestoneUrl: this.url, successful: true });
             redirectTo(response.request.responseURL);
           })
           .catch((error) => {
-            eventHub.$emit('promoteMilestoneModal.requestFinished', { labelUrl: this.url, successful: true });
+            eventHub.$emit('promoteMilestoneModal.requestFinished', { milestoneUrl: this.url, successful: false });
             createFlash(error);
           });
       },

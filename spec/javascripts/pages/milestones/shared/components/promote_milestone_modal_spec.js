@@ -7,39 +7,31 @@ import mountComponent from '../../../../helpers/vue_mount_component_helper';
 
 describe('Promote milestone modal', () => {
   let vm;
-  let Component;
+  const Component = Vue.extend(promoteMilestoneModal);
   const milestoneMockData = {
     milestoneTitle: 'v1.0',
     milestoneGroup: 'Group',
-    url: `${gl.TEST_HOST}/dummy/endpoint`,
+    url: `${gl.TEST_HOST}/dummy/promote/milestones`,
   };
-
-  beforeEach(() => {
-    Component = Vue.extend(promoteMilestoneModal);
-  });
 
   describe('Modal title and description', () => {
     beforeEach(() => {
-      vm = mountComponent(Component, {
-        ...milestoneMockData,
-      });
+      vm = mountComponent(Component, milestoneMockData);
     });
 
     afterEach(() => {
       vm.$destroy();
     });
 
-    it('should contain the proper description', () => {
+    it('contains the proper description', () => {
       expect(vm.text).toContain('Promoting v1.0 will make it available for all projects inside Group');
-      expect(vm.text).toContain('Existing project milestones with the same name will be merged.');
-      expect(vm.text).toContain('This action cannot be reversed.');
     });
 
-    it('should contain a link to the burndown documentation on the description', () => {
+    it('contains a link to the burndown documentation on the description', () => {
       expect(vm.text).toContain('https://docs.gitlab.com/ee/user/project/milestones/');
     });
 
-    it('should contain the correct title', () => {
+    it('contains the correct title', () => {
       expect(vm.title).toEqual('Promote v1.0 to group milestone?');
     });
   });
@@ -56,7 +48,7 @@ describe('Promote milestone modal', () => {
       vm.$destroy();
     });
 
-    it('should redirect when a milestone is promoted', (done) => {
+    it('redirects when a milestone is promoted', (done) => {
       const responseURL = `${gl.TEST_HOST}/dummy/endpoint`;
       spyOn(axios, 'post').and.callFake((url) => {
         expect(url).toBe(milestoneMockData.url);
@@ -72,6 +64,7 @@ describe('Promote milestone modal', () => {
       vm.onSubmit()
         .then(() => {
           expect(redirectSpy).toHaveBeenCalledWith(responseURL);
+          expect(eventHub.$emit).toHaveBeenCalledWith('promoteMilestoneModal.requestFinished', { milestoneUrl: milestoneMockData.url, successful: true });
         })
         .then(done)
         .catch(done.fail);
