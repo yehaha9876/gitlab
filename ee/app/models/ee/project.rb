@@ -13,6 +13,8 @@ module EE
       prepend ImportStatusStateMachine
       include EE::DeploymentPlatform
 
+      default_value_for :ci_cd_only, false
+
       before_validation :mark_remote_mirrors_for_removal
 
       before_save :set_override_pull_mirror_available, unless: -> { ::Gitlab::CurrentSettings.mirror_available }
