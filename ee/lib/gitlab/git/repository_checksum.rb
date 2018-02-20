@@ -37,16 +37,17 @@ module Gitlab
             end
           end
         else
-          Gitlab::GitLogger.error("'git show-ref --heads --tags' in #{path}: #{output}")
-
-          raise Gitlab::Git::ChecksumVerificationError.new(
-            "Could not calculate the checksum for #{path}: #{output}")
+          fail!(output)
         end
       rescue Timeout::Error => e
-        Gitlab::GitLogger.error("'git show-ref --heads --tags' in #{path}: #{e}")
+        fail!(e.message)
+      end
+
+      def fail!(message)
+        Gitlab::GitLogger.error("'git show-ref --heads --tags' in #{path}: #{message}")
 
         raise Gitlab::Git::ChecksumVerificationError.new(
-          "Could not calculate the checksum for #{path}: #{e}")
+          "Could not calculate the checksum for #{path}: #{message}")
       end
 
       def circuit_breaker
