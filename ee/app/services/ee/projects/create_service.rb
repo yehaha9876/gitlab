@@ -2,11 +2,12 @@ module EE
   module Projects
     module CreateService
       extend ::Gitlab::Utils::Override
-      include ::Gitlab::Utils::StrongMemoize
 
       override :execute
       def execute
         limit = params.delete(:repository_size_limit)
+        mirror = params.delete(:mirror)
+        mirror_user_id = params.delete(:mirror_user_id)
         mirror_trigger_builds = params.delete(:mirror_trigger_builds)
 
         project = super do |project|
@@ -30,22 +31,6 @@ module EE
 
       private
 
-      def ci_cd_project?
-        project.ci_cd_only?
-      end
-
-      def mirror
-        strong_memoize(:mirror) do
-          ci_cd_project? ? true : params.delete(:mirror)
-        end
-      end
-
-      def mirror_user_id
-        strong_memoize(:mirror_user_id) do
-          ci_cd_project? ? current_user.id : params.delete(:mirror_user_id)
-        end
-      end
-
       def log_geo_event(project)
         ::Geo::RepositoryCreatedEventStore.new(project).create
       end
@@ -54,8 +39,8 @@ module EE
       def after_create_actions
         super
 
-        create_predefined_push_rule unless ci_cd_project?
-        setup_ci_cd_project         if ci_cd_project?
+        create_predefined_push_rule
+        setup_ci_cd_project if project.ci_cd_only?
 
         project.group&.refresh_members_authorized_projects
       end
@@ -72,17 +57,7 @@ module EE
       end
 
       def setup_ci_cd_project
-        project.update_attributes!(
-          container_registry_enabled: false,
-          mirror: true
-        )
-
-        project.project_feature.update_attributes!(
-          issues_access_level:         ProjectFeature::DISABLED,
-          merge_requests_access_level: ProjectFeature::DISABLED,
-          wiki_access_level:           ProjectFeature::DISABLED,
-          snippets_access_level:       ProjectFeature::DISABLED
-        )
+        EE::Projects::SetupCiCd.new(project, current_user).execute
       end
 
       def log_audit_event(project)
