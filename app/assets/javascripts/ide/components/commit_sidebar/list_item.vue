@@ -23,13 +23,17 @@
     methods: {
       ...mapActions([
         'discardFileChanges',
+        'unstageFile',
       ]),
     },
   };
 </script>
 
 <template>
-  <div class="multi-file-commit-list-item">
+  <div
+    v-once
+    class="multi-file-commit-list-item"
+  >
     <icon
       :name="iconName"
       :size="16"
@@ -41,9 +45,12 @@
     <button
       type="button"
       class="btn btn-blank multi-file-discard-btn"
-      @click="discardFileChanges(file)"
+      @click="unstageFile(file)"
     >
-      Discard
+      <icon
+        name="history"
+        :size="16"
+      />
     </button>
   </div>
 </template>

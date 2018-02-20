@@ -151,3 +151,7 @@ export const discardFileChanges = ({ commit }, file) => {
     commit(types.TOGGLE_FILE_OPEN, file);
   }
 };
+
+export const unstageFile = ({ commit }, file) => {
+  commit(types.UNSTAGE_CHANGE, file);
+};
