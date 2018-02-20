@@ -42,19 +42,19 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   end
 
   def project_repository_verification_checksum
-    project.state&.repository_checksum
+    project.state&.repository_verification_checksum
   end
 
   def project_wiki_verification_checksum
-    project.state&.wiki_checksum
+    project.state&.wiki_verification_checksum
   end
 
   def project_repository_last_check
-    project.state&.last_repository_check_at
+    project.state&.last_repository_verification_at
   end
 
   def project_wiki_last_check
-    project.state&.last_wiki_check_at
+    project.state&.last_wiki_verification_at
   end
 
   def repository(type)
