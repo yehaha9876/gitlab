@@ -57,7 +57,7 @@ module EE
       end
 
       def setup_ci_cd_project
-        EE::Projects::SetupCiCd.new(project, current_user).execute
+        ::Projects::SetupCiCd.new(project, current_user).execute
       end
 
       def log_audit_event(project)

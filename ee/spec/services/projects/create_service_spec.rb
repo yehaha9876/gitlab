@@ -9,6 +9,35 @@ describe Projects::CreateService, '#execute' do
     }
   end
 
+  context 'with a CI/CD only project' do
+    before do
+      opts.merge!(
+        ci_cd_only: true,
+        import_url: 'http://foo.com'
+      )
+    end
+
+    it 'setup pull mirroring on the project' do
+      project = create_project(user, opts)
+
+      expect(project.mirror).to be_truthy
+      expect(project.mirror_trigger_builds).to be_truthy
+      expect(project.mirror_user_id).to eq(user.id)
+    end
+
+    it 'disable some features' do
+      project = create_project(user, opts)
+      project_feature = project.project_feature
+
+      expect(project.container_registry_enabled).to be_falsey
+
+      expect(project_feature.issues_access_level).to eq(ProjectFeature::DISABLED)
+      expect(project_feature.merge_requests_access_level).to eq(ProjectFeature::DISABLED)
+      expect(project_feature.wiki_access_level).to eq(ProjectFeature::DISABLED)
+      expect(project_feature.snippets_access_level).to eq(ProjectFeature::DISABLED)
+    end
+  end
+
   context 'repository_size_limit assignment as Bytes' do
     let(:admin_user) { create(:user, admin: true) }
 
