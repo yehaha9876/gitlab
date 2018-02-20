@@ -24,20 +24,18 @@ module Gitlab
         args = %W(--git-dir=#{path} show-ref --heads --tags)
         output, status = run_git_with_timeout(args, Gitlab::Git::Popen::SLOW_GIT_PROCESS_TIMEOUT)
 
-        if status.zero?
-          refs = output.split("\n")
+        fail!(output) unless status.zero?
 
-          refs.inject(nil) do |checksum, ref|
-            value = Digest::SHA1.hexdigest(ref)
+        refs = output.split("\n")
 
-            if checksum.nil?
-              value
-            else
-              (checksum.hex ^ value.hex).to_s(16)
-            end
+        refs.inject(nil) do |checksum, ref|
+          value = Digest::SHA1.hexdigest(ref)
+
+          if checksum.nil?
+            value
+          else
+            (checksum.hex ^ value.hex).to_s(16)
           end
-        else
-          fail!(output)
         end
       rescue Timeout::Error => e
         fail!(e.message)
