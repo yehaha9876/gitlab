@@ -49,20 +49,22 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     project.state&.wiki_verification_checksum
   end
 
-  def project_repository_last_check
+  def project_repository_last_verification
     project.state&.last_repository_verification_at
   end
 
-  def project_wiki_last_check
+  def project_wiki_last_verification
     project.state&.last_wiki_verification_at
   end
 
-  def repository(type)
+  def repository_path(type)
+    repo_path = project.disk_path
+
     case type
     when :repository
-      project.repository
+      repo_path
     when :wiki
-      project.wiki.repository
+      "#{repo_path}.wiki"
     end
   end
 
