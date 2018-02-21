@@ -12,6 +12,7 @@ module EE
       include Elastic::ProjectsSearch
       prepend ImportStatusStateMachine
       include EE::DeploymentPlatform
+      include EachBatch
 
       before_validation :mark_remote_mirrors_for_removal
 
