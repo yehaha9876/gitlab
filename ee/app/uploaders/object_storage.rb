@@ -131,7 +131,8 @@ module ObjectStorage
       end
 
       def licensed?
-        License.feature_available?(:object_storage)
+        # TODO to bring back
+        true || License.feature_available?(:object_storage)
       end
 
       def serialization_column(model_class, mount_point)
@@ -176,7 +177,7 @@ module ObjectStorage
     def persist_object_store!
       return unless persist_object_store?
 
-      updated = model.update_column(store_serialization_column, object_store)
+      updated = model.update({ store_serialization_column => object_store })
       raise ActiveRecordError unless updated
     end
 
@@ -288,8 +289,10 @@ module ObjectStorage
       # result['TempPath'] = cache_path
 
       remote_path = cache_path
-      remote_path.slice!(self.class.local_store_path)
+      remote_path.slice!(self.root)
       remote_path.slice!('/')
+
+      remote_storage = storage_for(Store::REMOTE)
 
       expire_at = ::Fog::Time.now + 24.hours
       result[:ObjectStore] = {
@@ -319,7 +322,7 @@ module ObjectStorage
       @use_storage_for_cache = true
 
       puts "xxy1"
-      self.object_store = REMOTE_STORE
+      self.object_store = Store::REMOTE
 
       puts "xxy2"
       retrieve_from_cache!(identifier)
@@ -329,14 +332,9 @@ module ObjectStorage
     end
 
     def store_remote_file!(identifier, filename)
-      @use_storage_for_cache = true
-
-      self.object_store = REMOTE_STORE
-      retrieve_from_cache!(identifier)
-      @filename = filename
+      retrive_uploaded_file!(identifier, filename)
       store!
-    ensure
-      @use_storage_for_cache = false
+      persist_object_store!
     end
 
     def cache_storage

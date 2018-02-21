@@ -51,12 +51,11 @@ class Projects::LfsStorageController < Projects::GitHttpClientController
   end
 
   def store_file(oid, size)
-    object = LfsObject.find_or_create_by(oid: oid, size: size)
-    file_exists = object.file.exists?
+    object = LfsObject.find_by(oid: oid, size: size)
+    file_exists = object&.file&.exists?
     unless file_exists
-      object.file.retrive_uploaded_file!(params["file.object_id"], params["file.name"])
-      object.file.store!
-      object.save!
+      object = LfsObject.new(oid: oid, size: size)
+      object.file.store_remote_file!(params["file.object_id"], params["file.name"])
       file_exists = true
     end
 
