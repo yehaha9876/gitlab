@@ -639,3 +639,9 @@ table.table tr td.multi-file-table-name {
     left: 0;
   }
 }
+
+/* monaco overriding styles */
+.editor-widget > .tree {
+  border-radius: $border-radius-base;
+  box-shadow: 0 2px 4px $dropdown-shadow-color;
+}

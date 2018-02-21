@@ -4,6 +4,7 @@ export default {
     base: 'vs',
     inherit: true,
     rules: [
+      { foreground: '2e2e2e' },
       { token: 'comment', foreground: '999988', fontStyle: 'italic' },
       { token: 'comment.block.preprocessor', foreground: '999999' },
       { token: 'name', foreground: '333333' },
@@ -21,6 +22,15 @@ export default {
     colors: {
       'editor.foreground': '#2e2e2e',
       'editorLineNumber.foreground': '#CCCCCC',
+      'dropdown.background': '#ffffff',
+      'list.hoverBackground': '#eeeeee',
+      'list.focusBackground': '#eeeeee',
+      'list.hoverForeground': '#2e2e2e',
+      'list.focusForeground': '#2e2e2e',
+      'editorWidget.background': '#ffffff',
+      'editorWidget.border': '#e5e5e5',
+      'widget.shadow': 'rgba(0, 0, 0, .1)',
+      'editorSuggestWidget.highlightForeground': '#2e87e0',
     },
   },
 };
