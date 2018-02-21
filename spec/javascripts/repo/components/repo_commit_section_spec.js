@@ -29,7 +29,9 @@ describe('RepoCommitSection', () => {
       },
     };
 
-    const files = [file('file1'), file('file2')];
+    const files = [file('file1'), file('file2')].map(f => Object.assign(f, {
+      type: 'blob',
+    }));
 
     vm.$store.state.rightPanelCollapsed = false;
     vm.$store.state.currentBranch = 'master';
@@ -105,6 +107,48 @@ describe('RepoCommitSection', () => {
 
     expect(submitCommit.disabled).toBeTruthy();
     expect(submitCommit.querySelector('.fa-spinner.fa-spin')).toBeNull();
+  });
+
+  it('adds changed files into staged files', (done) => {
+    vm.$el.querySelector('.ide-staged-action-btn').click();
+
+    Vue.nextTick(() => {
+      expect(vm.$el.querySelector('.ide-commit-list-container').textContent).toContain('No changes');
+
+      done();
+    });
+  });
+
+  it('stages a single file', (done) => {
+    vm.$el.querySelector('.multi-file-discard-btn').click();
+
+    Vue.nextTick(() => {
+      expect(vm.$el.querySelector('.ide-commit-list-container').querySelectorAll('li').length).toBe(1);
+
+      done();
+    });
+  });
+
+  it('removes all staged files', (done) => {
+    vm.$el.querySelectorAll('.ide-staged-action-btn')[1].click();
+
+    Vue.nextTick(() => {
+      expect(vm.$el.querySelectorAll('.ide-commit-list-container')[1].textContent).toContain('No changes');
+
+      done();
+    });
+  });
+
+  it('unstages a single file', (done) => {
+    vm.$el.querySelectorAll('.multi-file-discard-btn')[2].click();
+
+    Vue.nextTick(() => {
+      expect(
+        vm.$el.querySelectorAll('.ide-commit-list-container')[1].querySelectorAll('li').length,
+      ).toBe(1);
+
+      done();
+    });
   });
 
   describe('when submitting', () => {

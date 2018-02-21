@@ -390,4 +390,64 @@ describe('Multi-file store actions', () => {
         .catch(done.fail);
     });
   });
+
+  describe('stageAllChanges', () => {
+    it('adds all files from changedFiles to stagedFiles', (done) => {
+      const f = file();
+      store.state.changedFiles.push(f);
+      store.state.changedFiles.push(file());
+
+      store.dispatch('stageAllChanges')
+        .then(() => {
+          expect(store.state.stagedFiles.length).toBe(2);
+          expect(store.state.stagedFiles[0]).toEqual(f);
+
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it('removes all files from changedFiles after adding to stagedFiles', (done) => {
+      store.state.changedFiles.push(file());
+      store.state.changedFiles.push(file());
+
+      store.dispatch('stageAllChanges')
+        .then(() => {
+          expect(store.state.changedFiles.length).toBe(0);
+
+          done();
+        })
+        .catch(done.fail);
+    });
+  });
+
+  describe('unstageAllChanges', () => {
+    it('adds all files from stagedFiles to channgedFiles', (done) => {
+      const f = file();
+      store.state.stagedFiles.push(f);
+      store.state.stagedFiles.push(file());
+
+      store.dispatch('unstageAllChanges')
+        .then(() => {
+          expect(store.state.stagedFiles.length).toBe(0);
+          expect(store.state.changedFiles[0]).toEqual(f);
+
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it('removes all files from changedFiles after adding to stagedFiles', (done) => {
+      store.state.stagedFiles.push(file());
+      store.state.stagedFiles.push(file());
+
+      store.dispatch('unstageAllChanges')
+        .then(() => {
+          expect(store.state.stagedFiles.length).toBe(0);
+
+          done();
+        })
+        .catch(done.fail);
+    });
+  });
 });

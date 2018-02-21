@@ -166,11 +166,11 @@ export const scrollToTab = () => {
 };
 
 export const stageAllChanges = ({ state, commit }) => {
-  state.changedFiles.forEach(file => commit(types.STAGE_CHANGE, file));
+  [...state.changedFiles].forEach(file => commit(types.STAGE_CHANGE, file));
 };
 
 export const unstageAllChanges = ({ state, commit }) => {
-  state.stagedFiles.forEach(file => commit(types.UNSTAGE_CHANGE, file));
+  [...state.stagedFiles].forEach(file => commit(types.UNSTAGE_CHANGE, file));
 };
 
 export * from './actions/tree';
