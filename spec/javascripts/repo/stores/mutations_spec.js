@@ -110,4 +110,14 @@ describe('Multi-file store mutations', () => {
       expect(localState.rightPanelCollapsed).toBeFalsy();
     });
   });
+
+  describe('CLEAR_STAGED_CHANGES', () => {
+    it('clears stagedFiles array', () => {
+      localState.stagedFiles.push('a');
+
+      mutations.CLEAR_STAGED_CHANGES(localState);
+
+      expect(localState.stagedFiles.length).toBe(0);
+    });
+  });
 });

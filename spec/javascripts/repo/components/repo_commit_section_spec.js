@@ -29,9 +29,17 @@ describe('RepoCommitSection', () => {
       },
     };
 
+    const files = [file('file1'), file('file2')];
+
     vm.$store.state.rightPanelCollapsed = false;
     vm.$store.state.currentBranch = 'master';
-    vm.$store.state.stagedFiles = [file('file1'), file('file2')];
+    vm.$store.state.changedFiles = [...files];
+    vm.$store.state.changedFiles.forEach(f => Object.assign(f, {
+      changed: true,
+      content: 'changedFile testing',
+    }));
+
+    vm.$store.state.stagedFiles = [{ ...files[0] }, { ...files[1] }];
     vm.$store.state.stagedFiles.forEach(f => Object.assign(f, {
       changed: true,
       content: 'testing',
@@ -137,6 +145,10 @@ describe('RepoCommitSection', () => {
           expect(actions[0].file_path).toEqual(stagedFiles[0].path);
           expect(actions[1].file_path).toEqual(stagedFiles[1].path);
 
+          vm.$store.state.changedFiles = [];
+        })
+        .then(Vue.nextTick)
+        .then(() => {
           expect(vm.$el.querySelector('.js-empty-state').textContent.trim()).toContain('All changes are committed');
           expect(vm.$el.querySelector('.js-empty-state img').getAttribute('src')).toBe('commitsvg');
         })
