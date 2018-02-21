@@ -5,8 +5,6 @@ import Disposable from './common/disposable';
 import ModelManager from './common/model_manager';
 import editorOptions from './editor_options';
 
-import gitlabTheme from './themes/gl_theme';
-
 export default class Editor {
   static create(monaco) {
     this.editorInstance = new Editor(monaco);
@@ -76,9 +74,14 @@ export default class Editor {
   }
 
   setupMonacoTheme() {
-    this.monaco.editor.defineTheme(gitlabTheme.themeName, gitlabTheme.monacoTheme);
+    const context = require.context('./themes', true, /\.(js)$/);
+    context.keys().forEach((filename) => {
+      const theme = context(filename).default;
 
-    this.monaco.editor.setTheme('gitlab');
+      this.monaco.editor.defineTheme(theme.themeName, theme.monacoTheme);
+    });
+
+    this.monaco.editor.setTheme('gl-white');
   }
 
   clearEditor() {
