@@ -2,6 +2,7 @@ module Geo
   class BatchRepositoryVerificationWorker
     include ApplicationWorker
     include CronjobQueue
+    include Gitlab::Geo::LogHelpers
 
     BATCH_SIZE     = 1000
     DELAY_INTERVAL = 5.minutes.to_i
@@ -11,7 +12,11 @@ module Geo
       return unless Gitlab::Geo.primary?
 
       lease = exclusive_lease.try_obtain
-      return unless lease
+
+      unless lease
+        log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.')
+        return
+      end
 
       begin
         projects.each_batch(of: BATCH_SIZE, column: :last_activity_at) do |batch, index|

@@ -1,8 +1,6 @@
 module Gitlab
   module BackgroundMigration
     class CalculateProjectRepositoryChecksum
-      include Gitlab::ShellAdapter
-
       BATCH_SIZE = 100
 
       class ProjectState < ActiveRecord::Base
@@ -41,8 +39,6 @@ module Gitlab
         end
       end
 
-      delegate :exists?, to: :gitlab_shell
-
       def perform(start_id, stop_id)
         return unless Gitlab::Geo.primary?
 
@@ -63,14 +59,10 @@ module Gitlab
       end
 
       def calculate_checksum(type, project_state, storage, relative_path)
-        # TODO: Move this guard clause to Gitlab::Git::RepositoryChecksum#calculate
-        storage_path = Gitlab.config.repositories.storages[storage].try(:[], 'path')
-        return unless exists?(storage_path, "#{relative_path}.git")
-
         begin
           checksum = Gitlab::Git::RepositoryChecksum.new(storage, relative_path)
           project_state.update!("#{type}_verification_checksum" => checksum.calculate, "last_#{type}_verification_at" => DateTime.now)
-        rescue Gitlab::Git::ChecksumVerificationError, Timeout::Error => e
+        rescue => e
           Rails.logger.error("#{self.class.name} - #{e.message}")
           project_state.update!("last_#{type}_verification_failure" => e.message, "last_#{type}_verification_at" => DateTime.now)
         end

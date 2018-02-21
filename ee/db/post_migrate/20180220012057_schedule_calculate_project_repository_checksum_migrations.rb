@@ -4,7 +4,7 @@ class ScheduleCalculateProjectRepositoryChecksumMigrations < ActiveRecord::Migra
   DOWNTIME = false
   BATCH_SIZE = 1_000
   MIGRATION = 'CalculateProjectRepositoryChecksum'.freeze
-  DELAY_INTERVAL = 10.seconds # 5.minutes
+  DELAY_INTERVAL = 5.minutes
 
   disable_ddl_transaction!
 

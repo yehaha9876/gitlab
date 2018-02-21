@@ -2,6 +2,7 @@ module Geo
   class SingleRepositoryVerificationWorker
     include ApplicationWorker
     include GeoQueue
+    include Gitlab::Geo::LogHelpers
 
     LEASE_TIMEOUT = 1.hour.to_i
 
@@ -13,15 +14,17 @@ module Geo
 
       lease = lease_for(project_id).try_obtain
 
-      if lease
+      unless lease
+        log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.', nil, project_id: project.id, project_path: project.full_path)
+        return
+      end
+
+      begin
         calculate_repository_checksum(project) if project.repository.exists?
         calculate_wiki_checksum(project) if project.wiki.repository.exists?
-      else
-        false
+      ensure
+        cancel_lease_for(project_id, lease)
       end
-    rescue => ex
-      cancel_lease_for(project_id, lease) if lease
-      raise ex
     end
 
     private
@@ -35,15 +38,11 @@ module Geo
     end
 
     def calculate_checksum(type, storage, relative_path, project_state)
-      # TODO: Move this guard clause to Gitlab::Git::RepositoryChecksum#calculate
-      storage_path = Gitlab.config.repositories.storages[storage].try(:[], 'path')
-      return unless exists?(storage_path, "#{relative_path}.git")
-
       begin
         checksum = Gitlab::Git::RepositoryChecksum.new(storage, relative_path)
         project_state.update!("#{type}_verification_checksum" => checksum.calculate, "last_#{type}_verification_at" => DateTime.now)
-      rescue Gitlab::Git::ChecksumVerificationError, Timeout::Error => e
-        Rails.logger.error("#{self.class.name} - #{e.message}")
+      rescue => e
+        log_error('Error calculating the repository checksum', e, storage: storage, relative_path: relative_path, type: type)
         project_state.update!("last_#{type}_verification_failure" => e.message, "last_#{type}_verification_at" => DateTime.now)
         raise e
       end
