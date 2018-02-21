@@ -94,12 +94,13 @@ describe('RepoCommitSection', () => {
   it('renders a commit section', () => {
     const changedFileElements = [...vm.$el.querySelectorAll('.multi-file-commit-list li')];
     const submitCommit = vm.$el.querySelector('form .btn');
+    const allFiles = vm.$store.state.changedFiles.concat(vm.$store.state.stagedFiles);
 
     expect(vm.$el.querySelector('.multi-file-commit-form')).not.toBeNull();
-    expect(changedFileElements.length).toEqual(2);
+    expect(changedFileElements.length).toEqual(4);
 
     changedFileElements.forEach((changedFile, i) => {
-      expect(changedFile.textContent.trim()).toContain(vm.$store.state.stagedFiles[i].path);
+      expect(changedFile.textContent.trim()).toContain(allFiles[i].path);
     });
 
     expect(submitCommit.disabled).toBeTruthy();
