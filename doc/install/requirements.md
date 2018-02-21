@@ -128,16 +128,17 @@ As of GitLab 10.0, PostgreSQL 9.6 or newer is required, and earlier versions are
 not supported. We highly recommend users to use PostgreSQL 9.6 as this
 is the PostgreSQL version used for development and testing.
 
-Users using PostgreSQL must ensure the `pg_trgm` extension is loaded into every
-GitLab database. This extension can be enabled (using a PostgreSQL super user)
-by running the following query for every database:
+Users using PostgreSQL must ensure the `pg_trgm` and `pg_stat_statements` extensions are loaded into every
+GitLab database. This extensions can be enabled (using a PostgreSQL super user)
+by running the following queries for every database:
 
 ```
 CREATE EXTENSION pg_trgm;
+CREATE EXTENSION pg_stat_statements;
 ```
 
 On some systems you may need to install an additional package (e.g.
-`postgresql-contrib`) for this extension to become available.
+`postgresql-contrib`) for these extensions to become available.
 
 ## Unicorn Workers
 
