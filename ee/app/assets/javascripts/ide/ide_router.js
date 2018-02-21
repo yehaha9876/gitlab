@@ -70,6 +70,11 @@ router.beforeEach((to, from, next) => {
           branchId: to.params.branch,
         });
 
+        store.dispatch('getFiles', {
+          projectId: fullProjectId,
+          branchId: to.params.branch,
+        });
+
         store.dispatch('getTreeData', {
           projectId: fullProjectId,
           branch: to.params.branch,

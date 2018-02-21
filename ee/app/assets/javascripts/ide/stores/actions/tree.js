@@ -198,3 +198,15 @@ export const updateDirectoryData = (
 
   commit(types.SET_DIRECTORY_DATA, { tree: selectedTree, data: formattedData });
 };
+
+export const getFiles = ({ state, commit, dispatch }, { projectId, branchId} = {},) => {
+  const selectedProject = state.projects[projectId];
+  service
+    .getFiles(selectedProject.web_url, branchId)
+    .then((data) => {
+      console.log('Files : ', data);
+    })
+    .catch(() => {
+      flash('Error loading files. Please try again.', 'alert', document, null, false, true);
+    });
+};
