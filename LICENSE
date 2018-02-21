@@ -9,10 +9,9 @@ source code, and the associated documentation files (the "Software").
 The Proprietary Terms apply only to the part of the Software that is not
 distributed as open source software, and that is not a file that produces 
 client-side JavaScript, in whole or in part. Any part of the Software 
-distributed as open source software, or that is a file that produces
-client-side JavaScript, in whole or in part, is licensed under the MIT Expat
-license (see below for full text of the MIT license). For a complete list of the
-open source software, please refer to https://gitlab.com/gitlab-org/gitlab-ce.
+distributed in https://gitlab.com/gitlab-org/gitlab-ce, or that is a file that 
+produces client-side JavaScript, in whole or in part, is licensed under the MIT 
+Expat license (see below for full text of the MIT license).
 
 For all third party components incorporated into the Software or the open source 
 software, those components are licensed under the original license provided by 
