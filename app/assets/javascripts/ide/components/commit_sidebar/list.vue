@@ -106,7 +106,7 @@
       <button
         v-if="showToggle"
         type="button"
-        class="btn btn-transparent multi-file-commit-panel-collapse-btn"
+        class="btn btn-transparent multi-file-commit-panel-collapse-btn prepend-left-10"
         @click.stop="toggleCollapsed"
       >
         <icon
@@ -138,7 +138,7 @@
       </ul>
       <p
         v-else
-        class="multi-file-commit-list"
+        class="multi-file-commit-list help-block"
       >
         No changes
       </p>

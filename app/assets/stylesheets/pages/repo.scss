@@ -375,6 +375,9 @@ table.table tr td.multi-file-table-name {
   padding: $gl-btn-padding 0;
 
   &.is-collapsed {
+    margin-left: -$gl-padding;
+    margin-right: -$gl-padding;
+
     svg {
       margin-left: auto;
       margin-right: auto;
@@ -391,7 +394,6 @@ table.table tr td.multi-file-table-name {
 .multi-file-commit-panel-header-title {
   display: flex;
   flex: 1;
-  padding: 0 $gl-btn-padding;
 
   svg {
     margin-right: $gl-btn-padding;
@@ -405,12 +407,11 @@ table.table tr td.multi-file-table-name {
 .multi-file-commit-list {
   flex: 1;
   overflow: auto;
-  padding: $gl-padding;
+  padding: $gl-padding 0;
 }
 
 .multi-file-commit-list-item {
   display: flex;
-  margin: 0 -8px 4px -8px;
   padding: ($grid-size / 2) $grid-size;
   align-items: center;
   border-radius: $border-radius-default;
@@ -446,7 +447,7 @@ table.table tr td.multi-file-table-name {
 .multi-file-commit-list-collapsed {
   display: flex;
   flex-direction: column;
-  padding: $gl-padding;
+  padding: $gl-padding 0;
 
   > svg {
     margin-left: auto;
@@ -648,6 +649,7 @@ table.table tr td.multi-file-table-name {
   display: flex;
   flex-direction: column;
   width: 100%;
+  padding: 0 16px;
 
   &:not(.is-collapsed) {
     flex: 1;

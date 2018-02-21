@@ -42,7 +42,7 @@ export default {
       'stagedFiles',
     ]),
     commitButtonDisabled() {
-      return this.commitMessage === '' || this.submitCommitsLoading || !this.changedFiles.length;
+      return this.commitMessage === '' || this.submitCommitsLoading || !this.stagedFiles.length;
     },
     commitMessageCount() {
       return this.commitMessage.length;
@@ -66,7 +66,7 @@ export default {
           `${this.currentBranchId}-${new Date().getTime().toString()}` :
           this.currentBranchId,
         commit_message: this.commitMessage,
-        actions: this.changedFiles.map(f => ({
+        actions: this.stagedFiles.map(f => ({
           action: f.tempFile ? 'create' : 'update',
           file_path: f.path,
           content: f.content,
