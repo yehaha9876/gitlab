@@ -80,22 +80,29 @@ export default {
     state.changedFiles.splice(indexOfChangedFile, 1);
   },
   [types.STAGE_CHANGE](state, file) {
-    Object.assign(file, {
-      staged: true,
-    });
+    const indexOfChangedFile = findIndexOfFile(state.changedFiles, file);
+    const stagedFile = findEntry(state.stagedFiles, 'blob', file.name);
 
-    state.stagedFiles.push({
-      ...file,
-    });
+    if (stagedFile) {
+      Object.assign(stagedFile, {
+        ...file,
+      });
+    } else {
+      state.stagedFiles.push({
+        ...file,
+      });
+    }
+
+    state.changedFiles.splice(indexOfChangedFile, 1);
   },
   [types.UNSTAGE_CHANGE](state, file) {
     const indexOfStagedFile = findIndexOfFile(state.stagedFiles, file);
-    const changedFile = findEntry(state.changedFiles, 'blob', file.name);
+    const indexOfChangedFile = findIndexOfFile(state.changedFiles, file);
 
     state.stagedFiles.splice(indexOfStagedFile, 1);
 
-    Object.assign(changedFile, {
-      staged: false,
-    });
+    if (indexOfChangedFile < 0) {
+      state.changedFiles.push(file);
+    }
   },
 };

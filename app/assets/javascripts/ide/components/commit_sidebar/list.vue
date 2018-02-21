@@ -36,6 +36,14 @@
         type: String,
         required: true,
       },
+      itemAction: {
+        type: String,
+        required: true,
+      },
+      itemActionIcon: {
+        type: String,
+        required: true,
+      },
     },
     computed: {
       ...mapState([
@@ -123,6 +131,8 @@
         >
           <list-item
             :file="file"
+            :action="itemAction"
+            :action-icon="itemActionIcon"
           />
         </li>
       </ul>

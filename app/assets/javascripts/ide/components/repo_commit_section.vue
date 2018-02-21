@@ -41,9 +41,6 @@ export default {
       'changedFiles',
       'stagedFiles',
     ]),
-    ...mapGetters([
-      'unstagedFiles',
-    ]),
     commitButtonDisabled() {
       return this.commitMessage === '' || this.submitCommitsLoading || !this.changedFiles.length;
     },
@@ -125,14 +122,16 @@ you started editing. Would you like to create a new branch?`)"
       @submit="makeCommit(true)"
     />
     <template
-      v-if="changedFiles.length"
+      v-if="changedFiles.length || stagedFiles.length"
     >
       <commit-files-list
         icon="unstaged"
         title="Unstaged"
-        :file-list="unstagedFiles"
+        :file-list="changedFiles"
         action="stageAllChanges"
         action-btn-text="Stage all"
+        item-action="stageChange"
+        item-action-icon="plus"
       />
       <commit-files-list
         icon="staged"
@@ -140,6 +139,8 @@ you started editing. Would you like to create a new branch?`)"
         :file-list="stagedFiles"
         action="unstageAllChanges"
         action-btn-text="Unstage all"
+        item-action="unstageChange"
+        item-action-icon="history"
         :show-toggle="false"
       />
       <form

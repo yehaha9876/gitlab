@@ -11,6 +11,14 @@
         type: Object,
         required: true,
       },
+      action: {
+        type: String,
+        required: true,
+      },
+      actionIcon: {
+        type: String,
+        required: true,
+      },
     },
     computed: {
       iconName() {
@@ -22,9 +30,12 @@
     },
     methods: {
       ...mapActions([
-        'discardFileChanges',
-        'unstageFile',
+        'unstageChange',
+        'stageChange',
       ]),
+      actionBtnClicked() {
+        this[this.action](this.file);
+      },
     },
   };
 </script>
@@ -45,10 +56,10 @@
     <button
       type="button"
       class="btn btn-blank multi-file-discard-btn"
-      @click="unstageFile(file)"
+      @click="actionBtnClicked"
     >
       <icon
-        name="history"
+        :name="actionIcon"
         :size="16"
       />
     </button>

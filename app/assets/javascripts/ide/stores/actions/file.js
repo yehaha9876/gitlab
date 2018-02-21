@@ -152,6 +152,10 @@ export const discardFileChanges = ({ commit }, file) => {
   }
 };
 
-export const unstageFile = ({ commit }, file) => {
+export const stageChange = ({ commit }, file) => {
+  commit(types.STAGE_CHANGE, file);
+};
+
+export const unstageChange = ({ commit }, file) => {
   commit(types.UNSTAGE_CHANGE, file);
 };

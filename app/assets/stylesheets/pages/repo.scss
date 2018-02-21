@@ -410,8 +410,8 @@ table.table tr td.multi-file-table-name {
 
 .multi-file-commit-list-item {
   display: flex;
-  margin: 0 -8px 8px -8px;
-  padding: $grid-size;
+  margin: 0 -8px 4px -8px;
+  padding: ($grid-size / 2) $grid-size;
   align-items: center;
   border-radius: $border-radius-default;
 
@@ -421,7 +421,9 @@ table.table tr td.multi-file-table-name {
 
   .multi-file-discard-btn {
     display: none;
+    margin-top: -5px;
     margin-left: auto;
+    line-height: 0;
   }
 
   &:hover {
