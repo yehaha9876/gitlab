@@ -1,14 +1,23 @@
 Copyright (c) 2011-2018 GitLab B.V.
 
 The terms of the GitLab Subscription Agreement, available at 
-https://about.gitlab.com/terms/#subscription (the “Subscription Terms”), or 
-other similar agreement as agreed upon by you and GitLab, governing the use of 
-the Software (as defined below), shall govern your use of this proprietary 
-software source code, and the associated documentation files (the "Software").  
+https://about.gitlab.com/terms/#subscription, or other similar agreement as 
+agreed upon by you and GitLab, governing the use of the Software 
+(the “Proprietary Terms”), shall govern your use of the proprietary software 
+source code, and the associated documentation files (the "Software").  
 
-However, the open source code contained herein is governed by the MIT Expat 
-License. For a complete list of which code is considered open source, 
-please refer to https://gitlab.com/gitlab-org/gitlab-ce.
+The Proprietary Terms apply only to the part of the Software that is not
+distributed as open source software, and that is not a file that produces 
+client-side JavaScript, in whole or in part. Any part of the Software 
+distributed as open source software, or that is a file that produces
+client-side JavaScript, in whole or in part, is licensed under the MIT Expat
+license (see below for full text of the MIT license). For a complete list of the
+open source software, please refer to https://gitlab.com/gitlab-org/gitlab-ce.
+
+For all third party components incorporated into the Software or the open source 
+software, those components are licensed under the original license provided by 
+the owner of the applicable component, all of which are compatible with the MIT 
+Expat License.
 
 MIT Expat License
 
@@ -28,7 +37,3 @@ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-For all third party components incorporated into the GitLab Software, those
-components are licensed under the original license provided by the owner of the
-applicable component, all of which are compatible with the MIT Expat License.
