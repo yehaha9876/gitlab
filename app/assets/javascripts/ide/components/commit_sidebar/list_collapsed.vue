@@ -2,6 +2,9 @@
   import icon from '../../../vue_shared/components/icon.vue';
 
   export default {
+    components: {
+      icon,
+    },
     props: {
       files: {
         type: Array,
@@ -11,9 +14,6 @@
         type: String,
         required: true,
       },
-    },
-    components: {
-      icon,
     },
     computed: {
       addedFiles() {
