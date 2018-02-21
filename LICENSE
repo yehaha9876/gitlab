@@ -6,11 +6,9 @@ agreed upon by you and GitLab, governing the use of the Software
 (the “Proprietary Terms”), shall govern your use of the proprietary software 
 source code, and the associated documentation files (the "Software").  
 
-The Proprietary Terms apply only to the part of the Software that is not
-distributed as open source software, and that is not a file that produces 
-client-side JavaScript, in whole or in part. Any part of the Software 
-distributed in https://gitlab.com/gitlab-org/gitlab-ce, or that is a file that 
-produces client-side JavaScript, in whole or in part, is licensed under the MIT 
+The Proprietary Terms do not apply to parts of the software that are distributed 
+in https://gitlab.com/gitlab-org/gitlab-ce and/or files that 
+produces client-side JavaScript. These parts are licensed under the MIT 
 Expat license (see below for full text of the MIT license).
 
 For all third party components incorporated into the Software or the open source 
