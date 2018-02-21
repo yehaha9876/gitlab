@@ -395,7 +395,7 @@ describe('Multi-file store actions', () => {
     it('adds all files from changedFiles to stagedFiles', (done) => {
       const f = file();
       store.state.changedFiles.push(f);
-      store.state.changedFiles.push(file());
+      store.state.changedFiles.push(file('new'));
 
       store.dispatch('stageAllChanges')
         .then(() => {
@@ -409,7 +409,7 @@ describe('Multi-file store actions', () => {
 
     it('removes all files from changedFiles after adding to stagedFiles', (done) => {
       store.state.changedFiles.push(file());
-      store.state.changedFiles.push(file());
+      store.state.changedFiles.push(file('new'));
 
       store.dispatch('stageAllChanges')
         .then(() => {
@@ -425,7 +425,7 @@ describe('Multi-file store actions', () => {
     it('adds all files from stagedFiles to channgedFiles', (done) => {
       const f = file();
       store.state.stagedFiles.push(f);
-      store.state.stagedFiles.push(file());
+      store.state.stagedFiles.push(file('new'));
 
       store.dispatch('unstageAllChanges')
         .then(() => {
@@ -439,7 +439,7 @@ describe('Multi-file store actions', () => {
 
     it('removes all files from changedFiles after adding to stagedFiles', (done) => {
       store.state.stagedFiles.push(file());
-      store.state.stagedFiles.push(file());
+      store.state.stagedFiles.push(file('new'));
 
       store.dispatch('unstageAllChanges')
         .then(() => {
