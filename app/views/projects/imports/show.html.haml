@@ -1,12 +1,27 @@
-- page_title @project.forked? ? "Forking in progress" : "Import in progress"
+- ci_cd_only = @project.ci_cd_only
+
+- if @project.forked?
+  - page_title _('Forking in progress')
+- elsif ci_cd_only
+  - page_title _('Connecting...')
+- else
+  - page_title _('Import in progress')
+
 .save-project-loader
   .center
     %h2
       %i.fa.fa-spinner.fa-spin
       - if @project.forked?
-        Forking in progress.
+        = _('Forking in progress.')
+      - elsif ci_cd_only
+        = _('Connecting...')
       - else
-        Import in progress.
-    - if @project.external_import?
+        = _('Import in progress.')
+    - if !ci_cd_only && @project.external_import?
       %p.monospace git clone --bare #{@project.safe_import_url}
-    %p Please wait while we import the repository for you. Refresh at will.
+    - if ci_cd_only
+      %p
+        = _('Please wait while we connect to your repository. Refresh at will.')
+    - else
+      %p
+        = _('Please wait while we import the repository for you. Refresh at will.')

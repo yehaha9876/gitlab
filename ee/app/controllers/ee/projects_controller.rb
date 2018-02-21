@@ -24,5 +24,9 @@ module EE
         ci_cd_only
       ]
     end
+
+    def active_new_project_tab
+      ('ci_cd_only' if project_params[:ci_cd_only] == 'true') || super
+    end
   end
 end

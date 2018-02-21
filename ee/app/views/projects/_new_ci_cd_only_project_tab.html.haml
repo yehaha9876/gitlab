@@ -1,0 +1,7 @@
+- if ::License.feature_available?(:ci_cd_projects)
+  %li{ class: ('active' if active_tab == 'ci_cd_only'), role: 'presentation' }
+    %a{ href: '#ci-cd-project-pane', id: 'ci-cd-project-tab', data: { toggle: 'tab' }, role: 'tab' }
+      %span.hidden-xs
+        = _('CI/CD only')
+      %span.visible-xs
+        = _('CI/CD')
