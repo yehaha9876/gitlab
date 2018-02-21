@@ -115,7 +115,7 @@ export const commitChanges = (
           });
         });
 
-        dispatch('discardAllChanges');
+        commit(types.CLEAR_STAGED_CHANGES);
 
         window.scrollTo(0, 0);
       }

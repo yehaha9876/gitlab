@@ -63,6 +63,11 @@ export default {
       lastCommitMsg,
     });
   },
+  [types.CLEAR_STAGED_CHANGES](state) {
+    Object.assign(state, {
+      stagedFiles: [],
+    });
+  },
   ...projectMutations,
   ...fileMutations,
   ...treeMutations,

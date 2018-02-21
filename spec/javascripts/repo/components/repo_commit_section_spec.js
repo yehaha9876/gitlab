@@ -31,8 +31,8 @@ describe('RepoCommitSection', () => {
 
     vm.$store.state.rightPanelCollapsed = false;
     vm.$store.state.currentBranch = 'master';
-    vm.$store.state.changedFiles = [file('file1'), file('file2')];
-    vm.$store.state.changedFiles.forEach(f => Object.assign(f, {
+    vm.$store.state.stagedFiles = [file('file1'), file('file2')];
+    vm.$store.state.stagedFiles.forEach(f => Object.assign(f, {
       changed: true,
       content: 'testing',
     }));
@@ -91,7 +91,7 @@ describe('RepoCommitSection', () => {
     expect(changedFileElements.length).toEqual(2);
 
     changedFileElements.forEach((changedFile, i) => {
-      expect(changedFile.textContent.trim()).toContain(vm.$store.state.changedFiles[i].path);
+      expect(changedFile.textContent.trim()).toContain(vm.$store.state.stagedFiles[i].path);
     });
 
     expect(submitCommit.disabled).toBeTruthy();
@@ -99,11 +99,11 @@ describe('RepoCommitSection', () => {
   });
 
   describe('when submitting', () => {
-    let changedFiles;
+    let stagedFiles;
 
     beforeEach(() => {
       vm.commitMessage = 'testing';
-      changedFiles = JSON.parse(JSON.stringify(vm.$store.state.changedFiles));
+      stagedFiles = JSON.parse(JSON.stringify(vm.$store.state.stagedFiles));
 
       spyOn(service, 'commit').and.returnValue(Promise.resolve({
         data: {
@@ -132,10 +132,10 @@ describe('RepoCommitSection', () => {
           expect(payloadBranch).toEqual('master');
           expect(actions[0].action).toEqual('update');
           expect(actions[1].action).toEqual('update');
-          expect(actions[0].content).toEqual(changedFiles[0].content);
-          expect(actions[1].content).toEqual(changedFiles[1].content);
-          expect(actions[0].file_path).toEqual(changedFiles[0].path);
-          expect(actions[1].file_path).toEqual(changedFiles[1].path);
+          expect(actions[0].content).toEqual(stagedFiles[0].content);
+          expect(actions[1].content).toEqual(stagedFiles[1].content);
+          expect(actions[0].file_path).toEqual(stagedFiles[0].path);
+          expect(actions[1].file_path).toEqual(stagedFiles[1].path);
 
           expect(vm.$el.querySelector('.js-empty-state').textContent.trim()).toContain('All changes are committed');
           expect(vm.$el.querySelector('.js-empty-state img').getAttribute('src')).toBe('commitsvg');
