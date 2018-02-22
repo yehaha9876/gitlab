@@ -20,22 +20,17 @@ module Geo
       end
 
       begin
-        calculate_repository_checksum(project) if project.repository.exists?
-        calculate_wiki_checksum(project) if project.wiki.repository.exists?
+        repository_storage = project.repository_storage
+        repository_state   = project.state || project.create_state!
+
+        calculate_checksum(:repository, repository_storage, project.disk_path, repository_state)
+        calculate_checksum(:wiki, repository_storage, project.wiki.disk_path, repository_state)
       ensure
         cancel_lease_for(project_id, lease)
       end
     end
 
     private
-
-    def calculate_repository_checksum(project)
-      calculate_checksum(:repository, project.repository_storage, project.disk_path, project.state)
-    end
-
-    def calculate_wiki_checksum(project)
-      calculate_checksum(:wiki, project.repository_storage, project.wiki.disk_path, project.state)
-    end
 
     def calculate_checksum(type, storage, relative_path, project_state)
       checksum = Gitlab::Git::RepositoryChecksum.new(storage, relative_path)
