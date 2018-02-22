@@ -2,6 +2,7 @@ module Geo
   class BatchRepositoryVerificationWorker
     include ApplicationWorker
     include CronjobQueue
+    include ExclusiveLeaseGuard
     include Gitlab::Geo::LogHelpers
 
     BATCH_SIZE     = 1000
@@ -11,14 +12,7 @@ module Geo
     def perform
       return unless Gitlab::Geo.primary?
 
-      lease = exclusive_lease.try_obtain
-
-      unless lease
-        log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.')
-        return
-      end
-
-      begin
+      try_obtain_lease do
         projects.each_batch(of: BATCH_SIZE, column: :last_activity_at) do |batch, index|
           interval = index * DELAY_INTERVAL
 
@@ -26,8 +20,6 @@ module Geo
             Geo::SingleRepositoryVerificationWorker.perform_in(interval, project.id)
           end
         end
-      ensure
-        release_lease(lease)
       end
     end
 
@@ -39,17 +31,8 @@ module Geo
         .where('projects.last_activity_at >= ?', 24.hours.ago)
     end
 
-    def exclusive_lease
-      Gitlab::ExclusiveLease
-        .new(lease_key, timeout: LEASE_TIMEOUT)
-    end
-
-    def lease_key
-      @lease_key ||= self.class.name.underscore
-    end
-
-    def release_lease(uuid)
-      Gitlab::ExclusiveLease.cancel(lease_key, uuid)
+    def lease_timeout
+      LEASE_TIMEOUT
     end
   end
 end
