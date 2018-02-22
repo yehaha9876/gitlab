@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe ProjectState do
+describe ProjectRepositoryState do
   describe 'assocations' do
     it { is_expected.to belong_to(:project) }
   end

@@ -14,7 +14,7 @@ describe Project do
     it { is_expected.to delegate_method(:shared_runners_minutes_used?).to(:shared_runners_limit_namespace) }
 
     it { is_expected.to have_one(:mirror_data).class_name('ProjectMirrorData') }
-    it { is_expected.to have_one(:state).class_name('ProjectState') }
+    it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState') }
 
     it { is_expected.to have_many(:path_locks) }
     it { is_expected.to have_many(:sourced_pipelines) }

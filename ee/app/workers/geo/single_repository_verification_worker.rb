@@ -21,7 +21,7 @@ module Geo
 
       begin
         repository_storage = project.repository_storage
-        repository_state   = project.state || project.create_state!
+        repository_state   = project.repository_state || project.create_repository_state!
 
         calculate_checksum(:repository, repository_storage, project.disk_path, repository_state)
         calculate_checksum(:wiki, repository_storage, project.wiki.disk_path, repository_state)
@@ -32,12 +32,12 @@ module Geo
 
     private
 
-    def calculate_checksum(type, storage, relative_path, project_state)
+    def calculate_checksum(type, storage, relative_path, repository_state)
       checksum = Gitlab::Git::RepositoryChecksum.new(storage, relative_path)
-      project_state.update!("#{type}_verification_checksum" => checksum.calculate, "last_#{type}_verification_at" => DateTime.now)
+      repository_state.update!("#{type}_verification_checksum" => checksum.calculate, "last_#{type}_verification_at" => DateTime.now)
     rescue => e
-      log_error('Error calculating the repository checksum', e, storage: storage, relative_path: relative_path, type: type)
-      project_state.update!("last_#{type}_verification_failure" => e.message, "last_#{type}_verification_at" => DateTime.now)
+      log_error('Error calculating the repository checksum', e, project_id: repository_state.project_id, storage: storage, relative_path: relative_path, type: type)
+      repository_state.update!("last_#{type}_verification_failure" => e.message, "last_#{type}_verification_at" => DateTime.now, "last_#{type}_verification_failed" => true)
       raise e
     end
 
