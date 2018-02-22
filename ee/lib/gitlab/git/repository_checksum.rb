@@ -34,8 +34,8 @@ module Gitlab
         args = %W(--git-dir=#{path} show-ref --heads --tags)
         output, status = run_git_with_timeout(args, Gitlab::Git::Popen::SLOW_GIT_PROCESS_TIMEOUT)
 
-        unless status.zero?
-          fail!(Gitlab::Git::ChecksumVerificationError, output)
+        unless status&.zero?
+          failed!(Gitlab::Git::ChecksumVerificationError, output)
         end
 
         refs = output.split("\n")
@@ -50,10 +50,10 @@ module Gitlab
           end
         end
       rescue Timeout::Error => e
-        fail!(Gitlab::Git::ChecksumVerificationError, e.message)
+        failed!(Gitlab::Git::ChecksumVerificationError, e.message)
       end
 
-      def fail!(klass, message)
+      def failed!(klass, message)
         Gitlab::GitLogger.error("'git show-ref --heads --tags' in #{path}: #{message}")
 
         raise klass.new("Could not calculate the checksum for #{path}: #{message}")
