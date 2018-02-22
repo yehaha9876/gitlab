@@ -38,14 +38,12 @@ module Geo
     end
 
     def calculate_checksum(type, storage, relative_path, project_state)
-      begin
-        checksum = Gitlab::Git::RepositoryChecksum.new(storage, relative_path)
-        project_state.update!("#{type}_verification_checksum" => checksum.calculate, "last_#{type}_verification_at" => DateTime.now)
-      rescue => e
-        log_error('Error calculating the repository checksum', e, storage: storage, relative_path: relative_path, type: type)
-        project_state.update!("last_#{type}_verification_failure" => e.message, "last_#{type}_verification_at" => DateTime.now)
-        raise e
-      end
+      checksum = Gitlab::Git::RepositoryChecksum.new(storage, relative_path)
+      project_state.update!("#{type}_verification_checksum" => checksum.calculate, "last_#{type}_verification_at" => DateTime.now)
+    rescue => e
+      log_error('Error calculating the repository checksum', e, storage: storage, relative_path: relative_path, type: type)
+      project_state.update!("last_#{type}_verification_failure" => e.message, "last_#{type}_verification_at" => DateTime.now)
+      raise e
     end
 
     def lease_for(project_id)

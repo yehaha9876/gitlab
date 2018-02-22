@@ -59,13 +59,11 @@ module Gitlab
       end
 
       def calculate_checksum(type, project_state, storage, relative_path)
-        begin
-          checksum = Gitlab::Git::RepositoryChecksum.new(storage, relative_path)
-          project_state.update!("#{type}_verification_checksum" => checksum.calculate, "last_#{type}_verification_at" => DateTime.now)
-        rescue => e
-          Rails.logger.error("#{self.class.name} - #{e.message}")
-          project_state.update!("last_#{type}_verification_failure" => e.message, "last_#{type}_verification_at" => DateTime.now)
-        end
+        checksum = Gitlab::Git::RepositoryChecksum.new(storage, relative_path)
+        project_state.update!("#{type}_verification_checksum" => checksum.calculate, "last_#{type}_verification_at" => DateTime.now)
+      rescue => e
+        Rails.logger.error("#{self.class.name} - #{e.message}")
+        project_state.update!("last_#{type}_verification_failure" => e.message, "last_#{type}_verification_at" => DateTime.now)
       end
     end
   end
