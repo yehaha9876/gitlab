@@ -53,6 +53,7 @@ class License < ActiveRecord::Base
     reject_unsigned_commits
     commit_committer_check
     project_creation_level
+    ci_cd_projects
   ].freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
