@@ -8,7 +8,7 @@ class ScheduleCalculateProjectRepositoryChecksumMigrations < ActiveRecord::Migra
 
   disable_ddl_transaction!
 
-  class ProjecRepositorytState < ActiveRecord::Base
+  class ProjectRepositorytState < ActiveRecord::Base
     self.table_name = 'project_repository_states'
   end
 
@@ -22,7 +22,7 @@ class ScheduleCalculateProjectRepositoryChecksumMigrations < ActiveRecord::Migra
     return unless Gitlab::Geo.primary?
 
     relation = Project.joins("LEFT OUTER JOIN project_repository_states on projects.id = project_repository_states.project_id")
-                      .merge(ProjecRepositorytState.where(project_id: nil))
+                      .merge(ProjectRepositorytState.where(project_id: nil))
 
     relation.each_batch(of: BATCH_SIZE, column: :last_activity_at) do |batch, index|
       range = batch.pluck('MIN(projects.id)', 'MAX(projects.id)').first
