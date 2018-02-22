@@ -1,5 +1,5 @@
 <script>
-  import { mapActions, mapState } from 'vuex';
+  import { mapActions, mapState, mapGetters } from 'vuex';
   import icon from '../../../vue_shared/components/icon.vue';
   import listItem from './list_item.vue';
   import listCollapsed from './list_collapsed.vue';
@@ -49,9 +49,9 @@
       ...mapState([
         'rightPanelCollapsed',
       ]),
-      currentIcon() {
-        return this.rightPanelCollapsed ? 'angle-double-left' : 'angle-double-right';
-      },
+      ...mapGetters([
+        'collapseButtonIcon',
+      ]),
     },
     methods: {
       ...mapActions([
@@ -87,6 +87,9 @@
     >
       <div
         class="multi-file-commit-panel-header-title"
+        :class="{
+          'append-right-10': showToggle
+        }"
         v-if="!rightPanelCollapsed"
       >
         <icon
@@ -106,11 +109,11 @@
       <button
         v-if="showToggle"
         type="button"
-        class="btn btn-transparent multi-file-commit-panel-collapse-btn prepend-left-10"
+        class="btn btn-transparent multi-file-commit-panel-collapse-btn"
         @click.stop="toggleCollapsed"
       >
         <icon
-          :name="currentIcon"
+          :name="collapseButtonIcon"
           :size="18"
         />
       </button>

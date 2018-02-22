@@ -363,6 +363,10 @@ table.table tr td.multi-file-table-name {
   flex: 1;
 }
 
+.ide-commity-empty-state {
+  padding: 0 $gl-padding;
+}
+
 .ide-commit-empty-state-container {
   margin-top: auto;
   margin-bottom: auto;
@@ -402,6 +406,7 @@ table.table tr td.multi-file-table-name {
 
 .multi-file-commit-panel-collapse-btn {
   border-left: 1px solid $white-dark;
+  margin-left: auto;
 }
 
 .multi-file-commit-list {

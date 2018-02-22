@@ -4,12 +4,14 @@ import tooltip from '../../vue_shared/directives/tooltip';
 import icon from '../../vue_shared/components/icon.vue';
 import modal from '../../vue_shared/components/modal.vue';
 import commitFilesList from './commit_sidebar/list.vue';
+import EmptyState from './commit_sidebar/empty_state.vue';
 
 export default {
   components: {
     modal,
     icon,
     commitFilesList,
+    EmptyState,
   },
   directives: {
     tooltip,
@@ -37,7 +39,6 @@ export default {
       'currentProjectId',
       'currentBranchId',
       'rightPanelCollapsed',
-      'lastCommitMsg',
       'changedFiles',
       'stagedFiles',
     ]),
@@ -47,16 +48,12 @@ export default {
     commitMessageCount() {
       return this.commitMessage.length;
     },
-    statusSvg() {
-      return this.lastCommitMsg ? this.committedStateSvgPath : this.noChangesStateSvgPath;
-    },
   },
   methods: {
     ...mapActions([
       'checkCommitStatus',
       'commitChanges',
       'getTreeData',
-      'setPanelCollapsedStatus',
     ]),
     makeCommit(newBranch = false) {
       const createNewBranch = newBranch || this.startNewMR;
@@ -193,37 +190,10 @@ you started editing. Would you like to create a new branch?`)"
         </div>
       </form>
     </template>
-    <div
-      v-else-if="!rightPanelCollapsed"
-      class="ide-commit-empty-state-container js-empty-state"
-    >
-      <div class="svg-content svg-80">
-        <img :src="statusSvg" />
-      </div>
-      <div class="append-right-default prepend-left-default">
-        <div
-          class="text-content text-center"
-          v-if="!lastCommitMsg"
-        >
-          <h4>
-            {{ __('No changes') }}
-          </h4>
-          <p>
-            {{ __('Edit files in the editor and commit changes here') }}
-          </p>
-        </div>
-        <div
-          class="text-content text-center"
-          v-else
-        >
-          <h4>
-            {{ __('All changes are committed') }}
-          </h4>
-          <p>
-            {{ lastCommitMsg }}
-          </p>
-        </div>
-      </div>
-    </div>
+    <empty-state
+      v-else
+      :no-changes-state-svg-path="noChangesStateSvgPath"
+      :committed-state-svg-path="committedStateSvgPath"
+    />
   </div>
 </template>

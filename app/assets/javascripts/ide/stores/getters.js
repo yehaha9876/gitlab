@@ -15,3 +15,5 @@ export const canEditFile = (state) => {
 export const addedFiles = state => state.changedFiles.filter(f => f.tempFile);
 
 export const modifiedFiles = state => state.changedFiles.filter(f => !f.tempFile);
+
+export const collapseButtonIcon = state => (state.rightPanelCollapsed ? 'angle-double-left' : 'angle-double-right');

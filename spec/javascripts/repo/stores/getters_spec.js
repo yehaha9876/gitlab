@@ -98,4 +98,16 @@ describe('Multi-file store getters', () => {
       expect(modifiedFiles[0].name).toBe('added');
     });
   });
+
+  describe('collapseButtonIcon', () => {
+    it('returns angle right when not collapsed', () => {
+      expect(getters.collapseButtonIcon(localState)).toBe('angle-double-right');
+    });
+
+    it('returns angle left when collapsed', () => {
+      localState.rightPanelCollapsed = true;
+
+      expect(getters.collapseButtonIcon(localState)).toBe('angle-double-left');
+    });
+  });
 });
