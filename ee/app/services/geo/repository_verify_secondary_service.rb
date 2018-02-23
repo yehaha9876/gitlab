@@ -29,12 +29,12 @@ module Geo
     # - primary repository was checked after the last repository update
     # - secondary repository was successfully synced after the last repository update
     def self.should_verify_repository?(registry, type)
-      original_checksum = registry.send("project_#{type}_verification_checksum")
-      secondary_checksum = registry.send("#{type}_verification_checksum")
-      last_verification_at = registry.send("project_#{type}_last_verification")
+      original_checksum       = registry.send("project_#{type}_verification_checksum")
+      secondary_checksum      = registry.send("#{type}_verification_checksum")
+      last_verification_at    = registry.send("project_#{type}_last_verification")
       last_successful_sync_at = registry.send("last_#{type}_successful_sync_at")
 
-      original_checksum &&
+      !original_checksum.nil? &&
         secondary_checksum.nil? &&
         registry.project.last_repository_updated_at < 6.hours.ago &&
         !last_verification_at.nil? && last_verification_at > registry.project.last_repository_updated_at &&
@@ -44,18 +44,17 @@ module Geo
     private
 
     def compare_checksum
-      begin
-        checksum = calculate_checksum(@registry.project.repository_storage, @registry.repository_path(@type))
+      repo_path = File.join(@registry.project.repository_storage_path, "#{@registry.repository_path(@type)}.git")
+      checksum = calculate_checksum(@registry.project.repository_storage, @registry.repository_path(@type))
 
-        if checksum != @original_checksum
-          record_status(error: "#{@type.to_s.capitalize} checksum did not match")
-        else
-          record_status(checksum: checksum)
-        end
-      rescue StandardError, Timeout::Error => e
-        Rails.logger.error("#{self.class.name} - #{e.message}")
-        record_status(error: e.message)
+      if checksum != @original_checksum
+        record_status(error: "#{@type.to_s.capitalize} checksum did not match: #{repo_path}")
+      else
+        record_status(checksum: checksum)
       end
+    rescue StandardError, Timeout::Error => e
+      log_error("#{self.class.name} - #{e.message}")
+      record_status(error: e.message)
     end
 
     def calculate_checksum(storage, relative_path)
@@ -71,6 +70,7 @@ module Geo
         attrs["#{@type}_verification_checksum"] = checksum
       else
         attrs["last_#{@type}_verification_failure"] = error
+        Gitlab::RepositoryCheckLogger.error(error)
       end
 
       @registry.update!(attrs)

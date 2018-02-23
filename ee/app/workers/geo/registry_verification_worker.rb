@@ -6,7 +6,7 @@
 # across the day.
 module Geo
   class RegistryVerificationWorker < Geo::BaseSchedulerWorker
-    sidekiq_options retry: 3
+    include CronjobQueue
 
     MAX_CAPACITY = 1000
 
