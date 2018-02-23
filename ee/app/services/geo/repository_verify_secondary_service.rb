@@ -64,11 +64,13 @@ module Geo
     def record_status(checksum: nil, error: nil)
       attrs = { "#{@type}_verification_checksum" => nil,
                 "last_#{@type}_verification_at" => DateTime.now,
-                "last_#{@type}_verification_failure" => nil }
+                "last_#{@type}_verification_failure" => nil,
+                "last_#{@type}_verification_failed" => false }
 
       if checksum
         attrs["#{@type}_verification_checksum"] = checksum
       else
+        attrs["last_#{@type}_verification_failed"]  = true
         attrs["last_#{@type}_verification_failure"] = error
         Gitlab::RepositoryCheckLogger.error(error)
       end

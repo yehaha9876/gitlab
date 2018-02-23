@@ -54,9 +54,11 @@ ActiveRecord::Schema.define(version: 20180201154345) do
     t.string "last_wiki_sync_failure"
     t.string "repository_verification_checksum"
     t.datetime_with_timezone "last_repository_verification_at"
+    t.boolean "last_repository_verification_failed", default: false, null: false
     t.string "last_repository_verification_failure"
     t.string "wiki_verification_checksum"
     t.datetime_with_timezone "last_wiki_verification_at"
+    t.boolean "last_wiki_verification_failed", default: false, null: false
     t.string "last_wiki_verification_failure"
   end
 
