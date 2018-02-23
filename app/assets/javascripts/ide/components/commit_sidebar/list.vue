@@ -36,11 +36,7 @@
         type: String,
         required: true,
       },
-      itemAction: {
-        type: String,
-        required: true,
-      },
-      itemActionIcon: {
+      itemActionComponent: {
         type: String,
         required: true,
       },
@@ -134,8 +130,7 @@
         >
           <list-item
             :file="file"
-            :action="itemAction"
-            :action-icon="itemActionIcon"
+            :action-component="itemActionComponent"
           />
         </li>
       </ul>

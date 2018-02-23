@@ -16,8 +16,7 @@ describe('Multi-file editor commit sidebar list', () => {
       icon: 'staged',
       action: 'stageAllChanges',
       actionBtnText: 'stage all',
-      itemAction: 'stageChange',
-      itemActionIcon: 'stage',
+      itemActionComponent: 'stage-button',
     });
 
     vm.$store.state.rightPanelCollapsed = false;
@@ -80,18 +79,6 @@ describe('Multi-file editor commit sidebar list', () => {
         side: 'right',
         collapsed: true,
       });
-    });
-  });
-
-  describe('currentIcon', () => {
-    it('equals angle-double-right when not collapsed', () => {
-      expect(vm.currentIcon).toBe('angle-double-right');
-    });
-
-    it('equals angle-double-left when collapsed', () => {
-      vm.$store.state.rightPanelCollapsed = true;
-
-      expect(vm.currentIcon).toBe('angle-double-left');
     });
   });
 

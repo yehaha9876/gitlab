@@ -1,21 +1,20 @@
 <script>
-  import { mapActions } from 'vuex';
-  import icon from '../../../vue_shared/components/icon.vue';
+  import Icon from '../../../vue_shared/components/icon.vue';
+  import StageButton from './stage_button.vue';
+  import UnstageButton from './unstage_button.vue';
 
   export default {
     components: {
-      icon,
+      Icon,
+      StageButton,
+      UnstageButton,
     },
     props: {
       file: {
         type: Object,
         required: true,
       },
-      action: {
-        type: String,
-        required: true,
-      },
-      actionIcon: {
+      actionComponent: {
         type: String,
         required: true,
       },
@@ -26,15 +25,6 @@
       },
       iconClass() {
         return `multi-file-${this.file.tempFile ? 'addition' : 'modified'} append-right-8`;
-      },
-    },
-    methods: {
-      ...mapActions([
-        'unstageChange',
-        'stageChange',
-      ]),
-      actionBtnClicked() {
-        this[this.action](this.file);
       },
     },
   };
@@ -53,15 +43,9 @@
     <span class="multi-file-commit-list-path">
       {{ file.path }}
     </span>
-    <button
-      type="button"
-      class="btn btn-blank multi-file-discard-btn"
-      @click="actionBtnClicked"
-    >
-      <icon
-        :name="actionIcon"
-        :size="16"
-      />
-    </button>
+    <component
+      :is="actionComponent"
+      :file="file"
+    />
   </div>
 </template>

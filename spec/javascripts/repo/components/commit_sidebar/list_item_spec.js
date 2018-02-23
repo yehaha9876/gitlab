@@ -15,8 +15,7 @@ describe('Multi-file editor commit sidebar list item', () => {
 
     vm = createComponentWithStore(Component, store, {
       file: f,
-      action: 'unstageChange',
-      actionIcon: 'history',
+      actionComponent: 'stage-button',
     });
 
     vm.$mount();
@@ -34,12 +33,8 @@ describe('Multi-file editor commit sidebar list item', () => {
     expect(vm.$el.querySelector('.multi-file-commit-list-path').textContent.trim()).toBe(f.path);
   });
 
-  it('calls store actions when clicking action button', () => {
-    spyOn(vm, 'unstageChange');
-
-    vm.$el.querySelector('.multi-file-discard-btn').click();
-
-    expect(vm.unstageChange).toHaveBeenCalled();
+  it('renders actionn button', () => {
+    expect(vm.$el.querySelector('.multi-file-discard-btn')).not.toBeNull();
   });
 
   describe('computed', () => {

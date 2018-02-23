@@ -127,8 +127,7 @@ you started editing. Would you like to create a new branch?`)"
         :file-list="changedFiles"
         action="stageAllChanges"
         action-btn-text="Stage all"
-        item-action="stageChange"
-        item-action-icon="plus"
+        item-action-component="stage-button"
       />
       <commit-files-list
         icon="staged"
@@ -136,8 +135,7 @@ you started editing. Would you like to create a new branch?`)"
         :file-list="stagedFiles"
         action="unstageAllChanges"
         action-btn-text="Unstage all"
-        item-action="unstageChange"
-        item-action-icon="history"
+        item-action-component="unstage-button"
         :show-toggle="false"
       />
       <form
