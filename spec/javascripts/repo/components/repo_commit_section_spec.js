@@ -120,9 +120,20 @@ describe('RepoCommitSection', () => {
   });
 
   it('stages a single file', (done) => {
-    vm.$el.querySelector('.multi-file-discard-btn').click();
+    vm.$el.querySelector('.multi-file-discard-btn .btn').click();
 
     Vue.nextTick(() => {
+      expect(vm.$el.querySelector('.ide-commit-list-container').querySelectorAll('li').length).toBe(1);
+
+      done();
+    });
+  });
+
+  it('discards a single file', (done) => {
+    vm.$el.querySelectorAll('.multi-file-discard-btn .btn')[1].click();
+
+    Vue.nextTick(() => {
+      expect(vm.$el.querySelector('.ide-commit-list-container').textContent).not.toContain('file1');
       expect(vm.$el.querySelector('.ide-commit-list-container').querySelectorAll('li').length).toBe(1);
 
       done();
@@ -140,7 +151,7 @@ describe('RepoCommitSection', () => {
   });
 
   it('unstages a single file', (done) => {
-    vm.$el.querySelectorAll('.multi-file-discard-btn')[2].click();
+    vm.$el.querySelectorAll('.multi-file-discard-btn')[2].querySelector('.btn').click();
 
     Vue.nextTick(() => {
       expect(
