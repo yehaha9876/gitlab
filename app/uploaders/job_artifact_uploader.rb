@@ -21,19 +21,6 @@ class JobArtifactUploader < GitlabUploader
     File.open(path, "rb") if path
   end
 
-  ##
-  # CarrierWave Override
-  #
-  # We have to keep the live trace for the transition periods of creating trace artifact record
-  # After the live trace has been moved to artifact trace path, it should be removed.
-  #
-  # Context: https://gitlab.com/gitlab-org/gitlab-ce/issues/43022
-  def move_to_cache
-    return false if model.trace? && model&.job_artifacts_trace&.new_record?
-
-    super
-  end
-
   private
 
   def dynamic_segment
