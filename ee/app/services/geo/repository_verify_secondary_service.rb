@@ -52,7 +52,7 @@ module Geo
         else
           record_status(checksum: checksum)
         end
-      rescue Gitlab::Git::ChecksumVerificationError, Timeout::Error => e
+      rescue StandardError, Timeout::Error => e
         Rails.logger.error("#{self.class.name} - #{e.message}")
         record_status(error: e.message)
       end

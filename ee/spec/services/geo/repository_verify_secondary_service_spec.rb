@@ -11,13 +11,13 @@ describe Geo::RepositoryVerifySecondaryService do
   end
 
   describe '#execute' do
-    let(:project_state) { create(:project_state, project: create(:project, :repository))}
+    let(:project_repository_state) { create(:project_repository_state, project: create(:project, :repository))}
     let(:registry) do
-      registry = create(:geo_project_registry, project: project_state.project)
+      registry = create(:geo_project_registry, project: project_repository_state.project)
       registry.project.last_repository_updated_at = 7.hours.ago
-      registry.project.state.last_repository_verification_at = 5.hours.ago
+      registry.project.repository_state.last_repository_verification_at = 5.hours.ago
       registry.last_repository_successful_sync_at = 5.hours.ago
-      registry.project.state.repository_verification_checksum = 'my_checksum'
+      registry.project.repository_state.repository_verification_checksum = 'my_checksum'
 
       registry
     end
@@ -34,7 +34,7 @@ describe Geo::RepositoryVerifySecondaryService do
     it 'sets checksum when the checksum matches' do
       allow(service).to receive(:calculate_checksum).and_return('my_checksum')
 
-      expect(service).to receive(:record_status).once.with('my_checksum')
+      expect(service).to receive(:record_status).once.with(checksum: 'my_checksum')
 
       service.execute
     end
@@ -45,20 +45,20 @@ describe Geo::RepositoryVerifySecondaryService do
 
       allow(described_class).to receive(:should_verify_repository?).and_return(true)
 
-      expect(service).to receive(:record_status).once.with(nil, 'Repository was not found')
+      expect(service).to receive(:record_status).once.with(error: 'Repository was not found')
 
       service.execute
     end
   end
 
   shared_examples 'should_verify_repository? for repositories/wikis' do |type|
-    let(:project_state) { create(:project_state, project: create(:project, :repository))}
+    let(:project_repository_state) { create(:project_repository_state, project: create(:project, :repository))}
     let(:registry) do
-      registry = create(:geo_project_registry, project: project_state.project)
+      registry = create(:geo_project_registry, project: project_repository_state.project)
       registry.project.last_repository_updated_at = 7.hours.ago
-      registry.project.state.send("last_#{type}_verification_at=", 5.hours.ago)
+      registry.project.repository_state.send("last_#{type}_verification_at=", 5.hours.ago)
       registry.send("last_#{type}_successful_sync_at=", 5.hours.ago)
-      registry.project.state.send("#{type}_verification_checksum=", 'my_checksum')
+      registry.project.repository_state.send("#{type}_verification_checksum=", 'my_checksum')
 
       registry
     end
@@ -69,7 +69,7 @@ describe Geo::RepositoryVerifySecondaryService do
 
     it 'does not verify if repository was updated after checksum' do
       registry.project.last_repository_updated_at = 4.hours.ago
-      registry.project.state.send("last_#{type}_verification_at=", 5.hours.ago)
+      registry.project.repository_state.send("last_#{type}_verification_at=", 5.hours.ago)
 
       expect(described_class.should_verify_repository?(registry, type)).to be_falsy
     end
@@ -88,7 +88,7 @@ describe Geo::RepositoryVerifySecondaryService do
     end
 
     it 'does not verify if there is no checksum' do
-      registry.project.state.send("#{type}_verification_checksum=", nil)
+      registry.project.repository_state.send("#{type}_verification_checksum=", nil)
 
       expect(described_class.should_verify_repository?(registry, type)).to be_falsy
     end
