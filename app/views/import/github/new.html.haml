@@ -1,43 +1,36 @@
-- page_title "GitHub Import"
+- title = @ci_cd_only ? _('Connect repositories from GitHub') : _('GitHub import')
+- page_title title
+- breadcrumb_title title
 - header_title "Projects", root_path
 
 %h3.page-title
-  = icon 'github', text: 'Import Projects from GitHub'
+  - connect_verb = @ci_cd_only ? _('Connect') : _('Import')
+  = icon 'github', text: _('%{connect_verb} repositories from GitHub') % { connect_verb: connect_verb }
 
 - if github_import_configured?
   %p
-    To import a GitHub project, you first need to authorize GitLab to access
-    the list of your GitHub repositories:
+    - connect_verb = @ci_cd_only ? _('connect') : _('import')
+    = _('To %{connect_verb} GitHub repositories, you first need to authorize GitLab to access the list of your GitHub repositories:') % { connect_verb: connect_verb }
 
-  = link_to 'List your GitHub repositories', status_import_github_path, class: 'btn btn-success'
+  = link_to _('List your GitHub repositories'), status_import_github_path, class: 'btn btn-success'
 
   %hr
 
 %p
-  - if github_import_configured?
-    Alternatively,
-  - else
-    To import a GitHub project,
-  you can use a
-  = succeed '.' do
-    = link_to 'Personal Access Token', 'https://github.com/settings/tokens'
-  When you create your Personal Access Token,
-  you will need to select the <code>repo</code> scope, so we can display a
-  list of your public and private repositories which are available for import.
+  - connect_verb = @ci_cd_only ? _('connect') : _('import')
+  - alternative_prefix = github_import_configured? ? _('Alternatively,') : _('To %{connect_verb} GitHub repositories,') % { connect_verb: connect_verb }
+  - personal_access_token_link = link_to 'Personal Access Token', 'https://github.com/settings/tokens'
+  = _('%{alternative_prefix} you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to %{connect_verb}.').html_safe % { alternative_prefix: alternative_prefix, personal_access_token_link: personal_access_token_link, connect_verb: connect_verb }
 
-= form_tag personal_access_token_import_github_path, method: :post, class: 'form-inline' do
+= form_tag personal_access_token_import_github_path(ci_cd_only: @ci_cd_only), method: :post, class: 'form-inline' do
   .form-group
-    = text_field_tag :personal_access_token, '', class: 'form-control', placeholder: "Personal Access Token", size: 40
-    = submit_tag 'List your GitHub repositories', class: 'btn btn-success'
+    = text_field_tag :personal_access_token, '', class: 'form-control', placeholder: _('Personal Access Token'), size: 40
+    = submit_tag _('List your GitHub repositories'), class: 'btn btn-success'
 
 - unless github_import_configured?
   %hr
   %p
-    Note:
-    - if current_user.admin?
-      As an administrator you may like to configure
-    - else
-      Consider asking your GitLab administrator to configure
-    = link_to 'GitHub integration', help_page_path("integration/github")
-    which will allow login via GitHub and allow importing projects without
-    generating a Personal Access Token.
+    - configure_note = current_user.admin? ? _('As an administrator you may like to configure') : _('Consider asking your GitLab administrator to configure')
+    - github_integration_link = link_to 'GitHub integration', help_page_path("integration/github")
+    - connecting_verb = @ci_cd_only ? _('connecting') : _('importing')
+    = _('Note: %{configure_note} %{github_integration_link}, which will allow login via GitHub and allow %{connecting_verb} repositories without generating a Personal Access Token.').html_safe % { configure_note: configure_note, github_integration_link: github_integration_link, connecting_verb: connecting_verb }
