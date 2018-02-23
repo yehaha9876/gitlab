@@ -112,6 +112,7 @@
 - cronjob:geo_repository_sync
 - cronjob:geo_batch_repository_verification
 - cronjob:geo_sidekiq_cron_config
+- cronjob:geo_registry_verification
 - cronjob:historical_data
 - cronjob:ldap_all_groups_sync
 - cronjob:ldap_sync
