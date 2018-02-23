@@ -29,13 +29,19 @@ var pageEntries = glob.sync('pages/**/index.js', { cwd: path.join(ROOT_PATH, 'ap
 var dispatcher = fs.readFileSync(path.join(ROOT_PATH, 'app/assets/javascripts/dispatcher.js')).toString();
 var dispatcherChunks = dispatcher.match(/(?!import\(')\.\/pages\/[^']+/g);
 
-pageEntries.forEach(( path ) => {
-  let chunkPath = path.replace(/\/index\.js$/, '');
-  if (!dispatcherChunks.includes('./' + chunkPath)) {
-    let chunkName = chunkPath.replace(/\//g, '.');
-    autoEntries[chunkName] = './' + path;
+function generateAutoEntries(path, prefix = '.') {
+  const chunkPath = path.replace(/\/index\.js$/, '');
+  if (!dispatcherChunks.includes(`${prefix}/${chunkPath}`)) {
+    const chunkName = chunkPath.replace(/\//g, '.');
+    autoEntries[chunkName] = `${prefix}/${path}`;
   }
-});
+}
+
+pageEntries.forEach(( path ) => generateAutoEntries(path));
+
+// add and replace any ce entries with ee entries
+const eePageEntries = glob.sync('pages/**/index.js', { cwd: path.join(ROOT_PATH, 'ee/app/assets/javascripts') });
+eePageEntries.forEach(( path ) => generateAutoEntries(path, 'ee'));
 
 // report our auto-generated bundle count
 var autoEntriesCount = Object.keys(autoEntries).length;
@@ -48,7 +54,6 @@ var config = {
   },
   context: path.join(ROOT_PATH, 'app/assets/javascripts'),
   entry: {
-    account:              './profile/account/index.js',
     add_gitlab_slack_application: './add_gitlab_slack_application/index.js',
     balsamiq_viewer:      './blob/balsamiq_viewer.js',
     blob:                 './blob_edit/blob_bundle.js',
@@ -59,7 +64,6 @@ var config = {
     cycle_analytics:      './cycle_analytics/cycle_analytics_bundle.js',
     commit_pipelines:     './commit/pipelines/pipelines_bundle.js',
     deploy_keys:          './deploy_keys/index.js',
-    docs:                 './docs/docs_bundle.js',
     diff_notes:           './diff_notes/diff_notes_bundle.js',
     environments:         './environments/environments_bundle.js',
     environments_folder:  './environments/folder/environments_folder_bundle.js',
@@ -67,15 +71,10 @@ var config = {
     new_epic:             'ee/epics/new_epic/new_epic_bundle.js',
     filtered_search:      './filtered_search/filtered_search_bundle.js',
     geo_nodes:            'ee/geo_nodes',
-    graphs:               './graphs/graphs_bundle.js',
-    graphs_charts:        './graphs/graphs_charts.js',
-    graphs_show:          './graphs/graphs_show.js',
     help:                 './help/help.js',
     issuable:             './issuable/issuable_bundle.js',
     issues:               './issues/issues_bundle.js',
-    how_to_merge:         './how_to_merge.js',
     issue_show:           './issue_show/index.js',
-    job_details:          './jobs/job_details_bundle.js',
     ldap_group_links:     './groups/ldap_group_links.js',
     locale:               './locale/index.js',
     main:                 './main.js',
@@ -84,7 +83,6 @@ var config = {
     monitoring:           './monitoring/monitoring_bundle.js',
     network:              './network/network_bundle.js',
     notebook_viewer:      './blob/notebook_viewer.js',
-    notes:                './notes/index.js',
     pdf_viewer:           './blob/pdf_viewer.js',
     pipelines:            './pipelines/pipelines_bundle.js',
     pipelines_details:    './pipelines/pipeline_details_bundle.js',
@@ -98,7 +96,7 @@ var config = {
     service_desk_issues:  './service_desk_issues/index.js',
     registry_list:        './registry/index.js',
     roadmap:              'ee/roadmap',
-    ide:                 './ide/index.js',
+    ide:                  './ide/index.js',
     sidebar:              './sidebar/sidebar_bundle.js',
     ee_sidebar:           'ee/sidebar/sidebar_bundle.js',
     snippet:              './snippet/snippet_bundle.js',
@@ -275,11 +273,9 @@ var config = {
         'groups',
         'issuable',
         'issue_show',
-        'job_details',
         'merge_conflicts',
         'monitoring',
         'notebook_viewer',
-        'notes',
         'pdf_viewer',
         'pipelines',
         'pipelines_details',
@@ -293,21 +289,6 @@ var config = {
       ],
       minChunks: function(module, count) {
         return module.resource && (/vue_shared/).test(module.resource);
-      },
-    }),
-
-    // create cacheable common library bundle for all d3 chunks
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'common_d3',
-      chunks: [
-        'graphs',
-        'graphs_show',
-        'monitoring',
-        'users',
-        'burndown_chart', // EE
-      ],
-      minChunks: function (module, count) {
-        return module.resource && /d3-/.test(module.resource);
       },
     }),
 

@@ -180,6 +180,9 @@ ActiveRecord::Schema.define(version: 20180216165932) do
     t.boolean "mirror_available", default: true, null: false
     t.string "auto_devops_domain"
     t.integer "default_project_creation", default: 2, null: false
+    t.boolean "external_authorization_service_enabled", default: false, null: false
+    t.string "external_authorization_service_url"
+    t.string "external_authorization_service_default_label"
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -1913,13 +1916,19 @@ ActiveRecord::Schema.define(version: 20180216165932) do
     t.boolean "only_mirror_protected_branches"
     t.boolean "pull_mirror_available_overridden"
     t.integer "jobs_cache_index"
+<<<<<<< HEAD
     t.boolean "ci_cd_only"
+=======
+    t.boolean "mirror_overwrites_diverged_branches"
+    t.string "external_authorization_classification_label"
+>>>>>>> master
   end
 
   add_index "projects", ["ci_id"], name: "index_projects_on_ci_id", using: :btree
   add_index "projects", ["created_at"], name: "index_projects_on_created_at", using: :btree
   add_index "projects", ["creator_id"], name: "index_projects_on_creator_id", using: :btree
   add_index "projects", ["description"], name: "index_projects_on_description_trigram", using: :gin, opclasses: {"description"=>"gin_trgm_ops"}
+  add_index "projects", ["id"], name: "index_projects_on_id_partial_for_visibility", unique: true, where: "(visibility_level = ANY (ARRAY[10, 20]))", using: :btree
   add_index "projects", ["last_activity_at"], name: "index_projects_on_last_activity_at", using: :btree
   add_index "projects", ["last_repository_check_failed"], name: "index_projects_on_last_repository_check_failed", using: :btree
   add_index "projects", ["last_repository_updated_at"], name: "index_projects_on_last_repository_updated_at", using: :btree
