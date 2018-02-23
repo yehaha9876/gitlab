@@ -129,6 +129,7 @@
 - geo:geo_repository_destroy
 - geo:geo_repository_shard_sync
 - geo:geo_single_repository_verification
+- geo:geo_repository_verify_secondary
 
 - object_storage_upload
 - object_storage:object_storage_background_move
