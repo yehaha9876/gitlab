@@ -84,7 +84,7 @@ module Geo
       header = { "http.#{url}.extraHeader" => "Authorization: #{authorization}" }
 
       repository.with_config(header) do
-        repository.fetch_as_mirror(url, remote_name: GEO_REMOTE_NAME, forced: true)
+        repository.fetch_as_mirror(url, remote_name: GEO_REMOTE_NAME, forced: true, prune: false)
       end
     end
 

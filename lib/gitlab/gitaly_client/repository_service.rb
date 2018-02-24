@@ -48,7 +48,7 @@ module Gitlab
       def fetch_remote(remote, ssh_auth:, forced:, no_tags:, timeout:, prune: true)
         request = Gitaly::FetchRemoteRequest.new(
           repository: @gitaly_repo, remote: remote, force: forced,
-          no_tags: no_tags, timeout: timeout, prune: prune
+          no_tags: no_tags, timeout: timeout
         )
 
         if ssh_auth&.ssh_import?
