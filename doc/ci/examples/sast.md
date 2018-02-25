@@ -13,7 +13,7 @@ You can then add a new job to `.gitlab-ci.yml`, called `sast`:
 
 ```yaml
 before_script:
-  - *functions
+  - functions
 
 sast:
   image: docker:latest
