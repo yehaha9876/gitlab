@@ -1011,7 +1011,7 @@ ActiveRecord::Schema.define(version: 20180225180932) do
     t.string "revision"
     t.integer "repositories_verified_count"
     t.integer "repositories_verify_failed_count"
-    t.integer "wikis_verify_count"
+    t.integer "wikis_verified_count"
     t.integer "wikis_verify_failed_count"
   end
 

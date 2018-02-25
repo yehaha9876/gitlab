@@ -7,7 +7,7 @@ class AddGeoNodeVerificationStatus < ActiveRecord::Migration
   def change
     add_column :geo_node_statuses, :repositories_verified_count, :integer
     add_column :geo_node_statuses, :repositories_verify_failed_count, :integer
-    add_column :geo_node_statuses, :wikis_verify_count, :integer
+    add_column :geo_node_statuses, :wikis_verified_count, :integer
     add_column :geo_node_statuses, :wikis_verify_failed_count, :integer
   end
 end
