@@ -24,6 +24,10 @@ class GeoNodeStatus < ActiveRecord::Base
     wikis_count: 'Total number of wikis available on primary',
     wikis_synced_count: 'Number of wikis synced on secondary',
     wikis_failed_count: 'Number of wikis failed to sync on secondary',
+    repositories_verified_count: 'Number of repositories verified on secondary',
+    repositories_verify_failed_count: 'Number of repositories failed to verify on secondary',
+    wikis_verify_count: 'Number of wikis verified on secondary',
+    wikis_verify_failed_count: 'Number of wikis failed to verify on secondary',
     lfs_objects_count: 'Total number of local LFS objects available on primary',
     lfs_objects_synced_count: 'Number of local LFS objects synced on secondary',
     lfs_objects_failed_count: 'Number of local LFS objects failed to sync on secondary',
@@ -148,6 +152,10 @@ class GeoNodeStatus < ActiveRecord::Base
       self.repositories_failed_count = projects_finder.count_failed_repositories
       self.wikis_synced_count = projects_finder.count_synced_wikis
       self.wikis_failed_count = projects_finder.count_failed_wikis
+      self.repositories_verified_count = projects_finder.count_verified_repositories
+      self.repositories_verify_failed_count = projects_finder.count_verify_failed_repositories
+      self.wikis_verified_count = projects_finder.count_verified_wikis
+      self.wikis_verify_failed_count = projects_finder.count_verify_failed_wikis
       self.lfs_objects_synced_count = lfs_objects_finder.count_synced_lfs_objects
       self.lfs_objects_failed_count = lfs_objects_finder.count_failed_lfs_objects
       self.job_artifacts_synced_count = job_artifacts_finder.count_synced_job_artifacts
@@ -197,6 +205,14 @@ class GeoNodeStatus < ActiveRecord::Base
 
   def wikis_synced_in_percentage
     calc_percentage(wikis_count, wikis_synced_count)
+  end
+
+  def repositories_verified_in_percentage
+    calc_percentage(repositories_count, repositories_verified_count)
+  end
+
+  def wikis_verified_in_percentage
+    calc_percentage(wikis_count, wikis_verified_count)
   end
 
   def lfs_objects_synced_in_percentage

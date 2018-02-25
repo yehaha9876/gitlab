@@ -67,6 +67,16 @@
             itemValueType: VALUE_TYPE.GRAPH,
           },
           {
+            itemTitle: s__('GeoNodes|Verified Repositories:'),
+            itemValue: this.nodeDetails.verifiedRepositories,
+            itemValueType: VALUE_TYPE.GRAPH,
+          },
+          {
+            itemTitle: s__('GeoNodes|Verified Wikis:'),
+            itemValue: this.nodeDetails.verifiedWikis,
+            itemValueType: VALUE_TYPE.GRAPH,
+          },
+          {
             itemTitle: s__('GeoNodes|Sync settings:'),
             itemValue: this.syncSettings(),
             itemValueType: VALUE_TYPE.CUSTOM,

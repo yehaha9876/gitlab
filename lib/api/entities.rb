@@ -1232,6 +1232,18 @@ module API
         number_to_percentage(node.wikis_synced_in_percentage, precision: 2)
       end
 
+      expose :repositories_verify_failed_count
+      expose :repositories_verified_count
+      expose :repositories_verified_in_percentage do |node|
+        number_to_percentage(node.repositories_verified_in_percentage, precision: 2)
+      end
+
+      expose :wikis_verify_failed_count
+      expose :wikis_verified_count
+      expose :wikis_verified_in_percentage do |node|
+        number_to_percentage(node.wikis_verified_in_percentage, precision: 2)
+      end
+
       expose :replication_slots_count
       expose :replication_slots_used_count
       expose :replication_slots_used_in_percentage do |node|
