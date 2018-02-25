@@ -49,6 +49,47 @@ module Geo
       relation
     end
 
+    def count_verified_repositories
+      relation =
+        if use_legacy_queries?
+          legacy_find_verified_repositories
+        else
+          find_verified_repositories
+        end
+
+      relation.count
+    end
+
+    def count_verified_wikis
+      relation =
+        if use_legacy_queries?
+          legacy_find_verified_wikis
+        else
+          find_verified_wikis
+        end
+
+      relation.count
+    end
+
+    def count_verify_failed_repositories
+      find_verify_failed_project_registries('repository').count
+    end
+
+    def count_verify_failed_wikis
+      find_verify_failed_project_registries('wiki').count
+    end
+
+    def find_verify_failed_project_registries(type = nil)
+      relation =
+        if use_legacy_queries?
+          legacy_find_filtered_verify_failed_projects(type)
+        else
+          find_filtered_verify_failed_project_registries(type)
+        end
+
+      relation
+    end
+
     def find_registries_to_verify
       # note that the checksum values get reset when the repository starts syncing
       Geo::ProjectRegistry.where('repository_verification_checksum IS NULL OR wiki_verification_checksum IS NULL')
@@ -82,6 +123,14 @@ module Geo
       Geo::ProjectRegistry.synced_repos
     end
 
+    def find_verified_repositories
+      Geo::ProjectRegistry.verified_repos
+    end
+
+    def find_verified_wikis
+      Geo::ProjectRegistry.verified_wikis
+    end
+
     def find_filtered_failed_project_registries(type = nil)
       case type
       when 'repository'
@@ -90,6 +139,17 @@ module Geo
         Geo::ProjectRegistry.failed_wikis
       else
         Geo::ProjectRegistry.failed
+      end
+    end
+
+    def find_filtered_verify_failed_project_registries(type = nil)
+      case type
+      when 'repository'
+        Geo::ProjectRegistry.verify_failed_repos
+      when 'wiki'
+        Geo::ProjectRegistry.verify_failed_wikis
+      else
+        Geo::ProjectRegistry.verify_failed
       end
     end
 
@@ -167,6 +227,16 @@ module Geo
       )
     end
 
+    # @return [ActiveRecord::Relation<Geo::ProjectRegistry>] list of verified projects
+    def legacy_find_verified_repositories
+      legacy_find_project_registries(Geo::ProjectRegistry.verified_repos)
+    end
+
+    # @return [ActiveRecord::Relation<Geo::ProjectRegistry>] list of verified projects
+    def legacy_find_verified_wikis
+      legacy_find_project_registries(Geo::ProjectRegistry.verified_wikis)
+    end
+
     # @return [ActiveRecord::Relation<Project>] list of synced projects
     def legacy_find_project_registries(project_registries)
       legacy_inner_join_registry_ids(
@@ -180,6 +250,16 @@ module Geo
     def legacy_find_filtered_failed_projects(type = nil)
       legacy_inner_join_registry_ids(
         find_filtered_failed_project_registries(type),
+        current_node.projects.pluck(:id),
+        Geo::ProjectRegistry,
+        foreign_key: :project_id
+      )
+    end
+
+    # @return [ActiveRecord::Relation<Project>] list of projects that verification has failed
+    def legacy_find_filtered_verify_failed_projects(type = nil)
+      legacy_inner_join_registry_ids(
+        find_filtered_verify_failed_project_registries(type),
         current_node.projects.pluck(:id),
         Geo::ProjectRegistry,
         foreign_key: :project_id

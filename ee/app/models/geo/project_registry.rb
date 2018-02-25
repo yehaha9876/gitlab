@@ -16,6 +16,13 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     where(repository_sync_failed.or(wiki_sync_failed))
   end
 
+  def self.verify_failed
+    repository_verify_failed = arel_table[:last_repository_verification_failed].eq(true)
+    wiki_verify_failed = arel_table[:last_wiki_verification_failed].eq(true)
+
+    where(repository_verify_failed.or(wiki_verify_failed))
+  end
+
   def self.retry_due
     where(
       arel_table[:repository_retry_at].lt(Time.now)

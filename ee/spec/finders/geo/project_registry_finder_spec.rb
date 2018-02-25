@@ -9,6 +9,11 @@ describe Geo::ProjectRegistryFinder, :geo do
   let(:project_synced) { create(:project) }
   let(:project_repository_dirty) { create(:project) }
   let(:project_wiki_dirty) { create(:project) }
+  let(:project_repository_verified) { create(:project) }
+  let(:project_repository_verify_failed) { create(:project) }
+  let(:project_wiki_verified) { create(:project) }
+  let(:project_wiki_verify_failed) { create(:project) }
+
 
   subject { described_class.new(current_node: secondary) }
 
@@ -187,6 +192,82 @@ describe Geo::ProjectRegistryFinder, :geo do
     end
   end
 
+  describe '#count_verify_failed_repositories' do
+    it 'delegates to #find_verify_failed_project_registries' do
+      expect(subject).to receive(:find_verify_failed_project_registries).with('repository').and_call_original
+
+      subject.count_verify_failed_repositories
+    end
+
+    it 'counts projects that verification has failed' do
+      create(:geo_project_registry, :repository_verified, project: project_repository_verified)
+      create(:geo_project_registry, :repository_verification_failed, project: project_repository_verify_failed)
+      create(:geo_project_registry, :wiki_verified, project: project_wiki_verified)
+      create(:geo_project_registry, :wiki_verification_failed, project: project_wiki_verify_failed)
+
+      expect(subject.count_verify_failed_repositories).to eq 1
+    end
+
+    context 'with legacy queries' do
+      before do
+        allow(subject).to receive(:use_legacy_queries?).and_return(true)
+      end
+
+      it 'delegates to #legacy_find_filtered_verify_failed_projects' do
+        expect(subject).to receive(:legacy_find_filtered_verify_failed_projects).and_call_original
+
+        subject.find_verify_failed_project_registries('repository')
+      end
+
+      it 'counts projects that verification has failed' do
+        create(:geo_project_registry, :repository_verified, project: project_repository_verified)
+        create(:geo_project_registry, :repository_verification_failed, project: project_repository_verify_failed)
+        create(:geo_project_registry, :wiki_verified, project: project_wiki_verified)
+        create(:geo_project_registry, :wiki_verification_failed, project: project_wiki_verify_failed)
+
+        expect(subject.count_verify_failed_repositories).to eq 1
+      end
+    end
+  end
+
+  describe '#count_verify_failed_wikis' do
+    it 'delegates to #find_verify_failed_project_registries' do
+      expect(subject).to receive(:find_verify_failed_project_registries).with('wiki').and_call_original
+
+      subject.count_verify_failed_wikis
+    end
+
+    it 'counts projects that verification has failed' do
+      create(:geo_project_registry, :repository_verified, project: project_repository_verified)
+      create(:geo_project_registry, :repository_verification_failed, project: project_repository_verify_failed)
+      create(:geo_project_registry, :wiki_verified, project: project_wiki_verified)
+      create(:geo_project_registry, :wiki_verification_failed, project: project_wiki_verify_failed)
+
+      expect(subject.count_verify_failed_wikis).to eq 1
+    end
+
+    context 'with legacy queries' do
+      before do
+        allow(subject).to receive(:use_legacy_queries?).and_return(true)
+      end
+
+      it 'delegates to #legacy_find_filtered_verify_failed_projects' do
+        expect(subject).to receive(:legacy_find_filtered_verify_failed_projects).and_call_original
+
+        subject.find_verify_failed_project_registries('wiki')
+      end
+
+      it 'counts projects that verification has failed' do
+        create(:geo_project_registry, :repository_verified, project: project_repository_verified)
+        create(:geo_project_registry, :repository_verification_failed, project: project_repository_verify_failed)
+        create(:geo_project_registry, :wiki_verified, project: project_wiki_verified)
+        create(:geo_project_registry, :wiki_verification_failed, project: project_wiki_verify_failed)
+
+        expect(subject.count_verify_failed_wikis).to eq 1
+      end
+    end
+  end
+
   describe '#find_failed_project_registries' do
     let(:project_1_in_synced_group) { create(:project, group: synced_group) }
     let(:project_2_in_synced_group) { create(:project, group: synced_group) }
@@ -238,6 +319,58 @@ describe Geo::ProjectRegistryFinder, :geo do
       end
     end
   end
+
+  # describe '#find_verify_failed_project_registries' do
+  #   let(:project_1_in_synced_group) { create(:project, group: synced_group) }
+  #   let(:project_2_in_synced_group) { create(:project, group: synced_group) }
+  #
+  #   let!(:synced) { create(:geo_project_registry, :synced) }
+  #   let!(:sync_failed) { create(:geo_project_registry, :sync_failed, project: project_synced) }
+  #   let!(:repository_sync_failed) { create(:geo_project_registry, :repository_sync_failed, project: project_1_in_synced_group) }
+  #   let!(:wiki_sync_failed) { create(:geo_project_registry, :wiki_sync_failed, project: project_2_in_synced_group) }
+  #
+  #   it 'delegates to #find_failed_project_registries' do
+  #     expect(subject).to receive(:find_failed_project_registries).with('repository').and_call_original
+  #
+  #     subject.count_failed_repositories
+  #   end
+  #
+  #   it 'returns only project registries that repository sync has failed' do
+  #     expect(subject.find_failed_project_registries('repository')).to match_array([sync_failed, repository_sync_failed])
+  #   end
+  #
+  #   it 'returns only project registries that wiki sync has failed' do
+  #     expect(subject.find_failed_project_registries('wiki')).to match_array([sync_failed, wiki_sync_failed])
+  #   end
+  #
+  #   context 'with selective sync' do
+  #     before do
+  #       secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+  #     end
+  #
+  #     it 'delegates to #legacy_find_filtered_failed_projects' do
+  #       expect(subject).to receive(:legacy_find_filtered_failed_projects).and_call_original
+  #
+  #       subject.find_failed_project_registries
+  #     end
+  #
+  #     it 'returns project registries that sync has failed' do
+  #       expect(subject.find_failed_project_registries).to match_array([repository_sync_failed, wiki_sync_failed])
+  #     end
+  #
+  #     it 'returns only project registries that repository sync has failed' do
+  #       create(:geo_project_registry, :repository_sync_failed)
+  #
+  #       expect(subject.find_failed_project_registries('repository')).to match_array([repository_sync_failed])
+  #     end
+  #
+  #     it 'returns only project registries that wiki sync has failed' do
+  #       create(:geo_project_registry, :wiki_sync_failed)
+  #
+  #       expect(subject.find_failed_project_registries('wiki')).to match_array([wiki_sync_failed])
+  #     end
+  #   end
+  # end
 
   it '#find_registries_to_verify' do
     create(:geo_project_registry)
