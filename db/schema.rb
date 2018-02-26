@@ -1916,12 +1916,9 @@ ActiveRecord::Schema.define(version: 20180216165932) do
     t.boolean "only_mirror_protected_branches"
     t.boolean "pull_mirror_available_overridden"
     t.integer "jobs_cache_index"
-<<<<<<< HEAD
-    t.boolean "ci_cd_only"
-=======
     t.boolean "mirror_overwrites_diverged_branches"
     t.string "external_authorization_classification_label"
->>>>>>> master
+    t.boolean "ci_cd_only"
   end
 
   add_index "projects", ["ci_id"], name: "index_projects_on_ci_id", using: :btree
