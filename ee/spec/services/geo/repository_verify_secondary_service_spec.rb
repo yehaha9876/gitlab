@@ -42,7 +42,7 @@ describe Geo::RepositoryVerifySecondaryService do
     it 'sets failure message when the checksum does not match' do
       allow(service).to receive(:calculate_checksum).and_return('not_my_checksum')
 
-      expect(service).to receive(:record_status).once.with(error: 'Repository checksum did not match')
+      expect(service).to receive(:record_status).once.with(error: start_with('Repository checksum did not match'))
 
       service.execute
     end
@@ -50,9 +50,6 @@ describe Geo::RepositoryVerifySecondaryService do
     it 'sets failure message when repository not found' do
       registry = create(:geo_project_registry)
       service  = described_class.new(registry, :repository)
-
-      allow(described_class).to receive(:should_verify_repository?).and_return(true)
-
       expect(service).to receive(:record_status).once.with(error: 'Repository was not found')
 
       service.execute

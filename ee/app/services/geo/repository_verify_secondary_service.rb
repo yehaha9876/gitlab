@@ -12,7 +12,6 @@ module Geo
     def execute
       return unless Gitlab::Geo.geo_database_configured?
       return unless Gitlab::Geo.secondary?
-      return unless self.class.should_verify_repository?(@registry, @type)
 
       if repository_exists?(@type)
         compare_checksum
@@ -25,10 +24,10 @@ module Geo
     # when should we verify?
     # - primary repository checksum has been calculated
     # - secondary repository checksum is nil
-    # - primary repository has not changed in 6 hours
+    # - primary repository has not changed/is stable for some amount of time
     # - primary repository was checked after the last repository update
     # - secondary repository was successfully synced after the last repository update
-    def self.should_verify_repository?(registry, type)
+    def self.should_verify_repository?(registry, type, stable_time = 6.hours.ago)
       original_checksum       = registry.send("project_#{type}_verification_checksum")
       secondary_checksum      = registry.send("#{type}_verification_checksum")
       last_verification_at    = registry.send("project_#{type}_last_verification")
@@ -36,7 +35,7 @@ module Geo
 
       !original_checksum.nil? &&
         secondary_checksum.nil? &&
-        registry.project.last_repository_updated_at < 6.hours.ago &&
+        registry.project.last_repository_updated_at < stable_time &&
         !last_verification_at.nil? && last_verification_at > registry.project.last_repository_updated_at &&
         !last_successful_sync_at.nil? && last_successful_sync_at > registry.project.last_repository_updated_at
     end
