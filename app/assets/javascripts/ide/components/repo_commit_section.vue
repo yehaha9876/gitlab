@@ -43,6 +43,9 @@ export default {
       'commitMessage',
       'submitCommitLoading',
     ]),
+    ...mapGetters([
+      'unstagedFiles',
+    ]),
     ...mapGetters('commit', [
       'commitButtonDisabled',
       'discardDraftButtonDisabled',
@@ -98,7 +101,7 @@ export default {
       <commit-files-list
         icon="unstaged"
         title="Unstaged"
-        :file-list="changedFiles"
+        :file-list="unstagedFiles"
         action="stageAllChanges"
         action-btn-text="Stage all"
         item-action-component="stage-button"

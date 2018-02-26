@@ -72,7 +72,15 @@ export default {
     parent.tree.push(file);
   },
   [types.ADD_FILE_TO_CHANGED](state, file) {
-    state.changedFiles.push(file);
+    const indexOfChangedFile = findIndexOfFile(state.changedFiles, file);
+
+    if (indexOfChangedFile !== -1) {
+      Object.assign(file, {
+        staged: false,
+      });
+    } else {
+      state.changedFiles.push(file);
+    }
   },
   [types.REMOVE_FILE_FROM_CHANGED](state, file) {
     const indexOfChangedFile = findIndexOfFile(state.changedFiles, file);
@@ -80,8 +88,11 @@ export default {
     state.changedFiles.splice(indexOfChangedFile, 1);
   },
   [types.STAGE_CHANGE](state, file) {
-    const indexOfChangedFile = findIndexOfFile(state.changedFiles, file);
     const stagedFile = findEntry(state.stagedFiles, 'blob', file.name);
+
+    Object.assign(file, {
+      staged: true,
+    });
 
     if (stagedFile) {
       Object.assign(stagedFile, {
@@ -92,17 +103,15 @@ export default {
         ...file,
       });
     }
-
-    state.changedFiles.splice(indexOfChangedFile, 1);
   },
   [types.UNSTAGE_CHANGE](state, file) {
     const indexOfStagedFile = findIndexOfFile(state.stagedFiles, file);
-    const indexOfChangedFile = findIndexOfFile(state.changedFiles, file);
+    const changedFile = findEntry(state.changedFiles, 'blob', file.name);
 
     state.stagedFiles.splice(indexOfStagedFile, 1);
 
-    if (indexOfChangedFile < 0) {
-      state.changedFiles.push(file);
-    }
+    Object.assign(changedFile, {
+      staged: false,
+    });
   },
 };

@@ -144,6 +144,9 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState }) =
     } else {
       dispatch('updateFilesAfterCommit', { data, branch: getters.branchName });
     }
+
+    commit(rootTypes.CLEAR_STAGED_CHANGES, null, { root: true });
+    dispatch('discardDraft');
   })
   .catch((err) => {
     let errMsg = __('Error committing changes. Please try again.');
