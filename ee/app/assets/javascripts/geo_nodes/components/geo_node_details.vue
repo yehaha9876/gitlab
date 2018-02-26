@@ -67,16 +67,6 @@
             itemValueType: VALUE_TYPE.GRAPH,
           },
           {
-            itemTitle: s__('GeoNodes|Verified Repositories:'),
-            itemValue: this.nodeDetails.verifiedRepositories,
-            itemValueType: VALUE_TYPE.GRAPH,
-          },
-          {
-            itemTitle: s__('GeoNodes|Verified Wikis:'),
-            itemValue: this.nodeDetails.verifiedWikis,
-            itemValueType: VALUE_TYPE.GRAPH,
-          },
-          {
             itemTitle: s__('GeoNodes|Sync settings:'),
             itemValue: this.syncSettings(),
             itemValueType: VALUE_TYPE.CUSTOM,
@@ -223,6 +213,22 @@
           />
         </template>
         <template v-else>
+          <geo-node-detail-item
+            :item-title="s__('GeoNodes|Verified Repositories:')"
+            :success-label="s__('GeoNodes|Verified')"
+            :neutral-label="s__('GeoNodes|Unverified')"
+            :failure-label="s__('GeoNodes|Failed')"
+            :item-value="nodeDetails.verifiedRepositories"
+            :item-value-type="valueType.GRAPH"
+          />
+          <geo-node-detail-item
+            :item-title="s__('GeoNodes|Verified Wikis:')"
+            :success-label="s__('GeoNodes|Verified')"
+            :neutral-label="s__('GeoNodes|Unverified')"
+            :failure-label="s__('GeoNodes|Failed')"
+            :item-value="nodeDetails.verifiedWikis"
+            :item-value-type="valueType.GRAPH"
+          />
           <geo-node-detail-item
             css-class="node-detail-value-bold"
             :item-title="s__('GeoNodes|Database replication lag:')"
