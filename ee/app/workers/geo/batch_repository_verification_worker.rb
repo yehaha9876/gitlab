@@ -13,7 +13,7 @@ module Geo
       return unless Gitlab::Geo.primary?
 
       try_obtain_lease do
-        projects.each_batch(of: BATCH_SIZE, column: :last_activity_at) do |batch, index|
+        projects.each_batch(of: BATCH_SIZE, column: :last_repository_updated_at) do |batch, index|
           interval = index * DELAY_INTERVAL
 
           batch.each do |project|
@@ -28,7 +28,7 @@ module Geo
     def projects
       Project
         .select(:id)
-        .where('projects.last_activity_at >= ?', 24.hours.ago)
+        .where('projects.last_repository_updated_at >= ?', 24.hours.ago)
     end
 
     def lease_timeout

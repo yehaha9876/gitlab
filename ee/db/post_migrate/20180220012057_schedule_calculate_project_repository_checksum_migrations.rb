@@ -24,7 +24,7 @@ class ScheduleCalculateProjectRepositoryChecksumMigrations < ActiveRecord::Migra
     relation = Project.joins("LEFT OUTER JOIN project_repository_states on projects.id = project_repository_states.project_id")
                       .merge(ProjectRepositorytState.where(project_id: nil))
 
-    relation.each_batch(of: BATCH_SIZE, column: :last_activity_at) do |batch, index|
+    relation.each_batch(of: BATCH_SIZE, column: :last_repository_updated_at) do |batch, index|
       range = batch.pluck('MIN(projects.id)', 'MAX(projects.id)').first
 
       BackgroundMigrationWorker.perform_in(index * DELAY_INTERVAL, MIGRATION, range)
