@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import * as urlUtils from '~/lib/utils/url_utility';
 import store from '~/ide/stores';
 import service from '~/ide/services';
 import repoCommitSection from '~/ide/components/repo_commit_section.vue';
@@ -86,8 +85,6 @@ describe('RepoCommitSection', () => {
         committedStateSvgPath: 'svg',
       }).$mount();
 
-      // Vue.nextTick();
-
       expect(vm.$el.querySelector('.js-empty-state').textContent.trim()).toContain('No changes');
       expect(vm.$el.querySelector('.js-empty-state img').getAttribute('src')).toBe('nochangessvg');
     });
@@ -162,66 +159,57 @@ describe('RepoCommitSection', () => {
     });
   });
 
-  describe('when submitting', () => {
-    let stagedFiles;
+  it('updates commitMessage in store on input', (done) => {
+    const textarea = vm.$el.querySelector('textarea');
 
-    beforeEach(() => {
-      vm.commitMessage = 'testing';
-      stagedFiles = JSON.parse(JSON.stringify(vm.$store.state.stagedFiles));
+    textarea.value = 'testing commit message';
 
-      spyOn(service, 'commit').and.returnValue(Promise.resolve({
-        data: {
-          short_id: '1',
-          stats: {},
-        },
-      }));
+    textarea.dispatchEvent(new Event('input'));
+
+    getSetTimeoutPromise()
+      .then(() => {
+        expect(vm.$store.state.commit.commitMessage).toBe('testing commit message');
+      })
+      .then(done)
+      .catch(done.fail);
+  });
+
+  describe('discard draft button', () => {
+    it('hidden when commitMessage is empty', () => {
+      expect(vm.$el.querySelector('.multi-file-commit-form .btn-default')).toBeNull();
     });
 
-    it('allows you to submit', () => {
-      expect(vm.$el.querySelector('form .btn').disabled).toBeTruthy();
-    });
+    it('resets commitMessage when clicking discard button', (done) => {
+      vm.$store.state.commit.commitMessage = 'testing commit message';
 
-    it('submits commit', (done) => {
-      vm.makeCommit();
-
-      // Wait for the branch check to finish
       getSetTimeoutPromise()
-        .then(() => Vue.nextTick())
         .then(() => {
-          const args = service.commit.calls.allArgs()[0];
-          const { commit_message, actions, branch: payloadBranch } = args[1];
-
-          expect(commit_message).toBe('testing');
-          expect(actions.length).toEqual(2);
-          expect(payloadBranch).toEqual('master');
-          expect(actions[0].action).toEqual('update');
-          expect(actions[1].action).toEqual('update');
-          expect(actions[0].content).toEqual(stagedFiles[0].content);
-          expect(actions[1].content).toEqual(stagedFiles[1].content);
-          expect(actions[0].file_path).toEqual(stagedFiles[0].path);
-          expect(actions[1].file_path).toEqual(stagedFiles[1].path);
-
-          vm.$store.state.changedFiles = [];
+          vm.$el.querySelector('.multi-file-commit-form .btn-default').click();
         })
         .then(Vue.nextTick)
         .then(() => {
-          expect(vm.$el.querySelector('.js-empty-state').textContent.trim()).toContain('All changes are committed');
-          expect(vm.$el.querySelector('.js-empty-state img').getAttribute('src')).toBe('commitsvg');
+          expect(vm.$store.state.commit.commitMessage).not.toBe('testing commit message');
         })
         .then(done)
         .catch(done.fail);
     });
+  });
 
-    it('redirects to MR creation page if start new MR checkbox checked', (done) => {
-      spyOn(urlUtils, 'visitUrl');
-      vm.startNewMR = true;
+  describe('when submitting', () => {
+    beforeEach(() => {
+      spyOn(vm, 'commitChanges');
+    });
 
-      vm.makeCommit();
+    it('calls commitChanges', (done) => {
+      vm.$store.state.commit.commitMessage = 'testing commit message';
 
       getSetTimeoutPromise()
-        .then(() => Vue.nextTick())
         .then(() => {
-          expect(urlUtils.visitUrl).toHaveBeenCalled();
+          vm.$el.querySelector('.multi-file-commit-form .btn-success').click();
+        })
+        .then(Vue.nextTick)
+        .then(() => {
+          expect(vm.commitChanges).toHaveBeenCalled();
         })
         .then(done)
         .catch(done.fail);

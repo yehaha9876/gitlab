@@ -22,7 +22,7 @@
     },
     data() {
       return {
-        width: 290,
+        width: 340,
       };
     },
     computed: {
@@ -86,7 +86,7 @@
     <panel-resizer
       :size.sync="width"
       :enabled="!rightPanelCollapsed"
-      :start-size="290"
+      :start-size="340"
       :min-size="200"
       :max-size="maxSize"
       @resize-start="resizingStarted"
