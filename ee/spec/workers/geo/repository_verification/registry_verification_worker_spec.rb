@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Geo::RegistryVerificationWorker, :geo do
+describe Geo::RepositoryVerification::RegistryVerificationWorker, :geo do
   include ::EE::GeoHelpers
 
   let(:primary)   { create(:geo_node, :primary) }
@@ -35,8 +35,8 @@ describe Geo::RegistryVerificationWorker, :geo do
       allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).with(registry, :repository).and_return(true)
       allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).with(registry, :wiki).and_return(true)
 
-      expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).with(registry, :repository).once
-      expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).with(registry, :wiki).once
+      expect(Geo::RepositoryVerification::VerifySecondaryWorker).to receive(:perform_async).with(registry, :repository).once
+      expect(Geo::RepositoryVerification::VerifySecondaryWorker).to receive(:perform_async).with(registry, :wiki).once
 
       worker.perform
     end
@@ -45,8 +45,8 @@ describe Geo::RegistryVerificationWorker, :geo do
       allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).with(registry, :repository).and_return(true)
       allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).with(registry, :wiki).and_return(false)
 
-      expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).with(registry, :repository).once
-      expect(Geo::RepositoryVerifySecondaryWorker).not_to receive(:perform_async).with(registry, :wiki)
+      expect(Geo::RepositoryVerification::VerifySecondaryWorker).to receive(:perform_async).with(registry, :repository).once
+      expect(Geo::RepositoryVerification::VerifySecondaryWorker).not_to receive(:perform_async).with(registry, :wiki)
 
       worker.perform
     end
@@ -55,8 +55,8 @@ describe Geo::RegistryVerificationWorker, :geo do
       allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).with(registry, :repository).and_return(false)
       allow(Geo::RepositoryVerifySecondaryService).to receive(:should_verify_repository?).with(registry, :wiki).and_return(true)
 
-      expect(Geo::RepositoryVerifySecondaryWorker).not_to receive(:perform_async).with(registry, :repository)
-      expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).with(registry, :wiki).once
+      expect(Geo::RepositoryVerification::VerifySecondaryWorker).not_to receive(:perform_async).with(registry, :repository)
+      expect(Geo::RepositoryVerification::VerifySecondaryWorker).to receive(:perform_async).with(registry, :wiki).once
 
       worker.perform
     end
@@ -68,7 +68,7 @@ describe Geo::RegistryVerificationWorker, :geo do
       create(:geo_project_registry)
       create(:geo_project_registry, :repository_verified, :wiki_verified)
 
-      expect(Geo::RepositoryVerifySecondaryWorker).to receive(:perform_async).exactly(4).times
+      expect(Geo::RepositoryVerification::VerifySecondaryWorker).to receive(:perform_async).exactly(4).times
 
       worker.perform
     end
