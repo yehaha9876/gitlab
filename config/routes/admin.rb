@@ -133,6 +133,7 @@ namespace :admin do
 
   resources :geo_nodes, only: [:index, :create, :new, :edit, :update, :destroy] do
     member do
+      post :verify
       post :repair
       post :toggle
       get  :status

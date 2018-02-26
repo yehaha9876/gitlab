@@ -1,6 +1,6 @@
 class Admin::GeoNodesController < Admin::ApplicationController
   before_action :check_license, except: [:index, :destroy]
-  before_action :load_node, only: [:edit, :update, :destroy, :repair, :toggle, :status]
+  before_action :load_node, only: [:edit, :update, :destroy, :verify, :repair, :toggle, :status]
 
   helper EE::GeoHelper
 
@@ -41,6 +41,18 @@ class Admin::GeoNodesController < Admin::ApplicationController
     @node.destroy
 
     redirect_to admin_geo_nodes_path, status: 302, notice: 'Node was successfully removed.'
+  end
+
+  def verify
+    if @node.secondary?
+      flash[:alert] = "Repositories verification cannot be started on a secondary node."
+    else
+      Geo::BatchRepositoryVerificationWorker.perform_async(false)
+
+      flash[:notice] = 'Repositories verification started asynchronous for all repositories that have changed.'
+    end
+
+    redirect_to admin_geo_nodes_path
   end
 
   def repair

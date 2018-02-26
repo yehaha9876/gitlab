@@ -4,6 +4,7 @@ export const NODE_ACTIONS = {
   TOGGLE: '/toggle',
   EDIT: '/edit',
   REPAIR: '/repair',
+  VERIFY: '/verify',
 };
 
 export const VALUE_TYPE = {

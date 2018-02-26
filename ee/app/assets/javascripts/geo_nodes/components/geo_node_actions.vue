@@ -40,6 +40,9 @@
       nodePath() {
         return `${NODE_ACTION_BASE_PATH}${this.node.id}`;
       },
+      nodeVerifyRepositoriesPath() {
+        return `${this.nodePath}${NODE_ACTIONS.VERIFY}`;
+      },
       nodeRepairAuthPath() {
         return `${this.nodePath}${NODE_ACTIONS.REPAIR}`;
       },
@@ -55,6 +58,18 @@
 
 <template>
   <div class="geo-node-actions">
+    <div
+      v-if="node.primary"
+      class="node-action-container"
+    >
+      <a
+        class="btn btn-default btn-sm btn-node-action"
+        data-method="post"
+        :href="nodeVerifyRepositoriesPath"
+      >
+        {{ s__('Verify repositories') }}
+      </a>
+    </div>
     <div
       v-if="nodeMissingOauth"
       class="node-action-container"
