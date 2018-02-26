@@ -117,6 +117,8 @@
 - cronjob:ldap_all_groups_sync
 - cronjob:ldap_sync
 - cronjob:update_all_mirrors
+- cronjob:geo_repository_verification_batch_verify_secondary
+- cronjob:geo_repository_verification_registry_verification
 
 - geo:geo_base_scheduler
 - geo:geo_file_download
@@ -129,7 +131,8 @@
 - geo:geo_repository_destroy
 - geo:geo_repository_shard_sync
 - geo:geo_single_repository_verification
-- geo:geo_repository_verify_secondary
+- geo:geo_repository_verification_verify_secondary
+- geo:geo_repository_verification_clear_secondary
 
 - object_storage_upload
 - object_storage:object_storage_background_move

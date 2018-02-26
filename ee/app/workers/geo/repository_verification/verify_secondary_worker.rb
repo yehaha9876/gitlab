@@ -4,7 +4,9 @@ module Geo
       include ApplicationWorker
       include GeoQueue
 
-      def perform(registry, type)
+      def perform(registry_id, type)
+        registry = ProjectRegistry.find(registry_id)
+
         return unless Geo::RepositoryVerifySecondaryService.should_verify_repository?(registry, type)
 
         Geo::RepositoryVerifySecondaryService.new(registry, type).execute
