@@ -81,6 +81,16 @@ class Admin::GeoNodesController < Admin::ApplicationController
     end
 
     redirect_to admin_geo_nodes_path
+      end
+
+  def verify_repositories
+    if @node.secondary?
+      Geo::RepositoryVerification::ClearSecondaryWorker.perform_async
+      Geo::RepositoryVerification::RegistryVerificationWorker.perform_async
+      flash[:notice] = 'Repository Verification cleared and re-started'
+    end
+
+    redirect_to admin_geo_nodes_path
   end
 
   def status

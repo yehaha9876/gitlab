@@ -23,6 +23,8 @@
     .alert.alert-warning WARNING: Please upgrade PostgreSQL to version 9.6 or greater. The status of the replication cannot be determined reliably with the current version.
 
 - if @nodes.any?
+  = link_to 'Clear and Restart Verification', verify_repositories_admin_geo_node_path(2), class: 'btn btn-sm btn-node-action'
+
   #js-geo-nodes{ data: node_vue_list_properties }
 - else
   = render 'shared/empty_states/geo'

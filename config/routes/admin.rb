@@ -136,6 +136,7 @@ namespace :admin do
       post :verify
       post :repair
       post :toggle
+      get  :verify_repositories
       get  :status
     end
   end
