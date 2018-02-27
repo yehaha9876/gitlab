@@ -206,18 +206,6 @@ describe('IDE commit module actions', () => {
         .catch(done.fail);
     });
 
-    it('removes all changed files', (done) => {
-      store.dispatch('commit/updateFilesAfterCommit', {
-        data,
-        branch,
-      })
-        .then(() => {
-          expect(store.state.changedFiles.length).toBe(0);
-        })
-        .then(done)
-        .catch(done.fail);
-    });
-
     it('sets files commit data', (done) => {
       store.dispatch('commit/updateFilesAfterCommit', {
         data,
