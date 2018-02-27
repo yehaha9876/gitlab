@@ -96,9 +96,7 @@ export const updateFilesAfterCommit = (
     eventHub.$emit(`editor.update.model.content.${entry.path}`, entry.raw);
   });
 
-  commit(rootTypes.REMOVE_ALL_CHANGES_FILES, null, { root: true });
-
-  if (state.commitAction === consts.COMMIT_TO_NEW_BRANCH) {
+  if (state.commitAction === consts.COMMIT_TO_NEW_BRANCH && rootGetters.activeFile) {
     router.push(`/project/${rootState.currentProjectId}/blob/${branch}/${rootGetters.activeFile.path}`);
   }
 

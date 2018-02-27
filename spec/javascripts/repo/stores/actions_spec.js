@@ -222,13 +222,16 @@ describe('Multi-file store actions', () => {
         .catch(done.fail);
     });
 
-    it('removes all files from changedFiles after adding to stagedFiles', (done) => {
+    it('sets all files from changedFiles as staged after adding to stagedFiles', (done) => {
       store.state.changedFiles.push(file());
       store.state.changedFiles.push(file('new'));
 
       store.dispatch('stageAllChanges')
         .then(() => {
-          expect(store.state.changedFiles.length).toBe(0);
+          expect(store.state.changedFiles.length).toBe(2);
+          store.state.changedFiles.forEach((f) => {
+            expect(f.staged).toBeTruthy();
+          });
 
           done();
         })
@@ -237,24 +240,35 @@ describe('Multi-file store actions', () => {
   });
 
   describe('unstageAllChanges', () => {
-    it('adds all files from stagedFiles to channgedFiles', (done) => {
-      const f = file();
+    let f;
+
+    beforeEach(() => {
+      f = {
+        ...file(),
+        type: 'blob',
+        staged: true,
+      };
+
+      store.state.changedFiles.push({
+        ...f,
+      });
+    });
+
+    it('sets staged to false in changedFiles when unstaging', (done) => {
       store.state.stagedFiles.push(f);
-      store.state.stagedFiles.push(file('new'));
 
       store.dispatch('unstageAllChanges')
         .then(() => {
           expect(store.state.stagedFiles.length).toBe(0);
-          expect(store.state.changedFiles[0]).toEqual(f);
+          expect(store.state.changedFiles[0].staged).toBeFalsy();
 
           done();
         })
         .catch(done.fail);
     });
 
-    it('removes all files from changedFiles after adding to stagedFiles', (done) => {
+    it('removes all files from stagedFiles after unstaging', (done) => {
       store.state.stagedFiles.push(file());
-      store.state.stagedFiles.push(file('new'));
 
       store.dispatch('unstageAllChanges')
         .then(() => {

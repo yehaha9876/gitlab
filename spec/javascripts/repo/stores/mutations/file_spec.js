@@ -172,14 +172,18 @@ describe('Multi-file store file mutations', () => {
       expect(localState.stagedFiles[0]).toEqual(f);
     });
 
-    it('removes file from changedFiles', () => {
-      const f = file();
+    it('updates changedFiles file to staged', () => {
+      const f = {
+        ...file(),
+        type: 'blob',
+        staged: false,
+      };
 
       localState.changedFiles.push(f);
 
       mutations.STAGE_CHANGE(localState, f);
 
-      expect(localState.changedFiles.length).not.toBe(1);
+      expect(localState.changedFiles[0].staged).toBeTruthy();
     });
 
     it('updates stagedFile if it is already staged', () => {
@@ -201,9 +205,14 @@ describe('Multi-file store file mutations', () => {
     let f;
 
     beforeEach(() => {
-      f = file();
+      f = {
+        ...file(),
+        type: 'blob',
+        staged: true,
+      };
 
       localState.stagedFiles.push(f);
+      localState.changedFiles.push(f);
     });
 
     it('removes from stagedFiles array', () => {
@@ -212,20 +221,10 @@ describe('Multi-file store file mutations', () => {
       expect(localState.stagedFiles.length).toBe(0);
     });
 
-    it('adds file back to changedFiles array', () => {
+    it('updates changedFiles array file to unstaged', () => {
       mutations.UNSTAGE_CHANGE(localState, f);
 
-      expect(localState.changedFiles.length).toBe(1);
-      expect(localState.changedFiles[0]).toEqual(f);
-    });
-
-    it('does not add file back to changedFiles array if it already exists', () => {
-      localState.changedFiles.push(f);
-
-      mutations.UNSTAGE_CHANGE(localState, f);
-
-      expect(localState.changedFiles.length).toBe(1);
-      expect(localState.changedFiles[0]).toEqual(f);
+      expect(localState.changedFiles[0].staged).toBeFalsy();
     });
   });
 });

@@ -301,8 +301,16 @@ describe('IDE commit module actions', () => {
           },
         },
       };
-      store.state.changedFiles.push(file('changed'));
-      store.state.changedFiles[0].active = true;
+
+      const f = {
+        ...file('changed'),
+        type: 'blob',
+        active: true,
+      };
+      store.state.stagedFiles.push(f);
+      store.state.changedFiles = [{
+        ...f,
+      }];
       store.state.openFiles = store.state.changedFiles;
 
       store.state.commit.commitAction = '2';
@@ -370,7 +378,7 @@ describe('IDE commit module actions', () => {
           }).catch(done.fail);
       });
 
-      it('adds commit data to changed files', (done) => {
+      it('adds commit data to files', (done) => {
         store.dispatch('commit/commitChanges')
           .then(() => {
             expect(store.state.openFiles[0].lastCommit.message).toBe('test message');
