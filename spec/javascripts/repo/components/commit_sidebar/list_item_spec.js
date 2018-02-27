@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import store from '~/ide/stores';
 import listItem from '~/ide/components/commit_sidebar/list_item.vue';
-import { createComponentWithStore } from '../../../helpers/vue_mount_component_helper';
+import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { file, resetStore } from '../../helpers';
 
 describe('Multi-file editor commit sidebar list item', () => {
