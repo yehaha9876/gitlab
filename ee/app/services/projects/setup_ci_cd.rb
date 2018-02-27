@@ -12,10 +12,11 @@ module Projects
 
     def update_project
       project.update_attributes!(
-        container_registry_enabled: false,
-        mirror:                     true,
-        mirror_trigger_builds:      true,
-        mirror_user_id:             current_user.id
+        container_registry_enabled:          false,
+        mirror:                              true,
+        mirror_trigger_builds:               true,
+        mirror_overwrites_diverged_branches: true,
+        mirror_user_id:                      current_user.id
       )
     end
 
