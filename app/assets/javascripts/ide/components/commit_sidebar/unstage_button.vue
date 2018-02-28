@@ -21,10 +21,14 @@
 </script>
 
 <template>
-  <div class="multi-file-discard-btn">
+  <div
+    v-once
+    class="multi-file-discard-btn"
+  >
     <button
       type="button"
       class="btn btn-blank"
+      :aria-label="__('Unstage change')"
       @click="unstageChange(file)"
     >
       <icon

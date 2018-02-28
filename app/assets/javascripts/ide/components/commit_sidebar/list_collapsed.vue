@@ -16,17 +16,17 @@
       },
     },
     computed: {
-      addedFiles() {
-        return this.files.filter(f => f.tempFile);
+      addedFilesLength() {
+        return this.files.filter(f => f.tempFile).length;
       },
-      modifiedFiles() {
-        return this.files.filter(f => !f.tempFile);
+      modifiedFilesLength() {
+        return this.files.filter(f => !f.tempFile).length;
       },
       addedFilesIconClass() {
-        return `${this.addedFiles.length ? 'multi-file-addition' : ''} append-bottom-10`;
+        return this.addedFiles ? 'multi-file-addition' : '';
       },
       modifiedFilesClass() {
-        return `${this.modifiedFiles.length ? 'multi-file-modified' : ''} prepend-top-10 append-bottom-10`;
+        return this.modifiedFiles ? 'multi-file-modified' : '';
       },
     },
   };
@@ -45,14 +45,14 @@
     <icon
       name="file-addition"
       :size="18"
-      :css-classes="addedFilesIconClass"
+      :css-classes="addedFilesIconClass + 'append-bottom-10'"
     />
-    {{ addedFiles.length }}
+    {{ addedFiles }}
     <icon
       name="file-modified"
       :size="18"
-      :css-classes="modifiedFilesClass"
+      :css-classes="modifiedFilesClass + ' prepend-top-10 append-bottom-10'"
     />
-    {{ modifiedFiles.length }}
+    {{ modifiedFiles }}
   </div>
 </template>

@@ -28,7 +28,6 @@
     computed: {
       ...mapState([
         'rightPanelCollapsed',
-        'changedFiles',
       ]),
       maxSize() {
         return window.innerWidth / 2;
@@ -42,18 +41,13 @@
     },
     methods: {
       ...mapActions([
-        'setPanelCollapsedStatus',
+        'toggleRightPanelCollapsed',
         'setResizingStatus',
       ]),
-      toggleCollapsed() {
-        this.setPanelCollapsedStatus({
-          side: 'right',
-          collapsed: !this.rightPanelCollapsed,
-        });
-      },
+
       toggleFullbarCollapsed() {
         if (this.rightPanelCollapsed) {
-          this.toggleCollapsed();
+          this.toggleRightPanelCollapsed();
         }
       },
       resizingStarted() {

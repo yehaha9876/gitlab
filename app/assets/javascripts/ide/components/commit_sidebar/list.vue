@@ -51,16 +51,10 @@
     },
     methods: {
       ...mapActions([
-        'setPanelCollapsedStatus',
+        'toggleRightPanelCollapsed',
         'stageAllChanges',
         'unstageAllChanges',
       ]),
-      toggleCollapsed() {
-        this.setPanelCollapsedStatus({
-          side: 'right',
-          collapsed: !this.rightPanelCollapsed,
-        });
-      },
       actionBtnClicked() {
         this[this.action]();
       },
@@ -82,11 +76,11 @@
       }"
     >
       <div
+        v-if="!rightPanelCollapsed"
         class="multi-file-commit-panel-header-title"
         :class="{
-          'append-right-10': showToggle
+          'append-right-10': showToggle,
         }"
-        v-if="!rightPanelCollapsed"
       >
         <icon
           v-once
@@ -106,7 +100,8 @@
         v-if="showToggle"
         type="button"
         class="btn btn-transparent multi-file-commit-panel-collapse-btn"
-        @click.stop="toggleCollapsed"
+        :aria-label="__('Toggle sidebar')"
+        @click.stop="toggleRightPanelCollapsed"
       >
         <icon
           :name="collapseButtonIcon"
@@ -138,7 +133,7 @@
         v-else
         class="multi-file-commit-list help-block"
       >
-        No changes
+        {{ __('No changes') }}
       </p>
     </template>
   </div>

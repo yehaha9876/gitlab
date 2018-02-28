@@ -72,33 +72,6 @@ describe('Multi-file store getters', () => {
     });
   });
 
-  describe('modifiedFiles', () => {
-    it('returns a list of modified files', () => {
-      localState.openFiles.push(file());
-      localState.changedFiles.push(file('changed'));
-      localState.changedFiles[0].changed = true;
-
-      const modifiedFiles = getters.modifiedFiles(localState);
-
-      expect(modifiedFiles.length).toBe(1);
-      expect(modifiedFiles[0].name).toBe('changed');
-    });
-  });
-
-  describe('addedFiles', () => {
-    it('returns a list of added files', () => {
-      localState.openFiles.push(file());
-      localState.changedFiles.push(file('added'));
-      localState.changedFiles[0].changed = true;
-      localState.changedFiles[0].tempFile = true;
-
-      const modifiedFiles = getters.addedFiles(localState);
-
-      expect(modifiedFiles.length).toBe(1);
-      expect(modifiedFiles[0].name).toBe('added');
-    });
-  });
-
   describe('collapseButtonIcon', () => {
     it('returns angle right when not collapsed', () => {
       expect(getters.collapseButtonIcon(localState)).toBe('angle-double-right');

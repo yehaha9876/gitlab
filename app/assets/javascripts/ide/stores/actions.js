@@ -44,6 +44,13 @@ export const setPanelCollapsedStatus = ({ commit }, { side, collapsed }) => {
   }
 };
 
+export const toggleRightPanelCollapsed = ({ dispatch, state }) => {
+  dispatch('setPanelCollapsedStatus', {
+    side: 'right',
+    collapsed: !state.rightPanelCollapsed,
+  });
+};
+
 export const setResizingStatus = ({ commit }, resizing) => {
   commit(types.SET_RESIZING_STATUS, resizing);
 };

@@ -33,10 +33,6 @@ export default {
   },
   computed: {
     ...mapState([
-      'currentProjectId',
-      'currentBranchId',
-      'rightPanelCollapsed',
-      'changedFiles',
       'stagedFiles',
     ]),
     ...mapState('commit', [
@@ -51,26 +47,14 @@ export default {
       'discardDraftButtonDisabled',
       'branchName',
     ]),
-    statusSvg() {
-      return this.lastCommitMsg ? this.committedStateSvgPath : this.noChangesStateSvgPath;
-    },
   },
   methods: {
-    ...mapActions([
-      'getTreeData',
-    ]),
     ...mapActions('commit', [
       'updateCommitMessage',
       'discardDraft',
       'commitChanges',
       'updateCommitAction',
     ]),
-    toggleCollapsed() {
-      this.setPanelCollapsedStatus({
-        side: 'right',
-        collapsed: !this.rightPanelCollapsed,
-      });
-    },
     forceCreateNewBranch() {
       return this.updateCommitAction(consts.COMMIT_TO_NEW_BRANCH)
         .then(() => this.commitChanges());
@@ -96,22 +80,22 @@ export default {
       </template>
     </modal>
     <template
-      v-if="changedFiles.length || stagedFiles.length"
+      v-if="unstagedFiles.length || stagedFiles.length"
     >
       <commit-files-list
         icon="unstaged"
-        title="Unstaged"
+        :title="__('Unstaged')"
         :file-list="unstagedFiles"
         action="stageAllChanges"
-        action-btn-text="Stage all"
+        :action-btn-text="__('Stage all')"
         item-action-component="stage-button"
       />
       <commit-files-list
         icon="staged"
-        title="Staged"
+        :title="__('Staged')"
         :file-list="stagedFiles"
         action="unstageAllChanges"
-        action-btn-text="Unstage all"
+        :action-btn-text="__('Unstage all')"
         item-action-component="unstage-button"
         :show-toggle="false"
       />

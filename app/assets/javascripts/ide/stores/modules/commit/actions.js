@@ -144,6 +144,7 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState }) =
     }
 
     commit(rootTypes.CLEAR_STAGED_CHANGES, null, { root: true });
+
     dispatch('discardDraft');
   })
   .catch((err) => {

@@ -30,7 +30,7 @@
     },
     methods: {
       ...mapActions([
-        'setPanelCollapsedStatus',
+        'toggleRightPanelCollapsed',
       ]),
     },
   };
@@ -49,10 +49,8 @@
       <button
         type="button"
         class="btn btn-transparent multi-file-commit-panel-collapse-btn"
-        @click.stop="setPanelCollapsedStatus({
-          side: 'right',
-          collapsed: !rightPanelCollapsed,
-        })"
+        :aria-label="__('Toggle sidebar')"
+        @click.stop="toggleRightPanelCollapsed"
       >
         <icon
           :name="collapseButtonIcon"
@@ -86,8 +84,7 @@
           <h4>
             {{ __('All changes are committed') }}
           </h4>
-          <p v-html="lastCommitMsg">
-          </p>
+          <p v-html="lastCommitMsg"></p>
         </div>
       </div>
     </div>

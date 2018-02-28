@@ -22,11 +22,15 @@
 </script>
 
 <template>
-  <div class="multi-file-discard-btn">
+  <div
+    v-once
+    class="multi-file-discard-btn"
+  >
     <button
       type="button"
       class="btn btn-blank append-right-5"
-      @click="stageChange(file)"
+      :aria-label="__('Stage change')"
+      @click.stop="stageChange(file)"
     >
       <icon
         name="mobile-issue-close"
@@ -36,7 +40,8 @@
     <button
       type="button"
       class="btn btn-blank"
-      @click="discardFileChanges(file)"
+      :aria-label="__('Discard change')"
+      @click.stop="discardFileChanges(file)"
     >
       <icon
         name="remove"
