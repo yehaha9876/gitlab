@@ -16,6 +16,7 @@ module Projects
         mirror:                              true,
         mirror_trigger_builds:               true,
         mirror_overwrites_diverged_branches: true,
+        only_mirror_protected_branches:      false,
         mirror_user_id:                      current_user.id
       )
     end
@@ -35,7 +36,8 @@ module Projects
         'web',
         {
           url: web_hook_url,
-          content_type: 'json'
+          content_type: 'json',
+          secret: token
         },
         {
           events: ['push'],
@@ -44,12 +46,16 @@ module Projects
       )
     end
 
-    def pipeline_trigger
-      @pipeline_trigger ||= project.triggers.create(description: 'Webhook', owner: current_user)
+    def web_hook_url
+      "#{Settings.gitlab.url}/api/v4/projects/#{project.id}/mirror/pull"
     end
 
-    def web_hook_url
-      "#{builds_trigger_url(project.id)}?token=#{pipeline_trigger.token}"
+    def token
+      if project.external_webhook_token.blank?
+        project.update_column(:external_webhook_token, Devise.friendly_token)
+      end
+
+      project.external_webhook_token
     end
 
     def client
