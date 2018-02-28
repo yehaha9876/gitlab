@@ -31,40 +31,7 @@ module Projects
     end
 
     def create_webhook
-      client.create_hook(
-        project.import_source,
-        'web',
-        {
-          url: web_hook_url,
-          content_type: 'json',
-          secret: token
-        },
-        {
-          events: ['push'],
-          active: true
-        }
-      )
-    end
-
-    def web_hook_url
-      "#{Settings.gitlab.url}/api/v4/projects/#{project.id}/mirror/pull"
-    end
-
-    def token
-      if project.external_webhook_token.blank?
-        project.update_column(:external_webhook_token, Devise.friendly_token)
-      end
-
-      project.external_webhook_token
-    end
-
-    def client
-      access_token = project.import_data.credentials[:user]
-
-      case project.import_type
-      when 'github'
-        Gitlab::LegacyGithubImport::Client.new(access_token)
-      end
+      CreateExternalWebhookWorker.perform_async(project.id)
     end
   end
 end
