@@ -24,7 +24,7 @@ export default function importU2FLibrary() {
   if (window.u2f) {
     return Promise.resolve(window.u2f);
   }
-  if (canInjectU2fApi()) {
+  if (canInjectU2fApi() || (gon && gon.test_env)) {
     return import(/* webpackMode: "eager" */ 'vendor/u2f').then(() => window.u2f);
   }
   return Promise.reject();
