@@ -12,7 +12,7 @@ module Gitlab
         @type = type
       end
 
-      def execute(extra_attrs)
+      def execute(extra_attrs = {})
         attrs = {
           name: name,
           path: name,

@@ -36,6 +36,12 @@ describe Projects::CreateService, '#execute' do
       expect(project_feature.wiki_access_level).to eq(ProjectFeature::DISABLED)
       expect(project_feature.snippets_access_level).to eq(ProjectFeature::DISABLED)
     end
+
+    it 'flags the project as ci_cd_only' do
+      project = create_project(user, opts)
+
+      expect(project.ci_cd_only).to eq(true)
+    end
   end
 
   context 'repository_size_limit assignment as Bytes' do
