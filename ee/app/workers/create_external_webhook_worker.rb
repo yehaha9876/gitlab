@@ -31,8 +31,7 @@ class CreateExternalWebhookWorker
   end
 
   def web_hook_url
-    #"#{Settings.gitlab.url}/api/v4/projects/#{project.id}/mirror/pull"
-    "https://gl-local.ngrok.io/api/v4/projects/#{project.id}/mirror/pull"
+    "#{Settings.gitlab.url}/api/v4/projects/#{project.id}/mirror/pull"
   end
 
   def token

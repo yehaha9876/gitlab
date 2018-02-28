@@ -6,7 +6,7 @@ module API
     include Helpers::CustomAttributes
 
     before do
-      authenticate_from_github_webhook! if current_endpoint?(:post, %r{/mirror/pull\z}/)
+      authenticate_from_github_webhook! if current_endpoint?(:post, %r{/mirror/pull\z})
       authenticate_non_get!
     end
 
