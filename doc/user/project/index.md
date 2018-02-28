@@ -115,6 +115,13 @@ Read through the documentation on [project settings](settings/index.md).
 - [Export a project from GitLab](settings/import_export.md#exporting-a-project-and-its-data)
 - [Importing and exporting projects between GitLab instances](settings/import_export.md)
 
+## CI/CD only project
+
+Instead of importing a repository directly to GitLab, you can connect your repository
+as a CI/CD-only project.
+
+Read through the documentation on [CI/CD only projects](ci_cd_only_projects.md).
+
 ## Project's members
 
 Learn how to [add members to your projects](members/index.md).

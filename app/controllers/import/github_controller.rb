@@ -7,10 +7,12 @@ class Import::GithubController < Import::BaseController
   rescue_from Octokit::Unauthorized, with: :provider_unauthorized
 
   def new
+    @ci_cd_only = params[:ci_cd_only]
+
     if logged_in_with_provider?
       go_to_provider_for_permissions
     elsif session[access_token_key]
-      redirect_to status_import_url
+      redirect_to status_import_url(ci_cd_only: @ci_cd_only)
     end
   end
 
@@ -20,11 +22,14 @@ class Import::GithubController < Import::BaseController
   end
 
   def personal_access_token
+    @ci_cd_only = params[:ci_cd_only]
+
     session[access_token_key] = params[:personal_access_token]
-    redirect_to status_import_url
+    redirect_to status_import_url(ci_cd_only: @ci_cd_only)
   end
 
   def status
+    @ci_cd_only = params[:ci_cd_only]
     @repos = client.repos
     @already_added_projects = current_user.created_projects.where(import_type: provider)
     already_added_projects_names = @already_added_projects.pluck(:import_source)
@@ -76,12 +81,12 @@ class Import::GithubController < Import::BaseController
     __send__("#{provider}_import_enabled?") # rubocop:disable GitlabSecurity/PublicSend
   end
 
-  def new_import_url
-    public_send("new_import_#{provider}_url") # rubocop:disable GitlabSecurity/PublicSend
+  def new_import_url(*params)
+    public_send("new_import_#{provider}_url", *params) # rubocop:disable GitlabSecurity/PublicSend
   end
 
-  def status_import_url
-    public_send("status_import_#{provider}_url") # rubocop:disable GitlabSecurity/PublicSend
+  def status_import_url(*params)
+    public_send("status_import_#{provider}_url", *params) # rubocop:disable GitlabSecurity/PublicSend
   end
 
   def callback_import_url
@@ -90,7 +95,7 @@ class Import::GithubController < Import::BaseController
 
   def provider_unauthorized
     session[access_token_key] = nil
-    redirect_to new_import_url,
+    redirect_to new_import_url(ci_cd_only: @ci_cd_only),
       alert: "Access denied to your #{Gitlab::ImportSources.title(provider.to_s)} account."
   end
 
