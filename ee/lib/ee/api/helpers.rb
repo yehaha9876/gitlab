@@ -31,7 +31,7 @@ module EE
         return if project.external_webhook_token.blank?
 
         if valid_github_signature?(project.external_webhook_token)
-          @current_user = project.creator
+          @current_user = project.creator # rubocop:disable Gitlab/ModuleWithInstanceVariables
         else
           unauthorized!
         end
