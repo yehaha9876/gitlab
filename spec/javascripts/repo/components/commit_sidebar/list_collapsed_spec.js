@@ -32,17 +32,15 @@ describe('Multi-file editor commit sidebar list collapsed', () => {
     expect(vm.$el.textContent.replace(/\s+/g, ' ').trim()).toBe('1 1');
   });
 
-  describe('addedFiles', () => {
-    it('returns an array of temp files', () => {
-      expect(vm.addedFiles.length).toBe(1);
-      expect(vm.addedFiles[0].name).toBe('file1');
+  describe('addedFilesLength', () => {
+    it('returns an length of temp files', () => {
+      expect(vm.addedFilesLength).toBe(1);
     });
   });
 
-  describe('modifiedFiles', () => {
-    it('returns an array of modified files', () => {
-      expect(vm.modifiedFiles.length).toBe(1);
-      expect(vm.modifiedFiles[0].name).toBe('file2');
+  describe('modifiedFilesLength', () => {
+    it('returns an length of modified files', () => {
+      expect(vm.modifiedFilesLength).toBe(1);
     });
   });
 
