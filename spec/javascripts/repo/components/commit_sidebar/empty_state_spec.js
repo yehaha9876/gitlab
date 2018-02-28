@@ -58,11 +58,11 @@ describe('IDE commit panel empty state', () => {
 
   describe('toggle button', () => {
     it('calls store action', () => {
-      spyOn(vm, 'rightPanelCollapsed');
+      spyOn(vm, 'toggleRightPanelCollapsed');
 
       vm.$el.querySelector('.multi-file-commit-panel-collapse-btn').click();
 
-      expect(vm.rightPanelCollapsed).toHaveBeenCalledWith();
+      expect(vm.toggleRightPanelCollapsed).toHaveBeenCalled();
     });
 
     it('renders collapsed class', (done) => {

@@ -35,25 +35,19 @@ describe('Multi-file editor right context bar', () => {
     });
 
     it('clicking sidebar collapses the bar', () => {
-      spyOn(vm, 'setPanelCollapsedStatus').and.returnValue(Promise.resolve());
+      spyOn(vm, 'toggleRightPanelCollapsed').and.returnValue(Promise.resolve());
 
       vm.$el.click();
 
-      expect(vm.setPanelCollapsedStatus).toHaveBeenCalledWith({
-        side: 'right',
-        collapsed: false,
-      });
+      expect(vm.toggleRightPanelCollapsed).toHaveBeenCalled();
     });
   });
 
   it('when expanded clicking the main sidebar is not collapsing the bar', () => {
-    spyOn(vm, 'setPanelCollapsedStatus').and.returnValue(Promise.resolve());
+    spyOn(vm, 'toggleRightPanelCollapsed').and.returnValue(Promise.resolve());
 
     vm.$el.click();
 
-    expect(vm.setPanelCollapsedStatus).not.toHaveBeenCalledWith({
-      side: 'right',
-      collapsed: false,
-    });
+    expect(vm.toggleRightPanelCollapsed).not.toHaveBeenCalled();
   });
 });

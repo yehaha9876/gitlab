@@ -47,12 +47,12 @@
       :size="18"
       :css-classes="addedFilesIconClass + 'append-bottom-10'"
     />
-    {{ addedFiles }}
+    {{ addedFilesLength }}
     <icon
       name="file-modified"
       :size="18"
       :css-classes="modifiedFilesClass + ' prepend-top-10 append-bottom-10'"
     />
-    {{ modifiedFiles }}
+    {{ modifiedFilesLength }}
   </div>
 </template>

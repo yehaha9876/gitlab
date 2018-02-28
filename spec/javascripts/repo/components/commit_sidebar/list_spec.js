@@ -65,7 +65,7 @@ describe('Multi-file editor commit sidebar list', () => {
 
   describe('with toggle', () => {
     beforeEach((done) => {
-      spyOn(vm, 'setPanelCollapsedStatus');
+      spyOn(vm, 'toggleRightPanelCollapsed');
 
       vm.showToggle = true;
 
@@ -75,10 +75,7 @@ describe('Multi-file editor commit sidebar list', () => {
     it('calls setPanelCollapsedStatus when clickin toggle', () => {
       vm.$el.querySelector('.multi-file-commit-panel-collapse-btn').click();
 
-      expect(vm.setPanelCollapsedStatus).toHaveBeenCalledWith({
-        side: 'right',
-        collapsed: true,
-      });
+      expect(vm.toggleRightPanelCollapsed).toHaveBeenCalled();
     });
   });
 
