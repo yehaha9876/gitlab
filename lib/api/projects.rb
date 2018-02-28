@@ -5,10 +5,7 @@ module API
     include PaginationParams
     include Helpers::CustomAttributes
 
-    before do
-      authenticate_from_github_webhook! if current_endpoint?(:post, %r{/mirror/pull\z})
-      authenticate_non_get!
-    end
+    before { authenticate_non_get! }
 
     helpers do
       params :optional_params_ce do

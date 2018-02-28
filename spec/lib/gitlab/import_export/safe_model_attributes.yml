@@ -475,7 +475,6 @@ Project:
 - jobs_cache_index
 - external_authorization_classification_label
 - ci_cd_only
-- external_webhook_token
 Author:
 - name
 ProjectFeature:

@@ -5,7 +5,6 @@ module Projects
     def execute
       update_project
       disable_project_features
-      create_webhook
     end
 
     private
@@ -28,10 +27,6 @@ module Projects
         wiki_access_level:           ProjectFeature::DISABLED,
         snippets_access_level:       ProjectFeature::DISABLED
       )
-    end
-
-    def create_webhook
-      CreateExternalWebhookWorker.perform_async(project.id)
     end
   end
 end
