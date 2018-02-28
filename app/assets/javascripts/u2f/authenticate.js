@@ -1,5 +1,3 @@
-/* eslint-disable func-names, wrap-iife */
-/* global u2f */
 import _ from 'underscore';
 import importU2FLibrary from './util';
 import U2FError from './error';
@@ -10,6 +8,7 @@ import U2FError from './error';
 // State Flow #2: setup -> in_progress -> error -> setup
 export default class U2FAuthenticate {
   constructor(container, form, u2fParams, fallbackButton, fallbackUI) {
+    this.u2fUtils = null;
     this.container = container;
     this.renderNotSupported = this.renderNotSupported.bind(this);
     this.renderAuthenticated = this.renderAuthenticated.bind(this);
@@ -51,20 +50,22 @@ export default class U2FAuthenticate {
 
   start() {
     return importU2FLibrary()
-      .then(() => this.renderInProgress())
+      .then((utils) => {
+        this.u2fUtils = utils;
+        this.renderInProgress();
+      })
       .catch(() => this.renderNotSupported());
   }
 
   authenticate() {
-    return u2f.sign(this.appId, this.challenge, this.signRequests, (function (_this) {
-      return function (response) {
+    return this.u2fUtils.sign(this.appId, this.challenge, this.signRequests,
+      (response) => {
         if (response.errorCode) {
           const error = new U2FError(response.errorCode, 'authenticate');
-          return _this.renderError(error);
+          return this.renderError(error);
         }
-        return _this.renderAuthenticated(JSON.stringify(response));
-      };
-    })(this), 10);
+        return this.renderAuthenticated(JSON.stringify(response));
+      }, 10);
   }
 
   renderTemplate(name, params) {
