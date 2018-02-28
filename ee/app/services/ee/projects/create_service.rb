@@ -40,7 +40,7 @@ module EE
         super
 
         create_predefined_push_rule
-        setup_ci_cd_project if project.ci_cd_only?
+        setup_ci_cd_project
 
         project.group&.refresh_members_authorized_projects
       end
@@ -57,6 +57,9 @@ module EE
       end
 
       def setup_ci_cd_project
+        return unless project.ci_cd_only?
+        return unless ::License.feature_available?(:ci_cd_projects)
+
         ::Projects::SetupCiCd.new(project, current_user).execute
       end
 

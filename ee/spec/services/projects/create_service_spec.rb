@@ -17,30 +17,28 @@ describe Projects::CreateService, '#execute' do
       )
     end
 
-    it 'setup pull mirroring on the project' do
-      project = create_project(user, opts)
+    context 'when CI/CD projects feature is available' do
+      before do
+        stub_licensed_features(ci_cd_projects: true)
+      end
 
-      expect(project.mirror).to be_truthy
-      expect(project.mirror_trigger_builds).to be_truthy
-      expect(project.mirror_user_id).to eq(user.id)
+      it 'calls the service to setup CI/CD on the project' do
+        expect(Projects::SetupCiCd).to receive_message_chain(:new, :execute)
+
+        create_project(user, opts)
+      end
     end
 
-    it 'disable some features' do
-      project = create_project(user, opts)
-      project_feature = project.project_feature
+    context 'when CI/CD projects feature is not available' do
+      before do
+        stub_licensed_features(ci_cd_projects: false)
+      end
 
-      expect(project.container_registry_enabled).to be_falsey
+      it "doesn't call the service to setup CI/CD on the project" do
+        expect(Projects::SetupCiCd).not_to receive(:new)
 
-      expect(project_feature.issues_access_level).to eq(ProjectFeature::DISABLED)
-      expect(project_feature.merge_requests_access_level).to eq(ProjectFeature::DISABLED)
-      expect(project_feature.wiki_access_level).to eq(ProjectFeature::DISABLED)
-      expect(project_feature.snippets_access_level).to eq(ProjectFeature::DISABLED)
-    end
-
-    it 'flags the project as ci_cd_only' do
-      project = create_project(user, opts)
-
-      expect(project.ci_cd_only).to eq(true)
+        create_project(user, opts)
+      end
     end
   end
 
