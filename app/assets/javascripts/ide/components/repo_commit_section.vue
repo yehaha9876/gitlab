@@ -34,6 +34,7 @@ export default {
   computed: {
     ...mapState([
       'stagedFiles',
+      'rightPanelCollapsed',
     ]),
     ...mapState('commit', [
       'commitMessage',

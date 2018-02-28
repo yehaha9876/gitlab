@@ -23,10 +23,10 @@
         return this.files.filter(f => !f.tempFile).length;
       },
       addedFilesIconClass() {
-        return this.addedFiles ? 'multi-file-addition' : '';
+        return this.addedFilesLength ? 'multi-file-addition' : '';
       },
       modifiedFilesClass() {
-        return this.modifiedFiles ? 'multi-file-modified' : '';
+        return this.modifiedFilesLength ? 'multi-file-modified' : '';
       },
     },
   };
