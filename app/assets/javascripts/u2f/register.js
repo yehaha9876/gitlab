@@ -2,7 +2,7 @@
 /* global u2f */
 
 import _ from 'underscore';
-import isU2FSupported from './util';
+import importU2FLibrary from './util';
 import U2FError from './error';
 
 // Register U2F (universal 2nd factor) devices for users to authenticate with.
@@ -34,10 +34,9 @@ export default class U2FRegister {
   }
 
   start() {
-    if (isU2FSupported()) {
-      return this.renderSetup();
-    }
-    return this.renderNotSupported();
+    return importU2FLibrary()
+      .then(() => this.renderSetup())
+      .catch(() => this.renderNotSupported());
   }
 
   register() {
