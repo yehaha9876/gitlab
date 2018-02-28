@@ -18,7 +18,7 @@ class Import::GithubController < Import::BaseController
 
   def callback
     session[access_token_key] = client.get_token(params[:code])
-    redirect_to status_import_url
+    redirect_to status_import_url(ci_cd_only: params[:ci_cd_only])
   end
 
   def personal_access_token
@@ -74,7 +74,7 @@ class Import::GithubController < Import::BaseController
   end
 
   def go_to_provider_for_permissions
-    redirect_to client.authorize_url(callback_import_url)
+    redirect_to client.authorize_url("#{callback_import_url}?ci_cd_only=true")
   end
 
   def import_enabled?
