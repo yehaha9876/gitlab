@@ -1926,7 +1926,6 @@ ActiveRecord::Schema.define(version: 20180222043024) do
     t.integer "jobs_cache_index"
     t.boolean "mirror_overwrites_diverged_branches"
     t.string "external_authorization_classification_label"
-    t.boolean "ci_cd_only"
   end
 
   add_index "projects", ["ci_id"], name: "index_projects_on_ci_id", using: :btree

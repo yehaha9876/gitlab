@@ -22,6 +22,8 @@ module EE
       after_update :remove_mirror_repository_reference,
         if: ->(project) { project.mirror? && project.import_url_updated? }
 
+      attr_accessor :ci_cd_only
+
       belongs_to :mirror_user, foreign_key: 'mirror_user_id', class_name: 'User'
 
       has_one :mirror_data, autosave: true, class_name: 'ProjectMirrorData'

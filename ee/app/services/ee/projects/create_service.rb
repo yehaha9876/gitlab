@@ -57,7 +57,7 @@ module EE
       end
 
       def setup_ci_cd_project
-        return unless project.ci_cd_only?
+        return unless project.ci_cd_only
         return unless ::License.feature_available?(:ci_cd_projects)
 
         ::Projects::SetupCiCd.new(project, current_user).execute
