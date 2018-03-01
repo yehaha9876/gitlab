@@ -158,7 +158,7 @@ class Settings < Settingslogic
 end
 
 # Default settings
-Settings.set_default('ldap', Settingslogic.new({}))
+Settings.set_default('ldap', {})
 Settings.ldap.set_default('enabled', false)
 Settings.ldap.set_default('sync_time', 3600)
 Settings.ldap.set_default('schedule_sync_daily', 1)
@@ -171,7 +171,7 @@ if Settings.ldap['enabled'] || Rails.env.test?
     # We detected old LDAP configuration syntax. Update the config to make it
     # look like it was entered with the new syntax.
     server = Settings.ldap.except('sync_time')
-    Settings.ldap['servers'] = Settingslogic.new('main' => server)
+    Settings.ldap['servers'] = { 'main' => server }
   end
 
   Settings.ldap.servers.each_key do |key|
@@ -204,7 +204,7 @@ if Settings.ldap['enabled'] || Rails.env.test?
   end
 end
 
-Settings.set_default('omniauth', Settingslogic.new({}))
+Settings.set_default('omniauth', {})
 Settings.omniauth.set_default('enabled', false)
 Settings.omniauth.set_default('auto_sign_in_with_provider', false)
 Settings.omniauth.set_default('allow_single_sign_on', false)
@@ -228,9 +228,9 @@ if Settings.omniauth['sync_email_from_provider']
 end
 
 Settings.omniauth.set_default('providers', [])
-Settings.omniauth.set_default('cas3', Settingslogic.new({}))
+Settings.omniauth.set_default('cas3', {})
 Settings.omniauth.cas3.set_default('session_duration', 8.hours)
-Settings.omniauth.set_default('session_tickets', Settingslogic.new({}))
+Settings.omniauth.set_default('session_tickets', {})
 Settings.omniauth.session_tickets['cas3'] = 'ticket'
 
 # Fill out omniauth-gitlab settings. It is needed for easy set up GHE or GH by just specifying url.
@@ -245,7 +245,7 @@ if github_settings
     github_settings['url'] = github_default_url
   end
 
-  github_settings.set_default('args', Settingslogic.new({}))
+  github_settings.set_default('args', {})
 
   github_settings["args"]["client_options"] =
     if github_settings["url"].include?(github_default_url)
@@ -259,7 +259,7 @@ if github_settings
     end
 end
 
-Settings.set_default('shared', Settingslogic.new({}))
+Settings.set_default('shared', {})
 Settings.shared['path'] = Settings.absolute(Settings.shared['path'] || "shared")
 
 Settings.set_default('issues_tracker', {})
@@ -267,7 +267,7 @@ Settings.set_default('issues_tracker', {})
 #
 # GitLab
 #
-Settings.set_default('gitlab', Settingslogic.new({}))
+Settings.set_default('gitlab', {})
 Settings.gitlab.set_default('default_project_creation', ::EE::Gitlab::Access::DEVELOPER_MASTER_PROJECT_ACCESS)
 Settings.gitlab.set_default('default_projects_limit', 100000)
 Settings.gitlab.set_default('default_branch_protection', 2)
@@ -321,14 +321,14 @@ Settings.gitlab.set_default('usage_ping_enabled', true)
 #
 # Elasticseacrh
 #
-Settings.set_default('elasticsearch', Settingslogic.new({}))
+Settings.set_default('elasticsearch', {})
 Settings.elasticsearch.set_default('enabled', false)
 Settings.elasticsearch['url'] = ENV['ELASTIC_URL'] || 'http://localhost:9200'
 
 #
 # CI
 #
-Settings.set_default('gitlab_ci', Settingslogic.new({}))
+Settings.set_default('gitlab_ci', {})
 Settings.gitlab_ci.set_default('shared_runners_enabled', true)
 Settings.gitlab_ci.set_default('all_broken_builds', true)
 Settings.gitlab_ci.set_default('add_pusher', false)
@@ -338,19 +338,19 @@ Settings.gitlab_ci.set_default('url', Settings.__send__(:build_gitlab_ci_url))
 #
 # Reply by email
 #
-Settings.set_default('incoming_email', Settingslogic.new({}))
+Settings.set_default('incoming_email', {})
 Settings.incoming_email.set_default('enabled', false)
 
 #
 # Build Artifacts
 #
-Settings.set_default('artifacts', Settingslogic.new({}))
+Settings.set_default('artifacts', {})
 Settings.artifacts.set_default('enabled', true)
 Settings.artifacts['storage_path'] = Settings.absolute(Settings.artifacts.values_at('path', 'storage_path').compact.first || File.join(Settings.shared['path'], 'artifacts'))
 # Settings.artifact['path'] is deprecated, use `storage_path` instead
 Settings.artifacts['path'] = Settings.artifacts['storage_path']
 Settings.artifacts.set_default('max_size', 100) # in megabytes
-Settings.artifacts.set_default('object_store', Settingslogic.new({}))
+Settings.artifacts.set_default('object_store', {})
 Settings.artifacts.object_store.set_default('enabled', false)
 Settings.artifacts.object_store.set_default('remote_directory', nil)
 Settings.artifacts.object_store.set_default('background_upload', true)
@@ -360,7 +360,7 @@ Settings.artifacts.object_store['connection']&.deep_stringify_keys!
 #
 # Registry
 #
-Settings.set_default('registry', Settingslogic.new({}))
+Settings.set_default('registry', {})
 Settings.registry.set_default('enabled', false)
 Settings.registry.set_default('host', 'example.com')
 Settings.registry.set_default('port', nil)
@@ -373,7 +373,7 @@ Settings.registry['path'] = Settings.absolute(Settings.registry['path'] || File.
 #
 # Pages
 #
-Settings.set_default('pages', Settingslogic.new({}))
+Settings.set_default('pages', {})
 Settings.pages.set_default('enabled', false)
 Settings.pages['path'] = Settings.absolute(Settings.pages['path'] || File.join(Settings.shared['path'], 'pages'))
 Settings.pages.set_default('https', false)
@@ -393,10 +393,10 @@ Settings.gitlab.set_default('geo_status_timeout', 10)
 #
 # Git LFS
 #
-Settings.set_default('lfs', Settingslogic.new({}))
+Settings.set_default('lfs', {})
 Settings.lfs.set_default('enabled', true)
 Settings.lfs['storage_path'] = Settings.absolute(Settings.lfs['storage_path'] || File.join(Settings.shared['path'], 'lfs-objects'))
-Settings.lfs.set_default('object_store', Settingslogic.new({}))
+Settings.lfs.set_default('object_store', {})
 Settings.lfs.object_store.set_default('enabled', false)
 Settings.lfs.object_store.set_default('remote_directory', nil)
 Settings.lfs.object_store.set_default('background_upload', true)
@@ -406,10 +406,10 @@ Settings.lfs.object_store['connection']&.deep_stringify_keys!
 #
 # Uploads
 #
-Settings.set_default('uploads', Settingslogic.new({}))
+Settings.set_default('uploads', {})
 Settings.uploads['storage_path'] = Settings.absolute(Settings.uploads['storage_path'] || 'public')
 Settings.uploads['base_dir'] = Settings.uploads['base_dir'] || 'uploads/-/system'
-Settings.uploads.set_default('object_store', Settingslogic.new({}))
+Settings.uploads.set_default('object_store', {})
 Settings.uploads.object_store.set_default('enabled', false)
 Settings.uploads.object_store.set_default('remote_directory', 'uploads')
 Settings.uploads.object_store.set_default('background_upload', true)
@@ -419,14 +419,14 @@ Settings.uploads.object_store['connection']&.deep_stringify_keys!
 #
 # Mattermost
 #
-Settings.set_default('mattermost', Settingslogic.new({}))
+Settings.set_default('mattermost', {})
 Settings.mattermost.set_default('enabled', false)
 Settings.mattermost['host'] = nil unless Settings.mattermost.enabled
 
 #
 # Gravatar
 #
-Settings.set_default('gravatar', Settingslogic.new({}))
+Settings.set_default('gravatar', {})
 Settings.gravatar.set_default('enabled', true)
 Settings.gravatar.set_default('plain_url', 'https://www.gravatar.com/avatar/%{hash}?s=%{size}&d=identicon')
 Settings.gravatar.set_default('ssl_url', 'https://secure.gravatar.com/avatar/%{hash}?s=%{size}&d=identicon')
@@ -435,99 +435,99 @@ Settings.gravatar['host'] = Settings.host_without_www(Settings.gravatar['plain_u
 #
 # Cron Jobs
 #
-Settings.set_default('cron_jobs', Settingslogic.new({}))
-Settings.cron_jobs.set_default('stuck_ci_jobs_worker', Settingslogic.new({}))
+Settings.set_default('cron_jobs', {})
+Settings.cron_jobs.set_default('stuck_ci_jobs_worker', {})
 Settings.cron_jobs.stuck_ci_jobs_worker.set_default('cron', '0 * * * *')
 Settings.cron_jobs.stuck_ci_jobs_worker['job_class'] = 'StuckCiJobsWorker'
-Settings.cron_jobs.set_default('pipeline_schedule_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('pipeline_schedule_worker', {})
 Settings.cron_jobs.pipeline_schedule_worker.set_default('cron', '19 * * * *')
 Settings.cron_jobs.pipeline_schedule_worker['job_class'] = 'PipelineScheduleWorker'
-Settings.cron_jobs.set_default('expire_build_artifacts_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('expire_build_artifacts_worker', {})
 Settings.cron_jobs.expire_build_artifacts_worker.set_default('cron', '50 * * * *')
 Settings.cron_jobs.expire_build_artifacts_worker['job_class'] = 'ExpireBuildArtifactsWorker'
-Settings.cron_jobs.set_default('repository_check_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('repository_check_worker', {})
 Settings.cron_jobs.repository_check_worker.set_default('cron', '20 * * * *')
 Settings.cron_jobs.repository_check_worker['job_class'] = 'RepositoryCheck::BatchWorker'
-Settings.cron_jobs.set_default('admin_email_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('admin_email_worker', {})
 Settings.cron_jobs.admin_email_worker.set_default('cron', '0 0 * * 0')
 Settings.cron_jobs.admin_email_worker['job_class'] = 'AdminEmailWorker'
-Settings.cron_jobs.set_default('repository_archive_cache_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('repository_archive_cache_worker', {})
 Settings.cron_jobs.repository_archive_cache_worker.set_default('cron', '0 * * * *')
 Settings.cron_jobs.repository_archive_cache_worker['job_class'] = 'RepositoryArchiveCacheWorker'
-Settings.cron_jobs.set_default('historical_data_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('historical_data_worker', {})
 Settings.cron_jobs.historical_data_worker.set_default('cron', '0 12 * * *')
 Settings.cron_jobs.historical_data_worker['job_class'] = 'HistoricalDataWorker'
-Settings.cron_jobs.set_default('ldap_sync_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('ldap_sync_worker', {})
 Settings.cron_jobs.ldap_sync_worker.set_default('cron', '30 1 * * *')
 Settings.cron_jobs.ldap_sync_worker['job_class'] = 'LdapSyncWorker'
-Settings.cron_jobs.set_default('ldap_group_sync_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('ldap_group_sync_worker', {})
 Settings.cron_jobs.ldap_group_sync_worker.set_default('cron', '0 * * * *')
 Settings.cron_jobs.ldap_group_sync_worker['job_class'] = 'LdapAllGroupsSyncWorker'
-Settings.cron_jobs.set_default('geo_metrics_update_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('geo_metrics_update_worker', {})
 Settings.cron_jobs.geo_metrics_update_worker.set_default('cron', '*/1 * * * *')
 Settings.cron_jobs.geo_metrics_update_worker.set_default('job_class', 'Geo::MetricsUpdateWorker')
-Settings.cron_jobs.set_default('geo_repository_sync_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('geo_repository_sync_worker', {})
 Settings.cron_jobs.geo_repository_sync_worker.set_default('cron', '*/1 * * * *')
 Settings.cron_jobs.geo_repository_sync_worker.set_default('job_class', 'Geo::RepositorySyncWorker')
-Settings.cron_jobs.set_default('geo_file_download_dispatch_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('geo_file_download_dispatch_worker', {})
 Settings.cron_jobs.geo_file_download_dispatch_worker.set_default('cron', '*/1 * * * *')
 Settings.cron_jobs.geo_file_download_dispatch_worker.set_default('job_class', 'Geo::FileDownloadDispatchWorker')
-Settings.cron_jobs.set_default('geo_prune_event_log_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('geo_prune_event_log_worker', {})
 Settings.cron_jobs.geo_prune_event_log_worker.set_default('cron', '0 */6 * * *')
 Settings.cron_jobs.geo_prune_event_log_worker.set_default('job_class', 'Geo::PruneEventLogWorker')
-Settings.cron_jobs.set_default('import_export_project_cleanup_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('import_export_project_cleanup_worker', {})
 Settings.cron_jobs.import_export_project_cleanup_worker.set_default('cron', '0 * * * *')
 Settings.cron_jobs.import_export_project_cleanup_worker['job_class'] = 'ImportExportProjectCleanupWorker'
-Settings.cron_jobs.set_default('requests_profiles_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('requests_profiles_worker', {})
 Settings.cron_jobs.requests_profiles_worker.set_default('cron', '0 0 * * *')
 Settings.cron_jobs.requests_profiles_worker['job_class'] = 'RequestsProfilesWorker'
-Settings.cron_jobs.set_default('remove_expired_members_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('remove_expired_members_worker', {})
 Settings.cron_jobs.remove_expired_members_worker.set_default('cron', '10 0 * * *')
 Settings.cron_jobs.remove_expired_members_worker['job_class'] = 'RemoveExpiredMembersWorker'
-Settings.cron_jobs.set_default('remove_expired_group_links_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('remove_expired_group_links_worker', {})
 Settings.cron_jobs.remove_expired_group_links_worker.set_default('cron', '10 0 * * *')
 Settings.cron_jobs.remove_expired_group_links_worker['job_class'] = 'RemoveExpiredGroupLinksWorker'
-Settings.cron_jobs.set_default('prune_old_events_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('prune_old_events_worker', {})
 Settings.cron_jobs.prune_old_events_worker.set_default('cron', '0 */6 * * *')
 Settings.cron_jobs.prune_old_events_worker['job_class'] = 'PruneOldEventsWorker'
 
-Settings.cron_jobs.set_default('trending_projects_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('trending_projects_worker', {})
 Settings.cron_jobs.trending_projects_worker['cron'] = '0 1 * * *'
 Settings.cron_jobs.trending_projects_worker['job_class'] = 'TrendingProjectsWorker'
-Settings.cron_jobs.set_default('remove_unreferenced_lfs_objects_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('remove_unreferenced_lfs_objects_worker', {})
 Settings.cron_jobs.remove_unreferenced_lfs_objects_worker.set_default('cron', '20 0 * * *')
 Settings.cron_jobs.remove_unreferenced_lfs_objects_worker['job_class'] = 'RemoveUnreferencedLfsObjectsWorker'
-Settings.cron_jobs.set_default('stuck_import_jobs_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('stuck_import_jobs_worker', {})
 Settings.cron_jobs.stuck_import_jobs_worker.set_default('cron', '15 * * * *')
 Settings.cron_jobs.stuck_import_jobs_worker['job_class'] = 'StuckImportJobsWorker'
-Settings.cron_jobs.set_default('gitlab_usage_ping_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('gitlab_usage_ping_worker', {})
 Settings.cron_jobs.gitlab_usage_ping_worker.set_default('cron', Settings.__send__(:cron_for_usage_ping))
 Settings.cron_jobs.gitlab_usage_ping_worker['job_class'] = 'GitlabUsagePingWorker'
 
-Settings.cron_jobs.set_default('schedule_update_user_activity_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('schedule_update_user_activity_worker', {})
 Settings.cron_jobs.schedule_update_user_activity_worker.set_default('cron', '30 0 * * *')
 Settings.cron_jobs.schedule_update_user_activity_worker['job_class'] = 'ScheduleUpdateUserActivityWorker'
 
-Settings.cron_jobs.set_default('clear_shared_runners_minutes_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('clear_shared_runners_minutes_worker', {})
 Settings.cron_jobs.clear_shared_runners_minutes_worker.set_default('cron', '0 0 1 * *')
 Settings.cron_jobs.clear_shared_runners_minutes_worker['job_class'] = 'ClearSharedRunnersMinutesWorker'
 
-Settings.cron_jobs.set_default('remove_old_web_hook_logs_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('remove_old_web_hook_logs_worker', {})
 Settings.cron_jobs.remove_old_web_hook_logs_worker.set_default('cron', '40 0 * * *')
 Settings.cron_jobs.remove_old_web_hook_logs_worker['job_class'] = 'RemoveOldWebHookLogsWorker'
 
-Settings.cron_jobs.set_default('stuck_merge_jobs_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('stuck_merge_jobs_worker', {})
 Settings.cron_jobs.stuck_merge_jobs_worker.set_default('cron', '0 */2 * * *')
 Settings.cron_jobs.stuck_merge_jobs_worker['job_class'] = 'StuckMergeJobsWorker'
 
-Settings.cron_jobs.set_default('pages_domain_verification_cron_worker', Settingslogic.new({}))
+Settings.cron_jobs.set_default('pages_domain_verification_cron_worker', {})
 Settings.cron_jobs.pages_domain_verification_cron_worker.set_default('cron', '*/15 * * * *')
 Settings.cron_jobs.pages_domain_verification_cron_worker['job_class'] = 'PagesDomainVerificationCronWorker'
 
 #
 # GitLab Shell
 #
-Settings.set_default('gitlab_shell', Settingslogic.new({}))
+Settings.set_default('gitlab_shell', {})
 Settings.gitlab_shell['path']           = Settings.absolute(Settings.gitlab_shell['path'] || Settings.gitlab['user_home'] + '/gitlab-shell/')
 Settings.gitlab_shell['hooks_path']     = Settings.absolute(Settings.gitlab_shell['hooks_path'] || Settings.gitlab['user_home'] + '/gitlab-shell/hooks/')
 Settings.gitlab_shell.set_default('secret_file', Rails.root.join('.gitlab_shell_secret'))
@@ -543,26 +543,25 @@ Settings.gitlab_shell.set_default('git_timeout', 10800)
 #
 # Workhorse
 #
-Settings.set_default('workhorse', Settingslogic.new({}))
+Settings.set_default('workhorse', {})
 Settings.workhorse.set_default('secret_file', Rails.root.join('.gitlab_workhorse_secret'))
 
 #
 # Repositories
 #
-Settings.set_default('repositories', Settingslogic.new({}))
-Settings.repositories.set_default('storages', Settingslogic.new({}))
+Settings.set_default('repositories', {})
+Settings.repositories.set_default('storages', {})
 unless Settings.repositories.storages['default']
-  Settings.repositories.storages.set_default('default', Settingslogic.new({}))
+  Settings.repositories.storages.set_default('default', {})
   # We set the path only if the default storage doesn't exist, in case it exists
   # but follows the pre-9.0 configuration structure. `6_validations.rb` initializer
   # will validate all storages and throw a relevant error to the user if necessary.
   Settings.repositories.storages.default.set_default('path', Settings.gitlab['user_home'] + '/repositories/')
 end
 
-Settings.repositories.storages.each do |key, storage|
-  storage = Settingslogic.new(storage)
-
+Settings.repositories.storages.each_key do |key|
   # Expand relative paths
+  storage = Settings.repositories.storages.public_send(key)
   storage['path'] = Settings.absolute(storage['path'])
 
   Settings.repositories.storages[key] = storage
@@ -586,12 +585,12 @@ end
 #
 # Backup
 #
-Settings.set_default('backup', Settingslogic.new({}))
+Settings.set_default('backup', {})
 Settings.backup.set_default('keep_time', 0)
 Settings.backup['pg_schema'] = nil
 Settings.backup['path'] = Settings.absolute(Settings.backup['path'] || 'tmp/backups/')
 Settings.backup.set_default('archive_permissions', 0600)
-Settings.backup.set_default('upload', Settingslogic.new({ 'remote_directory' => nil, 'connection' => nil }))
+Settings.backup.set_default('upload', { 'remote_directory' => nil, 'connection' => nil })
 Settings.backup.upload.set_default('multipart_chunk_size', 104857600)
 Settings.backup.upload.set_default('encryption', nil)
 Settings.backup.upload.set_default('storage_class', nil)
@@ -599,19 +598,19 @@ Settings.backup.upload.set_default('storage_class', nil)
 #
 # Git
 #
-Settings.set_default('git', Settingslogic.new({}))
+Settings.set_default('git', {})
 Settings.git.set_default('bin_path', '/usr/bin/git')
 
 # Important: keep the satellites.path setting until GitLab 9.0 at
 # least. This setting is fed to 'rm -rf' in
 # db/migrate/20151023144219_remove_satellites.rb
-Settings.set_default('satellites', Settingslogic.new({}))
+Settings.set_default('satellites', {})
 Settings.satellites['path'] = Settings.absolute(Settings.satellites['path'] || 'tmp/repo_satellites/')
 
 #
 # Kerberos
 #
-Settings.set_default('kerberos', Settingslogic.new({}))
+Settings.set_default('kerberos', {})
 Settings.kerberos.set_default('enabled', false)
 Settings.kerberos['keytab'] = nil if Settings.kerberos['keytab'].blank? # nil means use default keytab
 Settings.kerberos['service_principal_name'] = nil if Settings.kerberos['service_principal_name'].blank? # nil means any SPN in keytab
@@ -620,19 +619,19 @@ Settings.kerberos.set_default('https', Settings.gitlab.https)
 Settings.kerberos.set_default('port', Settings.kerberos.https ? 8443 : 8088)
 
 if Settings.kerberos['enabled'] && !Settings.omniauth.providers.map(&:name).include?('kerberos_spnego')
-  Settings.omniauth.providers << Settingslogic.new({ 'name' => 'kerberos_spnego' })
+  Settings.omniauth.providers << { 'name' => 'kerberos_spnego' }
 end
 
 #
 # Extra customization
 #
-Settings.set_default('extra', Settingslogic.new({}))
+Settings.set_default('extra', {})
 
 #
 # Rack::Attack settings
 #
-Settings.set_default('rack_attack', Settingslogic.new({}))
-Settings.rack_attack.set_default('git_basic_auth', Settingslogic.new({}))
+Settings.set_default('rack_attack', {})
+Settings.rack_attack.set_default('git_basic_auth', {})
 Settings.rack_attack.git_basic_auth.set_default('enabled', true)
 Settings.rack_attack.git_basic_auth.set_default('ip_whitelist', %w{127.0.0.1})
 Settings.rack_attack.git_basic_auth.set_default('maxretry', 10)
@@ -642,13 +641,13 @@ Settings.rack_attack.git_basic_auth.set_default('bantime', 1.hour)
 #
 # Gitaly
 #
-Settings.set_default('gitaly', Settingslogic.new({}))
+Settings.set_default('gitaly', {})
 
 #
 # Webpack settings
 #
-Settings.set_default('webpack', Settingslogic.new({}))
-Settings.webpack.set_default('dev_server', Settingslogic.new({}))
+Settings.set_default('webpack', {})
+Settings.webpack.set_default('dev_server', {})
 Settings.webpack.dev_server.set_default('enabled', false)
 Settings.webpack.dev_server.set_default('host', 'localhost')
 Settings.webpack.dev_server.set_default('port', 3808)
@@ -656,11 +655,11 @@ Settings.webpack.dev_server.set_default('port', 3808)
 #
 # Monitoring settings
 #
-Settings.set_default('monitoring', Settingslogic.new({}))
+Settings.set_default('monitoring', {})
 Settings.monitoring.set_default('ip_whitelist', ['127.0.0.1/8'])
 Settings.monitoring.set_default('unicorn_sampler_interval', 10)
 Settings.monitoring.set_default('ruby_sampler_interval', 60)
-Settings.monitoring.set_default('sidekiq_exporter', Settingslogic.new({}))
+Settings.monitoring.set_default('sidekiq_exporter', {})
 Settings.monitoring.sidekiq_exporter.set_default('enabled', false)
 Settings.monitoring.sidekiq_exporter.set_default('address', 'localhost')
 Settings.monitoring.sidekiq_exporter.set_default('port', 3807)
