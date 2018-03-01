@@ -30,7 +30,9 @@ describe Projects::SetupCiCd do
   end
 
   context 'when import_url is blank' do
-    before { project.update_attribute(:import_url, nil) }
+    before do
+      project.update_attribute(:import_url, nil)
+    end
 
     it "doesn't update the project" do
       expect(project).not_to receive(:update_project)
