@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import store from '~/ide/stores';
 import listItem from '~/ide/components/commit_sidebar/list_item.vue';
+import router from '~/ide/ide_router';
 import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { file, resetStore } from '../../helpers';
 
@@ -35,6 +36,16 @@ describe('Multi-file editor commit sidebar list item', () => {
 
   it('renders actionn button', () => {
     expect(vm.$el.querySelector('.multi-file-discard-btn')).not.toBeNull();
+  });
+
+  it('opens a closed file in the editor when clicking the file path', () => {
+    spyOn(vm, 'openFileInEditor').and.callThrough();
+    spyOn(router, 'push');
+
+    vm.$el.querySelector('.multi-file-commit-list-path').click();
+
+    expect(vm.openFileInEditor).toHaveBeenCalled();
+    expect(router.push).toHaveBeenCalled();
   });
 
   describe('computed', () => {
