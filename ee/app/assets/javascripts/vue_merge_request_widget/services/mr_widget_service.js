@@ -1,5 +1,4 @@
 import axios from '~/lib/utils/axios_utils';
-
 import CEWidgetService from '~/vue_merge_request_widget/services/mr_widget_service';
 
 export default class MRWidgetService extends CEWidgetService {

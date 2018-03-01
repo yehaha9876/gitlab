@@ -85,8 +85,8 @@ const axiosDefaultAdapter = getDefaultAdapter();
 
 // render all of our tests
 const testContexts = [
-  require.context('spec', true, /_spec$/),
   require.context('ee_spec', true, /_spec$/),
+  require.context('spec', true, /_spec$/),
 ];
 
 testContexts.forEach(function(context) {
