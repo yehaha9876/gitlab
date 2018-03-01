@@ -33,7 +33,8 @@
             milestone_group: @milestone.project.group.name,
             url: promote_project_milestone_path(@milestone.project, @milestone),
             container: 'body' },
-            disabled: true }
+            disabled: true,
+            type: 'button' }
             = _('Promote')
           #promote-milestone-modal
 

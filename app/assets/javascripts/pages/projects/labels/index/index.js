@@ -6,7 +6,7 @@ import PromoteLabelModal from '../components/promote_label_modal.vue';
 
 Vue.use(Translate);
 
-export default () => {
+const initLabelIndex = () => {
   initLabels();
 
   const onRequestFinished = ({ labelUrl, successful }) => {
@@ -88,4 +88,4 @@ export default () => {
   return promoteLabelModalComponent;
 };
 
-document.addEventListener('DOMContentLoaded', initLabels);
+document.addEventListener('DOMContentLoaded', initLabelIndex);

@@ -1,10 +1,9 @@
 <script>
   import axios from '~/lib/utils/axios_utils';
   import createFlash from '~/flash';
-  import { saveFlashMessage } from '~/lib/utils/flash_queue';
   import GlModal from '~/vue_shared/components/gl_modal.vue';
-  import { redirectTo } from '~/lib/utils/url_utility';
   import { s__, sprintf } from '~/locale';
+  import { visitUrl } from '~/lib/utils/url_utility';
   import eventHub from '../event_hub';
 
   export default {
@@ -48,13 +47,10 @@
     methods: {
       onSubmit() {
         eventHub.$emit('promoteMilestoneModal.requestStarted', this.url);
-        return axios.post(this.url)
+        return axios.post(this.url, { params: { format: 'json' } })
           .then((response) => {
             eventHub.$emit('promoteMilestoneModal.requestFinished', { milestoneUrl: this.url, successful: true });
-            const responseURL = new URL(response.request.responseURL);
-            const bodyData = responseURL.searchParams.get('body_data');
-            saveFlashMessage(bodyData, `${this.milestoneTitle} promoted to group milestone`, 'notice');
-            redirectTo(`${responseURL.protocol}//${responseURL.host}${responseURL.pathname}`);
+            visitUrl(response.data.url);
           })
           .catch((error) => {
             eventHub.$emit('promoteMilestoneModal.requestFinished', { milestoneUrl: this.url, successful: false });
