@@ -171,13 +171,11 @@ if Settings.ldap['enabled'] || Rails.env.test?
     # We detected old LDAP configuration syntax. Update the config to make it
     # look like it was entered with the new syntax.
     server = Settings.ldap.except('sync_time')
-    Settings.ldap['servers'] = {
-      'main' => server
-    }
+    Settings.ldap['servers'] = Settingslogic.new('main' => server)
   end
 
-  Settings.ldap['servers'].each do |key, server|
-    server = Settingslogic.new(server)
+  Settings.ldap.servers.each_key do |key|
+    server = Settings.ldap.servers.public_send(key)
 
     server.set_default('label', 'LDAP')
     server.set_default('timeout', 10.seconds)
@@ -238,7 +236,7 @@ Settings.omniauth.session_tickets['cas3'] = 'ticket'
 # Fill out omniauth-gitlab settings. It is needed for easy set up GHE or GH by just specifying url.
 
 github_default_url = "https://github.com"
-github_settings = Settings.omniauth['providers'].find { |provider| provider["name"] == "github" }
+github_settings = Settings.omniauth.providers.find { |provider| provider["name"] == "github" }
 
 if github_settings
   # For compatibility with old config files (before 7.8)
