@@ -32,8 +32,7 @@ module EE
       custom_params = super
       ci_cd_param   = params.dig(:project, :ci_cd_only).presence || params[:ci_cd_only].presence
 
-      custom_params.merge!(ci_cd_only: ci_cd_param) if ci_cd_param == 'true'
-
+      custom_params[:ci_cd_only] = ci_cd_param if ci_cd_param == 'true'
       custom_params
     end
   end
