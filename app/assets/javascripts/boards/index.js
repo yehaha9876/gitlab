@@ -251,116 +251,119 @@ export default () => {
     });
   }
 
-  gl.IssueBoardsModalAddBtn = new Vue({
-    el: document.getElementById('js-add-issues-btn'),
-    mixins: [gl.issueBoards.ModalMixins],
-    data() {
-      return {
+  const addIssuesModalButton = document.getElementById('js-add-issues-btn');
+  if (addIssuesModalButton) {
+    gl.IssueBoardsModalAddBtn = new Vue({
+      el: addIssuesModalButton,
+      mixins: [gl.issueBoards.ModalMixins],
+      data() {
+        return {
+          modal: ModalStore.store,
+          store: Store.state,
+          isFullscreen: false,
+          focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
+          canAdminList: this.$options.el.hasAttribute('data-can-admin-list'),
+        };
+      },
+      computed: {
+        disabled() {
+          if (!this.store) {
+            return true;
+          }
+          return !this.store.lists.filter(list => !list.preset).length;
+        },
+        tooltipTitle() {
+          if (this.disabled) {
+            return 'Please add a list to your board first';
+          }
+
+          return '';
+        },
+      },
+      watch: {
+        disabled() {
+          this.updateTooltip();
+        },
+      },
+      mounted() {
+        this.updateTooltip();
+      },
+      methods: {
+        updateTooltip() {
+          const $tooltip = $(this.$refs.addIssuesButton);
+
+          this.$nextTick(() => {
+            if (this.disabled) {
+              $tooltip.tooltip();
+            } else {
+              $tooltip.tooltip('destroy');
+            }
+          });
+        },
+        openModal() {
+          if (!this.disabled) {
+            this.toggleModal(true);
+          }
+        },
+      },
+      template: `
+        <div class="board-extra-actions">
+          <button
+            class="btn btn-create prepend-left-10"
+            type="button"
+            data-placement="bottom"
+            ref="kutton"
+            :class="{ 'disabled': disabled }"
+            :title="tooltipTitle"
+            :aria-disabled="disabled"
+            v-if="canAdminList"
+            @click="openModal">
+            Add issues
+          </button>
+        </div>
+      `,
+    });
+
+    gl.IssueBoardsToggleFocusBtn = new Vue({
+      el: document.getElementById('js-toggle-focus-btn'),
+      data: {
         modal: ModalStore.store,
         store: Store.state,
         isFullscreen: false,
         focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
-        canAdminList: this.$options.el.hasAttribute('data-can-admin-list'),
-      };
-    },
-    computed: {
-      disabled() {
-        if (!this.store) {
-          return true;
-        }
-        return !this.store.lists.filter(list => !list.preset).length;
       },
-      tooltipTitle() {
-        if (this.disabled) {
-          return 'Please add a list to your board first';
-        }
+      methods: {
+        toggleFocusMode() {
+          if (!this.focusModeAvailable) { return; }
 
-        return '';
-      },
-    },
-    watch: {
-      disabled() {
-        this.updateTooltip();
-      },
-    },
-    mounted() {
-      this.updateTooltip();
-    },
-    methods: {
-      updateTooltip() {
-        const $tooltip = $(this.$refs.addIssuesButton);
+          $(this.$refs.toggleFocusModeButton).tooltip('hide');
+          issueBoardsContent.classList.toggle('is-focused');
 
-        this.$nextTick(() => {
-          if (this.disabled) {
-            $tooltip.tooltip();
-          } else {
-            $tooltip.tooltip('destroy');
-          }
-        });
+          this.isFullscreen = !this.isFullscreen;
+        },
       },
-      openModal() {
-        if (!this.disabled) {
-          this.toggleModal(true);
-        }
-      },
-    },
-    template: `
-      <div class="board-extra-actions">
-        <button
-          class="btn btn-create prepend-left-10"
-          type="button"
-          data-placement="bottom"
-          ref="addIssuesButton"
-          :class="{ 'disabled': disabled }"
-          :title="tooltipTitle"
-          :aria-disabled="disabled"
-          v-if="canAdminList"
-          @click="openModal">
-          Add issues
-        </button>
-      </div>
-    `,
-  });
-
-  gl.IssueBoardsToggleFocusBtn = new Vue({
-    el: document.getElementById('js-toggle-focus-btn'),
-    data: {
-      modal: ModalStore.store,
-      store: Store.state,
-      isFullscreen: false,
-      focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
-    },
-    methods: {
-      toggleFocusMode() {
-        if (!this.focusModeAvailable) { return; }
-
-        $(this.$refs.toggleFocusModeButton).tooltip('hide');
-        issueBoardsContent.classList.toggle('is-focused');
-
-        this.isFullscreen = !this.isFullscreen;
-      },
-    },
-    template: `
-      <div class="board-extra-actions">
-        <a
-          href="#"
-          class="btn btn-default has-tooltip prepend-left-10 js-focus-mode-btn"
-          role="button"
-          aria-label="Toggle focus mode"
-          title="Toggle focus mode"
-          ref="toggleFocusModeButton"
-          v-if="focusModeAvailable"
-          @click="toggleFocusMode">
-          <span v-show="isFullscreen">
-            ${collapseIcon}
-          </span>
-          <span v-show="!isFullscreen">
-            ${expandIcon}
-          </span>
-        </a>
-      </div>
-    `,
-  });
+      template: `
+        <div class="board-extra-actions">
+          <a
+            href="#"
+            class="btn btn-default has-tooltip prepend-left-10 js-focus-mode-btn"
+            role="button"
+            aria-label="Toggle focus mode"
+            title="Toggle focus mode"
+            ref="toggleFocusModeButton"
+            v-if="focusModeAvailable"
+            @click="toggleFocusMode">
+            <span v-show="isFullscreen">
+              ${collapseIcon}
+            </span>
+            <span v-show="!isFullscreen">
+              ${expandIcon}
+            </span>
+          </a>
+        </div>
+      `,
+    });
+  }
 
   gl.IssueboardsSwitcher = new Vue({
     el: '#js-multiple-boards-switcher',
