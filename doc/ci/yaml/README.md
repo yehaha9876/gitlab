@@ -365,6 +365,12 @@ skip the download step.
 
 > Introduced in [GitLab Edition Premium][ee] 10.5.
 
+NOTE: **Notes:**
+- The main file and the included files must be well-formatted YAML files. This
+  prevents external YAML aliases (aka templates) to be referenced in the main
+  file, since they cannot be resolved at loading time.
+- Momentarily the [CI Lint](https://gitlab.com/ci/lint) does not support the `include` keyword.
+
 Using the `include` keyword, you can allow the inclusion of external YAML files.
 
 In the following example, the content of `.before-script-template.yml` will be
@@ -497,9 +503,6 @@ In this case, the variables `POSTGRES_USER`, `POSTGRES_PASSWORD` and
 `POSTGRES_DB` along with the `production` job defined in
 `autodevops-template.yml` will be overridden by the ones defined in
 `.gitlab-ci.yml`.
-
-NOTE: **Note:**
-Momentarily the [CI Lint](https://gitlab.com/ci/lint) does not support the `include` keyword.
 
 ## Jobs
 
