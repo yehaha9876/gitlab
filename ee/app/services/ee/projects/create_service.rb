@@ -9,7 +9,7 @@ module EE
         mirror = params.delete(:mirror)
         mirror_user_id = params.delete(:mirror_user_id)
         mirror_trigger_builds = params.delete(:mirror_trigger_builds)
-        @ci_cd_only = params.delete(:ci_cd_only)
+        ci_cd_only = params.delete(:ci_cd_only)
 
         project = super do |project|
           # Repository size limit comes as MB from the view
@@ -23,6 +23,8 @@ module EE
         end
 
         if project&.persisted?
+          setup_ci_cd_project if ci_cd_only
+
           log_geo_event(project)
           log_audit_event(project)
         end
@@ -41,7 +43,6 @@ module EE
         super
 
         create_predefined_push_rule
-        setup_ci_cd_project
 
         project.group&.refresh_members_authorized_projects
       end
@@ -58,7 +59,6 @@ module EE
       end
 
       def setup_ci_cd_project
-        return unless @ci_cd_only
         return unless ::License.feature_available?(:ci_cd_projects)
 
         ::Projects::SetupCiCd.new(project, current_user).execute
