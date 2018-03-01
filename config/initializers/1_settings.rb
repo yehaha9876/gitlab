@@ -551,6 +551,7 @@ Settings.workhorse.set_default('secret_file', Rails.root.join('.gitlab_workhorse
 #
 Settings.set_default('repositories', {})
 Settings.repositories.set_default('storages', {})
+
 unless Settings.repositories.storages['default']
   Settings.repositories.storages.set_default('default', {})
   # We set the path only if the default storage doesn't exist, in case it exists
