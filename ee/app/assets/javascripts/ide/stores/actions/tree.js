@@ -203,10 +203,43 @@ export const getFiles = ({ state, commit, dispatch }, { projectId, branchId} = {
   const selectedProject = state.projects[projectId];
   service
     .getFiles(selectedProject.web_url, branchId)
+    .then((res) => res.json())
     .then((data) => {
       console.log('Files : ', data);
     })
-    .catch(() => {
-      flash('Error loading files. Please try again.', 'alert', document, null, false, true);
+    .then((data) => {
+
+      const selectedTree = state.trees[`${projectId}/${branchId}`];
+
+      data.each((file) => {
+        console.log('File ' + file);
+        const pathSplit = file.split('/');
+        const fileName = pathSplit[pathSplit.length-1];
+        console.log('Filename : ' + fileName);
+      });
+
+      /* 
+      if (!state.isInitialRoot) {
+        commit(types.SET_ROOT, data.path === '/');
+      }
+
+      dispatch('updateDirectoryData', { data, tree, projectId, branch, clearTree: false });
+      const selectedTree = tree || state.trees[`${projectId}/${branch}`];
+
+      commit(types.SET_PARENT_TREE_URL, data.parent_tree_url);
+      commit(types.SET_LAST_COMMIT_URL, { tree: selectedTree, url: data.last_commit_path });
+      if (tree) commit(types.TOGGLE_LOADING, selectedTree);
+
+      const prevLastCommitPath = selectedTree.lastCommitPath;
+      if (prevLastCommitPath !== null) {
+        dispatch('getLastCommitData', selectedTree);
+      }
+      */
+      resolve(data);
+    })
+    .catch((e) => {
+      flash('Error loading tree data. Please try again.', 'alert', document, null, false, true);
+      if (tree) commit(types.TOGGLE_LOADING, tree);
+      reject(e);
     });
 };
