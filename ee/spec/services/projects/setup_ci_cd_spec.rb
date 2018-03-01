@@ -28,4 +28,15 @@ describe Projects::SetupCiCd do
     expect(project_feature.wiki_access_level).to eq(ProjectFeature::DISABLED)
     expect(project_feature.snippets_access_level).to eq(ProjectFeature::DISABLED)
   end
+
+  context 'when import_url is blank' do
+    before { project.update_attribute(:import_url, nil) }
+
+    it "doesn't update the project" do
+      expect(project).not_to receive(:update_project)
+      expect(project).not_to receive(:disable_project_features)
+
+      subject.execute
+    end
+  end
 end

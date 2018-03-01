@@ -1,8 +1,8 @@
 module Projects
   class SetupCiCd < BaseService
-    include ::TriggersHelper
-
     def execute
+      return if project.import_url.blank?
+
       update_project
       disable_project_features
     end
