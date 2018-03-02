@@ -200,7 +200,7 @@ if Settings.ldap['enabled'] || Rails.env.test?
     # Since GitLab 10.0, verify_certificates defaults to true for security.
     server.set_default('verify_certificates', true)
 
-    Settings.ldap['servers'][key] = server
+    Settings.ldap.servers[key] = server
   end
 end
 
