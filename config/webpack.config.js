@@ -53,7 +53,6 @@ function generateEntries() {
     terminal:             './terminal/terminal_bundle.js',
 
     common:               './commons/index.js',
-    common_vue:           './vue_shared/vue_resource_interceptor.js',
     locale:               './locale/index.js',
     main:                 './main.js',
     ide:                  './ide/index.js',

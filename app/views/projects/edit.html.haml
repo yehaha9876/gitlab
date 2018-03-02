@@ -4,7 +4,6 @@
 - expanded = Rails.env.test?
 
 - content_for :page_specific_javascripts do
-  = webpack_bundle_tag('common_vue')
   = webpack_bundle_tag('service_desk')
 
 .project-edit-container
