@@ -30,7 +30,7 @@ module EE
     override :custom_import_params
     def custom_import_params
       custom_params = super
-      ci_cd_param   = params.dig(:project, :ci_cd_only).presence || params[:ci_cd_only].presence
+      ci_cd_param   = params.dig(:project, :ci_cd_only) || params[:ci_cd_only]
 
       custom_params[:ci_cd_only] = ci_cd_param if ci_cd_param == 'true'
       custom_params
