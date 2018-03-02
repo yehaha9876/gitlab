@@ -12,8 +12,9 @@ module Gitlab
         @type = type
       end
 
-      def execute(extra_attrs = {})
-        attrs = {
+      def execute
+        ::Projects::CreateService.new(
+          current_user,
           name: name,
           path: name,
           description: repo.description,
@@ -23,9 +24,7 @@ module Gitlab
           import_source: repo.full_name,
           import_url: import_url,
           skip_wiki: skip_wiki
-        }.merge!(extra_attrs)
-
-        ::Projects::CreateService.new(current_user, attrs).execute
+        ).execute
       end
 
       private
