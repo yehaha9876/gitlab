@@ -323,47 +323,47 @@ export default () => {
         </div>
       `,
     });
-
-    gl.IssueBoardsToggleFocusBtn = new Vue({
-      el: document.getElementById('js-toggle-focus-btn'),
-      data: {
-        modal: ModalStore.store,
-        store: Store.state,
-        isFullscreen: false,
-        focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
-      },
-      methods: {
-        toggleFocusMode() {
-          if (!this.focusModeAvailable) { return; }
-
-          $(this.$refs.toggleFocusModeButton).tooltip('hide');
-          issueBoardsContent.classList.toggle('is-focused');
-
-          this.isFullscreen = !this.isFullscreen;
-        },
-      },
-      template: `
-        <div class="board-extra-actions">
-          <a
-            href="#"
-            class="btn btn-default has-tooltip prepend-left-10 js-focus-mode-btn"
-            role="button"
-            aria-label="Toggle focus mode"
-            title="Toggle focus mode"
-            ref="toggleFocusModeButton"
-            v-if="focusModeAvailable"
-            @click="toggleFocusMode">
-            <span v-show="isFullscreen">
-              ${collapseIcon}
-            </span>
-            <span v-show="!isFullscreen">
-              ${expandIcon}
-            </span>
-          </a>
-        </div>
-      `,
-    });
   }
+
+  gl.IssueBoardsToggleFocusBtn = new Vue({
+    el: document.getElementById('js-toggle-focus-btn'),
+    data: {
+      modal: ModalStore.store,
+      store: Store.state,
+      isFullscreen: false,
+      focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
+    },
+    methods: {
+      toggleFocusMode() {
+        if (!this.focusModeAvailable) { return; }
+
+        $(this.$refs.toggleFocusModeButton).tooltip('hide');
+        issueBoardsContent.classList.toggle('is-focused');
+
+        this.isFullscreen = !this.isFullscreen;
+      },
+    },
+    template: `
+      <div class="board-extra-actions">
+        <a
+          href="#"
+          class="btn btn-default has-tooltip prepend-left-10 js-focus-mode-btn"
+          role="button"
+          aria-label="Toggle focus mode"
+          title="Toggle focus mode"
+          ref="toggleFocusModeButton"
+          v-if="focusModeAvailable"
+          @click="toggleFocusMode">
+          <span v-show="isFullscreen">
+            ${collapseIcon}
+          </span>
+          <span v-show="!isFullscreen">
+            ${expandIcon}
+          </span>
+        </a>
+      </div>
+    `,
+  });
 
   gl.IssueboardsSwitcher = new Vue({
     el: '#js-multiple-boards-switcher',
