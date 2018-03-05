@@ -2,7 +2,7 @@
 comments: false
 ---
 
-# GitLab Documentation
+# GitLab Documentation yo!
 
 Welcome to [GitLab](https://about.gitlab.com/), a Git-based fully featured
 platform for software development!
