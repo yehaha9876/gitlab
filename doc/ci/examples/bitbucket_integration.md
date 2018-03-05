@@ -5,7 +5,7 @@ GitLab CI/CD can be used with any Git repository using Pull Mirroring.
 1. In GitLab create a **CI/CD project** using the Git URL option and the HTTPS
    URL for your Bitbucket repository.
    
-   GitLab will automatically configure polling-based pull mirroring.
+    GitLab will automatically configure polling-based pull mirroring.
 
 1. In GitLab create a **Personal Access Token** with `API` scope to
    authenticate the Bitbucket web hook notifying GitLab of new commits.
@@ -22,7 +22,7 @@ GitLab CI/CD can be used with any Git repository using Pull Mirroring.
 
     The web hook Trigger should be set to 'Repository Push'.
 
-    ![Bitbucket Cloud webhook](img/bitbucket_webhook.png)
+    ![Bitbucket Cloud webhook](img/bitbucket_webhook.png){:width="500px"}
 
     After saving, test the web hook by pushing a change to your Bitbucket
     repository.
@@ -31,7 +31,7 @@ GitLab CI/CD can be used with any Git repository using Pull Mirroring.
    Passwords** to authenticate the build status script setting commit build
    statuses in Bitbucket. Repository write permissions are required.
 
-    ![Bitbucket Cloud webhook](img/bitbucket_app_password.png)
+    ![Bitbucket Cloud webhook](img/bitbucket_app_password.png){:width="500px"}
 
 1. Update your `.gitlab-ci.yml` to push commit statuses to Bitbucket.
 
