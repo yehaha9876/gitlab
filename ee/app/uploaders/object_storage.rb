@@ -10,6 +10,9 @@ module ObjectStorage
   UnknownStoreError = Class.new(StandardError)
   ObjectStorageUnavailable = Class.new(StandardError)
 
+  DIRECT_UPLOAD_TIMEOUT = 4.hour
+  TMP_WORKHORSE_PATH = 'tmp/workhorse'
+
   module Store
     LOCAL = 1
     REMOTE = 2
@@ -124,6 +127,10 @@ module ObjectStorage
         object_store_options.enabled
       end
 
+      def direct_upload_enabled?
+        object_store_options.direct_upload
+      end
+
       def background_upload_enabled?
         object_store_options.background_upload
       end
@@ -142,6 +149,28 @@ module ObjectStorage
 
       def serialization_column(model_class, mount_point)
         model_class.uploader_options.dig(mount_point, :mount_on) || mount_point
+      end
+
+      def workhorse_authorize
+        object_id = [CarrierWave.generate_cache_id, SecureRandom.hex].join('-')
+        upload_path = File.join(TMP_WORKHORSE_PATH, object_id)
+
+        unless self.object_store_enabled? && self.direct_upload_enabled?
+          return { TempPath: File.join(self.root, upload_path) }
+        end
+
+        connection = ::Fog::Storage.new(self.object_store_credentials)
+        expire_at = Time.now + DIRECT_UPLOAD_TIMEOUT
+
+        { ObjectStore: {
+            ObjectID: object_id,
+            GetURL: connection.get_object_https_url(remote_store_path, upload_path, expire_at),
+            DeleteURL: connection.delete_object_url(remote_store_path, upload_path, expire_at),
+            StoreURL: connection.put_object_url(remote_store_path, upload_path, expire_at, {
+              'Content-Type' => 'application/octet-stream'
+            })
+          }
+        }
       end
     end
 
@@ -255,6 +284,18 @@ module ObjectStorage
       }
     end
 
+    def store_workhorse_file!(params, identifier)
+      filename = params["#{identifier}.name"]
+
+      if remote_object_id = params["#{identifier}.object_id"]
+        store_remote_file!(remote_object_id, filename)
+      elsif local_path = params["#{identifier}.path"]
+        store_local_file!(local_path, filename)
+      else
+        raise 'Bad file'
+      end
+    end
+
     private
 
     def schedule_background_upload?
@@ -262,6 +303,31 @@ module ObjectStorage
         self.class.background_upload_enabled? &&
         self.class.licensed? &&
         self.file_storage?
+    end
+
+    def store_remote_file!(remote_object_id, filename)
+      file_path = File.join(TMP_WORKHORSE_PATH, remote_object_id)
+      raise 'Bad file path' unless file_path.start_with?(TMP_WORKHORSE_PATH + '/')
+
+      self.object_store = Store::REMOTE
+      self.original_filename = filename
+
+      CarrierWave::Storage::Fog::File.new(self, storage, file_path).tap do |file|
+        storage.store!(file)
+      end
+    end
+
+    def store_local_file!(local_path, filename)
+      root_path = File.realpath(File.join(self.root, TMP_WORKHORSE_PATH))
+      file_path = File.realpath(local_path)
+      raise 'Bad file path' unless file_path.start_with?(root_path)
+
+      self.object_store = Store::LOCAL
+      self.original_filename = filename
+
+      File.open(local_path) do |file|
+        self.store!(file)
+      end
     end
 
     # this is a hack around CarrierWave. The #migrate method needs to be
