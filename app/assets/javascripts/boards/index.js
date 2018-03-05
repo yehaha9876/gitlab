@@ -255,7 +255,12 @@ export default () => {
   if (addIssuesModalButton) {
     gl.IssueBoardsModalAddBtn = new Vue({
       el: addIssuesModalButton,
-      mixins: [gl.issueBoards.ModalMixins],
+      directives: {
+        tooltip,
+      },
+      mixins: [
+        gl.issueBoards.ModalMixins,
+      ],
       data() {
         return {
           modal: ModalStore.store,
@@ -280,26 +285,7 @@ export default () => {
           return '';
         },
       },
-      watch: {
-        disabled() {
-          this.updateTooltip();
-        },
-      },
-      mounted() {
-        this.updateTooltip();
-      },
       methods: {
-        updateTooltip() {
-          const $tooltip = $(this.$refs.addIssuesButton);
-
-          this.$nextTick(() => {
-            if (this.disabled) {
-              $tooltip.tooltip();
-            } else {
-              $tooltip.tooltip('destroy');
-            }
-          });
-        },
         openModal() {
           if (!this.disabled) {
             this.toggleModal(true);
@@ -309,6 +295,7 @@ export default () => {
       template: `
         <div class="board-extra-actions">
           <button
+            v-tooltip
             class="btn btn-create prepend-left-10"
             type="button"
             data-placement="bottom"
