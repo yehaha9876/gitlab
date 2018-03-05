@@ -63,6 +63,10 @@ Analyze your [browser performance with Sitespeed.io](browser_performance.md).
 
 See the documentation on [GitLab Pages](../../user/project/pages/index.md) for a complete overview.
 
+## GitLab CI/CD for external repositories
+
+- [Bitbucket Cloud](bitbucket_integration.md)
+
 ## Contributing
 
 Contributions are very welcome! You can help your favorite programming
