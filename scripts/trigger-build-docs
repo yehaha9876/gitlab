@@ -7,7 +7,7 @@ require 'gitlab'
 #
 Gitlab.configure do |config|
   config.endpoint       = 'https://gitlab.com/api/v4'
-  config.private_token  = ENV["DOCS_API_TOKEN"]  # GitLab Docs bot access token which has only Developer access to gitlab-docs
+  config.private_token  = ENV["DOCS_API_TOKEN"] # GitLab Docs bot access token with Developer access to gitlab-docs
 end
 
 #
@@ -31,13 +31,18 @@ def docs_branch
 end
 
 #
-# Create a remote branch in gitlab-docs
+# Create a remote branch in gitlab-docs and immediately cancel the pipeline.
+# A triggered pipeline will run right after the branch creation.
 #
 def create_remote_branch
+  puts "=> Creating remote branch '#{docs_branch}'"
   Gitlab.create_branch(GITLAB_DOCS_REPO, docs_branch, 'master')
-  puts "Remote branch '#{docs_branch}' created"
+  puts "=> Canceling pipeline for '#{docs_branch}'"
+  pipeline_id = Gitlab.pipelines(GITLAB_DOCS_REPO, { ref: docs_branch }).last.id
+  puts pipeline_id
+  Gitlab.cancel_pipeline(GITLAB_DOCS_REPO, pipeline_id)
 rescue Gitlab::Error::BadRequest
-  puts "Remote branch '#{docs_branch}' already exists"
+  puts "=> Remote branch '#{docs_branch}' already exists"
 end
 
 #
@@ -45,7 +50,7 @@ end
 #
 def remove_remote_branch
   Gitlab.delete_branch(GITLAB_DOCS_REPO, docs_branch)
-  puts "Remote branch '#{docs_branch}' deleted"
+  puts "=> Remote branch '#{docs_branch}' deleted"
 end
 
 #
