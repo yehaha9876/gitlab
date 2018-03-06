@@ -1,3 +1,8 @@
+import '~/pages/projects/milestones/show/index';
 import UserCallout from '~/user_callout';
+import initBurndownChart from 'ee/burndown_chart';
 
-export default () => new UserCallout();
+document.addEventListener('DOMContentLoaded', () => {
+  new UserCallout(); // eslint-disable-line no-new
+  initBurndownChart();
+});

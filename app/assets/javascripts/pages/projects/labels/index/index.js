@@ -88,3 +88,4 @@ export default () => {
   return promoteLabelModalComponent;
 };
 
+document.addEventListener('DOMContentLoaded', initLabels);
