@@ -195,6 +195,8 @@ export const getFiles = (
     const selectedProject = state.projects[projectId];
     commit(types.CREATE_TREE, { treePath: `${projectId}/${branchId}` });
 
+    if (selectedTree) commit(types.TOGGLE_LOADING, selectedTree);
+
     service
       .getFiles(selectedProject.web_url, branchId)
       .then(res => res.json())
