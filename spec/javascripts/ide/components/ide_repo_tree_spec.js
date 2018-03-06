@@ -31,8 +31,6 @@ describe('IdeRepoTree', () => {
   });
 
   it('renders a sidebar', () => {
-    const fileList = vm.$el.querySelector('.ide-file-list');
-
     expect(vm.$el.classList.contains('sidebar-mini')).toBeFalsy();
     expect(vm.$el.querySelector('.repo-file-options')).toBeFalsy();
     expect(vm.$el.querySelector('.loading-file')).toBeFalsy();
