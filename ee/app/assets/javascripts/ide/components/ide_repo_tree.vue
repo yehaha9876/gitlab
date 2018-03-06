@@ -26,10 +26,12 @@ export default {
     selctedTree() {
       return this.trees[this.treeId].tree;
     },
+  },
+  methods: {
     showLoading() {
       return !this.trees[this.treeId] || this.trees[this.treeId].loading;
     },
-  },
+  }
 };
 </script>
 
@@ -38,7 +40,7 @@ export default {
     class="ide-file-list"
     v-if="treeId"
   >
-    <template v-if="showLoading">
+    <template v-if="showLoading()">
       <div
         class="multi-file-loading-container"
         v-for="n in 3"
