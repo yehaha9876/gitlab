@@ -9,6 +9,7 @@ import {
   findEntry,
   createTemp,
   createOrMergeEntry,
+  sortTree,
 } from '../utils';
 
 export const getTreeData = (
@@ -254,27 +255,6 @@ export const getFiles = (
             state,
           }));
         });
-
-        const sortTreesByTypeAndName = (a, b) => {
-          if (a.type === 'tree' && b.type === 'blob') {
-            return -1;
-          } else if (a.type === 'blob' && b.type === 'tree') {
-            return 1;
-          }
-          if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-          if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-          return 0;
-        };
-
-        const sortTree = (sortedTree) => {
-          sortedTree.forEach((el) => {
-            Object.assign(el, {
-              tree: sortTree(el.tree),
-            });
-          });
-          return sortedTree.sort(sortTreesByTypeAndName);
-        };
-
 
         selectedTree = state.trees[`${projectId}/${branchId}`];
         commit(types.SET_DIRECTORY_DATA, { tree: selectedTree, data: sortTree(baseTree) });

@@ -34,13 +34,16 @@ describe('IdeRepoTree', () => {
     const fileList = vm.$el.querySelector('.ide-file-list');
 
     expect(vm.$el.classList.contains('sidebar-mini')).toBeFalsy();
-    expect(fileList.querySelector('.repo-file-options')).toBeFalsy();
-    expect(fileList.querySelector('.prev-directory')).toBeFalsy();
-    expect(fileList.querySelector('.loading-file')).toBeFalsy();
-    expect(fileList.querySelector('.file')).toBeTruthy();
+    expect(vm.$el.querySelector('.repo-file-options')).toBeFalsy();
+    expect(vm.$el.querySelector('.loading-file')).toBeFalsy();
+    expect(vm.$el.querySelector('.file')).toBeTruthy();
   });
 
   it('renders 3 loading files if tree is loading', (done) => {
+    vm.$store.state.trees['123'] = {
+      tree: [],
+      loading: true,
+    };
     vm.treeId = '123';
 
     Vue.nextTick(() => {

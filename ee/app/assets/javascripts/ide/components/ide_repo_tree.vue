@@ -27,7 +27,7 @@ export default {
       return this.trees[this.treeId].tree;
     },
     showLoading() {
-      return this.trees[this.treeId].loading;
+      return !this.trees[this.treeId] || this.trees[this.treeId].loading;
     },
   },
 };
