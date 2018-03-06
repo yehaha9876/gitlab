@@ -73,20 +73,6 @@ describe('Multi-file store mutations', () => {
     });
   });
 
-  describe('SET_ROOT', () => {
-    it('sets isRoot & initialRoot', () => {
-      mutations.SET_ROOT(localState, true);
-
-      expect(localState.isRoot).toBeTruthy();
-      expect(localState.isInitialRoot).toBeTruthy();
-
-      mutations.SET_ROOT(localState, false);
-
-      expect(localState.isRoot).toBeFalsy();
-      expect(localState.isInitialRoot).toBeFalsy();
-    });
-  });
-
   describe('SET_LEFT_PANEL_COLLAPSED', () => {
     it('sets left panel collapsed', () => {
       mutations.SET_LEFT_PANEL_COLLAPSED(localState, true);

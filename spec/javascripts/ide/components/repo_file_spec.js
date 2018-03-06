@@ -66,7 +66,7 @@ describe('RepoFile', () => {
 
     spyOn(vm, 'clickFile');
 
-    vm.$el.querySelector('td').click();
+    vm.$el.querySelector('.file-name').click();
 
     expect(vm.clickFile).toHaveBeenCalledWith(vm.file);
   });
@@ -89,10 +89,6 @@ describe('RepoFile', () => {
 
     it('renders submodule short ID', () => {
       expect(vm.$el.querySelector('.commit-sha').textContent.trim()).toBe('12345678');
-    });
-
-    it('renders ID next to submodule name', () => {
-      expect(vm.$el.querySelector('td').textContent.replace(/\s+/g, ' ')).toContain('submodule name @ 12345678');
     });
   });
 

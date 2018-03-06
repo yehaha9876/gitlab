@@ -113,18 +113,6 @@ describe('Multi-file store tree actions', () => {
         }).catch(done.fail);
     });
 
-    it('sets root if not currently at root', (done) => {
-      store.state.isInitialRoot = false;
-
-      store.dispatch('getTreeData', basicCallParameters)
-        .then(() => {
-          expect(store.state.isInitialRoot).toBeTruthy();
-          expect(store.state.isRoot).toBeTruthy();
-
-          done();
-        }).catch(done.fail);
-    });
-
     it('sets page title', (done) => {
       store.dispatch('getTreeData', basicCallParameters)
         .then(() => {
