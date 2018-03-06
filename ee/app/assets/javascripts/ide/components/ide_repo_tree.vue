@@ -1,13 +1,10 @@
 <script>
 import { mapState } from 'vuex';
 import skeletonLoadingContainer from '~/vue_shared/components/skeleton_loading_container.vue';
-import repoPreviousDirectory from './repo_prev_directory.vue';
 import repoFile from './repo_file.vue';
-import { treeList } from '../stores/utils';
 
 export default {
   components: {
-    repoPreviousDirectory,
     repoFile,
     skeletonLoadingContainer,
   },
@@ -20,18 +17,14 @@ export default {
   computed: {
     ...mapState([
       'trees',
-      'isRoot',
     ]),
     ...mapState({
       projectName(state) {
         return state.project.name;
       },
     }),
-    fetchedList() {
-      return treeList(this.$store.state, this.treeId);
-    },
-    hasPreviousDirectory() {
-      return !this.isRoot && this.fetchedList.length;
+    selctedTree() {
+      return this.trees[this.treeId].tree;
     },
     showLoading() {
       if (this.trees[this.treeId]) {
@@ -50,9 +43,6 @@ export default {
         <tbody
           v-if="treeId"
         >
-          <repo-previous-directory
-            v-if="hasPreviousDirectory"
-          />
           <template v-if="showLoading">
             <div
               class="multi-file-loading-container"
@@ -63,7 +53,7 @@ export default {
             </div>
           </template>
           <repo-file
-            v-for="file in fetchedList"
+            v-for="file in selctedTree"
             :key="file.key"
             :file="file"
           />

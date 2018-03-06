@@ -10,6 +10,7 @@
   import changedFileIcon from 'ee/ide/components/changed_file_icon.vue'; // eslint-disable-line import/first
 
   export default {
+    name: 'repo-file',
     components: {
       skeletonLoadingContainer,
       newDropdown,
@@ -81,23 +82,25 @@
           });
         }
         this.$router.push(`/project${row.url}`);
+        this.$emit('folderOpened');
       },
     },
   };
 </script>
 
 <template>
-  <tr
+  <div>
+  <div
     class="file"
     :class="fileClass"
   >
-    <td
+    <div
       class="multi-file-table-name"
       :colspan="submoduleColSpan"
       @click="clickFile(file)"
     >
       <a
-        class="repo-file-name str-truncated"
+        class="repo-file-name str-truncated-dis"
       >
         <file-icon
           :file-name="file.name"
@@ -133,10 +136,10 @@
           </a>
         </span>
       </template>
-    </td>
+    </div>
 
     <template v-if="showExtraColumns && !isSubmodule">
-      <td class="multi-file-table-col-commit-message hidden-sm hidden-xs">
+      <div class="multi-file-table-col-commit-message hidden-sm hidden-xs">
         <a
           v-if="file.lastCommit.message"
           @click.stop
@@ -148,9 +151,9 @@
           v-else
           :small="true"
         />
-      </td>
+      </div>
 
-      <td class="commit-update hidden-xs text-right">
+      <div class="commit-update hidden-xs text-right">
         <span
           v-if="file.lastCommit.updatedAt"
           :title="tooltipTitle(file.lastCommit.updatedAt)"
@@ -162,7 +165,14 @@
           class="animation-container-right"
           :small="true"
         />
-      </td>
+      </div>
     </template>
-  </tr>
+  </div>
+  <repo-file
+    v-if="file.opened"
+    v-for="childFile in file.tree"
+    :key="childFile.key"
+    :file="childFile"
+  />
+  </div>
 </template>

@@ -28,12 +28,6 @@ export default {
       editMode: !state.editMode,
     });
   },
-  [types.SET_ROOT](state, isRoot) {
-    Object.assign(state, {
-      isRoot,
-      isInitialRoot: isRoot,
-    });
-  },
   [types.SET_LEFT_PANEL_COLLAPSED](state, collapsed) {
     Object.assign(state, {
       leftPanelCollapsed: collapsed,

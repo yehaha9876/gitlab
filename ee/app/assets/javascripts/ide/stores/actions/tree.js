@@ -34,10 +34,6 @@ export const getTreeData = (
         return res.json();
       })
       .then((data) => {
-        if (!state.isInitialRoot) {
-          commit(types.SET_ROOT, data.path === '/');
-        }
-
         dispatch('updateDirectoryData', { data, tree, projectId, branch, clearTree: false });
         const selectedTree = tree || state.trees[`${projectId}/${branch}`];
 
@@ -62,15 +58,16 @@ export const getTreeData = (
   }
 });
 
-export const toggleTreeOpen = ({ commit, dispatch }, { endpoint, tree }) => {
-  if (tree.opened) {
+export const toggleTreeOpen = ({ commit, dispatch }, { tree }) => {
+  /* if (tree.opened) {
     // send empty data to clear the tree
     const data = { trees: [], blobs: [], submodules: [] };
 
-    dispatch('updateDirectoryData', { data, tree, projectId: tree.projectId, branchId: tree.branchId });
+    dispatch('updateDirectoryData',
+    { data, tree, projectId: tree.projectId, branchId: tree.branchId });
   } else {
     dispatch('getTreeData', { endpoint, tree, projectId: tree.projectId, branch: tree.branchId });
-  }
+  } */
 
   commit(types.TOGGLE_TREE_OPEN, tree);
 };
@@ -199,47 +196,100 @@ export const updateDirectoryData = (
   commit(types.SET_DIRECTORY_DATA, { tree: selectedTree, data: formattedData });
 };
 
-export const getFiles = ({ state, commit, dispatch }, { projectId, branchId} = {},) => {
-  const selectedProject = state.projects[projectId];
-  service
-    .getFiles(selectedProject.web_url, branchId)
-    .then((res) => res.json())
-    .then((data) => {
-      console.log('Files : ', data);
-    })
-    .then((data) => {
+export const getFiles = (
+  { state, commit, dispatch },
+  { projectId, branchId } = {},
+) => new Promise((resolve, reject) => {
+  let selectedTree = state.trees[`${projectId}/${branchId}`];
+  if (!selectedTree) {
+    const selectedProject = state.projects[projectId];
+    commit(types.CREATE_TREE, { treePath: `${projectId}/${branchId}` });
+    selectedTree = state.trees[`${projectId}/${branchId}`];
 
-      const selectedTree = state.trees[`${projectId}/${branchId}`];
+    service
+      .getFiles(selectedProject.web_url, branchId)
+      .then(res => res.json())
+      .then((data) => {
+        const baseTree = [];
 
-      data.each((file) => {
-        console.log('File ' + file);
-        const pathSplit = file.split('/');
-        const fileName = pathSplit[pathSplit.length-1];
-        console.log('Filename : ' + fileName);
+        data.forEach((file) => {
+          const pathSplit = file.split('/');
+          const blobName = pathSplit[pathSplit.length - 1];
+          let level = 0;
+          let selectedFolderTree = baseTree;
+
+          if (pathSplit.length > 1) {
+            let fullPath = '';
+            pathSplit.pop();
+            pathSplit.forEach((folder) => {
+              fullPath += `/${folder}`;
+              const foundFolder = findEntry(selectedFolderTree, 'tree', fullPath, 'path');
+              if (!foundFolder) {
+                const newFolder = createOrMergeEntry({
+                  projectId,
+                  branchId,
+                  entry: {
+                    id: fullPath,
+                    name: folder,
+                    path: fullPath,
+                    url: `/${projectId}/tree/${branchId}/${fullPath}`,
+                  },
+                  level,
+                  type: 'tree',
+                  parentTreeUrl: '',
+                  state,
+                });
+                selectedFolderTree.push(newFolder);
+                selectedFolderTree = newFolder.tree;
+              } else {
+                selectedFolderTree = foundFolder.tree;
+              }
+              level += 1;
+            });
+          }
+
+          // Add file
+          const parentTreeUrl = '';
+          selectedFolderTree.push(createOrMergeEntry({
+            projectId,
+            branchId,
+            entry: {
+              id: file,
+              name: blobName,
+              path: file,
+              url: `/${projectId}/tree/${branchId}/${file}`,
+            },
+            level,
+            type: 'blob',
+            parentTreeUrl,
+            state,
+          }));
+        });
+
+        commit(types.SET_DIRECTORY_DATA, { tree: selectedTree, data: baseTree });
+
+        /*
+        dispatch('updateDirectoryData', { data, tree, projectId, branch, clearTree: false });
+        const selectedTree = tree || state.trees[`${projectId}/${branch}`];
+
+        commit(types.SET_PARENT_TREE_URL, data.parent_tree_url);
+        commit(types.SET_LAST_COMMIT_URL, { tree: selectedTree, url: data.last_commit_path });
+        if (tree) commit(types.TOGGLE_LOADING, selectedTree);
+
+        const prevLastCommitPath = selectedTree.lastCommitPath;
+        if (prevLastCommitPath !== null) {
+          dispatch('getLastCommitData', selectedTree);
+        }
+        */
+        resolve(data);
+      })
+      .catch((e) => {
+        flash('Error loading tree data. Please try again.', 'alert', document, null, false, true);
+        if (selectedTree) commit(types.TOGGLE_LOADING, selectedTree);
+        reject(e);
       });
+  } else {
+    resolve(selectedTree);
+  }
+});
 
-      /* 
-      if (!state.isInitialRoot) {
-        commit(types.SET_ROOT, data.path === '/');
-      }
-
-      dispatch('updateDirectoryData', { data, tree, projectId, branch, clearTree: false });
-      const selectedTree = tree || state.trees[`${projectId}/${branch}`];
-
-      commit(types.SET_PARENT_TREE_URL, data.parent_tree_url);
-      commit(types.SET_LAST_COMMIT_URL, { tree: selectedTree, url: data.last_commit_path });
-      if (tree) commit(types.TOGGLE_LOADING, selectedTree);
-
-      const prevLastCommitPath = selectedTree.lastCommitPath;
-      if (prevLastCommitPath !== null) {
-        dispatch('getLastCommitData', selectedTree);
-      }
-      */
-      resolve(data);
-    })
-    .catch((e) => {
-      flash('Error loading tree data. Please try again.', 'alert', document, null, false, true);
-      if (tree) commit(types.TOGGLE_LOADING, tree);
-      reject(e);
-    });
-};
