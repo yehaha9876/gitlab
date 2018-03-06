@@ -86,14 +86,6 @@ router.beforeEach((to, from, next) => {
           flash('Error while loading the branch files. Please try again.', 'alert', document, null, false, true);
           throw e;
         });
-
-        /*
-        store.dispatch('getTreeData', {
-          projectId: fullProjectId,
-          branch: to.params.branch,
-          endpoint: `/tree/${to.params.branch}`,
-        })
-        */
       }
     })
     .catch((e) => {
