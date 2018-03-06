@@ -37,28 +37,23 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div class="ide-file-list">
-      <table class="table">
-        <tbody
-          v-if="treeId"
-        >
-          <template v-if="showLoading">
-            <div
-              class="multi-file-loading-container"
-              v-for="n in 3"
-              :key="n"
-            >
-              <skeleton-loading-container />
-            </div>
-          </template>
-          <repo-file
-            v-for="file in selctedTree"
-            :key="file.key"
-            :file="file"
-          />
-        </tbody>
-      </table>
-    </div>
+  <div
+    class="ide-file-list"
+    v-if="treeId"
+  >
+    <template v-if="showLoading">
+      <div
+        class="multi-file-loading-container"
+        v-for="n in 3"
+        :key="n"
+      >
+        <skeleton-loading-container />
+      </div>
+    </template>
+    <repo-file
+      v-for="file in selctedTree"
+      :key="file.key"
+      :file="file"
+    />
   </div>
 </template>

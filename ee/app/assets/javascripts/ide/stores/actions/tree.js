@@ -59,16 +59,6 @@ export const getTreeData = (
 });
 
 export const toggleTreeOpen = ({ commit, dispatch }, { tree }) => {
-  /* if (tree.opened) {
-    // send empty data to clear the tree
-    const data = { trees: [], blobs: [], submodules: [] };
-
-    dispatch('updateDirectoryData',
-    { data, tree, projectId: tree.projectId, branchId: tree.branchId });
-  } else {
-    dispatch('getTreeData', { endpoint, tree, projectId: tree.projectId, branch: tree.branchId });
-  } */
-
   commit(types.TOGGLE_TREE_OPEN, tree);
 };
 
@@ -206,6 +196,8 @@ export const getFiles = (
     commit(types.CREATE_TREE, { treePath: `${projectId}/${branchId}` });
     selectedTree = state.trees[`${projectId}/${branchId}`];
 
+    if (selectedTree) commit(types.TOGGLE_LOADING, selectedTree);
+
     service
       .getFiles(selectedProject.web_url, branchId)
       .then(res => res.json())
@@ -266,21 +258,27 @@ export const getFiles = (
           }));
         });
 
-        commit(types.SET_DIRECTORY_DATA, { tree: selectedTree, data: baseTree });
+        const sortTreesByTypeAndName = (a, b) => {
+          if (a.type === 'tree' && b.type === 'blob') {
+            return -1;
+          } else if (a.type === 'blob' && b.type === 'tree') {
+            return 1;
+          }
+          if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+          if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+          return 0;
+        };
 
-        /*
-        dispatch('updateDirectoryData', { data, tree, projectId, branch, clearTree: false });
-        const selectedTree = tree || state.trees[`${projectId}/${branch}`];
+        const sortTree = (sortedTree) => {
+          sortedTree.forEach((el) => {
+            el.tree = sortTree(el.tree);
+          });
+          return sortedTree.sort(sortTreesByTypeAndName);
+        };
 
-        commit(types.SET_PARENT_TREE_URL, data.parent_tree_url);
-        commit(types.SET_LAST_COMMIT_URL, { tree: selectedTree, url: data.last_commit_path });
-        if (tree) commit(types.TOGGLE_LOADING, selectedTree);
+        commit(types.SET_DIRECTORY_DATA, { tree: selectedTree, data: sortTree(baseTree) });
+        commit(types.TOGGLE_LOADING, selectedTree);
 
-        const prevLastCommitPath = selectedTree.lastCommitPath;
-        if (prevLastCommitPath !== null) {
-          dispatch('getLastCommitData', selectedTree);
-        }
-        */
         resolve(data);
       })
       .catch((e) => {

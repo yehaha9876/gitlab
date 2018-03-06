@@ -31,7 +31,7 @@ describe('RepoFile', () => {
     spyOn(vm, 'timeFormated').and.returnValue(updated);
     vm.$mount();
 
-    const name = vm.$el.querySelector('.repo-file-name');
+    const name = vm.$el.querySelector('.ide-file-name');
 
     expect(name.href).toMatch('');
     expect(name.textContent.trim()).toEqual(vm.file.name);
@@ -122,7 +122,7 @@ describe('RepoFile', () => {
     });
 
     it('renders a tooltip', () => {
-      expect(vm.$el.querySelector('.repo-file-name span:nth-child(2)').dataset.originalTitle).toContain('Locked by testuser');
+      expect(vm.$el.querySelector('.ide-file-name span:nth-child(2)').dataset.originalTitle).toContain('Locked by testuser');
     });
   });
 });
