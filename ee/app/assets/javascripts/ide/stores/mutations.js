@@ -18,9 +18,9 @@ export default {
       currentBlobView: 'repo-editor',
     });
   },
-  [types.TOGGLE_LOADING](state, entry) {
+  [types.TOGGLE_LOADING](state, entry, forceValue) {
     Object.assign(entry, {
-      loading: !entry.loading,
+      loading: typeof forceValue !== 'undefined' ? forceValue : !entry.loading,
     });
   },
   [types.TOGGLE_EDIT_MODE](state) {

@@ -196,7 +196,7 @@ export const getFiles = (
     commit(types.CREATE_TREE, { treePath: `${projectId}/${branchId}` });
     selectedTree = state.trees[`${projectId}/${branchId}`];
 
-    if (selectedTree) commit(types.TOGGLE_LOADING, selectedTree);
+    commit(types.TOGGLE_LOADING, selectedTree, true);
 
     service
       .getFiles(selectedProject.web_url, branchId)
@@ -277,7 +277,7 @@ export const getFiles = (
         };
 
         commit(types.SET_DIRECTORY_DATA, { tree: selectedTree, data: sortTree(baseTree) });
-        commit(types.TOGGLE_LOADING, selectedTree);
+        commit(types.TOGGLE_LOADING, selectedTree, false);
 
         resolve(data);
       })
