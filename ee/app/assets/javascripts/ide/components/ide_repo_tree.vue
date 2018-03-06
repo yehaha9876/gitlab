@@ -31,7 +31,7 @@ export default {
     showLoading() {
       return this.trees[this.treeId].loading;
     },
-  }
+  },
 };
 </script>
 

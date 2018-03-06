@@ -271,7 +271,9 @@ export const getFiles = (
 
         const sortTree = (sortedTree) => {
           sortedTree.forEach((el) => {
-            el.tree = sortTree(el.tree);
+            Object.assign(el, {
+              tree: sortTree(el.tree),
+            });
           });
           return sortedTree.sort(sortTreesByTypeAndName);
         };

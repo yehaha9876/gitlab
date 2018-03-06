@@ -10,7 +10,7 @@
   import changedFileIcon from 'ee/ide/components/changed_file_icon.vue'; // eslint-disable-line import/first
 
   export default {
-    name: 'repoFile',
+    name: 'RepoFile',
     components: {
       skeletonLoadingContainer,
       newDropdown,
@@ -79,7 +79,6 @@
           });
         }
         this.$router.push(`/project${row.url}`);
-        this.$emit('folderOpened');
       },
     },
   };
@@ -138,7 +137,6 @@
       v-if="file.opened"
     >
       <repo-file
-        v-if="file.opened"
         v-for="childFile in file.tree"
         :key="childFile.key"
         :file="childFile"
