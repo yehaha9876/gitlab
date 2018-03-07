@@ -58,7 +58,7 @@ module Geo
 
       if redownload
         log_info("Redownloading #{type}")
-        fetch_geo_mirror(build_temporary_repository)
+        fetch_geo_mirror(build_temporary_repository, prune: false)
         set_temp_repository_as_main
       else
         ensure_repository
@@ -86,7 +86,7 @@ module Geo
       ::Gitlab::Geo.current_node
     end
 
-    def fetch_geo_mirror(repository)
+    def fetch_geo_mirror(repository, prune: true)
       url = Gitlab::Geo.primary_node.url + repository.full_path + '.git'
 
       # Fetch the repository, using a JWT header for authentication
@@ -94,7 +94,7 @@ module Geo
       header = { "http.#{url}.extraHeader" => "Authorization: #{authorization}" }
 
       repository.with_config(header) do
-        repository.fetch_as_mirror(url, remote_name: GEO_REMOTE_NAME, forced: true)
+        repository.fetch_as_mirror(url, remote_name: GEO_REMOTE_NAME, forced: true, prune: prune)
       end
     end
 

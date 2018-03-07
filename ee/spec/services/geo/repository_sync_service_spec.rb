@@ -33,7 +33,7 @@ describe Geo::RepositorySyncService do
     it 'fetches project repository with JWT credentials' do
       expect(repository).to receive(:with_config).with("http.#{url_to_repo}.extraHeader" => anything).and_call_original
       expect(repository).to receive(:fetch_as_mirror)
-        .with(url_to_repo, remote_name: 'geo', forced: true)
+        .with(url_to_repo, remote_name: 'geo', forced: true, prune: true)
         .once
 
       subject.execute
@@ -62,7 +62,7 @@ describe Geo::RepositorySyncService do
 
     it 'returns the lease when sync fail' do
       allow(repository).to receive(:fetch_as_mirror)
-        .with(url_to_repo, remote_name: 'geo', forced: true)
+        .with(url_to_repo, remote_name: 'geo', forced: true, prune: true)
         .and_raise(Gitlab::Shell::Error)
 
       expect(Gitlab::ExclusiveLease).to receive(:cancel).once.with(
@@ -81,7 +81,7 @@ describe Geo::RepositorySyncService do
 
     it 'rescues when Gitlab::Shell::Error is raised' do
       allow(repository).to receive(:fetch_as_mirror)
-        .with(url_to_repo, remote_name: 'geo', forced: true)
+        .with(url_to_repo, remote_name: 'geo', forced: true, prune: true)
         .and_raise(Gitlab::Shell::Error)
 
       expect { subject.execute }.not_to raise_error
@@ -89,7 +89,7 @@ describe Geo::RepositorySyncService do
 
     it 'rescues when Gitlab::Git::RepositoryMirroring::RemoteError is raised' do
       allow(repository).to receive(:fetch_as_mirror)
-        .with(url_to_repo, remote_name: 'geo', forced: true)
+        .with(url_to_repo, remote_name: 'geo', forced: true, prune: true)
         .and_raise(Gitlab::Git::RepositoryMirroring::RemoteError)
 
       expect { subject.execute }.not_to raise_error
@@ -97,7 +97,7 @@ describe Geo::RepositorySyncService do
 
     it 'rescues exception and fires after_create hook when Gitlab::Git::Repository::NoRepository is raised' do
       allow(repository).to receive(:fetch_as_mirror)
-      .with(url_to_repo, remote_name: 'geo', forced: true)
+      .with(url_to_repo, remote_name: 'geo', forced: true, prune: true)
       .and_raise(Gitlab::Git::Repository::NoRepository)
 
       expect(repository).to receive(:after_create)
@@ -107,7 +107,7 @@ describe Geo::RepositorySyncService do
 
     it 'increases retry count when Gitlab::Git::Repository::NoRepository is raised' do
       allow(repository).to receive(:fetch_as_mirror)
-        .with(url_to_repo, remote_name: 'geo', forced: true)
+        .with(url_to_repo, remote_name: 'geo', forced: true, prune: true)
         .and_raise(Gitlab::Git::Repository::NoRepository)
 
       subject.execute
@@ -119,7 +119,7 @@ describe Geo::RepositorySyncService do
       registry = create(:geo_project_registry, project: project)
 
       allow(repository).to receive(:fetch_as_mirror)
-        .with(url_to_repo, remote_name: 'geo', forced: true)
+        .with(url_to_repo, remote_name: 'geo', forced: true, prune: true)
         .and_raise(Gitlab::Shell::Error.new(Gitlab::GitAccess::ERROR_MESSAGES[:no_repo]))
 
       subject.execute
@@ -186,7 +186,7 @@ describe Geo::RepositorySyncService do
 
         before do
           allow(repository).to receive(:fetch_as_mirror)
-            .with(url_to_repo, remote_name: 'geo', forced: true)
+            .with(url_to_repo, remote_name: 'geo', forced: true, prune: true)
             .and_raise(Gitlab::Shell::Error.new('shell error'))
 
           subject.execute
@@ -235,6 +235,8 @@ describe Geo::RepositorySyncService do
         create(:geo_project_registry, project: project, repository_retry_count: Geo::BaseSyncService::RETRY_BEFORE_REDOWNLOAD + 1)
 
         expect(subject).to receive(:sync_repository).with(true).and_call_original
+        expect(repository).to receive(:fetch_as_mirror).with(url_to_repo, remote_name: 'geo', forced: true, prune: false)
+
         expect(subject.gitlab_shell).to receive(:mv_repository).exactly(2).times.and_call_original
         expect(subject.gitlab_shell).to receive(:remove_repository).exactly(3).times.and_call_original
 

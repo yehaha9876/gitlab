@@ -1,0 +1,5 @@
+---
+title: Don't use --prune option when redownload a repo (aka clone)
+merge_request:
+author:
+type: performance
