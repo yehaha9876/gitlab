@@ -262,28 +262,32 @@ node.
 1. Configure the [PostgreSQL FDW][FDW] connection and credentials:
 
     Save the script below in a file, ex. `/tmp/geo_fdw.sh` and modify the connection
-    params to match your environment.
+    params to match your environment. Execute it to setup the FDW connection.
     
     ```bash
     #!/bin/bash
  
     # Secondary Database connection params:
-    DB_HOST="/var/opt/gitlab/postgresql"
+    DB_HOST="/var/opt/gitlab/postgresql" # change to the public IP or VPC private IP if its an external server
     DB_NAME="gitlabhq_production"
     DB_USER="gitlab"
     DB_PORT="5432"
     
     # Tracking Database connection params:
-    GEO_DB_HOST="/var/opt/gitlab/geo-postgresql"
+    GEO_DB_HOST="/var/opt/gitlab/geo-postgresql" # change to the public IP or VPC private IP if its an external server
     GEO_DB_NAME="gitlabhq_geo_production"
     GEO_DB_USER="gitlab_geo"
     GEO_DB_PORT="5432"
  
-    sudo -u postgres psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "CREATE EXTENSION postgres_fdw;"
-    sudo -u postgres psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "CREATE SERVER gitlab_secondary FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host '$(DB_HOST)', dbname '$(DB_NAME)', port '$(DB_PORT)' );"
-    sudo -u postgres psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "CREATE USER MAPPING FOR $(GEO_DB_USER) SERVER gitlab_secondary OPTIONS (user '$(DB_USER)');"
-    sudo -u postgres psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "CREATE SCHEMA gitlab_secondary;"
-    sudo -u postgres psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "GRANT USAGE ON FOREIGN SERVER gitlab_secondary TO $(GEO_DB_USER);"
+    query_exec () {
+      gitlab-psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "${1}"
+    }
+ 
+    query_exec "CREATE EXTENSION postgres_fdw;"
+    query_exec "CREATE SERVER gitlab_secondary FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host '${DB_HOST}', dbname '${DB_NAME}', port '${DB_PORT}');"
+    query_exec "CREATE USER MAPPING FOR ${GEO_DB_USER} SERVER gitlab_secondary OPTIONS (user '${DB_USER}');"
+    query_exec "CREATE SCHEMA gitlab_secondary;"
+    query_exec "GRANT USAGE ON FOREIGN SERVER gitlab_secondary TO ${GEO_DB_USER};"
     ```
 
     And edit the content of `database_geo.yml` and to add `fdw: true` to
@@ -336,7 +340,6 @@ data before running `pg_basebackup`.
 
     echo Cleaning up old cluster directory
     sudo -u postgres rm -rf /var/opt/gitlab/postgresql/data
-    rm -f /tmp/postgresql.trigger
 
     echo Starting base backup as the replicator user
     echo Enter the password for $USER@$HOST
@@ -346,7 +349,6 @@ data before running `pg_basebackup`.
     sudo -u postgres bash -c "cat > /var/opt/gitlab/postgresql/data/recovery.conf <<- _EOF1_
       standby_mode = 'on'
       primary_conninfo = 'host=$HOST port=$PORT user=$USER password=$PASSWORD sslmode=$SSLMODE'
-      trigger_file = '/tmp/postgresql.trigger'
     _EOF1_
     "
 

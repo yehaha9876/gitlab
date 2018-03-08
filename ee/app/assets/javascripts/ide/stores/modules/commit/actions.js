@@ -1,8 +1,8 @@
 import { sprintf, __ } from '~/locale';
-import * as rootTypes from '~/ide/stores/mutation_types';
-import { createCommitPayload, createNewMergeRequestUrl } from '~/ide/stores/utils';
-import router from '~/ide/ide_router';
-import service from '~/ide/services';
+import * as rootTypes from 'ee/ide/stores/mutation_types';
+import { createCommitPayload, createNewMergeRequestUrl } from 'ee/ide/stores/utils';
+import router from 'ee/ide/ide_router';
+import service from 'ee/ide/services';
 import flash from '~/flash';
 import { stripHtml } from '~/lib/utils/text_utility';
 import * as types from './mutation_types';
@@ -89,12 +89,17 @@ export const updateFilesAfterCommit = (
       lastCommit,
     }, { root: true });
 
+    eventHub.$emit(`editor.update.model.content.${entry.path}`, entry.content);
+
     commit(rootTypes.SET_FILE_RAW_DATA, {
       file: entry,
       raw: entry.content,
     }, { root: true });
 
-    eventHub.$emit(`editor.update.model.content.${entry.path}`, entry.raw);
+    commit(rootTypes.TOGGLE_FILE_CHANGED, {
+      file: entry,
+      changed: false,
+    }, { root: true });
   });
 
   if (state.commitAction === consts.COMMIT_TO_NEW_BRANCH && rootGetters.activeFile) {
