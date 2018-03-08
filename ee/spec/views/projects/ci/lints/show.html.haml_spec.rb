@@ -1,17 +1,20 @@
 require 'spec_helper'
 
-describe 'ci/lints/show' do
+describe 'projects/ci/lints/show' do
   include Devise::Test::ControllerHelpers
 
-  describe 'XSS protection' do
-    let(:config_processor) { Gitlab::Ci::YamlProcessor.new(YAML.dump(content)) }
-    before do
-      assign(:status, true)
-      assign(:builds, config_processor.builds)
-      assign(:stages, config_processor.stages)
-      assign(:jobs, config_processor.jobs)
-    end
+  let(:project) { create(:project, :repository) }
+  let(:config_processor) { Gitlab::Ci::YamlProcessor.new(YAML.dump(content)) }
 
+  before do
+    assign(:project, project)
+    assign(:status, true)
+    assign(:builds, config_processor.builds)
+    assign(:stages, config_processor.stages)
+    assign(:jobs, config_processor.jobs)
+  end
+
+  describe 'XSS protection' do
     context 'when builds attrbiutes contain HTML nodes' do
       let(:content) do
         {
@@ -59,19 +62,9 @@ describe 'ci/lints/show' do
     }
   end
 
-  let(:config_processor) { Gitlab::Ci::YamlProcessor.new(YAML.dump(content)) }
-
   context 'when the content is valid' do
-    before do
-      assign(:status, true)
-      assign(:builds, config_processor.builds)
-      assign(:stages, config_processor.stages)
-      assign(:jobs, config_processor.jobs)
-    end
-
     it 'shows the correct values' do
       render
-
       expect(rendered).to have_content('Tag list: dotnet')
       expect(rendered).to have_content('Only policy: refs, test@dude/repo')
       expect(rendered).to have_content('Except policy: refs, deploy')
