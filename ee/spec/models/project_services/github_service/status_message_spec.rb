@@ -7,14 +7,14 @@ describe GithubService::StatusMessage do
 
   describe '#description' do
     it 'includes human readable gitlab status' do
-      subject = described_class.new(project, detailed_status: 'passed')
+      subject = described_class.new(detailed_status: 'passed')
 
       expect(subject.description).to eq "Pipeline passed on GitLab"
     end
 
     it 'gets truncated to 140 chars' do
       dummy_text = 'a' * 500
-      subject = described_class.new(project, detailed_status: dummy_text)
+      subject = described_class.new(detailed_status: dummy_text)
 
       expect(subject.description.length).to eq 140
     end
@@ -36,7 +36,7 @@ describe GithubService::StatusMessage do
 
     with_them do
       it 'transforms status' do
-        subject = described_class.new(project, status: gitlab_status)
+        subject = described_class.new(status: gitlab_status)
 
         expect(subject.status).to eq github_status
       end
@@ -44,7 +44,7 @@ describe GithubService::StatusMessage do
   end
 
   describe '#status_options' do
-    let(:subject) { described_class.new(project, id: 1) }
+    let(:subject) { described_class.new(target_url: 'http://some.url') }
 
     it 'includes context' do
       expect(subject.status_options[:context]).to be_a String
@@ -59,11 +59,11 @@ describe GithubService::StatusMessage do
     end
   end
 
-  describe '.from_pipeline_data' do
+  describe '.pipeline_overview' do
     let(:pipeline) { create(:ci_pipeline) }
     let(:project) { pipeline.project }
     let(:sample_data) { Gitlab::DataBuilder::Pipeline.build(pipeline) }
-    let(:subject) { described_class.from_pipeline_data(project, sample_data) }
+    let(:subject) { described_class.pipeline_overview(project, sample_data) }
 
     it 'builds an instance of GithubService::StatusMessage' do
       expect(subject).to be_a described_class
@@ -96,6 +96,40 @@ describe GithubService::StatusMessage do
         it 'uses human readable status which can be used in a sentence' do
           expect(subject.description). to eq 'Pipeline waiting for manual action on GitLab'
         end
+      end
+    end
+  end
+  describe '.for_pipeline_data' do
+    let(:build) { create(:ci_build) }
+    let(:pipeline) { build.pipeline }
+    let(:project) { pipeline.project }
+    let(:sample_data) { Gitlab::DataBuilder::Pipeline.build(pipeline) }
+    let(:status_messages) { described_class.for_pipeline_data(project, sample_data) }
+    let(:subject) { status_messages.last }
+
+    it 'builds an instance of GithubService::StatusMessage' do
+      expect(subject).to be_a described_class
+    end
+
+    describe 'builds an object with' do
+      specify 'sha' do
+        expect(subject.sha).to eq build.pipeline.sha
+      end
+
+      specify 'status' do
+        expect(subject.status).to eq :pending
+      end
+
+      specify 'target_url' do
+        expect(subject.target_url).to end_with project_build_path(project, pipeline.builds.first)
+      end
+
+      specify 'description' do
+        expect(subject.description).to eq "Pipeline pending on GitLab"
+      end
+
+      specify 'context' do
+        expect(subject.context).to eq "ci/gitlab/#{build.stage}"
       end
     end
   end

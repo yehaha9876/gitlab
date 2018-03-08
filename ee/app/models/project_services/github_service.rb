@@ -53,9 +53,11 @@ class GithubService < Service
   def execute(data)
     return if disabled?
 
-    status_message = StatusMessage.from_pipeline_data(project, data)
+    status_messages = StatusMessage.for_pipeline_data(project, data)
 
-    update_status(status_message)
+    status_messages.map do |status_message|
+      update_status(status_message)
+    end
   end
 
   def test_data(project, user)
@@ -68,7 +70,7 @@ class GithubService < Service
 
   def test(data)
     begin
-      result = execute(data)
+      result = execute(data).first
 
       context = result[:context]
       by_user = result.dig(:creator, :login)

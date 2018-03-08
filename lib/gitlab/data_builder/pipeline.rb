@@ -36,6 +36,7 @@ module Gitlab
           stage: build.stage,
           name: build.name,
           status: build.status,
+          detailed_status: build.detailed_status(nil).label,
           created_at: build.created_at,
           started_at: build.started_at,
           finished_at: build.finished_at,
