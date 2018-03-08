@@ -6,7 +6,8 @@ describe CiCd::GithubIntegrationSetupService do
   let(:import_url) { "https://#{api_token}@github.com/#{repo_full_name}.git" }
   let(:credentials) { { user: api_token } }
   let(:project) do
-    create(:project, import_source: repo_full_name,
+    create(:project, :mirror,
+                     import_source: repo_full_name,
                      import_url: import_url,
                      import_data_attributes: { credentials: credentials } )
   end
@@ -20,12 +21,21 @@ describe CiCd::GithubIntegrationSetupService do
   describe 'sets up GitHub service integration' do
     let(:integration) { project.github_service }
 
-    specify 'with API token' do
-      expect(integration.token).to eq api_token
+    it 'enables the integration' do
+      expect(integration).to be_active
     end
 
-    specify 'with repo URL' do
-      expect(integration.repository_url).to eq 'https://github.com/MyUser/my-project'
+    it 'leaves API token blank so it can default to mirror settings' do
+      expect(integration.token).to eq nil
+    end
+
+    it 'leaves repo URL blank so it can default to mirror settings' do
+      expect(integration.repository_url).to eq nil
+    end
+
+    it 'defaults to mirror settings' do
+      expect(integration.owner).to eq 'MyUser'
+      expect(integration.repository_name).to eq 'my-project'
     end
   end
 end

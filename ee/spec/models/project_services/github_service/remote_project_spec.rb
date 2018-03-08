@@ -58,4 +58,21 @@ describe GithubService::RemoteProject do
       end
     end
   end
+
+  context 'with token set as username' do
+    let(:token) { "941c7e70be2" }
+    let(:project_url) { "https://#{token}@github.com/#{repo_full_path}" }
+
+    describe '#token' do
+      it 'is extracted from URI username' do
+        expect(subject.token).to eq token
+      end
+    end
+
+    describe '#sanized_url' do
+      it 'sanitizes mirror url by by removing username' do
+        expect(subject.sanitized_url).to eq "https://github.com/#{repo_full_path}"
+      end
+    end
+  end
 end

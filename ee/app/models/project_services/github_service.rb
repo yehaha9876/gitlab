@@ -6,8 +6,10 @@ class GithubService < Service
 
   delegate :api_url, :owner, :repository_name, to: :remote_project
 
-  validates :token, presence: true, if: :activated?
+  validates :token, presence: true, if: :token_required?
   validates :repository_url, url: true, allow_blank: true
+  validates :owner, presence: { message: "couldn't be found in Repository URL or Mirror URL" }, if: :active?
+  validates :repository_name, presence: { message: "couldn't be found in Repository URL or Mirror URL" }, if: :active?
 
   default_value_for :pipeline_events, true
 
@@ -31,8 +33,8 @@ class GithubService < Service
 
   def fields
     [
-      { type: 'text', name: "token", required: true, placeholder: "e.g. 8d3f016698e...", help: 'Create a <a href="https://github.com/settings/tokens">personal access token</a> with  <code>repo:status</code> access granted and paste it here.'.html_safe },
-      { type: 'text', name: "repository_url", title: 'Repository URL', required: true, placeholder: 'e.g. https://github.com/owner/repository' }
+      { type: 'text', name: "token", placeholder: token_placeholder, help: 'Create a <a href="https://github.com/settings/tokens">personal access token</a> with  <code>repo:status</code> access granted and paste it here.'.html_safe },
+      { type: 'text', name: "repository_url", title: 'Repository URL', placeholder: repository_url_placeholder }
     ]
   end
 
@@ -80,8 +82,51 @@ class GithubService < Service
 
   private
 
+  # def configuration
+  # def defaults
+  # def settings
+  # def settings_with_fallback
+  # def settings_with_fallback
+  #   Configuration.new(project, repository_url, token)
+  #   RemoteProject::WithMirrorDefault.new
+  #   configuration.token
+  #   delegate :api_url, :owner, :repository_name to here?
+  # end
+
+  def token_placeholder
+    if remote_project.token
+      "e.g. 8d3f016698e... (Leave blank to use import token)"
+    else
+      "e.g. 8d3f016698e..."
+    end
+  end
+
+  def token_required?
+    activated? && !remote_project.token
+  end
+
+  def repository_url_placeholder
+    if mirror_url
+      "e.g. #{remote_project.sanitized_url}"
+    else
+      'e.g. https://github.com/owner/repository'
+    end
+  end
+
+  def token_or_mirror_token
+    token.presence || remote_project.token
+  end
+
   def remote_project
-    RemoteProject.new(repository_url)
+    RemoteProject.new(configuration_url)
+  end
+
+  def configuration_url
+    repository_url.presence || mirror_url
+  end
+
+  def mirror_url
+    project.import_url
   end
 
   def disabled?
@@ -95,7 +140,7 @@ class GithubService < Service
   end
 
   def notifier
-    StatusNotifier.new(token, remote_repo_path, api_endpoint: api_url)
+    StatusNotifier.new(token_or_mirror_token, remote_repo_path, api_endpoint: api_url)
   end
 
   def remote_repo_path

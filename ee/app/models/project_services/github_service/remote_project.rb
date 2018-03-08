@@ -20,6 +20,14 @@ class GithubService
       uri_path.split('/')[2]
     end
 
+    def token
+      @uri.user
+    end
+
+    def sanitized_url
+      "#{protocol}://#{host}#{uri_path}"
+    end
+
     private
 
     def host
