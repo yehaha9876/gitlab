@@ -22,6 +22,11 @@ class GithubService
               detailed_status: params[:detailed_status],
               target_url: project_build_url(project, params[:id]))
       end
+
+      def message_type
+        "Job"
+      end
+    end
     end
 
     def initialize(params)
@@ -37,7 +42,11 @@ class GithubService
     end
 
     def description
-      "Pipeline #{@detailed_status} on GitLab".truncate(140)
+      "#{message_type} #{@detailed_status} on GitLab".truncate(140)
+    end
+
+    def message_type
+      "Pipeline"
     end
 
     def status

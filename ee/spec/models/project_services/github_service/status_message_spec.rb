@@ -125,7 +125,7 @@ describe GithubService::StatusMessage do
       end
 
       specify 'description' do
-        expect(subject.description).to eq "Pipeline pending on GitLab"
+        expect(subject.description).to eq "Job pending on GitLab"
       end
 
       specify 'context' do
