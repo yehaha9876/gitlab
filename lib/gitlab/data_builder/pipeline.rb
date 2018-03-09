@@ -10,6 +10,7 @@ module Gitlab
           user: pipeline.user.try(:hook_attrs),
           project: pipeline.project.hook_attrs(backward: false),
           commit: pipeline.commit.try(:hook_attrs),
+          stages: pipeline.stages.map(&method(:stage_hook_attrs)),
           builds: pipeline.builds.map(&method(:build_hook_attrs))
         }
       end
@@ -27,6 +28,17 @@ module Gitlab
           created_at: pipeline.created_at,
           finished_at: pipeline.finished_at,
           duration: pipeline.duration
+        }
+      end
+
+      def stage_hook_attrs(stage)
+        {
+          id: stage.id,
+          name: stage.name,
+          status: stage.status,
+          detailed_status: stage.detailed_status(nil).label,
+          created_at: stage.created_at,
+          updated_at: stage.updated_at,
         }
       end
 

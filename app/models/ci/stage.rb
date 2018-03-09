@@ -66,5 +66,9 @@ module Ci
         end
       end
     end
+
+    def detailed_status(current_user)
+      Gitlab::Ci::Status::Stage::Factory.new(self, current_user).fabricate!
+    end
   end
 end
