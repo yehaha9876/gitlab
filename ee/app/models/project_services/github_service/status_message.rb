@@ -17,7 +17,7 @@ class GithubService
     class ForBuild < self
       def initialize(project, params, sha:)
         super(sha: sha,
-              context_name: params[:stage],
+              context_name: params[:name],
               status: params[:status],
               detailed_status: params[:detailed_status],
               target_url: project_build_url(project, params[:id]))
@@ -27,6 +27,19 @@ class GithubService
         "Job"
       end
     end
+
+    class ForStage < self
+      def initialize(project, params, sha:)
+        super(sha: sha,
+              context_name: params[:name],
+              status: params[:status],
+              detailed_status: params[:detailed_status],
+              target_url: project_build_url(project, params[:id]))
+      end
+
+      def message_type
+        "Stage"
+      end
     end
 
     def initialize(params)
