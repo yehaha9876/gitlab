@@ -1,0 +1,18 @@
+rbac:
+  create: false
+  clusterWideAccess: false
+
+cassandra:
+  resources:
+    requests:
+      memory: 8Gi
+      cpu: 2
+    limits:
+      memory: 8Gi
+      cpu: 2
+  config:
+    seed_size: 1
+    cluster_size: 1
+
+spark:
+  enabled: true

@@ -37,6 +37,7 @@ module Clusters
     has_one :application_runner, class_name: 'Clusters::Applications::Runner'
     has_one :application_jupyter, class_name: 'Clusters::Applications::Jupyter'
     has_one :application_knative, class_name: 'Clusters::Applications::Knative'
+    has_one :application_jaeger, class_name: 'Clusters::Applications::Jaeger'
 
     has_many :kubernetes_namespaces
     has_one :kubernetes_namespace, -> { order(id: :desc) }, class_name: 'Clusters::KubernetesNamespace'
