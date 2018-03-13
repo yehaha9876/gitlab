@@ -135,6 +135,10 @@ module Gitlab
     config.assets.precompile << "icons.json"
     config.assets.precompile << "illustrations/*.svg"
 
+    # Import csslab
+    config.assets.paths << "#{config.root}/node_modules/@gitlab-org/csslab/dist/css"
+    config.assets.precompile << "csslab-slim.css"
+
     ## EE-specific assets config START
     %w[images javascripts stylesheets].each do |path|
       config.assets.paths << "#{config.root}/ee/app/assets/#{path}"
