@@ -4865,7 +4865,7 @@ jquery.waitforimages@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/jquery.waitforimages/-/jquery.waitforimages-2.2.0.tgz#63f23131055a1b060dc913e6d874bcc9b9e6b16b"
 
-"jquery@>= 1.9.1", jquery@>=1.8.0, jquery@^3.2.1:
+"jquery@>= 1.9.1", jquery@>=1.8.0, jquery@>=3.2.1, jquery@^3.2.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
@@ -7304,19 +7304,6 @@ resolve-dir@^1.0.0:
     expand-tilde "^2.0.0"
     global-modules "^1.0.0"
 
-resolve-cwd@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/resolve-cwd/-/resolve-cwd-2.0.0.tgz#00a9f7387556e27038eae232caa372a6a59b665a"
-  dependencies:
-    resolve-from "^3.0.0"
-
-resolve-dir@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/resolve-dir/-/resolve-dir-1.0.1.tgz#79a40644c362be82f26effe739c9bb5382046f43"
-  dependencies:
-    expand-tilde "^2.0.0"
-    global-modules "^1.0.0"
-
 resolve-from@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-1.0.1.tgz#26cbfe935d1aeeeabb29bc3fe5aeb01e93d44226"
@@ -8145,6 +8132,12 @@ table@^3.7.8:
     lodash "^4.0.0"
     slice-ansi "0.0.4"
     string-width "^2.0.0"
+
+tablesorter@^2.29.6:
+  version "2.29.6"
+  resolved "https://registry.yarnpkg.com/tablesorter/-/tablesorter-2.29.6.tgz#625bcc6a00c25be4b12246143ee3ed4c8cde6827"
+  dependencies:
+    jquery ">=3.2.1"
 
 tapable@^0.1.8:
   version "0.1.10"
