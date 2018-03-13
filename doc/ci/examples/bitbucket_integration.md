@@ -112,10 +112,10 @@ GitLab CI/CD can be used with any Git repository using Pull Mirroring.
     esac
 
     echo "Pushing status to $BITBUCKET_STATUS_API..."
-    curl -X POST $BITBUCKET_STATUS_API \
+    curl --request POST $BITBUCKET_STATUS_API \
     --user $BITBUCKET_USERNAME:$BITBUCKET_ACCESS_TOKEN \
-    -H "Content-Type:application/json" \
+    --header "Content-Type:application/json" \
     --silent \
-    -d "{ \"state\": \"$BITBUCKET_STATE\", \"key\": \"$BITBUCKET_KEY\", \"description\":
+    --data "{ \"state\": \"$BITBUCKET_STATE\", \"key\": \"$BITBUCKET_KEY\", \"description\":
     \"$BITBUCKET_DESCRIPTION\",\"url\": \"$CI_PROJECT_URL/-/jobs/$CI_JOB_ID\" }"
     ```
