@@ -6,7 +6,7 @@ describe Clusters::Applications::Jaeger do
 
   describe '#install_command' do
     let(:kubeclient) { double('kubernetes client') }
-    let(:jaeger) { create(:clusters_applications_Jaeger) }
+    let(:jaeger) { create(:clusters_applications_jaeger) }
 
     subject { jaeger.install_command }
 
