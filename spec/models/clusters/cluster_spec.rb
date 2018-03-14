@@ -315,9 +315,10 @@ describe Clusters::Cluster do
       let!(:runner) { create(:clusters_applications_runner, cluster: cluster) }
       let!(:jupyter) { create(:clusters_applications_jupyter, cluster: cluster) }
       let!(:knative) { create(:clusters_applications_knative, cluster: cluster) }
+      let!(:jaeger) { create(:clusters_applications_runner, cluster: cluster) }
 
       it 'returns a list of created applications' do
-        is_expected.to contain_exactly(helm, ingress, prometheus, runner, jupyter, knative)
+        is_expected.to contain_exactly(helm, ingress, prometheus, runner, jupyter, knative, jaeger)
       end
     end
   end
