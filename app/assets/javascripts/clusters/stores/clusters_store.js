@@ -54,6 +54,13 @@ export default class ClusterStore {
           requestReason: null,
           hostname: null,
         },
+        jaeger: {
+          title: s__('ClusterIntegration|Jaeger'),
+          status: null,
+          statusReason: null,
+          requestStatus: null,
+          requestReason: null,
+        },
       },
     };
   }

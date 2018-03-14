@@ -2,17 +2,42 @@ rbac:
   create: false
   clusterWideAccess: false
 
-cassandra:
-  resources:
-    requests:
-      memory: 8Gi
-      cpu: 2
-    limits:
-      memory: 8Gi
-      cpu: 2
-  config:
-    seed_size: 1
-    cluster_size: 1
+provisionDataStore:
+  cassandra: false
+  elasticsearch: true
+  
+storage:
+  type: elasticsearch
 
+elasticsearch:
+  client:
+    replicas: 1
+    resources:
+      limits:
+        cpu: 1
+        memory: 1024Mi
+      requests:
+        cpu: 25m
+        memory: 512Mi
+
+  master:
+    replicas: 2
+    resources:
+      limits:
+        cpu: 1
+        memory: 1024Mi
+      requests:
+        cpu: 25m
+        memory: 512Mi
+
+  data:
+    replicas: 1
+    resources:
+      limits:
+        cpu: 2
+        memory: 2048Mi
+      requests:
+        cpu: 25m
+        memory: 1536Mi
 spark:
   enabled: true
