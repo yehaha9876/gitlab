@@ -24,6 +24,7 @@ describe('Applications', () => {
           prometheus: { title: 'Prometheus' },
           jupyter: { title: 'JupyterHub' },
           knative: { title: 'Knative' },
+          jaeger: { title: 'Jaeger' },
         },
       });
     });
@@ -51,6 +52,10 @@ describe('Applications', () => {
     it('renders a row for Knative', () => {
       expect(vm.$el.querySelector('.js-cluster-application-row-knative')).not.toBe(null);
     });
+
+    it('renders a row for Jaeger', () => {
+      expect(vm.$el.querySelector('.js-cluster-application-row-jaeger')).toBeDefined();
+    });
   });
 
   describe('Ingress application', () => {
@@ -69,6 +74,7 @@ describe('Applications', () => {
               prometheus: { title: 'Prometheus' },
               jupyter: { title: 'JupyterHub', hostname: '' },
               knative: { title: 'Knative', hostname: '' },
+              jaeger: { title: 'Jaeger' },
             },
           });
 
@@ -93,6 +99,7 @@ describe('Applications', () => {
               prometheus: { title: 'Prometheus' },
               jupyter: { title: 'JupyterHub', hostname: '' },
               knative: { title: 'Knative', hostname: '' },
+              jaeger: { title: 'Jaeger' },
             },
           });
 

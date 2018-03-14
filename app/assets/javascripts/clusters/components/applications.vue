@@ -371,6 +371,7 @@ export default {
                   />
                 </span>
               </div>
+<<<<<<< HEAD
             </div>
             <p v-if="ingressInstalled">
               {{ s__(`ClusterIntegration|Replace this with your own hostname if you want.
@@ -438,6 +439,41 @@ export default {
           </template>
         </div>
       </application-row>
+=======
+              <p v-if="ingressInstalled">
+                {{ s__(`ClusterIntegration|Replace this with your own hostname if you want.
+                If you do so, point hostname to Ingress IP Address from above.`) }}
+                <a
+                  :href="ingressDnsHelpPath"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ __('More information') }}
+                </a>
+              </p>
+            </template>
+          </div>
+        </application-row>
+        <application-row
+          id="jaeger"
+          :title="applications.jaeger.title"
+          title-link="https://github.com/jaegertracing/jaeger"
+          :status="applications.jaeger.status"
+          :status-reason="applications.jaeger.statusReason"
+          :request-status="applications.jaeger.requestStatus"
+          :request-reason="applications.jaeger.requestReason"
+        >
+          <div slot="description">
+            {{ s__(`ClusterIntegration|Jaeger collects and processes OpenTracing data.
+              Enables tracing requests happening between services in your cluster`) }}
+          </div>
+        </application-row>
+        <!--
+          NOTE: Don't forget to update `clusters.scss`
+          min-height for this block and uncomment `application_spec` tests
+        -->
+      </div>
+>>>>>>> Install Jaeger UI
     </div>
   </section>
 </template>

@@ -12,7 +12,7 @@ module Clusters
       default_value_for :version, VERSION
 
       def chart
-        'incubator/jaeger'
+        'jaeger/jaeger'
       end
 
       def repository

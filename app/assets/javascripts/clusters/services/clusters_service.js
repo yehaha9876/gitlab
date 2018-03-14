@@ -10,6 +10,7 @@ export default class ClusterService {
       prometheus: this.options.installPrometheusEndpoint,
       jupyter: this.options.installJupyterEndpoint,
       knative: this.options.installKnativeEndpoint,
+      jaeger: this.options.installJaegerEndpoint,
     };
   }
 

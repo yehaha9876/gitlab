@@ -37,6 +37,7 @@ export default class Clusters {
       helpPath,
       ingressHelpPath,
       ingressDnsHelpPath,
+      installJaegerPath
     } = document.querySelector('.js-edit-cluster-form').dataset;
 
     this.store = new ClustersStore();
@@ -52,6 +53,7 @@ export default class Clusters {
       installPrometheusEndpoint: installPrometheusPath,
       installJupyterEndpoint: installJupyterPath,
       installKnativeEndpoint: installKnativePath,
+      installJaegerEndpoint: installJaegerPath,
     });
 
     this.installApplication = this.installApplication.bind(this);
