@@ -120,6 +120,7 @@ describe('Applications', () => {
             prometheus: { title: 'Prometheus' },
             jupyter: { title: 'JupyterHub', hostname: '' },
             knative: { title: 'Knative', hostname: '' },
+            jaeger: { title: 'Jaeger' },
           },
         });
 

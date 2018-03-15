@@ -37,7 +37,7 @@ export default class Clusters {
       helpPath,
       ingressHelpPath,
       ingressDnsHelpPath,
-      installJaegerPath
+      installJaegerPath,
     } = document.querySelector('.js-edit-cluster-form').dataset;
 
     this.store = new ClustersStore();
