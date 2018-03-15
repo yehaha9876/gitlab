@@ -4,10 +4,14 @@ module Projects
     UpdateError = Class.new(Error)
 
     def execute
+      puts "   --> project mirror? #{project.mirror?}"
       unless project.mirror?
         return success
       end
 
+      puts "  --> can push code? #{can?(current_user, :push_code_to_protected_branches, project)}"
+      puts "  --> user is #{current_user.inspect}, project is #{project.inspect}"
+      put "   --> project count is #{Project.all.count}, user count is #{User.all.count}"
       unless can?(current_user, :push_code_to_protected_branches, project)
         return error("The mirror user is not allowed to push code to all branches on this project.")
       end
@@ -18,6 +22,7 @@ module Projects
 
       update_branches
 
+      puts " --> succeeded"
       success
     rescue Gitlab::Shell::Error, Gitlab::Git::RepositoryMirroring::RemoteError, UpdateError => e
       error(e.message)
