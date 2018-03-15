@@ -15,6 +15,10 @@ module Projects
 
             run_autodevops_pipeline(service)
 
+            if service.auto_devops_conflicts_custom_yml?
+              flash[:warning] = "The project must remove the custom CI config file to use the Auto DevOps pipeline configuration."
+            end
+
             redirect_to project_settings_ci_cd_path(@project)
           else
             render 'show'
