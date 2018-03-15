@@ -6,6 +6,7 @@ const CLUSTERS_MOCK_DATA = {
       data: {
         status: 'errored',
         status_reason: 'Failed to request to CloudPlatform.',
+<<<<<<< HEAD
         applications: [
           {
             name: 'helm',
@@ -38,6 +39,11 @@ const CLUSTERS_MOCK_DATA = {
             status: APPLICATION_STATUS.INSTALLING,
             status_reason: 'Cannot connect',
           },
+          {
+            name: 'jaeger',
+            status: APPLICATION_STATUS.ERROR,
+            status_reason: 'Cannot connect',
+          },
         ],
       },
     },
@@ -45,6 +51,7 @@ const CLUSTERS_MOCK_DATA = {
       data: {
         status: 'errored',
         status_reason: 'Failed to request to CloudPlatform.',
+<<<<<<< HEAD
         applications: [
           {
             name: 'helm',
@@ -77,6 +84,11 @@ const CLUSTERS_MOCK_DATA = {
             status: APPLICATION_STATUS.INSTALLABLE,
             status_reason: 'Cannot connect',
           },
+          {
+            name: 'jaeger',
+            status: APPLICATION_STATUS.ERROR,
+            status_reason: 'Cannot connect',
+          },
         ],
       },
     },
@@ -88,6 +100,7 @@ const CLUSTERS_MOCK_DATA = {
     '/gitlab-org/gitlab-shell/clusters/1/applications/prometheus': {},
     '/gitlab-org/gitlab-shell/clusters/1/applications/jupyter': {},
     '/gitlab-org/gitlab-shell/clusters/1/applications/knative': {},
+    '/gitlab-org/gitlab-shell/clusters/1/applications/jaeger': {},
   },
 };
 
