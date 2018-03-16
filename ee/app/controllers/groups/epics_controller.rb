@@ -1,6 +1,7 @@
 class Groups::EpicsController < Groups::ApplicationController
   include IssuableActions
   include IssuableCollections
+  include RendersNotes
 
   before_action :check_epics_available!
   before_action :epic, except: [:index, :create]
@@ -65,6 +66,10 @@ class Groups::EpicsController < Groups::ApplicationController
 
   def serializer
     EpicSerializer.new(current_user: current_user)
+  end
+
+  def discussion_serializer
+    DiscussionSerializer.new(project: nil, noteable: issuable, current_user: current_user, note_entity: EpicNoteEntity)
   end
 
   def update_service

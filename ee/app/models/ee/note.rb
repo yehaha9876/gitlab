@@ -7,7 +7,7 @@ module EE
       include ObjectStorage::BackgroundMove
     end
 
-    override :for_project_noteable?
+    override :for_epic?
     def for_epic?
       noteable.is_a?(Epic)
     end
@@ -20,6 +20,15 @@ module EE
     override :can_create_todo?
     def can_create_todo?
       !for_epic? && super
+    end
+
+    override :etag_key
+    def etag_key
+      if for_epic?
+        return ::Gitlab::Routing.url_helpers.group_epic_notes_path(noteable.group, noteable)
+      end
+
+      super
     end
   end
 end
