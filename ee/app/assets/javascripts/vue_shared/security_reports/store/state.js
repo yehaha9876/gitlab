@@ -2,7 +2,7 @@ export default {
   type: '',
 
   summaryCounts: {
-    new: 0,
+    added: 0,
     fixed: 0,
   },
 

@@ -68,6 +68,10 @@
         default: null,
       },
     },
+    sast: SAST,
+    dast: DAST,
+    sastContainer: SAST_CONTAINER,
+
     methods: {
       ...mapActions([
         'setAppType',
@@ -83,10 +87,24 @@
         'fetchSastContainerReports',
         'fetchDastReports',
       ]),
+      checkReportStatus(loading, error) {
+        if (loading) {
+          return 'loading';
+        } else if (error) {
+          return 'error';
+        }
+
+        return 'success';
+      },
+
+      translateText(type) {
+        return {
+          error: sprintf(s__('ciReport|Failed to load %{reportName} report'), { reportName: type }),
+          loading: sprintf(s__('ciReport|Loading %{reportName} report'), { reportName: type }),
+        };
+      },
     },
-    sast: SAST,
-    dast: DAST,
-    sastContainer: SAST_CONTAINER,
+
     computed: {
       ...mapState(['sast', 'sastContainer', 'dast']),
       ...mapGetters([
@@ -100,6 +118,17 @@
         'dastText',
         'summaryText',
       ]),
+
+      sastContainerInformationText() {
+        return sprintf(
+          s__('ciReport|Unapproved vulnerabilities (red) can be marked as approved. %{helpLink}'), {
+            helpLink: `<a href="https://gitlab.com/gitlab-org/clair-scanner#example-whitelist-yaml-file" target="_blank" rel="noopener noreferrer nofollow">
+              ${s__('ciReport|Learn more about whitelisting')}
+            </a>`,
+          },
+          false,
+        );
+      },
     },
 
     created() {
@@ -231,7 +260,7 @@
 
           <template v-else>
             SAST Container report summary
-            {{ sastContainerInformationText() }}
+            <div v-html="sastContainerInformationText"></div>
             <issues-list
               :unresolved-issues="sastContainer.unapproved"
               :neutral-issues="sastContainer.approved"

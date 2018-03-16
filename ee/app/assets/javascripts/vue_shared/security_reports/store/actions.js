@@ -10,12 +10,6 @@ export const setHeadBlobPath = ({ commit }, blobPath) =>
 export const setBaseBlobPath = ({ commit }, blobPath) =>
   commit(types.SET_BASE_BLOB_PATH, blobPath);
 
-export const incrementSummaryNewCount = ({ commit }, count) =>
-  commit(types.INCREMENT_SUMMARY_NEW_COUNT, count);
-
-export const incrementSummaryFixedCount = ({ commit }, count) =>
-  commit(types.INCREMENT_SUMMARY_FIXED_COUNT, count);
-
 /**
  * SAST
  */

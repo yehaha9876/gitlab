@@ -15,7 +15,6 @@
     SAST_CONTAINER,
   } from '../store/constants';
 
-
   const modalDefaultData = {
     modalId: 'modal-mrwidget-issue',
     modalDesc: '',

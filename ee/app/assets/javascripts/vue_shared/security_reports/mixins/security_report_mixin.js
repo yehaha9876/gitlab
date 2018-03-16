@@ -15,8 +15,8 @@ export default {
 
       if (resolvedIssues.length) {
         text.push(n__(
-          ' improved on %d security vulnerability',
-          ' improved on %d security vulnerabilities',
+          ' detected %d new vulnerability',
+          ' detected %d new vulnerabilities',
           resolvedIssues.length,
         ));
       }
@@ -27,30 +27,13 @@ export default {
 
       if (newIssues.length) {
         text.push(n__(
-          ' degraded on %d security vulnerability',
-          ' degraded on %d security vulnerabilities',
+          ' detected %d fixed vulnerability',
+          ' detected %d fixed vulnerabilities',
           newIssues.length,
         ));
       }
 
       return text.join('');
-    },
-
-    translateText(type) {
-      return {
-        error: sprintf(s__('ciReport|Failed to load %{reportName} report'), { reportName: type }),
-        loading: sprintf(s__('ciReport|Loading %{reportName} report'), { reportName: type }),
-      };
-    },
-
-    checkReportStatus(loading, error) {
-      if (loading) {
-        return 'loading';
-      } else if (error) {
-        return 'error';
-      }
-
-      return 'success';
     },
 
     sastContainerText(vulnerabilities = [], approved = [], unapproved = []) {
@@ -93,17 +76,6 @@ export default {
       }
 
       return s__('ciReport|DAST detected no alerts by analyzing the review app');
-    },
-
-    sastContainerInformationText() {
-      return sprintf(
-        s__('ciReport|Unapproved vulnerabilities (red) can be marked as approved. %{helpLink}'), {
-          helpLink: `<a href="https://gitlab.com/gitlab-org/clair-scanner#example-whitelist-yaml-file" target="_blank" rel="noopener noreferrer nofollow">
-            ${s__('ciReport|Learn more about whitelisting')}
-          </a>`,
-        },
-        false,
-      );
     },
   },
 };

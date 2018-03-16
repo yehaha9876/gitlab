@@ -19,14 +19,6 @@ export default {
     Object.assign(state.blobPath, { base: path });
   },
 
-  [types.INCREMENT_SUMMARY_NEW_COUNT](state, count) {
-    Object.assign(state.summaryCounts, { new: state.summaryCounts.new + count });
-  },
-
-  [types.INCREMENT_SUMMARY_FIXED_COUNT](state, count) {
-    Object.assign(state.summaryCounts, { fixed: state.summaryCounts.fixed + count });
-  },
-
   // SAST
 
   [types.SET_SAST_HEAD_PATH](state, path) {
@@ -41,6 +33,21 @@ export default {
     Object.assign(state.sast, { isLoading: true });
   },
 
+  /**
+   * Compares sast results and returns the formatted report
+   *
+   * Security report has 3 types of issues, newIssues, resolvedIssues and allIssues.
+   *
+   * When we have both base and head:
+   * - newIssues = head - base
+   * - resolvedIssues = base - head
+   * - allIssues = head - newIssues - resolvedIssues
+   *
+   * When we only have head
+   * - newIssues = head
+   * - resolvedIssues = 0
+   * - allIssues = 0
+   */
   [types.RECEIVE_SAST_REPORTS](state, reports) {
     if (reports.base && reports.head) {
       const filterKey = 'cve';
@@ -57,10 +64,19 @@ export default {
         allIssues,
         isLoading: false,
       });
+      Object.assign(state.summaryCounts, {
+        new: state.summaryCounts.added + newIssues.length,
+        fixed: state.summaryCounts.fixed + fixedIssues.length,
+      });
     } else {
+      const newIssues = parseSastIssues(reports.head, state.blobPath.head);
       Object.assign(state.sast, {
-        newIssues: parseSastIssues(reports.head, state.blobPath.head),
+        newIssues,
         isLoading: false,
+      });
+
+      Object.assign(state.summaryCounts, {
+        new: state.summaryCounts.added + newIssues.length,
       });
     }
   },
@@ -92,6 +108,11 @@ export default {
     } else {
       const parsedVulnerabilities = parseSastContainer(reports.head.vulnerabilities);
       const unapproved = reports.head.unapproved || [];
+      // todo figure out this addition
+      Object.assign(state.summaryCounts, {
+        new: state.summaryCounts.added + parsedVulnerabilities
+        .filter(item => unapproved.find(el => el === item.vulnerability)).length,
+      });
 
       Object.assign(state.sastContainer, {
         isLoading: false,
@@ -130,7 +151,9 @@ export default {
       // TODO set when we receive head.base
     } else {
       const alerts = reports.head.site.alerts;
-
+      Object.assign(state.summaryCounts, {
+        new: state.summaryCounts.added + alerts.length,
+      });
       Object.assign(state.dast, {
         isLoading: false,
         newIssues: alerts.map(alert => ({
