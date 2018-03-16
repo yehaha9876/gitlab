@@ -1,26 +1,32 @@
 <script>
   /**
-   * Renders SAST body text
-   * [priority]: [name] in [link] : [line]
+   * Renders Code quality body text
+   * Fixed: [name] in [link]:[line]
    */
   import ReportLink from './report_link.vue';
   export default {
-    name: 'SastIssueBody',
+    name: 'CodequalityIssueBody',
 
     components: {
       ReportLink,
     },
 
     props: {
-      type: Object,
-      required: true,
+      isStatusSuccess: {
+        type: Boolean,
+        required: true,
+      },
+      issue: {
+        type: Object,
+        required: true,
+      },
     },
   };
 </script>
 <template>
   <div class="report-block-list-issue-description prepend-top-5 append-bottom-5">
     <div class="report-block-list-issue-description-text append-right-5">
-      <template v-if="issue.priority">{{ issue.priority }}:</template>
+      <template v-if="isStatusSuccess">{{ s__('ciReport|Fixed:') }}</template>
 
       {{ issue.name }}
     </div>

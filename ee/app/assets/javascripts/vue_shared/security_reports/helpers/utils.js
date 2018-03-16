@@ -16,37 +16,58 @@ import { stripHtml } from '~/lib/utils/text_utility';
  * @param {array} issues
  * @return {array}
  */
-export const parseIssues = (issues = [], path = '') => issues.map((issue) => {
-  const parsedIssue = {
-    name: issue.description || issue.message,
-    ...issue,
-  };
+// export const parseCodeclimateMetrics = (issues = [], path = '') => issues.map((issue) => {
+//   const parsedIssue = {
+//     name: issue.description || issue.message,
+//     ...issue,
+//   };
 
-  // code quality
+//   // code quality
+//   if (issue.location) {
+//     let parseCodeQualityUrl;
+
+//     if (issue.location.path) {
+//       parseCodeQualityUrl = `${path}/${issue.location.path}`;
+//       parsedIssue.path = issue.location.path;
+//     }
+
+//     if (issue.location.lines && issue.location.lines.begin) {
+//       parsedIssue.line = issue.location.lines.begin;
+//       parseCodeQualityUrl += `#L${issue.location.lines.begin}`;
+//     }
+
+//     parsedIssue.urlPath = parseCodeQualityUrl;
+
+//   // security
+//   } else if (issue.file) {
+//     let parsedSecurityUrl = `${path}/${issue.file}`;
+//     parsedIssue.path = issue.file;
+
+//     if (issue.line) {
+//       parsedSecurityUrl += `#L${issue.line}`;
+//     }
+//     parsedIssue.urlPath = parsedSecurityUrl;
+//   }
+
+//   return parsedIssue;
+// });
+
+export const parseCodeclimateMetrics = (issues = [], path = '') => issues.map((issue) => {
+  const parsedIssue = Object.assign({}, issue, {
+    name: issue.description,
+  });
+
   if (issue.location) {
-    let parseCodeQualityUrl;
-
     if (issue.location.path) {
-      parseCodeQualityUrl = `${path}/${issue.location.path}`;
       parsedIssue.path = issue.location.path;
+
+      if (issue.location.lines && issue.location.lines.begin) {
+        parsedIssue.line = issue.location.lines.begin;
+        parsedIssue.urlPath = `${path}/${issue.location.path}`;
+      } else {
+        parsedIssue.urlPath = `${path}/${issue.location.path}#L${issue.location.lines.begin}`;
+      }
     }
-
-    if (issue.location.lines && issue.location.lines.begin) {
-      parsedIssue.line = issue.location.lines.begin;
-      parseCodeQualityUrl += `#L${issue.location.lines.begin}`;
-    }
-
-    parsedIssue.urlPath = parseCodeQualityUrl;
-
-  // security
-  } else if (issue.file) {
-    let parsedSecurityUrl = `${path}/${issue.file}`;
-    parsedIssue.path = issue.file;
-
-    if (issue.line) {
-      parsedSecurityUrl += `#L${issue.line}`;
-    }
-    parsedIssue.urlPath = parsedSecurityUrl;
   }
 
   return parsedIssue;
@@ -54,17 +75,19 @@ export const parseIssues = (issues = [], path = '') => issues.map((issue) => {
 
 /**
  * Maps SAST:
- * { tool: String, message: String, url: String , cve: String , file: String , solution: String }
+ * { tool: String, message: String, url: String , cve: String ,
+ * file: String , solution: String, priority: String }
  * to contain:
- * { name: String, path: String, line: String, urlPath: String}
+ * { name: String, path: String, line: String, urlPath: String, priority: String }
  * @param {Array} issues
  * @param {String} path
  */
-export const parseSastIssues = (issues = [], path = '') => issues.map(issue => Object.assign({}, issue, {
-  name: issue.name,
-  path: issue.file ? `${path}/${issue.file}` : null,
-  urlPath: issue.line ? `${path}/${issue.file}#L${issue.line}` : `${path}/${issue.file}`,
-}));
+export const parseSastIssues = (issues = [], path = '') => issues
+  .map(issue => Object.assign({}, issue, {
+    name: issue.name,
+    path: issue.file ? `${path}/${issue.file}` : null,
+    urlPath: issue.line ? `${path}/${issue.file}#L${issue.line}` : `${path}/${issue.file}`,
+  }));
 
 /**
  * Compares two arrays by the given key and returns the difference
@@ -114,37 +137,37 @@ export const parseSastContainer = (data = []) => data.map(el => ({
  * @param {*} data
  * @returns {Object}
  */
-export const setSastReport = (data = {}) => {
-  const securityReport = {};
+// export const setSastReport = (data = {}) => {
+//   const securityReport = {};
 
-  if (data.base) {
-    const filterKey = 'cve';
-    const parsedHead = parseIssues(data.head, data.headBlobPath);
-    const parsedBase = parseIssues(data.base, data.baseBlobPath);
+//   if (data.base) {
+//     const filterKey = 'cve';
+//     const parsedHead = parseIssues(data.head, data.headBlobPath);
+//     const parsedBase = parseIssues(data.base, data.baseBlobPath);
 
-    securityReport.newIssues = filterByKey(
-      parsedHead,
-      parsedBase,
-      filterKey,
-    );
-    securityReport.resolvedIssues = filterByKey(
-      parsedBase,
-      parsedHead,
-      filterKey,
-    );
+//     securityReport.newIssues = filterByKey(
+//       parsedHead,
+//       parsedBase,
+//       filterKey,
+//     );
+//     securityReport.resolvedIssues = filterByKey(
+//       parsedBase,
+//       parsedHead,
+//       filterKey,
+//     );
 
-    // Remove the new Issues and the added issues
-    securityReport.allIssues = filterByKey(
-      parsedHead,
-      securityReport.newIssues.concat(securityReport.resolvedIssues),
-      filterKey,
-    );
-  } else {
-    securityReport.newIssues = parseIssues(data.head, data.headBlobPath);
-  }
+//     // Remove the new Issues and the added issues
+//     securityReport.allIssues = filterByKey(
+//       parsedHead,
+//       securityReport.newIssues.concat(securityReport.resolvedIssues),
+//       filterKey,
+//     );
+//   } else {
+//     securityReport.newIssues = parseIssues(data.head, data.headBlobPath);
+//   }
 
-  return securityReport;
-};
+//   return securityReport;
+// };
 
 export const setSastContainerReport = (data = {}) => {
   const unapproved = data.unapproved || [];

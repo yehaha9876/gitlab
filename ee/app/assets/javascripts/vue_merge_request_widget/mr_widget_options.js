@@ -42,13 +42,7 @@ export default {
       return performance && performance.head_path && performance.base_path;
     },
     shouldRenderSecurityReport() {
-      return this.mr.sast && this.mr.sast.head_path;
-    },
-    shouldRenderDockerReport() {
-      return this.mr.sastContainer;
-    },
-    shouldRenderDastReport() {
-      return this.mr.dast;
+      return (this.mr.sast && this.mr.sast.head_path) || this.mr.sastContainer || this.mr.dast;
     },
     codequalityText() {
       const { newIssues, resolvedIssues } = this.mr.codeclimateMetrics;
@@ -330,44 +324,17 @@ export default {
         :unresolved-issues="mr.performanceMetrics.degraded"
         :resolved-issues="mr.performanceMetrics.improved"
         :neutral-issues="mr.performanceMetrics.neutral"
-        />
-      <report-section
-        class="js-sast-widget"
-        v-if="shouldRenderSecurityReport"
-        type="security"
-        :status="securityStatus"
-        :loading-text="translateText('security').loading"
-        :error-text="translateText('security').error"
-        :success-text="securityText"
-        :unresolved-issues="mr.securityReport.newIssues"
-        :resolved-issues="mr.securityReport.resolvedIssues"
-        :all-issues="mr.securityReport.allIssues"
-        :has-priority="true"
-        />
-      <report-section
-        class="js-docker-widget"
-        v-if="shouldRenderDockerReport"
-        type="docker"
-        :status="dockerStatus"
-        :loading-text="translateText('sast:container').loading"
-        :error-text="translateText('sast:container').error"
-        :success-text="dockerText"
-        :unresolved-issues="mr.dockerReport.unapproved"
-        :neutral-issues="mr.dockerReport.approved"
-        :info-text="sastContainerInformationText()"
-        :has-priority="true"
-        />
-      <report-section
-        class="js-dast-widget"
-        v-if="shouldRenderDastReport"
-        type="dast"
-        :status="dastStatus"
-        :loading-text="translateText('DAST').loading"
-        :error-text="translateText('DAST').error"
-        :success-text="getDastText"
-        :unresolved-issues="mr.dastReport"
-        :has-priority="true"
-        />
+      />
+      <security-report
+        head-blob-path="mr.headBlobPath"
+        base-blob-path="mr.baseBlobPath"
+        type="MR_WIDGET"
+        sast-head-path="mr.sast.head_path"
+        sast-base-path="mr.sast.base_path"
+        dast-head-path="mr.dast"
+        sast-container-path="mr.sastContainer"
+      />
+      />
       <div class="mr-widget-section">
         <component
           :is="componentName"
