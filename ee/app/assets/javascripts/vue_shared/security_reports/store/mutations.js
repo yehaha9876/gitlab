@@ -1,12 +1,16 @@
 import { stripHtml } from '~/lib/utils/text_utility';
 import * as types from './mutation_types';
 import {
-  parseIssues,
+  parseSastIssues,
   filterByKey,
   parseSastContainer,
 } from '../helpers/utils';
 
 export default {
+  [types.SET_APP_TYPE](state, type) {
+    Object.assign(state, { type });
+  },
+
   [types.SET_HEAD_BLOB_PATH](state, path) {
     Object.assign(state.blobPath, { head: path });
   },
@@ -40,8 +44,8 @@ export default {
   [types.RECEIVE_SAST_REPORTS](state, reports) {
     if (reports.base && reports.head) {
       const filterKey = 'cve';
-      const parsedHead = parseIssues(reports.head, state.blobPath.head);
-      const parsedBase = parseIssues(reports.base, state.blobPath.base);
+      const parsedHead = parseSastIssues(reports.head, state.blobPath.head);
+      const parsedBase = parseSastIssues(reports.base, state.blobPath.base);
 
       const newIssues = filterByKey(parsedHead, parsedBase, filterKey);
       const fixedIssues = filterByKey(parsedBase, parsedHead, filterKey);
@@ -55,7 +59,7 @@ export default {
       });
     } else {
       Object.assign(state.sast, {
-        newIssues: parseIssues(reports.head, state.blobPath.head),
+        newIssues: parseSastIssues(reports.head, state.blobPath.head),
         isLoading: false,
       });
     }

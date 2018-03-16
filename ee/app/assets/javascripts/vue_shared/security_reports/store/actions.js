@@ -1,6 +1,9 @@
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 
+export const setAppType = ({ commit }, type) =>
+  commit(types.SET_APP_TYPE, type);
+
 export const setHeadBlobPath = ({ commit }, blobPath) =>
   commit(types.SET_HEAD_BLOB_PATH, blobPath);
 

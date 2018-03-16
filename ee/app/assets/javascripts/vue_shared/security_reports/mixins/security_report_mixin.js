@@ -36,12 +36,12 @@ export default {
       return text.join('');
     },
 
-    translateText(type) {
-      return {
-        error: sprintf(s__('ciReport|Failed to load %{reportName} report'), { reportName: type }),
-        loading: sprintf(s__('ciReport|Loading %{reportName} report'), { reportName: type }),
-      };
-    },
+    // translateText(type) {
+    //   return {
+    //     error: sprintf(s__('ciReport|Failed to load %{reportName} report'), { reportName: type }),
+    //     loading: sprintf(s__('ciReport|Loading %{reportName} report'), { reportName: type }),
+    //   };
+    // },
 
     checkReportStatus(loading, error) {
       if (loading) {

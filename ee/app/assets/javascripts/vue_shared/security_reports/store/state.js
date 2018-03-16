@@ -1,4 +1,6 @@
 export default {
+  type: '',
+
   summaryCounts: {
     new: 0,
     fixed: 0,

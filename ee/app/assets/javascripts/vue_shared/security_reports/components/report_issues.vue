@@ -72,9 +72,6 @@
       isTypePerformance() {
         return this.type === 'performance';
       },
-      isTypeSecurity() {
-        return this.type === 'security';
-      },
       isTypeDocker() {
         return this.type === 'docker';
       },

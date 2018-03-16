@@ -1,3 +1,4 @@
+export const SET_APP_TYPE = 'SET_APP_TYPE';
 export const SET_HEAD_BLOB_PATH = 'SET_HEAD_BLOB_PATH';
 export const SET_BASE_BLOB_PATH = 'SET_BASE_BLOB_PATH';
 

@@ -53,6 +53,20 @@ export const parseIssues = (issues = [], path = '') => issues.map((issue) => {
 });
 
 /**
+ * Maps SAST:
+ * { tool: String, message: String, url: String , cve: String , file: String , solution: String }
+ * to contain:
+ * { name: String, path: String, line: String, urlPath: String}
+ * @param {Array} issues
+ * @param {String} path
+ */
+export const parseSastIssues = (issues = [], path = '') => issues.map(issue => Object.assign({}, issue, {
+  name: issue.name,
+  path: issue.file ? `${path}/${issue.file}` : null,
+  urlPath: issue.line ? `${path}/${issue.file}#L${issue.line}` : `${path}/${issue.file}`,
+}));
+
+/**
  * Compares two arrays by the given key and returns the difference
  *
  * @param {Array} firstArray
