@@ -38,6 +38,8 @@ export const fetchSastReports = ({ state, dispatch }) => {
   const base = state.sast.paths.base;
   const head = state.sast.paths.head;
 
+  dispatch('requestSastReports');
+
   if (head && base) {
     Promise.all([
       axios.get(head),
@@ -87,6 +89,8 @@ export const fetchSastContainerReports = ({ state, dispatch }) => {
   const base = state.sastContainer.paths.base;
   const head = state.sastContainer.paths.head;
 
+  dispatch('requestSastContainerReports');
+
   if (head && base) {
     Promise.all([
       axios.get(head),
@@ -135,6 +139,8 @@ export const receiveDastError = ({ commit }, error) =>
 export const fetchDastReports = ({ state, dispatch }) => {
   const base = state.sastContainer.paths.base;
   const head = state.sastContainer.paths.head;
+
+  dispatch('requestDastReports');
 
   if (head && base) {
     Promise.all([

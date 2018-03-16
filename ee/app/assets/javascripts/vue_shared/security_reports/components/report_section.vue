@@ -3,6 +3,11 @@
   import StatusIcon from '~/vue_merge_request_widget/components/mr_widget_status_icon.vue';
   import LoadingIcon from '~/vue_shared/components/loading_icon.vue';
   import IssuesBlock from './report_issues.vue';
+  import {
+    LOADING,
+    ERROR,
+    SUCCESS,
+  } from '../store/constants';
 
   export default {
     name: 'ReportSection',
@@ -12,11 +17,7 @@
       StatusIcon,
     },
     props: {
-      isCollapsible: {
-        type: Boolean,
-        required: false,
-        default: true,
-      },
+
       // security | codequality | performance | docker
       type: {
         type: String,
@@ -64,31 +65,29 @@
         required: false,
         default: false,
       },
+      hasIssues: {
+        type: Boolean,
+        required: true,
+      },
     },
 
     data() {
-      if (this.isCollapsible) {
-        return {
-          collapseText: __('Expand'),
-          isCollapsed: true,
-          isFullReportVisible: false,
-        };
-      }
-
       return {
-        isFullReportVisible: true,
+        collapseText: __('Expand'),
+        isCollapsed: true,
+        isFullReportVisible: false,
       };
     },
 
     computed: {
       isLoading() {
-        return this.status === 'loading';
+        return this.status === LOADING;
       },
       loadingFailed() {
-        return this.status === 'error';
+        return this.status === ERROR;
       },
       isSuccess() {
-        return this.status === 'success';
+        return this.status === SUCCESS;
       },
       statusIconName() {
         if (this.loadingFailed ||
@@ -97,12 +96,6 @@
           return 'warning';
         }
         return 'success';
-      },
-      hasIssues() {
-        return this.unresolvedIssues.length ||
-          this.resolvedIssues.length ||
-          this.allIssues.length ||
-          this.neutralIssues.length;
       },
     },
 
@@ -158,7 +151,7 @@
         <button
           type="button"
           class="js-collapse-btn btn bt-default pull-right btn-sm"
-          v-if="isCollapsible && hasIssues"
+          v-if="hasIssues"
           @click="toggleCollapsed"
         >
           {{ collapseText }}
@@ -168,11 +161,11 @@
 
     <div
       class="report-block-container"
-      v-show="!isCollapsible || (isCollapsible && !isCollapsed)"
+      v-show="!isCollapsed"
     >
       <slot name="body">
         <p
-          v-if="type === 'docker' && infoText"
+          v-if="infoText"
           v-html="infoText"
           class="js-mr-code-quality-info prepend-left-10 report-block-info"
         >

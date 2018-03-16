@@ -9,6 +9,11 @@
   import DastIssue from './dast_issue_body.vue';
   import PerformanceIssue from '../../../vue_merge_request_widget/components/performance_issue_body.vue';
   import CodequalityIssue from '../../../vue_merge_request_widget/components/codequality_issue_body.vue';
+  import {
+    SAST,
+    DAST,
+    SAST_CONTAINER,
+  } from '../store/constants';
 
 
   const modalDefaultData = {
@@ -70,10 +75,10 @@
         return this.status === 'neutral';
       },
       isTypeSast() {
-        return this.type === 'sast';
+        return this.type === SAST;
       },
       isTypeSastContainer() {
-        return this.type === 'sastContainer';
+        return this.type === SAST_CONTAINER;
       },
       isTypeCodequality() {
         return this.type === 'codequality';
@@ -82,7 +87,7 @@
         return this.type === 'performance';
       },
       isTypeDast() {
-        return this.type === 'dast';
+        return this.type === DAST;
       },
     },
     mounted() {

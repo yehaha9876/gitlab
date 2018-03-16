@@ -4,6 +4,7 @@
    * [priority]: [name] in [link] : [line]
    */
   import ReportLink from './report_link.vue';
+
   export default {
     name: 'SastIssueBody',
 
@@ -12,8 +13,10 @@
     },
 
     props: {
-      type: Object,
-      required: true,
+      issue: {
+        type: Object,
+        required: true,
+      },
     },
   };
 </script>

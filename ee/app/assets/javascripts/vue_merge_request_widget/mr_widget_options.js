@@ -326,13 +326,13 @@ export default {
         :neutral-issues="mr.performanceMetrics.neutral"
       />
       <security-report
-        head-blob-path="mr.headBlobPath"
-        base-blob-path="mr.baseBlobPath"
+        :head-blob-path="mr.headBlobPath"
+        :base-blob-path="mr.baseBlobPath"
         type="MR_WIDGET"
-        sast-head-path="mr.sast.head_path"
-        sast-base-path="mr.sast.base_path"
-        dast-head-path="mr.dast"
-        sast-container-path="mr.sastContainer"
+        :sast-head-path="mr.sast.head_path"
+        :sast-base-path="mr.sast.base_path"
+        :dast-head-path="mr.dast"
+        :sast-container-path="mr.sastContainer"
       />
       />
       <div class="mr-widget-section">
