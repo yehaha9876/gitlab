@@ -16,6 +16,6 @@ export default {
     <icon
       name="error"
     />
-    {{ __("There was an error loading results")}}
+    {{ __("There was an error loading results") }}
   </li>
 </template>

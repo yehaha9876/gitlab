@@ -14,6 +14,6 @@ export default {
 <template>
   <li class="report-block-list-issue">
     <loading-icon />
-    {{ __("in progress")}}
+    {{ __("in progress") }}
   </li>
 </template>
