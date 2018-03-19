@@ -88,5 +88,44 @@ feature 'Repository settings' do
         expect(page).not_to have_content(private_deploy_key.title)
       end
     end
+
+    context 'Deploy tokens' do
+      let(:deploy_token_project) { create(:project_deploy_token, project: project) }
+      let!(:deploy_token) { deploy_token_project.deploy_token }
+
+      before do
+        stub_container_registry_config(enabled: true)
+        visit project_settings_repository_path(project)
+      end
+
+      scenario 'view deploy tokens' do
+        within('.deploy-tokens') do
+          expect(page).to have_content(deploy_token.name)
+          expect(page).to have_content('read_repository')
+          expect(page).to have_content('read_registry')
+        end
+      end
+
+      scenario 'add a new deploy token' do
+        fill_in 'deploy_token_name', with: 'new_deploy_key'
+        fill_in 'deploy_token_expires_at', with: (Date.today + 1.month).to_s
+        check 'deploy_token_read_repository'
+        check 'deploy_token_read_registry'
+        click_button 'Create deploy token'
+
+        expect(page).to have_content('Your new project deploy token has been created')
+      end
+
+      scenario 'revoke a deploy token', :js do
+        within('.deploy-tokens') do
+          click_link 'Revoke'
+          click_link "Revoke #{deploy_token.name}"
+
+          expect(page).not_to have_content(deploy_token.name)
+          expect(page).not_to have_content('read_repository')
+          expect(page).not_to have_content('read_registry')
+        end
+      end
+    end
   end
 end
