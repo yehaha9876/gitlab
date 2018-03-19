@@ -11,8 +11,10 @@ const Api = {
   projectPath: '/api/:version/projects/:id',
   projectLabelsPath: '/:namespace_path/:project_path/labels',
   mergeRequestPath: '/api/:version/projects/:id/merge_requests/:mrid',
-  mergeRequestChangesPath: '/api/:version/projects/:id/merge_requests/:mrid/changes',
-  mergeRequestNotesPath: '/api/:version/projects/:id/merge_requests/:mrid/notes',
+  mergeRequestChangesPath:
+    '/api/:version/projects/:id/merge_requests/:mrid/changes',
+  mergeRequestNotesPath:
+    '/api/:version/projects/:id/merge_requests/:mrid/notes',
   groupLabelsPath: '/groups/:namespace_path/-/labels',
   licensePath: '/api/:version/templates/licenses/:key',
   gitignorePath: '/api/:version/templates/gitignores/:key',
@@ -27,25 +29,27 @@ const Api = {
   geoNodesPath: '/api/:version/geo_nodes',
 
   group(groupId, callback) {
-    const url = Api.buildUrl(Api.groupPath)
-      .replace(':id', groupId);
-    return axios.get(url)
-      .then(({ data }) => {
-        callback(data);
+    const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
+    return axios.get(url).then(({ data }) => {
+      callback(data);
 
-        return data;
-      });
+      return data;
+    });
   },
 
   // Return groups list. Filtered by query
   groups(query, options, callback = $.noop) {
     const url = Api.buildUrl(Api.groupsPath);
-    return axios.get(url, {
-      params: Object.assign({
-        search: query,
-        per_page: 20,
-      }, options),
-    })
+    return axios
+      .get(url, {
+        params: Object.assign(
+          {
+            search: query,
+            per_page: 20,
+          },
+          options,
+        ),
+      })
       .then(({ data }) => {
         callback(data);
 
@@ -56,12 +60,13 @@ const Api = {
   // Return namespaces list. Filtered by query
   namespaces(query, callback) {
     const url = Api.buildUrl(Api.namespacesPath);
-    return axios.get(url, {
-      params: {
-        search: query,
-        per_page: 20,
-      },
-    })
+    return axios
+      .get(url, {
+        params: {
+          search: query,
+          per_page: 20,
+        },
+      })
       .then(({ data }) => callback(data));
   },
 
@@ -78,9 +83,10 @@ const Api = {
       defaults.membership = true;
     }
 
-    return axios.get(url, {
-      params: Object.assign(defaults, options),
-    })
+    return axios
+      .get(url, {
+        params: Object.assign(defaults, options),
+      })
       .then(({ data }) => {
         callback(data);
 
@@ -90,8 +96,10 @@ const Api = {
 
   // Return single project
   project(projectPath) {
-    const url = Api.buildUrl(Api.projectPath)
-            .replace(':id', encodeURIComponent(projectPath));
+    const url = Api.buildUrl(Api.projectPath).replace(
+      ':id',
+      encodeURIComponent(projectPath),
+    );
 
     return axios.get(url);
   },
@@ -99,8 +107,8 @@ const Api = {
   // Return Merge Request for project
   mergeRequest(projectPath, mergeRequestId) {
     const url = Api.buildUrl(Api.mergeRequestPath)
-            .replace(':id', encodeURIComponent(projectPath))
-            .replace(':mrid', mergeRequestId);
+      .replace(':id', encodeURIComponent(projectPath))
+      .replace(':mrid', mergeRequestId);
 
     return axios.get(url);
   },
@@ -108,8 +116,8 @@ const Api = {
   // Return Merge Request Changes
   mergeRequestChanges(projectPath, mergeRequestId) {
     const url = Api.buildUrl(Api.mergeRequestChangesPath)
-            .replace(':id', encodeURIComponent(projectPath))
-            .replace(':mrid', mergeRequestId);
+      .replace(':id', encodeURIComponent(projectPath))
+      .replace(':mrid', mergeRequestId);
 
     return axios.get(url);
   },
@@ -117,8 +125,8 @@ const Api = {
   // Return Merge Request Notes
   mergeRequestNotes(projectPath, mergeRequestId) {
     const url = Api.buildUrl(Api.mergeRequestNotesPath)
-            .replace(':id', encodeURIComponent(projectPath))
-            .replace(':mrid', mergeRequestId);
+      .replace(':id', encodeURIComponent(projectPath))
+      .replace(':mrid', mergeRequestId);
 
     return axios.get(url);
   },
@@ -131,33 +139,39 @@ const Api = {
         .replace(':namespace_path', namespacePath)
         .replace(':project_path', projectPath);
     } else {
-      url = Api.buildUrl(Api.groupLabelsPath).replace(':namespace_path', namespacePath);
+      url = Api.buildUrl(Api.groupLabelsPath).replace(
+        ':namespace_path',
+        namespacePath,
+      );
     }
 
-    return axios.post(url, {
-      label: data,
-    })
+    return axios
+      .post(url, {
+        label: data,
+      })
       .then(res => callback(res.data))
       .catch(e => callback(e.response.data));
   },
 
   // Return group projects list. Filtered by query
   groupProjects(groupId, query, callback) {
-    const url = Api.buildUrl(Api.groupProjectsPath)
-      .replace(':id', groupId);
-    return axios.get(url, {
-      params: {
-        search: query,
-        per_page: 20,
-      },
-    })
+    const url = Api.buildUrl(Api.groupProjectsPath).replace(':id', groupId);
+    return axios
+      .get(url, {
+        params: {
+          search: query,
+          per_page: 20,
+        },
+      })
       .then(({ data }) => callback(data));
   },
 
   commitMultiple(id, data) {
     // see https://docs.gitlab.com/ce/api/commits.html#create-a-commit-with-multiple-files-and-actions
-    const url = Api.buildUrl(Api.commitPath)
-      .replace(':id', encodeURIComponent(id));
+    const url = Api.buildUrl(Api.commitPath).replace(
+      ':id',
+      encodeURIComponent(id),
+    );
     return axios.post(url, JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
@@ -168,39 +182,34 @@ const Api = {
   branchSingle(id, branch) {
     const url = Api.buildUrl(Api.branchSinglePath)
       .replace(':id', encodeURIComponent(id))
-      .replace(':branch', branch);
+      .replace(':branch', encodeURIComponent(branch));
 
     return axios.get(url);
   },
 
   // Return text for a specific license
   licenseText(key, data, callback) {
-    const url = Api.buildUrl(Api.licensePath)
-      .replace(':key', key);
-    return axios.get(url, {
-      params: data,
-    })
+    const url = Api.buildUrl(Api.licensePath).replace(':key', key);
+    return axios
+      .get(url, {
+        params: data,
+      })
       .then(res => callback(res.data));
   },
 
   gitignoreText(key, callback) {
-    const url = Api.buildUrl(Api.gitignorePath)
-      .replace(':key', key);
-    return axios.get(url)
-      .then(({ data }) => callback(data));
+    const url = Api.buildUrl(Api.gitignorePath).replace(':key', key);
+    return axios.get(url).then(({ data }) => callback(data));
   },
 
   gitlabCiYml(key, callback) {
-    const url = Api.buildUrl(Api.gitlabCiYmlPath)
-      .replace(':key', key);
-    return axios.get(url)
-      .then(({ data }) => callback(data));
+    const url = Api.buildUrl(Api.gitlabCiYmlPath).replace(':key', key);
+    return axios.get(url).then(({ data }) => callback(data));
   },
 
   dockerfileYml(key, callback) {
     const url = Api.buildUrl(Api.dockerfilePath).replace(':key', key);
-    return axios.get(url)
-      .then(({ data }) => callback(data));
+    return axios.get(url).then(({ data }) => callback(data));
   },
 
   issueTemplate(namespacePath, projectPath, key, type, callback) {
@@ -209,7 +218,8 @@ const Api = {
       .replace(':type', type)
       .replace(':project_path', projectPath)
       .replace(':namespace_path', namespacePath);
-    return axios.get(url)
+    return axios
+      .get(url)
       .then(({ data }) => callback(null, data))
       .catch(callback);
   },
@@ -217,40 +227,53 @@ const Api = {
   users(query, options) {
     const url = Api.buildUrl(this.usersPath);
     return axios.get(url, {
-      params: Object.assign({
-        search: query,
-        per_page: 20,
-      }, options),
+      params: Object.assign(
+        {
+          search: query,
+          per_page: 20,
+        },
+        options,
+      ),
     });
   },
 
   approverUsers(search, options, callback = $.noop) {
     const url = Api.buildUrl('/autocomplete/users.json');
-    return axios.get(url, {
-      params: Object.assign({
-        search,
-        per_page: 20,
-      }, options),
-    }).then(({ data }) => {
-      callback(data);
+    return axios
+      .get(url, {
+        params: Object.assign(
+          {
+            search,
+            per_page: 20,
+          },
+          options,
+        ),
+      })
+      .then(({ data }) => {
+        callback(data);
 
-      return data;
-    });
+        return data;
+      });
   },
 
   ldap_groups(query, provider, callback) {
-    const url = Api.buildUrl(this.ldapGroupsPath).replace(':provider', provider);
-    return axios.get(url, {
-      params: {
-        search: query,
-        per_page: 20,
-        active: true,
-      },
-    }).then(({ data }) => {
-      callback(data);
+    const url = Api.buildUrl(this.ldapGroupsPath).replace(
+      ':provider',
+      provider,
+    );
+    return axios
+      .get(url, {
+        params: {
+          search: query,
+          per_page: 20,
+          active: true,
+        },
+      })
+      .then(({ data }) => {
+        callback(data);
 
-      return data;
-    });
+        return data;
+      });
   },
 
   buildUrl(url) {

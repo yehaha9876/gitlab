@@ -1,5 +1,5 @@
+import flash from '~/flash';
 import service from '../../services';
-import flash from '../../../flash';
 import * as types from '../mutation_types';
 
 // eslint-disable-next-line import/prefer-default-export
@@ -12,7 +12,7 @@ export const getMergeRequestData = (
       service
         .getProjectMergeRequestData(projectId, mergeRequestId)
         .then(res => res.data)
-        .then((data) => {
+        .then(data => {
           commit(types.SET_MERGE_REQUEST, {
             projectPath: projectId,
             mergeRequestId,
@@ -41,11 +41,14 @@ export const getMergeRequestChanges = (
   { projectId, mergeRequestId, force = false } = {},
 ) =>
   new Promise((resolve, reject) => {
-    if (!state.projects[projectId].mergeRequests[mergeRequestId].changes || force) {
+    if (
+      !state.projects[projectId].mergeRequests[mergeRequestId].changes ||
+      force
+    ) {
       service
         .getProjectMergeRequestChanges(projectId, mergeRequestId)
         .then(res => res.data)
-        .then((data) => {
+        .then(data => {
           commit(types.SET_MERGE_REQUEST_CHANGES, {
             projectPath: projectId,
             mergeRequestId,
@@ -68,11 +71,14 @@ export const getMergeRequestNotes = (
   { projectId, mergeRequestId, force = false } = {},
 ) =>
   new Promise((resolve, reject) => {
-    if (!state.projects[projectId].mergeRequests[mergeRequestId].notes || force) {
+    if (
+      !state.projects[projectId].mergeRequests[mergeRequestId].notes ||
+      force
+    ) {
       service
         .getProjectMergeRequestNotes(projectId, mergeRequestId)
         .then(res => res.data)
-        .then((data) => {
+        .then(data => {
           commit(types.SET_MERGE_REQUEST_NOTES, {
             projectPath: projectId,
             mergeRequestId,

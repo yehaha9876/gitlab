@@ -2,9 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import flash from '~/flash';
 import store from './stores';
-import {
-  getTreeEntry,
-} from './stores/utils';
+import { getTreeEntry } from './stores/utils';
 
 Vue.use(VueRouter);
 
@@ -57,118 +55,178 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.params.namespace && to.params.project) {
-    store.dispatch('getProjectData', {
-      namespace: to.params.namespace,
-      projectId: to.params.project,
-    })
-    .then(() => {
-      const fullProjectId = `${to.params.namespace}/${to.params.project}`;
+    store
+      .dispatch('getProjectData', {
+        namespace: to.params.namespace,
+        projectId: to.params.project,
+      })
+      .then(() => {
+        const fullProjectId = `${to.params.namespace}/${to.params.project}`;
 
-      if (to.params.branch) {
-        store.dispatch('getBranchData', {
-          projectId: fullProjectId,
-          branchId: to.params.branch,
-        });
-
-        store.dispatch('getFiles', {
-          projectId: fullProjectId,
-          branchId: to.params.branch,
-        })
-        .then(() => {
-          if (to.params[0]) {
-            const treeEntry = getTreeEntry(store, `${to.params.namespace}/${to.params.project}/${to.params.branch}`, to.params[0]);
-            if (treeEntry) {
-              store.dispatch('handleTreeEntryAction', treeEntry);
-            }
-          }
-        })
-        .catch((e) => {
-          flash('Error while loading the branch files. Please try again.', 'alert', document, null, false, true);
-          throw e;
-        });
-      } else if (to.params.mrid) {
-        store.dispatch('setViewMode', 'mrchanges');
-        store.dispatch('getMergeRequestData', {
-          projectId: fullProjectId,
-          mergeRequestId: to.params.mrid,
-        })
-        .then((mr) => {
+        if (to.params.branch) {
           store.dispatch('getBranchData', {
             projectId: fullProjectId,
-            branchId: mr.source_branch,
+            branchId: to.params.branch,
           });
 
-          store.dispatch('getTreeData', {
-            projectId: fullProjectId,
-            branch: mr.source_branch,
-            endpoint: `/tree/${mr.source_branch}`,
-          })
-          .then(() => {
-            const treeEntry = getTreeEntry(store, `${to.params.namespace}/${to.params.project}/${mr.source_branch}`, '/');
-            if (treeEntry) {
-              store.dispatch('handleTreeEntryAction', treeEntry);
-            }
-
-            store.dispatch('getMergeRequestChanges', {
+          store
+            .dispatch('getFiles', {
+              projectId: fullProjectId,
+              branchId: to.params.branch,
+            })
+            .then(() => {
+              if (to.params[0]) {
+                const treeEntry = getTreeEntry(
+                  store,
+                  `${to.params.namespace}/${to.params.project}/${
+                    to.params.branch
+                  }`,
+                  to.params[0],
+                );
+                if (treeEntry) {
+                  store.dispatch('handleTreeEntryAction', treeEntry);
+                }
+              }
+            })
+            .catch(e => {
+              flash(
+                'Error while loading the branch files. Please try again.',
+                'alert',
+                document,
+                null,
+                false,
+                true,
+              );
+              throw e;
+            });
+        } else if (to.params.mrid) {
+          // store.dispatch('updateViewer', 'mrdiff');
+          store
+            .dispatch('getMergeRequestData', {
               projectId: fullProjectId,
               mergeRequestId: to.params.mrid,
             })
-            .then((mrChanges) => {
-              if (mrChanges.changes.length > 0) {
-                
-              }
-              mrChanges.changes.forEach((change, ind) => {
-                console.log('CHANGE : ' + ind + ' : ', change);
-
-                const changeTreeEntry = getTreeEntry(store, `${to.params.namespace}/${to.params.project}/${mr.source_branch}`, change.new_path);
-
-                console.log('Tree Entry for the change ', changeTreeEntry, change.diff);
-
-                if (changeTreeEntry) {
-                  store.dispatch('setFileMrDiff', { file: changeTreeEntry, mrDiff: change.diff });
-                  store.dispatch('setFileTargetBranch', { file: changeTreeEntry, targetBranch: mrChanges.target_branch });
-                  //store.dispatch('getFileData', changeTreeEntry);
-                } else {
-                  console.warn('No Tree Entry for ' + change.new_path);
-                }
+            .then(mr => {
+              store.dispatch('getBranchData', {
+                projectId: fullProjectId,
+                branchId: mr.source_branch,
               });
 
-              // Now lets open them
-              mrChanges.changes.forEach((change, ind) => {
-                const changeTreeEntry = getTreeEntry(store, `${to.params.namespace}/${to.params.project}/${mr.source_branch}`, change.new_path);
-                console.log('Tree Entry for the change ', changeTreeEntry, change.diff);
-
-                if (changeTreeEntry) {
-                  if (ind === 0) {
-                    store.dispatch('getFileData', changeTreeEntry);
-                  } else {
-                    // TODO : Implement Tab reloading
-                    store.dispatch('preloadFileTab', changeTreeEntry);
+              store
+                .dispatch('getTreeData', {
+                  projectId: fullProjectId,
+                  branch: mr.source_branch,
+                  endpoint: `/tree/${mr.source_branch}`,
+                })
+                .then(() => {
+                  const treeEntry = getTreeEntry(
+                    store,
+                    `${to.params.namespace}/${to.params.project}/${
+                      mr.source_branch
+                    }`,
+                    '/',
+                  );
+                  if (treeEntry) {
+                    store.dispatch('handleTreeEntryAction', treeEntry);
                   }
-                } else {
-                  console.warn('No Tree Entry for ' + change.new_path);
-                }
-              });
+
+                  store
+                    .dispatch('getMergeRequestChanges', {
+                      projectId: fullProjectId,
+                      mergeRequestId: to.params.mrid,
+                    })
+                    .then(mrChanges => {
+                      if (mrChanges.changes.length > 0) {
+                      }
+                      mrChanges.changes.forEach((change, ind) => {
+                        console.log('CHANGE : ' + ind + ' : ', change);
+
+                        const changeTreeEntry = getTreeEntry(
+                          store,
+                          `${to.params.namespace}/${to.params.project}/${
+                            mr.source_branch
+                          }`,
+                          change.new_path,
+                        );
+
+                        console.log(
+                          'Tree Entry for the change ',
+                          changeTreeEntry,
+                          change.diff,
+                        );
+
+                        if (changeTreeEntry) {
+                          store.dispatch('setFileMrDiff', {
+                            file: changeTreeEntry,
+                            mrDiff: change.diff,
+                          });
+                          store.dispatch('setFileTargetBranch', {
+                            file: changeTreeEntry,
+                            targetBranch: mrChanges.target_branch,
+                          });
+                          //store.dispatch('getFileData', changeTreeEntry);
+                        } else {
+                          console.warn('No Tree Entry for ' + change.new_path);
+                        }
+                      });
+
+                      // Now lets open them
+                      mrChanges.changes.forEach((change, ind) => {
+                        const changeTreeEntry = getTreeEntry(
+                          store,
+                          `${to.params.namespace}/${to.params.project}/${
+                            mr.source_branch
+                          }`,
+                          change.new_path,
+                        );
+                        console.log(
+                          'Tree Entry for the change ',
+                          changeTreeEntry,
+                          change.diff,
+                        );
+
+                        if (changeTreeEntry) {
+                          if (ind === 0) {
+                            store.dispatch('getFileData', changeTreeEntry);
+                          } else {
+                            // TODO : Implement Tab reloading
+                            store.dispatch('preloadFileTab', changeTreeEntry);
+                          }
+                        } else {
+                          console.warn('No Tree Entry for ' + change.new_path);
+                        }
+                      });
+                    })
+                    .catch(e => {
+                      flash(
+                        'Error while loading the merge request changes. Please try again.',
+                      );
+                      throw e;
+                    });
+                })
+                .catch(e => {
+                  flash(
+                    'Error while loading the branch files. Please try again.',
+                  );
+                  throw e;
+                });
             })
-            .catch((e) => {
-              flash('Error while loading the merge request changes. Please try again.');
+            .catch(e => {
               throw e;
             });
-          })
-          .catch((e) => {
-            flash('Error while loading the branch files. Please try again.');
-            throw e;
-          });
-        })
-        .catch((e) => {
-          throw e;
-        });
-      }
-    })
-    .catch((e) => {
-      flash('Error while loading the project data. Please try again.', 'alert', document, null, false, true);
-      throw e;
-    });
+        }
+      })
+      .catch(e => {
+        flash(
+          'Error while loading the project data. Please try again.',
+          'alert',
+          document,
+          null,
+          false,
+          true,
+        );
+        throw e;
+      });
   }
 
   next();

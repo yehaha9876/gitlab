@@ -15,9 +15,7 @@ export default {
     },
   },
   computed: {
-    ...mapState([
-      'trees',
-    ]),
+    ...mapState(['trees']),
     ...mapState({
       projectName(state) {
         return state.project.name;

@@ -20,6 +20,7 @@ export default {
     });
   },
   [types.TOGGLE_LOADING](state, { entry, forceValue = undefined }) {
+    console.log('LOADING :: ', entry, '/', forceValue);
     Object.assign(entry, {
       loading: forceValue !== undefined ? forceValue : !entry.loading,
     });

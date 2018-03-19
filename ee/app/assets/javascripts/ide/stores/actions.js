@@ -8,7 +8,7 @@ export const setInitialData = ({ commit }, data) =>
   commit(types.SET_INITIAL_DATA, data);
 
 export const discardAllChanges = ({ state, commit, dispatch }) => {
-  state.changedFiles.forEach((file) => {
+  state.changedFiles.forEach(file => {
     commit(types.DISCARD_FILE_CHANGES, file);
 
     if (file.tempFile) {
@@ -21,10 +21,6 @@ export const discardAllChanges = ({ state, commit, dispatch }) => {
 
 export const closeAllFiles = ({ state, dispatch }) => {
   state.openFiles.forEach(file => dispatch('closeFile', file));
-};
-
-export const setViewMode = ({ state, commit }, viewMode) => {
-  commit(types.SET_VIEWMODE, viewMode);
 };
 
 export const toggleEditMode = ({ commit, dispatch }) => {
