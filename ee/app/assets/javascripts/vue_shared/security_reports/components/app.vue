@@ -99,8 +99,12 @@
 
       translateText(type) {
         return {
-          error: sprintf(s__('ciReport|Failed to load %{reportName} report'), { reportName: type }),
-          loading: sprintf(s__('ciReport|Loading %{reportName} report'), { reportName: type }),
+          error: sprintf(s__('ciReport|Failed to load %{reportName} report'), {
+            reportName: type,
+          }),
+          loading: sprintf(s__('ciReport|Loading %{reportName} report'), {
+            reportName: type,
+          }),
         };
       },
     },
@@ -121,10 +125,13 @@
 
       sastContainerInformationText() {
         return sprintf(
-          s__('ciReport|Unapproved vulnerabilities (red) can be marked as approved. %{helpLink}'), {
+          s__(
+            'ciReport|Unapproved vulnerabilities (red) can be marked as approved. %{helpLink}',
+          ),
+          {
             helpLink: `<a href="https://gitlab.com/gitlab-org/clair-scanner#example-whitelist-yaml-file" target="_blank" rel="noopener noreferrer nofollow">
-              ${s__('ciReport|Learn more about whitelisting')}
-            </a>`,
+                ${s__('ciReport|Learn more about whitelisting')}
+              </a>`,
           },
           false,
         );
@@ -196,7 +203,7 @@
         :status="checkReportStatus(sast.isLoading, sast.hasError)"
         :loading-text="translateText('security').loading"
         :error-text="translateText('security').error"
-        :success-text="sastText(sast.newIssues, sast.resolvedIssues)"
+        :success-text="sastText"
         :unresolved-issues="sast.newIssues"
         :resolved-issues="sast.resolvedIssues"
         :all-issues="sast.allIssues"
@@ -209,7 +216,7 @@
         :status="checkReportStatus(sastContainer.isLoading, sastContainer.hasError)"
         :loading-text="translateText('security').loading"
         :error-text="translateText('security').error"
-        :success-text="sastContainerText(sastContainer.newIssues, sastContainer.resolvedIssues)"
+        :success-text="sastContainerText"
         :unresolved-issues="sastContainer.unapproved"
         :neutral-issues="sastContainer.approved"
         :has-issues="sastContainer.approved.length > 0 || dast.newIssues.length > 0"
@@ -223,7 +230,7 @@
         :status="checkReportStatus(dast.isLoading, dast.hasError)"
         :loading-text="translateText('security').loading"
         :error-text="translateText('security').error"
-        :success-text="dastText(dast.newIssues, dast.resolvedIssues)"
+        :success-text="dastText"
         :unresolved-issues="dast.newIssues"
         :resolved-issues="dast.resolvedIssues"
         :has-issues="dast.resolvedIssues.length > 0 || dast.newIssues.length > 0"
@@ -242,7 +249,7 @@
           <error-row v-else-if="sast.hasError" />
 
           <template v-else>
-            SAST report summary text
+            {{ sastText }}
 
             <issues-list
               :unresolved-issues="sast.newIssues"
@@ -259,8 +266,9 @@
           <error-row v-else-if="sastContainer.hasError" />
 
           <template v-else>
-            SAST Container report summary
+            {{ sastContainerText }}
             <div v-html="sastContainerInformationText"></div>
+
             <issues-list
               :unresolved-issues="sastContainer.unapproved"
               :neutral-issues="sastContainer.approved"
@@ -274,7 +282,7 @@
           <error-row v-else-if="dast.hasError" />
 
           <template v-else>
-            DAST report summary
+            {{ dastText }}
             <issues-list
               :unresolved-issues="dast.newIssues"
               :resolved-issues="dast.resolvedIssues"

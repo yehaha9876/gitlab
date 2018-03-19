@@ -5,7 +5,7 @@ import {
   setSastContainerReport,
   setSastReport,
   setDastReport,
-} from '../../vue_shared/security_reports/helpers/utils';
+} from '../../vue_shared/security_reports/store/utils';
 
 export default class MergeRequestStore extends CEMergeRequestStore {
   constructor(data) {

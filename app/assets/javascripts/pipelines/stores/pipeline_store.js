@@ -1,7 +1,7 @@
-import securityState from 'ee/vue_shared/security_reports/helpers/state';
-import {
-  setSastReport,
-} from 'ee/vue_shared/security_reports/helpers/utils';
+//import securityState from 'ee/vue_shared/security_reports/helpers/state';
+// import {
+//   setSastReport,
+// } from 'ee/vue_shared/security_reports/helpers/utils';
 
 export default class PipelineStore {
   constructor() {
@@ -10,7 +10,7 @@ export default class PipelineStore {
     this.state.pipeline = {};
 
     /* EE only */
-    this.state.securityReports = securityState;
+    // this.state.securityReports = securityState;
   }
 
   storePipeline(pipeline = {}) {
@@ -20,10 +20,10 @@ export default class PipelineStore {
   /**
    * EE only
   */
-  storeSastReport(data, blobPath) {
-    Object.assign(
-      this.state.securityReports.sast,
-      setSastReport({ head: data, headBlobPath: blobPath }),
-    );
-  }
+  // storeSastReport(data, blobPath) {
+  //   Object.assign(
+  //     this.state.securityReports.sast,
+  //     setSastReport({ head: data, headBlobPath: blobPath }),
+  //   );
+  // }
 }

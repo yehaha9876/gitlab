@@ -1,9 +1,9 @@
 import {
-  parseIssues,
+  parseCodeclimateMetrics,
   parseSastContainer,
   setSastReport,
   setDastReport,
-} from 'ee/vue_shared/security_reports/helpers/utils';
+} from 'ee/vue_shared/security_reports/store/utils';
 import {
   baseIssues,
   sastIssues,
@@ -19,14 +19,14 @@ import {
 } from '../mock_data';
 
 describe('security reports utils', () => {
-  describe('parseIssues', () => {
+  describe('parseCodeclimateMetrics', () => {
     it('should parse the received issues', () => {
-      const codequality = parseIssues(baseIssues, 'path')[0];
+      const codequality = parseCodeclimateMetrics(baseIssues, 'path')[0];
       expect(codequality.name).toEqual(baseIssues[0].check_name);
       expect(codequality.path).toEqual(baseIssues[0].location.path);
       expect(codequality.line).toEqual(baseIssues[0].location.lines.begin);
 
-      const security = parseIssues(sastIssues, 'path')[0];
+      const security = parseCodeclimateMetrics(sastIssues, 'path')[0];
       expect(security.name).toEqual(sastIssues[0].message);
       expect(security.path).toEqual(sastIssues[0].file);
     });

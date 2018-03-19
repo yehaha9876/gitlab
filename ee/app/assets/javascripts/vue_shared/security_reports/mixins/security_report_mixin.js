@@ -1,4 +1,4 @@
-import { s__, n__, __, sprintf } from '~/locale';
+import { s__, n__, __ } from '~/locale';
 
 export default {
   methods: {

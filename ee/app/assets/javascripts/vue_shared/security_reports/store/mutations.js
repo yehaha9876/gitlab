@@ -4,7 +4,7 @@ import {
   parseSastIssues,
   filterByKey,
   parseSastContainer,
-} from '../helpers/utils';
+} from './utils';
 
 export default {
   [types.SET_APP_TYPE](state, type) {
@@ -108,7 +108,7 @@ export default {
     } else {
       const parsedVulnerabilities = parseSastContainer(reports.head.vulnerabilities);
       const unapproved = reports.head.unapproved || [];
-      // todo figure out this addition
+
       Object.assign(state.summaryCounts, {
         new: state.summaryCounts.added + parsedVulnerabilities
         .filter(item => unapproved.find(el => el === item.vulnerability)).length,
