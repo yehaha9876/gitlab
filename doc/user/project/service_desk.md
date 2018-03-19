@@ -55,13 +55,14 @@ you can skip the step 1 below; you only need to enable it per project.
 
 1.   [Set up incoming email][incoming-email] for the GitLab instance. This must
      support [email sub-addressing][email-sub-addressing].
-2.   Navigate to your project's **Settings** and scroll down to the **Service Desk**
+2.   [Restart GitLab services](https://docs.gitlab.com/ee/administration/restart_gitlab.html)
+3.   Navigate to your project's **Settings** and scroll down to the **Service Desk**
      section.
-3.   If you have the correct access and an Premium license,
+4.   If you have the correct access and an Premium license,
      you will see an option to set up Service Desk:
 
      ![Activate Service Desk option](img/service_desk_disabled.png)
-4.   Checking that box will enable Service Desk for the project, and show a
+5.   Checking that box will enable Service Desk for the project, and show a
      unique email address to email issues to the project. These issues will be
      [confidential], so they will only be visible to project members.
 
@@ -73,7 +74,7 @@ you can skip the step 1 below; you only need to enable it per project.
      checking to this service.
 
      ![Service Desk enabled](img/service_desk_enabled.png)
-5.   Service Desk is now enabled for this project! You should be able to access it from your project's navigation **Issue submenu**:
+6.   Service Desk is now enabled for this project! You should be able to access it from your project's navigation **Issue submenu**:
 
       ![Service Desk Navigation Item](img/service_desk_nav_item.png)
 
