@@ -43,7 +43,7 @@
         }
         let tooltipTitle = this.epicTitle;
 
-        if (this.store.epic.human_readable_end_date ||  this.store.epic.human_readable_timestamp) {
+        if (this.store.epic.human_readable_end_date || this.store.epic.human_readable_timestamp) {
           tooltipTitle += '<br />';
           tooltipTitle += this.store.epic.human_readable_end_date ? `${this.store.epic.human_readable_end_date} ` : '';
           tooltipTitle += this.store.epic.human_readable_timestamp ? `(${this.store.epic.human_readable_timestamp})` : '';
