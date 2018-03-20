@@ -183,7 +183,7 @@ module ObjectStorage
 
         {
           ID: id,
-          GetURL: connection.get_object_https_url(remote_store_path, upload_path, expire_at),
+          GetURL: connection.get_object_url(remote_store_path, upload_path, expire_at),
           DeleteURL: connection.delete_object_url(remote_store_path, upload_path, expire_at),
           StoreURL: connection.put_object_url(remote_store_path, upload_path, expire_at, options)
         }
@@ -241,6 +241,7 @@ module ObjectStorage
         cache_stored_file!
         yield cache_path
       ensure
+        FileUtils.rm_f(cache_path)
         cache_storage.delete_dir!(cache_path(nil))
       end
     end

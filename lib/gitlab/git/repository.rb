@@ -1006,8 +1006,9 @@ module Gitlab
       # This only checks the root .gitattributes file,
       # it does not traverse subfolders to find additional .gitattributes files
       #
-      # This method is around 30 times slower than `attributes`,
-      # which uses `$GIT_DIR/info/attributes`
+      # This method is around 30 times slower than `attributes`, which uses
+      # `$GIT_DIR/info/attributes`. Consider caching AttributesAtRefParser
+      # and reusing that for multiple calls instead of this method.
       def attributes_at(ref, file_path)
         parser = AttributesAtRefParser.new(self, ref)
         parser.attributes(file_path)
@@ -1393,7 +1394,7 @@ module Gitlab
         offset = 2
         args = %W(grep -i -I -n -z --before-context #{offset} --after-context #{offset} -E -e #{Regexp.escape(query)} #{ref || root_ref})
 
-        run_git(args).first.scrub.split(/^--$/)
+        run_git(args).first.scrub.split(/^--\n/)
       end
 
       def can_be_merged?(source_sha, target_branch)

@@ -24,30 +24,14 @@ describe('Multi-file editor right context bar', () => {
   });
 
   describe('collapsed', () => {
-    beforeEach((done) => {
+    beforeEach(done => {
       vm.$store.state.rightPanelCollapsed = true;
 
       Vue.nextTick(done);
     });
 
     it('adds collapsed class', () => {
-      expect(vm.$el.classList.contains('is-collapsed')).toBeTruthy();
+      expect(vm.$el.querySelector('.is-collapsed')).not.toBeNull();
     });
-
-    it('clicking sidebar collapses the bar', () => {
-      spyOn(vm, 'toggleRightPanelCollapsed').and.returnValue(Promise.resolve());
-
-      vm.$el.click();
-
-      expect(vm.toggleRightPanelCollapsed).toHaveBeenCalled();
-    });
-  });
-
-  it('when expanded clicking the main sidebar is not collapsing the bar', () => {
-    spyOn(vm, 'toggleRightPanelCollapsed').and.returnValue(Promise.resolve());
-
-    vm.$el.click();
-
-    expect(vm.toggleRightPanelCollapsed).not.toHaveBeenCalled();
   });
 });

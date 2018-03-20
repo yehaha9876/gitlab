@@ -81,6 +81,42 @@ describe Ci::Build do
     end
   end
 
+  describe '.with_artifacts_archive' do
+    subject { described_class.with_artifacts_archive }
+
+    context 'when job does not have an archive' do
+      let!(:job) { create(:ci_build) }
+
+      it 'does not return the job' do
+        is_expected.not_to include(job)
+      end
+    end
+
+    context 'when job has a legacy archive' do
+      let!(:job) { create(:ci_build, :legacy_artifacts) }
+
+      it 'returns the job' do
+        is_expected.to include(job)
+      end
+    end
+
+    context 'when job has a job artifact archive' do
+      let!(:job) { create(:ci_build, :artifacts) }
+
+      it 'returns the job' do
+        is_expected.to include(job)
+      end
+    end
+
+    context 'when job has a job artifact trace' do
+      let!(:job) { create(:ci_build, :trace_artifact) }
+
+      it 'does not return the job' do
+        is_expected.not_to include(job)
+      end
+    end
+  end
+
   describe '#actionize' do
     context 'when build is a created' do
       before do
@@ -698,21 +734,21 @@ describe Ci::Build do
 
         describe '#erase' do
           before do
-            build.erase(erased_by: user)
+            build.erase(erased_by: erased_by)
           end
 
           context 'erased by user' do
-            let!(:user) { create(:user, username: 'eraser') }
+            let!(:erased_by) { create(:user, username: 'eraser') }
 
             include_examples 'erasable'
 
             it 'records user who erased a build' do
-              expect(build.erased_by).to eq user
+              expect(build.erased_by).to eq erased_by
             end
           end
 
           context 'erased by system' do
-            let(:user) { nil }
+            let(:erased_by) { nil }
 
             include_examples 'erasable'
 
@@ -767,21 +803,21 @@ describe Ci::Build do
 
           describe '#erase' do
             before do
-              build.erase(erased_by: user)
+              build.erase(erased_by: erased_by)
             end
 
             context 'erased by user' do
-              let!(:user) { create(:user, username: 'eraser') }
+              let!(:erased_by) { create(:user, username: 'eraser') }
 
               include_examples 'erasable'
 
               it 'records user who erased a build' do
-                expect(build.erased_by).to eq user
+                expect(build.erased_by).to eq erased_by
               end
             end
 
             context 'erased by system' do
-              let(:user) { nil }
+              let(:erased_by) { nil }
 
               include_examples 'erasable'
 
@@ -1905,10 +1941,10 @@ describe Ci::Build do
 
     describe 'variables ordering' do
       context 'when variables hierarchy is stubbed' do
-        let(:build_pre_var) { { key: 'build', value: 'value' } }
-        let(:project_pre_var) { { key: 'project', value: 'value' } }
-        let(:pipeline_pre_var) { { key: 'pipeline', value: 'value' } }
-        let(:build_yaml_var) { { key: 'yaml', value: 'value' } }
+        let(:build_pre_var) { { key: 'build', value: 'value', public: true } }
+        let(:project_pre_var) { { key: 'project', value: 'value', public: true } }
+        let(:pipeline_pre_var) { { key: 'pipeline', value: 'value', public: true } }
+        let(:build_yaml_var) { { key: 'yaml', value: 'value', public: true } }
 
         before do
           allow(build).to receive(:predefined_variables) { [build_pre_var] }
@@ -1978,7 +2014,7 @@ describe Ci::Build do
       context 'when depended job has not been completed yet' do
         let!(:pre_stage_job) { create(:ci_build, :manual, pipeline: pipeline, name: 'test', stage_idx: 0) }
 
-        it { expect { job.run! }.not_to raise_error(Ci::Build::MissingDependenciesError) }
+        it { expect { job.run! }.not_to raise_error }
       end
 
       context 'when artifacts of depended job has been expired' do

@@ -197,6 +197,10 @@ describe('IDE commit module actions', () => {
         changed: true,
       });
       store.state.openFiles = store.state.changedFiles;
+
+      store.state.changedFiles.forEach((changedFile) => {
+        store.state.entries[changedFile.path] = changedFile;
+      });
     });
 
     it('updates stores working reference', (done) => {
@@ -334,6 +338,10 @@ describe('IDE commit module actions', () => {
       }];
       store.state.openFiles = store.state.changedFiles;
 
+      store.state.openFiles.forEach((f) => {
+        store.state.entries[f.path] = f;
+      });
+
       store.state.commit.commitAction = '2';
       store.state.commit.commitMessage = 'testing 123';
     });
@@ -409,6 +417,8 @@ describe('IDE commit module actions', () => {
       });
 
       it('redirects to new merge request page', (done) => {
+        spyOn(eventHub, '$on');
+
         store.state.commit.commitAction = '3';
 
         store.dispatch('commit/commitChanges')

@@ -1,17 +1,31 @@
-export const activeFile = state => state.openFiles.find(file => file.active) || null;
+export const activeFile = state =>
+  state.openFiles.find(file => file.active) || null;
 
-export const activeFileExtension = (state) => {
-  const file = activeFile(state);
-  return file ? `.${file.path.split('.').pop()}` : '';
-};
+export const addedFiles = state => state.changedFiles.filter(f => f.tempFile);
 
-export const canEditFile = (state) => {
-  const currentActiveFile = activeFile(state);
+export const modifiedFiles = state =>
+  state.changedFiles.filter(f => !f.tempFile);
 
-  return state.canCommit &&
-         (currentActiveFile && !currentActiveFile.renderError && !currentActiveFile.binary);
-};
+export const projectsWithTrees = state =>
+  Object.keys(state.projects).map(projectId => {
+    const project = state.projects[projectId];
+    return {
+      ...project,
+      branches: Object.keys(project.branches).map(branchId => {
+        const branch = project.branches[branchId];
 
-export const collapseButtonIcon = state => (state.rightPanelCollapsed ? 'angle-double-left' : 'angle-double-right');
+        return {
+          ...branch,
+          tree: state.trees[branch.treeId],
+        };
+      }),
+    };
+  });
+
+// eslint-disable-next-line no-confusing-arrow
+export const collapseButtonIcon = state =>
+  state.rightPanelCollapsed ? 'angle-double-left' : 'angle-double-right';
 
 export const unstagedFiles = state => state.changedFiles.filter(f => !f.staged);
+
+export const hasChanges = state => !!state.changedFiles.length;

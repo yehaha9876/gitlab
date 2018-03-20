@@ -29,7 +29,12 @@
       },
     },
     methods: {
+      ...mapActions([
+        'updateViewer',
+      ]),
       openFileInEditor(file) {
+        this.updateViewer('diff');
+
         router.push(`/project${file.url}`);
       },
     },

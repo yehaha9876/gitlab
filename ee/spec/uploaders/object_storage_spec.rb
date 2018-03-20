@@ -189,6 +189,18 @@ describe ObjectStorage do
           it "calls a cache path" do
             expect { |b| uploader.use_file(&b) }.to yield_with_args(%r[tmp/cache])
           end
+
+          it "cleans up the cached file" do
+            cached_path = ''
+
+            uploader.use_file do |path|
+              cached_path = path
+
+              expect(File.exist?(cached_path)).to be_truthy
+            end
+
+            expect(File.exist?(cached_path)).to be_falsey
+          end
         end
       end
 
@@ -475,6 +487,29 @@ describe ObjectStorage do
             let(:storage_url) { "https://storage.googleapis.com/uploads/" }
 
             it 'returns links for Google Cloud' do
+              expect(subject[:RemoteObject][:GetURL]).to start_with(storage_url)
+              expect(subject[:RemoteObject][:DeleteURL]).to start_with(storage_url)
+              expect(subject[:RemoteObject][:StoreURL]).to start_with(storage_url)
+            end
+          end
+        end
+
+        context 'uses GDK/minio' do
+          before do
+            expect(uploader_class).to receive(:object_store_credentials) do
+              { provider: "AWS",
+                aws_access_key_id: "AWS_ACCESS_KEY_ID",
+                aws_secret_access_key: "AWS_SECRET_ACCESS_KEY",
+                endpoint: 'http://127.0.0.1:9000',
+                path_style: true,
+                region: "gdk" }
+            end
+          end
+
+          it_behaves_like 'uses remote storage' do
+            let(:storage_url) { "http://127.0.0.1:9000/uploads/" }
+
+            it 'returns links for S3' do
               expect(subject[:RemoteObject][:GetURL]).to start_with(storage_url)
               expect(subject[:RemoteObject][:DeleteURL]).to start_with(storage_url)
               expect(subject[:RemoteObject][:StoreURL]).to start_with(storage_url)
