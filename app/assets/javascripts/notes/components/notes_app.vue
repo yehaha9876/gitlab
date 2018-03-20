@@ -52,8 +52,7 @@ export default {
       // FIXME -- @fatihacet Get this from JSON data.
       const { ISSUE_NOTEABLE_TYPE, MERGE_REQUEST_NOTEABLE_TYPE, EPIC_NOTEABLE_TYPE } = constants;
 
-      // FIXME - hack to support epic notes
-      if (this.notesData.notesPath.search("^/groups/.*/epics/") > -1) {
+      if (this.notesData.noteableType === EPIC_NOTEABLE_TYPE) {
         return EPIC_NOTEABLE_TYPE;
       }
 
