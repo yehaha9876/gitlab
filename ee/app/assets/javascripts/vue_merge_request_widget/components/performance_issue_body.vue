@@ -4,6 +4,7 @@
    *  [name] :[score] [symbol] [delta] in [link]
    */
   import ReportLink from 'ee/vue_shared/security_reports/components/report_link.vue';
+
   export default {
     name: 'PerformanceIssueBody',
 

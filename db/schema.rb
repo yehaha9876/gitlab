@@ -2015,15 +2015,15 @@ ActiveRecord::Schema.define(version: 20180314100728) do
   add_index "projects", ["visibility_level"], name: "index_projects_on_visibility_level", using: :btree
 
   create_table "prometheus_metrics", force: :cascade do |t|
-    t.integer "project_id", null: false
+    t.integer "project_id"
     t.string "title", null: false
     t.string "query", null: false
     t.string "y_label"
     t.string "unit"
     t.string "legend"
     t.integer "group", null: false
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "prometheus_metrics", ["group"], name: "index_prometheus_metrics_on_group", using: :btree
@@ -2627,7 +2627,7 @@ ActiveRecord::Schema.define(version: 20180314100728) do
   add_foreign_key "cluster_providers_gcp", "clusters", on_delete: :cascade
   add_foreign_key "clusters", "users", on_delete: :nullify
   add_foreign_key "clusters_applications_helm", "clusters", on_delete: :cascade
-  add_foreign_key "clusters_applications_ingress", "clusters", on_delete: :cascade
+  add_foreign_key "clusters_applications_ingress", "clusters", name: "fk_753a7b41c1", on_delete: :cascade
   add_foreign_key "clusters_applications_prometheus", "clusters", name: "fk_557e773639", on_delete: :cascade
   add_foreign_key "clusters_applications_runners", "ci_runners", column: "runner_id", name: "fk_02de2ded36", on_delete: :nullify
   add_foreign_key "clusters_applications_runners", "clusters", on_delete: :cascade
@@ -2766,8 +2766,8 @@ ActiveRecord::Schema.define(version: 20180314100728) do
   add_foreign_key "u2f_registrations", "users"
   add_foreign_key "user_callouts", "users", on_delete: :cascade
   add_foreign_key "user_custom_attributes", "users", on_delete: :cascade
-  add_foreign_key "user_interacted_projects", "projects", on_delete: :cascade
-  add_foreign_key "user_interacted_projects", "users", on_delete: :cascade
+  add_foreign_key "user_interacted_projects", "projects", name: "fk_722ceba4f7", on_delete: :cascade
+  add_foreign_key "user_interacted_projects", "users", name: "fk_0894651f08", on_delete: :cascade
   add_foreign_key "user_synced_attributes_metadata", "users", on_delete: :cascade
   add_foreign_key "users_star_projects", "projects", name: "fk_22cd27ddfc", on_delete: :cascade
   add_foreign_key "web_hook_logs", "web_hooks", on_delete: :cascade
