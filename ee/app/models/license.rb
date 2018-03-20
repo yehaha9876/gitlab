@@ -82,6 +82,7 @@ class License < ActiveRecord::Base
     sast_container
     container_scanning
     cluster_health
+    cluster_application_jaeger
     dast
     epics
     chatops
