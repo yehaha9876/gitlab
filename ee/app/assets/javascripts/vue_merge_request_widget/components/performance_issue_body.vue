@@ -34,11 +34,14 @@
       {{ issue.name }}<template v-if="issue.score">:
       <strong>{{ formatScore(issue.score) }}</strong></template>
 
-    <template v-if="issue.delta != null">
-      ({{ issue.delta >= 0 ? '+' : '' }}{{ formatScore(issue.delta) }})
-    </template>
+      <template v-if="issue.delta != null">
+        ({{ issue.delta >= 0 ? '+' : '' }}{{ formatScore(issue.delta) }})
+      </template>
     </div>
 
-    <report-link :issue="issue" />
+    <report-link
+      v-if="issue.path"
+      :issue="issue"
+    />
   </div>
 </template>

@@ -4,6 +4,7 @@
    * [priority]: [name|link] in [link]:[line]
    */
   import ReportLink from './report_link.vue';
+
   export default {
     name: 'SastContainerIssueBody',
 
@@ -37,6 +38,9 @@
       </template>
     </div>
 
-    <report-link :issue="issue" />
+    <report-link
+      v-if="issue.path"
+      :issue="issue"
+    />
   </div>
 </template>

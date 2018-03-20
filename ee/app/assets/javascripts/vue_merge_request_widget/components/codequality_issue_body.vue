@@ -4,6 +4,7 @@
    * Fixed: [name] in [link]:[line]
    */
   import ReportLink from 'ee/vue_shared/security_reports/components/report_link.vue';
+
   export default {
     name: 'CodequalityIssueBody',
 
@@ -31,6 +32,9 @@
       {{ issue.name }}
     </div>
 
-    <report-link :issue="issue" />
+    <report-link
+      v-if="issue.path"
+      :issue="issue"
+    />
   </div>
 </template>

@@ -203,15 +203,57 @@
           :issues="resolvedIssues"
         />
 
-        <button
-          v-if="allIssues.length && !isFullReportVisible"
-          type="button"
-          class="btn-link btn-blank prepend-left-10 js-expand-full-list break-link"
-          @click="openFullReport"
-        >
-          {{ s__("ciReport|Show complete code vulnerabilities report") }}
-        </button>
-      </slot>
+      <p
+        v-if="infoText"
+        v-html="infoText"
+        class="js-mr-code-quality-info prepend-left-10 report-block-info"
+      >
+      </p>
+
+      <issues-block
+        class="js-mr-code-new-issues"
+        v-if="unresolvedIssues.length"
+        :type="type"
+        status="failed"
+        :issues="unresolvedIssues"
+        :has-priority="hasPriority"
+      />
+
+      <issues-block
+        class="js-mr-code-all-issues"
+        v-if="isFullReportVisible"
+        :type="type"
+        status="failed"
+        :issues="allIssues"
+        :has-priority="hasPriority"
+      />
+
+      <issues-block
+        class="js-mr-code-non-issues"
+        v-if="neutralIssues.length"
+        :type="type"
+        status="neutral"
+        :issues="neutralIssues"
+        :has-priority="hasPriority"
+      />
+
+      <issues-block
+        class="js-mr-code-resolved-issues"
+        v-if="resolvedIssues.length"
+        :type="type"
+        status="success"
+        :issues="resolvedIssues"
+        :has-priority="hasPriority"
+      />
+
+      <button
+        v-if="allIssues.length && !isFullReportVisible"
+        type="button"
+        class="btn-link btn-blank prepend-left-10 js-expand-full-list break-link"
+        @click="openFullReport"
+      >
+        {{ s__("ciReport|Show complete code vulnerabilities report") }}
+      </button>
     </div>
     <div
       v-else-if="loadingFailed"

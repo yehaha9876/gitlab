@@ -1,19 +1,15 @@
 <script>
   import $ from 'jquery';
-  import { s__ } from '~/locale';
   import Icon from '~/vue_shared/components/icon.vue';
   import Modal from '~/vue_shared/components/gl_modal.vue';
   import ExpandButton from '~/vue_shared/components/expand_button.vue';
+  import PerformanceIssue from 'ee/vue_merge_request_widget/components/performance_issue_body.vue';
+  import CodequalityIssue from 'ee/vue_merge_request_widget/components/codequality_issue_body.vue';
   import SastIssue from './sast_issue_body.vue';
   import SastContainerIssue from './sast_container_issue_body.vue';
   import DastIssue from './dast_issue_body.vue';
-  import PerformanceIssue from '../../../vue_merge_request_widget/components/performance_issue_body.vue';
-  import CodequalityIssue from '../../../vue_merge_request_widget/components/codequality_issue_body.vue';
-  import {
-    SAST,
-    DAST,
-    SAST_CONTAINER,
-  } from '../store/constants';
+
+  import { SAST, DAST, SAST_CONTAINER } from '../helpers/constants';
 
   const modalDefaultData = {
     modalId: 'modal-mrwidget-issue',
@@ -33,7 +29,7 @@
       SastContainerIssue,
       DastIssue,
       PerformanceIssue,
-      CodequalityIssue
+      CodequalityIssue,
     },
     props: {
       issues: {
@@ -73,17 +69,17 @@
       isStatusNeutral() {
         return this.status === 'neutral';
       },
-      isTypeSast() {
-        return this.type === SAST;
-      },
-      isTypeSastContainer() {
-        return this.type === SAST_CONTAINER;
-      },
       isTypeCodequality() {
         return this.type === 'codequality';
       },
       isTypePerformance() {
         return this.type === 'performance';
+      },
+      isTypeSast() {
+        return this.type === SAST;
+      },
+      isTypeSastContainer() {
+        return this.type === SAST_CONTAINER;
       },
       isTypeDast() {
         return this.type === DAST;

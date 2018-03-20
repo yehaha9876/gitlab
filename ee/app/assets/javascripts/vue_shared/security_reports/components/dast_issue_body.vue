@@ -1,10 +1,8 @@
 <script>
   /**
-   * Renders SAST body text
-   * [priority]: [name] in [link] : [line]
+   * Renders DAST body text
+   * [priority]: [name]
    */
-  import ReportLink from './report_link.vue';
-
   export default {
     name: 'SastIssueBody',
     props: {
@@ -22,10 +20,6 @@
         type: String,
         required: true,
       },
-    },
-
-    components: {
-      ReportLink,
     },
 
     methods: {
@@ -50,7 +44,5 @@
         {{ issue.name }}
       </button>
     </div>
-
-    <report-link :issue="issue" />
   </div>
 </template>

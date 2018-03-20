@@ -28,6 +28,9 @@
       {{ issue.name }}
     </div>
 
-    <report-link :issue="issue" />
+    <report-link
+      v-if="issue.path"
+      :issue="issue"
+    />
   </div>
 </template>
