@@ -48,7 +48,7 @@ function generateEntries() {
   });
   eePageEntries.forEach(path => generateAutoEntries(path, 'ee'));
   watchAutoEntries.concat(
-    path.join(ROOT_PATH, 'ee/app/assets/javascripts/pages/'),
+    path.join(ROOT_PATH, 'ee/app/assets/javascripts/pages/')
   );
 
   autoEntriesCount = Object.keys(autoEntries).length;
@@ -209,7 +209,7 @@ const config = {
             path
               .relative(pagesBase, m.resource)
               .replace(/\/index\.[a-z]+$/, '')
-              .replace(/\//g, '__'),
+              .replace(/\//g, '__')
           );
         } else {
           moduleNames.push(path.relative(m.context, m.resource));
@@ -239,7 +239,7 @@ const config = {
       {
         from: path.join(
           ROOT_PATH,
-          `node_modules/monaco-editor/${IS_PRODUCTION ? 'min' : 'dev'}/vs`,
+          `node_modules/monaco-editor/${IS_PRODUCTION ? 'min' : 'dev'}/vs`
         ),
         to: 'monaco-editor/vs',
         transform: function(content, path) {
@@ -301,7 +301,7 @@ if (IS_PRODUCTION) {
     }),
     new webpack.DefinePlugin({
       'process.env': { NODE_ENV: JSON.stringify('production') },
-    }),
+    })
   );
 
   // compression can require a lot of compute time and is disabled in CI
@@ -336,13 +336,13 @@ if (IS_DEV_SERVER) {
 
           // report our auto-generated bundle count
           console.log(
-            `${autoEntriesCount} entries from '/pages' automatically added to webpack output.`,
+            `${autoEntriesCount} entries from '/pages' automatically added to webpack output.`
           );
 
           callback();
         });
       },
-    },
+    }
   );
   if (DEV_SERVER_LIVERELOAD) {
     config.plugins.push(new webpack.HotModuleReplacementPlugin());
@@ -357,7 +357,7 @@ if (WEBPACK_REPORT) {
       openAnalyzer: false,
       reportFilename: path.join(ROOT_PATH, 'webpack-report/index.html'),
       statsFilename: path.join(ROOT_PATH, 'webpack-report/stats.json'),
-    }),
+    })
   );
 }
 
