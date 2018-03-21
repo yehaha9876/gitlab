@@ -51,7 +51,7 @@ There's also a collection of repositories with [example projects](https://gitlab
 
 ## Dependency Scanning
 
-**(Ultimate)** [Scan your dependencies for vulnerabilities](https://docs.gitlab.com/ee/ci/examples/dependency_scanning.html)
+**(Ultimate)** [Scan your dependencies for vulnerabilities](dependency_scanning.md)
 
 ## Container Scanning
 

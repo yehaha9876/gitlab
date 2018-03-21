@@ -231,6 +231,19 @@ check out.
 In GitLab Ultimate, any security warnings are also
 [shown in the merge request widget](https://docs.gitlab.com/ee/user/project/merge_requests//dependency_scanning.md).
 
+### Auto Dependency Scanning
+
+> Introduced in [GitLab Ultimate][ee] 10.7.
+
+Dependency Scanning uses the
+[Dependency Scanning Docker image](https://gitlab.com/gitlab-org/security-products/dependency-scanning)
+to run analysis on the project dependencies and checks for potential security issues. Once the
+report is created, it's uploaded as an artifact which you can later download and
+check out.
+
+In GitLab Ultimate, any security warnings are also
+[shown in the merge request widget](../../user/project/merge_requests/dependency_scanning.md).
+
 ### Auto Container Scanning
 
 > Introduced in GitLab 10.4.
@@ -468,7 +481,7 @@ also be customized, and you can easily use a [custom buildpack](#custom-buildpac
 | `POSTGRES_DB`       | The PostgreSQL database name; defaults to the value of [`$CI_ENVIRONMENT_SLUG`](../../ci/variables/README.md#predefined-variables-environment-variables). Set it to use a custom database name. |
 | `BUILDPACK_URL`  | The buildpack's full URL. It can point to either Git repositories or a tarball URL. For Git repositories, it is possible to point to a specific `ref`, for example `https://github.com/heroku/heroku-buildpack-ruby.git#v142`|
 | `SAST_CONFIDENCE_LEVEL`  | The minimum confidence level of security issues you want to be reported; `1` for Low, `2` for Medium, `3` for High; defaults to `3`.|
-| `SAST_DISABLE_REMOTE_CHECKS`  | Whether remote SAST checks are disabled; defaults to `"false"`. Set to `"true"` to disable SAST checks that send data to GitLab central servers. [Read more about remote checks](https://gitlab.com/gitlab-org/security-products/sast#remote-checks).|
+| `DEP_SCAN_DISABLE_REMOTE_CHECKS` | Whether remote Dependency Scanning checks are disabled; defaults to `"false"`. Set to `"true"` to disable checks that send data to GitLab central servers. [Read more about remote checks](https://gitlab.com/gitlab-org/security-products/dependency-scanning#remote-checks).|
 
 TIP: **Tip:**
 Set up the replica variables using a
