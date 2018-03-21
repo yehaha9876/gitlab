@@ -113,10 +113,9 @@ router.beforeEach((to, from, next) => {
               });
 
               store
-                .dispatch('getTreeData', {
+                .dispatch('getFiles', {
                   projectId: fullProjectId,
-                  branch: mr.source_branch,
-                  endpoint: `/tree/${mr.source_branch}`,
+                  branchId: mr.source_branch,
                 })
                 .then(() => {
                   const treeEntry = getTreeEntry(

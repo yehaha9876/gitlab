@@ -41,7 +41,7 @@ export default class Editor {
     }, 200);
   }
 
-  createInstance(editorDomElement, diffEditorDomElement) {
+  createInstance(domElement) {
     if (!this.instance) {
       clearDomElement(domElement);
 

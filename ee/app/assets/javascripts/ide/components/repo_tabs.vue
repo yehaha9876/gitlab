@@ -30,7 +30,7 @@ export default {
 </script>
 
 <template>
-  <div class="multi-file-tabs">
+  <div class="ide-file-tabs">
     <ul
       class="list-unstyled append-bottom-0"
       ref="tabsScroller"

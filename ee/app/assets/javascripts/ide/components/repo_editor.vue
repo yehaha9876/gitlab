@@ -7,10 +7,7 @@ import Editor from '../lib/editor';
 
 export default {
   computed: {
-    ...mapGetters([
-      'activeFile',
-      'activeFileExtension',
-    ]),
+    ...mapGetters(['activeFile', 'activeFileExtension']),
     ...mapState([
       'currentViewMode',
       'leftPanelCollapsed',
@@ -89,7 +86,9 @@ export default {
 
       this.getRawFileData(this.activeFile)
         .then(() => {
-          const viewerPromise = this.delayViewerUpdated ? this.updateViewer('editor') : Promise.resolve();
+          const viewerPromise = this.delayViewerUpdated
+            ? this.updateViewer('editor')
+            : Promise.resolve();
 
           return viewerPromise;
         })
@@ -97,8 +96,15 @@ export default {
           this.updateDelayViewerUpdated(false);
           this.createEditorInstance();
         })
-        .catch((err) => {
-          flash('Error setting up monaco. Please try again.', 'alert', document, null, false, true);
+        .catch(err => {
+          flash(
+            'Error setting up monaco. Please try again.',
+            'alert',
+            document,
+            null,
+            false,
+            true,
+          );
           throw err;
         });
     },
@@ -118,11 +124,12 @@ export default {
     setupEditor() {
       if (!this.activeFile || !this.editor.instance) return;
 
-      this.editorModel = this.editor.createModel(this.activeFile);
+      this.model = this.editor.createModel(this.activeFile);
 
-      this.editor.attachModel(this.editorModel);
+      this.editor.attachModel(this.model);
 
-      this.model.onChange((model) => {
+      this.model.onChange(model => {
+        debugger;
         const { file } = model;
 
         if (file.active) {
@@ -148,12 +155,12 @@ export default {
 
       // Handle File Language
       this.setFileLanguage({
-        fileLanguage: this.editorModel.language,
+        fileLanguage: this.model.language,
       });
 
       // Get File eol
       this.setFileEOL({
-        eol: this.editorModel.eol,
+        eol: this.model.eol,
       });
     },
     setupViewMode(selectedMode) {
@@ -169,9 +176,9 @@ export default {
       } else {
         this.$refs.diffEditor.style.display = 'block';
         if (this.currentViewMode === 'changes') {
-          this.editor.setDiffModel(this.editorModel, this.editorModel.getOriginalModel());
+          this.editor.setDiffModel(this.model, this.model.getOriginalModel());
         } else if (this.currentViewMode === 'mrchanges') {
-          this.editor.setDiffModel(this.editorModel, this.editorModel.getTargetModel());
+          this.editor.setDiffModel(this.model, this.model.getTargetModel());
         }
       }
 
@@ -217,13 +224,6 @@ export default {
     <div
       v-show="!shouldHideEditor"
       ref="editor"
-      class="multi-file-editor-holder"
-      style="display:none;"
-    >
-    </div>
-    <div
-      v-show="!shouldHideEditor"
-      ref="diffEditor"
       class="multi-file-editor-holder"
       style="display:none;"
     >
