@@ -69,4 +69,68 @@ describe API::Jobs do
       end
     end
   end
+
+
+  describe 'GET /projects/:id/artifacts/:ref_name/download?job=name' do
+    let(:api_user) { reporter }
+    let(:job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
+
+    before do
+      stub_artifacts_object_storage
+      job.success
+    end
+
+    context 'find proper job' do
+      shared_examples 'a valid file' do
+        context 'when artifacts are stored locally' do
+          let(:download_headers) do
+            { 'Content-Transfer-Encoding' => 'binary',
+              'Content-Disposition' =>
+                "attachment; filename=#{job.artifacts_file.filename}" }
+          end
+
+          it { expect(response).to have_http_status(:ok) }
+          it { expect(response.headers).to include(download_headers) }
+        end
+
+        context 'when artifacts are stored remotely' do
+          let(:job) { create(:ci_build, pipeline: pipeline, user: api_user) }
+          let!(:artifact) { create(:ci_job_artifact, :archive, :remote_store, job: job) }
+
+          before do
+            job.reload
+
+            get api("/projects/#{project.id}/jobs/#{job.id}/artifacts", api_user)
+          end
+
+          it 'returns location redirect' do
+            expect(response).to have_http_status(:found)
+          end
+        end
+      end
+
+      context 'when using job_token to authenticate' do
+        before do
+          pipeline.reload
+          pipeline.update(ref: 'master',
+                          sha: project.commit('master').sha)
+
+          get api("/projects/#{project.id}/jobs/artifacts/master/download"), job: job.name, job_token: job.token
+        end
+
+        context 'when user is reporter' do
+          it_behaves_like 'a valid file'
+        end
+
+        context 'when user is admin, but not member' do
+          let(:api_user) { create(:admin) }
+          let(:job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
+
+          it 'does not allow to see that artfiact is present' do
+            expect(response).to have_gitlab_http_status(404)
+          end
+        end
+      end
+    end
+  end
 end
