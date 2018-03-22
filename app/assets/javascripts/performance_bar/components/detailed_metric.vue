@@ -61,8 +61,8 @@ export default {
       <table
         class="table"
       >
-       <template v-if="detailsList.length">
-        <tr
+        <template v-if="detailsList.length">
+          <tr
             v-for="(item, index) in detailsList"
             :key="index"
           >
