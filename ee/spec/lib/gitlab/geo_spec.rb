@@ -30,6 +30,17 @@ describe Gitlab::Geo, :geo do
         expect(described_class.primary?).to be_falsey
       end
     end
+
+    context 'with a different host', :request_store, :clean_gitlab_redis_cache do
+      it 'returns false' do
+        expect(described_class.primary?).to be_truthy
+
+        allow(Gitlab.config.gitlab).to receive(:host).and_return("bad.example.com")
+        allow(Gitlab.config.gitlab).to receive(:url).and_return("http://bad.example.com")
+
+        expect(described_class.primary?).to be_falsey
+      end
+    end
   end
 
   describe 'primary_node_configured?' do

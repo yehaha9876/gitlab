@@ -49,7 +49,7 @@ class GeoNode < ActiveRecord::Base
 
   class << self
     def current_node_url
-      RequestStore.fetch('geo_node:current_node_url') do
+      RequestStore.fetch(current_node_cache_key) do
         cfg = Gitlab.config.gitlab
 
         uri = URI.parse("#{cfg.protocol}://#{cfg.host}:#{cfg.port}#{cfg.relative_url_root}")
@@ -63,6 +63,11 @@ class GeoNode < ActiveRecord::Base
       return unless column_names.include?('url')
 
       GeoNode.find_by(url: current_node_url)
+    end
+
+    # Use a key that includes the host URL to ensure a canary host doesn't poison the cache
+    def current_node_cache_key
+      Gitlab::Geo.host_cache_key("geo_node:current_node_url")
     end
   end
 

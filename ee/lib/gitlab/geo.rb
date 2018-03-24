@@ -82,16 +82,24 @@ module Gitlab
     def self.cache_value(key, &block)
       return yield unless RequestStore.active?
 
+      cache_key = host_cache_key(key)
+
       # We need a short expire time as we can't manually expire on a secondary node
-      RequestStore.fetch(key) { Rails.cache.fetch(key, expires_in: 15.seconds) { yield } }
+      RequestStore.fetch(cache_key) { Rails.cache.fetch(cache_key, expires_in: 15.seconds) { yield } }
+    end
+
+    # Use a key that includes the host URL to ensure a canary host doesn't poison the cache
+    def self.host_cache_key(key)
+      "#{key}:#{Gitlab.config.gitlab.url}"
     end
 
     def self.expire_cache!
       return true unless RequestStore.active?
 
       CACHE_KEYS.each do |key|
-        Rails.cache.delete(key)
-        RequestStore.delete(key)
+        cache_key = host_cache_key(key)
+        Rails.cache.delete(cache_key)
+        RequestStore.delete(cache_key)
       end
 
       true

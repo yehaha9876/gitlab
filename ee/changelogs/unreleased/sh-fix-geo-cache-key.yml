@@ -1,0 +1,6 @@
+---
+title: 'Geo: Use a cache key that includes the host URL to ensure a canary host doesn''t
+  poison the cache'
+merge_request:
+author:
+type: fixed
