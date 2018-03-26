@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180314100728) do
+ActiveRecord::Schema.define(version: 20180320142552) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -2014,6 +2014,19 @@ ActiveRecord::Schema.define(version: 20180314100728) do
   add_index "projects", ["star_count"], name: "index_projects_on_star_count", using: :btree
   add_index "projects", ["visibility_level"], name: "index_projects_on_visibility_level", using: :btree
 
+  create_table "prometheus_alerts", force: :cascade do |t|
+    t.integer "iid", null: false
+    t.string "query", null: false
+    t.string "condition", null: false
+    t.integer "environment_id"
+    t.integer "project_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "prometheus_alerts", ["environment_id"], name: "index_prometheus_alerts_on_environment_id", using: :btree
+  add_index "prometheus_alerts", ["project_id", "iid"], name: "index_prometheus_alerts_on_project_id_and_iid", unique: true, using: :btree
+  add_index "prometheus_alerts", ["project_id"], name: "index_prometheus_alerts_on_project_id", using: :btree
   create_table "prometheus_metrics", force: :cascade do |t|
     t.integer "project_id"
     t.string "title", null: false
