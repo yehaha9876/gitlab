@@ -5,17 +5,17 @@ module Projects
       before_action :require_prometheus_metrics!
 
       def new
-        @metric = environment.prometheus_alerts.new
+        @alert = project.prometheus_alerts.new
       end
 
       def index
         respond_to do |format|
           format.json do
-            metrics = environment.prometheus_alerts
+            alerts = project.prometheus_alerts
             response = {}
-            if metrics.any?
-              response[:metrics] = PrometheusMetricSerializer.new(project: project)
-                                       .represent(metrics.order(created_at: :asc))
+            if alerts.any?
+              response[:alerts] = PrometheusAlertSerializer.new(project: project)
+                                      .represent(alerts.order(created_at: :asc))
             end
 
             render json: response
@@ -24,8 +24,8 @@ module Projects
       end
 
       def create
-        @metric = environment.prometheus_alerts.create(metrics_params)
-        if @metric.persisted?
+        @alert = project.prometheus_alerts.create(alerts_params)  
+        if alert.persisted?
           redirect_to edit_project_service_path(project, PrometheusService),
                       notice: 'Metric was successfully added.'
         else
@@ -34,23 +34,22 @@ module Projects
       end
 
       def update
-        @metric = environment.prometheus_alerts.find(params[:id])
-        @metric.update(metrics_params)
+        alert.update(alerts_params)
 
-        if @metric.persisted?
+        if alert.persisted?
           redirect_to edit_project_service_path(project, PrometheusService),
-                      notice: 'Metric was successfully updated.'
+                      notice: 'Alert was successfully updated.'
         else
           render 'edit'
         end
       end
 
       def edit
-        @metric = environment.prometheus_alerts.find(params[:id])
+        alert
       end
 
       def destroy
-        metric = environment.prometheus_alerts.find(params[:id])
+        metric = alert
         metric.destroy
 
         respond_to do |format|
@@ -65,13 +64,16 @@ module Projects
 
       private
 
+      def alerts_params
+        params.require(:prometheus_alert).permit(:query, :constraints, :environment_id)
+      end
 
       def alert
-        @alert ||= environment.alerts.find_by(iid: params[:id])
+        @alert ||= project.alerts.find_by(iid: params[:id])
       end
 
       def environment
-        @environment ||= project.environments.find(params[:environment_id])
+        @environment ||= project.environments.find(alerts_params[:environment_id])
       end
     end
   end
