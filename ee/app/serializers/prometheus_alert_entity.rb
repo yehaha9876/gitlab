@@ -1,4 +1,4 @@
-class PrometheusMetricEntity < Grape::Entity
+class PrometheusAlertEntity < Grape::Entity
   include RequestAwareEntity
 
   expose :id
@@ -9,7 +9,7 @@ class PrometheusMetricEntity < Grape::Entity
   expose :group_title
   expose :unit
 
-  expose :edit_path do |prometheus_metric|
-    edit_project_prometheus_alert_path(prometheus_metric.project, prometheus_metric.iid)
+  expose :alert_path do |prometheus_alert|
+    edit_project_prometheus_alert_path(prometheus_alert.project, prometheus_alert.iid)
   end
 end
