@@ -452,6 +452,14 @@ ActiveRecord::Schema.define(version: 20180327101207) do
   add_index "ci_job_artifacts", ["job_id", "file_type"], name: "index_ci_job_artifacts_on_job_id_and_file_type", unique: true, using: :btree
   add_index "ci_job_artifacts", ["project_id"], name: "index_ci_job_artifacts_on_project_id", using: :btree
 
+  create_table "ci_job_trace_chunks", force: :cascade do |t|
+    t.integer "job_id", null: false
+    t.integer "chunk_index", null: false
+    t.text "data"
+  end
+
+  add_index "ci_job_trace_chunks", ["chunk_index", "job_id"], name: "index_ci_job_trace_chunks_on_chunk_index_and_job_id", unique: true, using: :btree
+
   create_table "ci_pipeline_chat_data", id: :bigserial, force: :cascade do |t|
     t.integer "pipeline_id", null: false
     t.integer "chat_name_id", null: false
@@ -2621,6 +2629,7 @@ ActiveRecord::Schema.define(version: 20180327101207) do
   add_foreign_key "ci_group_variables", "namespaces", column: "group_id", name: "fk_33ae4d58d8", on_delete: :cascade
   add_foreign_key "ci_job_artifacts", "ci_builds", column: "job_id", on_delete: :cascade
   add_foreign_key "ci_job_artifacts", "projects", on_delete: :cascade
+  add_foreign_key "ci_job_trace_chunks", "ci_builds", column: "job_id", on_delete: :cascade
   add_foreign_key "ci_pipeline_chat_data", "chat_names", on_delete: :cascade
   add_foreign_key "ci_pipeline_chat_data", "ci_pipelines", column: "pipeline_id", on_delete: :cascade
   add_foreign_key "ci_pipeline_schedule_variables", "ci_pipeline_schedules", column: "pipeline_schedule_id", name: "fk_41c35fda51", on_delete: :cascade
