@@ -480,7 +480,7 @@ If the 'Role' column for any node says "FAILED", check the
      sudo gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user pgbouncer --hostuser gitlab-consul
      ```
 
-#### PGBouncer Checkpoint
+#### PgBouncer Checkpoint
 
 1. Ensure the node is talking to the current master:
 
@@ -516,7 +516,8 @@ If the 'Role' column for any node says "FAILED", check the
      (2 rows)
      ```
 
-     Make sure that the host IP appears in the output above.
+     Ensure that the host IP appears in the output above as this data comes from the
+     Consul cluster.
 
 ### Configuring the Application nodes
 
