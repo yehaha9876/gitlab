@@ -477,7 +477,7 @@ If the 'Role' column for any node says "FAILED", check the
    reload PgBouncer. Enter the `PGBOUNCER_PASSWORD` twice when asked:
 
      ```sh
-     gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user pgbouncer --hostuser gitlab-consul
+     sudo gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user pgbouncer --hostuser gitlab-consul
      ```
 
 #### PGBouncer Checkpoint
@@ -485,7 +485,7 @@ If the 'Role' column for any node says "FAILED", check the
 1. Ensure the node is talking to the current master:
 
      ```sh
-     gitlab-ctl pgb-console # You will be prompted for PGBOUNCER_PASSWORD
+     sudo gitlab-ctl pgb-console # You will be prompted for PGBOUNCER_PASSWORD
      ```
 
      If there is an error `psql: ERROR:  Auth failed` after typing in the
@@ -515,6 +515,8 @@ If the 'Role' column for any node says "FAILED", check the
       C    | pgbouncer | pgbouncer           | active  | 127.0.0.1      | 56846 | 127.0.0.1  |       6432 | 2017-08-21 18:09:59 | 2017-08-21 18:10:48 | 0x22b3880 |      |          0 |
      (2 rows)
      ```
+
+     Make sure that the host IP appears in the output above.
 
 ### Configuring the Application nodes
 
