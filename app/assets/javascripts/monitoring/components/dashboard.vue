@@ -224,8 +224,12 @@ export default {
         :show-legend="showLegend"
         :small-graph="forceSmallGraph"
       >
+<<<<<<< HEAD
         <!-- EE content -->
         {{ null }}
+=======
+        <!-- EE Content Placeholder -->
+>>>>>>> add placeholder comment and closing tag to reduce conflicts with EE
       </graph>
     </graph-group>
   </div>
