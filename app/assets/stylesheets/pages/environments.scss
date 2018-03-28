@@ -439,9 +439,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+<<<<<<< HEAD
   margin-bottom: $gl-padding-8;
 
   h5 {
+=======
+  margin-bottom: 8px;
+
+  h3 {
+>>>>>>> add slot for monitoring graph widgets within prometheus graphs
     margin: 0;
   }
 }
