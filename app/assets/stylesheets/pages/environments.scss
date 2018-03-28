@@ -23,7 +23,6 @@
     }
 
     .btn-group {
-
       > a {
         color: $gl-text-color-secondary;
       }
@@ -405,6 +404,7 @@
 .prometheus-graph {
   flex: 1 0 auto;
   min-width: 450px;
+  max-width: 100%;
   padding: $gl-padding / 2;
 
   h5 {
@@ -413,6 +413,17 @@
 
   @media (max-width: $screen-sm-max) {
     min-width: 100%;
+  }
+}
+
+.prometheus-graph-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+
+  h3 {
+    margin: 0;
   }
 }
 
