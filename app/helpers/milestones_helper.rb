@@ -209,4 +209,12 @@ module MilestonesHelper
       group_milestone_path(@group, milestone.iid, milestone: params)
     end
   end
+
+  def milestone_weight_tooltip_text(weight)
+    if (weight.zero?)
+      _("Weight")
+    else
+      _("Weight %{weight}") % { weight: weight }
+    end
+  end
 end
