@@ -1,5 +1,7 @@
 <script>
-  import { dateInWords } from '../../../lib/utils/datetime_utility';
+  import { __ } from '~/locale';
+  import timeagoMixin from '../../mixins/timeago';
+  import { dateInWords, timeFor } from '../../../lib/utils/datetime_utility';
   import toggleSidebar from './toggle_sidebar.vue';
   import collapsedCalendarIcon from './collapsed_calendar_icon.vue';
 
@@ -9,6 +11,9 @@
       toggleSidebar,
       collapsedCalendarIcon,
     },
+    mixins: [
+      timeagoMixin,
+    ],
     props: {
       collapsed: {
         type: Boolean,
@@ -65,6 +70,17 @@
 
         return date ? parsedDateWords : 'None';
       },
+      tooltipText(dateType = 'min') {
+        const defaultText = dateType === 'min' ? __('Planned start date') : __('Planned finish date');
+        const date = this[`${dateType}Date`];
+        const timeAgo = dateType === 'min' ? this.timeFormated(date) : timeFor(date);
+        const dateText = date ? [
+          this.dateText(dateType),
+          `(${timeAgo})`,
+        ].join(' ') : '';
+
+        return [defaultText, dateText].join('<br />');
+    },
     },
   };
 </script>
@@ -83,6 +99,7 @@
     <collapsed-calendar-icon
       v-if="showMinDateBlock"
       :container-class="iconClass"
+      :tooltip-text="tooltipText('min')"
       @click="toggleSidebar"
     >
       <span class="sidebar-collapsed-value">
@@ -99,7 +116,7 @@
     <collapsed-calendar-icon
       v-if="maxDate"
       :container-class="iconClass"
-      :show-icon="!minDate"
+      :tooltip-text="tooltipText('max')"
       @click="toggleSidebar"
     >
       <span class="sidebar-collapsed-value">
