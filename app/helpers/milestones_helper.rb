@@ -211,7 +211,7 @@ module MilestonesHelper
   end
 
   def milestone_weight_tooltip_text(weight)
-    if (weight.zero?)
+    if weight.zero?
       _("Weight")
     else
       _("Weight %{weight}") % { weight: weight }
