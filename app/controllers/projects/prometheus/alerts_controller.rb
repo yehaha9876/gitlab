@@ -2,16 +2,15 @@ module Projects
   module Prometheus
     class AlertsController < Projects::ApplicationController
       before_action :authorize_admin_project!
-      before_action :require_prometheus_metrics!
 
       def new
-        @alert = project.prometheus_alerts.new
+        @alert = environment.prometheus_alerts.new
       end
 
       def index
         respond_to do |format|
           format.json do
-            alerts = project.prometheus_alerts
+            alerts = environment.prometheus_alerts
             response = {}
             if alerts.any?
               response[:alerts] = PrometheusAlertSerializer.new(project: project)
@@ -24,38 +23,30 @@ module Projects
       end
 
       def create
-        @alert = project.prometheus_alerts.create(alerts_params)
-        if alert.persisted?
-          redirect_to edit_project_service_path(project, PrometheusService),
-                      notice: 'Metric was successfully added.'
-        else
-          render 'new'
+        environment.prometheus_alerts.create(alerts_params)
+
+        respond_to do |format|
+          format.json do
+            head :ok
+          end
         end
       end
 
       def update
         alert.update(alerts_params)
 
-        if alert.persisted?
-          redirect_to edit_project_service_path(project, PrometheusService),
-                      notice: 'Alert was successfully updated.'
-        else
-          render 'edit'
+        respond_to do |format|
+          format.json do
+            head :ok
+          end
         end
       end
 
-      def edit
-        alert
-      end
 
       def destroy
-        metric = alert
-        metric.destroy
+        alert.destroy
 
         respond_to do |format|
-          format.html do
-            redirect_to edit_project_service_path(project, PrometheusService), status: 303
-          end
           format.json do
             head :ok
           end
@@ -73,7 +64,7 @@ module Projects
       end
 
       def environment
-        @environment ||= project.environments.find(alerts_params[:environment_id])
+        @environment ||= project.environments.find(params[:environment_id])
       end
     end
   end

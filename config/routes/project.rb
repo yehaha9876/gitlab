@@ -80,8 +80,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           post :validate_query, on: :collection
           get :active_common, on: :collection
         end
-
-        resources :alerts, constraints: { id: %r{[^\/]+} }, only: [:index, :new, :create, :edit, :update, :destroy]
       end
 
       resources :deploy_keys, constraints: { id: /\d+/ }, only: [:index, :new, :create, :edit, :update] do
@@ -264,6 +262,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
           # EE
           get :logs
+        end
+
+        namespace :prometheus, module: :prometheus do
+          resources :alerts, constraints: { id: %r{[^\/]+} }, only: [:index, :new, :create, :edit, :update, :destroy]
         end
 
         collection do
