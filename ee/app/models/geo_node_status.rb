@@ -161,30 +161,42 @@ class GeoNodeStatus < ActiveRecord::Base
       self.db_replication_lag_seconds = Gitlab::Geo::HealthCheck.db_replication_lag_seconds
       self.cursor_last_event_id = Geo::EventLogState.last_processed&.event_id
       self.cursor_last_event_date = Geo::EventLog.find_by(id: self.cursor_last_event_id)&.created_at
-      self.repositories_synced_count = projects_finder.count_synced_repositories
-      self.repositories_failed_count = projects_finder.count_failed_repositories
-      self.wikis_synced_count = projects_finder.count_synced_wikis
-      self.wikis_failed_count = projects_finder.count_failed_wikis
-      self.lfs_objects_synced_count = lfs_objects_finder.count_synced_lfs_objects
-      self.lfs_objects_failed_count = lfs_objects_finder.count_failed_lfs_objects
-      self.lfs_objects_registry_count = lfs_objects_finder.count_registry_lfs_objects
-      self.job_artifacts_synced_count = job_artifacts_finder.count_synced_job_artifacts
-      self.job_artifacts_failed_count = job_artifacts_finder.count_failed_job_artifacts
-      self.job_artifacts_registry_count = job_artifacts_finder.count_registry_job_artifacts
-      self.attachments_synced_count = attachments_finder.count_synced_attachments
-      self.attachments_failed_count = attachments_finder.count_failed_attachments
-      self.attachments_registry_count = attachments_finder.count_registry_attachments
+      self.repositories_synced_count = secondary_counts[:repositories_synced_count]
+      self.repositories_failed_count = secondary_counts[:repositories_failed_count]
+      self.wikis_synced_count = secondary_counts[:wikis_synced_count]
+      self.wikis_failed_count = secondary_counts[:wikis_failed_count]
+      self.lfs_objects_synced_count = secondary_counts[:lfs_objects_synced_count]
+      self.lfs_objects_failed_count = secondary_counts[:lfs_objects_failed_count]
+      self.lfs_objects_registry_count = secondary_counts[:lfs_objects_registry_count]
+      self.job_artifacts_synced_count = secondary_counts[:job_artifacts_synced_count]
+      self.job_artifacts_failed_count = secondary_counts[:job_artifacts_failed_count]
+      self.job_artifacts_registry_count = secondary_counts[:job_artifacts_registry_count]
+      self.attachments_synced_count = secondary_counts[:attachments_synced_count]
+      self.attachments_failed_count = secondary_counts[:attachments_failed_count]
+      self.attachments_registry_count = secondary_counts[:attachments_registry_count]
     end
   end
 
   def load_verification_data
     return unless repository_verification_enabled
 
-    finder = Gitlab::Geo.primary? ? repository_verification_finder : projects_finder
-    self.repositories_verified_count = finder.count_verified_repositories
-    self.repositories_verification_failed_count = finder.count_verification_failed_repositories
-    self.wikis_verified_count = finder.count_verified_wikis
-    self.wikis_verification_failed_count = finder.count_verification_failed_wikis
+    if Gitlab::Geo.primary?
+      finder = repository_verification_finder
+
+      self.repositories_verified_count = finder.count_verified_repositories
+      self.repositories_verification_failed_count = finder.count_verification_failed_repositories
+      self.wikis_verified_count = finder.count_verified_wikis
+      self.wikis_verification_failed_count = finder.count_verification_failed_wikis
+    else
+      self.repositories_verified_count = secondary_counts[:repositories_verified_count]
+      self.repositories_verification_failed_count = secondary_counts[:repositories_verification_failed_count]
+      self.wikis_verified_count = secondary_counts[:wikis_verified_count]
+      self.wikis_verification_failed_count = secondary_counts[:wikis_verification_failed_count]
+    end
+  end
+
+  def secondary_counts
+    @secondary_counts ||= ::Geo::SecondaryCountService.new(current_node: geo_node).execute
   end
 
   alias_attribute :health, :status_message
