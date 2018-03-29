@@ -4,13 +4,13 @@ module Projects
       before_action :authorize_admin_project!
 
       def new
-        @alert = environment.prometheus_alerts.new
+        @alert = project.prometheus_alerts.new
       end
 
       def index
         respond_to do |format|
           format.json do
-            alerts = environment.prometheus_alerts
+            alerts = project.prometheus_alerts
             response = {}
             if alerts.any?
               response[:alerts] = PrometheusAlertSerializer.new(project: project)
@@ -23,7 +23,7 @@ module Projects
       end
 
       def create
-        environment.prometheus_alerts.create(alerts_params)
+        project.prometheus_alerts.create(alerts_params)
 
         respond_to do |format|
           format.json do
@@ -56,15 +56,11 @@ module Projects
       private
 
       def alerts_params
-        params.require(:prometheus_alert).permit(:query, :operator, :threshold, :environment_id)
+        params.require(:prometheus_alert).permit(:query, :operator, :threshold)
       end
 
       def alert
         @alert ||= project.alerts.find_by(iid: params[:id])
-      end
-
-      def environment
-        @environment ||= project.environments.find(params[:environment_id])
       end
     end
   end
