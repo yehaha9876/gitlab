@@ -7,7 +7,8 @@ class CreatePrometheusAlerts < ActiveRecord::Migration
     create_table :prometheus_alerts do |t|
       t.integer :iid, null: false
       t.string :query, null: false
-      t.string :condition, null: false
+      t.string :operator, null: false
+      t.float :threshold, null: false
       t.references :environment, index: true, foreign_key: true
       t.references :project, index: true, foreign_key: true
       t.timestamps null: false
