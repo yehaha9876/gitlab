@@ -5,9 +5,34 @@ module Gitlab
         def query_metrics(project, query_context)
           matched_metrics(project).map(&query_group(query_context))
             .select(&method(:group_with_any_metrics))
+            .map(&query_with_alert(project))
         end
 
         protected
+
+        # ee
+        def query_with_alert(project)
+          alerts_map = {}
+          project.prometheus_alerts.each do |alert|
+            alerts_map[alert[:query]] = alert.iid
+          end
+
+          proc do |group|
+            group[:metrics]&.map! do |metric|
+              metric[:queries]&.map! do |item|
+              query = item&.[](:query) || item&.[](:query_range)
+
+              if query && alerts_map[query]
+                item[:alert_path] = ::Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alerts_map[query], format: :json)
+              end
+
+              item
+              end
+              metric
+            end
+            group
+          end
+        end
 
         def query_group(query_context)
           query_processor = method(:process_query).curry[query_context]
