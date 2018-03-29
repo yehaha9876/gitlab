@@ -80,8 +80,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           post :validate_query, on: :collection
           get :active_common, on: :collection
         end
-
-        resources :alerts, constraints: { id: %r{[^\/]+} }, only: [:index, :new, :create, :edit, :update, :destroy]
       end
 
       resources :deploy_keys, constraints: { id: /\d+/ }, only: [:index, :new, :create, :edit, :update] do
@@ -260,6 +258,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :metrics
           get :additional_metrics
           get '/terminal.ws/authorize', to: 'environments#terminal_websocket_authorize', constraints: { format: nil }
+        end
+
+        namespace :prometheus, module: :prometheus do
+          resources :alerts, constraints: { id: %r{[^\/]+} }, only: [:index, :new, :create, :edit, :update, :destroy]
         end
 
         collection do
