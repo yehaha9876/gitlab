@@ -52,9 +52,15 @@ users will only see the thread through email.
 Service Desk is enabled on GitLab.com. If you're a
 [Silver subscriber](https://about.gitlab.com/gitlab-com/),
 you can skip the step 1 below; you only need to enable it per project.
+ `incoming_email_address` must be configured with the `%{key}` placeholder and `incoming_email_enabled` needs to be enabled in your gitlab.rb
+ ```
+ gitlab_rails['incoming_email_address'] = 'gitlab-incoming+%{key}@example.com'
+ gitlab_rails['incoming_email_enabled'] = true
+ ```
 
 1.   [Set up incoming email][incoming-email] for the GitLab instance. This must
      support [email sub-addressing][email-sub-addressing].
+
 2.   Navigate to your project's **Settings** and scroll down to the **Service Desk**
      section.
 3.   If you have the correct access and an Premium license,
@@ -64,6 +70,7 @@ you can skip the step 1 below; you only need to enable it per project.
 4.   Checking that box will enable Service Desk for the project, and show a
      unique email address to email issues to the project. These issues will be
      [confidential], so they will only be visible to project members.
+
 
      **Warning**: as the screenshot below shows, this email address can be used
      by anyone to create an issue on this project, whether or not they have
