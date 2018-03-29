@@ -2017,7 +2017,8 @@ ActiveRecord::Schema.define(version: 20180320142552) do
   create_table "prometheus_alerts", force: :cascade do |t|
     t.integer "iid", null: false
     t.string "query", null: false
-    t.string "condition", null: false
+    t.string "operator", null: false
+    t.float "threshold", null: false
     t.integer "environment_id"
     t.integer "project_id"
     t.datetime "created_at", null: false
@@ -2749,6 +2750,8 @@ ActiveRecord::Schema.define(version: 20180320142552) do
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
   add_foreign_key "prometheus_metrics", "projects", on_delete: :cascade
+  add_foreign_key "prometheus_alerts", "environments"
+  add_foreign_key "prometheus_alerts", "projects"
   add_foreign_key "protected_branch_merge_access_levels", "namespaces", column: "group_id", name: "fk_98f3d044fe", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "protected_branches", name: "fk_8a3072ccb3", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "users"
