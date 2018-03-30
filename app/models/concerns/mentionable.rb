@@ -35,7 +35,7 @@ module Mentionable
     # "MergeRequest" > "merge_request" > "Merge request" > "merge request"
     friendly_name = self.class.to_s.underscore.humanize.downcase
 
-    "#{friendly_name} #{to_reference(from)}"
+    "#{friendly_name} #{to_reference(from, full: from.nil?)}"
   end
 
   # The GFM reference to this Mentionable, which shouldn't be included in its #references.
@@ -48,7 +48,8 @@ module Mentionable
     if extractor
       extractors[current_user] = extractor
     else
-      extractor = extractors[current_user] ||= Gitlab::ReferenceExtractor.new(project, current_user)
+      group = self.try(:extractor_group)
+      extractor = extractors[current_user] ||= Gitlab::ReferenceExtractor.new(project, current_user, group)
 
       extractor.reset_memoized_values
     end
@@ -153,6 +154,7 @@ module Mentionable
   # Determine whether or not a cross-reference Note has already been created between this Mentionable and
   # the specified target.
   def cross_reference_exists?(target)
+    #false #SystemNoteService.cross_reference_exists?(target, local_reference)
     SystemNoteService.cross_reference_exists?(target, local_reference)
   end
 

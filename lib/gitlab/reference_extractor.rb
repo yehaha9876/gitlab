@@ -2,18 +2,19 @@ module Gitlab
   # Extract possible GFM references from an arbitrary String for further processing.
   class ReferenceExtractor < Banzai::ReferenceExtractor
     REFERABLES = %i(user issue label milestone merge_request snippet commit commit_range directly_addressed_user epic).freeze
-    attr_accessor :project, :current_user, :author
+    attr_accessor :project, :group, :current_user, :author
 
-    def initialize(project, current_user = nil)
+    def initialize(project, current_user = nil, group = nil)
       @project = project
       @current_user = current_user
       @references = {}
+      @group = group
 
       super()
     end
 
     def analyze(text, context = {})
-      super(text, context.merge(project: project))
+      super(text, context.merge(project: project, group: group))
     end
 
     def references(type)

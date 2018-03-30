@@ -21,5 +21,9 @@ module EE
     def can_create_todo?
       !for_epic? && super
     end
+
+    def extractor_group
+      for_epic? ? noteable.group : nil
+    end
   end
 end

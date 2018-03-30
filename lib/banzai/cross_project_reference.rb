@@ -12,9 +12,13 @@ module Banzai
     #
     # Returns a Project, or nil if the reference can't be found
     def parent_from_ref(ref)
-      return context[:project] unless ref
+      return context[:project] || context[:group] unless ref
 
-      Project.find_by_full_path(ref)
+      if parent_type == :group
+        Group.find_by_full_path(ref)
+      else
+        Project.find_by_full_path(ref)
+      end
     end
   end
 end

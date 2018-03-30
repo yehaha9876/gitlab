@@ -115,5 +115,9 @@ module EE
     def mentionable_params
       { group: group }
     end
+
+    def extractor_group
+      group
+    end
   end
 end
