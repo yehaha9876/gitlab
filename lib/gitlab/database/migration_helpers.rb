@@ -314,7 +314,7 @@ module Gitlab
           stop_arel = yield table, stop_arel if block_given?
           stop_row = exec_query(stop_arel.to_sql).to_hash.first
 
-          update_arel = Arel::UpdateManager.new(ActiveRecord::Base)
+          update_arel = Arel::UpdateManager.new(ApplicationRecord)
             .table(table)
             .set([[table[column], value]])
             .where(table[:id].gteq(start_id))
@@ -514,7 +514,7 @@ module Gitlab
       #
       # Example usage:
       #
-      #     class Issue < ActiveRecord::Base
+      #     class Issue < ApplicationRecord
       #       self.table_name = 'issues'
       #
       #       include EachBatch
@@ -819,7 +819,7 @@ into similar problems in the future (e.g. when new tables are created).
       #
       # Example:
       #
-      #     class Route < ActiveRecord::Base
+      #     class Route < ApplicationRecord
       #       include EachBatch
       #       self.table_name = 'routes'
       #     end
@@ -867,7 +867,7 @@ into similar problems in the future (e.g. when new tables are created).
       #
       # Example:
       #
-      #     class Route < ActiveRecord::Base
+      #     class Route < ApplicationRecord
       #       include EachBatch
       #       self.table_name = 'routes'
       #     end

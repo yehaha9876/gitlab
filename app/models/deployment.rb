@@ -1,4 +1,4 @@
-class Deployment < ActiveRecord::Base
+class Deployment < ApplicationRecord
   include NonatomicInternalId
 
   belongs_to :project, required: true

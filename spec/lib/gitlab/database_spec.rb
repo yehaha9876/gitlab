@@ -375,7 +375,7 @@ describe Gitlab::Database do
 
   describe '.cached_column_exists?' do
     it 'only retrieves data once' do
-      expect(ActiveRecord::Base.connection).to receive(:columns).once.and_call_original
+      expect(ApplicationRecord.connection).to receive(:columns).once.and_call_original
 
       2.times do
         expect(described_class.cached_column_exists?(:projects, :id)).to be_truthy
@@ -386,8 +386,8 @@ describe Gitlab::Database do
 
   describe '.cached_table_exists?' do
     it 'only retrieves data once per table' do
-      expect(ActiveRecord::Base.connection).to receive(:table_exists?).with(:projects).once.and_call_original
-      expect(ActiveRecord::Base.connection).to receive(:table_exists?).with(:bogus_table_name).once.and_call_original
+      expect(ApplicationRecord.connection).to receive(:table_exists?).with(:projects).once.and_call_original
+      expect(ApplicationRecord.connection).to receive(:table_exists?).with(:bogus_table_name).once.and_call_original
 
       2.times do
         expect(described_class.cached_table_exists?(:projects)).to be_truthy

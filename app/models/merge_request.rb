@@ -1,4 +1,4 @@
-class MergeRequest < ActiveRecord::Base
+class MergeRequest < ApplicationRecord
   include NonatomicInternalId
   include Issuable
   include Noteable

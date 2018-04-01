@@ -9,7 +9,7 @@
 #
 # Example:
 #
-#   class User < ActiveRecord::Base
+#   class User < ApplicationRecord
 #     validates :personal_url, addressable_url: true
 #
 #     validates :ftp_url, addressable_url: { protocols: %w(ftp) }

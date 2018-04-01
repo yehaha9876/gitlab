@@ -9,7 +9,7 @@ class RemoveMRdiffFields < ActiveRecord::Migration
     add_column :merge_requests, :st_commits, :text, null: true, limit: 2147483647
     add_column :merge_requests, :st_diffs, :text, null: true, limit: 2147483647
 
-    if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+    if ApplicationRecord.connection.adapter_name == 'PostgreSQL'
       execute "UPDATE merge_requests mr
               SET (st_commits, st_diffs) = (md.st_commits, md.st_diffs)
               FROM merge_request_diffs md

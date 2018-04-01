@@ -23,9 +23,9 @@ describe Gitlab::CurrentSettings do
       before do
         # For some reason, `allow(described_class).to receive(:connect_to_db?).and_return(true)` causes issues
         # during the initialization phase of the test suite, so instead let's mock the internals of it
-        allow(ActiveRecord::Base.connection).to receive(:active?).and_return(true)
-        allow(ActiveRecord::Base.connection).to receive(:table_exists?).and_call_original
-        allow(ActiveRecord::Base.connection).to receive(:table_exists?).with('application_settings').and_return(true)
+        allow(ApplicationRecord.connection).to receive(:active?).and_return(true)
+        allow(ApplicationRecord.connection).to receive(:table_exists?).and_call_original
+        allow(ApplicationRecord.connection).to receive(:table_exists?).with('application_settings').and_return(true)
       end
 
       # This method returns the ::ApplicationSetting.defaults hash
@@ -105,7 +105,7 @@ describe Gitlab::CurrentSettings do
       before do
         # For some reason, `allow(described_class).to receive(:connect_to_db?).and_return(false)` causes issues
         # during the initialization phase of the test suite, so instead let's mock the internals of it
-        allow(ActiveRecord::Base.connection).to receive(:active?).and_return(false)
+        allow(ApplicationRecord.connection).to receive(:active?).and_return(false)
       end
 
       it 'returns an in-memory ApplicationSetting object' do

@@ -8,8 +8,8 @@ module EE
     rescue Geo::TrackingBase::SecondaryNotConfigured
     end
 
-    override :active_record_base
-    def active_record_base
+    override :application_record
+    def application_record
       if geo_migration?
         Geo::TrackingBase
       else
