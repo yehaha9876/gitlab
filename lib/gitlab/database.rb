@@ -211,10 +211,10 @@ module Gitlab
 
     # Disables prepared statements for the current database connection.
     def self.disable_prepared_statements
-      config = ActiveRecord::Base.configurations[Rails.env]
+      config = ApplicationRecord.configurations[Rails.env]
       config['prepared_statements'] = false
 
-      ActiveRecord::Base.establish_connection(config)
+      ApplicationRecord.establish_connection(config)
     end
 
     def self.connection
