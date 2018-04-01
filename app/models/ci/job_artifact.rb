@@ -1,5 +1,5 @@
 module Ci
-  class JobArtifact < ActiveRecord::Base
+  class JobArtifact < ApplicationRecord
     prepend EE::Ci::JobArtifact
     include AfterCommitQueue
     include ObjectStorage::BackgroundMove

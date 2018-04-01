@@ -1,4 +1,4 @@
-class Board < ActiveRecord::Base
+class Board < ApplicationRecord
   prepend EE::Board
 
   belongs_to :group
