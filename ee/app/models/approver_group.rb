@@ -1,4 +1,4 @@
-class ApproverGroup < ActiveRecord::Base
+class ApproverGroup < ApplicationRecord
   belongs_to :target, polymorphic: true  # rubocop:disable Cop/PolymorphicAssociations
   belongs_to :group
 

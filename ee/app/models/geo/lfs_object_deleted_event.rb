@@ -1,5 +1,5 @@
 module Geo
-  class LfsObjectDeletedEvent < ActiveRecord::Base
+  class LfsObjectDeletedEvent < ApplicationRecord
     include Geo::Model
 
     belongs_to :lfs_object

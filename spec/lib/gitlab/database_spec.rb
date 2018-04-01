@@ -428,11 +428,11 @@ describe Gitlab::Database do
     it 'disables prepared statements' do
       config = {}
 
-      expect(ActiveRecord::Base.configurations).to receive(:[])
+      expect(ApplicationRecord.configurations).to receive(:[])
         .with(Rails.env)
         .and_return(config)
 
-      expect(ActiveRecord::Base).to receive(:establish_connection)
+      expect(ApplicationRecord).to receive(:establish_connection)
         .with({ 'prepared_statements' => false })
 
       described_class.disable_prepared_statements

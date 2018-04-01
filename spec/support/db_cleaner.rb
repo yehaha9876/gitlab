@@ -54,6 +54,6 @@ RSpec.configure do |config|
       DatabaseCleaner[:active_record, { connection: Geo::BaseRegistry }]
     end
 
-    DatabaseCleaner[:active_record, { connection: ActiveRecord::Base }]
+    DatabaseCleaner[:active_record, { connection: ApplicationRecord }]
   end
 end

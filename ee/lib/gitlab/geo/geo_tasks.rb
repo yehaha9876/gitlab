@@ -43,8 +43,8 @@ module Gitlab
         SQL
 
         Gitlab::Geo::DatabaseTasks.with_geo_db do
-          ActiveRecord::Base.transaction do
-            ActiveRecord::Base.connection.execute(sql)
+          ApplicationRecord.transaction do
+            ApplicationRecord.connection.execute(sql)
           end
         end
       end
@@ -57,7 +57,7 @@ module Gitlab
         SQL
 
         Gitlab::Geo::DatabaseTasks.with_geo_db do
-          ActiveRecord::Base.connection.execute(sql).first.fetch('count').to_i == 1
+          ApplicationRecord.connection.execute(sql).first.fetch('count').to_i == 1
         end
       end
     end

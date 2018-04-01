@@ -1,4 +1,4 @@
-class GeoNodeStatus < ActiveRecord::Base
+class GeoNodeStatus < ApplicationRecord
   belongs_to :geo_node
 
   delegate :selective_sync_type, to: :geo_node

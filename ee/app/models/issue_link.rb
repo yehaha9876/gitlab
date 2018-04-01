@@ -1,4 +1,4 @@
-class IssueLink < ActiveRecord::Base
+class IssueLink < ApplicationRecord
   belongs_to :source, class_name: 'Issue'
   belongs_to :target, class_name: 'Issue'
 
