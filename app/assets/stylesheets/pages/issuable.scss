@@ -368,6 +368,10 @@
       padding: 15px 0 0;
       border-bottom: 0;
       overflow: hidden;
+
+      &.issuable-sidebar-header {
+        padding-top: 0;
+      }
     }
 
     .participants {
@@ -380,9 +384,10 @@
 
     .gutter-toggle {
       width: 100%;
+      height: 60px;
       margin-left: 0;
       padding-left: 0;
-      text-align: center;
+      border-bottom: 1px solid $border-gray-dark;
     }
 
     .sidebar-collapsed-icon {
@@ -950,6 +955,10 @@
 
 .right-sidebar-collapsed {
   .sidebar-grouped-item {
+    &.block {
+      padding-top: 0;
+    }
+    
     .sidebar-collapsed-icon {
       margin-bottom: 0;
     }
