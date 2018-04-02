@@ -1,4 +1,6 @@
-class AddHeaderAndFooterBannersToAppearancesTable < ActiveRecord::Migration[4.2]
+# frozen_string_literal: true
+
+class AddHeaderAndFooterBannersToAppearancesTable < ActiveRecord::Migration
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false
