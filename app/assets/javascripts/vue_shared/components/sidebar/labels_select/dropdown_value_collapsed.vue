@@ -1,5 +1,5 @@
 <script>
-import { __, s__, sprintf } from '~/locale';
+import { s__, sprintf } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 
 export default {
@@ -14,7 +14,7 @@ export default {
   },
   computed: {
     labelsList() {
-      const labelsString = this.labels.length ? this.labels.slice(0, 5).map(label => label.title).join(', ') : __('Labels');
+      const labelsString = this.labels.length ? this.labels.slice(0, 5).map(label => label.title).join(', ') : s__('LabelSelect|Labels');
 
       if (this.labels.length > 5) {
         return sprintf(s__('LabelSelect|%{labelsString}, and %{remainingLabelCount} more'), {
