@@ -100,7 +100,7 @@
 
   .right-sidebar-expanded & {
     .gutter-toggle {
-      margin-bottom: 10px;
+      margin-bottom: $sidebar-milestone-toggle-bottom-margin;
     }
   }
 
