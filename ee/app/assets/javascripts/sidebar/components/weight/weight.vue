@@ -2,7 +2,7 @@
   /* eslint-disable vue/require-default-prop */
 
   import $ from 'jquery';
-  import { __, s__ } from '~/locale';
+  import { s__ } from '~/locale';
   import eventHub from '~/sidebar/event_hub';
   import tooltip from '~/vue_shared/directives/tooltip';
   import icon from '~/vue_shared/components/icon.vue';
@@ -85,7 +85,7 @@
         return !this.fetching && !this.shouldShowDropdown;
       },
       tooltipTitle() {
-        let tooltipTitle = __('Weight');
+        let tooltipTitle = s__('Sidebar|Weight');
 
         if (!this.checkIfNoValue(this.weight)) {
           tooltipTitle += ` ${this.weight}`;
