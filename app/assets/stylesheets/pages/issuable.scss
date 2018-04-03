@@ -391,11 +391,14 @@
       height: 60px;
       margin-left: 0;
       padding-left: 0;
+      border-bottom: 1px solid $border-gray-dark;
+    }
+
+    a.gutter-toggle {
       display: flex;
-      text-align: center;
       justify-content: center;
       flex-direction: column;
-      border-bottom: 1px solid $border-gray-dark;
+      text-align: center;
     }
 
     .sidebar-collapsed-icon {
