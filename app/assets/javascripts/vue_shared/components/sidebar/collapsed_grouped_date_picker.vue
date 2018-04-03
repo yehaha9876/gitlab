@@ -1,7 +1,7 @@
 <script>
   import { __ } from '~/locale';
-  import timeagoMixin from '../../mixins/timeago';
-  import { dateInWords, timeFor } from '../../../lib/utils/datetime_utility';
+  import timeagoMixin from '~/vue_shared/mixins/timeago';
+  import { dateInWords, timeFor } from '~/lib/utils/datetime_utility';
   import toggleSidebar from './toggle_sidebar.vue';
   import collapsedCalendarIcon from './collapsed_calendar_icon.vue';
 
@@ -80,7 +80,7 @@
         ].join(' ') : '';
 
         return [defaultText, dateText].join('<br />');
-    },
+      },
     },
   };
 </script>

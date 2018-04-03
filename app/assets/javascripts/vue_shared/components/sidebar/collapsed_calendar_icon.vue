@@ -1,5 +1,5 @@
 <script>
-  import tooltip from '../../../vue_shared/directives/tooltip';
+  import tooltip from '~/vue_shared/directives/tooltip';
 
   export default {
     name: 'CollapsedCalendarIcon',
