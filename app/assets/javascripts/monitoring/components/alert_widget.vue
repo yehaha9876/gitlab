@@ -34,14 +34,10 @@ export default {
       return this.hasAlerts ? 'alert summary' : null;
     },
     alertIcon() {
-      return this.hasAlerts
-        ? 'notifications'
-        : 'notifications-off';
+      return this.hasAlerts ? 'notifications' : 'notifications-off';
     },
     dropdownTitle() {
-      return this.hasAlerts
-        ? 'Edit alert'
-        : 'Add alert';
+      return this.hasAlerts ? 'Edit alert' : 'Add alert';
     },
     hasAlerts() {
       return this.alerts.length > 0;
