@@ -130,6 +130,7 @@ export default {
           :is-loading="isLoading"
           :alert="alerts[0]"
           :query="query"
+          @cancel="handleDropdownClose"
         />
       </div>
     </div>
