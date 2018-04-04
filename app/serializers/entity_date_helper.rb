@@ -40,7 +40,7 @@ module EntityDateHelper
   #
   # It returns "Past due" for expired entities
   # It returns "Upcoming" for upcoming entities
-  # If due date is not yet elapsed, it returns "# days|weeks"months remaining"
+  # If due date is provided, it returns "# days|weeks|months remaining|ago"
   # If start date is provided and elapsed, with no due date, it returns "# days elapsed"
   def remaining_days_in_words(entity)
     if entity.has_attribute?(:expired) && entity.expired?
