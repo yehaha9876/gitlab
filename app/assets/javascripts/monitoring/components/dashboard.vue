@@ -8,11 +8,17 @@ import EmptyState from './empty_state.vue';
 import MonitoringStore from '../stores/monitoring_store';
 import eventHub from '../event_hub';
 
+// ee-only
+import AlertWidget from './alert_widget.vue';
+
 export default {
   components: {
     Graph,
     GraphGroup,
     EmptyState,
+
+    // ee-only
+    AlertWidget,
   },
   props: {
     hasMetrics: {
@@ -79,6 +85,13 @@ export default {
     emptyUnableToConnectSvgPath: {
       type: String,
       required: true,
+    },
+
+    // ee-only
+    alertsEndpoint: {
+      type: String,
+      required: false,
+      default: null,
     },
   },
   data() {
@@ -175,7 +188,11 @@ export default {
         :show-legend="showLegend"
         :small-graph="forceSmallGraph"
       >
-        <!-- EE Content Placeholder -->
+        <!-- EE-only -->
+        <alert-widget
+          v-if="alertsEndpoint"
+          :alerts-endpoint="alertsEndpoint"
+        />
       </graph>
     </graph-group>
   </div>
