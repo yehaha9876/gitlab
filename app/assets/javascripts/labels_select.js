@@ -4,7 +4,7 @@
 
 import $ from 'jquery';
 import _ from 'underscore';
-import { __, sprintf } from './locale';
+import { __ } from './locale';
 import axios from './lib/utils/axios_utils';
 import IssuableBulkUpdateActions from './issuable_bulk_update_actions';
 import DropdownUtils from './filtered_search/dropdown_utils';
