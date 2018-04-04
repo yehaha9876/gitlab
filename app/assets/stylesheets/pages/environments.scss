@@ -599,3 +599,34 @@
     }
   }
 }
+
+.alert-dropdown-button {
+  margin-left: $btn-side-margin;
+
+  .dropdown.open & {
+    background: $white-normal;
+    outline: 0;
+  }
+  
+  svg {
+    margin: 0;
+
+    + svg {
+      margin-left: -8px;
+    }
+
+    &.chevron {
+      color: $gl-text-color-secondary;
+    }
+  }
+}
+
+.alert-dropdown-menu {
+  right: 0;
+  left: auto;
+  z-index: 950; // must be higher than .popover z-index
+
+  .dropdown-title {
+    margin: 0;
+  }
+}
