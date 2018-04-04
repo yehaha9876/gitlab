@@ -42,7 +42,7 @@ export default {
     haveValuesChanged() {
       return (
         this.operator &&
-        this.threshold &&
+        (this.threshold || this.threshold === 0) &&
         this.operator !== this.alertData.operator &&
         this.threshold !== this.alertData.threshold
       );
@@ -74,19 +74,25 @@ export default {
     >
       <button
         type="button"
-        class="btn btn-default active"
+        class="btn btn-default"
+        :class="{ active: operator === '>' }"
+        @click="operator = '>'"
       >
         &gt;
       </button>
       <button
         type="button"
         class="btn btn-default"
+        :class="{ active: operator === '=' }"
+        @click="operator = '='"
       >
         =
       </button>
       <button
         type="button"
         class="btn btn-default"
+        :class="{ active: operator === '<' }"
+        @click="operator = '<'"
       >
         &lt;
       </button>
@@ -94,8 +100,9 @@ export default {
     <div class="form-group">
       <label>Threshold</label>
       <input
-        type="text"
+        type="number"
         class="form-control"
+        v-model.number="threshold"
       />
     </div>
     <div class="action-group">
