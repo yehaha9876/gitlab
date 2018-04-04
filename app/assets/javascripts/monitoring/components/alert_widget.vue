@@ -1,9 +1,11 @@
 <script>
 import Icon from '~/vue_shared/components/icon.vue';
+import AlertWidgetForm from './alert_widget_form.vue';
 
 export default {
   components: {
     Icon,
+    AlertWidgetForm,
   },
   data() {
     return {
@@ -81,7 +83,7 @@ export default {
         </button>
       </div>
       <div class="dropdown-content">
-        Dropdown Form
+        <alert-widget-form />
       </div>
     </div>
   </div>
