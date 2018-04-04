@@ -45,7 +45,7 @@ module Geo
     def find_migrated_local_lfs_objects_ids(batch_size:)
       return [] unless lfs_objects_object_store_enabled?
 
-      lfs_objects_finder.find_migrated_local_lfs_objects(batch_size: batch_size, except_file_ids: scheduled_file_ids(:lfs))
+      lfs_objects_finder.find_migrated_local_lfs_objects(batch_size: batch_size, except_lfs_object_ids: scheduled_file_ids(:lfs))
                         .pluck(:id)
                         .map { |id| [:lfs, id] }
     end

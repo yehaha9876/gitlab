@@ -362,7 +362,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
       end
 
       it 'removes the tracking database entry if exist' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object.id)
 
         expect { daemon.run_once! }.to change(Geo::FileRegistry.lfs_objects, :count).by(-1)
       end

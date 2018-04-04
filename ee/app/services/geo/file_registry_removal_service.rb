@@ -34,7 +34,9 @@ module Geo
 
     def file_registry
       strong_memoize(:file_registry) do
-        if object_type.to_sym == :job_artifact
+        if object_type.to_sym == :lfs
+          ::Geo::LfsObjectRegistry.find_by(lfs_object_id: object_db_id)
+        elsif object_type.to_sym == :job_artifact
           ::Geo::JobArtifactRegistry.find_by(artifact_id: object_db_id)
         else
           ::Geo::FileRegistry.find_by(file_type: object_type, file_id: object_db_id)

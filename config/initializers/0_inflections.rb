@@ -19,6 +19,7 @@ ActiveSupport::Inflector.inflections do |inflect|
     project_registry
     file_registry
     job_artifact_registry
+    lfs_object_registry
   )
   inflect.acronym 'EE'
 end

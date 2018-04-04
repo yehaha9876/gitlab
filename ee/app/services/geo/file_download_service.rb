@@ -30,7 +30,9 @@ module Geo
 
     def update_registry(bytes_downloaded, success:)
       transfer =
-        if object_type.to_sym == :job_artifact
+        if object_type.to_sym == :lfs
+          Geo::LfsObjectRegistry.find_or_initialize_by(lfs_object_id: object_db_id)
+        elsif object_type.to_sym == :job_artifact
           Geo::JobArtifactRegistry.find_or_initialize_by(artifact_id: object_db_id)
         else
           Geo::FileRegistry.find_or_initialize_by(

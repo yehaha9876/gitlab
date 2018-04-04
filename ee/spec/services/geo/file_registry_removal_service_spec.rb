@@ -51,12 +51,28 @@ describe Geo::FileRegistryRemovalService do
       end
     end
 
+    shared_examples 'removes LFS object' do
+      subject(:service) { described_class.new('lfs', registry.lfs_object_id) }
+
+      it 'file from disk' do
+        expect do
+          service.execute
+        end.to change { File.exist?(file_path) }.from(true).to(false)
+      end
+
+      it 'registry when file was deleted successfully' do
+        expect do
+          service.execute
+        end.to change(Geo::LfsObjectRegistry, :count).by(-1)
+      end
+    end
+
     context 'with LFS object' do
       let!(:lfs_object) { create(:lfs_object, :with_file) }
-      let!(:file_registry) { create(:geo_file_registry, :lfs, file_id: lfs_object.id) }
+      let!(:registry) { create(:geo_lfs_object_registry, lfs_object_id: lfs_object.id) }
       let!(:file_path) { lfs_object.file.path }
 
-      it_behaves_like 'removes'
+      it_behaves_like 'removes LFS object'
 
       context 'migrated to object storage' do
         before do
@@ -64,7 +80,7 @@ describe Geo::FileRegistryRemovalService do
           lfs_object.update_column(:file_store, LfsObjectUploader::Store::REMOTE)
         end
 
-        it_behaves_like 'removes'
+        it_behaves_like 'removes LFS object'
       end
     end
 

@@ -42,7 +42,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
         create(:geo_file_registry, :avatar, file_id: upload_3.id, success: false)
         create(:geo_file_registry, :avatar, file_id: upload_6.id)
         create(:geo_file_registry, :avatar, file_id: upload_7.id)
-        create(:geo_file_registry, :lfs, file_id: lfs_object.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object.id)
 
         synced_attachments = subject.find_synced_attachments
 
@@ -68,7 +68,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
           create(:geo_file_registry, :avatar, file_id: upload_5.id, success: false)
           create(:geo_file_registry, :avatar, file_id: upload_6.id)
           create(:geo_file_registry, :avatar, file_id: upload_7.id)
-          create(:geo_file_registry, :lfs, file_id: lfs_object.id)
+          create(:geo_lfs_object_registry, lfs_object_id: lfs_object.id)
 
           secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
 
@@ -87,7 +87,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
           create(:geo_file_registry, :avatar, file_id: upload_5.id, success: false)
           create(:geo_file_registry, :avatar, file_id: upload_6.id)
           create(:geo_file_registry, :avatar, file_id: upload_7.id)
-          create(:geo_file_registry, :lfs, file_id: lfs_object.id)
+          create(:geo_lfs_object_registry, lfs_object_id: lfs_object.id)
 
           secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['default'])
 
@@ -111,7 +111,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
         create(:geo_file_registry, :avatar, file_id: upload_3.id, success: false)
         create(:geo_file_registry, :avatar, file_id: upload_6.id, success: false)
         create(:geo_file_registry, :avatar, file_id: upload_7.id, success: false)
-        create(:geo_file_registry, :lfs, file_id: lfs_object.id, success: false)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object.id, success: false)
 
         failed_attachments = subject.find_failed_attachments
 
@@ -127,7 +127,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
           create(:geo_file_registry, :avatar, file_id: upload_5.id)
           create(:geo_file_registry, :avatar, file_id: upload_6.id, success: false)
           create(:geo_file_registry, :avatar, file_id: upload_7.id, success: false)
-          create(:geo_file_registry, :lfs, file_id: lfs_object.id, success: false)
+          create(:geo_lfs_object_registry, lfs_object_id: lfs_object.id, success: false)
 
           secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
 
@@ -146,7 +146,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
           create(:geo_file_registry, :avatar, file_id: upload_5.id)
           create(:geo_file_registry, :avatar, file_id: upload_6.id, success: false)
           create(:geo_file_registry, :avatar, file_id: upload_7.id, success: false)
-          create(:geo_file_registry, :lfs, file_id: lfs_object.id, success: false)
+          create(:geo_lfs_object_registry, lfs_object_id: lfs_object.id, success: false)
 
           secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['default'])
 

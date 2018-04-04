@@ -185,14 +185,14 @@ describe GeoNodeStatus, :geo do
     end
 
     it 'returns the right percentage with no group restrictions' do
-      create(:geo_file_registry, :lfs, file_id: lfs_object_project.lfs_object_id, success: true)
+      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_project.lfs_object_id, success: true)
 
       expect(subject.lfs_objects_synced_in_percentage).to be_within(0.0001).of(25)
     end
 
     it 'returns the right percentage with group restrictions' do
       secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-      create(:geo_file_registry, :lfs, file_id: lfs_object_project.lfs_object_id, success: true)
+      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_project.lfs_object_id, success: true)
 
       expect(subject.lfs_objects_synced_in_percentage).to be_within(0.0001).of(50)
     end

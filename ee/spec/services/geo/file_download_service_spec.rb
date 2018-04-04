@@ -169,13 +169,13 @@ describe Geo::FileDownloadService do
       it 'downloads an LFS object' do
         stub_transfer(Gitlab::Geo::LfsTransfer, 100)
 
-        expect { subject.execute }.to change { Geo::FileRegistry.synced.count }.by(1)
+        expect { subject.execute }.to change { Geo::LfsObjectRegistry.synced.count }.by(1)
       end
 
       it 'registers when the download fails' do
         stub_transfer(Gitlab::Geo::LfsTransfer, -1)
 
-        expect { subject.execute }.to change { Geo::FileRegistry.failed.count }.by(1)
+        expect { subject.execute }.to change { Geo::LfsObjectRegistry.failed.count }.by(1)
       end
 
       it 'logs a message' do

@@ -56,8 +56,8 @@ describe Geo::FileDownloadDispatchWorker, :geo do
       end
 
       it 'filters S3-backed files' do
-        expect(Geo::FileDownloadWorker).to receive(:perform_async).with(:lfs, lfs_object_local_store.id)
-        expect(Geo::FileDownloadWorker).not_to receive(:perform_async).with(:lfs, lfs_object_remote_store.id)
+        expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
+        expect(Geo::FileDownloadWorker).not_to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
 
         subject.perform
       end
@@ -68,7 +68,7 @@ describe Geo::FileDownloadDispatchWorker, :geo do
         artifact = create(:ci_job_artifact)
 
         expect(Geo::FileDownloadWorker).to receive(:perform_async)
-          .with(:job_artifact, artifact.id).once.and_return(spy)
+          .with('job_artifact', artifact.id).once.and_return(spy)
 
         subject.perform
       end
@@ -79,7 +79,7 @@ describe Geo::FileDownloadDispatchWorker, :geo do
         create(:geo_job_artifact_registry, artifact_id: artifact.id, bytes: 0, success: false)
 
         expect(Geo::FileDownloadWorker).to receive(:perform_async)
-          .with(:job_artifact, artifact.id).once.and_return(spy)
+          .with('job_artifact', artifact.id).once.and_return(spy)
 
         subject.perform
       end
@@ -137,37 +137,37 @@ describe Geo::FileDownloadDispatchWorker, :geo do
     end
 
     context 'with a failed file' do
-      let(:failed_registry) { create(:geo_file_registry, :lfs, file_id: 999, success: false) }
+      let(:failed_registry) { create(:geo_lfs_object_registry, lfs_object_id: 999, success: false) }
 
       it 'does not stall backfill' do
         unsynced = create(:lfs_object, :with_file)
 
         stub_const('Geo::Scheduler::SchedulerWorker::DB_RETRIEVE_BATCH_SIZE', 1)
 
-        expect(Geo::FileDownloadWorker).not_to receive(:perform_async).with(:lfs, failed_registry.file_id)
-        expect(Geo::FileDownloadWorker).to receive(:perform_async).with(:lfs, unsynced.id)
+        expect(Geo::FileDownloadWorker).not_to receive(:perform_async).with('lfs', failed_registry.lfs_object_id)
+        expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', unsynced.id)
 
         subject.perform
       end
 
       it 'retries failed files' do
-        expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', failed_registry.file_id)
+        expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', failed_registry.lfs_object_id)
 
         subject.perform
       end
 
       it 'does not retries failed files when retry_at is tomorrow' do
-        failed_registry = create(:geo_file_registry, :lfs, file_id: 999, success: false, retry_at: Date.tomorrow)
+        failed_registry = create(:geo_lfs_object_registry, lfs_object_id: 999, success: false, retry_at: Date.tomorrow)
 
-        expect(Geo::FileDownloadWorker).not_to receive(:perform_async).with('lfs', failed_registry.file_id)
+        expect(Geo::FileDownloadWorker).not_to receive(:perform_async).with('lfs', failed_registry.lfs_object_id)
 
         subject.perform
       end
 
       it 'does not retries failed files when retry_at is in the past' do
-        failed_registry = create(:geo_file_registry, :lfs, file_id: 999, success: false, retry_at: Date.yesterday)
+        failed_registry = create(:geo_lfs_object_registry, lfs_object_id: 999, success: false, retry_at: Date.yesterday)
 
-        expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', failed_registry.file_id)
+        expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', failed_registry.lfs_object_id)
 
         subject.perform
       end
@@ -189,7 +189,7 @@ describe Geo::FileDownloadDispatchWorker, :geo do
         create(:lfs_objects_project, project: unsynced_project)
 
         expect(Geo::FileDownloadWorker).to receive(:perform_async)
-          .with(:lfs, lfs_object_in_synced_group.lfs_object_id).once.and_return(spy)
+          .with('lfs', lfs_object_in_synced_group.lfs_object_id).once.and_return(spy)
 
         subject.perform
       end
@@ -199,7 +199,7 @@ describe Geo::FileDownloadDispatchWorker, :geo do
         job_artifact_in_synced_group = create(:ci_job_artifact, project: project_in_synced_group)
 
         expect(Geo::FileDownloadWorker).to receive(:perform_async)
-          .with(:job_artifact, job_artifact_in_synced_group.id).once.and_return(spy)
+          .with('job_artifact', job_artifact_in_synced_group.id).once.and_return(spy)
 
         subject.perform
       end
