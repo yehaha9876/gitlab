@@ -98,7 +98,7 @@ module EE
 
     def elapsed_days
       return 0 if start_date.nil? || start_date.future?
-      
+
       (Date.today - start_date).to_i
     end
 
