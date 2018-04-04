@@ -1,4 +1,16 @@
 <script>
+const SUBMIT_ACTION_TEXT = {
+  create: 'Add',
+  update: 'Save',
+  delete: 'Delete',
+};
+
+const SUBMIT_BUTTON_CLASS = {
+  create: 'btn-create',
+  update: 'btn-save',
+  delete: 'btn-remove',
+};
+
 export default {
   props: {
     isLoading: {
@@ -17,7 +29,37 @@ export default {
     alertData: {
       type: Object,
       required: false,
-      default: null,
+      default: () => ({}),
+    },
+  },
+  data() {
+    return {
+      operator: this.alertData.operator,
+      threshold: this.alertData.threshold,
+    };
+  },
+  computed: {
+    haveValuesChanged() {
+      return (
+        this.operator &&
+        this.threshold &&
+        this.operator !== this.alertData.operator &&
+        this.threshold !== this.alertData.threshold
+      );
+    },
+    submitAction() {
+      if (!this.alert) return 'create';
+      if (this.haveValuesChanged) return 'update';
+      return 'delete';
+    },
+    submitActionText() {
+      return SUBMIT_ACTION_TEXT[this.submitAction];
+    },
+    submitButtonClass() {
+      return SUBMIT_BUTTON_CLASS[this.submitAction];
+    },
+    isSubmitDisabled() {
+      return this.submitAction === 'create' && !this.haveValuesChanged;
     },
   },
 };
@@ -65,9 +107,11 @@ export default {
       </button>
       <button
         type="button"
-        class="btn btn-inverted btn-new"
+        class="btn btn-inverted"
+        :class="submitButtonClass"
+        :disabled="isSubmitDisabled"
       >
-        Save
+        {{ submitActionText }}
       </button>
     </div>
   </div>
