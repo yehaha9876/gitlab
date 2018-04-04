@@ -1,7 +1,6 @@
 class EpicBaseEntity < Grape::Entity
   include RequestAwareEntity
   include EntityDateHelper
-  include ActionView::Helpers::TagHelper
 
   expose :id
   expose :title
