@@ -1,4 +1,6 @@
 module MilestonesHelper
+  include EntityDateHelper
+
   def milestones_filter_path(opts = {})
     if @project
       project_milestones_path(@project, opts)
@@ -107,26 +109,7 @@ module MilestonesHelper
 
   def milestone_tooltip_due_date(milestone)
     if milestone.due_date
-      [milestone.due_date.to_s(:medium), "(#{milestone_remaining_days(milestone)})"].join(' ')
-    end
-  end
-
-  def milestone_remaining_days(milestone)
-    if milestone.expired?
-      content_tag(:strong, 'Past due')
-    elsif milestone.upcoming?
-      content_tag(:strong, 'Upcoming')
-    elsif milestone.due_date
-      time_ago = time_ago_in_words(milestone.due_date)
-      content = time_ago.gsub(/\d+/) { |match| "<strong>#{match}</strong>" }
-      content.slice!("about ")
-      content << " remaining"
-      content.html_safe
-    elsif milestone.start_date && milestone.start_date.past?
-      days    = milestone.elapsed_days
-      content = content_tag(:strong, days)
-      content << " #{'day'.pluralize(days)} elapsed"
-      content.html_safe
+      [milestone.due_date.to_s(:medium), "(#{remaining_days_in_words(milestone)})"].join(' ')
     end
   end
 

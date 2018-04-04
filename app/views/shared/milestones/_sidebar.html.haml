@@ -58,7 +58,7 @@
             %span.bold= milestone.due_date.to_s(:medium)
           - else
             %span.no-value No due date
-        - remaining_days = milestone_remaining_days(milestone)
+        - remaining_days = remaining_days_in_words(milestone)
         - if remaining_days.present?
           = surround '(', ')' do
             %span.remaining-days= remaining_days
