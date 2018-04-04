@@ -97,7 +97,9 @@ module EE
     end
 
     def elapsed_days
-      (Date.today - epic.start_date).to_i
+      return 0 if !start_date || start_date.future?
+      
+      (Date.today - start_date).to_i
     end
 
     # Needed to use EntityDateHelper::remaining_days_in_words
