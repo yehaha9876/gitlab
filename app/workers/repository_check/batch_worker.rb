@@ -24,7 +24,7 @@ module RepositoryCheck
 
         try_obtain_lease_for(project_id) do
           SingleRepositoryWorker.new.perform(project_id)
-        end
+        end rescue LeaseNotObtained
       end
     end
 
