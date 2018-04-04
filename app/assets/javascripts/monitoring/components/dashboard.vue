@@ -10,12 +10,18 @@ import EmptyState from './empty_state.vue';
 import MonitoringStore from '../stores/monitoring_store';
 import eventHub from '../event_hub';
 
+// ee-only
+import AlertWidget from './alert_widget.vue';
+
 export default {
   components: {
     Graph,
     GraphGroup,
     EmptyState,
     Icon,
+
+    // ee-only
+    AlertWidget,
   },
   props: {
     hasMetrics: {
@@ -90,6 +96,12 @@ export default {
     currentEnvironmentName: {
       type: String,
       required: true,
+
+    // ee-only
+    alertsEndpoint: {
+      type: String,
+      required: false,
+      default: null,
     },
   },
   data() {
@@ -225,11 +237,19 @@ export default {
         :small-graph="forceSmallGraph"
       >
 <<<<<<< HEAD
+<<<<<<< HEAD
         <!-- EE content -->
         {{ null }}
 =======
         <!-- EE Content Placeholder -->
 >>>>>>> add placeholder comment and closing tag to reduce conflicts with EE
+=======
+        <!-- EE-only -->
+        <alert-widget
+          v-if="alertsEndpoint"
+          :alerts-endpoint="alertsEndpoint"
+        />
+>>>>>>> create AlertWidget component and pass it the alert endpoint
       </graph>
     </graph-group>
   </div>
