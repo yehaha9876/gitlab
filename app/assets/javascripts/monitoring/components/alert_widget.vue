@@ -2,6 +2,12 @@
 import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
 
+let alertId = 1;
+const generateAlertPath = () => {
+  alertId += 1;
+  return `alert${alertId}.json`;
+};
+
 export default {
   components: {
     Icon,
@@ -27,11 +33,14 @@ export default {
       isLoading: false,
       isOpen: false,
       alerts: this.currentAlerts,
+      alertData: {},
     };
   },
   computed: {
     alertSummary() {
-      return this.hasAlerts ? 'alert summary' : null;
+      const data = this.firstAlertData;
+      if (!data) return null;
+      return `Threshold ${data.operator} ${data.threshold}`;
     },
     alertIcon() {
       return this.hasAlerts ? 'notifications' : 'notifications-off';
@@ -42,6 +51,12 @@ export default {
     hasAlerts() {
       return this.alerts.length > 0;
     },
+    firstAlert() {
+      return this.hasAlerts ? this.alerts[0] : undefined;
+    },
+    firstAlertData() {
+      return this.hasAlerts ? this.alertData[this.alerts[0]] : undefined;
+    },
   },
   watch: {
     isOpen(open) {
@@ -51,6 +66,9 @@ export default {
         document.removeEventListener('click', this.handleOutsideClick);
       }
     },
+  },
+  created() {
+    // query alertData
   },
   beforeDestroy() {
     // clean up external event listeners
@@ -67,6 +85,41 @@ export default {
       if (!this.$refs.dropdownMenu.contains(event.target)) {
         this.isOpen = false;
       }
+    },
+    handleCreate({ query, operator, threshold }) {
+      this.isLoading = true;
+      setTimeout(() => {
+        const alertPath = generateAlertPath();
+        this.alerts.unshift(alertPath);
+        this.alertData[alertPath] = {
+          query,
+          operator,
+          threshold,
+        };
+        this.isLoading = false;
+        this.handleDropdownClose();
+      }, 1000);
+    },
+    handleUpdate({ alert, query, operator, threshold }) {
+      this.isLoading = true;
+      setTimeout(() => {
+        this.alertData[alert] = {
+          query,
+          operator,
+          threshold,
+        };
+        this.isLoading = false;
+        this.handleDropdownClose();
+      }, 1000);
+    },
+    handleDelete({ alert }) {
+      this.isLoading = true;
+      setTimeout(() => {
+        delete this.alertData[alert];
+        this.alerts = this.alerts.filter(alertPath => alert !== alertPath);
+        this.isLoading = false;
+        this.handleDropdownClose();
+      }, 1000);
     },
   },
 };
@@ -124,8 +177,12 @@ export default {
       <div class="dropdown-content">
         <alert-widget-form
           :is-loading="isLoading"
-          :alert="alerts[0]"
+          :alert="firstAlert"
+          :alert-data="firstAlertData"
           :query="query"
+          @create="handleCreate"
+          @update="handleUpdate"
+          @delete="handleDelete"
           @cancel="handleDropdownClose"
         />
       </div>
