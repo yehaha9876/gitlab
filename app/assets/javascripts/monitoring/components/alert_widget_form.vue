@@ -62,6 +62,21 @@ export default {
       return this.submitAction === 'create' && !this.haveValuesChanged;
     },
   },
+  methods: {
+    handleCancel() {
+      this.operator = this.alertData.operator;
+      this.threshold = this.alertData.threshold;
+      this.$emit('cancel');
+    },
+    handleSubmit() {
+      this.$emit(this.submitAction, {
+        alert: this.alert,
+        query: this.query,
+        operator: this.operator,
+        threshold: this.threshold,
+      });
+    },
+  },
 };
 </script>
 
@@ -109,6 +124,7 @@ export default {
       <button
         type="button"
         class="btn btn-default"
+        @click="handleCancel"
       >
         Cancel
       </button>
@@ -117,6 +133,7 @@ export default {
         class="btn btn-inverted"
         :class="submitButtonClass"
         :disabled="isSubmitDisabled"
+        @click="handleSubmit"
       >
         {{ submitActionText }}
       </button>
