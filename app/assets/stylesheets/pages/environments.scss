@@ -635,3 +635,25 @@
   color: $gl-text-color-disabled;
   vertical-align: middle;
 }
+
+.alert-form {
+  padding: 16px 16px 8px;
+
+  label {
+    font-weight: normal;
+  }
+
+  .btn-group,
+  .action-group {
+    display: flex;
+    
+    .btn {
+      flex: 1 auto;
+      box-shadow: none;
+    }
+  }
+
+  .action-group .btn + .btn {
+    margin-left: 8px;
+  }
+}
