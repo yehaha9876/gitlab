@@ -43,15 +43,16 @@ module EntityDateHelper
   # If due date is not yet elapsed, it returns "# days|weeks"months remaining"
   # If start date is provided and elapsed, with no due date, it returns "# days elapsed"
   def remaining_days_in_words(entity)
-    if entity.expired?
+    if entity.has_attribute?(:expired) && entity.expired?
       content_tag(:strong, 'Past due')
-    elsif entity.upcoming?
+    elsif entity.has_attribute?(:upcoming) && entity.upcoming?
       content_tag(:strong, 'Upcoming')
     elsif entity.due_date
+      is_upcoming = (entity.due_date - Date.today).to_i > 0
       time_ago = time_ago_in_words(entity.due_date)
       content = time_ago.gsub(/\d+/) { |match| "<strong>#{match}</strong>" }
       content.slice!("about ")
-      content << " remaining"
+      content << " " + (is_upcoming ? _("remaining") : _("ago"))
       content.html_safe
     elsif entity.start_date && entity.start_date.past?
       days    = entity.elapsed_days
