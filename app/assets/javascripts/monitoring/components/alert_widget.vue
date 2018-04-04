@@ -7,15 +7,44 @@ export default {
     Icon,
     AlertWidgetForm,
   },
+  props: {
+    alertsEndpoint: {
+      type: String,
+      required: true,
+    },
+    query: {
+      type: String,
+      required: true,
+    },
+    currentAlerts: {
+      type: Array,
+      require: false,
+      default: () => [],
+    },
+  },
   data() {
     return {
       isLoading: false,
       isOpen: false,
+      alerts: this.currentAlerts,
     };
   },
   computed: {
     alertSummary() {
-      return 'hello world';
+      return this.hasAlerts ? 'alert summary' : null;
+    },
+    alertIcon() {
+      return this.hasAlerts
+        ? 'notifications'
+        : 'notifications-off';
+    },
+    dropdownTitle() {
+      return this.hasAlerts
+        ? 'Edit alert'
+        : 'Add alert';
+    },
+    hasAlerts() {
+      return this.alerts.length > 0;
     },
   },
   watch: {
@@ -66,7 +95,7 @@ export default {
       @click="handleDropdownToggle"
     >
       <icon
-        name="notifications"
+        :name="alertIcon"
         :size="16"
         aria-hidden="true"
       />
@@ -82,7 +111,7 @@ export default {
       class="dropdown-menu alert-dropdown-menu"
     >
       <div class="dropdown-title">
-        <span>Dropdown Title</span>
+        <span>{{ dropdownTitle }}</span>
         <button
           class="dropdown-title-button dropdown-menu-close"
           type="button"

@@ -161,6 +161,14 @@ export default {
     hoverChanged(data) {
       this.hoverData = data;
     },
+
+    // ee-only
+    getFirstGraphQuery(graphData) {
+      if (!graphData.queries || !graphData.queries[0]) {
+        return false;
+      }
+      return graphData.queries[0].query || graphData.queries[0].query_range;
+    }
   },
 };
 </script>
@@ -192,6 +200,7 @@ export default {
         <alert-widget
           v-if="alertsEndpoint"
           :alerts-endpoint="alertsEndpoint"
+          :query="getFirstGraphQuery(graphData)"
         />
       </graph>
     </graph-group>
