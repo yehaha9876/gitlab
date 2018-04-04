@@ -9,8 +9,14 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       isOpen: false,
     };
+  },
+  computed: {
+    alertSummary() {
+      return 'hello world';
+    },
   },
   watch: {
     isOpen(open) {
@@ -46,6 +52,14 @@ export default {
     class="prometheus-alert-widget dropdown"
     :class="{ open: isOpen }"
   >
+    <span class="alert-current-setting">
+      <i
+        v-if="isLoading"
+        class="fa fa-spinner fa-spin"
+        aria-hidden="true">
+      </i>
+      {{ alertSummary }}
+    </span>
     <button
       class="btn btn-xs alert-dropdown-button"
       type="button"
