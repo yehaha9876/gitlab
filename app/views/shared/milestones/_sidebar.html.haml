@@ -71,7 +71,7 @@
 
     - if !project || can?(current_user, :read_issue, project)
       .block.issues
-        .sidebar-collapsed-icon.has-tooltip{ title: milestone_issues_tooltip_text(milestone.issues_visible_to_user(current_user)), data: { container: 'body', html: 1, placement: 'left' } }
+        .sidebar-collapsed-icon.has-tooltip{ title: milestone_issues_tooltip_text(milestone.count_issues_by_state(current_user)), data: { container: 'body', html: 1, placement: 'left' } }
           %strong
             = custom_icon('issues')
           %span= milestone.issues_visible_to_user(current_user).count

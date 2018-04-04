@@ -144,8 +144,8 @@ module MilestonesHelper
     if issues.any?
       content = []
 
-      content.push(n_("1 open issue", "%d open issues", issues.opened.count) % issues.opened.count) if issues.opened.any?
-      content.push(n_("1 closed issue", "%d closed issues", issues.closed.count) % issues.closed.count) if issues.closed.any?
+      content.push(n_("1 open issue", "%d open issues", issues["opened"]) % issues["opened"]) if issues["opened"]
+      content.push(n_("1 closed issue", "%d closed issues", issues["closed"]) % issues["closed"]) if issues["closed"]
 
       return content.join('<br />').html_safe
     end
