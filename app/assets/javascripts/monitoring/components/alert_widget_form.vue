@@ -1,3 +1,28 @@
+<script>
+export default {
+  props: {
+    isLoading: {
+      type: Boolean,
+      required: true,
+    },
+    query: {
+      type: String,
+      required: true,
+    },
+    alert: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    alertData: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+  },
+};
+</script>
+
 <template>
   <div class="alert-form">
     <div
