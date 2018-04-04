@@ -168,7 +168,7 @@ export default {
         return false;
       }
       return graphData.queries[0].query || graphData.queries[0].query_range;
-    }
+    },
   },
 };
 </script>
