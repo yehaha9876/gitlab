@@ -42,9 +42,9 @@ export default {
     haveValuesChanged() {
       return (
         this.operator &&
-        (this.threshold || this.threshold === 0) &&
-        this.operator !== this.alertData.operator &&
-        this.threshold !== this.alertData.threshold
+        this.threshold === Number(this.threshold) &&
+        (this.operator !== this.alertData.operator ||
+          this.threshold !== this.alertData.threshold)
       );
     },
     submitAction() {
@@ -59,7 +59,10 @@ export default {
       return SUBMIT_BUTTON_CLASS[this.submitAction];
     },
     isSubmitDisabled() {
-      return this.submitAction === 'create' && !this.haveValuesChanged;
+      return (
+        this.isLoading ||
+        (this.submitAction === 'create' && !this.haveValuesChanged)
+      );
     },
   },
   methods: {
@@ -69,6 +72,7 @@ export default {
       this.$emit('cancel');
     },
     handleSubmit() {
+      this.$refs.submitButton.blur();
       this.$emit(this.submitAction, {
         alert: this.alert,
         query: this.query,
@@ -92,6 +96,7 @@ export default {
         class="btn btn-default"
         :class="{ active: operator === '>' }"
         @click="operator = '>'"
+        :disabled="isLoading"
       >
         &gt;
       </button>
@@ -100,6 +105,7 @@ export default {
         class="btn btn-default"
         :class="{ active: operator === '=' }"
         @click="operator = '='"
+        :disabled="isLoading"
       >
         =
       </button>
@@ -108,6 +114,7 @@ export default {
         class="btn btn-default"
         :class="{ active: operator === '<' }"
         @click="operator = '<'"
+        :disabled="isLoading"
       >
         &lt;
       </button>
@@ -118,6 +125,7 @@ export default {
         type="number"
         class="form-control"
         v-model.number="threshold"
+        :disabled="isLoading"
       />
     </div>
     <div class="action-group">
@@ -125,10 +133,12 @@ export default {
         type="button"
         class="btn btn-default"
         @click="handleCancel"
+        :disabled="isLoading"
       >
         Cancel
       </button>
       <button
+        ref="submitButton"
         type="button"
         class="btn btn-inverted"
         :class="submitButtonClass"
