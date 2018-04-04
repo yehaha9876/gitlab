@@ -50,7 +50,7 @@
             = icon('spinner spin', 'aria-hidden': 'true')
       - if issuable.has_attribute?(:due_date)
         .block.due_date
-          .sidebar-collapsed-icon.has-tooltip{ data: { placement: 'left', container: 'body', html: 1 }, title: sidebar_due_date_tooltip_label(issuable.due_date) }
+          .sidebar-collapsed-icon.has-tooltip{ data: { placement: 'left', container: 'body', html: 1 }, title: sidebar_due_date_tooltip_label(issuable) }
             = icon('calendar', 'aria-hidden': 'true')
             %span.js-due-date-sidebar-value
               = issuable.due_date.try(:to_s, :medium) || 'None'

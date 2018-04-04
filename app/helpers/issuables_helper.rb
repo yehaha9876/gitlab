@@ -17,27 +17,23 @@ module IssuablesHelper
     issuable.is_a?(Issue) ? _('Assignee(s)') : _('Assignee')
   end
 
-  def sidebar_due_date_tooltip_label(due_date)
-    if due_date
+  def sidebar_due_date_tooltip_label(issuable)
+    if issuable.due_date
       [
         _('Due date'),
-        due_date_remaining_days(due_date)
+        due_date_remaining_days(issuable)
       ].join('<br />')
     else
       _('Due date')
     end
   end
 
-  def due_date_remaining_days(due_date)
-    is_upcoming = (due_date - Date.today).to_i > 0
-    time_ago = time_ago_in_words(due_date)
-    content = time_ago.gsub(/\d+/) { |match| "<strong>#{match}</strong>" }
-    content.slice!("about ")
-    content << (is_upcoming ? " remaining" : " ago")
+  def due_date_remaining_days(issuable)
+    remaining_days_in_words = remaining_days_in_words(issuable)
 
     [
-      due_date.to_s(:medium),
-      "(#{content.html_safe})"
+      issuable.due_date.to_s(:medium),
+      "(#{remaining_days_in_words})"
     ].join(' ')
   end
 
