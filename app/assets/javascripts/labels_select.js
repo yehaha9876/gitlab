@@ -4,7 +4,7 @@
 
 import $ from 'jquery';
 import _ from 'underscore';
-import { __ } from './locale';
+import { __, sprintf } from './locale';
 import axios from './lib/utils/axios_utils';
 import IssuableBulkUpdateActions from './issuable_bulk_update_actions';
 import DropdownUtils from './filtered_search/dropdown_utils';
@@ -82,7 +82,7 @@ export default class LabelsSelect {
         $dropdown.trigger('loading.gl.dropdown');
         axios.put(issueUpdateURL, data)
           .then(({ data }) => {
-            var labelCount, template, labelTooltipTitle, labelTitles;
+            var labelCount, template, labelTooltipTitle, labelTitles, formattedLabels;
             $loading.fadeOut();
             $dropdown.trigger('loaded.gl.dropdown');
             $selectbox.hide();
@@ -114,8 +114,7 @@ export default class LabelsSelect {
               labelTooltipTitle = labelTitles.join(', ');
             }
             else {
-              labelTooltipTitle = '';
-              $sidebarLabelTooltip.tooltip('destroy');
+              labelTooltipTitle = __('Labels');
             }
 
             $sidebarLabelTooltip

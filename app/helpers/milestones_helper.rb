@@ -95,6 +95,17 @@ module MilestonesHelper
   end
 
   def milestone_tooltip_title(milestone)
+    if milestone
+      [
+        milestone.title,
+        milestone_tooltip_due_date(milestone)
+      ].join('<br />')
+    else
+      _('Milestone')
+    end
+  end
+
+  def milestone_tooltip_due_date(milestone)
     if milestone.due_date
       [milestone.due_date.to_s(:medium), "(#{milestone_remaining_days(milestone)})"].join(' ')
     end
