@@ -126,7 +126,11 @@ export default {
         </button>
       </div>
       <div class="dropdown-content">
-        <alert-widget-form />
+        <alert-widget-form
+          :is-loading="isLoading"
+          :alert="alerts[0]"
+          :query="query"
+        />
       </div>
     </div>
   </div>
