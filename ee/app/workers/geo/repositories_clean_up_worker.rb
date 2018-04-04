@@ -20,6 +20,8 @@ module Geo
           end
         end
       end
+    rescue LeaseNotObtained
+      log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.')
     rescue ActiveRecord::RecordNotFound => e
       log_error('Could not find Geo node, skipping repositories clean up', geo_node_id: geo_node_id, error: e)
     end

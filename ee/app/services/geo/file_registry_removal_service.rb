@@ -25,6 +25,8 @@ module Geo
 
         log_info('Local file & registry removed')
       end
+    rescue LeaseNotObtained
+      log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.')
     rescue SystemCallError
       log_error('Could not remove file', e.message)
       raise

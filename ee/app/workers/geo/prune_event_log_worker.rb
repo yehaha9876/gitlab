@@ -33,6 +33,8 @@ module Geo
         Geo::EventLog.where('id <= ?', cursor_last_event_ids.min)
                      .each_batch { |batch| batch.delete_all }
       end
+    rescue LeaseNotObtained
+      log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.')
     end
 
     def lease_timeout

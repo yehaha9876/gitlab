@@ -65,6 +65,8 @@ module Geo
             log_info('Finished scheduler', total_loops: loops, duration: duration, reason: reason)
           end
         end
+      rescue LeaseNotObtained
+        log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.')
       end
 
       private

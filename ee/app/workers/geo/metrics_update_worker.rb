@@ -8,6 +8,8 @@ module Geo
 
     def perform
       try_obtain_lease { Geo::MetricsUpdateService.new.execute }
+    rescue LeaseNotObtained
+      log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.')
     end
 
     def lease_timeout

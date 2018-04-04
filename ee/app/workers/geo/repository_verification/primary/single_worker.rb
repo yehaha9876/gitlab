@@ -21,6 +21,8 @@ module Geo
             calculate_repository_checksum if repository_state.repository_verification_checksum.nil?
             calculate_wiki_checksum if repository_state.wiki_verification_checksum.nil?
           end
+        rescue LeaseNotObtained
+          log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.')
         end
 
         private

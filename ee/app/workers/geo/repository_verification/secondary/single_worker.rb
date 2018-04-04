@@ -24,6 +24,8 @@ module Geo
             verify_checksum(:repository)
             verify_checksum(:wiki)
           end
+        rescue LeaseNotObtained
+          log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.')
         end
 
         private

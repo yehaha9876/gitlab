@@ -34,6 +34,8 @@ module Geo
 
         log_info("Finished #{type} sync")
       end
+    rescue LeaseNotObtained
+      log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.')
     end
 
     def lease_key

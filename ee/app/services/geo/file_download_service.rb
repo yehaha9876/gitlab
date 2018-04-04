@@ -22,6 +22,8 @@ module Geo
                         mark_as_synced: mark_as_synced,
                         missing_on_primary: download_result.primary_missing_file)
       end
+    rescue LeaseNotObtained
+      log_error('Cannot obtain an exclusive lease. There must be another instance already in execution.')
     end
 
     private
