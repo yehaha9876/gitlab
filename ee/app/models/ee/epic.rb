@@ -88,6 +88,18 @@ module EE
       false
     end
 
+    def upcoming?
+      start_date&.future?
+    end
+
+    def expired?
+      end_date&.past?
+    end
+
+    def elapsed_days
+      (Date.today - epic.start_date).to_i
+    end
+
     def to_reference(from = nil, full: false)
       reference = "#{self.class.reference_prefix}#{iid}"
 
