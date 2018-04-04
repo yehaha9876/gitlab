@@ -10,12 +10,30 @@ export default {
       isOpen: false,
     };
   },
+  watch: {
+    isOpen(open) {
+      if (open) {
+        document.addEventListener('click', this.handleOutsideClick);
+      } else {
+        document.removeEventListener('click', this.handleOutsideClick);
+      }
+    },
+  },
+  beforeDestroy() {
+    // clean up external event listeners
+    document.removeEventListener('click', this.handleOutsideClick);
+  },
   methods: {
     handleDropdownToggle() {
       this.isOpen = !this.isOpen;
     },
     handleDropdownClose() {
       this.isOpen = false;
+    },
+    handleOutsideClick(event) {
+      if (!this.$refs.dropdownMenu.contains(event.target)) {
+        this.isOpen = false;
+      }
     },
   },
 };
