@@ -100,6 +100,9 @@ module EE
       (Date.today - epic.start_date).to_i
     end
 
+    # Needed to use EntityDateHelper::remaining_days_in_words
+    alias_attribute(:due_date, :end_date)
+
     def to_reference(from = nil, full: false)
       reference = "#{self.class.reference_prefix}#{iid}"
 
