@@ -84,6 +84,25 @@ stages:
     - redis:alpine
 
 
+compile-assets:
+  <<: *dedicated-runner
+  <<: *use-pg
+  stage: prepare
+  cache:
+    <<: *default-cache
+  script:
+    - node --version
+    - date
+    - yarn install --frozen-lockfile --cache-folder .yarn-cache
+    - date
+    - bundle exec rake gitlab:assets:compile
+  artifacts:
+    expire_in: 7d
+    paths:
+      - node_modules
+      - public/assets
+
+
 # Retrieve knapsack and rspec_flaky reports
 retrieve-tests-metadata:
   <<: *tests-metadata-state
