@@ -81,7 +81,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :active_common, on: :collection
         end
 
-        resources :alerts, constraints: { id: %r{[^\/]+} }, only: [:index, :new, :create, :edit, :update, :destroy]
+        resources :alerts, constraints: { id: /\d+/ }, only: [:index, :create, :show, :update, :destroy]
       end
 
       resources :deploy_keys, constraints: { id: /\d+/ }, only: [:index, :new, :create, :edit, :update] do
