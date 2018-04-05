@@ -328,6 +328,26 @@ stages:
     paths:
       - log/development.log
 
+# Review docs base
+.review-docs: &review-docs
+  <<: *dedicated-runner
+  <<: *except-qa
+  image: ruby:2.4-alpine
+  before_script:
+    - gem install gitlab --no-doc
+    # We need to download the script rather than clone the repo since the
+    # review-docs-cleanup job will not be able to run when the branch gets
+    # deleted (when merging the MR).
+    - apk add --update openssl
+    - wget https://gitlab.com/gitlab-org/gitlab-ce/raw/master/scripts/trigger-build-docs
+    - chmod 755 trigger-build-docs
+  cache: {}
+  dependencies: []
+  variables:
+    GIT_STRATEGY: none
+  when: manual
+  only:
+    - branches
 
 # DB migration, rollback, and seed jobs
 .db-migrate-reset: &db-migrate-reset
@@ -978,3 +998,13 @@ cache gems:
     - master@gitlab-org/gitlab-ce
     - master@gitlab-org/gitlab-ee
     - tags
+
+gitlab_git_test:
+  <<: *dedicated-runner
+  <<: *except-docs-and-qa
+  variables:
+    SETUP_DB: "false"
+  before_script: []
+  cache: {}
+  script:
+    - spec/support/prepare-gitlab-git-test-for-commit --check-for-changes
