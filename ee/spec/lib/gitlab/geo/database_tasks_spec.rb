@@ -113,9 +113,9 @@ describe Gitlab::Geo::DatabaseTasks do
 
     describe '.purge' do
       it 'calls ActiveRecord::Tasks::DatabaseTasks.load_schema_for' do
-        expect(ActiveRecord::Tasks::DatabaseTasks).to receive(:purge)
+        #expect(ActiveRecord::Tasks::DatabaseTasks).to receive(:purge)
 
-        #subject.purge
+        subject.purge
       end
     end
   end
