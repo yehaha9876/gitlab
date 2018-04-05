@@ -1,12 +1,10 @@
 <script>
   import { dateInWords } from '../../../lib/utils/datetime_utility';
-  import toggleSidebar from './toggle_sidebar.vue';
   import collapsedCalendarIcon from './collapsed_calendar_icon.vue';
 
   export default {
     name: 'SidebarCollapsedGroupedDatePicker',
     components: {
-      toggleSidebar,
       collapsedCalendarIcon,
     },
     props: {
@@ -14,11 +12,6 @@
         type: Boolean,
         required: false,
         default: true,
-      },
-      showToggleSidebar: {
-        type: Boolean,
-        required: false,
-        default: false,
       },
       minDate: {
         type: Date,
@@ -51,7 +44,7 @@
       },
       iconClass() {
         const disabledClass = this.disableClickableIcons ? 'disabled' : '';
-        return `block sidebar-collapsed-icon calendar-icon ${disabledClass}`;
+        return `sidebar-collapsed-icon calendar-icon ${disabledClass}`;
       },
     },
     methods: {
@@ -71,15 +64,6 @@
 
 <template>
   <div class="block sidebar-grouped-item">
-    <div
-      v-if="showToggleSidebar"
-      class="issuable-sidebar-header"
-    >
-      <toggle-sidebar
-        :collapsed="collapsed"
-        @toggle="toggleSidebar"
-      />
-    </div>
     <collapsed-calendar-icon
       v-if="showMinDateBlock"
       :container-class="iconClass"
