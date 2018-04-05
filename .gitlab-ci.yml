@@ -422,29 +422,6 @@ package-and-qa:
     - //@gitlab-org/gitlab-ce
     - //@gitlab-org/gitlab-ee
 
-# Trigger a docs build in gitlab-docs
-# Useful to preview the docs changes live
-review-docs-deploy:
-  <<: *review-docs
-  stage: build
-  environment:
-    name: review-docs/$CI_COMMIT_REF_NAME
-    # DOCS_REVIEW_APPS_DOMAIN and DOCS_GITLAB_REPO_SUFFIX are secret variables
-    # Discussion: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/14236/diffs#note_40140693
-    url: http://$DOCS_GITLAB_REPO_SUFFIX-$CI_COMMIT_REF_SLUG.$DOCS_REVIEW_APPS_DOMAIN/$DOCS_GITLAB_REPO_SUFFIX
-    on_stop: review-docs-cleanup
-  script:
-    - ./trigger-build-docs deploy
-
-# Cleanup remote environment of gitlab-docs
-review-docs-cleanup:
-  <<: *review-docs
-  stage: post-cleanup
-  environment:
-    name: review-docs/$CI_COMMIT_REF_NAME
-    action: stop
-  script:
-    - ./trigger-build-docs cleanup
 
 # Retrieve knapsack and rspec_flaky reports
 retrieve-tests-metadata:
