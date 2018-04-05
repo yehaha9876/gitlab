@@ -1,5 +1,5 @@
 alertmanager:
-  enabled: false
+  enabled: true
 
 kubeStateMetrics:
   enabled: true
@@ -17,8 +17,28 @@ server:
   image:
     tag: v2.1.0
 
+alertmanagerFiles:
+  alertmanager.yml:
+    route:
+      receiver: 'default-receiver'
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 4h
+
 serverFiles:
-  alerts: {}
+  alerts:
+    groups:
+      - name: GitLab alerting
+        rules:
+          - alert: Metric name
+            expr: up > 0
+            for: 5m
+            labels:
+              gitlab: hook
+            annotations:
+              summary: "Instance {{ $labels.instance }} down"
+              description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
+
   rules: {}
 
   prometheus.yml:

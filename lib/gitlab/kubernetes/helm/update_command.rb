@@ -1,7 +1,7 @@
 module Gitlab
   module Kubernetes
     module Helm
-      class InstallCommand < BaseCommand
+      class UpdateCommand < BaseCommand
         attr_reader :name, :chart, :repository, :values
 
         def initialize(name, chart:, values:, repository: nil)
@@ -24,7 +24,7 @@ module Gitlab
         end
 
         def config_map_resource
-          nil # Gitlab::Kubernetes::ConfigMap.new(name, values).generate
+          Gitlab::Kubernetes::ConfigMap.new(name, values).generate
         end
 
         private
@@ -39,7 +39,7 @@ module Gitlab
 
         def script_command
           <<~HEREDOC
-            helm upgrade #{name} #{chart} --reset-values --install --namespace #{Gitlab::Kubernetes::Helm::NAMESPACE} -f /data/helm/#{name}/config/values.yaml >/dev/null
+          helm install #{chart} --name #{name} --namespace #{Gitlab::Kubernetes::Helm::NAMESPACE} -f /data/helm/#{name}/config/values.yaml >/dev/null
           HEREDOC
         end
       end
