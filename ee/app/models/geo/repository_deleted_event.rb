@@ -1,5 +1,5 @@
 module Geo
-  class RepositoryDeletedEvent < ActiveRecord::Base
+  class RepositoryDeletedEvent < ApplicationRecord
     include Geo::Model
 
     belongs_to :project

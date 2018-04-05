@@ -1,4 +1,4 @@
-class Approval < ActiveRecord::Base
+class Approval < ApplicationRecord
   belongs_to :user
   belongs_to :merge_request
 

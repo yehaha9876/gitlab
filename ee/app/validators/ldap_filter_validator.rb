@@ -4,7 +4,7 @@
 #
 # Example:
 #
-#   class LdapGroupLink < ActiveRecord::Base
+#   class LdapGroupLink < ApplicationRecord
 #     validates :filter, ldap_filter: true
 #   end
 #

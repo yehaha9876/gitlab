@@ -1,4 +1,4 @@
-class SamlProvider < ActiveRecord::Base
+class SamlProvider < ApplicationRecord
   belongs_to :group
 
   validates :group, presence: true, top_level_group: true
