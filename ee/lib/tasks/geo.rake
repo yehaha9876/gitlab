@@ -177,7 +177,7 @@ namespace :geo do
   task set_secondary_as_primary: :environment do
     abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
 
-    ApplicationRecord.transaction do
+    ActiveRecord::Base.transaction do
       primary_node = Gitlab::Geo.primary_node
 
       unless primary_node

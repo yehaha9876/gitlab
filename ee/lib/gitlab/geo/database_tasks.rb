@@ -33,7 +33,7 @@ module Gitlab
 
       def dump_schema_after_migration?
         with_geo_db do
-          !!ApplicationRecord.dump_schema_after_migration
+          !!ActiveRecord::Base.dump_schema_after_migration
         end
       end
 
@@ -60,7 +60,7 @@ module Gitlab
           Gitlab::Geo::DatabaseTasks.with_geo_db do
             filename = ENV['SCHEMA'] || File.join(ActiveRecord::Tasks::DatabaseTasks.db_dir, 'schema.rb')
             File.open(filename, "w:utf-8") do |file|
-              ActiveRecord::SchemaDumper.dump(ApplicationRecord.connection, file)
+              ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
             end
           end
         end
@@ -109,7 +109,7 @@ module Gitlab
               ['up', version, '********** NO FILE **********']
             end
             # output
-            puts "\ndatabase: #{ApplicationRecord.connection_config[:database]}\n\n"
+            puts "\ndatabase: #{ActiveRecord::Base.connection_config[:database]}\n\n"
             puts "#{'Status'.center(8)}  #{'Migration ID'.ljust(14)}  Migration Name"
             puts "-" * 50
             (db_list + file_list).sort_by { |_, version, _| version }.each do |status, version, name|
@@ -127,12 +127,12 @@ module Gitlab
         def load
           Gitlab::Geo::DatabaseTasks.with_geo_db do
             begin
-              should_reconnect = ApplicationRecord.connection_pool.active_connection?
+              should_reconnect = ActiveRecord::Base.connection_pool.active_connection?
               ActiveRecord::Schema.verbose = false
-              ActiveRecord::Tasks::DatabaseTasks.load_schema_for ApplicationRecord.configurations['test'], :ruby, ENV['SCHEMA']
+              ActiveRecord::Tasks::DatabaseTasks.load_schema_for ActiveRecord::Base.configurations['test'], :ruby, ENV['SCHEMA']
             ensure
               if should_reconnect
-                ApplicationRecord.establish_connection(ApplicationRecord.configurations[ActiveRecord::Tasks::DatabaseTasks.env])
+                ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[ActiveRecord::Tasks::DatabaseTasks.env])
               end
             end
           end
@@ -140,7 +140,7 @@ module Gitlab
 
         def purge
           Gitlab::Geo::DatabaseTasks.with_geo_db do
-            ActiveRecord::Tasks::DatabaseTasks.purge ApplicationRecord.configurations['test']
+            ActiveRecord::Tasks::DatabaseTasks.purge ActiveRecord::Base.configurations['test']
           end
         end
       end
@@ -191,10 +191,10 @@ module Gitlab
         ActiveRecord::Tasks::DatabaseTasks.migrations_paths = settings[:migrations_paths]
         ActiveRecord::Tasks::DatabaseTasks.seed_loader = settings[:seed_loader]
 
-        ApplicationRecord.configurations = ActiveRecord::Tasks::DatabaseTasks.database_configuration || {}
+        ActiveRecord::Base.configurations = ActiveRecord::Tasks::DatabaseTasks.database_configuration || {}
         ActiveRecord::Migrator.migrations_paths = ActiveRecord::Tasks::DatabaseTasks.migrations_paths
 
-        ApplicationRecord.establish_connection(ApplicationRecord.configurations[ActiveRecord::Tasks::DatabaseTasks.env])
+        ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[ActiveRecord::Tasks::DatabaseTasks.env])
       end
 
       class SeedLoader

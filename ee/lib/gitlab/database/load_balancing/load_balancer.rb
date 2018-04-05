@@ -63,7 +63,7 @@ module Gitlab
           # Instead of immediately grinding to a halt we'll retry the operation
           # a few times.
           retry_with_backoff do
-            yield ApplicationRecord.retrieve_connection
+            yield ActiveRecord::Base.retrieve_connection
           end
         end
 
@@ -82,7 +82,7 @@ module Gitlab
         end
 
         def release_primary_connection
-          ApplicationRecord.connection_pool.release_connection
+          ActiveRecord::Base.connection_pool.release_connection
         end
 
         # Returns the transaction write location of the primary.

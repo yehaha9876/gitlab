@@ -7,7 +7,7 @@ module Gitlab
     class UpdateAuthorizedKeysFileSince
       include Gitlab::ShellAdapter
 
-      class Key < ApplicationRecord
+      class Key < ActiveRecord::Base
         self.table_name = 'keys'
 
         def shell_id
