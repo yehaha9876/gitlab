@@ -8,7 +8,19 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis porro eius exe
 
 ### Lorem ipsum dolor sit h3 <span class="badge-trigger premium"></span>
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis porro eius exercitationem nostrum facere necessitatibus repellendus nemo. Maxime excepturi facilis laborum officia libero ipsum adipisci non consequuntur, soluta eveniet nihil. <span class="badge-trigger ultimate"></span>
+Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis porro eius exercitationem nostrum facere necessitatibus repellendus nemo. Maxime excepturi facilis laborum officia libero ipsum adipisci non consequuntur, soluta eveniet nihil. <span class="badge-trigger premium"></span>
 
 - Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis, nulla. 1
-- Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis, nulla. 1 <span class="badge-trigger premium dotcom-false"></span>
+- Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis, nulla. 1 <span class="badge-trigger ultimate dotcom-false"></span>
+
+#### Lorem ipsum dolor sit h4 <span class="badge-trigger ultimate"></span>
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+
+##### Lorem ipsum dolor sit h5 <span class="badge-trigger core"></span>
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+
+##### Lorem ipsum dolor sit h6 <span class="badge-trigger ultimate"></span>
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit.
