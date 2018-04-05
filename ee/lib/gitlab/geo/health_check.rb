@@ -43,7 +43,7 @@ module Gitlab
       def self.get_database_version
         if defined?(ActiveRecord)
           connection = ::Geo::BaseRegistry.connection
-          schema_migrations_table_name = ActiveRecord::Base.schema_migrations_table_name
+          schema_migrations_table_name = ApplicationRecord.schema_migrations_table_name
 
           if connection.table_exists?(schema_migrations_table_name)
             connection.execute("SELECT MAX(version) AS version FROM #{schema_migrations_table_name}")
@@ -68,7 +68,7 @@ module Gitlab
       end
 
       def self.database_secondary?
-        ActiveRecord::Base.connection.execute('SELECT pg_is_in_recovery()')
+        ApplicationRecord.connection.execute('SELECT pg_is_in_recovery()')
           .first
           .fetch('pg_is_in_recovery') == 't'
       end
@@ -76,7 +76,7 @@ module Gitlab
       def self.db_replication_lag_seconds
         # Obtain the replication lag in seconds
         lag =
-          ActiveRecord::Base.connection.execute(<<-SQL.squish)
+          ApplicationRecord.connection.execute(<<-SQL.squish)
             SELECT CASE
                    WHEN #{Gitlab::Database.pg_last_wal_receive_lsn}() = #{Gitlab::Database.pg_last_wal_receive_lsn}()
                     THEN 0
@@ -95,7 +95,7 @@ module Gitlab
         # Get a streaming status
         # This only works for Postgresql 9.6 and greater
         pid =
-          ActiveRecord::Base.connection.select_values('
+          ApplicationRecord.connection.select_values('
           SELECT pid FROM pg_stat_wal_receiver;')
           .first
 

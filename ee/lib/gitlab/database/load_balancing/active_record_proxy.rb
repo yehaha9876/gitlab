@@ -1,7 +1,7 @@
 module Gitlab
   module Database
     module LoadBalancing
-      # Module injected into ActiveRecord::Base to allow hijacking of the
+      # Module injected into ApplicationRecord to allow hijacking of the
       # "connection" method.
       module ActiveRecordProxy
         def connection
