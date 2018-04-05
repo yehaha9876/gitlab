@@ -1,4 +1,4 @@
-class ProjectRepositoryState < ApplicationRecord
+class ProjectRepositoryState < ActiveRecord::Base
   include IgnorableColumn
   include ShaAttribute
 

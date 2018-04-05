@@ -1,5 +1,5 @@
 module Geo
-  class HashedStorageMigratedEvent < ApplicationRecord
+  class HashedStorageMigratedEvent < ActiveRecord::Base
     include Geo::Model
 
     belongs_to :project

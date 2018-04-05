@@ -1,4 +1,4 @@
-class HistoricalData < ApplicationRecord
+class HistoricalData < ActiveRecord::Base
   validates :date, presence: true
 
   # HistoricalData.during((Date.today - 1.year)..Date.today).average(:active_user_count)

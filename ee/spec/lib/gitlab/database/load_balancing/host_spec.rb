@@ -9,7 +9,7 @@ describe Gitlab::Database::LoadBalancing::Host, :postgresql do
 
   before do
     allow(Gitlab::Database).to receive(:create_connection_pool)
-      .and_return(ApplicationRecord.connection_pool)
+      .and_return(ActiveRecord::Base.connection_pool)
   end
 
   describe '#connection' do

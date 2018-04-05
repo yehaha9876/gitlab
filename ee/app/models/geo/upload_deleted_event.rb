@@ -1,5 +1,5 @@
 module Geo
-  class UploadDeletedEvent < ApplicationRecord
+  class UploadDeletedEvent < ActiveRecord::Base
     include Geo::Model
 
     belongs_to :upload

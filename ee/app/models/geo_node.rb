@@ -1,4 +1,4 @@
-class GeoNode < ApplicationRecord
+class GeoNode < ActiveRecord::Base
   include Presentable
 
   SELECTIVE_SYNC_TYPES = %w[namespaces shards].freeze

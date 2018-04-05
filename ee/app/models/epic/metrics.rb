@@ -1,4 +1,4 @@
-class Epic::Metrics < ApplicationRecord
+class Epic::Metrics < ActiveRecord::Base
   belongs_to :epic
 
   def record!

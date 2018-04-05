@@ -1,4 +1,4 @@
-class EpicIssue < ApplicationRecord
+class EpicIssue < ActiveRecord::Base
   include RelativePositioning
 
   validates :epic, :issue, presence: true

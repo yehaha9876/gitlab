@@ -1,4 +1,4 @@
-class RemoteMirror < ApplicationRecord
+class RemoteMirror < ActiveRecord::Base
   include AfterCommitQueue
 
   PROTECTED_BACKOFF_DELAY   = 1.minute

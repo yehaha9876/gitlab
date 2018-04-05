@@ -8,8 +8,8 @@ describe UpdateAuthorizedKeysFile, :migration do
     context 'when authorized_keys_enabled is nil' do
       before do
         # Ensure the column can be null for the test
-        ApplicationRecord.connection.change_column_null :application_settings, :authorized_keys_enabled, true
-        ApplicationRecord.connection.change_column :application_settings, :authorized_keys_enabled, :boolean, default: nil
+        ActiveRecord::Base.connection.change_column_null :application_settings, :authorized_keys_enabled, true
+        ActiveRecord::Base.connection.change_column :application_settings, :authorized_keys_enabled, :boolean, default: nil
 
         described_class::ApplicationSetting.create!(authorized_keys_enabled: nil)
       end
@@ -91,8 +91,8 @@ describe UpdateAuthorizedKeysFile, :migration do
         context 'when authorized_keys_enabled is nil' do
           before do
             # Ensure the column can be null for the test
-            ApplicationRecord.connection.change_column_null :application_settings, :authorized_keys_enabled, true
-            ApplicationRecord.connection.change_column :application_settings, :authorized_keys_enabled, :boolean, default: nil
+            ActiveRecord::Base.connection.change_column_null :application_settings, :authorized_keys_enabled, true
+            ActiveRecord::Base.connection.change_column :application_settings, :authorized_keys_enabled, :boolean, default: nil
 
             described_class::ApplicationSetting.create!(authorized_keys_enabled: nil)
           end
@@ -136,8 +136,8 @@ describe UpdateAuthorizedKeysFile, :migration do
 
     context 'for unaffected customers: the authorized_keys_enabled column has a default (so the fixed migration ran)' do
       before do
-        ApplicationRecord.connection.change_column :application_settings, :authorized_keys_enabled, :boolean, default: true
-        ApplicationRecord.connection.change_column_null :application_settings, :authorized_keys_enabled, false, true
+        ActiveRecord::Base.connection.change_column :application_settings, :authorized_keys_enabled, :boolean, default: true
+        ActiveRecord::Base.connection.change_column_null :application_settings, :authorized_keys_enabled, false, true
       end
 
       it 'returns false' do
@@ -147,8 +147,8 @@ describe UpdateAuthorizedKeysFile, :migration do
 
     context 'for affected customers: the authorized_keys_enabled column does not have a default (so the broken migration ran)' do
       before do
-        ApplicationRecord.connection.change_column_null :application_settings, :authorized_keys_enabled, true
-        ApplicationRecord.connection.change_column :application_settings, :authorized_keys_enabled, :boolean, default: nil
+        ActiveRecord::Base.connection.change_column_null :application_settings, :authorized_keys_enabled, true
+        ActiveRecord::Base.connection.change_column :application_settings, :authorized_keys_enabled, :boolean, default: nil
       end
 
       it 'returns true' do

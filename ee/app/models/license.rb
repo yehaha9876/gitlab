@@ -1,4 +1,4 @@
-class License < ApplicationRecord
+class License < ActiveRecord::Base
   include ActionView::Helpers::NumberHelper
 
   STARTER_PLAN = 'starter'.freeze

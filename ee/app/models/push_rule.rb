@@ -1,4 +1,4 @@
-class PushRule < ApplicationRecord
+class PushRule < ActiveRecord::Base
   MatchError = Class.new(StandardError)
 
   REGEX_COLUMNS = %i[

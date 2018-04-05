@@ -1,5 +1,5 @@
 module Geo
-  class RepositoryUpdatedEvent < ApplicationRecord
+  class RepositoryUpdatedEvent < ActiveRecord::Base
     include Geo::Model
 
     REPOSITORY = 0

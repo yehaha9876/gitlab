@@ -1,5 +1,5 @@
 module Geo
-  class RepositoryRenamedEvent < ApplicationRecord
+  class RepositoryRenamedEvent < ActiveRecord::Base
     include Geo::Model
 
     belongs_to :project

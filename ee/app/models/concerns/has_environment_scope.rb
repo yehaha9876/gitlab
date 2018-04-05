@@ -33,7 +33,7 @@ module HasEnvironmentScope
         # Note that the connection could be
         # Gitlab::Database::LoadBalancing::ConnectionProxy
         # which supports `quote` via `method_missing`
-        ApplicationRecord.connection.quote(value)
+        ActiveRecord::Base.connection.quote(value)
       end
 
       # The query is trying to find variables with scopes matching the

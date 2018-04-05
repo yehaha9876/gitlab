@@ -1,4 +1,4 @@
-class SlackIntegration < ApplicationRecord
+class SlackIntegration < ActiveRecord::Base
   belongs_to :service
 
   validates :team_id, presence: true

@@ -1,4 +1,4 @@
-class LdapGroupLink < ApplicationRecord
+class LdapGroupLink < ActiveRecord::Base
   include Gitlab::Access
   belongs_to :group
 

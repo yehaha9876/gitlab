@@ -1,5 +1,5 @@
 module Geo
-  class EventLog < ApplicationRecord
+  class EventLog < ActiveRecord::Base
     include Geo::Model
 
     belongs_to :repository_created_event,

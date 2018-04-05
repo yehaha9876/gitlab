@@ -1,4 +1,4 @@
-class ProjectMirrorData < ApplicationRecord
+class ProjectMirrorData < ActiveRecord::Base
   BACKOFF_PERIOD = 24.seconds
   JITTER = 6.seconds
 

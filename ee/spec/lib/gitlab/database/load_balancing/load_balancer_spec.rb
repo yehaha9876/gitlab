@@ -5,7 +5,7 @@ describe Gitlab::Database::LoadBalancing::LoadBalancer do
 
   before do
     allow(Gitlab::Database).to receive(:create_connection_pool)
-      .and_return(ApplicationRecord.connection_pool)
+      .and_return(ActiveRecord::Base.connection_pool)
   end
 
   after do
@@ -84,14 +84,14 @@ describe Gitlab::Database::LoadBalancing::LoadBalancer do
       expect(lb).to receive(:read_write).and_call_original
 
       expect { |b| lb.read(&b) }
-        .to yield_with_args(ApplicationRecord.retrieve_connection)
+        .to yield_with_args(ActiveRecord::Base.retrieve_connection)
     end
   end
 
   describe '#read_write' do
     it 'yields a connection for a write' do
       expect { |b| lb.read_write(&b) }
-        .to yield_with_args(ApplicationRecord.retrieve_connection)
+        .to yield_with_args(ActiveRecord::Base.retrieve_connection)
     end
 
     it 'uses a retry with exponential backoffs' do
@@ -127,7 +127,7 @@ describe Gitlab::Database::LoadBalancing::LoadBalancer do
 
   describe '#release_primary_connection' do
     it 'releases the connection to the primary' do
-      expect(ApplicationRecord.connection_pool).to receive(:release_connection)
+      expect(ActiveRecord::Base.connection_pool).to receive(:release_connection)
 
       lb.release_primary_connection
     end

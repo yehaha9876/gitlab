@@ -1,5 +1,5 @@
 module Geo
-  class HashedStorageAttachmentsEvent < ApplicationRecord
+  class HashedStorageAttachmentsEvent < ActiveRecord::Base
     include Geo::Model
 
     belongs_to :project

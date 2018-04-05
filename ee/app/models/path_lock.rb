@@ -1,4 +1,4 @@
-class PathLock < ApplicationRecord
+class PathLock < ActiveRecord::Base
   belongs_to :project
   belongs_to :user
 

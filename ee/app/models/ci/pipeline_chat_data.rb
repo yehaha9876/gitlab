@@ -1,5 +1,5 @@
 module Ci
-  class PipelineChatData < ApplicationRecord
+  class PipelineChatData < ActiveRecord::Base
     self.table_name = 'ci_pipeline_chat_data'
 
     belongs_to :chat_name
