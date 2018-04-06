@@ -63,7 +63,7 @@ module Projects
       private
 
       def alerts_params
-        params.require(:prometheus_alert).permit(:query, :operator, :threshold, :name)
+        params.permit(:query, :operator, :threshold, :name)
       end
 
       def alert
