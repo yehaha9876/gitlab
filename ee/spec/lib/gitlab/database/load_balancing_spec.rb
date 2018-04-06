@@ -13,7 +13,7 @@ describe Gitlab::Database::LoadBalancing do
     it 'returns a Hash' do
       config = { 'hosts' => %w(foo) }
 
-      allow(ActiveRecord::Base.configurations[Rails.env])
+      allow(ApplicationRecord.configurations[Rails.env])
         .to receive(:[])
         .with('load_balancing')
         .and_return(config)
@@ -185,7 +185,7 @@ describe Gitlab::Database::LoadBalancing do
     end
 
     it 'configures the connection proxy' do
-      expect(ActiveRecord::Base.singleton_class).to receive(:prepend)
+      expect(ApplicationRecord.singleton_class).to receive(:prepend)
         .with(Gitlab::Database::LoadBalancing::ActiveRecordProxy)
 
       described_class.configure_proxy
