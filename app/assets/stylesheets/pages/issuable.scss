@@ -187,7 +187,12 @@
       padding-left: 10px;
 
       &:hover {
-        color: $gray-darkest;
+        color: $gl-text-color;
+      }
+
+      &:hover,
+      &:focus {
+        text-decoration: none;
       }
     }
 
@@ -445,10 +450,10 @@
 
       .btn-clipboard {
         border: 0;
+        background: transparent;
         color: $issuable-sidebar-color;
 
         &:hover {
-          background: transparent;
           color: $gl-text-color;
         }
       }
