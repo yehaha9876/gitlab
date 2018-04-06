@@ -178,11 +178,19 @@ export default {
     },
 
     // ee-only
-    getFirstGraphQuery(graphData) {
-      if (!graphData.queries || !graphData.queries[0]) {
-        return false;
-      }
+    getGraphQuery(graphData) {
+      if (!graphData.queries || !graphData.queries[0]) return undefined;
       return graphData.queries[0].query || graphData.queries[0].query_range;
+    },
+    getGraphLabel(graphData) {
+      if (!graphData.queries || !graphData.queries[0]) return undefined;
+      return graphData.queries[0].label;
+    },
+    getQueryAlerts(graphData) {
+      if (!graphData.queries) {
+        return undefined;
+      }
+      return graphData.queries.map(query => query.alert_path).filter(Boolean);
     },
   },
 };
@@ -256,7 +264,9 @@ export default {
         <alert-widget
           v-if="alertsEndpoint"
           :alerts-endpoint="alertsEndpoint"
-          :query="getFirstGraphQuery(graphData)"
+          :query="getGraphQuery(graphData)"
+          :name="getGraphLabel(graphData)"
+          :current-alerts="getQueryAlerts(graphData)"
         />
 >>>>>>> create AlertWidget component and pass it the alert endpoint
       </graph>
