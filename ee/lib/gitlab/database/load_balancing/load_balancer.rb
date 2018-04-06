@@ -6,7 +6,7 @@ module Gitlab
       # Each host in the load balancer uses the same credentials as the primary
       # database.
       #
-      # This class *requires* that `ActiveRecord::Base.retrieve_connection`
+      # This class *requires* that `ApplicationRecord.retrieve_connection`
       # always returns a connection to the primary.
       class LoadBalancer
         CACHE_KEY = :gitlab_load_balancer_host
@@ -63,7 +63,7 @@ module Gitlab
           # Instead of immediately grinding to a halt we'll retry the operation
           # a few times.
           retry_with_backoff do
-            yield ActiveRecord::Base.retrieve_connection
+            yield ApplicationRecord.retrieve_connection
           end
         end
 
@@ -82,7 +82,7 @@ module Gitlab
         end
 
         def release_primary_connection
-          ActiveRecord::Base.connection_pool.release_connection
+          ApplicationRecord.connection_pool.release_connection
         end
 
         # Returns the transaction write location of the primary.

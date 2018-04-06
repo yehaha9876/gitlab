@@ -26,7 +26,7 @@ module Gitlab
 
       # Returns a Hash containing the load balancing configuration.
       def self.configuration
-        ActiveRecord::Base.configurations[Rails.env]['load_balancing'] || {}
+        ApplicationRecord.configurations[Rails.env]['load_balancing'] || {}
       end
 
       # Returns the maximum replica lag size in bytes.
@@ -57,7 +57,7 @@ module Gitlab
       end
 
       def self.pool_size
-        ActiveRecord::Base.configurations[Rails.env]['pool']
+        ApplicationRecord.configurations[Rails.env]['pool']
       end
 
       # Returns true if load balancing is to be enabled.
@@ -77,13 +77,13 @@ module Gitlab
         self.proxy = ConnectionProxy.new(hosts)
 
         # This hijacks the "connection" method to ensure both
-        # `ActiveRecord::Base.connection` and all models use the same load
+        # `ApplicationRecord.connection` and all models use the same load
         # balancing proxy.
-        ActiveRecord::Base.singleton_class.prepend(ActiveRecordProxy)
+        ApplicationRecord.singleton_class.prepend(ActiveRecordProxy)
       end
 
       def self.active_record_models
-        ActiveRecord::Base.descendants
+        ApplicationRecord.descendants
       end
     end
   end
