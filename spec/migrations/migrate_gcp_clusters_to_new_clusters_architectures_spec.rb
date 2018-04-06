@@ -9,7 +9,7 @@ describe MigrateGcpClustersToNewClustersArchitectures, :migration do
   let(:service) { GcpMigrationSpec::KubernetesService.create!(project_id: project.id) }
 
   module GcpMigrationSpec
-    class KubernetesService < ActiveRecord::Base
+    class KubernetesService < ApplicationRecord
       self.table_name = 'services'
 
       serialize :properties, JSON # rubocop:disable Cop/ActiveRecordSerialize
