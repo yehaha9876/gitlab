@@ -43,8 +43,7 @@ export default {
       return (
         this.operator &&
         this.threshold === Number(this.threshold) &&
-        (this.operator !== this.alertData.operator ||
-          this.threshold !== this.alertData.threshold)
+        (this.operator !== this.alertData.operator || this.threshold !== this.alertData.threshold)
       );
     },
     submitAction() {
@@ -59,16 +58,17 @@ export default {
       return SUBMIT_BUTTON_CLASS[this.submitAction];
     },
     isSubmitDisabled() {
-      return (
-        this.isLoading ||
-        (this.submitAction === 'create' && !this.haveValuesChanged)
-      );
+      return this.isLoading || (this.submitAction === 'create' && !this.haveValuesChanged);
+    },
+  },
+  watch: {
+    alertData() {
+      this.resetAlertData();
     },
   },
   methods: {
     handleCancel() {
-      this.operator = this.alertData.operator;
-      this.threshold = this.alertData.threshold;
+      this.resetAlertData();
       this.$emit('cancel');
     },
     handleSubmit() {
@@ -79,6 +79,10 @@ export default {
         operator: this.operator,
         threshold: this.threshold,
       });
+    },
+    resetAlertData() {
+      this.operator = this.alertData.operator;
+      this.threshold = this.alertData.threshold;
     },
   },
 };
