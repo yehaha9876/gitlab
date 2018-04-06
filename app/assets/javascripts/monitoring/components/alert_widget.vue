@@ -18,6 +18,10 @@ export default {
       type: String,
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
     query: {
       type: String,
       required: true,
@@ -40,7 +44,7 @@ export default {
     alertSummary() {
       const data = this.firstAlertData;
       if (!data) return null;
-      return `Threshold ${data.operator} ${data.threshold}`;
+      return `${this.name} ${data.operator} ${data.threshold}`;
     },
     alertIcon() {
       return this.hasAlerts ? 'notifications' : 'notifications-off';
