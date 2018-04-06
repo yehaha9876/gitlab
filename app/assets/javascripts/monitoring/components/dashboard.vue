@@ -8,11 +8,17 @@ import EmptyState from './empty_state.vue';
 import MonitoringStore from '../stores/monitoring_store';
 import eventHub from '../event_hub';
 
+// ee-only
+import AlertWidget from './alert_widget.vue';
+
 export default {
   components: {
     Graph,
     GraphGroup,
     EmptyState,
+
+    // ee-only
+    AlertWidget,
   },
   props: {
     hasMetrics: {
@@ -79,6 +85,13 @@ export default {
     emptyUnableToConnectSvgPath: {
       type: String,
       required: true,
+    },
+
+    // ee-only
+    alertsEndpoint: {
+      type: String,
+      required: false,
+      default: null,
     },
   },
   data() {
@@ -148,6 +161,22 @@ export default {
     hoverChanged(data) {
       this.hoverData = data;
     },
+
+    // ee-only
+    getGraphQuery(graphData) {
+      if (!graphData.queries || !graphData.queries[0]) return undefined;
+      return graphData.queries[0].query || graphData.queries[0].query_range;
+    },
+    getGraphLabel(graphData) {
+      if (!graphData.queries || !graphData.queries[0]) return undefined;
+      return graphData.queries[0].label;
+    },
+    getQueryAlerts(graphData) {
+      if (!graphData.queries) {
+        return undefined;
+      }
+      return graphData.queries.map(query => query.alert_path).filter(Boolean);
+    },
   },
 };
 </script>
@@ -174,7 +203,16 @@ export default {
         :tags-path="tagsPath"
         :show-legend="showLegend"
         :small-graph="forceSmallGraph"
-      />
+      >
+        <!-- EE-only -->
+        <alert-widget
+          v-if="alertsEndpoint"
+          :alerts-endpoint="alertsEndpoint"
+          :query="getGraphQuery(graphData)"
+          :name="getGraphLabel(graphData)"
+          :current-alerts="getQueryAlerts(graphData)"
+        />
+      </graph>
     </graph-group>
   </div>
   <empty-state
