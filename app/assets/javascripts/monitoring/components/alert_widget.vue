@@ -1,6 +1,7 @@
 <script>
 import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
+import AlertsService from '../services/alerts_service';
 
 let alertId = 1;
 const generateAlertPath = () => {
@@ -34,6 +35,7 @@ export default {
   },
   data() {
     return {
+      service: null,
       isLoading: false,
       isOpen: false,
       alerts: this.currentAlerts,
@@ -72,13 +74,31 @@ export default {
     },
   },
   created() {
-    // query alertData
+    this.service = new AlertsService({ alertsEndpoint: this.alertsEndpoint });
+    this.fetchAlertData();
   },
   beforeDestroy() {
     // clean up external event listeners
     document.removeEventListener('click', this.handleOutsideClick);
   },
   methods: {
+    fetchAlertData() {
+      this.isLoading = true;
+      return Promise.all(
+        this.alerts.map(alertPath =>
+          this.service
+            .readAlert(alertPath)
+            .then(alertData => this.$set(this.alertData, alertPath, alertData)),
+        ),
+      )
+        .then(() => {
+          this.isLoading = false;
+        })
+        .catch(() => {
+          // TODO: produce an error message and/or fail state
+          this.isLoading = false;
+        });
+    },
     handleDropdownToggle() {
       this.isOpen = !this.isOpen;
     },
@@ -90,40 +110,49 @@ export default {
         this.isOpen = false;
       }
     },
-    handleCreate({ query, operator, threshold }) {
+    handleCreate({ name, query, operator, threshold }) {
+      const newAlert = { name, query, operator, threshold };
       this.isLoading = true;
-      setTimeout(() => {
-        const alertPath = generateAlertPath();
-        this.alerts.unshift(alertPath);
-        this.alertData[alertPath] = {
-          query,
-          operator,
-          threshold,
-        };
-        this.isLoading = false;
-        this.handleDropdownClose();
-      }, 1000);
+      this.service
+        .createAlert(newAlert)
+        .then(() => {
+          const alertPath = generateAlertPath();
+          this.alerts.unshift(alertPath);
+          this.$set(this.alertData, alertPath, newAlert);
+          this.isLoading = false;
+          this.handleDropdownClose();
+        })
+        .catch(() => {
+          // TODO: add error handling
+        });
     },
-    handleUpdate({ alert, query, operator, threshold }) {
+    handleUpdate({ alert, name, query, operator, threshold }) {
+      const updatedAlert = { name, query, operator, threshold };
       this.isLoading = true;
-      setTimeout(() => {
-        this.alertData[alert] = {
-          query,
-          operator,
-          threshold,
-        };
-        this.isLoading = false;
-        this.handleDropdownClose();
-      }, 1000);
+      this.service
+        .updateAlert(alert, updatedAlert)
+        .then(() => {
+          this.$set(this.alertData, alert, updatedAlert);
+          this.isLoading = false;
+          this.handleDropdownClose();
+        })
+        .catch(() => {
+          // TODO: add error handling
+        });
     },
     handleDelete({ alert }) {
       this.isLoading = true;
-      setTimeout(() => {
-        delete this.alertData[alert];
-        this.alerts = this.alerts.filter(alertPath => alert !== alertPath);
-        this.isLoading = false;
-        this.handleDropdownClose();
-      }, 1000);
+      this.service
+        .deleteAlert(alert)
+        .then(() => {
+          this.$delete(this.alertData, alert);
+          this.alerts = this.alerts.filter(alertPath => alert !== alertPath);
+          this.isLoading = false;
+          this.handleDropdownClose();
+        })
+        .catch(() => {
+          // TODO: add error handling
+        });
     },
   },
 };
