@@ -3,7 +3,7 @@ class StoreGeoNodesUrlDirectly < ActiveRecord::Migration
 
   DOWNTIME = false
 
-  class GeoNode < ActiveRecord::Base
+  class GeoNode < ApplicationRecord
     def compute_unified_url!
       uri = URI.parse("#{schema}://#{host}#{relative_url_root}")
       uri.port = port if port.present?

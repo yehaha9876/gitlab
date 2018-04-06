@@ -67,7 +67,7 @@ namespace :geo do
       end
     end
 
-    # IMPORTANT: This task won't dump the schema if ApplicationRecord.dump_schema_after_migration is set to false
+    # IMPORTANT: This task won't dump the schema if ActiveRecord::Base.dump_schema_after_migration is set to false
     task _dump: [:environment] do
       if Gitlab::Geo::DatabaseTasks.dump_schema_after_migration?
         ns["schema:dump"].invoke
@@ -177,7 +177,7 @@ namespace :geo do
   task set_secondary_as_primary: :environment do
     abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
 
-    ApplicationRecord.transaction do
+    ActiveRecord::Base.transaction do
       primary_node = Gitlab::Geo.primary_node
 
       unless primary_node

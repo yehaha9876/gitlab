@@ -9,7 +9,7 @@ module SystemCheck
       end
 
       def check?
-        ApplicationRecord.connection.execute('SELECT pg_is_in_recovery()').first.fetch('pg_is_in_recovery') == 't'
+        ActiveRecord::Base.connection.execute('SELECT pg_is_in_recovery()').first.fetch('pg_is_in_recovery') == 't'
       end
 
       def show_error
