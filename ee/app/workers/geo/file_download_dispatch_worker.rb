@@ -38,17 +38,40 @@ module Geo
       find_jobs(sync_statuses: [:failed, :synced_missing_on_primary], batch_size: batch_size)
     end
 
-    # Get a batch of resources taking equal parts from each resource.
+    # Get a batch of resources taking some from each resource in proportion to all available resources.
+    #
+    # Example: If batch_size is 6, and there are 1000 unsynced attachments, 2000 unsynced LFS objects,
+    # and 3000 unsynced job artifacts, this method will return job arguments for 1 attachment, 2 LFS
+    # objects, and 3 job artifacts.
     #
     # @return [Array] job arguments of a batch of resources
     def find_jobs(sync_statuses:, batch_size:)
-      jobs = job_finders.reduce([]) do |jobs, job_finder|
-        sync_statuses.reduce(jobs) do |jobs, sync_status|
-          jobs << job_finder.find_jobs(sync_status: sync_status, batch_size: batch_size)
+      total_pending = job_finders.reduce(0) do |sum, job_finder|
+        sync_statuses.each do |sync_status|
+          sum += job_finder.count_jobs(sync_status: sync_status)
         end
+
+        sum
       end
 
-      take_batch(*jobs, batch_size: batch_size)
+      return [] if total_pending <= 0
+
+      job_finders.reduce([]) do |jobs, job_finder|
+        sync_statuses.each do |sync_status|
+          sub_batch_size = sub_batch_size(job_finder: job_finder, sync_status: sync_status, total_pending: total_pending, batch_size: batch_size)
+
+          jobs += job_finder.find_jobs(sync_status: sync_status, batch_size: sub_batch_size)
+        end
+
+        jobs
+      end
+    end
+
+    # Scaled to batch_size, as a proportion of the total number of resources available.
+    #
+    # @return [Integer] number to take from this resource with this sync status
+    def sub_batch_size(job_finder:, sync_status:, total_pending:, batch_size:)
+      [(job_finder.count_jobs(sync_status: sync_status) / total_pending.to_f * batch_size).to_i, 1].max
     end
 
     def job_finders
