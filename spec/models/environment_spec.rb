@@ -33,6 +33,7 @@ describe Environment do
     end
   end
 
+
   describe 'state machine' do
     it 'invalidates the cache after a change' do
       expect(environment).to receive(:expire_etag_cache)
