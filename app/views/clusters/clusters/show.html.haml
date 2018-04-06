@@ -22,7 +22,8 @@
   help_path: help_page_path('user/project/clusters/index.md', anchor: 'installing-applications'),
   ingress_help_path: help_page_path('user/project/clusters/index.md', anchor: 'getting-the-external-ip-address'),
   ingress_dns_help_path: help_page_path('topics/autodevops/quick_start_guide.md', anchor: 'point-dns-at-cluster-ip'),
-  manage_prometheus_path: manage_prometheus_path } }
+  manage_prometheus_path: manage_prometheus_path,
+  jaeger_enabled: @cluster.project.feature_available?(:jaeger) } }
 
   .js-cluster-application-notice
     .flash-container

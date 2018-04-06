@@ -31,10 +31,43 @@ export default {
       required: false,
       default: () => ({}),
     },
+<<<<<<< HEAD
     helpPath: {
       type: String,
       required: false,
       default: '',
+=======
+    props: {
+      applications: {
+        type: Object,
+        required: false,
+        default: () => ({}),
+      },
+      helpPath: {
+        type: String,
+        required: false,
+        default: '',
+      },
+      ingressHelpPath: {
+        type: String,
+        required: false,
+        default: '',
+      },
+      ingressDnsHelpPath: {
+        type: String,
+        required: false,
+        default: '',
+      },
+      managePrometheusPath: {
+        type: String,
+        required: false,
+        default: '',
+      },
+      jaegerEnabled: {
+        type: Boolean,
+        required: true,
+      },
+>>>>>>> added license check
     },
     ingressHelpPath: {
       type: String,
@@ -455,6 +488,7 @@ export default {
           </div>
         </application-row>
         <application-row
+          v-if="jaegerEnabled"
           id="jaeger"
           :title="applications.jaeger.title"
           title-link="https://github.com/jaegertracing/jaeger"

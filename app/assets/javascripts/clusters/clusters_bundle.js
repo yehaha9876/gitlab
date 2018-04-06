@@ -38,6 +38,7 @@ export default class Clusters {
       ingressHelpPath,
       ingressDnsHelpPath,
       installJaegerPath,
+      jaegerEnabled,
     } = document.querySelector('.js-edit-cluster-form').dataset;
 
     this.store = new ClustersStore();
@@ -45,6 +46,7 @@ export default class Clusters {
     this.store.setManagePrometheusPath(managePrometheusPath);
     this.store.updateStatus(clusterStatus);
     this.store.updateStatusReason(clusterStatusReason);
+    this.store.setJaegerEnabled(jaegerEnabled);
     this.service = new ClustersService({
       endpoint: statusPath,
       installHelmEndpoint: installHelmPath,
@@ -102,6 +104,7 @@ export default class Clusters {
             ingressHelpPath: this.state.ingressHelpPath,
             managePrometheusPath: this.state.managePrometheusPath,
             ingressDnsHelpPath: this.state.ingressDnsHelpPath,
+            jaegerEnabled: this.state.jaegerEnabled,
           },
         });
       },

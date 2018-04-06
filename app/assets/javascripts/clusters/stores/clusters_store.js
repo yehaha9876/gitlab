@@ -62,6 +62,7 @@ export default class ClusterStore {
           requestReason: null,
         },
       },
+      jaegerEnabled: false,
     };
   }
 
@@ -113,5 +114,9 @@ export default class ClusterStore {
           serverAppEntry.hostname || this.state.applications.knative.hostname;
       }
     });
+  }
+
+  setJaegerEnabled(enabled) {
+    this.state.jaegerEnabled = enabled;
   }
 }

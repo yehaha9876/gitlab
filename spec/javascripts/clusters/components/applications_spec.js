@@ -26,6 +26,7 @@ describe('Applications', () => {
           knative: { title: 'Knative' },
           jaeger: { title: 'Jaeger' },
         },
+        jaegerEnabled: true,
       });
     });
 
@@ -76,6 +77,7 @@ describe('Applications', () => {
               knative: { title: 'Knative', hostname: '' },
               jaeger: { title: 'Jaeger' },
             },
+            jaegerEnabled: true,
           });
 
           expect(vm.$el.querySelector('.js-ip-address').value).toEqual('0.0.0.0');
@@ -101,6 +103,7 @@ describe('Applications', () => {
               knative: { title: 'Knative', hostname: '' },
               jaeger: { title: 'Jaeger' },
             },
+            jaegerEnabled: true,
           });
 
           expect(vm.$el.querySelector('.js-ip-address').value).toEqual('?');
@@ -122,6 +125,7 @@ describe('Applications', () => {
             knative: { title: 'Knative', hostname: '' },
             jaeger: { title: 'Jaeger' },
           },
+          jaegerEnabled: true,
         });
 
         expect(vm.$el.textContent).not.toContain('Ingress IP Address');

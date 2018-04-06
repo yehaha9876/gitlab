@@ -91,6 +91,7 @@ class License < ActiveRecord::Base
     prometheus_alerts
     operations_dashboard
     tracing
+    jaeger
   ].freeze
 
   # List all features available for early adopters,
