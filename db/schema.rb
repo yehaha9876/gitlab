@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180327101207) do
+ActiveRecord::Schema.define(version: 20180405101928) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -197,6 +197,7 @@ ActiveRecord::Schema.define(version: 20180327101207) do
     t.string "encrypted_external_auth_client_key_iv"
     t.string "encrypted_external_auth_client_key_pass"
     t.string "encrypted_external_auth_client_key_pass_iv"
+    t.string "email_additional_text"
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -1076,6 +1077,9 @@ ActiveRecord::Schema.define(version: 20180327101207) do
     t.integer "repositories_verification_failed_count"
     t.integer "wikis_verified_count"
     t.integer "wikis_verification_failed_count"
+    t.integer "lfs_objects_synced_missing_on_primary_count"
+    t.integer "job_artifacts_synced_missing_on_primary_count"
+    t.integer "attachments_synced_missing_on_primary_count"
   end
 
   add_index "geo_node_statuses", ["geo_node_id"], name: "index_geo_node_statuses_on_geo_node_id", unique: true, using: :btree
@@ -2078,6 +2082,17 @@ ActiveRecord::Schema.define(version: 20180327101207) do
   add_index "protected_branch_push_access_levels", ["protected_branch_id"], name: "index_protected_branch_push_access", using: :btree
   add_index "protected_branch_push_access_levels", ["user_id"], name: "index_protected_branch_push_access_levels_on_user_id", using: :btree
 
+  create_table "protected_branch_unprotect_access_levels", force: :cascade do |t|
+    t.integer "protected_branch_id", null: false
+    t.integer "access_level", default: 40
+    t.integer "user_id"
+    t.integer "group_id"
+  end
+
+  add_index "protected_branch_unprotect_access_levels", ["group_id"], name: "index_protected_branch_unprotect_access_levels_on_group_id", using: :btree
+  add_index "protected_branch_unprotect_access_levels", ["protected_branch_id"], name: "index_protected_branch_unprotect_access", using: :btree
+  add_index "protected_branch_unprotect_access_levels", ["user_id"], name: "index_protected_branch_unprotect_access_levels_on_user_id", using: :btree
+
   create_table "protected_branches", force: :cascade do |t|
     t.integer "project_id", null: false
     t.string "name", null: false
@@ -2247,6 +2262,7 @@ ActiveRecord::Schema.define(version: 20180327101207) do
     t.boolean "confidential_issues_events", default: true, null: false
     t.boolean "commit_events", default: true, null: false
     t.boolean "job_events", default: false, null: false
+    t.boolean "confidential_note_events", default: true
   end
 
   add_index "services", ["project_id"], name: "index_services_on_project_id", using: :btree
@@ -2608,6 +2624,7 @@ ActiveRecord::Schema.define(version: 20180327101207) do
     t.boolean "confidential_issues_events", default: false, null: false
     t.boolean "repository_update_events", default: false, null: false
     t.boolean "job_events", default: false, null: false
+    t.boolean "confidential_note_events"
   end
 
   add_index "web_hooks", ["project_id"], name: "index_web_hooks_on_project_id", using: :btree
@@ -2779,6 +2796,9 @@ ActiveRecord::Schema.define(version: 20180327101207) do
   add_foreign_key "protected_branch_push_access_levels", "namespaces", column: "group_id", name: "fk_7111b68cdb", on_delete: :cascade
   add_foreign_key "protected_branch_push_access_levels", "protected_branches", name: "fk_9ffc86a3d9", on_delete: :cascade
   add_foreign_key "protected_branch_push_access_levels", "users"
+  add_foreign_key "protected_branch_unprotect_access_levels", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "protected_branch_unprotect_access_levels", "protected_branches", on_delete: :cascade
+  add_foreign_key "protected_branch_unprotect_access_levels", "users", on_delete: :cascade
   add_foreign_key "protected_branches", "projects", name: "fk_7a9c6d93e7", on_delete: :cascade
   add_foreign_key "protected_tag_create_access_levels", "namespaces", column: "group_id", name: "fk_b4eb82fe3c", on_delete: :cascade
   add_foreign_key "protected_tag_create_access_levels", "protected_tags", name: "fk_f7dfda8c51", on_delete: :cascade
