@@ -611,7 +611,7 @@ describe MergeRequestPresenter do
       end
 
       it 'returns false' do
-        expect(subject).to eq false
+        is_expected.to eq false
       end
     end
 
@@ -627,7 +627,7 @@ describe MergeRequestPresenter do
         end
 
         it 'returns true' do
-          expect(subject).to eq true
+          is_expected.to eq true
         end
       end
 
@@ -638,7 +638,7 @@ describe MergeRequestPresenter do
         end
 
         it 'returns false' do
-          expect(subject).to eq false
+          is_expected.to eq false
         end
       end
     end
