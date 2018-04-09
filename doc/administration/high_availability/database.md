@@ -516,9 +516,6 @@ If the 'Role' column for any node says "FAILED", check the
      (2 rows)
      ```
 
-     **Ensure that the host IP appears in the output above as this data comes from the
-     Consul cluster.**
-
 ### Configuring the Application nodes
 
 These will be the nodes running the `gitlab-rails` service. You may have other
