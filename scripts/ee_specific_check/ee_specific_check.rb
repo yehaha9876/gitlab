@@ -2,16 +2,16 @@
 
 module EESpecificCheck
   WHITELIST = [
+    '.gitlab-ci.yml',
     'CHANGELOG-EE.md',
     'config/**/*', # https://gitlab.com/gitlab-org/gitlab-ee/issues/4946
+    'db/schema.rb',
     'doc/**/*', # https://gitlab.com/gitlab-org/gitlab-ee/issues/4948#note_59945483
+    'locale/gitlab.pot',
     'qa/**/*', # https://gitlab.com/gitlab-org/gitlab-ee/issues/4997#note_59764702
     'scripts/**/*',
-    'spec/javascripts/**/*', # https://gitlab.com/gitlab-org/gitlab-ee/issues/3871
-    'vendor/assets/javascripts/jasmine-jquery.js',
-    '.gitlab-ci.yml',
-    'db/schema.rb',
-    'locale/gitlab.pot'
+    'spec/javascripts/test_bundle.js',
+    'vendor/assets/javascripts/jasmine-jquery.js'
   ].freeze
 
   CompareBase = Struct.new(:ce_merge_base, :ee_fetch_base, :ce_updated_base)
