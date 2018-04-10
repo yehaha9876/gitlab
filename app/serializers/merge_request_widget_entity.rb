@@ -236,10 +236,6 @@ class MergeRequestWidgetEntity < IssuableEntity
     merge_request.project.ci_config_path
   end
 
-  expose :has_new_custom_ci_config_yaml do |merge_request|
-    presenter(merge_request).has_new_custom_ci_config_yaml?
-  end
-
   private
 
   delegate :current_user, to: :request
