@@ -117,6 +117,13 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     ## EE-specific
     resource :roadmap, only: [:show], controller: 'roadmap'
+
+    resources :runners, only: [:index, :edit, :update, :destroy, :show] do
+      member do
+        post :resume
+        post :pause
+      end
+    end
   end
 
   scope(path: '*id',
