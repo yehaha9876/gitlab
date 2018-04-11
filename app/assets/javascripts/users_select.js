@@ -6,6 +6,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import axios from './lib/utils/axios_utils';
 import { __ } from './locale';
+import ModalStore from './boards/stores/modal_store';
 
 // TODO: remove eventHub hack after code splitting refactor
 window.emitSidebarEvent = window.emitSidebarEvent || $.noop;
@@ -444,7 +445,7 @@ function UsersSelect(currentUser, els, options = {}) {
             return;
           }
           if ($el.closest('.add-issues-modal').length) {
-            gl.issueBoards.ModalStore.store.filter[$dropdown.data('fieldName')] = user.id;
+            ModalStore.store.filter[$dropdown.data('fieldName')] = user.id;
           } else if (handleClick) {
             e.preventDefault();
             handleClick(user, isMarking);
