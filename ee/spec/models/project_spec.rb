@@ -852,8 +852,8 @@ describe Project do
         default_branch_protection: Gitlab::Access::PROTECTION_NONE)
     end
 
-    context 'when environment is specified' do
-      let(:environment) { create(:environment, name: 'review/name') }
+    context 'when environment name is specified' do
+      let(:environment) { 'review/name' }
 
       subject do
         project.secret_variables_for(ref: 'ref', environment: environment)
@@ -938,11 +938,14 @@ describe Project do
           is_expected.not_to contain_exactly(secret_variable)
         end
 
-        it 'matches literally for _' do
-          secret_variable.update(environment_scope: 'foo_bar/*')
-          environment.update(name: 'foo_bar/test')
+        context 'when environment name contains underscore' do
+          let(:environment) { 'foo_bar/test' }
 
-          is_expected.to contain_exactly(secret_variable)
+          it 'matches literally for _' do
+            secret_variable.update(environment_scope: 'foo_bar/*')
+
+            is_expected.to contain_exactly(secret_variable)
+          end
         end
       end
 
@@ -961,11 +964,14 @@ describe Project do
           is_expected.not_to contain_exactly(secret_variable)
         end
 
-        it 'matches literally for _' do
-          secret_variable.update(environment_scope: 'foo%bar/*')
-          environment.update_attribute(:name, 'foo%bar/test')
+        context 'when environment name contains a percent' do
+          let(:environment) { 'foo%bar/test' }
 
-          is_expected.to contain_exactly(secret_variable)
+          it 'matches literally for _' do
+            secret_variable.update(environment_scope: 'foo%bar/*')
+
+            is_expected.to contain_exactly(secret_variable)
+          end
         end
       end
 
@@ -1096,6 +1102,8 @@ describe Project do
 
   shared_examples 'project with disabled services' do
     it 'has some disabled services' do
+      stub_const('License::ANY_PLAN_FEATURES', [])
+
       expect(project.disabled_services).to match_array(disabled_services)
     end
   end
@@ -1267,7 +1275,7 @@ describe Project do
 
   describe '#external_authorization_classification_label' do
     it 'falls back to the default when none is configured' do
-      enable_external_authorization_service
+      enable_external_authorization_service_check
 
       expect(build(:project).external_authorization_classification_label)
         .to eq('default_label')
@@ -1284,7 +1292,7 @@ describe Project do
     end
 
     it 'returns the classification label if it was configured on the project' do
-      enable_external_authorization_service
+      enable_external_authorization_service_check
 
       project = build(:project,
                       external_authorization_classification_label: 'hello')
@@ -1294,7 +1302,7 @@ describe Project do
     end
 
     it 'does not break when not stubbing the license check' do
-      enable_external_authorization_service
+      enable_external_authorization_service_check
       enable_namespace_license_check!
       project = build(:project)
 

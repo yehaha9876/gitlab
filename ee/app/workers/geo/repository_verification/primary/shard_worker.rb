@@ -1,7 +1,7 @@
 module Geo
   module RepositoryVerification
     module Primary
-      class ShardWorker < Geo::Scheduler::PrimaryWorker
+      class ShardWorker < Geo::Scheduler::Primary::SchedulerWorker
         sidekiq_options retry: false
 
         MAX_CAPACITY = 100
@@ -32,7 +32,7 @@ module Geo
         end
 
         def schedule_job(project_id)
-          job_id = Geo::RepositoryVerification::Primary::SingleWorker.perform_async(project_id, Time.now)
+          job_id = Geo::RepositoryVerification::Primary::SingleWorker.perform_async(project_id)
 
           { id: project_id, job_id: job_id } if job_id
         end

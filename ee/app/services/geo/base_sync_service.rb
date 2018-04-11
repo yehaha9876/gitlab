@@ -112,11 +112,6 @@ module Geo
         attrs["last_#{type}_synced_at"] = started_at
         attrs["#{type}_retry_count"] = retry_count + 1
         attrs["#{type}_retry_at"] = next_retry_time(attrs["#{type}_retry_count"])
-
-        # indicate that repository verification needs to be done again
-        attrs["#{type}_verification_checksum"] = nil
-        attrs["last_#{type}_verification_at"] = nil
-        attrs["last_#{type}_verification_failure"] = nil
       end
 
       if finished_at
@@ -125,6 +120,10 @@ module Geo
         attrs["#{type}_retry_count"] = nil
         attrs["#{type}_retry_at"] = nil
         attrs["force_to_redownload_#{type}"] = false
+
+        # Indicate that repository verification needs to be done again
+        attrs["#{type}_verification_checksum"] = nil
+        attrs["last_#{type}_verification_failure"] = nil
       end
 
       registry.update!(attrs)
@@ -179,7 +178,7 @@ module Geo
 
       log_info("Created temporary repository")
 
-      repository.clone.tap { |repo| repo.disk_path = disk_path_temp }
+      ::Repository.new(repository.full_path, repository.project, disk_path: disk_path_temp, is_wiki: repository.is_wiki)
     end
 
     def clean_up_temporary_repository
@@ -211,6 +210,8 @@ module Geo
       if repository.exists? && !gitlab_shell.mv_repository(project.repository_storage_path, repository.disk_path, deleted_disk_path_temp)
         raise Gitlab::Shell::Error, 'Can not move original repository out of the way'
       end
+
+      gitlab_shell.add_namespace(project.repository_storage_path, repository.disk_path)
 
       unless gitlab_shell.mv_repository(project.repository_storage_path, disk_path_temp, repository.disk_path)
         raise Gitlab::Shell::Error, 'Can not move temporary repository'

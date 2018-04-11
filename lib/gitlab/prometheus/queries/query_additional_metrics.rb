@@ -20,13 +20,13 @@ module Gitlab
           proc do |group|
             group[:metrics]&.map! do |metric|
               metric[:queries]&.map! do |item|
-              query = item&.[](:query) || item&.[](:query_range)
+                query = item&.[](:query) || item&.[](:query_range)
 
-              if query && alerts_map[query]
-                item[:alert_path] = ::Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alerts_map[query], format: :json)
-              end
+                if query && alerts_map[query]
+                  item[:alert_path] = ::Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alerts_map[query], format: :json)
+                end
 
-              item
+                item
               end
               metric
             end
@@ -104,7 +104,7 @@ module Gitlab
         def common_query_context(environment, timeframe_start:, timeframe_end:)
           base_query_context(timeframe_start, timeframe_end).merge({
             ci_environment_slug: environment.slug,
-            kube_namespace: environment.project.deployment_platform(environment: environment)&.actual_namespace || '',
+            kube_namespace: environment.deployment_platform&.actual_namespace || '',
             environment_filter: %{container_name!="POD",environment="#{environment.slug}"}
           })
         end

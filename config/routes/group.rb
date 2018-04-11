@@ -67,6 +67,10 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     resources :ldap_group_links, only: [:index, :create, :destroy]
 
+    resource :saml_providers, path: 'saml', only: [:show, :create, :update] do
+      get :sso, to: 'sso#saml'
+    end
+
     resource :notification_setting, only: [:update]
     resources :audit_events, only: [:index]
     resources :pipeline_quota, only: [:index]
@@ -78,12 +82,17 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     end
 
     resources :billings, only: [:index]
-    resources :epics do
+    resources :epics, concerns: :awardable, constraints: { id: /\d+/ } do
       member do
+        get :discussions, format: :json
         get :realtime_changes
       end
 
       resources :epic_issues, only: [:index, :create, :destroy, :update], as: 'issues', path: 'issues'
+
+      scope module: :epics do
+        resources :notes, only: [:index, :create, :destroy, :update], concerns: :awardable, constraints: { id: /\d+/ }
+      end
     end
 
     # On CE only index and show are needed

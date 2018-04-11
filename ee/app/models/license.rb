@@ -26,6 +26,7 @@ class License < ActiveRecord::Base
     multiple_issue_assignees
     multiple_project_issue_boards
     push_rules
+    project_creation_level
     protected_refs_for_users
     related_issues
     repository_mirrors
@@ -37,6 +38,7 @@ class License < ActiveRecord::Base
     admin_audit_log
     auditor_user
     cross_project_pipelines
+    email_additional_text
     db_load_balancing
     deploy_board
     extended_audit_events
@@ -49,16 +51,17 @@ class License < ActiveRecord::Base
     multiple_group_issue_boards
     merge_request_performance_metrics
     object_storage
+    group_saml
     service_desk
     variable_environment_scope
     reject_unsigned_commits
     commit_committer_check
-    project_creation_level
     external_authorization_service
     ci_cd_projects
   ].freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
+    dependency_scanning
     sast
     sast_container
     cluster_health
@@ -123,6 +126,13 @@ class License < ActiveRecord::Base
     'GitLab_Geo' => :geo,
     'GitLab_ServiceDesk' => :service_desk
   }.freeze
+
+  # Features added here are available for all namespaces.
+  ANY_PLAN_FEATURES = %i[
+    ci_cd_projects
+    repository_mirrors
+    github_project_service_integration
+  ].freeze
 
   # Global features that cannot be restricted to only a subset of projects or namespaces.
   # Use `License.feature_available?(:feature)` to check if these features are available.

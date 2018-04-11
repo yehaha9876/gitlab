@@ -12,6 +12,7 @@ module Gitlab
         geo_repository_sync_worker
         geo_file_download_dispatch_worker
         geo_repository_verification_secondary_scheduler_worker
+        geo_migrated_local_files_clean_up_worker
       ].freeze
 
       GEO_JOBS = (COMMON_JOBS + PRIMARY_JOBS + SECONDARY_JOBS).freeze
@@ -20,9 +21,11 @@ module Gitlab
       CONFIG_WATCHER_CLASS = 'Geo::SidekiqCronConfigWorker'.freeze
 
       def execute
-        if Geo.connected? && Geo.primary?
+        return unless Geo.connected?
+
+        if Geo.primary?
           configure_primary
-        elsif Geo.connected? && Geo.secondary?
+        elsif Geo.secondary?
           configure_secondary
         else
           enable!(all_jobs(except: GEO_JOBS))

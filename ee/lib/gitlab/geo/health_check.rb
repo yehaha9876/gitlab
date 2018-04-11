@@ -35,6 +35,11 @@ module Gitlab
         @db_migrate_path ||= File.join(Rails.root, 'ee', 'db', 'geo', 'migrate')
       end
 
+      def self.db_post_migrate_path
+        # Lazy initialisation so Rails.root will be defined
+        @db_post_migrate_path ||= File.join(Rails.root, 'ee', 'db', 'geo', 'post_migrate')
+      end
+
       def self.get_database_version
         if defined?(ActiveRecord)
           connection = ::Geo::BaseRegistry.connection
@@ -51,7 +56,7 @@ module Gitlab
       def self.get_migration_version
         latest_migration = nil
 
-        Dir[File.join(self.db_migrate_path, "[0-9]*_*.rb")].each do |f|
+        Dir[File.join(self.db_migrate_path, "[0-9]*_*.rb"), File.join(self.db_post_migrate_path, "[0-9]*_*.rb")].each do |f|
           timestamp = f.scan(/0*([0-9]+)_[_.a-zA-Z0-9]*.rb/).first.first rescue -1
 
           if latest_migration.nil? || timestamp.to_i > latest_migration.to_i
@@ -71,14 +76,15 @@ module Gitlab
       def self.db_replication_lag_seconds
         # Obtain the replication lag in seconds
         lag =
-          ActiveRecord::Base.connection.execute('
-          SELECT CASE
-                 WHEN pg_last_xlog_receive_location() = pg_last_xlog_replay_location()
-                  THEN 0
-                 ELSE
-                  EXTRACT (EPOCH FROM now() - pg_last_xact_replay_timestamp())::INTEGER
-                 END
-                 AS replication_lag')
+          ActiveRecord::Base.connection.execute(<<-SQL.squish)
+            SELECT CASE
+                   WHEN #{Gitlab::Database.pg_last_wal_receive_lsn}() = #{Gitlab::Database.pg_last_wal_receive_lsn}()
+                    THEN 0
+                   ELSE
+                    EXTRACT (EPOCH FROM now() - pg_last_xact_replay_timestamp())::INTEGER
+                   END
+                   AS replication_lag
+          SQL
           .first
           .fetch('replication_lag')
 

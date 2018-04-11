@@ -160,6 +160,18 @@ describe Geo::RepositorySyncService do
           expect(registry.last_repository_successful_sync_at).not_to be_nil
         end
 
+        it 'resets the repository_verification_checksum' do
+          subject.execute
+
+          expect(registry.repository_verification_checksum).to be_nil
+        end
+
+        it 'resets the last_repository_verification_failure' do
+          subject.execute
+
+          expect(registry.last_repository_verification_failure).to be_nil
+        end
+
         it 'logs success with timings' do
           allow(Gitlab::Geo::Logger).to receive(:info).and_call_original
           expect(Gitlab::Geo::Logger).to receive(:info).with(hash_including(:message, :update_delay_s, :download_time_s)).and_call_original
@@ -242,14 +254,21 @@ describe Geo::RepositorySyncService do
 
         expect(subject).to receive(:sync_repository).with(true).and_call_original
         expect(subject.gitlab_shell).to receive(:mv_repository).exactly(2).times.and_call_original
+
+        expect(subject.gitlab_shell).to receive(:add_namespace).with(
+          project.repository_storage_path,
+          "@failed-geo-sync/#{repository.disk_path}"
+        ).and_call_original
+
+        expect(subject.gitlab_shell).to receive(:add_namespace).with(
+          project.repository_storage_path,
+          repository.disk_path
+        ).and_call_original
+
         expect(subject.gitlab_shell).to receive(:remove_repository).exactly(2).times.and_call_original
 
         subject.execute
 
-        # gitlab-shell always appends .git to the end of the repository, so
-        # we're relying on the fact that projects can't contain + in the name
-        deleted_dir = File.join(project.repository_storage_path, project.path) + "+failed-geo-sync.git"
-        expect(File.directory?(deleted_dir)).to be false
         expect(File.directory?(project.repository.path)).to be true
       end
 

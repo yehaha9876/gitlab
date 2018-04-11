@@ -23,7 +23,6 @@
     }
 
     .btn-group {
-
       > a {
         color: $gl-text-color-secondary;
       }
@@ -405,6 +404,7 @@
 .prometheus-graph {
   flex: 1 0 auto;
   min-width: 450px;
+  max-width: 100%;
   padding: $gl-padding / 2;
 
   h5 {
@@ -413,6 +413,17 @@
 
   @media (max-width: $screen-sm-max) {
     min-width: 100%;
+  }
+}
+
+.prometheus-graph-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+
+  h3 {
+    margin: 0;
   }
 }
 
@@ -586,5 +597,63 @@
     .state-button {
       display: none;
     }
+  }
+}
+
+.alert-dropdown-button {
+  margin-left: $btn-side-margin;
+
+  .dropdown.open & {
+    background: $white-normal;
+    outline: 0;
+  }
+  
+  svg {
+    margin: 0;
+
+    + svg {
+      margin-left: -4px;
+    }
+
+    &.chevron {
+      color: $gl-text-color-secondary;
+    }
+  }
+}
+
+.alert-dropdown-menu {
+  right: 0;
+  left: auto;
+  z-index: 950; // must be higher than .popover z-index
+
+  .dropdown-title {
+    margin: 0;
+  }
+}
+
+.alert-current-setting {
+  color: $gl-text-color-disabled;
+  vertical-align: middle;
+}
+
+.alert-form {
+  padding: 16px 16px 8px;
+
+  label {
+    font-weight: normal;
+  }
+
+  .btn-group,
+  .action-group {
+    display: flex;
+    
+    .btn {
+      flex: 1 auto;
+      box-shadow: none;
+    }
+  }
+
+  .action-group .btn + .btn {
+    margin-left: 8px;
   }
 }

@@ -1,15 +1,15 @@
 import Vue from 'vue';
-import store from 'ee/ide/stores';
-import repoEditor from 'ee/ide/components/repo_editor.vue';
-import monacoLoader from 'ee/ide/monaco_loader';
-import Editor from 'ee/ide/lib/editor';
+import store from '~/ide/stores';
+import repoEditor from '~/ide/components/repo_editor.vue';
+import monacoLoader from '~/ide/monaco_loader';
+import Editor from '~/ide/lib/editor';
 import { createComponentWithStore } from '../../helpers/vue_mount_component_helper';
 import { file, resetStore } from '../helpers';
 
 describe('RepoEditor', () => {
   let vm;
 
-  beforeEach((done) => {
+  beforeEach(done => {
     const f = file();
     const RepoEditor = Vue.extend(repoEditor);
 
@@ -19,7 +19,6 @@ describe('RepoEditor', () => {
 
     f.active = true;
     f.tempFile = true;
-    f.html = 'testing';
     vm.$store.state.openFiles.push(f);
     vm.$store.state.entries[f.path] = f;
     vm.monaco = true;
@@ -39,7 +38,7 @@ describe('RepoEditor', () => {
     Editor.editorInstance.modelManager.dispose();
   });
 
-  it('renders an ide container', (done) => {
+  it('renders an ide container', done => {
     Vue.nextTick(() => {
       expect(vm.shouldHideEditor).toBeFalsy();
 
@@ -47,8 +46,63 @@ describe('RepoEditor', () => {
     });
   });
 
+  it('renders only an edit tab', done => {
+    Vue.nextTick(() => {
+      const tabs = vm.$el.querySelectorAll('.ide-mode-tabs .nav-links li');
+      expect(tabs.length).toBe(1);
+      expect(tabs[0].textContent.trim()).toBe('Edit');
+
+      done();
+    });
+  });
+
+  describe('when file is markdown', () => {
+    beforeEach(done => {
+      vm.file.previewMode = {
+        id: 'markdown',
+        previewTitle: 'Preview Markdown',
+      };
+
+      vm.$nextTick(done);
+    });
+
+    it('renders an Edit and a Preview Tab', done => {
+      Vue.nextTick(() => {
+        const tabs = vm.$el.querySelectorAll('.ide-mode-tabs .nav-links li');
+        expect(tabs.length).toBe(2);
+        expect(tabs[0].textContent.trim()).toBe('Edit');
+        expect(tabs[1].textContent.trim()).toBe('Preview Markdown');
+
+        done();
+      });
+    });
+  });
+
+  describe('when file is markdown and viewer mode is review', () => {
+    beforeEach(done => {
+      vm.file.previewMode = {
+        id: 'markdown',
+        previewTitle: 'Preview Markdown',
+      };
+      vm.$store.state.viewer = 'diff';
+
+      vm.$nextTick(done);
+    });
+
+    it('renders an Edit and a Preview Tab', done => {
+      Vue.nextTick(() => {
+        const tabs = vm.$el.querySelectorAll('.ide-mode-tabs .nav-links li');
+        expect(tabs.length).toBe(2);
+        expect(tabs[0].textContent.trim()).toBe('Review');
+        expect(tabs[1].textContent.trim()).toBe('Preview Markdown');
+
+        done();
+      });
+    });
+  });
+
   describe('when open file is binary and not raw', () => {
-    beforeEach((done) => {
+    beforeEach(done => {
       vm.file.binary = true;
 
       vm.$nextTick(done);
@@ -57,14 +111,10 @@ describe('RepoEditor', () => {
     it('does not render the IDE', () => {
       expect(vm.shouldHideEditor).toBeTruthy();
     });
-
-    it('shows activeFile html', () => {
-      expect(vm.$el.textContent).toContain('testing');
-    });
   });
 
   describe('createEditorInstance', () => {
-    it('calls createInstance when viewer is editor', (done) => {
+    it('calls createInstance when viewer is editor', done => {
       spyOn(vm.editor, 'createInstance');
 
       vm.createEditorInstance();
@@ -76,8 +126,22 @@ describe('RepoEditor', () => {
       });
     });
 
-    it('calls createDiffInstance when viewer is diff', (done) => {
+    it('calls createDiffInstance when viewer is diff', done => {
       vm.$store.state.viewer = 'diff';
+
+      spyOn(vm.editor, 'createDiffInstance');
+
+      vm.createEditorInstance();
+
+      vm.$nextTick(() => {
+        expect(vm.editor.createDiffInstance).toHaveBeenCalled();
+
+        done();
+      });
+    });
+
+    it('calls createDiffInstance when viewer is a merge request diff', done => {
+      vm.$store.state.viewer = 'mrdiff';
 
       spyOn(vm.editor, 'createDiffInstance');
 
@@ -124,7 +188,7 @@ describe('RepoEditor', () => {
       expect(vm.model.events.size).toBe(1);
     });
 
-    it('updates state when model content changed', (done) => {
+    it('updates state when model content changed', done => {
       vm.model.setValue('testing 123');
 
       setTimeout(() => {
@@ -132,6 +196,50 @@ describe('RepoEditor', () => {
 
         done();
       });
+    });
+  });
+
+  describe('setup editor for merge request viewing', () => {
+    beforeEach(done => {
+      // Resetting as the main test setup has already done it
+      vm.$destroy();
+      resetStore(vm.$store);
+      Editor.editorInstance.modelManager.dispose();
+
+      const f = {
+        ...file(),
+        active: true,
+        tempFile: true,
+        html: 'testing',
+        mrChange: { diff: 'ABC' },
+        baseRaw: 'testing',
+        content: 'test',
+      };
+      const RepoEditor = Vue.extend(repoEditor);
+      vm = createComponentWithStore(RepoEditor, store, {
+        file: f,
+      });
+
+      vm.$store.state.openFiles.push(f);
+      vm.$store.state.entries[f.path] = f;
+
+      vm.$store.state.viewer = 'mrdiff';
+
+      vm.monaco = true;
+
+      vm.$mount();
+
+      monacoLoader(['vs/editor/editor.main'], () => {
+        setTimeout(done, 0);
+      });
+    });
+
+    it('attaches merge request model to editor when merge request diff', () => {
+      spyOn(vm.editor, 'attachMergeRequestModel').and.callThrough();
+
+      vm.setupEditor();
+
+      expect(vm.editor.attachMergeRequestModel).toHaveBeenCalledWith(vm.model);
     });
   });
 });
