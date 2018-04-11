@@ -1881,6 +1881,12 @@ class Project < ActiveRecord::Base
     memoized_results[cache_key]
   end
 
+  def auto_devops_conflicts_ci_config_path?
+    return false if auto_devops.previous_changes.include?('enabled')
+
+    auto_devops.enabled? && ci_config_path.present?
+  end
+
   private
 
   def storage
