@@ -123,7 +123,7 @@ The Pages daemon doesn't listen to the outside world.
     pages_external_url 'http://example.io'
     ```
 
-1. [Reconfigure GitLab][reconfigure]
+1. [Restart GitLab][restart]
 
 Watch the [video tutorial][video-admin] for this configuration.
 
@@ -308,6 +308,6 @@ latest previous version.
 [pages-readme]: https://gitlab.com/gitlab-org/gitlab-pages/blob/master/README.md
 [pages-userguide]: ../../user/project/pages/index.md
 [reconfigure]: ../restart_gitlab.md#omnibus-gitlab-reconfigure
-[restart]: ../restart_gitlab.md#installations-from-source
+[restart]: ../restart_gitlab.md
 [gitlab-pages]: https://gitlab.com/gitlab-org/gitlab-pages/tree/v0.2.4
 [video-admin]: https://youtu.be/dD8c7WNcc6s
