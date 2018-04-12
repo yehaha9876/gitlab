@@ -72,6 +72,7 @@ From there, you can see the following actions:
 - User was added to project and with which [permissions]
 - Permission changes of a user assigned to a project
 - User was removed from project
+- Removal of a protected branch
 
 ### Instance events
 
