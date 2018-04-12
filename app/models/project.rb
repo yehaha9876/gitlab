@@ -22,6 +22,13 @@ class Project < ActiveRecord::Base
   include DeploymentPlatform
   include ::Gitlab::Utils::StrongMemoize
   include ChronicDurationAttribute
+  include IgnorableColumn
+
+  ignore_column :import_status
+  ignore_column :import_jid
+  ignore_column :mirror_last_update_at
+  ignore_column :mirror_last_successful_update_at
+  ignore_column :import_error
 
   # EE specific modules
   prepend EE::Project

@@ -1952,6 +1952,11 @@ ActiveRecord::Schema.define(version: 20180425131009) do
     t.datetime "next_execution_timestamp"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string "status"
+    t.string "jid"
+    t.datetime_with_timezone "last_update_at"
+    t.datetime_with_timezone "last_successful_update_at"
+    t.text "last_error"
   end
 
   add_index "project_mirror_data", ["next_execution_timestamp", "retry_count"], name: "index_mirror_data_on_next_execution_and_retry_count", using: :btree
@@ -1998,7 +2003,6 @@ ActiveRecord::Schema.define(version: 20180425131009) do
     t.integer "visibility_level", default: 0, null: false
     t.boolean "archived", default: false, null: false
     t.string "avatar"
-    t.string "import_status"
     t.text "merge_requests_template"
     t.integer "star_count", default: 0, null: false
     t.boolean "merge_requests_rebase_enabled", default: false
@@ -2009,10 +2013,7 @@ ActiveRecord::Schema.define(version: 20180425131009) do
     t.boolean "merge_requests_ff_only_enabled", default: false
     t.text "issues_template"
     t.boolean "mirror", default: false, null: false
-    t.datetime "mirror_last_update_at"
-    t.datetime "mirror_last_successful_update_at"
     t.integer "mirror_user_id"
-    t.text "import_error"
     t.integer "ci_id"
     t.boolean "shared_runners_enabled", default: true, null: false
     t.string "runners_token"
@@ -2039,7 +2040,6 @@ ActiveRecord::Schema.define(version: 20180425131009) do
     t.boolean "printing_merge_request_link_enabled", default: true, null: false
     t.integer "auto_cancel_pending_pipelines", default: 1, null: false
     t.boolean "service_desk_enabled", default: true
-    t.string "import_jid"
     t.integer "cached_markdown_version"
     t.text "delete_error"
     t.datetime "last_repository_updated_at"
@@ -2065,7 +2065,6 @@ ActiveRecord::Schema.define(version: 20180425131009) do
   add_index "projects", ["last_activity_at"], name: "index_projects_on_last_activity_at", using: :btree
   add_index "projects", ["last_repository_check_failed"], name: "index_projects_on_last_repository_check_failed", using: :btree
   add_index "projects", ["last_repository_updated_at"], name: "index_projects_on_last_repository_updated_at", using: :btree
-  add_index "projects", ["mirror_last_successful_update_at"], name: "index_projects_on_mirror_last_successful_update_at", using: :btree
   add_index "projects", ["name"], name: "index_projects_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
   add_index "projects", ["namespace_id"], name: "index_projects_on_namespace_id", using: :btree
   add_index "projects", ["path"], name: "index_projects_on_path", using: :btree
