@@ -20,7 +20,7 @@ module Ci
 
     before_validation :set_default_values
 
-    scope :specific, ->() { where(is_shared: false) }
+    scope :specific, ->() { where(is_shared: false, web_ide_only: false) }
     scope :shared, ->() { where(is_shared: true) }
     scope :active, ->() { where(active: true) }
     scope :paused, ->() { where(active: false) }
@@ -38,6 +38,8 @@ module Ci
       where(locked: false)
         .where.not("id IN (#{project.runners.select(:id).to_sql})").specific
     end
+
+    scope :web_ide_only, ->() { where(web_ide_only: true, is_shared: false) }
 
     validate :tag_constraints
     validates :access_level, presence: true
@@ -80,6 +82,7 @@ module Ci
     end
 
     def set_default_values
+      self.web_ide_only = false if shared?
       self.token = SecureRandom.hex(15) if self.token.blank?
     end
 
@@ -173,6 +176,10 @@ module Ci
         self.assign_attributes(values)
         self.save if self.changed?
       end
+    end
+
+    def web_ide_only?
+      self.web_ide_only && !shared?
     end
 
     private

@@ -15,9 +15,10 @@ module API
         optional :run_untagged, type: Boolean, desc: 'Should Runner handle untagged jobs'
         optional :tag_list, type: Array[String], desc: %q(List of Runner's tags)
         optional :maximum_timeout, type: Integer, desc: 'Maximum timeout set when this Runner will handle the job'
+        optional :web_ide_only, type: Boolean, default: false, desc: 'Set runner as Web IDE only. Default to false'
       end
       post '/' do
-        attributes = attributes_for_keys([:description, :locked, :run_untagged, :tag_list, :maximum_timeout])
+        attributes = attributes_for_keys([:description, :locked, :run_untagged, :tag_list, :maximum_timeout, :web_ide_only])
           .merge(get_runner_details_from_request)
 
         runner =
