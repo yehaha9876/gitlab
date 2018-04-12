@@ -73,6 +73,10 @@ module Gitlab
       nil
     end
 
+    def bytes_to_megabytes(bytes)
+      bytes.to_f / Numeric::MEGABYTE
+    end
+
     # EE below
     def try_megabytes_to_bytes(size)
       Integer(size).megabytes
