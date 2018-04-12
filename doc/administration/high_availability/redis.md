@@ -256,6 +256,29 @@ The prerequisites for a HA Redis setup are the following:
 1. Protect the nodes from access from external networks ([Internet][it]), using
    firewall.
 
+### User information
+
+Various services require different configuration to secure
+the communication as well as information required for running the service.
+Bellow you will find details on each service and the minimum required
+information you need to provide.
+
+### Redis information
+
+When using default setup, minimum configuration requires:
+
+- `REDIS_PASSWORD`. Password used for Redis authentication.
+
+Notes on the service itself:
+
+- The service runs under a system account, by default `gitlab-redis`.
+  - If you are using a different username, you will have to specify it. We
+will refer to it with `REDIS_USERNAME`,
+- Passwords will be stored in the following locations:
+  - `/etc/gitlab/gitlab.rb` in plaintext
+  - `/var/opt/gitlab/redis/redis.conf` in plaintext
+
+
 ### Step 1. Configuring the master Redis instance
 
 1. SSH into the **master** Redis server.
@@ -268,9 +291,10 @@ The prerequisites for a HA Redis setup are the following:
 1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
 
     ```ruby
-    # Specify server role as 'redis_master_role'
+    # Enable the master role and disable all other services in the machine
+    # (you can still enable Sentinel).
     roles ['redis_master_role']
-    
+
     # IP address pointing to a local IP that the other machines can reach to.
     # You can also set bind to '0.0.0.0' which listen in all interfaces.
     # If you really need to bind to an external accessible IP, make
@@ -282,9 +306,8 @@ The prerequisites for a HA Redis setup are the following:
     redis['port'] = 6379
 
     # Set up password authentication for Redis (use the same password in all nodes).
-    redis['password'] = 'redis-password-goes-here'
+    redis['password'] = 'REDIS_PASSWORD'
     ```
-    
 
 1. Only the primary GitLab application server should handle migrations. To
    prevent database migrations from running on upgrade, add the following
@@ -312,9 +335,11 @@ The prerequisites for a HA Redis setup are the following:
 1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
 
     ```ruby
-    # Specify server role as 'redis_slave_role'
+    # Enable the slave role and disable all other services in the machine
+    # (you can still enable Sentinel). This will also set automatically
+    # `redis['master'] = false`.
     roles ['redis_slave_role']
-    
+
     # IP address pointing to a local IP that the other machines can reach to.
     # You can also set bind to '0.0.0.0' which listen in all interfaces.
     # If you really need to bind to an external accessible IP, make
@@ -325,8 +350,8 @@ The prerequisites for a HA Redis setup are the following:
     # machines to connect to it.
     redis['port'] = 6379
 
-    # The same password for Redeis authentication you set up for the master node.
-    redis['password'] = 'redis-password-goes-here'
+    # The same password for Redis authentication you set up for the master node.
+    redis['password'] = 'REDIS_PASSWORD'
 
     # The IP of the master Redis node.
     redis['master_ip'] = '10.0.0.1'
@@ -336,11 +361,13 @@ The prerequisites for a HA Redis setup are the following:
     #redis['master_port'] = 6379
     ```
 
-1. To prevent reconfigure from running automatically on upgrade, run:
+1. To prevent database migrations from running on upgrade, run:
 
     ```
     sudo touch /etc/gitlab/skip-auto-migrations
     ```
+
+    Only the primary GitLab application server should handle migrations.
 
 1. [Reconfigure Omnibus GitLab][reconfigure] for the changes to take effect.
 1. Go through the steps again for all the other slave nodes.
@@ -402,7 +429,7 @@ multiple machines with the Sentinel daemon.
     redis['master_name'] = 'gitlab-redis'
 
     # The same password for Redis authentication you set up for the master node.
-    redis['password'] = 'redis-password-goes-here'
+    redis['password'] = 'REDIS_PASSWORD'
 
     # The IP of the master Redis node.
     redis['master_ip'] = '10.0.0.1'
@@ -432,7 +459,7 @@ multiple machines with the Sentinel daemon.
     ##    able to talk with the master.
     ## 1. If a quorum is set to a value greater than the majority of Sentinels, we are
     ##    making Sentinel able to failover only when there are a very large number (larger
-    ##    than majority) of well connected Sentinels which agree about the master being down.s
+    ##    than majority) of well connected Sentinels which agree about the master being down.
     sentinel['quorum'] = 2
 
     ## Consider unresponsive server down after x amount of ms.
@@ -471,6 +498,34 @@ multiple machines with the Sentinel daemon.
 1. [Reconfigure Omnibus GitLab][reconfigure] for the changes to take effect.
 1. Go through the steps again for all the other Sentinel nodes.
 
+### Redis Checkpoint
+
+To make sure Redis is configured correctly. Run the following
+command to verify all server nodes are communicating:
+
+```
+/opt/gitlab/embedded/bin/redis-cli -h redis-master-ip|redis-slave-ip -a 'REDIS_PASSWORD' info replication
+```
+
+The output should be similar to:
+
+```
+# Replication
+role:master
+connected_slaves:2
+slave0:ip=10.6.0.26,port=6379,state=online,offset=1950374,lag=1
+slave1:ip=10.6.0.25,port=6379,state=online,offset=1950511,lag=1
+master_repl_offset:1950511
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:901936
+repl_backlog_histlen:1048576
+```
+
+If any of the nodes aren't recognised or missing,
+check the [Troubleshooting Replication](#troubleshooting-replication) before proceeding.
+
+
 ### Step 4. Configuring the GitLab application
 
 The final part is to inform the main GitLab application server of the Redis
@@ -495,7 +550,7 @@ which ideally should not have Redis or Sentinels on it for a HA setup.
     redis['master_name'] = 'gitlab-redis'
 
     ## The same password for Redis authentication you set up for the master node.
-    redis['master_password'] = 'redis-password-goes-here'
+    redis['master_password'] = 'REDIS_PASSWORD'
 
     ## A list of sentinels with `host` and `port`
     gitlab_rails['redis_sentinels'] = [
@@ -572,9 +627,9 @@ In `/etc/gitlab/gitlab.rb`:
 roles ['redis_sentinel_role', 'redis_master_role']
 redis['bind'] = '10.0.0.1'
 redis['port'] = 6379
-redis['password'] = 'redis-password-goes-here'
+redis['password'] = 'REDIS_PASSWORD'
 redis['master_name'] = 'gitlab-redis' # must be the same in every sentinel node
-redis['master_password'] = 'redis-password-goes-here' # the same value defined in redis['password'] in the master instance
+redis['master_password'] = 'REDIS_PASSWORD' # the same value defined in redis['password'] in the master instance
 redis['master_ip'] = '10.0.0.1' # ip of the initial master redis instance
 #redis['master_port'] = 6379 # port of the initial master redis instance, uncomment to change to non default
 sentinel['bind'] = '10.0.0.1'
@@ -594,8 +649,8 @@ In `/etc/gitlab/gitlab.rb`:
 roles ['redis_sentinel_role', 'redis_slave_role']
 redis['bind'] = '10.0.0.2'
 redis['port'] = 6379
-redis['password'] = 'redis-password-goes-here'
-redis['master_password'] = 'redis-password-goes-here'
+redis['password'] = 'REDIS_PASSWORD'
+redis['master_password'] = 'REDIS_PASSWORD'
 redis['master_ip'] = '10.0.0.1' # IP of master Redis server
 #redis['master_port'] = 6379 # Port of master Redis server, uncomment to change to non default
 redis['master_name'] = 'gitlab-redis' # must be the same in every sentinel node
@@ -616,8 +671,8 @@ In `/etc/gitlab/gitlab.rb`:
 roles ['redis_sentinel_role', 'redis_slave_role']
 redis['bind'] = '10.0.0.3'
 redis['port'] = 6379
-redis['password'] = 'redis-password-goes-here'
-redis['master_password'] = 'redis-password-goes-here'
+redis['password'] = 'REDIS_PASSWORD'
+redis['master_password'] = 'REDIS_PASSWORD'
 redis['master_ip'] = '10.0.0.1' # IP of master Redis server
 #redis['master_port'] = 6379 # Port of master Redis server, uncomment to change to non default
 redis['master_name'] = 'gitlab-redis' # must be the same in every sentinel node
@@ -636,7 +691,7 @@ In `/etc/gitlab/gitlab.rb`:
 
 ```ruby
 redis['master_name'] = 'gitlab-redis'
-redis['master_password'] = 'redis-password-goes-here'
+redis['password'] = 'REDIS_PASSWORD'
 gitlab_rails['redis_sentinels'] = [
   {'host' => '10.0.0.1', 'port' => 26379},
   {'host' => '10.0.0.2', 'port' => 26379},
@@ -800,7 +855,7 @@ To make sure your configuration is correct:
 
     ```bash
     # port must match your master redis port, and the sleep time must be a few seconds bigger than defined one
-     redis-cli -h localhost -p 6379 DEBUG sleep 20
+     redis-cli -h localhost|redis-current-master-ip -p 6379 DEBUG sleep 20
     ```
 
 1. Then back in the Rails console from the first step, run:
