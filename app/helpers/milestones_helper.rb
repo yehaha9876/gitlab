@@ -109,7 +109,6 @@ module MilestonesHelper
     end
   end
 
-  # TODO: This should be renamed to be clearer amongst other tooltip helper methods
   def milestone_tooltip_title(milestone)
     if milestone
       [
