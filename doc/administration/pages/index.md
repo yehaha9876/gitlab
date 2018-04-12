@@ -154,7 +154,7 @@ outside world.
     where `pages-nginx.crt` and `pages-nginx.key` are the SSL cert and key,
     respectively.
 
-1. [Reconfigure GitLab][reconfigure]
+1. [Restart GitLab][restart]
 
 ## Advanced configuration
 
@@ -191,7 +191,7 @@ world. Custom domains are supported, but no TLS.
     `1.1.1.2` and `2001::2` are the secondary IPs the GitLab Pages daemon
     listens on. If you don't have IPv6, you can omit the IPv6 address.
 
-1. [Reconfigure GitLab][reconfigure]
+1. [Restart GitLab][restart]
 
 ### Custom domains with TLS support
 
@@ -224,7 +224,7 @@ world. Custom domains and TLS are supported.
     `1.1.1.2` and `2001::2` are the secondary IPs where the GitLab Pages daemon
     listens on. If you don't have IPv6, you can omit the IPv6 address.
 
-1. [Reconfigure GitLab][reconfigure]
+1. [Restart GitLab][restart]
 
 ### Custom domain verification
 
@@ -251,7 +251,7 @@ are stored.
      gitlab_rails['pages_path'] = "/mnt/storage/pages"
      ```
 
-1. [Reconfigure GitLab][reconfigure]
+1. [Restart GitLab][restart]
 
 ## Set maximum pages size
 
