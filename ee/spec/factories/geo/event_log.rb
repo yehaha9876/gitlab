@@ -53,6 +53,10 @@ FactoryBot.define do
     source 0
     branches_affected 0
     tags_affected 0
+
+    trait :with_event_log do
+      event_log factory: :geo_event_log
+    end
   end
 
   factory :geo_repository_deleted_event, class: Geo::RepositoryDeletedEvent do

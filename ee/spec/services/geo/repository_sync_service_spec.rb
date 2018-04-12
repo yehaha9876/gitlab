@@ -128,6 +128,20 @@ describe Geo::RepositorySyncService do
       expect(registry.reload.last_repository_successful_sync_at).not_to be nil
     end
 
+    it 'does not mark repo as synced if there is a new event to handle' do
+      registry = create(:geo_project_registry, project: project)
+
+      expect(repository).to receive(:fetch_as_mirror) do
+        # Simulate a case when event is created during the sync
+        create(:geo_repository_updated_event, :with_event_log, project: project)
+      end
+
+      subject.execute
+
+      expect(registry.reload.resync_repository).to be true
+      expect(registry.reload.last_repository_successful_sync_at).not_to be nil
+    end
+
     context 'tracking database' do
       context 'temporary repositories' do
         include_examples 'cleans temporary repositories' do

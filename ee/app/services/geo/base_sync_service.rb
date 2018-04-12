@@ -26,6 +26,7 @@ module Geo
     def execute
       try_obtain_lease do
         log_info("Started #{type} sync")
+        @sync_started_at = Time.now
 
         if should_be_retried?
           sync_repository
@@ -116,7 +117,7 @@ module Geo
 
       if finished_at
         attrs["last_#{type}_successful_sync_at"] = finished_at
-        attrs["resync_#{type}"] = false
+        attrs["resync_#{type}"] = any_more_recent_event?
         attrs["#{type}_retry_count"] = nil
         attrs["#{type}_retry_at"] = nil
         attrs["force_to_redownload_#{type}"] = false
@@ -127,6 +128,19 @@ module Geo
       end
 
       registry.update!(attrs)
+    end
+
+    # The intention of this method is to prevent a race condition when event is created during the sync.
+    # See https://gitlab.com/gitlab-org/gitlab-ee/issues/5489
+    def any_more_recent_event?
+      Geo::RepositoryUpdatedEvent
+        .joins(:event_log)
+        .where(
+          project: project,
+          source: Geo::RepositoryUpdatedEvent.sources[type]
+        )
+        .where('geo_event_log.created_at > ?', @sync_started_at)
+        .any?
     end
 
     def fail_registry!(message, error, attrs = {})
