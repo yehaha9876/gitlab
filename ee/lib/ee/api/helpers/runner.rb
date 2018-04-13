@@ -28,8 +28,8 @@ module EE
           super
         end
 
-        override :runner_register_attribute_keys
-        def runner_register_attribute_keys(project = nil)
+        override :runner_create_attribute_keys
+        def runner_create_attribute_keys(project = nil)
           super.tap do |attributes|
             attributes << :web_ide_only if ide_enabled?(project)
           end

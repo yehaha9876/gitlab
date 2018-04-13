@@ -42,6 +42,29 @@ describe API::Runner do
           expect(runner.token).not_to eq(registration_token)
         end
 
+        ## EE specific
+        context 'with IDE license feature' do
+          context 'available' do
+            it 'adds web_ide_only field' do
+              stub_licensed_features(ide: true)
+
+              expect(Ci::Runner).to receive(:create).with('web_ide_only' => true, 'ip_address' => '127.0.0.1', 'is_shared' => true)
+
+              post api('/runners'), token: registration_token, web_ide_only: true
+            end
+          end
+
+          context 'not available' do
+            it 'does not add web_ide_only field' do
+              stub_licensed_features(ide: false)
+
+              expect(Ci::Runner).to receive(:create).with(hash_excluding('web_ide_only' => true))
+
+              post api('/runners'), token: registration_token, web_ide_only: true
+            end
+          end
+        end
+
         context 'when project token is used' do
           let(:project) { create(:project) }
 
@@ -52,6 +75,33 @@ describe API::Runner do
             expect(project.runners.size).to eq(1)
             expect(Ci::Runner.first.token).not_to eq(registration_token)
             expect(Ci::Runner.first.token).not_to eq(project.runners_token)
+          end
+
+          ## EE specific
+          context 'with IDE license feature' do
+            context 'available' do
+              it 'adds web_ide_only field' do
+                stub_licensed_features(ide: true)
+
+                post api('/runners'), token: project.runners_token, web_ide_only: true
+
+                runner = Ci::Runner.first
+
+                expect(runner.web_ide_only).to be_truthy
+              end
+            end
+
+            context 'not available' do
+              it 'does not add web_ide_only field' do
+                stub_licensed_features(ide: false)
+
+                post api('/runners'), token: project.runners_token, web_ide_only: true
+
+                runner = Ci::Runner.first
+
+                expect(runner.web_ide_only).to be_falsey
+              end
+            end
           end
         end
       end

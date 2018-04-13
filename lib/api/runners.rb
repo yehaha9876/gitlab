@@ -15,16 +15,16 @@ module API
         optional :access_level, type: String, values: Ci::Runner.access_levels.keys,
                                 desc: 'The access_level of the runner'
         optional :maximum_timeout, type: Integer, desc: 'Maximum timeout set when this Runner will handle the job'
-        at_least_one_of :description, :active, :tag_list, :run_untagged, :locked, :access_level
       end
 
       params :runner_params_ee do
-        optional :web_ide_only, type: Boolean, default: false, desc: 'Set runner as Web IDE only. Default to false'
+        optional :web_ide_only, type: Boolean, desc: 'Set runner as Web IDE only. Default to false'
       end
 
       params :runner_params do
         use :runner_params_ce
         use :runner_params_ee
+        at_least_one_of(*(@declared_params - [:id]))
       end
     end
 

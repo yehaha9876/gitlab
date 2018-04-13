@@ -3,7 +3,7 @@ require 'spec_helper'
 describe API::Runners do
   let(:admin) { create(:user, :admin) }
   let(:user) { create(:user) }
-  let(:user2) { create(:user) }
+  let!(:user2) { create(:user) }
 
   let(:project) { create(:project, creator_id: user.id) }
   let(:project2) { create(:project, creator_id: user.id) }
@@ -181,8 +181,35 @@ describe API::Runners do
   end
 
   describe 'PUT /runners/:id' do
+    ## EE specific
+    shared_examples 'with IDE license feature' do
+      context 'available' do
+        it 'updates web_ide_only field' do
+          stub_licensed_features(ide: true)
+
+          expect_any_instance_of(Ci::UpdateRunnerService).to receive(:update).with(web_ide_only: true)
+
+          update_runner(runner.id, admin, web_ide_only: true)
+        end
+      end
+
+      context 'not available' do
+        it 'does not update web_ide_only field' do
+          stub_licensed_features(ide: false)
+
+          expect_any_instance_of(Ci::UpdateRunnerService).to receive(:update).with(hash_excluding(web_ide_only: true))
+
+          update_runner(runner.id, admin, web_ide_only: true)
+        end
+      end
+    end
+
     context 'admin user' do
       context 'when runner is shared' do
+        it_behaves_like 'with IDE license feature' do
+          let(:runner) { shared_runner }
+        end
+
         it 'updates runner' do
           description = shared_runner.description
           active = shared_runner.active
@@ -211,6 +238,11 @@ describe API::Runners do
       end
 
       context 'when runner is not shared' do
+        it_behaves_like 'with IDE license feature' do
+          let(:user) { admin }
+          let(:runner) { specific_runner }
+        end
+
         it 'updates runner' do
           description = specific_runner.description
           runner_queue_value = specific_runner.ensure_runner_queue_value

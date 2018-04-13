@@ -35,10 +35,10 @@ module API
         runner =
           if runner_registration_token_valid?
             # Create shared runner. Requires admin access
-            Ci::Runner.create(runner_register_attributes.merge(is_shared: true))
+            Ci::Runner.create(runner_create_attributes.merge(is_shared: true))
           elsif project = Project.find_by(runners_token: params[:token])
             # Create a specific runner for project.
-            project.runners.create(runner_register_attributes(project))
+            project.runners.create(runner_create_attributes(project))
           end
 
         break forbidden! unless runner

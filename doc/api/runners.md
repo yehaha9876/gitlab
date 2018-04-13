@@ -209,6 +209,7 @@ PUT /runners/:id
 | `locked`    | boolean   | no       | Flag indicating the runner is locked |
 | `access_level`    | string   | no       | The access_level of the runner; `not_protected` or `ref_protected` |
 | `maximum_timeout` | integer | no | Maximum timeout set when this Runner will handle the job |
+| `web_ide_only`    | boolean   | no       | Set runner as Web IDE only. Default to false (Only [GitLab Ultimate](https://about.gitlab.com/products/)) |
 
 ```
 curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/runners/6" --form "description=test-1-20150125-test" --form "tag_list=ruby,mysql,tag1,tag2"
