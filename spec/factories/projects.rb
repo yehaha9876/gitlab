@@ -61,45 +61,61 @@ FactoryBot.define do
       visibility_level Gitlab::VisibilityLevel::PRIVATE
     end
 
-    trait :import_none do
-      import_status :none
-    end
-
     trait :import_scheduled do
-      import_status :scheduled
+      transient do
+        status :scheduled
+      end
 
       after(:create) do |project, _|
-        project.mirror_data&.update_attributes(last_update_scheduled_at: Time.now)
+        project.import_state.create!(last_update_scheduled_at: Time.now)
       end
     end
 
     trait :import_started do
-      import_status :started
+      transient do
+        status :started
+      end
 
       after(:create) do |project, _|
-        project.mirror_data&.update_attributes(last_update_started_at: Time.now)
+        project.import_state.create!(last_update_started_at: Time.now)
       end
     end
 
     trait :import_finished do
       timestamp = Time.now
 
-      import_status :finished
-      mirror_last_update_at timestamp
-      mirror_last_successful_update_at timestamp
+      transient do
+        status :finished
+      end
+
+      after(:create) do |project, _|
+        project.import_state.create!(
+          last_update_at: timestamp,
+          last_successful_update_at: timestamp
+        )
+      end
     end
 
     trait :import_failed do
-      import_status :failed
-      mirror_last_update_at { Time.now }
+      transient do
+        status :failed
+      end
+
+      after(:create) do |project, _|
+        project.import_state.create!(last_update_at: Time.now)
+      end
     end
 
     trait :import_hard_failed do
-      import_status :failed
-      mirror_last_update_at { Time.now - 1.minute }
+      transient do
+        status :failed
+      end
 
       after(:create) do |project|
-        project.mirror_data&.update_attributes(retry_count: Gitlab::Mirror::MAX_RETRY + 1)
+        project.import_state&.update_attributes(
+          retry_count: Gitlab::Mirror::MAX_RETRY + 1,
+          last_update_at: Time.now - 1.minute
+        )
       end
     end
 

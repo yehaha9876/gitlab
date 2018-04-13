@@ -56,7 +56,7 @@ class RepositoryUpdateMirrorWorker
 
       true
     else
-      Rails.logger.info("Project #{project.full_path} was in inconsistent state: #{project.import_status}")
+      Rails.logger.info("Project #{project.full_path} was in inconsistent state: #{project.import_state.status}")
       false
     end
   end

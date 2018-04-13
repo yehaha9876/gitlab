@@ -14,7 +14,12 @@ describe Gitlab::GithubImport::RefreshImportJidWorker do
   end
 
   describe '#perform' do
-    let(:project) { create(:project, import_jid: '123abc') }
+    let(:project) { create(:project) }
+
+    # TODO: make sure this spec works
+    before do
+      project.import_state.jid = '123abc'
+    end
 
     context 'when the project does not exist' do
       it 'does nothing' do
@@ -76,8 +81,14 @@ describe Gitlab::GithubImport::RefreshImportJidWorker do
     end
 
     it 'only selects the import JID field' do
-      project = create(:project, import_status: 'started', import_jid: '123abc')
+      project = create(:project, import_status: 'started')
 
+      # TODO: Make sure this spec works
+      before do
+        project.import_state.jid = '123abc'
+      end
+
+      # TODO: Explore a solution to this
       expect(worker.find_project(project.id).attributes)
         .to eq({ 'id' => nil, 'import_jid' => '123abc' })
     end

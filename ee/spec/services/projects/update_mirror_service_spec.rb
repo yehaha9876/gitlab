@@ -12,7 +12,7 @@ describe Projects::UpdateMirrorService do
       end
 
       it 'does nothing' do
-        allow_any_instance_of(EE::Project).to receive(:destroy_mirror_data)
+        allow_any_instance_of(EE::Project).to receive(:destroy_import_state)
 
         expect(project).not_to receive(:fetch_mirror)
 

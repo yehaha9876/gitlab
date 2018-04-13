@@ -1,8 +1,12 @@
 require 'spec_helper'
 
 describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_state do
-  let(:project) { create(:project, import_jid: '123') }
+  let(:project) { create(:project) }
   let(:worker) { described_class.new }
+
+  before do
+    project.import_state.jid = '123'
+  end
 
   describe '#perform' do
     context 'when the project no longer exists' do
@@ -103,6 +107,7 @@ describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_st
 
       expect(found).to be_an_instance_of(Project)
 
+      # TODO: Make sure this works here
       # This test is there to make sure we only select the columns we care
       # about.
       expect(found.attributes).to eq({ 'id' => nil, 'import_jid' => '123' })

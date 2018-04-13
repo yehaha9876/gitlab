@@ -50,7 +50,7 @@ class RepositoryForkWorker
   def start_fork(project)
     return true if start(project)
 
-    Rails.logger.info("Project #{project.full_path} was in inconsistent state (#{project.import_status}) while forking.")
+    Rails.logger.info("Project #{project.full_path} was in inconsistent state (#{project.import_state.status}) while forking.")
     false
   end
 end

@@ -54,7 +54,7 @@ class GithubImport
       puts "Import finished. Timings: #{timings}".color(:green)
     else
       puts "Import was not successful. Errors were as follows:"
-      puts @project.import_error
+      puts @project.import_state.last_error
     end
   end
 

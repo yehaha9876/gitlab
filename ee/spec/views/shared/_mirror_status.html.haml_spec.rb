@@ -42,7 +42,7 @@ describe 'shared/_mirror_status.html.haml' do
 
     context 'with a previous successful update' do
       it 'renders failure message' do
-        @project.mirror_last_successful_update_at = Time.now - 1.minute
+        @project.import_state.last_successful_update_at = Time.now - 1.minute
 
         render 'shared/mirror_status', raw_message: true
 
@@ -52,7 +52,7 @@ describe 'shared/_mirror_status.html.haml' do
 
     context 'with a hard failed mirror' do
       it 'renders hard failed message' do
-        @project.mirror_data.retry_count = Gitlab::Mirror::MAX_RETRY + 1
+        @project.import_state.retry_count = Gitlab::Mirror::MAX_RETRY + 1
 
         render 'shared/mirror_status', raw_message: true
 

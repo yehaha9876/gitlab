@@ -62,12 +62,13 @@ module Gitlab
         end
       end
 
+      # TODO: Check if this method works
       def find_project(id)
         # We only care about the import JID so we can refresh it. We also only
         # want the project if it hasn't been marked as failed yet. It's possible
         # the import gets marked as stuck when jobs of the current stage failed
         # somehow.
-        Project.select(:import_jid).import_started.find_by(id: id)
+        Project.with_import_state.select(:"import_state.jid").import_started.find_by(id: id)
       end
     end
   end

@@ -30,12 +30,12 @@ feature 'Project mirror', :js do
       let(:timestamp) { Time.now }
 
       before do
-        project.mirror_data.update_attributes(next_execution_timestamp: timestamp + 10.minutes)
+        project.import_state.update_attributes(next_execution_timestamp: timestamp + 10.minutes)
       end
 
       context 'when able to force update' do
         it 'forces import' do
-          project.update_attributes(mirror_last_update_at: timestamp - 8.minutes)
+          project.import_state.update_attributes(last_update_at: timestamp - 8.minutes)
 
           expect_any_instance_of(EE::Project).to receive(:force_import_job!)
 
@@ -49,7 +49,7 @@ feature 'Project mirror', :js do
 
       context 'when unable to force update' do
         it 'does not force import' do
-          project.update_attributes(mirror_last_update_at: timestamp - 3.minutes)
+          project.import_state.update_attributes(last_update_at: timestamp - 3.minutes)
 
           expect_any_instance_of(EE::Project).not_to receive(:force_import_job!)
 

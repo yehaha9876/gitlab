@@ -38,7 +38,7 @@ class RepositoryImportWorker
   def start_import(project)
     return true if start(project)
 
-    Rails.logger.info("Project #{project.full_path} was in inconsistent state (#{project.import_status}) while importing.")
+    Rails.logger.info("Project #{project.full_path} was in inconsistent state (#{project.import_state.status}) while importing.")
     false
   end
 

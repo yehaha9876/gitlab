@@ -53,7 +53,10 @@ class Import::FogbugzController < Import::BaseController
   end
 
   def jobs
-    jobs = current_user.created_projects.where(import_type: 'fogbugz').to_json(only: [:id, :import_status])
+    jobs = current_user.created_projects
+                       .with_import_state
+                       .where(import_type: 'fogbugz')
+                       .to_json(only: [:id], include: { import_state: { only: [:status] } })
     render json: jobs
   end
 

@@ -364,6 +364,7 @@ describe Gitlab::Database::MigrationHelpers do
       end
 
       it 'updates all the rows in a table' do
+        # TODO: check if this needs to be changed
         model.update_column_in_batches(:projects, :import_error, 'foo')
 
         expect(Project.where(import_error: 'foo').count).to eq(5)

@@ -1630,7 +1630,7 @@ describe Project do
 
     context 'when project is not a mirror' do
       it 'returns the sanitized URL' do
-        project = create(:project, import_status: 'started', import_url: 'http://user:pass@test.com')
+        project = create(:project, :import_started, import_url: 'http://user:pass@test.com')
 
         project.import_finish
 
@@ -1767,8 +1767,8 @@ describe Project do
     it 'imports a project' do
       expect_any_instance_of(RepositoryImportWorker).to receive(:perform).and_call_original
 
-      expect { project.import_schedule }.to change { project.import_jid }
-      expect(project.reload.import_status).to eq('finished')
+      expect { project.import_schedule }.to change { project.import_state.jid }
+      expect(project.import_state.reload.status).to eq('finished')
     end
 
     context 'with a mirrored project' do
@@ -1779,7 +1779,7 @@ describe Project do
         expect_any_instance_of(EE::Project).to receive(:force_import_job!)
         expect_any_instance_of(RepositoryImportWorker).to receive(:perform).with(project.id).and_call_original
 
-        expect { project.import_schedule }.to change { project.import_jid }
+        expect { project.import_schedule }.to change { project.import_state.jid }
       end
     end
   end
@@ -1802,9 +1802,10 @@ describe Project do
 
       it 'resets project import_error' do
         error_message = 'Some error'
-        mirror = create(:project_empty_repo, :import_started, import_error: error_message)
+        mirror = create(:project_empty_repo, :import_started)
+        mirror.import_state.update_attributes(last_error: error_message)
 
-        expect { mirror.import_finish }.to change { mirror.import_error }.from(error_message).to(nil)
+        expect { mirror.import_finish }.to change { mirror.import_state.last_error }.from(error_message).to(nil)
       end
 
       it 'performs housekeeping when an import of a fresh project is completed' do
@@ -2547,11 +2548,11 @@ describe Project do
     end
   end
 
-  describe '#create_mirror_data' do
+  describe '#create_import_state' do
     it 'it is called after save' do
       project = create(:project)
 
-      expect(project).to receive(:create_mirror_data)
+      expect(project).to receive(:create_import_state)
 
       project.update(mirror: true, mirror_user: project.owner, import_url: 'http://foo.com')
     end
@@ -3646,7 +3647,10 @@ describe Project do
 
     context 'with an import JID' do
       it 'unsets the import JID' do
-        project = create(:project, import_jid: '123')
+        project = create(:project)
+
+        # TODO: make sure this works
+        project.import_state.jid = '123'
 
         expect(Gitlab::SidekiqStatus)
           .to receive(:unset)
@@ -3655,7 +3659,7 @@ describe Project do
 
         project.remove_import_jid
 
-        expect(project.import_jid).to be_nil
+        expect(project.import_state.jid).to be_nil
       end
     end
   end

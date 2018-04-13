@@ -13,7 +13,7 @@ describe Project do
     it { is_expected.to delegate_method(:shared_runners_minutes_limit_enabled?).to(:shared_runners_limit_namespace) }
     it { is_expected.to delegate_method(:shared_runners_minutes_used?).to(:shared_runners_limit_namespace) }
 
-    it { is_expected.to have_one(:mirror_data).class_name('ProjectMirrorData') }
+    it { is_expected.to have_one(:import_state).class_name('ProjectMirrorData') }
     it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState').inverse_of(:project) }
 
     it { is_expected.to have_many(:path_locks) }
@@ -75,7 +75,7 @@ describe Project do
       end
 
       it 'returns empty if next_execution_timestamp is in the future' do
-        project.mirror_data.update_attributes(next_execution_timestamp: timestamp + 2.minutes)
+        project.import_state.update_attributes(next_execution_timestamp: timestamp + 2.minutes)
 
         expect(described_class.mirrors_to_sync(timestamp)).to be_empty
       end
@@ -89,7 +89,7 @@ describe Project do
       end
 
       it 'returns empty if next_execution_timestamp is in the future' do
-        project.mirror_data.update_attributes(next_execution_timestamp: timestamp + 2.minutes)
+        project.import_state.update_attributes(next_execution_timestamp: timestamp + 2.minutes)
 
         expect(described_class.mirrors_to_sync(timestamp)).to be_empty
       end
@@ -119,7 +119,7 @@ describe Project do
   describe 'hard failing a mirror' do
     it 'sends a notification' do
       project = create(:project, :mirror, :import_started)
-      project.mirror_data.update_attributes(retry_count: Gitlab::Mirror::MAX_RETRY)
+      project.import_state.update_attributes(retry_count: Gitlab::Mirror::MAX_RETRY)
 
       expect_any_instance_of(EE::NotificationService).to receive(:mirror_was_hard_failed).with(project)
 
@@ -316,7 +316,7 @@ describe Project do
       expect(UpdateAllMirrorsWorker).to receive(:perform_async)
 
       Timecop.freeze(timestamp) do
-        expect { project.force_import_job! }.to change(project.mirror_data, :next_execution_timestamp).to(timestamp)
+        expect { project.force_import_job! }.to change(project.import_state, :next_execution_timestamp).to(timestamp)
       end
     end
 
@@ -328,8 +328,8 @@ describe Project do
         expect(UpdateAllMirrorsWorker).to receive(:perform_async)
 
         Timecop.freeze(timestamp) do
-          expect { project.force_import_job! }.to change(project.mirror_data, :retry_count).to(0)
-          expect(project.mirror_data.next_execution_timestamp).to eq(timestamp)
+          expect { project.force_import_job! }.to change(project.import_state, :retry_count).to(0)
+          expect(project.import_state.next_execution_timestamp).to eq(timestamp)
         end
       end
     end
@@ -366,9 +366,9 @@ describe Project do
   describe '#mirror_waiting_duration' do
     it 'returns in seconds the time spent in the queue' do
       project = create(:project, :mirror, :import_scheduled)
-      mirror_data = project.mirror_data
+      import_state = project.import_state
 
-      mirror_data.update_attributes(last_update_started_at: mirror_data.last_update_scheduled_at + 5.minutes)
+      import_state.update_attributes(last_update_started_at: import_state.last_update_scheduled_at + 5.minutes)
 
       expect(project.mirror_waiting_duration).to eq(300)
     end
@@ -378,7 +378,7 @@ describe Project do
     it 'returns in seconds the time spent updating' do
       project = create(:project, :mirror, :import_started)
 
-      project.update_attributes(mirror_last_update_at: project.mirror_data.last_update_started_at + 5.minutes)
+      project.import_state.update_attributes(last_update_at: project.import_state.last_update_started_at + 5.minutes)
 
       expect(project.mirror_update_duration).to eq(300)
     end
@@ -389,8 +389,8 @@ describe Project do
       it 'returns true' do
         timestamp = Time.now
         project = create(:project, :mirror, :import_finished, :repository)
-        project.mirror_last_update_at = timestamp - 3.minutes
-        project.mirror_data.next_execution_timestamp = timestamp - 2.minutes
+        project.import_state.last_update_at = timestamp - 3.minutes
+        project.import_state.next_execution_timestamp = timestamp - 2.minutes
 
         expect(project.mirror_about_to_update?).to be true
       end
@@ -521,12 +521,12 @@ describe Project do
       let(:timestamp) { Time.now }
 
       before do
-        project.mirror_last_update_at = timestamp
+        project.import_state.last_update_at = timestamp
       end
 
       context 'when last update time equals the time of the last successful update' do
         it 'returns success' do
-          project.mirror_last_successful_update_at = timestamp
+          project.import_state.last_successful_update_at = timestamp
 
           expect(project.mirror_last_update_status).to eq(:success)
         end
@@ -534,7 +534,7 @@ describe Project do
 
       context 'when last update time does not equal the time of the last successful update' do
         it 'returns failed' do
-          project.mirror_last_successful_update_at = Time.now - 1.minute
+          project.import_state.last_successful_update_at = Time.now - 1.minute
 
           expect(project.mirror_last_update_status).to eq(:failed)
         end

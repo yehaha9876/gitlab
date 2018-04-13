@@ -12,7 +12,11 @@ describe RepositoryImportWorker do
 
     context 'when worker was reset without cleanup' do
       let(:jid) { '12345678' }
-      let(:started_project) { create(:project, :import_started, import_jid: jid) }
+      let(:started_project) { create(:project, :import_started) }
+
+      before do
+        started_project.import_state.jid = jid
+      end
 
       it 'imports the project successfully' do
         allow(subject).to receive(:jid).and_return(jid)
@@ -57,26 +61,27 @@ describe RepositoryImportWorker do
       it 'hide the credentials that were used in the import URL' do
         error = %q{remote: Not Found fatal: repository 'https://user:pass@test.com/root/repoC.git/' not found }
 
-        project.update_attributes(import_jid: '123')
+        project.import_state.update_attributes(jid: '123')
         expect_any_instance_of(Projects::ImportService).to receive(:execute).and_return({ status: :error, message: error })
 
         expect do
           subject.perform(project.id)
         end.to raise_error(RuntimeError, error)
-        expect(project.reload.import_jid).not_to be_nil
+        expect(project.import_state.reload.jid).not_to be_nil
       end
 
       it 'updates the error on Import/Export' do
         error = %q{remote: Not Found fatal: repository 'https://user:pass@test.com/root/repoC.git/' not found }
 
-        project.update_attributes(import_jid: '123', import_type: 'gitlab_project')
+        project.update_attributes(import_type: 'gitlab_project')
+        project.import_state.update_attributes(jid: '123')
         expect_any_instance_of(Projects::ImportService).to receive(:execute).and_return({ status: :error, message: error })
 
         expect do
           subject.perform(project.id)
         end.to raise_error(RuntimeError, error)
 
-        expect(project.reload.import_error).not_to be_nil
+        expect(project.import_state.reload.last_error).not_to be_nil
       end
     end
 

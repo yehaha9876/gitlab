@@ -169,6 +169,8 @@ class Project < ActiveRecord::Base
   has_one :fork_network_member
   has_one :fork_network, through: :fork_network_member
 
+  has_one :import_state, autosave: true, class_name: 'ProjectMirrorData'
+
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id'
   has_many :source_of_merge_requests, foreign_key: 'source_project_id', class_name: 'MergeRequest'
@@ -313,7 +315,7 @@ class Project < ActiveRecord::Base
   scope :in_namespace, ->(namespace_ids) { where(namespace_id: namespace_ids) }
   scope :personal, ->(user) { where(namespace_id: user.namespace_id) }
   scope :joined, ->(user) { where('namespace_id != ?', user.namespace_id) }
-  scope :starred_by, ->(user) { joins(:users_star_projects).where('users_star_projects.user_id': user.id) }
+  scope :starred_by, ->(user) { joins(:users_star_projects).where('users_star_projects.user_id' => user.id) }
   scope :visible_to_user, ->(user) { where(id: user.authorized_projects.select(:id).reorder(nil)) }
   scope :archived, -> { where(archived: true) }
   scope :non_archived, -> { where(archived: false) }
@@ -395,7 +397,9 @@ class Project < ActiveRecord::Base
   scope :abandoned, -> { where('projects.last_activity_at < ?', 6.months.ago) }
 
   scope :excluding_project, ->(project) { where.not(id: project) }
-  scope :import_started, -> { where(import_status: 'started') }
+
+  scope :with_import_state, -> { joins("INNER JOIN project_mirror_data import_state ON import_state.project_id = projects.id") }
+  scope :import_started, -> { with_import_state.where(import_state: { status: 'started' }) }
 
   state_machine :import_status, initial: :none do
     event :import_schedule do
@@ -426,7 +430,7 @@ class Project < ActiveRecord::Base
     after_transition [:none, :finished, :failed] => :scheduled do |project, _|
       project.run_after_commit do
         job_id = add_import_job
-        update(import_jid: job_id) if job_id
+        import_state.update(jid: job_id) if job_id
       end
     end
 
@@ -623,7 +627,7 @@ class Project < ActiveRecord::Base
       ProjectCacheWorker.perform_async(self.id)
     end
 
-    update(import_error: nil)
+    import_state.update(last_error: nil)
     remove_import_data
   end
 
@@ -680,7 +684,7 @@ class Project < ActiveRecord::Base
   end
 
   def no_import?
-    import_status == 'none'
+    import_state.status == 'none'
   end
 
   def external_import?
@@ -697,19 +701,19 @@ class Project < ActiveRecord::Base
 
   def import_started?
     # import? does SQL work so only run it if it looks like there's an import running
-    import_status == 'started' && import?
+    import_state.status == 'started' && import?
   end
 
   def import_scheduled?
-    import_status == 'scheduled'
+    import_state.status == 'scheduled'
   end
 
   def import_failed?
-    import_status == 'failed'
+    import_state.status == 'failed'
   end
 
   def import_finished?
-    import_status == 'finished'
+    import_state.status == 'finished'
   end
 
   def safe_import_url
@@ -1546,7 +1550,7 @@ class Project < ActiveRecord::Base
     return unless import_jid
 
     Gitlab::SidekiqStatus.unset(import_jid)
-    update_column(:import_jid, nil)
+    import_state.update_column(:jid, nil)
   end
 
   def running_or_pending_build_count(force: false)
@@ -1565,7 +1569,7 @@ class Project < ActiveRecord::Base
     sanitized_message = Gitlab::UrlSanitizer.sanitize(error_message)
 
     import_fail
-    update_column(:import_error, sanitized_message)
+    import_state.update_column(:last_error, sanitized_message)
   rescue ActiveRecord::ActiveRecordError => e
     Rails.logger.error("Error setting import status to failed: #{e.message}. Original error: #{sanitized_message}")
   ensure
@@ -1896,6 +1900,10 @@ class Project < ActiveRecord::Base
   end
 
   private
+
+  def import_jid
+    import_state.jid
+  end
 
   def storage
     @storage ||=

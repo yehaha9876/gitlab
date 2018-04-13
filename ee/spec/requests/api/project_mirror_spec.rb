@@ -25,7 +25,7 @@ describe API::ProjectMirror do
       context 'when import state is' do
         def project_in_state(state)
           project = create(:project, :repository, :mirror, state, namespace: user.namespace)
-          project.mirror_data.update_attributes(next_execution_timestamp: 10.minutes.from_now)
+          project.import_state.update_attributes(next_execution_timestamp: 10.minutes.from_now)
           project
         end
 
