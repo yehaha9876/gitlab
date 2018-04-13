@@ -27,6 +27,26 @@ module EE
 
           super
         end
+
+        override :runner_register_attribute_keys
+        def runner_register_attribute_keys(project = nil)
+          super.tap do |attributes|
+            attributes << :web_ide_only if ide_enabled?(project)
+          end
+        end
+
+        override :runner_update_attributes
+        def runner_update_attributes
+          super.tap do |attributes|
+            attributes.delete(:web_ide_only) unless ide_enabled?
+          end
+        end
+
+        def ide_enabled?(project = nil)
+          license_object = project ? project : License
+
+          license_object.feature_available?(:ide)
+        end
       end
     end
   end

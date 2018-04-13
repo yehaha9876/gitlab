@@ -2,6 +2,26 @@ module API
   class Runner < Grape::API
     helpers ::API::Helpers::Runner
 
+    helpers do
+      params :runner_params_ce do
+        optional :description, type: String, desc: %q(Runner's description)
+        optional :info, type: Hash, desc: %q(Runner's metadata)
+        optional :locked, type: Boolean, desc: 'Should Runner be locked for current project'
+        optional :run_untagged, type: Boolean, desc: 'Should Runner handle untagged jobs'
+        optional :tag_list, type: Array[String], desc: %q(List of Runner's tags)
+        optional :maximum_timeout, type: Integer, desc: 'Maximum timeout set when this Runner will handle the job'
+      end
+
+      params :runner_params_ee do
+        optional :web_ide_only, type: Boolean, default: false, desc: 'Set runner as Web IDE only. Default to false'
+      end
+
+      params :runner_params do
+        use :runner_params_ce
+        use :runner_params_ee
+      end
+    end
+
     resource :runners do
       desc 'Registers a new Runner' do
         success Entities::RunnerRegistrationDetails
@@ -9,25 +29,16 @@ module API
       end
       params do
         requires :token, type: String, desc: 'Registration token'
-        optional :description, type: String, desc: %q(Runner's description)
-        optional :info, type: Hash, desc: %q(Runner's metadata)
-        optional :locked, type: Boolean, desc: 'Should Runner be locked for current project'
-        optional :run_untagged, type: Boolean, desc: 'Should Runner handle untagged jobs'
-        optional :tag_list, type: Array[String], desc: %q(List of Runner's tags)
-        optional :maximum_timeout, type: Integer, desc: 'Maximum timeout set when this Runner will handle the job'
-        optional :web_ide_only, type: Boolean, default: false, desc: 'Set runner as Web IDE only. Default to false'
+        use :runner_params
       end
       post '/' do
-        attributes = attributes_for_keys([:description, :locked, :run_untagged, :tag_list, :maximum_timeout, :web_ide_only])
-          .merge(get_runner_details_from_request)
-
         runner =
           if runner_registration_token_valid?
             # Create shared runner. Requires admin access
-            Ci::Runner.create(attributes.merge(is_shared: true))
+            Ci::Runner.create(runner_register_attributes.merge(is_shared: true))
           elsif project = Project.find_by(runners_token: params[:token])
             # Create a specific runner for project.
-            project.runners.create(attributes)
+            project.runners.create(runner_register_attributes(project))
           end
 
         break forbidden! unless runner
