@@ -1,0 +1,5 @@
+---
+title: Fix missing namespace for some internal users
+merge_request: 5355
+author:
+type: fixed
