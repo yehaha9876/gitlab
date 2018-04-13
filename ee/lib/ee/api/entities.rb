@@ -121,6 +121,14 @@ module EE
         end
       end
 
+      module RunnerDetails
+        extend ActiveSupport::Concern
+
+        prepended do
+          expose :web_ide_only, if: ->(runner, _) { License.feature_available?(:ide) }
+        end
+      end
+
       ########################
       # EE-specific entities #
       ########################
