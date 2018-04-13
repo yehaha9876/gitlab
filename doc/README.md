@@ -2,7 +2,7 @@
 comments: false
 ---
 
-# GitLab Documentation <span class="badge-trigger core"></span>
+# GitLab Documentation
 
 Welcome to [GitLab](https://about.gitlab.com/), a Git-based fully featured
 platform for software development!
@@ -48,11 +48,11 @@ management tools.
 - [Issues](user/project/issues/index.md)
 - [Project Issue Boards](user/project/issue_board.md)
 - [Group Issue Boards](user/project/issue_board.md#group-issue-boards)
-- <span class="badge-trigger starter"></span>[Related Issues](user/project/issues/related_issues.md): create a relationship between issues.
+- [Related Issues](user/project/issues/related_issues.md): create a relationship between issues.<span class="badge-trigger starter-sm"></span>
 - [Issues and merge requests templates](user/project/description_templates.md): Create templates for submitting new issues and merge requests.
 - [Labels](user/project/labels.md): Categorize your issues or merge requests based on descriptive titles.
 - [Milestones](user/project/milestones/index.md): Organize issues and merge requests into a cohesive group, optionally setting a due date.
-  - <span class="badge-trigger starter"></span>[Burndown Charts](user/project/milestones/burndown_charts.md): Watch your project's progress throughout a specific milestone.
+  - [Burndown Charts](user/project/milestones/burndown_charts.md): Watch your project's progress throughout a specific milestone.<span class="badge-trigger starter-sm"></span>
 - [Todos](workflow/todos.md): A chronological list of to-dos that are waiting for your input, all in a simple dashboard.
 - [GitLab Quick Actions](user/project/quick_actions.md): Textual shortcuts for common actions on issues or merge requests that are usually done by clicking buttons or dropdowns in GitLab's UI.
 
@@ -80,16 +80,16 @@ on projects and code.
   - [GitLab Pages](user/project/pages/index.md): Build, test, and deploy your static website with GitLab Pages.
 - [Groups](user/group/index.md): Organize your projects in groups.
   - [Subgroups](user/group/subgroups/index.md)
-  - <span class="badge-trigger ultimate"></span>[Epics](user/group/epics/index.md)
-  - <span class="badge-trigger ultimate"></span>[Roadmap](user/group/roadmap/index.md)
-  - <span class="badge-trigger starter"></span>[Contribution Analytics](user/group/contribution_analytics/index.md): See detailed statistics of group contributors. 
+  - [Epics](user/group/epics/index.md) <span class="badge-trigger ultimate-sm"></span>
+  - [Roadmap](user/group/roadmap/index.md) <span class="badge-trigger ultimate-sm"></span>
+  - [Contribution Analytics](user/group/contribution_analytics/index.md): See detailed statistics of group contributors. <span class="badge-trigger starter-sm"></span>
 - [Search through GitLab](user/search/index.md): Search for issues, merge requests, projects, groups, todos, and issues in Issue Boards.
-  - <span class="badge-trigger starter"></span>[Advanced Global Search](user/search/advanced_global_search.md): Leverage Elasticsearch for faster, more advanced code search across your entire GitLab instance. 
-  - <span class="badge-trigger starter"></span>[Advanced Syntax Search](user/search/advanced_search_syntax.md): Use advanced queries for more targeted search results. 
+  - [Advanced Global Search](user/search/advanced_global_search.md): Leverage Elasticsearch for faster, more advanced code search across your entire GitLab instance. <span class="badge-trigger starter-sm"></span>
+  - [Advanced Syntax Search](user/search/advanced_search_syntax.md): Use advanced queries for more targeted search results. <span class="badge-trigger starter-sm"></span>
 - [Snippets](user/snippets.md): Snippets allow you to create little bits of code.
 - [Wikis](user/project/wiki/index.md): Enhance your repository documentation with built-in wikis.
-- <span class="badge-trigger premium"></span>[GitLab Service Desk](user/project/service_desk.md): A simple way to allow people to create issues in your GitLab instance without needing their own user account. 
-- <span class="badge-trigger ultimate"></span>[Web IDE](user/project/web_ide/index.md) 
+- [GitLab Service Desk](user/project/service_desk.md): A simple way to allow people to create issues in your GitLab instance without needing their own user account. <span class="badge-trigger premium-sm"></span>
+- [Web IDE](user/project/web_ide/index.md) <span class="badge-trigger ultimate-sm"></span>
 
 #### Repositories
 
@@ -101,7 +101,7 @@ Manage your [repositories](user/project/repository/index.md) from the UI (user i
   - [File templates](user/project/repository/web_editor.md#template-dropdowns)
   - [Create a directory](user/project/repository/web_editor.md#create-a-directory)
   - [Start a merge request](user/project/repository/web_editor.md#tips) (when committing via UI)
-  - <span class="badge-trigger premium"></span>[File locking](user/project/file_lock.md): Lock a file to avoid merge conflicts.
+  - [File locking](user/project/file_lock.md): Lock a file to avoid merge conflicts.<span class="badge-trigger premium-sm"></span>
 - [Branches](user/project/repository/branches/index.md)
   - [Default branch](user/project/repository/branches/index.md#default-branch)
   - [Create a branch](user/project/repository/web_editor.md#create-a-new-branch)
@@ -109,15 +109,15 @@ Manage your [repositories](user/project/repository/index.md) from the UI (user i
   - [Delete merged branches](user/project/repository/branches/index.md#delete-merged-branches)
 - [Commits](user/project/repository/index.md#commits)
   - [Signing commits](user/project/repository/gpg_signed_commits/index.md): use GPG to sign your commits.
-- <span class="badge-trigger starter"></span>[Repository Mirroring](workflow/repository_mirroring.md)
-- <span class="badge-trigger starter"></span>[Push rules](push_rules/push_rules.md): Additional control over pushes to your project.
+- [Repository Mirroring](workflow/repository_mirroring.md) <span class="badge-trigger starter-sm"></span>
+- [Push rules](push_rules/push_rules.md): Additional control over pushes to your project.<span class="badge-trigger starter-sm"></span>
 
 #### Integrations
 
 - [Project Services](user/project/integrations/project_services.md): Integrate a project with external services, such as CI and chat.
 - [GitLab Integration](integration/README.md): Integrate with multiple third-party services with GitLab to allow external issue trackers and external authentication.
 - [Trello Power-Up](integration/trello_power_up.md): Integrate with GitLab's Trello Power-Up.
-- <span class="badge-trigger premium"></span>[JIRA Development Panel](integration/jira_development_panel.md): See GitLab information in the JIRA Development Panel.
+- [JIRA Development Panel](integration/jira_development_panel.md): See GitLab information in the JIRA Development Panel.<span class="badge-trigger premium-sm"></span>
 
 #### Automation
 
@@ -135,8 +135,8 @@ auto scales to run your tests faster.
 - [Merge Requests](user/project/merge_requests/index.md)
   - [Work In Progress Merge Requests](user/project/merge_requests/work_in_progress_merge_requests.md)
   - [Merge Request discussion resolution](user/discussions/index.md#moving-a-single-discussion-to-a-new-issue): Resolve discussions, move discussions in a merge request to an issue, only allow merge requests to be merged if all discussions are resolved.
-  - <span class="badge-trigger starter"></span>[Merge Request approval](user/project/merge_requests/merge_request_approvals.md): Make sure every merge request is approved by one or more people before getting merged.
-  - <span class="badge-trigger ultimate"></span>[Static Application Security Testing](user/project/merge_requests/sast.md): Scan your code for vulnerabilities and display the results in merge requests.
+  - [Merge Request approval](user/project/merge_requests/merge_request_approvals.md): Make sure every merge request is approved by one or more people before getting merged. <span class="badge-trigger starter-sm"></span>
+  - [Static Application Security Testing](user/project/merge_requests/sast.md): Scan your code for vulnerabilities and display the results in merge requests. <span class="badge-trigger ultimate-sm"></span>
   - [Checkout merge requests locally](user/project/merge_requests/index.md#checkout-merge-requests-locally)
   - [Cherry-pick](user/project/merge_requests/cherry_pick_changes.md)
 - [Review Apps](ci/review_apps/index.md): Preview changes to your app right from a merge request.
@@ -158,8 +158,8 @@ confidently and securely with GitLab’s built-in Continuous Delivery and Deploy
 
 - [GitLab Pages](user/project/pages/index.md): Build, test, and deploy a static site directly from GitLab.
 - [Auto Deploy](topics/autodevops/index.md#auto-deploy): Configure GitLab CI/CD for the deployment of your application.
-- <span class="badge-trigger premium"></span>[Deploy Boards](user/project/deploy_boards.md): View of the current health and status of each CI environment running on Kubernetes, displaying the status of the pods in the deployment.
-- <span class="badge-trigger premium"></span>[Canary Deployments](user/project/canary_deployments.md): A popular CI strategy, where a small portion of the fleet is updated to the new version first.
+- [Deploy Boards](user/project/deploy_boards.md): View of the current health and status of each CI environment running on Kubernetes, displaying the status of the pods in the deployment.<span class="badge-trigger premium-sm"></span>
+- [Canary Deployments](user/project/canary_deployments.md): A popular CI strategy, where a small portion of the fleet is updated to the new version first. <span class="badge-trigger premium-sm"></span>
 - [Environments and deployments](ci/environments.md): With environments, you can control the continuous deployment of your software within GitLab.
 
 ### Configure
