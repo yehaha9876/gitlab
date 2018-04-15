@@ -17,7 +17,7 @@ module Gitlab
         }
 
         if config[:aws]
-          creds = resolve_aws_credentials(config)
+          creds = instantiate_aws_credentials(config)
           region = config[:aws_region]
 
           ::Elasticsearch::Client.new(base_config) do |fmid|
@@ -28,19 +28,8 @@ module Gitlab
         end
       end
 
-      def self.resolve_aws_credentials(config)
-        # Resolve credentials in order
-        # 1.  Static config
-        # 2.  ec2 instance profile
-        static_credentials = Aws::Credentials.new(config[:aws_access_key], config[:aws_secret_access_key])
-
-        return static_credentials if static_credentials&.set?
-
-        # Instantiating this will perform an API call, so only do so if the
-        # static credentials did not work
-        instance_credentials = Aws::InstanceProfileCredentials.new
-
-        instance_credentials if instance_credentials&.set?
+      def self.instantiate_aws_credentials(config)
+        Aws::Credentials.new(config[:aws_access_key], config[:aws_secret_access_key])
       end
     end
   end

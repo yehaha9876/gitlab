@@ -8,6 +8,7 @@ module EE
 
     prepended do
       include IgnorableColumn
+      include ::Gitlab::Utils::StrongMemoize
 
       EMAIL_ADDITIONAL_TEXT_CHARACTER_LIMIT = 10_000
 
@@ -144,13 +145,24 @@ module EE
     end
 
     def elasticsearch_config
-      {
+      config = {
         url:                   elasticsearch_url,
         aws:                   elasticsearch_aws,
         aws_access_key:        elasticsearch_aws_access_key,
         aws_secret_access_key: elasticsearch_aws_secret_access_key,
         aws_region:            elasticsearch_aws_region
       }
+
+      if elasticsearch_aws
+        creds = resolve_aws_credentials(elasticsearch_aws_access_key, elasticsearch_aws_secret_access_key)
+
+        if creds
+          config[:aws_access_key] = creds.credentials.access_key_id
+          config[:aws_secret_access_key] = creds.credentials.secret_access_key
+        end
+      end
+
+      config
     end
 
     def email_additional_text
@@ -184,6 +196,23 @@ module EE
     end
 
     private
+
+    def resolve_aws_credentials(aws_access_key, aws_secret_access_key)
+      strong_memoize(:elastic_aws_creds) do
+        # Resolve credentials in order
+        # 1.  Static config
+        # 2.  ec2 instance profile
+        static_credentials = Aws::Credentials.new(aws_access_key, aws_secret_access_key)
+
+        return static_credentials if static_credentials&.set?
+
+        # Instantiating this will perform an API call, so only do so if the
+        # static credentials did not work
+        instance_credentials = Aws::InstanceProfileCredentials.new
+
+        instance_credentials if instance_credentials&.set?
+      end
+    end
 
     def mirror_max_delay_in_minutes
       ::Gitlab::Mirror.min_delay_upper_bound / 60

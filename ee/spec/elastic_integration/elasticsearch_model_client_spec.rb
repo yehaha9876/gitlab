@@ -3,7 +3,10 @@ require 'spec_helper'
 # This module is monkey-patched in config/initializers/elastic_client_setup.rb
 describe "Monkey-patches to ::Elasticsearch::Model::Client" do
   before do
-    stub_ee_application_setting(elasticsearch_url: ['http://localhost:9200'])
+    # Use a configuration unlikely to be reused elsewhere to make sure 
+    # the stubbed client doesn't affect other tests due to the singleton nature of 
+    # the elasticsearch client
+    stub_ee_application_setting(elasticsearch_url: ['http://example.com:9300'], elasticsearch_aws_region: ':lhasruh')
   end
 
   it 'uses the same client instance for all subclasses' do

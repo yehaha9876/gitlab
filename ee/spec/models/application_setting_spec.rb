@@ -82,6 +82,82 @@ describe ApplicationSetting do
     end
   end
 
+  describe '#elasticsearch_config' do
+    let(:creds) { setting.elasticsearch_config }
+
+    let(:creds_valid_response) do
+      '{
+        "Code": "Success",
+        "Type": "AWS-HMAC",
+        "AccessKeyId": "0",
+        "SecretAccessKey": "0",
+        "Token": "token",
+        "Expiration": "2018-12-16T01:51:37Z",
+        "LastUpdated": "2009-11-23T0:00:00Z"
+      }'
+    end
+
+    let(:creds_fail_response) do
+      '{
+        "Code": "ErrorCode",
+        "Message": "ErrorMsg",
+        "LastUpdated": "2009-11-23T0:00:00Z"
+      }'
+    end
+
+    def stub_instance_credentials(creds_response)
+      stub_request(:get, "http://169.254.169.254/latest/meta-data/iam/security-credentials/")
+        .to_return(status: 200, body: "RoleName", headers: {})
+      stub_request(:get, "http://169.254.169.254/latest/meta-data/iam/security-credentials/RoleName")
+        .to_return(status: 200, body: creds_response, headers: {})
+    end
+
+    context 'when the AWS IAM static credentials are valid' do
+      before do
+        stub_ee_application_setting(
+          elasticsearch_url: 'http://example-elastic:9200',
+          elasticsearch_aws: true,
+          elasticsearch_aws_region: 'us-east-1',
+          elasticsearch_aws_access_key: '0',
+          elasticsearch_aws_secret_access_key: '0'
+        )
+      end
+
+      it 'returns credentials from static credentials without making an HTTP request' do
+        expect(creds[:aws_access_key]).to eq '0'
+        expect(creds[:aws_secret_access_key]).to eq '0'
+      end
+    end
+
+    context 'when the AWS IAM static credentials are invalid' do
+      before do
+        stub_ee_application_setting(
+          elasticsearch_url: 'http://example-elastic:9200',
+          elasticsearch_aws: true,
+          elasticsearch_aws_region: 'us-east-1'
+        )
+      end
+
+      context 'with AWS ec2 instance profile' do
+        it 'returns credentials from ec2 instance profile' do
+          stub_instance_credentials(creds_valid_response)
+
+          expect(creds[:aws_access_key]).to eq '0'
+          expect(creds[:aws_secret_access_key]).to eq '0'
+        end
+      end
+
+      context 'with AWS no credentials' do
+        it 'returns nil' do
+          stub_instance_credentials(creds_fail_response)
+
+          expect(creds[:aws_access_key]).to be_nil
+          expect(creds[:aws_secret_access_key]).to be_nil
+        end
+      end
+    end
+  end
+
   describe '#should_check_namespace_plan?' do
     before do
       stub_application_setting(check_namespace_plan: check_namespace_plan_column)
