@@ -401,50 +401,6 @@ class Project < ActiveRecord::Base
   scope :with_import_state, -> { joins("INNER JOIN project_mirror_data import_state ON import_state.project_id = projects.id") }
   scope :import_started, -> { with_import_state.where(import_state: { status: 'started' }) }
 
-  state_machine :import_status, initial: :none do
-    event :import_schedule do
-      transition [:none, :finished, :failed] => :scheduled
-    end
-
-    event :force_import_start do
-      transition [:none, :finished, :failed] => :started
-    end
-
-    event :import_start do
-      transition scheduled: :started
-    end
-
-    event :import_finish do
-      transition started: :finished
-    end
-
-    event :import_fail do
-      transition [:scheduled, :started] => :failed
-    end
-
-    state :scheduled
-    state :started
-    state :finished
-    state :failed
-
-    after_transition [:none, :finished, :failed] => :scheduled do |project, _|
-      project.run_after_commit do
-        job_id = add_import_job
-        import_state.update(jid: job_id) if job_id
-      end
-    end
-
-    after_transition started: :finished do |project, _|
-      project.reset_cache_and_import_attrs
-
-      if Gitlab::ImportSources.importer_names.include?(project.import_type) && project.repo_exists?
-        project.run_after_commit do
-          Projects::AfterImportService.new(project).execute
-        end
-      end
-    end
-  end
-
   class << self
     # Searches for a list of projects based on the query given in `query`.
     #

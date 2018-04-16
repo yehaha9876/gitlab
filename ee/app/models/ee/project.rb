@@ -10,7 +10,6 @@ module EE
 
     prepended do
       include Elastic::ProjectsSearch
-      prepend ImportStatusStateMachine
       include EE::DeploymentPlatform
       include EachBatch
 
@@ -176,6 +175,7 @@ module EE
       mirror_updated? && self.import_state.last_successful_update_at
     end
 
+    # TODO: investigate if we can remove this method
     def mirror_hard_failed?
       self.import_state.retry_limit_exceeded?
     end
