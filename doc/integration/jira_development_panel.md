@@ -1,4 +1,4 @@
-# GitLab JIRA Development Panel integration
+# GitLab JIRA Development Panel integration **[PREMIUM]**
 
 > [Introduced][ee-2381] in [GitLab Premium][eep] 10.0.
 
@@ -33,7 +33,6 @@ account, in order to maximize the integrated GitLab projects used by your team.
     this would be `https://gitlab.com/-/jira/login/oauth/callback`.
 
     ![GitLab Application setup](img/jira_dev_panel_gl_setup_1.png)
-
     - Check `api` in the Scopes section.
 
 2. Click `Save application`. You will see the generated 'Application Id' and 'Secret' values.

@@ -1,4 +1,4 @@
-# Static Application Security Testing (SAST)
+# Static Application Security Testing (SAST) **[ULTIMATE]**
 
 > [Introduced][ee-3775] in [GitLab Ultimate][ee] 10.3.
 
@@ -25,12 +25,13 @@ request widget area.
 
 The following languages and frameworks are supported.
 
-| Language / framework | Scan tool                                          |
-|----------------------|----------------------------------------------------|
-| C/C++                | [Flawfinder](https://www.dwheeler.com/flawfinder/) |
-| Python               | [bandit](https://github.com/openstack/bandit)      |
-| Ruby on Rails        | [brakeman](https://brakemanscanner.org)            |
-| Java                 | [find-sec-bugs](https://find-sec-bugs.github.io/)  |
+| Language / framework | Scan tool                                             |
+|----------------------|-------------------------------------------------------|
+| C/C++                | [Flawfinder](https://www.dwheeler.com/flawfinder/)    |
+| Python               | [bandit](https://github.com/openstack/bandit)         |
+| Ruby on Rails        | [brakeman](https://brakemanscanner.org)               |
+| Java                 | [find-sec-bugs](https://find-sec-bugs.github.io/)     |
+| Go (experimental)    | [Go AST Scanner](https://github.com/GoASTScanner/gas) |
 
 ## How it works
 

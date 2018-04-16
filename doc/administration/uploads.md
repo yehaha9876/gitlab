@@ -48,10 +48,10 @@ _The uploads are stored by default in
 
 1. Save the file and [restart GitLab][] for the changes to take effect.
 
-### Using object storage
+### Using object storage **[PREMIUM]**
 
 >**Notes:**
-- [Introduced][ee-3867] in [GitLab Enterprise Edition Premium][eep] 10.5.
+- [Introduced][ee-3867] in [GitLab Premium][eep] 10.5.
 
 If you don't want to use the local disk where GitLab is installed to store the
 uploads, you can use an object storage provider like AWS S3 instead.
@@ -65,6 +65,7 @@ For source installations the following settings are nested under `uploads:` and 
 |---------|-------------|---------|
 | `enabled` | Enable/disable object storage | `false` |
 | `remote_directory` | The bucket name where Uploads will be stored| |
+| `direct_upload` | Set to true to enable direct upload of Uploads without the need of local shared storage. Option may be removed once we decide to support only single storage for all files. This is beta option as it uses inefficient way of uploading data (via Unicorn). The accelerated uploads gonna be implemented in future releases | `false` |
 | `background_upload` | Set to false to disable automatic upload. Option may be removed once upload is direct to S3 | `true` |
 | `proxy_download` | Set to true to enable proxying all files served. Option allows to reduce egress traffic as this allows clients to download directly from remote storage instead of proxying all data | `false` |
 | `connection` | Various connection options described below | |
@@ -205,5 +206,5 @@ _The uploads are stored by default in
 
 [reconfigure gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
 [restart gitlab]: restart_gitlab.md#installations-from-source "How to restart GitLab"
-[eep]: https://about.gitlab.com/gitlab-ee/ "GitLab Enterprise Edition Premium"
+[eep]: https://about.gitlab.com/gitlab-ee/ "GitLab Premium"
 [ee-3867]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3867
