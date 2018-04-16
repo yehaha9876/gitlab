@@ -4,7 +4,7 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
-        scope :web_ide_only, ->() { where(web_ide_only: true, is_shared: false) }
+        scope :web_ide_only, -> { where(web_ide_only: true, is_shared: false) }
       end
 
       class_methods do
