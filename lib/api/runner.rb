@@ -3,7 +3,7 @@ module API
     helpers ::API::Helpers::Runner
 
     helpers do
-      params :runner_params_ce do
+      params :optional_runner_register_params_ce do
         optional :description, type: String, desc: %q(Runner's description)
         optional :info, type: Hash, desc: %q(Runner's metadata)
         optional :locked, type: Boolean, desc: 'Should Runner be locked for current project'
@@ -12,13 +12,13 @@ module API
         optional :maximum_timeout, type: Integer, desc: 'Maximum timeout set when this Runner will handle the job'
       end
 
-      params :runner_params_ee do
+      params :optional_runner_register_params_ee do
         optional :web_ide_only, type: Boolean, default: false, desc: 'Set runner as Web IDE only. Default to false'
       end
 
-      params :runner_params do
-        use :runner_params_ce
-        use :runner_params_ee
+      params :runner_register_params do
+        use :optional_runner_register_params_ce
+        use :optional_runner_register_params_ee
       end
     end
 
@@ -29,7 +29,7 @@ module API
       end
       params do
         requires :token, type: String, desc: 'Registration token'
-        use :runner_params
+        use :runner_register_params
       end
       post '/' do
         runner =

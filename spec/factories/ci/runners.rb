@@ -6,6 +6,7 @@ FactoryBot.define do
     is_shared false
     active    true
     access_level :not_protected
+    web_ide_only false
 
     trait :online do
       contacted_at Time.now
@@ -21,6 +22,11 @@ FactoryBot.define do
 
     trait :inactive do
       active false
+    end
+
+    trait :web_ide_only do
+      is_shared false
+      web_ide_only true
     end
 
     trait :ref_protected do

@@ -6,7 +6,7 @@ module API
 
     helpers ::API::Helpers::Runner
     helpers do
-      params :runner_params_ce do
+      params :optional_runner_update_params_ce do
         optional :description, type: String, desc: 'The description of the runner'
         optional :active, type: Boolean, desc: 'The state of a runner'
         optional :tag_list, type: Array[String], desc: 'The list of tags for a runner'
@@ -17,13 +17,13 @@ module API
         optional :maximum_timeout, type: Integer, desc: 'Maximum timeout set when this Runner will handle the job'
       end
 
-      params :runner_params_ee do
+      params :optional_runner_update_params_ee do
         optional :web_ide_only, type: Boolean, desc: 'Set runner as Web IDE only. Default to false'
       end
 
-      params :runner_params do
-        use :runner_params_ce
-        use :runner_params_ee
+      params :runner_update_params do
+        use :optional_runner_update_params_ce
+        use :optional_runner_update_params_ee
         at_least_one_of(*(@declared_params - [:id]))
       end
     end
@@ -74,7 +74,7 @@ module API
       end
       params do
         requires :id, type: Integer, desc: 'The ID of the runner'
-        use :runner_params
+        use :runner_update_params
       end
       put ':id' do
         runner = get_runner(params.delete(:id))
