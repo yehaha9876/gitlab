@@ -2,7 +2,7 @@
 comments: false
 ---
 
-# GitLab CI/CD Examples <span class="badge-trigger core"></span>
+# GitLab CI/CD Examples
 
 A collection of `.gitlab-ci.yml` template files is maintained at the [GitLab CI/CD YAML project][gitlab-ci-templates]. When you create a new file via the UI,
 GitLab will give you the option to choose one of the templates existent on this project.
@@ -45,15 +45,15 @@ There's also a collection of repositories with [example projects](https://gitlab
 
 [Analyze code quality with the Code Climate CLI](code_climate.md).
 
-## Static Application Security Testing (SAST) <span class="badge-trigger ultimate"></span>
+## Static Application Security Testing (SAST) **[ULTIMATE]**
 
 [Scan your code for vulnerabilities](sast.md)
 
-## Dependency Scanning <span class="badge-trigger ultimate"></span>
+## Dependency Scanning **[ULTIMATE]**
 
 [Scan your dependencies for vulnerabilities](dependency_scanning.md)
 
-## Dependency Scanning <span class="badge-trigger ultimate"></span>
+## Dependency Scanning **[ULTIMATE]**
 
 [Scan your dependencies for vulnerabilities](https://docs.gitlab.com/ee/ci/examples/dependency_scanning.html)
 
