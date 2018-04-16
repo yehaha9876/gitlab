@@ -48,7 +48,7 @@ module EntityDateHelper
     elsif entity.try(:upcoming?)
       content_tag(:strong, 'Upcoming')
     elsif entity.due_date
-      is_upcoming = is_upcoming = (entity.due_date - Date.today).to_i > 0
+      is_upcoming = (entity.due_date - Date.today).to_i > 0
       time_ago = time_ago_in_words(entity.due_date)
       content = time_ago.gsub(/\d+/) { |match| "<strong>#{match}</strong>" }
       content.slice!("about ")
