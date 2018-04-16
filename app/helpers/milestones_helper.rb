@@ -80,7 +80,7 @@ module MilestonesHelper
     if has_issues
       [
         _('Progress'),
-        _("%{percent} complete") % { percent: "#{milestone.percent_complete(current_user)}%" }
+        _("%{percent}%% complete") % { percent: milestone.percent_complete(current_user) }
       ].join('<br />')
     else
       _('Progress')
@@ -121,7 +121,7 @@ module MilestonesHelper
   end
 
   def milestone_time_for(date, date_type)
-    title = date_type === :start ? "Start date" : "End date"
+    title = date_type == :start ? "Start date" : "End date"
 
     if date
       time_ago = time_ago_in_words(date)
@@ -146,12 +146,14 @@ module MilestonesHelper
     end
   end
 
-  def milestone_issues_tooltip_text(issues)
+  def milestone_issues_tooltip_text(milestone)
+    issues = milestone.count_issues_by_state(current_user)
+
     if issues.any?
       content = []
 
-      content.push(n_("1 open issue", "%d open issues", issues["opened"]) % issues["opened"]) if issues["opened"]
-      content.push(n_("1 closed issue", "%d closed issues", issues["closed"]) % issues["closed"]) if issues["closed"]
+      content << n_("1 open issue", "%d open issues", issues["opened"]) % issues["opened"] if issues["opened"]
+      content << n_("1 closed issue", "%d closed issues", issues["closed"]) % issues["closed"] if issues["closed"]
 
       return content.join('<br />').html_safe
     end
@@ -159,13 +161,15 @@ module MilestonesHelper
     _("Issues")
   end
 
-  def milestone_merge_requests_tooltip_text(merge_requests)
+  def milestone_merge_requests_tooltip_text(milestone)
+    merge_requests = milestone.merge_requests
+
     if merge_requests.any?
       content = []
 
-      content.push(n_("1 open merge request", "%d open merge requests", merge_requests.opened.count) % merge_requests.opened.count) if merge_requests.opened.any?
-      content.push(n_("1 closed merge request", "%d closed merge requests", merge_requests.closed.count) % merge_requests.closed.count) if merge_requests.closed.any?
-      content.push(n_("1 merged merge request", "%d merged merge requests", merge_requests.merged.count) % merge_requests.merged.count) if merge_requests.merged.any?
+      content << n_("1 open merge request", "%d open merge requests", merge_requests.opened.count) % merge_requests.opened.count if merge_requests.opened.any?
+      content << n_("1 closed merge request", "%d closed merge requests", merge_requests.closed.count) % merge_requests.closed.count if merge_requests.closed.any?
+      content << n_("1 merged merge request", "%d merged merge requests", merge_requests.merged.count) % merge_requests.merged.count if merge_requests.merged.any?
 
       return content.join('<br />').html_safe
     end
