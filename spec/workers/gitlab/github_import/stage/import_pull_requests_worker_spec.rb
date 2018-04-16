@@ -4,6 +4,10 @@ describe Gitlab::GithubImport::Stage::ImportPullRequestsWorker do
   let(:project) { create(:project) }
   let(:worker) { described_class.new }
 
+  before do
+    project.create_import_state
+  end
+
   describe '#import' do
     it 'imports all the pull requests' do
       importer = double(:importer)
@@ -19,8 +23,8 @@ describe Gitlab::GithubImport::Stage::ImportPullRequestsWorker do
         .to receive(:execute)
         .and_return(waiter)
 
-      expect(project)
-        .to receive(:refresh_import_jid_expiration)
+      expect(project.import_state)
+        .to receive(:refresh_jid_expiration)
 
       expect(Gitlab::GithubImport::AdvanceStageWorker)
         .to receive(:perform_async)

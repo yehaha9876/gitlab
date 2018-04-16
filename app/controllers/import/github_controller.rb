@@ -34,7 +34,7 @@ class Import::GithubController < Import::BaseController
 
   def jobs
     jobs = current_user.created_projects
-                       .with_import_state
+                       .joins_import_state
                        .where(import_type: provider)
                        .to_json(only: [:id], include: { import_state: { only: [:status] } })
     render json: jobs

@@ -16,9 +16,8 @@ describe Gitlab::GithubImport::RefreshImportJidWorker do
   describe '#perform' do
     let(:project) { create(:project) }
 
-    # TODO: make sure this spec works
     before do
-      project.import_state.jid = '123abc'
+      project.create_import_state(jid: '123abc')
     end
 
     context 'when the project does not exist' do
@@ -33,17 +32,17 @@ describe Gitlab::GithubImport::RefreshImportJidWorker do
     context 'when the job is running' do
       it 'refreshes the import JID and reschedules itself' do
         allow(worker)
-          .to receive(:find_project)
+          .to receive(:find_project_import_state)
           .with(project.id)
-          .and_return(project)
+          .and_return(project.import_state)
 
         expect(Gitlab::SidekiqStatus)
           .to receive(:running?)
           .with('123')
           .and_return(true)
 
-        expect(project)
-          .to receive(:refresh_import_jid_expiration)
+        expect(project.import_state)
+          .to receive(:refresh_jid_expiration)
 
         expect(worker.class)
           .to receive(:perform_in_the_future)
@@ -56,51 +55,54 @@ describe Gitlab::GithubImport::RefreshImportJidWorker do
     context 'when the job is no longer running' do
       it 'returns' do
         allow(worker)
-          .to receive(:find_project)
+          .to receive(:find_project_import_state)
           .with(project.id)
-          .and_return(project)
+          .and_return(project.import_state)
 
         expect(Gitlab::SidekiqStatus)
           .to receive(:running?)
           .with('123')
           .and_return(false)
 
-        expect(project)
-          .not_to receive(:refresh_import_jid_expiration)
+        expect(project.import_state)
+          .not_to receive(:refresh_jid_expiration)
 
         worker.perform(project.id, '123')
       end
     end
   end
 
-  describe '#find_project' do
-    it 'returns a Project' do
-      project = create(:project, import_status: 'started')
+  describe '#find_project_import_state' do
+    context 'when import status is started' do
+      let(:project) { create(:project) }
 
-      expect(worker.find_project(project.id)).to be_an_instance_of(Project)
-    end
-
-    it 'only selects the import JID field' do
-      project = create(:project, import_status: 'started')
-
-      # TODO: Make sure this spec works
       before do
-        project.import_state.jid = '123abc'
+        project.create_import_state(status: 'started')
       end
 
-      # TODO: Explore a solution to this
-      expect(worker.find_project(project.id).attributes)
-        .to eq({ 'id' => nil, 'import_jid' => '123abc' })
+      it 'returns a ProjectImportState' do
+        expect(worker.find_project_import_state(project.id)).to be_an_instance_of(ProjectImportState)
+      end
+
+      it 'only selects the import JID field' do
+        project.import_state.update_attributes(jid: '123abc')
+
+        expect(worker.find_project_import_state(project.id).attributes)
+            .to eq({ 'id' => nil, 'jid' => '123abc' })
+      end
     end
 
-    it 'returns nil for a project for which the import process failed' do
-      project = create(:project, import_status: 'failed')
+    context 'when import status is not started' do
+      it 'returns nil' do
+        project = create(:project)
+        project.create_import_state(status: 'failed')
 
-      expect(worker.find_project(project.id)).to be_nil
+        expect(worker.find_project_import_state(project.id)).to be_nil
+      end
     end
 
     it 'returns nil for a non-existing project' do
-      expect(worker.find_project(-1)).to be_nil
+      expect(worker.find_project_import_state(-1)).to be_nil
     end
   end
 end

@@ -1,7 +1,11 @@
 class ProjectImportState < ActiveRecord::Base
   include AfterCommitQueue
 
+  self.table_name = "project_mirror_data"
+
   prepend EE::ProjectImportState
+
+  scope :with_started_status, -> { where(status: 'started') }
 
   state_machine :status, initial: :none do
     event :import_schedule do
@@ -47,5 +51,12 @@ class ProjectImportState < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def refresh_jid_expiration
+    return unless jid
+
+    Gitlab::SidekiqStatus
+        .set(jid, StuckImportJobsWorker::IMPORT_JOBS_EXPIRATION)
   end
 end

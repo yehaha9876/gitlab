@@ -33,20 +33,18 @@
         %th To GitLab
         %th Status
     %tbody
-      - @already_added_projects.each do |project|
-        -# TODO: Get rid of this N+1 query
-        - import_status = project.import_state.status
-        %tr{ id: "project_#{project.id}", class: "#{project_status_css_class(import_status)}" }
+      - @already_added_projects.includes(:import_state).each do |project|
+        %tr{ id: "project_#{project.id}", class: "#{project_status_css_class(project.import_status)}" }
           %td
             = link_to project.import_source, "https://code.google.com/p/#{project.import_source}", target: "_blank", rel: 'noopener noreferrer'
           %td
             = link_to project.full_path, [project.namespace.becomes(Namespace), project]
           %td.job-status
-            - if import_status == 'finished'
+            - if project.import_finished?
               %span
                 %i.fa.fa-check
                 done
-            - elsif import_status == 'started'
+            - elsif project.import_started?
               %i.fa.fa-spinner.fa-spin
               started
             - else

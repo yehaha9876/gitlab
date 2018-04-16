@@ -16,12 +16,12 @@ module Gitlab
       # project_id - The ID of the project that is being imported.
       # check_job_id - The ID of the job for which to check the status.
       def perform(project_id, check_job_id)
-        return unless (project = find_project(project_id))
+        return unless (import_state = find_project_import_state(project_id))
 
         if SidekiqStatus.running?(check_job_id)
           # As long as the repository is being cloned we want to keep refreshing
           # the import JID status.
-          project.refresh_import_jid_expiration
+          import_state.refresh_jid_expiration
           self.class.perform_in_the_future(project_id, check_job_id)
         end
 
@@ -30,8 +30,8 @@ module Gitlab
         # stage, if it died there's nothing we can do anyway.
       end
 
-      def find_project(id)
-        Project.with_import_state.select(:"import_state.jid").import_started.find_by(id: id)
+      def find_project_import_state(project_id)
+        ProjectImportState.select(:jid).with_started_status.find_by(project_id: project_id)
       end
     end
   end

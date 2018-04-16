@@ -398,8 +398,8 @@ class Project < ActiveRecord::Base
 
   scope :excluding_project, ->(project) { where.not(id: project) }
 
-  scope :with_import_state, -> { joins("INNER JOIN project_mirror_data import_state ON import_state.project_id = projects.id") }
-  scope :import_started, -> { with_import_state.where(import_state: { status: 'started' }) }
+  scope :joins_import_state, -> { joins("INNER JOIN project_mirror_data import_state ON import_state.project_id = projects.id") }
+  scope :import_started, -> { joins_import_state.where(import_state: { status: 'started' }) }
 
   class << self
     # Searches for a list of projects based on the query given in `query`.
@@ -655,21 +655,26 @@ class Project < ActiveRecord::Base
     import_started? || import_scheduled?
   end
 
+  def import_status
+    import_state.status.inquiry
+  end
+
+
   def import_started?
     # import? does SQL work so only run it if it looks like there's an import running
-    import_state.status == 'started' && import?
+    import_status.started? && import?
   end
 
   def import_scheduled?
-    import_state.status == 'scheduled'
+    import_status.scheduled?
   end
 
   def import_failed?
-    import_state.status == 'failed'
+    import_state.failed?
   end
 
   def import_finished?
-    import_state.status == 'finished'
+    import_status.failed?
   end
 
   def safe_import_url
@@ -1796,17 +1801,6 @@ class Project < ActiveRecord::Base
 
   def reference_counter(wiki: false)
     Gitlab::ReferenceCounter.new(gl_repository(is_wiki: wiki))
-  end
-
-  # Refreshes the expiration time of the associated import job ID.
-  #
-  # This method can be used by asynchronous importers to refresh the status,
-  # preventing the StuckImportJobsWorker from marking the import as failed.
-  def refresh_import_jid_expiration
-    return unless import_jid
-
-    Gitlab::SidekiqStatus
-      .set(import_jid, StuckImportJobsWorker::IMPORT_JOBS_EXPIRATION)
   end
 
   def badges

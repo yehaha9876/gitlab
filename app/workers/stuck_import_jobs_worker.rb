@@ -42,7 +42,7 @@ class StuckImportJobsWorker
     completed_projects = enqueued_projects_with_jid.where(id: completed_project_ids)
 
     # TODO: Check if `includes` is not a better fit in this case
-    failed_jids = completed_projects.with_import_state.map { |project| project.import_state.jid }
+    failed_jids = completed_projects.joins_import_state.map { |project| project.import_state.jid }
 
     Rails.logger.info("Marked stuck import jobs as failed. JIDs: #{failed_jids.join(', ')}")
 
@@ -52,7 +52,7 @@ class StuckImportJobsWorker
   end
 
   def enqueued_projects
-    Project.with_import_state.with_status(:scheduled, :started)
+    Project.joins_import_state.with_status(:scheduled, :started)
   end
 
   def enqueued_projects_with_jid

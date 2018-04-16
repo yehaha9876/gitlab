@@ -4,6 +4,10 @@ describe Gitlab::GithubImport::Stage::ImportBaseDataWorker do
   let(:project) { create(:project) }
   let(:worker) { described_class.new }
 
+  before do
+    project.create_import_state
+  end
+
   describe '#import' do
     it 'imports the base data of a project' do
       importer = double(:importer)
@@ -18,7 +22,7 @@ describe Gitlab::GithubImport::Stage::ImportBaseDataWorker do
         expect(importer).to receive(:execute)
       end
 
-      expect(project).to receive(:refresh_import_jid_expiration)
+      expect(project.import_state).to receive(:refresh_jid_expiration)
 
       expect(Gitlab::GithubImport::Stage::ImportPullRequestsWorker)
         .to receive(:perform_async)

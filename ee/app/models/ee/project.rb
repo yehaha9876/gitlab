@@ -48,8 +48,8 @@ module EE
 
       scope :mirrors_to_sync, ->(freeze_at) do
         mirror
-        .with_import_state
-        .with_import_state.without_status(:scheduled, :started)
+        .joins_import_state
+        .where.not(import_state: { status: [:scheduled, :started] })
         .where("import_state.next_execution_timestamp <= ?", freeze_at)
         .where("import_state.retry_count <= ?", ::Gitlab::Mirror::MAX_RETRY)
       end
