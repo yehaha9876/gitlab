@@ -1,4 +1,4 @@
-class ProjectMirrorData < ActiveRecord::Base
+class ProjectImportState < ActiveRecord::Base
   BACKOFF_PERIOD = 24.seconds
   JITTER = 6.seconds
 

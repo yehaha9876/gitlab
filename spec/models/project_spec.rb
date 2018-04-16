@@ -275,13 +275,13 @@ describe Project do
     it 'creates mirror data when enabled' do
       project2 = create(:project, :mirror, mirror: false)
 
-      expect { project2.update_attributes(mirror: true) }.to change { ProjectMirrorData.count }.from(0).to(1)
+      expect { project2.update_attributes(mirror: true) }.to change { ProjectImportState.count }.from(0).to(1)
     end
 
     it 'destroys mirror data when disabled' do
       project2 = create(:project, :mirror)
 
-      expect { project2.update_attributes(mirror: false) }.to change { ProjectMirrorData.count }.from(1).to(0)
+      expect { project2.update_attributes(mirror: false) }.to change { ProjectImportState.count }.from(1).to(0)
     end
 
     describe 'project pending deletion' do

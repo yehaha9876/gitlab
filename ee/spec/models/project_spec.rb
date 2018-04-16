@@ -13,7 +13,7 @@ describe Project do
     it { is_expected.to delegate_method(:shared_runners_minutes_limit_enabled?).to(:shared_runners_limit_namespace) }
     it { is_expected.to delegate_method(:shared_runners_minutes_used?).to(:shared_runners_limit_namespace) }
 
-    it { is_expected.to have_one(:import_state).class_name('ProjectMirrorData') }
+    it { is_expected.to have_one(:import_state).class_name('ProjectImportState') }
     it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState').inverse_of(:project) }
 
     it { is_expected.to have_many(:path_locks) }

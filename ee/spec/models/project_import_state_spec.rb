@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe ProjectMirrorData, type: :model do
+describe ProjectImportState, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
   end
@@ -45,7 +45,7 @@ describe ProjectMirrorData, type: :model do
     let!(:jitter) { 2.seconds }
 
     before do
-      allow_any_instance_of(ProjectMirrorData).to receive(:rand).and_return(jitter)
+      allow_any_instance_of(ProjectImportState).to receive(:rand).and_return(jitter)
     end
 
     context 'when base delay is lower than mirror_max_delay' do

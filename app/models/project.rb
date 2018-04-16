@@ -169,7 +169,7 @@ class Project < ActiveRecord::Base
   has_one :fork_network_member
   has_one :fork_network, through: :fork_network_member
 
-  has_one :import_state, autosave: true, class_name: 'ProjectMirrorData'
+  has_one :import_state, autosave: true, class_name: 'ProjectImportState'
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id'
