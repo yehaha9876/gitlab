@@ -123,7 +123,13 @@ The Pages daemon doesn't listen to the outside world.
     pages_external_url 'http://example.io'
     ```
 
-1. [Restart GitLab][restart]
+1. [Reconfigure GitLab][reconfigure]
+
+1. Restart gitlab-pages by running the following command:
+
+     ```ruby
+    sudo gitlab-ctl restart gitlab-pages
+    ```
 
 Watch the [video tutorial][video-admin] for this configuration.
 
@@ -154,7 +160,13 @@ outside world.
     where `pages-nginx.crt` and `pages-nginx.key` are the SSL cert and key,
     respectively.
 
-1. [Restart GitLab][restart]
+1. [Reconfigure GitLab][reconfigure]
+
+1. Restart gitlab-pages by running the following command:
+
+     ```ruby
+    sudo gitlab-ctl restart gitlab-pages
+    ```
 
 ## Advanced configuration
 
@@ -191,8 +203,13 @@ world. Custom domains are supported, but no TLS.
     `1.1.1.2` and `2001::2` are the secondary IPs the GitLab Pages daemon
     listens on. If you don't have IPv6, you can omit the IPv6 address.
 
-1. [Restart GitLab][restart]
+1. [Reconfigure GitLab][reconfigure]
 
+1. Restart gitlab-pages by running the following command:
+
+     ```ruby
+    sudo gitlab-ctl restart gitlab-pages
+    ```
 ### Custom domains with TLS support
 
 >**Requirements:**
@@ -224,7 +241,13 @@ world. Custom domains and TLS are supported.
     `1.1.1.2` and `2001::2` are the secondary IPs where the GitLab Pages daemon
     listens on. If you don't have IPv6, you can omit the IPv6 address.
 
-1. [Restart GitLab][restart]
+1. [Reconfigure GitLab][reconfigure]
+
+1. Restart gitlab-pages by running the following command:
+
+     ```ruby
+    sudo gitlab-ctl restart gitlab-pages
+    ```
 
 ### Custom domain verification
 
@@ -251,7 +274,13 @@ are stored.
      gitlab_rails['pages_path'] = "/mnt/storage/pages"
      ```
 
-1. [Restart GitLab][restart]
+1. [Reconfigure GitLab][reconfigure]
+
+1. Restart gitlab-pages by running the following command:
+
+     ```ruby
+    sudo gitlab-ctl restart gitlab-pages
+    ```
 
 ## Set maximum pages size
 
