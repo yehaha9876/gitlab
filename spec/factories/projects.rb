@@ -12,7 +12,7 @@ FactoryBot.define do
     has_external_issue_tracker false
 
     # Associations
-    namespace
+    namespace { create(:group) }
     creator { group ? create(:user) : namespace&.owner }
 
     # Nest Project Feature attributes
