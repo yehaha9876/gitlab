@@ -81,9 +81,9 @@ export default {
         time: new Date(),
         value: 0,
       },
-      currentDataIndex: 0,
       currentXCoordinate: 0,
-      currentFlagPosition: 0,
+      currentHoveredTimeSeriesIndex: 0,
+      currentCoordinates: [],
       showFlag: false,
       showFlagContent: false,
       timeSeries: [],
@@ -123,6 +123,12 @@ export default {
       this.positionFlag();
     },
   },
+  created() {
+    eventHub.$on('areaHovered', this.areaHovered);
+  },
+  beforeDestroy() {
+    eventHub.$off('areaHovered', this.areaHovered);
+  },
   mounted() {
     this.draw();
   },
@@ -156,6 +162,7 @@ export default {
       point.y = e.clientY;
       point = point.matrixTransform(this.$refs.graphData.getScreenCTM().inverse());
       point.x = point.x += 7;
+      if (point.x < 0) return;
       const firstTimeSeries = this.timeSeries[0];
       const timeValueOverlay = firstTimeSeries.timeSeriesScaleX.invert(point.x);
       const overlayIndex = bisectDate(firstTimeSeries.values, timeValueOverlay, 1);
@@ -171,6 +178,10 @@ export default {
         hoveredDate,
         currentDeployXPos,
       });
+    },
+    areaHovered(data) {
+      this.currentHoveredTimeSeriesIndex = data.timeSeriesIndex;
+      this.handleMouseOverGraph(data.event);
     },
     renderAxesPaths() {
       this.timeSeries = createTimeSeries(
@@ -265,6 +276,14 @@ export default {
           :viewBox="innerViewBox"
           ref="graphData"
         >
+          <rect
+            class="prometheus-graph-overlay"
+            :width="(graphWidth - 70)"
+            :height="(graphHeight - 100)"
+            transform="translate(-5, 20)"
+            ref="graphOverlay"
+            @mousemove="handleMouseOverGraph($event)"
+          />
           <graph-path
             v-for="(path, index) in timeSeries"
             :key="index"
@@ -273,19 +292,13 @@ export default {
             :line-style="path.lineStyle"
             :line-color="path.lineColor"
             :area-color="path.areaColor"
+            :current-coordinates="currentCoordinates[index]"
+            :current-time-series-index="index"
           />
           <graph-deployment
             :deployment-data="reducedDeploymentData"
             :graph-height="graphHeight"
             :graph-height-offset="graphHeightOffset"
-          />
-          <rect
-            class="prometheus-graph-overlay"
-            :width="(graphWidth - 70)"
-            :height="(graphHeight - 100)"
-            transform="translate(-5, 20)"
-            ref="graphOverlay"
-            @mousemove="handleMouseOverGraph($event)"
           />
         </svg>
       </svg>
@@ -298,9 +311,10 @@ export default {
         :show-flag-content="showFlagContent"
         :time-series="timeSeries"
         :unit-of-display="unitOfDisplay"
-        :current-data-index="currentDataIndex"
         :legend-title="legendTitle"
         :deployment-flag-data="deploymentFlagData"
+        :current-coordinates="currentCoordinates"
+        :current-hovered-time-series-index="currentHoveredTimeSeriesIndex"
       />
     </div>
     <graph-legend
