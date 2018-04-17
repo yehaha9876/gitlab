@@ -13,16 +13,13 @@ module IssuablesHelper
     sidebar_gutter_collapsed? ? _('Expand sidebar') : _('Collapse sidebar')
   end
 
-  def sidebar_assignee_empty_tooltip_label(issuable)
-    issuable.is_a?(Issue) ? _('Assignee(s)') : _('Assignee')
+  def sidebar_assignee_tooltip_label(issuable)
+    issuable.allows_multiple_assignees? ? _('Assignee(s)') : _('Assignee') unless issuable.assignee&.name?
   end
 
   def sidebar_due_date_tooltip_label(issuable)
     if issuable.due_date
-      [
-        _('Due date'),
-        due_date_remaining_days(issuable)
-      ].join('<br />')
+      "#{_('Due date')}<br />#{due_date_remaining_days(issuable)}"
     else
       _('Due date')
     end
@@ -31,10 +28,7 @@ module IssuablesHelper
   def due_date_remaining_days(issuable)
     remaining_days_in_words = remaining_days_in_words(issuable)
 
-    [
-      issuable.due_date.to_s(:medium),
-      "(#{remaining_days_in_words})"
-    ].join(' ')
+    "#{issuable.due_date.to_s(:medium)} (#{remaining_days_in_words})"
   end
 
   def multi_label_name(current_labels, default_label)

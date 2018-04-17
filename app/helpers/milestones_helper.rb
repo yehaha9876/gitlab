@@ -111,10 +111,7 @@ module MilestonesHelper
 
   def milestone_tooltip_title(milestone)
     if milestone
-      [
-        milestone.title,
-        milestone_tooltip_due_date(milestone)
-      ].join('<br />')
+      "#{milestone.title}<br />#{milestone_tooltip_due_date(milestone)}"
     else
       _('Milestone')
     end
@@ -149,6 +146,8 @@ module MilestonesHelper
   def milestone_issues_tooltip_text(milestone)
     issues = milestone.count_issues_by_state(current_user)
 
+    return _("Issues") if issues.empty?
+
     if issues.any?
       content = []
 
@@ -157,12 +156,12 @@ module MilestonesHelper
 
       return content.join('<br />').html_safe
     end
-
-    _("Issues")
   end
 
   def milestone_merge_requests_tooltip_text(milestone)
     merge_requests = milestone.merge_requests
+
+    return _("Merge requests") if merge_requests.empty?
 
     if merge_requests.any?
       content = []
@@ -173,13 +172,11 @@ module MilestonesHelper
 
       return content.join('<br />').html_safe
     end
-
-    _("Merge requests")
   end
 
   def milestone_tooltip_due_date(milestone)
     if milestone.due_date
-      [milestone.due_date.to_s(:medium), "(#{remaining_days_in_words(milestone)})"].join(' ')
+      "#{milestone.due_date.to_s(:medium)} (#{remaining_days_in_words(milestone)})"
     end
   end
 
