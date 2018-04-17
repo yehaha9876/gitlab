@@ -1893,11 +1893,7 @@ class Project < ActiveRecord::Base
   end
 
   def ci_yaml_file_path
-    if ci_config_path.blank?
-      '.gitlab-ci.yml'
-    else
-      ci_config_path
-    end
+    ci_config_path.presence || '.gitlab-ci.yml'
   end
 
   private
