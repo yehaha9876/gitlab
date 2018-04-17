@@ -78,6 +78,9 @@ class Project < ActiveRecord::Base
   before_save :ensure_runners_token
 
   after_save :update_project_statistics, if: :namespace_id_changed?
+
+  after_save :create_import_state, if: ->(project) { project.import_state.nil? && project.import? }
+
   after_create :create_project_feature, unless: :project_feature
 
   after_create :create_ci_cd_settings,
@@ -315,7 +318,7 @@ class Project < ActiveRecord::Base
   scope :in_namespace, ->(namespace_ids) { where(namespace_id: namespace_ids) }
   scope :personal, ->(user) { where(namespace_id: user.namespace_id) }
   scope :joined, ->(user) { where('namespace_id != ?', user.namespace_id) }
-  scope :starred_by, ->(user) { joins(:users_star_projects).where('users_star_projects.user_id' => user.id) }
+  scope :starred_by, ->(user) { joins(:users_star_projects).where('users_star_projects.user_id': user.id) }
   scope :visible_to_user, ->(user) { where(id: user.authorized_projects.select(:id).reorder(nil)) }
   scope :archived, -> { where(archived: true) }
   scope :non_archived, -> { where(archived: false) }
@@ -670,7 +673,7 @@ class Project < ActiveRecord::Base
   end
 
   def import_failed?
-    import_state.failed?
+    import_status.failed?
   end
 
   def import_finished?
@@ -1457,7 +1460,7 @@ class Project < ActiveRecord::Base
   def rename_repo_notify!
     # When we import a project overwriting the original project, there
     # is a move operation. In that case we don't want to send the instructions.
-    send_move_instructions(full_path_was) unless started?
+    send_move_instructions(full_path_was) unless import? && import_started?
     expires_full_path_cache
 
     self.old_path_with_namespace = full_path_was
@@ -1468,8 +1471,8 @@ class Project < ActiveRecord::Base
 
   def after_import
     repository.after_import
-    import_finish
-    remove_import_jid
+    import_state.finish
+    import_state.remove_jid
     update_project_counter_caches
     after_create_default_branch
     refresh_markdown_cache!
@@ -1507,13 +1510,6 @@ class Project < ActiveRecord::Base
     end
   end
 
-  def remove_import_jid
-    return unless import_jid
-
-    Gitlab::SidekiqStatus.unset(import_jid)
-    import_state.update_column(:jid, nil)
-  end
-
   def running_or_pending_build_count(force: false)
     Rails.cache.fetch(['projects', id, 'running_or_pending_build_count'], force: force) do
       builds.running_or_pending.count(:all)
@@ -1523,18 +1519,6 @@ class Project < ActiveRecord::Base
   # Lazy loading of the `pipeline_status` attribute
   def pipeline_status
     @pipeline_status ||= Gitlab::Cache::Ci::ProjectPipelineStatus.load_for_project(self)
-  end
-
-  def mark_import_as_failed(error_message)
-    original_errors = errors.dup
-    sanitized_message = Gitlab::UrlSanitizer.sanitize(error_message)
-
-    import_fail
-    import_state.update_column(:last_error, sanitized_message)
-  rescue ActiveRecord::ActiveRecordError => e
-    Rails.logger.error("Error setting import status to failed: #{e.message}. Original error: #{sanitized_message}")
-  ensure
-    @errors = original_errors
   end
 
   def add_export_job(current_user:, after_export_strategy: nil, params: {})
@@ -1850,10 +1834,6 @@ class Project < ActiveRecord::Base
   end
 
   private
-
-  def import_jid
-    import_state.jid
-  end
 
   def storage
     @storage ||=

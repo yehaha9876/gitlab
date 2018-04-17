@@ -62,14 +62,14 @@ class RepositoryUpdateMirrorWorker
   end
 
   def fail_mirror(project, message)
-    project.mark_import_as_failed(message)
+    project.import_state.mark_as_failed(message)
 
     Rails.logger.error("Mirror update for #{project.full_path} failed with the following message: #{message}")
     Gitlab::Metrics.add_event(:mirrors_failed, path: project.full_path)
   end
 
   def finish_mirror(project)
-    project.import_finish
+    project.import_state.finish
 
     Rails.logger.info("Mirror update for #{project.full_path} successfully finished. Update duration: #{project.mirror_update_duration}}.")
     Gitlab::Metrics.add_event_with_values(

@@ -80,11 +80,7 @@ class Import::GoogleCodeController < Import::BaseController
   end
 
   def jobs
-    jobs = current_user.created_projects
-                       .joins_import_state
-                       .where(import_type: "google_code")
-                       .to_json(only: [:id], include: { import_state: { only: [:status] } })
-    render json: jobs
+    render json: find_jobs("google_code")
   end
 
   def create

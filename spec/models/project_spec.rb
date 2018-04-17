@@ -272,16 +272,12 @@ describe Project do
       expect(project2.errors[:import_url].first).to include('Only allowed ports are 22, 80, 443')
     end
 
-    it 'creates mirror data when enabled' do
-      project2 = create(:project, :mirror, mirror: false)
+    it 'creates import state when mirror gets enabled' do
+      project2 = create(:project)
 
-      expect { project2.update_attributes(mirror: true) }.to change { ProjectImportState.count }.from(0).to(1)
-    end
-
-    it 'destroys mirror data when disabled' do
-      project2 = create(:project, :mirror)
-
-      expect { project2.update_attributes(mirror: false) }.to change { ProjectImportState.count }.from(1).to(0)
+      expect do
+        project2.update_attributes(mirror: true, import_url: generate(:url), mirror_user: project.creator)
+      end.to change { ProjectImportState.where(project: project2).count }.from(0).to(1)
     end
 
     describe 'project pending deletion' do
@@ -1622,7 +1618,7 @@ describe Project do
       it 'returns the full URL' do
         project = create(:project, :mirror, import_url: 'http://user:pass@test.com')
 
-        project.import_finish
+        project.import_state.finish
 
         expect(project.reload.import_url).to eq('http://user:pass@test.com')
       end
@@ -1632,7 +1628,7 @@ describe Project do
       it 'returns the sanitized URL' do
         project = create(:project, :import_started, import_url: 'http://user:pass@test.com')
 
-        project.import_finish
+        project.import_state.finish
 
         expect(project.reload.import_url).to eq('http://test.com')
       end
@@ -1767,7 +1763,7 @@ describe Project do
     it 'imports a project' do
       expect_any_instance_of(RepositoryImportWorker).to receive(:perform).and_call_original
 
-      expect { project.import_schedule }.to change { project.import_state.jid }
+      expect { project.import_state.schedule }.to change { project.import_state.jid }
       expect(project.import_state.reload.status).to eq('finished')
     end
 
@@ -1779,7 +1775,7 @@ describe Project do
         expect_any_instance_of(EE::Project).to receive(:force_import_job!)
         expect_any_instance_of(RepositoryImportWorker).to receive(:perform).with(project.id).and_call_original
 
-        expect { project.import_schedule }.to change { project.import_state.jid }
+        expect { project.import_state.schedule }.to change { project.import_state.jid }
       end
     end
   end
@@ -1805,13 +1801,13 @@ describe Project do
         mirror = create(:project_empty_repo, :import_started)
         mirror.import_state.update_attributes(last_error: error_message)
 
-        expect { mirror.import_finish }.to change { mirror.import_state.last_error }.from(error_message).to(nil)
+        expect { mirror.import_state.finish }.to change { mirror.import_state.last_error }.from(error_message).to(nil)
       end
 
       it 'performs housekeeping when an import of a fresh project is completed' do
         project = create(:project_empty_repo, :import_started, import_type: :github)
 
-        project.import_finish
+        project.import_state.finish
 
         expect(after_import_service).to have_received(:execute)
         expect(housekeeping_service).to have_received(:execute)
@@ -1820,7 +1816,7 @@ describe Project do
       it 'does not perform housekeeping when project repository does not exist' do
         project = create(:project, :import_started, import_type: :github)
 
-        project.import_finish
+        project.import_state.finish
 
         expect(housekeeping_service).not_to have_received(:execute)
       end
@@ -1828,7 +1824,7 @@ describe Project do
       it 'does not perform housekeeping when project does not have a valid import type' do
         project = create(:project, :import_started, import_type: nil)
 
-        project.import_finish
+        project.import_state.finish
 
         expect(housekeeping_service).not_to have_received(:execute)
       end
@@ -3564,7 +3560,7 @@ describe Project do
 
     it 'runs the correct hooks' do
       expect(project.repository).to receive(:after_import)
-      expect(project).to receive(:import_finish)
+      expect(project.import_state).to receive(:finish)
       expect(project).to receive(:update_project_counter_caches)
       expect(project).to receive(:remove_import_jid)
       expect(project).to receive(:after_create_default_branch)
@@ -3574,7 +3570,7 @@ describe Project do
     end
 
     context 'branch protection' do
-      let(:project) { create(:project, :repository) }
+      let(:project) { create(:project, :repository, :import_started) }
 
       it 'does not protect when branch protection is disabled' do
         stub_application_setting(default_branch_protection: Gitlab::Access::PROTECTION_NONE)
@@ -3638,6 +3634,8 @@ describe Project do
       it 'does nothing' do
         project = create(:project)
 
+        project.create_import_state
+
         expect(Gitlab::SidekiqStatus)
           .not_to receive(:unset)
 
@@ -3648,8 +3646,8 @@ describe Project do
     context 'with an import JID' do
       it 'unsets the import JID' do
         project = create(:project)
+        project.create_import_state
 
-        # TODO: make sure this works
         project.import_state.jid = '123'
 
         expect(Gitlab::SidekiqStatus)

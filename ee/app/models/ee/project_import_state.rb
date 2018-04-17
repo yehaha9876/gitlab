@@ -9,7 +9,6 @@ module EE
       belongs_to :project
 
       validates :project, presence: true
-      validates :next_execution_timestamp, presence: true
 
       before_validation :set_next_execution_to_now, on: :create
 
@@ -30,7 +29,7 @@ module EE
         end
 
         after_transition started: :failed do |state, _|
-          if state.project.mirror? && state.retry_limit_exceeded?
+          if state.project.mirror? && state.hard_failed?
             ::NotificationService.new.mirror_was_hard_failed(state.project)
           end
         end
@@ -54,7 +53,6 @@ module EE
 
           if project.mirror?
             timestamp = Time.now
-            # TODO: two calls to import_state, make it 1
             state.last_update_at = timestamp
             state.last_successful_update_at = timestamp
 
@@ -63,7 +61,7 @@ module EE
           end
 
           if ::Gitlab::CurrentSettings.current_application_settings.elasticsearch_indexing?
-            project.run_after_commit do
+            state.run_after_commit do
               last_indexed_commit = project.index_status&.last_commit
               ElasticCommitIndexerWorker.perform_async(project.id, last_indexed_commit)
             end
@@ -90,18 +88,20 @@ module EE
       def set_next_execution_timestamp
         timestamp = Time.now
         retry_factor = [1, self.retry_count].max
-        delay = [base_delay(timestamp), Gitlab::Mirror.min_delay].max
-        delay = [delay * retry_factor, Gitlab::Mirror.max_delay].min
+        delay = [base_delay(timestamp), ::Gitlab::Mirror.min_delay].max
+        delay = [delay * retry_factor, ::Gitlab::Mirror.max_delay].min
 
         self.next_execution_timestamp = timestamp + delay
       end
 
       def set_next_execution_to_now
+        return unless project.mirror?
+
         self.next_execution_timestamp = Time.now
       end
 
-      def retry_limit_exceeded?
-        self.retry_count > Gitlab::Mirror::MAX_RETRY
+      def hard_failed?
+        self.retry_count > ::Gitlab::Mirror::MAX_RETRY
       end
 
       private
@@ -113,7 +113,6 @@ module EE
 
         (BACKOFF_PERIOD + rand(JITTER)) * duration.seconds
       end
-
     end
   end
 end

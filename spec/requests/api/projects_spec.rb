@@ -888,9 +888,8 @@ describe API::Projects do
         expect(json_response['shared_runners_enabled']).to be_present
         expect(json_response['creator_id']).to be_present
         expect(json_response['namespace']).to be_present
-        expect(json_response['import_status']).to be_present
-        # TODO: Check this
-        expect(json_response).to include("last_error")
+        expect(json_response['import_status']).to be_nil
+        expect(json_response).not_to include("last_error")
         expect(json_response['avatar_url']).to be_nil
         expect(json_response['star_count']).to be_present
         expect(json_response['forks_count']).to be_present
@@ -962,7 +961,6 @@ describe API::Projects do
         expect(json_response).to include 'statistics'
       end
 
-      # TODO: check this
       it "includes import_error if user can admin project" do
         get api("/projects/#{project.id}", user)
 
@@ -970,7 +968,6 @@ describe API::Projects do
         expect(json_response).to include("import_error")
       end
 
-      # TODO: check this
       it "does not include import_error if user cannot admin project" do
         get api("/projects/#{project.id}", user3)
 
@@ -1896,7 +1893,6 @@ describe API::Projects do
         expect(json_response['namespace']['id']).to eq(user2.namespace.id)
         expect(json_response['forked_from_project']['id']).to eq(project.id)
         expect(json_response['import_status']).to eq('scheduled')
-        # TODO: Check this
         expect(json_response).to include("import_error")
       end
 
@@ -1910,7 +1906,6 @@ describe API::Projects do
         expect(json_response['namespace']['id']).to eq(admin.namespace.id)
         expect(json_response['forked_from_project']['id']).to eq(project.id)
         expect(json_response['import_status']).to eq('scheduled')
-        # TODO: check this
         expect(json_response).to include("import_error")
       end
 

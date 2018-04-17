@@ -7,7 +7,7 @@
 - when :failed
   = render_mirror_failed_message(raw_message: raw_message)
 
-  - if @project.mirror_hard_failed?
+  - if @project.import_state.hard_failed?
     %br
     Repository mirroring has been paused due to too many failed attempts, and can be resumed by a project master.
 

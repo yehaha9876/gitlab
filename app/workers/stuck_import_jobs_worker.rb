@@ -23,13 +23,13 @@ class StuckImportJobsWorker
   private
 
   def mark_projects_without_jid_as_failed!
-    enqueued_projects_without_jid.each do |project|
-      project.mark_import_as_failed(error_message)
+    enqueued_project_states_without_jid.each do |state|
+      state.mark_as_failed(error_message)
     end.count
   end
 
   def mark_projects_with_jid_as_failed!
-    jids_and_ids = enqueued_projects_with_jid.pluck("import_state.jid", :id).to_h
+    jids_and_ids = enqueued_project_states_with_jid.pluck(:jid, :project_id).to_h
 
     # Find the jobs that aren't currently running or that exceeded the threshold.
     completed_jids = Gitlab::SidekiqStatus.completed_jids(jids_and_ids.keys)
@@ -39,28 +39,27 @@ class StuckImportJobsWorker
 
     # We select the projects again, because they may have transitioned from
     # scheduled/started to finished/failed while we were looking up their Sidekiq status.
-    completed_projects = enqueued_projects_with_jid.where(id: completed_project_ids)
+    completed_project_states = enqueued_project_states_with_jid.where(project_id: completed_project_ids)
 
-    # TODO: Check if `includes` is not a better fit in this case
-    failed_jids = completed_projects.joins_import_state.map { |project| project.import_state.jid }
+    failed_jids = completed_project_states.map(&:jid)
 
     Rails.logger.info("Marked stuck import jobs as failed. JIDs: #{failed_jids.join(', ')}")
 
-    completed_projects.each do |project|
-      project.mark_import_as_failed(error_message)
+    completed_project_states.each do |state|
+      state.mark_as_failed(error_message)
     end.count
   end
 
-  def enqueued_projects
-    Project.joins_import_state.with_status(:scheduled, :started)
+  def enqueued_project_states
+    ProjectImportState.with_status(:scheduled, :started)
   end
 
-  def enqueued_projects_with_jid
-    enqueued_projects.where.not(import_state: { jid: nil })
+  def enqueued_project_states_with_jid
+    enqueued_project_states.where.not(jid: nil)
   end
 
-  def enqueued_projects_without_jid
-    enqueued_projects.where(import_state: { jid: nil })
+  def enqueued_project_states_without_jid
+    enqueued_project_states.where(jid: nil)
   end
 
   def error_message

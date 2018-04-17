@@ -8,23 +8,23 @@ class ProjectImportState < ActiveRecord::Base
   scope :with_started_status, -> { where(status: 'started') }
 
   state_machine :status, initial: :none do
-    event :import_schedule do
+    event :schedule do
       transition [:none, :finished, :failed] => :scheduled
     end
 
-    event :force_import_start do
+    event :force_start do
       transition [:none, :finished, :failed] => :started
     end
 
-    event :import_start do
+    event :start do
       transition scheduled: :started
     end
 
-    event :import_finish do
+    event :finish do
       transition started: :finished
     end
 
-    event :import_fail do
+    event :fail_op do
       transition [:scheduled, :started] => :failed
     end
 
@@ -46,7 +46,7 @@ class ProjectImportState < ActiveRecord::Base
       project.reset_cache_and_import_attrs
 
       if Gitlab::ImportSources.importer_names.include?(project.import_type) && project.repo_exists?
-        project.run_after_commit do
+        state.run_after_commit do
           Projects::AfterImportService.new(project).execute
         end
       end
@@ -58,5 +58,24 @@ class ProjectImportState < ActiveRecord::Base
 
     Gitlab::SidekiqStatus
         .set(jid, StuckImportJobsWorker::IMPORT_JOBS_EXPIRATION)
+  end
+
+  def remove_jid
+    return unless jid
+
+    Gitlab::SidekiqStatus.unset(jid)
+    update_column(:jid, nil)
+  end
+
+  def mark_as_failed(error_message)
+    original_errors = errors.dup
+    sanitized_message = Gitlab::UrlSanitizer.sanitize(error_message)
+
+    fail_op
+    update_column(:last_error, sanitized_message)
+  rescue ActiveRecord::ActiveRecordError => e
+    Rails.logger.error("Error setting import status to failed: #{e.message}. Original error: #{sanitized_message}")
+  ensure
+    @errors = original_errors
   end
 end

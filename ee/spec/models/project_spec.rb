@@ -123,7 +123,7 @@ describe Project do
 
       expect_any_instance_of(EE::NotificationService).to receive(:mirror_was_hard_failed).with(project)
 
-      project.import_fail
+      project.import_state.fail_op
     end
   end
 

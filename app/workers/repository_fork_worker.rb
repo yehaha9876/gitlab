@@ -13,8 +13,9 @@ class RepositoryForkWorker
     # See https://gitlab.com/gitlab-org/gitaly/issues/1110
     if args.empty?
       source_project = target_project.forked_from_project
+
       unless source_project
-        return target_project.mark_import_as_failed('Source project cannot be found.')
+        return target_project.import_state.mark_as_failed('Source project cannot be found.')
       end
 
       fork_repository(target_project, source_project.repository_storage, source_project.disk_path)

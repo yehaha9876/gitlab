@@ -112,7 +112,9 @@ module API
       end
 
       # TODO: Use `expose_nil` once we upgrade the grape-entity gem
-      expose :import_error, if: lambda { |status, _ops| status.import_state.last_error }
+      expose :import_error, if: lambda { |status, _ops| status.import_state.last_error } do |project, _|
+        project.import_state.last_error
+      end
     end
 
     class BasicProjectDetails < ProjectIdentity
@@ -195,9 +197,11 @@ module API
       expose :namespace, using: 'API::Entities::NamespaceBasic'
       expose :forked_from_project, using: Entities::BasicProjectDetails, if: lambda { |project, options| project.forked? }
       expose :import_status do |project, _|
-        project.import_state.status
+        project&.import_state&.status
       end
-      expose :import_error, if: lambda { |_project, options| options[:user_can_admin_project] }
+      expose :import_error, if: lambda { |_project, options| options[:user_can_admin_project] } do |project, _|
+        project&.import_state&.last_error
+      end
 
       expose :open_issues_count, if: lambda { |project, options| project.feature_available?(:issues, options[:current_user]) }
       expose :runners_token, if: lambda { |_project, options| options[:user_can_admin_project] }

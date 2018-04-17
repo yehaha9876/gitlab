@@ -39,7 +39,7 @@ class GithubImport
   end
 
   def import!
-    @project.force_import_start
+    @project.import_state.force_start
 
     import_success = false
 
@@ -50,7 +50,7 @@ class GithubImport
     end
 
     if import_success
-      @project.import_finish
+      @project.import_state.finish
       puts "Import finished. Timings: #{timings}".color(:green)
     else
       puts "Import was not successful. Errors were as follows:"

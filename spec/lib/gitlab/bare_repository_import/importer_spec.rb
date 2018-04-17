@@ -74,7 +74,7 @@ describe Gitlab::BareRepositoryImport::Importer, repository: true do
       end
 
       it 'does not schedule an import' do
-        expect_any_instance_of(Project).not_to receive(:import_schedule)
+        expect_any_instance_of(ProjectImportState).not_to receive(:import_schedule)
 
         importer.create_project_if_needed
       end

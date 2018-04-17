@@ -16,9 +16,6 @@ module EE
       before_validation :mark_remote_mirrors_for_removal
 
       before_save :set_override_pull_mirror_available, unless: -> { ::Gitlab::CurrentSettings.mirror_available }
-      # TODO: Handle these callbacks diferentely
-      after_save :create_import_data, if: ->(project) { project.mirror? && project.mirror_changed? }
-      after_save :destroy_import_data, if: ->(project) { !project.mirror? && project.mirror_changed? }
 
       after_update :remove_mirror_repository_reference,
         if: ->(project) { project.mirror? && project.import_url_updated? }
@@ -146,7 +143,7 @@ module EE
       return false if mirror_hard_failed?
       return false if updating_mirror?
 
-      self.import_state.next_execution_timestamp <= Time.now
+      import_state.next_execution_timestamp <= Time.now
     end
 
     def updating_mirror?
@@ -156,7 +153,7 @@ module EE
     def mirror_last_update_status
       return unless mirror_updated?
 
-      if self.import_state.last_update_at == self.import_state.last_successful_update_at
+      if import_state.last_update_at == import_state.last_successful_update_at
         :success
       else
         :failed
@@ -172,12 +169,7 @@ module EE
     end
 
     def mirror_ever_updated_successfully?
-      mirror_updated? && self.import_state.last_successful_update_at
-    end
-
-    # TODO: investigate if we can remove this method
-    def mirror_hard_failed?
-      self.import_state.retry_limit_exceeded?
+      mirror_updated? && import_state.last_successful_update_at
     end
 
     def has_remote_mirror?
@@ -258,13 +250,14 @@ module EE
       config.address&.gsub(wildcard, full_path)
     end
 
+    # TODO: explore refactoring for this method (Maybe move it to ProjectImportState?)
     def force_import_job!
       return if mirror_about_to_update? || updating_mirror?
 
       import_state = self.import_state
 
       import_state.set_next_execution_to_now
-      import_state.reset_retry_count if import_state.retry_limit_exceeded?
+      import_state.reset_retry_count if import_state.hard_failed?
 
       import_state.save!
 
@@ -532,10 +525,6 @@ module EE
       else
         globally_available
       end
-    end
-
-    def destroy_import_state
-      import_state.destroy
     end
 
     def validate_board_limit(board)

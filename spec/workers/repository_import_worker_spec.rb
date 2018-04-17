@@ -25,7 +25,7 @@ describe RepositoryImportWorker do
           .and_return({ status: :ok })
 
         expect_any_instance_of(Repository).to receive(:expire_emptiness_caches)
-        expect_any_instance_of(Project).to receive(:import_finish)
+        expect_any_instance_of(ProjectImportState).to receive(:finish)
 
         subject.perform(project.id)
       end
@@ -38,7 +38,7 @@ describe RepositoryImportWorker do
 
         expect_any_instance_of(Project).to receive(:after_import).and_call_original
         expect_any_instance_of(Repository).to receive(:expire_emptiness_caches)
-        expect_any_instance_of(Project).to receive(:import_finish)
+        expect_any_instance_of(ProjectImportState).to receive(:finish)
 
         subject.perform(project.id)
       end
@@ -101,8 +101,8 @@ describe RepositoryImportWorker do
           .to receive(:async?)
           .and_return(true)
 
-        expect_any_instance_of(Project)
-          .not_to receive(:import_finish)
+        expect_any_instance_of(ProjectImportState)
+          .not_to receive(:finish)
 
         subject.perform(project.id)
       end

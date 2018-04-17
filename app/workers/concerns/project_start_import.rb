@@ -5,6 +5,6 @@ module ProjectStartImport
       return true
     end
 
-    project.import_start
+    project.import_state.start
   end
 end

@@ -13,7 +13,7 @@ class Projects::ImportsController < Projects::ApplicationController
 
   def create
     if @project.update_attributes(safe_import_params)
-      @project.reload.import_schedule
+      @project.import_state.reload.schedule
     end
 
     redirect_to project_import_path(@project)

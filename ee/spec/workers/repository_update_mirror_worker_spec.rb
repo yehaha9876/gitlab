@@ -41,9 +41,8 @@ describe RepositoryUpdateMirrorWorker do
     context 'when worker was reset without cleanup' do
       let(:started_project) { create(:project, :mirror, :import_started) }
 
-      # TODO: Check if this spec passes
       before do
-        started_project.import_state.jid = jid
+        started_project.import_state.update_attributes(jid: jid)
       end
 
       it 'sets status as finished when update mirror service executes successfully' do

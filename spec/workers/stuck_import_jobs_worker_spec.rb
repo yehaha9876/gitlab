@@ -8,8 +8,8 @@ describe StuckImportJobsWorker do
       context 'when the import status was already updated' do
         before do
           allow(Gitlab::SidekiqStatus).to receive(:completed_jids) do
-            project.import_start
-            project.import_finish
+            project.import_state.start
+            project.import_state.finish
 
             [project.import_state.jid]
           end
@@ -50,7 +50,6 @@ describe StuckImportJobsWorker do
     it_behaves_like 'project import job detection' do
       let(:project) { create(:project, :import_scheduled) }
 
-      # TODO: Make sure this spec works
       before do
         project.import_state.update_attributes(jid: '123')
       end
@@ -59,9 +58,8 @@ describe StuckImportJobsWorker do
 
   describe 'with started import_status' do
     it_behaves_like 'project import job detection' do
-      let(:project) { create(:project, :import_started, import_jid: '123') }
+      let(:project) { create(:project, :import_started) }
 
-      # TODO: Make sure this spec works
       before do
         project.import_state.update_attributes(jid: '123')
       end
