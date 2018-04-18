@@ -5,6 +5,12 @@ class ProjectImportState < ActiveRecord::Base
 
   prepend EE::ProjectImportState
 
+  belongs_to :project
+
+  delegate :mirror?, to: :project
+
+  validates :project, presence: true
+
   scope :with_started_status, -> { where(status: 'started') }
 
   state_machine :status, initial: :none do
@@ -56,8 +62,7 @@ class ProjectImportState < ActiveRecord::Base
   def refresh_jid_expiration
     return unless jid
 
-    Gitlab::SidekiqStatus
-        .set(jid, StuckImportJobsWorker::IMPORT_JOBS_EXPIRATION)
+    Gitlab::SidekiqStatus.set(jid, StuckImportJobsWorker::IMPORT_JOBS_EXPIRATION)
   end
 
   def remove_jid

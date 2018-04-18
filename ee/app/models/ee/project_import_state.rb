@@ -6,10 +6,6 @@ module EE
       BACKOFF_PERIOD = 24.seconds
       JITTER = 6.seconds
 
-      belongs_to :project
-
-      validates :project, presence: true
-
       before_validation :set_next_execution_to_now, on: :create
 
       state_machine :status, initial: :none do
@@ -22,26 +18,24 @@ module EE
         end
 
         before_transition scheduled: :failed do |state, _|
-          if state.project.mirror?
+          if state.mirror?
             state.last_update_at = Time.now
             state.set_next_execution_to_now
           end
         end
 
         after_transition started: :failed do |state, _|
-          if state.project.mirror? && state.hard_failed?
+          if state.mirror? && state.hard_failed?
             ::NotificationService.new.mirror_was_hard_failed(state.project)
           end
         end
 
         after_transition [:scheduled, :started] => [:finished, :failed] do |state, _|
-          project = state.project
-
-          ::Gitlab::Mirror.decrement_capacity(project.id) if project.mirror?
+          ::Gitlab::Mirror.decrement_capacity(state.project_id) if state.mirror?
         end
 
         before_transition started: :failed do |state, _|
-          if state.project.mirror?
+          if state.mirror?
             state.last_update_at = Time.now
             state.increment_retry_count
             state.set_next_execution_timestamp
@@ -49,9 +43,7 @@ module EE
         end
 
         before_transition started: :finished do |state, _|
-          project = state.project
-
-          if project.mirror?
+          if state.mirror?
             timestamp = Time.now
             state.last_update_at = timestamp
             state.last_successful_update_at = timestamp
@@ -62,16 +54,14 @@ module EE
 
           if ::Gitlab::CurrentSettings.current_application_settings.elasticsearch_indexing?
             state.run_after_commit do
-              last_indexed_commit = project.index_status&.last_commit
-              ElasticCommitIndexerWorker.perform_async(project.id, last_indexed_commit)
+              last_indexed_commit = state.project.index_status&.last_commit
+              ElasticCommitIndexerWorker.perform_async(state.project_id, last_indexed_commit)
             end
           end
         end
 
         after_transition [:finished, :failed] => [:scheduled, :started] do |state, _|
-          project = state.project
-
-          ::Gitlab::Mirror.increment_capacity(project.id) if project.mirror?
+          ::Gitlab::Mirror.increment_capacity(state.project_id) if state.mirror?
         end
       end
 
@@ -95,7 +85,7 @@ module EE
       end
 
       def set_next_execution_to_now
-        return unless project.mirror?
+        return unless mirror?
 
         self.next_execution_timestamp = Time.now
       end
