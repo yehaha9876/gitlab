@@ -1,5 +1,7 @@
 module Search
   class GlobalService
+    prepend EE::Search::GlobalService
+
     attr_accessor :current_user, :params
     attr_reader :default_project_filter
 
@@ -38,11 +40,14 @@ module Search
 
     def scope
       @scope ||= begin
-        allowed_scopes = %w[issues merge_requests milestones]
-        allowed_scopes += %w[wiki_blobs blobs commits] if Gitlab::CurrentSettings.elasticsearch_search?
-
         allowed_scopes.delete(params[:scope]) { 'projects' }
       end
+    end
+
+    private
+
+    def allowed_scopes
+      %w[issues merge_requests milestones]
     end
   end
 end

@@ -1,0 +1,13 @@
+.search-result-row
+  %h4
+    %span.issue-title-text
+      = link_to epic.title, epic_path(epic)
+    %span.issuable-reference.float-right
+      = epic.to_reference(@group)
+  .issuable-info
+    - if epic.description.present?
+      .description.term
+        = search_md_sanitize(epic, :description)
+    - if epic.labels.any?
+      - epic.labels.each do |label|
+        = link_to render_colored_label(label, tooltip: true), group_epics_path(epic.group, label_name:[label.name]), class: 'label-link'

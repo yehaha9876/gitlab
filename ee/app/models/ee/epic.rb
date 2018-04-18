@@ -9,6 +9,7 @@ module EE
       include Noteable
       include Referable
       include Awardable
+      include Elastic::EpicsSearch
 
       belongs_to :assignee, class_name: "User"
       belongs_to :group
@@ -76,6 +77,10 @@ module EE
 
       def parent_class
         ::Group
+      end
+
+      def search(query)
+        fuzzy_search(query, [:title, :description])
       end
     end
 

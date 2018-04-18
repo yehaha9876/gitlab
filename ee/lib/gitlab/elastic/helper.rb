@@ -8,6 +8,7 @@ module Gitlab
 
         [
           Project,
+          Epic,
           Issue,
           MergeRequest,
           Snippet,

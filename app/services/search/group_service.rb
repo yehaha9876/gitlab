@@ -1,5 +1,7 @@
 module Search
   class GroupService < Search::GlobalService
+    prepend EE::Search::GroupService
+
     attr_accessor :group
 
     def initialize(user, group, params)

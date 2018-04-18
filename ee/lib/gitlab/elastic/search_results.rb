@@ -18,6 +18,8 @@ module Gitlab
         case scope
         when 'projects'
           projects.page(page).per(per_page).records
+        when 'epics'
+          epics.page(page).per(per_page).records
         when 'issues'
           issues.page(page).per(per_page).records
         when 'merge_requests'
@@ -39,6 +41,11 @@ module Gitlab
         @projects_count ||= projects.total_count
       end
       alias_method :limited_projects_count, :projects_count
+
+      def epics_count
+        @epics_count ||= epics.total_count
+      end
+      alias_method :limited_epics_count, :epics_count
 
       def blobs_count
         @blobs_count ||= blobs.total_count
@@ -131,6 +138,10 @@ module Gitlab
 
       def projects
         Project.elastic_search(query, options: base_options)
+      end
+
+      def epics
+        Epic.elastic_search(query, options: base_options)
       end
 
       def issues

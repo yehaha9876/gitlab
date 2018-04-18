@@ -64,7 +64,8 @@ namespace :gitlab do
       "MergeRequest" => "index_merge_requests",
       "Snippet"      => "index_snippets",
       "Note"         => "index_notes",
-      "Milestone"    => "index_milestones"
+      "Milestone"    => "index_milestones",
+      "Epic"         => "index_epics"
     }.freeze
 
     INDEXABLE_CLASSES.each do |klass_name, task_name|
@@ -77,7 +78,7 @@ namespace :gitlab do
         case klass_name
         when 'Note'
           Note.searchable.import_with_parent
-        when 'Project', 'Snippet'
+        when 'Project', 'Snippet', 'Epic'
           klass.import
         else
           klass.import_with_parent

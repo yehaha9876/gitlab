@@ -25,6 +25,8 @@ module Gitlab
       end
     end
 
+    prepend EE::Gitlab::SearchResults
+
     attr_reader :current_user, :query, :per_page
 
     # Limit search results by passed projects
@@ -46,19 +48,7 @@ module Gitlab
     end
 
     def objects(scope, page = nil, without_count = true)
-      collection = case scope
-                   when 'projects'
-                     projects.page(page).per(per_page)
-                   when 'issues'
-                     issues.page(page).per(per_page)
-                   when 'merge_requests'
-                     merge_requests.page(page).per(per_page)
-                   when 'milestones'
-                     milestones.page(page).per(per_page)
-                   else
-                     Kaminari.paginate_array([]).page(page).per(per_page)
-                   end
-
+      collection = collection(scope, page)
       without_count ? collection.without_count : collection
     end
 
@@ -95,6 +85,21 @@ module Gitlab
     end
 
     private
+
+    def collection(scope, page)
+      case scope
+      when 'projects'
+        projects.page(page).per(per_page)
+      when 'issues'
+        issues.page(page).per(per_page)
+      when 'merge_requests'
+        merge_requests.page(page).per(per_page)
+      when 'milestones'
+        milestones.page(page).per(per_page)
+      else
+        Kaminari.paginate_array([]).page(page).per(per_page)
+      end
+    end
 
     def projects
       limit_projects.search(query)

@@ -35,6 +35,28 @@ feature 'Global elastic search' do
     end
   end
 
+  describe 'I search through the epics' do
+    let!(:group) { create(:group) }
+    let!(:epic) { create(:epic, group: group, title: 'An epic epic') }
+
+    before do
+      group.add_master(user)
+
+      Gitlab::Elastic::Helper.refresh_index
+    end
+
+    it 'finds epics' do
+      visit dashboard_projects_path
+
+      fill_in 'search', with: 'epic'
+      click_button 'Go'
+
+      select_filter('Epics')
+
+      expect(page).to have_link(epic.title)
+    end
+  end
+
   describe 'I search through the blobs' do
     before do
       project.repository.index_blobs
