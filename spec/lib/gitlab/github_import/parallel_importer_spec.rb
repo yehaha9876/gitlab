@@ -11,6 +11,11 @@ describe Gitlab::GithubImport::ParallelImporter do
     let(:project) { create(:project) }
     let(:importer) { described_class.new(project) }
 
+    # TODO: Cross check if in fact when this is called the project already has the association established
+    before do
+      project.create_import_state
+    end
+
     before do
       expect(Gitlab::GithubImport::Stage::ImportRepositoryWorker)
         .to receive(:perform_async)

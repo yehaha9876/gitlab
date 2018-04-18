@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Gitlab::GithubImport::Importer::RepositoryImporter do
   let(:repository) { double(:repository) }
+  let(:import_state) { double(:import_state) }
   let(:client) { double(:client) }
 
   let(:project) do
@@ -12,7 +13,8 @@ describe Gitlab::GithubImport::Importer::RepositoryImporter do
       repository_storage: 'foo',
       disk_path: 'foo',
       repository: repository,
-      create_wiki: true
+      create_wiki: true,
+      import_state: import_state
     )
   end
 
@@ -215,7 +217,7 @@ describe Gitlab::GithubImport::Importer::RepositoryImporter do
 
   describe '#fail_import' do
     it 'marks the import as failed' do
-      expect(project.import_state).to receive(:mark_as_failed).with('foo')
+      expect_any_instance_of(ProjectImportState).to receive(:mark_as_failed).with('foo')
 
       expect(importer.fail_import('foo')).to eq(false)
     end

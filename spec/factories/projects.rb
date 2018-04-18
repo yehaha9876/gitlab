@@ -61,6 +61,17 @@ FactoryBot.define do
       visibility_level Gitlab::VisibilityLevel::PRIVATE
     end
 
+    trait :import_none do
+      after(:create) do |project, _|
+        ProjectImportState.where(project: project).first_or_initialize.tap do |state|
+          state.status = :none
+          state.save
+        end
+
+        project.reload
+      end
+    end
+
     trait :import_scheduled do
       after(:create) do |project, _|
         ProjectImportState.where(project: project).first_or_initialize.tap do |state|

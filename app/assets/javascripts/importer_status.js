@@ -79,7 +79,7 @@ class ImporterStatus {
 
           const spinner = '<i class="fa fa-spinner fa-spin"></i>';
 
-          switch (job.import_status) {
+          switch (job.import_state.status) {
             case 'finished':
               jobItem.removeClass('active').addClass('success');
               statusField.html(`<span><i class="fa fa-check"></i> ${__('Done')}</span>`);
@@ -94,7 +94,7 @@ class ImporterStatus {
               statusField.html(__('Failed'));
               break;
             default:
-              statusField.html(job.import_status);
+              statusField.html(job.import_state.status);
               break;
           }
         });

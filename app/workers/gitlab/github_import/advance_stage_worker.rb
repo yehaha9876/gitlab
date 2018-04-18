@@ -8,6 +8,7 @@ module Gitlab
     # stage.
     class AdvanceStageWorker
       include ApplicationWorker
+      include FindProjectImportState
 
       sidekiq_options dead: false
 
@@ -60,14 +61,6 @@ module Gitlab
 
           new_waiters[waiter.key] = waiter.jobs_remaining
         end
-      end
-
-      def find_project_import_state(project_id)
-        # We only care about the import JID so we can refresh it. We also only
-        # want the project if it hasn't been marked as failed yet. It's possible
-        # the import gets marked as stuck when jobs of the current stage failed
-        # somehow.
-        ProjectImportState.select(:jid).with_started_status.find_by(project_id: project_id)
       end
     end
   end

@@ -402,7 +402,6 @@ class Project < ActiveRecord::Base
   scope :excluding_project, ->(project) { where.not(id: project) }
 
   scope :joins_import_state, -> { joins("INNER JOIN project_mirror_data import_state ON import_state.project_id = projects.id") }
-  scope :import_started, -> { joins_import_state.where(import_state: { status: 'started' }) }
 
   class << self
     # Searches for a list of projects based on the query given in `query`.

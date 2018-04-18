@@ -1,20 +1,10 @@
 require 'rails_helper'
 
 describe ProjectImportState, type: :model do
-  describe 'associations' do
-    it { is_expected.to belong_to(:project) }
-  end
-
-  describe 'validations' do
-    it { is_expected.to validate_presence_of(:project) }
-  end
-
   describe 'when create' do
     it 'sets next execution timestamp to now' do
-      project = create(:project)
-
       Timecop.freeze(Time.now) do
-        project.create_import_state
+        project = create(:project, :mirror)
 
         expect(project.import_state.next_execution_timestamp).to eq(Time.now)
       end

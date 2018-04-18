@@ -140,7 +140,8 @@ module EE
 
     def mirror_about_to_update?
       return false unless mirror_with_content?
-      return false if mirror_hard_failed?
+      # TODO: maybe we should make a convenience method just like for every other state
+      return false if import_state.hard_failed?
       return false if updating_mirror?
 
       import_state.next_execution_timestamp <= Time.now

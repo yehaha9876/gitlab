@@ -5,6 +5,7 @@ module Gitlab
     class RefreshImportJidWorker
       include ApplicationWorker
       include GithubImport::Queue
+      include FindProjectImportState
 
       # The interval to schedule new instances of this job at.
       INTERVAL = 1.minute.to_i
@@ -28,10 +29,6 @@ module Gitlab
         # If the job is no longer running there's nothing else we need to do. If
         # the clone job completed successfully it will have scheduled the next
         # stage, if it died there's nothing we can do anyway.
-      end
-
-      def find_project_import_state(project_id)
-        ProjectImportState.select(:jid).with_started_status.find_by(project_id: project_id)
       end
     end
   end

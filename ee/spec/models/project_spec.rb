@@ -1322,7 +1322,7 @@ describe Project do
 
           expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
 
-          project.import_finish
+          project.import_state.finish
         end
       end
 
@@ -1337,7 +1337,7 @@ describe Project do
           it 'schedules a full index of the repository' do
             expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil)
 
-            project.import_finish
+            project.import_state.finish
           end
         end
 
@@ -1347,7 +1347,7 @@ describe Project do
           it 'schedules a progressive index of the repository' do
             expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, index_status.last_commit)
 
-            project.import_finish
+            project.import_state.finish
           end
         end
       end
