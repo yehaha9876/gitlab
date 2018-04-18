@@ -18,7 +18,7 @@ describe RuboCop::Cop::Gitlab::HasManyThroughScope do # rubocop:disable RSpec/Fi
     context 'when the model does not use has_many :through' do
       it 'does not register an offense' do
         expect_no_offenses(<<-RUBY)
-          class User < ActiveRecord::Base
+          class User < ApplicationRecord
             has_many :tags, source: 'UserTag'
           end
         RUBY
@@ -29,7 +29,7 @@ describe RuboCop::Cop::Gitlab::HasManyThroughScope do # rubocop:disable RSpec/Fi
       context 'when the association has no scope defined' do
         it 'registers an offense on the association' do
           expect_offense(<<-RUBY)
-            class User < ActiveRecord::Base
+            class User < ApplicationRecord
               has_many :tags, through: :user_tags
               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{described_class::MSG}
             end
@@ -41,7 +41,7 @@ describe RuboCop::Cop::Gitlab::HasManyThroughScope do # rubocop:disable RSpec/Fi
         context 'when the scope does not disable auto-loading' do
           it 'registers an offense on the scope' do
             expect_offense(<<-RUBY)
-              class User < ActiveRecord::Base
+              class User < ApplicationRecord
                 has_many :tags, -> { where(active: true) }, through: :user_tags
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^ #{described_class::MSG}
               end
@@ -52,7 +52,7 @@ describe RuboCop::Cop::Gitlab::HasManyThroughScope do # rubocop:disable RSpec/Fi
         context 'when the scope has auto_include(false)' do
           it 'does not register an offense' do
             expect_no_offenses(<<-RUBY)
-              class User < ActiveRecord::Base
+              class User < ApplicationRecord
                 has_many :tags, -> { where(active: true).auto_include(false).reorder(nil) }, through: :user_tags
               end
             RUBY
@@ -65,7 +65,7 @@ describe RuboCop::Cop::Gitlab::HasManyThroughScope do # rubocop:disable RSpec/Fi
   context 'outside of a migration spec file' do
     it 'does not register an offense' do
       expect_no_offenses(<<-RUBY)
-        class User < ActiveRecord::Base
+        class User < ApplicationRecord
           has_many :tags, through: :user_tags
         end
       RUBY
