@@ -190,7 +190,6 @@ Example response:
 }
 ```
 
-
 ## Update runner's details
 
 Update details of a runner.
