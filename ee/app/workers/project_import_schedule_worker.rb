@@ -4,6 +4,7 @@ class ProjectImportScheduleWorker
 
   def perform(project_id)
     project = Project.find_by(id: project_id)
-    project&.import_state.schedule
+
+    project&.import_state&.schedule
   end
 end

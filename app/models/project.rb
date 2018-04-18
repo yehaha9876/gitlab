@@ -661,7 +661,6 @@ class Project < ActiveRecord::Base
     import_state.status.inquiry
   end
 
-
   def import_started?
     # import? does SQL work so only run it if it looks like there's an import running
     import_status.started? && import?

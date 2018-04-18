@@ -45,10 +45,10 @@ module EE
 
       scope :mirrors_to_sync, ->(freeze_at) do
         mirror
-        .joins_import_state
-        .where.not(import_state: { status: [:scheduled, :started] })
-        .where("import_state.next_execution_timestamp <= ?", freeze_at)
-        .where("import_state.retry_count <= ?", ::Gitlab::Mirror::MAX_RETRY)
+          .joins_import_state
+          .where.not(import_state: { status: [:scheduled, :started] })
+          .where("import_state.next_execution_timestamp <= ?", freeze_at)
+          .where("import_state.retry_count <= ?", ::Gitlab::Mirror::MAX_RETRY)
       end
 
       scope :with_remote_mirrors, -> { joins(:remote_mirrors).where(remote_mirrors: { enabled: true }).distinct }
