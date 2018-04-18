@@ -1,0 +1,5 @@
+---
+title: Added web_ide_only attribute to runners
+merge_request: 5346
+author:
+type: changed
