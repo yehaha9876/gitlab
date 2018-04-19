@@ -148,14 +148,12 @@ module MilestonesHelper
 
     return _("Issues") if issues.empty?
 
-    if issues.any?
-      content = []
+    content = []
 
-      content << n_("1 open issue", "%d open issues", issues["opened"]) % issues["opened"] if issues["opened"]
-      content << n_("1 closed issue", "%d closed issues", issues["closed"]) % issues["closed"] if issues["closed"]
+    content << n_("1 open issue", "%d open issues", issues["opened"]) % issues["opened"] if issues["opened"]
+    content << n_("1 closed issue", "%d closed issues", issues["closed"]) % issues["closed"] if issues["closed"]
 
-      return content.join('<br />').html_safe
-    end
+    content.join('<br />').html_safe
   end
 
   def milestone_merge_requests_tooltip_text(milestone)
@@ -163,15 +161,13 @@ module MilestonesHelper
 
     return _("Merge requests") if merge_requests.empty?
 
-    if merge_requests.any?
-      content = []
+    content = []
 
-      content << n_("1 open merge request", "%d open merge requests", merge_requests.opened.count) % merge_requests.opened.count if merge_requests.opened.any?
-      content << n_("1 closed merge request", "%d closed merge requests", merge_requests.closed.count) % merge_requests.closed.count if merge_requests.closed.any?
-      content << n_("1 merged merge request", "%d merged merge requests", merge_requests.merged.count) % merge_requests.merged.count if merge_requests.merged.any?
+    content << n_("1 open merge request", "%d open merge requests", merge_requests.opened.count) % merge_requests.opened.count if merge_requests.opened.any?
+    content << n_("1 closed merge request", "%d closed merge requests", merge_requests.closed.count) % merge_requests.closed.count if merge_requests.closed.any?
+    content << n_("1 merged merge request", "%d merged merge requests", merge_requests.merged.count) % merge_requests.merged.count if merge_requests.merged.any?
 
-      return content.join('<br />').html_safe
-    end
+    content.join('<br />').html_safe
   end
 
   def milestone_tooltip_due_date(milestone)

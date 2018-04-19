@@ -14,7 +14,11 @@ module IssuablesHelper
   end
 
   def sidebar_assignee_tooltip_label(issuable)
-    issuable.allows_multiple_assignees? ? _('Assignee(s)') : _('Assignee') unless issuable.assignee&.name?
+    if issuable.assignee
+      issuable.assignee.name
+    else
+      issuable.allows_multiple_assignees? ? _('Assignee(s)') : _('Assignee')
+    end
   end
 
   def sidebar_due_date_tooltip_label(issuable)
