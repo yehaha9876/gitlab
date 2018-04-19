@@ -197,6 +197,9 @@ and after that you also need two extra steps.
 1. Edit `/etc/gitlab/gitlab.rb`
 
     ```ruby
+    ## Geo Primary role
+    geo_primary_role['enable'] = true
+
     ##
     # Primary and Secondary addresses
     # - replace '1.2.3.4' with the primary public or VPC address
