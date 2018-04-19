@@ -1,16 +1,17 @@
-- last_successful_update_at = @project.import_state.last_successful_update_at
 - raw_message = local_assigns.fetch(:raw_message, false)
+- import_state = @project.import_state
+- last_successful_update_at = import_state.last_successful_update_at
 
-- case @project.mirror_last_update_status
+- case import_state.last_update_status
 - when :success
   Updated #{time_ago_with_tooltip(last_successful_update_at)}.
 - when :failed
   = render_mirror_failed_message(raw_message: raw_message)
 
-  - if @project.import_state.hard_failed?
+  - if import_state.hard_failed?
     %br
     Repository mirroring has been paused due to too many failed attempts, and can be resumed by a project master.
 
-  - if @project.mirror_ever_updated_successfully?
+  - if import_state.ever_updated_successfully?
     %br
     Last successful update #{time_ago_with_tooltip(last_successful_update_at)}.

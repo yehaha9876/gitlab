@@ -22,7 +22,7 @@ class Import::BitbucketController < Import::BaseController
 
     @repos, @incompatible_repos = repos.partition { |repo| repo.valid? }
 
-    @already_added_projects = current_user.created_projects.where(import_type: 'bitbucket')
+    @already_added_projects = already_added_projects("bitbucket")
     already_added_projects_names = @already_added_projects.pluck(:import_source)
 
     @repos.to_a.reject! { |repo| already_added_projects_names.include?(repo.full_name) }

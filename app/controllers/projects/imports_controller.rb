@@ -54,7 +54,7 @@ class Projects::ImportsController < Projects::ApplicationController
   end
 
   def redirect_if_progress
-    if @project.import_in_progress?
+    if @project.import_state&.import_in_progress?
       redirect_to project_import_path(@project)
     end
   end

@@ -1,10 +1,13 @@
 module EE
   module ProjectImportState
     extend ActiveSupport::Concern
+    extend ::Gitlab::Utils::Override
 
     prepended do
       BACKOFF_PERIOD = 24.seconds
       JITTER = 6.seconds
+
+      delegate :mirror?, :empty_repo?, to: :project
 
       before_validation :set_next_execution_to_now, on: :create
 
@@ -64,45 +67,104 @@ module EE
           ::Gitlab::Mirror.increment_capacity(state.project_id) if state.mirror?
         end
       end
+    end
 
-      def reset_retry_count
-        self.retry_count = 0
+    def waiting_duration
+      return unless mirror?
+
+      (last_update_started_at.to_i - last_update_scheduled_at.to_i).seconds
+    end
+
+    def update_duration
+      return unless mirror?
+
+      (last_update_at.to_i - last_update_started_at.to_i).seconds
+    end
+
+    def mirror_with_content?
+      mirror? && !empty_repo?
+    end
+
+    def updated?
+      mirror? && last_update_at
+    end
+
+    def updating?
+      (scheduled? || started?) && mirror_with_content?
+    end
+
+    def about_to_update?
+      return false unless mirror_with_content?
+      return false if hard_failed?
+      return false if updating?
+
+      next_execution_timestamp <= Time.now
+    end
+
+    def last_update_status
+      return unless updated?
+
+      if last_update_at == last_successful_update_at
+        :success
+      else
+        :failed
       end
+    end
 
-      def increment_retry_count
-        self.retry_count += 1
-      end
+    def last_update_succeeded?
+      last_update_status == :success
+    end
 
-      # We schedule the next sync time based on the duration of the
-      # last mirroring period and add it a fixed backoff period with a random jitter
-      def set_next_execution_timestamp
-        timestamp = Time.now
-        retry_factor = [1, self.retry_count].max
-        delay = [base_delay(timestamp), ::Gitlab::Mirror.min_delay].max
-        delay = [delay * retry_factor, ::Gitlab::Mirror.max_delay].min
+    def last_update_failed?
+      last_update_status == :failed
+    end
 
-        self.next_execution_timestamp = timestamp + delay
-      end
+    def ever_updated_successfully?
+      updated? && last_successful_update_at
+    end
 
-      def set_next_execution_to_now
-        return unless mirror?
+    override :import_in_progress?
+    def import_in_progress?
+      super && !mirror_with_content?
+    end
 
-        self.next_execution_timestamp = Time.now
-      end
+    def reset_retry_count
+      self.retry_count = 0
+    end
 
-      def hard_failed?
-        self.retry_count > ::Gitlab::Mirror::MAX_RETRY
-      end
+    def increment_retry_count
+      self.retry_count += 1
+    end
 
-      private
+    # We schedule the next sync time based on the duration of the
+    # last mirroring period and add it a fixed backoff period with a random jitter
+    def set_next_execution_timestamp
+      timestamp = Time.now
+      retry_factor = [1, self.retry_count].max
+      delay = [base_delay(timestamp), ::Gitlab::Mirror.min_delay].max
+      delay = [delay * retry_factor, ::Gitlab::Mirror.max_delay].min
 
-      def base_delay(timestamp)
-        return 0 unless self.last_update_started_at
+      self.next_execution_timestamp = timestamp + delay
+    end
 
-        duration = timestamp - self.last_update_started_at
+    def set_next_execution_to_now
+      return unless mirror?
 
-        (BACKOFF_PERIOD + rand(JITTER)) * duration.seconds
-      end
+      self.next_execution_timestamp = Time.now
+    end
+
+    def hard_failed?
+      self.retry_count > ::Gitlab::Mirror::MAX_RETRY
+    end
+
+    private
+
+    def base_delay(timestamp)
+      return 0 unless self.last_update_started_at
+
+      duration = timestamp - self.last_update_started_at
+
+      (BACKOFF_PERIOD + rand(JITTER)) * duration.seconds
     end
   end
 end

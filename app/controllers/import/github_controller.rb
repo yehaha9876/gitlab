@@ -26,7 +26,7 @@ class Import::GithubController < Import::BaseController
 
   def status
     @repos = client.repos
-    @already_added_projects = current_user.created_projects.where(import_type: provider)
+    @already_added_projects = already_added_projects(provider)
     already_added_projects_names = @already_added_projects.pluck(:import_source)
 
     @repos.reject! { |repo| already_added_projects_names.include? repo.full_name }

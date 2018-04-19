@@ -232,6 +232,10 @@ module API
       get ":id/projects" do
         projects = find_group_projects(params)
 
+        unless params[:simple]
+          projects.includes(:import_state)
+        end
+
         options = {
           with: params[:simple] ? Entities::BasicProjectDetails : Entities::Project,
           current_user: current_user

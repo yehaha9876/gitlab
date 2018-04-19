@@ -110,69 +110,6 @@ module EE
     end
     alias_method :mirror?, :mirror
 
-    def mirror_updated?
-      mirror? && self.import_state.last_update_at
-    end
-
-    def mirror_waiting_duration
-      return unless mirror?
-
-      (import_state.last_update_started_at.to_i -
-        import_state.last_update_scheduled_at.to_i).seconds
-    end
-
-    def mirror_update_duration
-      return unless mirror?
-
-      (import_state.last_update_at.to_i -
-        import_state.last_update_started_at.to_i).seconds
-    end
-
-    def mirror_with_content?
-      mirror? && !empty_repo?
-    end
-
-    override :import_in_progress?
-    def import_in_progress?
-      # If we're importing while we do have a repository, we're simply updating the mirror.
-      super && !mirror_with_content?
-    end
-
-    def mirror_about_to_update?
-      return false unless mirror_with_content?
-      # TODO: maybe we should make a convenience method just like for every other state
-      return false if import_state.hard_failed?
-      return false if updating_mirror?
-
-      import_state.next_execution_timestamp <= Time.now
-    end
-
-    def updating_mirror?
-      (import_scheduled? || import_started?) && mirror_with_content?
-    end
-
-    def mirror_last_update_status
-      return unless mirror_updated?
-
-      if import_state.last_update_at == import_state.last_successful_update_at
-        :success
-      else
-        :failed
-      end
-    end
-
-    def mirror_last_update_succeeded?
-      mirror_last_update_status == :success
-    end
-
-    def mirror_last_update_failed?
-      mirror_last_update_status == :failed
-    end
-
-    def mirror_ever_updated_successfully?
-      mirror_updated? && import_state.last_successful_update_at
-    end
-
     def has_remote_mirror?
       feature_available?(:repository_mirrors) &&
         remote_mirror_available? &&
@@ -251,11 +188,8 @@ module EE
       config.address&.gsub(wildcard, full_path)
     end
 
-    # TODO: explore refactoring for this method (Maybe move it to ProjectImportState?)
     def force_import_job!
-      return if mirror_about_to_update? || updating_mirror?
-
-      import_state = self.import_state
+      return if import_state.about_to_update? || import_state.updating?
 
       import_state.set_next_execution_to_now
       import_state.reset_retry_count if import_state.hard_failed?

@@ -79,7 +79,7 @@ class Project < ActiveRecord::Base
 
   after_save :update_project_statistics, if: :namespace_id_changed?
 
-  after_save :create_import_state, if: ->(project) { project.import_state.nil? && project.import? }
+  after_save :create_import_state, if: ->(project) { project.import? && project.import_state.nil? }
 
   after_create :create_project_feature, unless: :project_feature
 
@@ -172,7 +172,7 @@ class Project < ActiveRecord::Base
   has_one :fork_network_member
   has_one :fork_network, through: :fork_network_member
 
-  has_one :import_state, autosave: true, class_name: 'ProjectImportState'
+  has_one :import_state, dependent: :destroy, autosave: true, class_name: 'ProjectImportState'
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id'
@@ -402,6 +402,7 @@ class Project < ActiveRecord::Base
   scope :excluding_project, ->(project) { where.not(id: project) }
 
   scope :joins_import_state, -> { joins("INNER JOIN project_mirror_data import_state ON import_state.project_id = projects.id") }
+  scope :with_started_import, -> { joins_import_state.where(import_state: { status: :started }) }
 
   class << self
     # Searches for a list of projects based on the query given in `query`.
@@ -641,42 +642,37 @@ class Project < ActiveRecord::Base
     external_import? || forked? || gitlab_project_import? || bare_repository_import?
   end
 
-  def no_import?
-    import_state.status == 'none'
-  end
-
   def external_import?
     import_url.present?
   end
 
-  def imported?
-    import_finished?
-  end
-
-  def import_in_progress?
-    import_started? || import_scheduled?
-  end
-
   def import_status
+    return unless import_state
+
     import_state.status.inquiry
+  end
+
+  def no_import?
+    import_status&.none?
   end
 
   def import_started?
     # import? does SQL work so only run it if it looks like there's an import running
-    import_status.started? && import?
+    import_status&.started? && import?
   end
 
   def import_scheduled?
-    import_status.scheduled?
+    import_status&.scheduled?
   end
 
   def import_failed?
-    import_status.failed?
+    import_status&.failed_op?
   end
 
   def import_finished?
-    import_status.failed?
+    import_status&.finished?
   end
+  alias_method :imported?, :import_finished?
 
   def safe_import_url
     Gitlab::UrlSanitizer.new(import_url).masked_url

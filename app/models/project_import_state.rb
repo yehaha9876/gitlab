@@ -7,11 +7,9 @@ class ProjectImportState < ActiveRecord::Base
 
   belongs_to :project
 
-  delegate :mirror?, to: :project
-
   validates :project, presence: true
 
-  scope :with_started_status, -> { where(status: 'started') }
+  scope :with_started_status, -> { where(status: :started) }
 
   state_machine :status, initial: :none do
     event :schedule do
@@ -57,6 +55,10 @@ class ProjectImportState < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def import_in_progress?
+    started? || scheduled?
   end
 
   def refresh_jid_expiration

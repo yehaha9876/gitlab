@@ -23,7 +23,7 @@
         %th To this GitLab instance
         %th Status
     %tbody
-      - @already_added_projects.includes(:import_state).each do |project|
+      - @already_added_projects.each do |project|
         %tr{ id: "project_#{project.id}", class: "#{project_status_css_class(project.import_status)}" }
           %td
             = link_to project.import_source, "https://gitlab.com/#{project.import_source}", target: "_blank"

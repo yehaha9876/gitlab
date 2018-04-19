@@ -1,6 +1,10 @@
 class Import::BaseController < ApplicationController
   private
 
+  def already_added_projects(import_type)
+    current_user.created_projects.where(import_type: import_type).includes(:import_state)
+  end
+
   def find_jobs(import_type)
     current_user.created_projects
         .joins_import_state

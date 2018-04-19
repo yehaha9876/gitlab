@@ -46,12 +46,12 @@ class RepositoryUpdateMirrorWorker
 
   def start_mirror(project)
     if start(project)
-      Rails.logger.info("Mirror update for #{project.full_path} started. Waiting duration: #{project.mirror_waiting_duration}")
-      metric_mirror_waiting_duration_seconds.observe({}, project.mirror_waiting_duration)
+      Rails.logger.info("Mirror update for #{project.full_path} started. Waiting duration: #{project.import_state.waiting_duration}")
+      metric_mirror_waiting_duration_seconds.observe({}, project.import_state.waiting_duration)
 
       Gitlab::Metrics.add_event_with_values(
         :mirrors_running,
-        { duration: project.mirror_waiting_duration },
+        { duration: project.import_state.waiting_duration },
         { path: project.full_path })
 
       true
@@ -71,13 +71,13 @@ class RepositoryUpdateMirrorWorker
   def finish_mirror(project)
     project.import_state.finish
 
-    Rails.logger.info("Mirror update for #{project.full_path} successfully finished. Update duration: #{project.mirror_update_duration}}.")
+    Rails.logger.info("Mirror update for #{project.full_path} successfully finished. Update duration: #{project.import_state.update_duration}}.")
     Gitlab::Metrics.add_event_with_values(
       :mirrors_finished,
-      { duration: project.mirror_update_duration },
+      { duration: project.import_state.update_duration },
       { path: project.full_path })
 
-    metric_mirror_update_duration_seconds.observe({}, project.mirror_update_duration)
+    metric_mirror_update_duration_seconds.observe({}, project.import_state.update_duration)
   end
 
   def metric_mirror_update_duration_seconds

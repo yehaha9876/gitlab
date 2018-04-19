@@ -22,7 +22,7 @@
         %span.label.label-success
           = s_('Branches|protected')
 
-      - if @project.mirror_ever_updated_successfully? && @repository.diverged_from_upstream?(branch.name)
+      - if @project.import_state&.ever_updated_successfully? && @repository.diverged_from_upstream?(branch.name)
         %span.label.label-danger.has-tooltip{ data: { html: "true", title: branch_diverged_tooltip_message } }
           = icon('exclamation-triangle')
           = s_('Branches|diverged from upstream')
