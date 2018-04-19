@@ -72,7 +72,7 @@ module Gitlab
       # @return [Boolean] whether schemas match and are not empty
       def self.foreign_schema_tables_match?
         Gitlab::Geo.cache_value(:geo_fdw_schema_tables_match) do
-          secondary = retrieve_schema_tables(ApplicationRecord, ApplicationRecord.connection_config[:database], DEFAULT_SCHEMA)
+          secondary = retrieve_schema_tables(ActiveRecord::Base, ActiveRecord::Base.connection_config[:database], DEFAULT_SCHEMA) # rubocop:disable Rails5/ApplicationRecord
           fdw = retrieve_schema_tables(::Geo::TrackingBase, Rails.configuration.geo_database['database'], FDW_SCHEMA)
 
           s = secondary.to_a
