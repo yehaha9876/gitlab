@@ -26,7 +26,6 @@ module Geo
     def execute
       try_obtain_lease do
         log_info("Started #{type} sync")
-        @sync_started_at = Time.now
 
         if should_be_retried?
           sync_repository
@@ -139,7 +138,7 @@ module Geo
           project: project,
           source: Geo::RepositoryUpdatedEvent.sources[type]
         )
-        .where('geo_event_log.created_at > ?', @sync_started_at)
+        .where('geo_event_log.created_at > ?', registry.public_send("last_#{type}_synced_at")) # rubocop:disable GitlabSecurity/PublicSend
         .any?
     end
 
