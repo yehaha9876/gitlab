@@ -65,7 +65,7 @@ gem 'akismet', '~> 2.0'
 # Two-factor authentication
 gem 'devise-two-factor', '~> 3.0.0'
 gem 'rqrcode-rails3', '~> 0.1.7'
-gem 'attr_encrypted', '~> 3.0.0'
+gem 'attr_encrypted', '~> 3.1.0'
 gem 'u2f', '~> 0.2.1'
 
 # GitLab Pages
@@ -85,7 +85,7 @@ gem 'net-ldap'
 
 # Git Wiki
 # Required manually in config/initializers/gollum.rb to control load order
-gem 'gitlab-gollum-lib', '~> 4.2'
+gem 'gitlab-gollum-lib', '~> 4.2', require: false
 
 gem 'gitlab-gollum-rugged_adapter', '~> 0.4.4', require: false
 
@@ -430,7 +430,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC client
-gem 'gitaly-proto', '~> 0.94.0', require: 'gitaly'
+gem 'gitaly-proto', '~> 0.97.0', require: 'gitaly'
 gem 'grpc', '~> 1.10.0'
 
 # Locked until https://github.com/google/protobuf/issues/4210 is closed
@@ -449,5 +449,3 @@ gem 'grape_logging', '~> 1.7'
 
 # Asset synchronization
 gem 'asset_sync', '~> 2.2.0'
-
-gem 'goldiloader', '~> 2.0'
