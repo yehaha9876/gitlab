@@ -116,7 +116,7 @@ module Geo
 
       if finished_at
         attrs["last_#{type}_successful_sync_at"] = finished_at
-        attrs["resync_#{type}"] = any_more_recent_event?
+        attrs["resync_#{type}"] = false
         attrs["#{type}_retry_count"] = nil
         attrs["#{type}_retry_at"] = nil
         attrs["force_to_redownload_#{type}"] = false
@@ -140,6 +140,20 @@ module Geo
         )
         .where('geo_event_log.created_at > ?', registry.public_send("last_#{type}_synced_at")) # rubocop:disable GitlabSecurity/PublicSend
         .any?
+    end
+
+    def finish
+      update_registry!(finished_at: DateTime.now, attrs: { "last_#{type}_sync_failure" => nil })
+
+      log_info("Finished #{type} sync",
+               update_delay_s: update_delay_in_seconds,
+               download_time_s: download_time_in_seconds)
+
+      if any_more_recent_event?
+        ::Geo::ProjectSyncWorker.perform_async(project.id, Time.now)
+      end
+
+      true
     end
 
     def fail_registry!(message, error, attrs = {})

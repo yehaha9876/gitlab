@@ -9,14 +9,14 @@ module Geo
 
       update_gitattributes
 
-      mark_sync_as_successful
+      finish
     rescue Gitlab::Shell::Error,
            Gitlab::Git::RepositoryMirroring::RemoteError => e
       # In some cases repository does not exist, the only way to know about this is to parse the error text.
       # If it does not exist we should consider it as successfully downloaded.
       if e.message.include? Gitlab::GitAccess::ERROR_MESSAGES[:no_repo]
         log_info('Repository is not found, marking it as successfully synced')
-        mark_sync_as_successful
+        finish
       else
         fail_registry!('Error syncing repository', e)
       end
@@ -29,14 +29,6 @@ module Geo
     ensure
       clean_up_temporary_repository if redownload
       expire_repository_caches
-    end
-
-    def mark_sync_as_successful
-      update_registry!(finished_at: DateTime.now, attrs: { last_repository_sync_failure: nil })
-
-      log_info('Finished repository sync',
-               update_delay_s: update_delay_in_seconds,
-               download_time_s: download_time_in_seconds)
     end
 
     def expire_repository_caches
