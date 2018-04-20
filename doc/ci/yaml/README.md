@@ -365,11 +365,11 @@ skip the download step.
 
 > Introduced in [GitLab Edition Premium][ee] 10.5.
 
-NOTE: **Notes:**
+NOTE: **Note:**
 - The main file and the included files must be well-formatted YAML files. This
-  prevents external YAML aliases (aka templates) to be referenced in the main
-  file, since they cannot be resolved at loading time.
-- Momentarily the [CI Lint](https://gitlab.com/ci/lint) does not support the `include` keyword.
+  prevents external [YAML aliases](#special-yaml-features) (aka templates) to be
+  referenced in the main file, since they cannot be loaded when `.gitlab-ci.yml`
+  is parsed.
 
 Using the `include` keyword, you can allow the inclusion of external YAML files.
 
