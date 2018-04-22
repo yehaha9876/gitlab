@@ -90,6 +90,7 @@ module Gitlab
 
           identity ||= gl_user.identities.build(provider: auth_hash.provider)
           identity.extern_uid = auth_hash.uid
+          #TODO: If possible to arrive here, we'll need to set saml_provider and add group membership
 
           if auto_link_ldap_user? && !gl_user.ldap_user? && ldap_person
             log.info "Correct LDAP account has been found. identity to user: #{gl_user.username}."
@@ -168,6 +169,7 @@ module Gitlab
         def block_after_signup?
           if creating_linked_ldap_user?
             ldap_config.block_auto_created_users
+          #TODO: elsif created with dynamic saml
           else
             Gitlab.config.omniauth.block_auto_created_users
           end
