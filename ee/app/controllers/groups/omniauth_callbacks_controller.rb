@@ -1,7 +1,7 @@
 class Groups::OmniauthCallbacksController < OmniauthCallbacksController
   extend ::Gitlab::Utils::Override
 
-  skip_before_filter :verify_authenticity_token, only: :group_saml
+  skip_before_filter :verify_authenticity_token, only: [:failure, :group_saml]
 
   def group_saml
     @unauthenticated_group = Group.find_by_full_path(params[:group_id])
@@ -45,5 +45,19 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
 
   def saml_redirect_path
     params['RelayState'].presence if current_user
+  end
+
+  override :after_omniauth_failure_path_for
+  def after_omniauth_failure_path_for(scope)
+    group_saml_failure_path(scope) || super
+  end
+
+  def group_saml_failure_path(scope)
+    return unless failed_strategy.is_a?(OmniAuth::Strategies::GroupSaml)
+    # return unless env['warden'].authenticated?
+
+    group = Gitlab::Auth::GroupSaml::GroupLookup.new(env).group
+    # flash_as_param = find_message(:failure, kind: 'SAML', reason: failure_message)
+    group_saml_providers_path(group)#, failure: flash_as_param)
   end
 end
