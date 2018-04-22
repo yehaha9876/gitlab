@@ -33,7 +33,10 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     error ||= exception.message      if exception.respond_to?(:message)
     error ||= env["omniauth.error.type"].to_s
 
-    error.to_s.humanize if error
+    #TODO: Somehow catch errors with SAML config to surface them during setup
+    #      E.g. when email missing the following error is silently swallowed
+    #      OmniAuth::Strategies::SAML::ValidationError, SAML response missing 'name_id'
+    error.to_s.humanize if error #TODO: humanize here changes 'SAML' to 'Saml'
   end
 
   def saml

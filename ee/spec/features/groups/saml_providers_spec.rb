@@ -77,6 +77,13 @@ feature 'SAML provider settings' do
         expect(login_url).to end_with "/groups/#{group.full_path}/-/saml/sso"
       end
     end
+
+    # it 'logs user in and redirects to group page'
+
+    # describe 'test button' do
+    #   it 'POSTs to the SSO path for the group'
+    #   it 'uses RelayState to redirect back to settings page'
+    # end
   end
 
   describe '#sso' do

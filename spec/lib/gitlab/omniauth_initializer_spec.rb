@@ -61,5 +61,18 @@ describe Gitlab::OmniauthInitializer do
 
       subject.execute([cas3_config])
     end
+
+    context 'with group_saml' do
+      let(:group_saml_config) { { 'name' => 'group_saml' } }
+
+      # it 'configures saml omniauth strategy' do
+      #   expect(devise_config).to receive(:omniauth).with(:group_saml)
+
+      #   subject.execute([group_saml_config])
+      # end
+
+      it 'configures setup function'
+      it 'configures callback function'
+    end
   end
 end
