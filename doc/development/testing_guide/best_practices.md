@@ -107,11 +107,17 @@ the test.
 
 #### Screenshots
 
+We use the `capybara-screenshot` gem to automatically attempt to take a 
+screenshot on failure, but you can manually take one at any point in a test by
+adding these methods. See 
+https://github.com/mattheworiordan/capybara-screenshot#manual-screenshots for
+more.
+
 Add the method `screenshot_and_save_page` in a `:js` spec to screenshot what 
-Capybara "sees" at that point in the test, and save the page source.
+Capybara "sees", and save the page source.
 
 Add the method `screenshot_and_open_image` in a `:js` spec to screenshot what
-Capybara "sees" at that point in the test, and automatically open the image.
+Capybara "sees", and automatically open the image.
 
 ### Fast unit tests
 
