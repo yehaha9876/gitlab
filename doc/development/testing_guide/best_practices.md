@@ -97,10 +97,13 @@ Note: `live_debug` only works on javascript enabled specs.
 Run the spec with `CHROME_HEADLESS=false`, e.g.:
 
 ```
-CHROME_HEADLESS=false bin/rspec some_spec.rb
+CHROME_HEADLESS=0 bin/rspec some_spec.rb
 ```
 
 The test will go by quickly, but this will give you an idea of what's happening.
+
+You can also add `byebug` or `binding.pry` to pause execution and step through
+the test.
 
 #### Screenshots
 
