@@ -63,6 +63,8 @@ writing one](testing_levels.md#consider-not-writing-a-system-test)!
 
 Sometimes you may need to debug Capybara tests by observing browser behavior.
 
+#### Live debug
+
 You can pause Capybara and view the website on the browser by using the
 `live_debug` method in your spec. The current page will be automatically opened
 in your default browser.
@@ -89,6 +91,24 @@ Finished in 34.51 seconds (files took 0.76702 seconds to load)
 ```
 
 Note: `live_debug` only works on javascript enabled specs.
+
+#### Run `:js` spec in a visible browser
+
+Run the spec with `CHROME_HEADLESS=false`, e.g.:
+
+```
+CHROME_HEADLESS=false bin/rspec some_spec.rb
+```
+
+The test will go by quickly, but this will give you an idea of what's happening.
+
+#### Screenshots
+
+Add the method `screenshot_and_save_page` in a `:js` spec to screenshot what 
+Capybara "sees" at that point in the test, and save the page source.
+
+Add the method `screenshot_and_open_image` in a `:js` spec to screenshot what
+Capybara "sees" at that point in the test, and automatically open the image.
 
 ### Fast unit tests
 
