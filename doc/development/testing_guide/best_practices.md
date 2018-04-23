@@ -94,7 +94,7 @@ Note: `live_debug` only works on javascript enabled specs.
 
 #### Run `:js` spec in a visible browser
 
-Run the spec with `CHROME_HEADLESS=false`, e.g.:
+Run the spec with `CHROME_HEADLESS=0`, e.g.:
 
 ```
 CHROME_HEADLESS=0 bin/rspec some_spec.rb
