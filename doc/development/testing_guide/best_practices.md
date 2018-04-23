@@ -97,7 +97,7 @@ Note: `live_debug` only works on javascript enabled specs.
 Run the spec with `CHROME_HEADLESS=0`, e.g.:
 
 ```
-CHROME_HEADLESS=0 bin/rspec some_spec.rb
+CHROME_HEADLESS=0 bundle exec rspec some_spec.rb
 ```
 
 The test will go by quickly, but this will give you an idea of what's happening.
