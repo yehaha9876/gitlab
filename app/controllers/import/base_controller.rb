@@ -1,7 +1,7 @@
 class Import::BaseController < ApplicationController
   private
 
-  def already_added_projects(import_type)
+  def find_already_added_projects(import_type)
     current_user.created_projects.where(import_type: import_type).includes(:import_state)
   end
 
@@ -9,7 +9,7 @@ class Import::BaseController < ApplicationController
     current_user.created_projects
         .joins_import_state
         .where(import_type: import_type)
-        .to_json(only: [:id], include: { import_state: { only: [:status] } })
+        .to_json(only: [:id], methods: [:import_status])
   end
 
   def find_or_create_namespace(names, owner)

@@ -68,14 +68,15 @@ describe Project do
     end
 
     context 'when mirror is finished' do
-      let!(:project) { create(:project, :mirror, :import_finished) }
+      let!(:project) { create(:project) }
+      let!(:import_state) { create(:import_state, :mirror, :finished, project: project) }
 
       it 'returns project if next_execution_timestamp is not in the future' do
         expect(described_class.mirrors_to_sync(timestamp)).to match_array(project)
       end
 
       it 'returns empty if next_execution_timestamp is in the future' do
-        project.import_state.update_attributes(next_execution_timestamp: timestamp + 2.minutes)
+        import_state.update_attributes(next_execution_timestamp: timestamp + 2.minutes)
 
         expect(described_class.mirrors_to_sync(timestamp)).to be_empty
       end
@@ -118,12 +119,12 @@ describe Project do
 
   describe 'hard failing a mirror' do
     it 'sends a notification' do
-      project = create(:project, :mirror, :import_started)
-      project.import_state.update_attributes(retry_count: Gitlab::Mirror::MAX_RETRY)
+      project = create(:project)
+      import_state = create(:import_state, :mirror, :started, project: project, retry_count: Gitlab::Mirror::MAX_RETRY)
 
       expect_any_instance_of(EE::NotificationService).to receive(:mirror_was_hard_failed).with(project)
 
-      project.import_state.fail_op
+      import_state.fail_op
     end
   end
 

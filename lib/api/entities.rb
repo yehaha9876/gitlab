@@ -197,10 +197,10 @@ module API
       expose :namespace, using: 'API::Entities::NamespaceBasic'
       expose :forked_from_project, using: Entities::BasicProjectDetails, if: lambda { |project, options| project.forked? }
       expose :import_status do |project, _|
-        project&.import_state&.status
+        project.import_state&.status || :none
       end
       expose :import_error, if: lambda { |_project, options| options[:user_can_admin_project] } do |project, _|
-        project&.import_state&.last_error
+        project.import_state&.last_error
       end
 
       expose :open_issues_count, if: lambda { |project, options| project.feature_available?(:issues, options[:current_user]) }
@@ -220,6 +220,7 @@ module API
 
       def self.preload_relation(projects_relation, options =  {})
         super(projects_relation).preload(:group)
+                                .preload(:import_state)
                                 .preload(project_group_links: :group,
                                          fork_network: :root_project,
                                          forked_project_link: :forked_from_project,

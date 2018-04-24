@@ -5,7 +5,6 @@ module Gitlab
     class RefreshImportJidWorker
       include ApplicationWorker
       include GithubImport::Queue
-      include FindProjectImportState
 
       # The interval to schedule new instances of this job at.
       INTERVAL = 1.minute.to_i
@@ -17,7 +16,9 @@ module Gitlab
       # project_id - The ID of the project that is being imported.
       # check_job_id - The ID of the job for which to check the status.
       def perform(project_id, check_job_id)
-        return unless (import_state = find_project_import_state(project_id))
+        import_state = find_project_import_state(project_id)
+
+        return unless import_state
 
         if SidekiqStatus.running?(check_job_id)
           # As long as the repository is being cloned we want to keep refreshing
@@ -29,6 +30,10 @@ module Gitlab
         # If the job is no longer running there's nothing else we need to do. If
         # the clone job completed successfully it will have scheduled the next
         # stage, if it died there's nothing we can do anyway.
+      end
+
+      def find_project_import_state(project_id)
+        ProjectImportState.select(:jid).with_status(:started).find_by(project_id: project_id)
       end
     end
   end

@@ -15,10 +15,7 @@ describe Gitlab::GithubImport::RefreshImportJidWorker do
 
   describe '#perform' do
     let(:project) { create(:project) }
-
-    before do
-      project.create_import_state(jid: '123abc')
-    end
+    let(:import_state) { create(:import_state, project: project, jid: '123abc') }
 
     context 'when the project does not exist' do
       it 'does nothing' do
@@ -34,14 +31,14 @@ describe Gitlab::GithubImport::RefreshImportJidWorker do
         allow(worker)
           .to receive(:find_project_import_state)
           .with(project.id)
-          .and_return(project.import_state)
+          .and_return(import_state)
 
         expect(Gitlab::SidekiqStatus)
           .to receive(:running?)
           .with('123')
           .and_return(true)
 
-        expect(project.import_state)
+        expect(import_state)
           .to receive(:refresh_jid_expiration)
 
         expect(worker.class)
@@ -57,14 +54,14 @@ describe Gitlab::GithubImport::RefreshImportJidWorker do
         allow(worker)
           .to receive(:find_project_import_state)
           .with(project.id)
-          .and_return(project.import_state)
+          .and_return(import_state)
 
         expect(Gitlab::SidekiqStatus)
           .to receive(:running?)
           .with('123')
           .and_return(false)
 
-        expect(project.import_state)
+        expect(import_state)
           .not_to receive(:refresh_jid_expiration)
 
         worker.perform(project.id, '123')
@@ -76,16 +73,14 @@ describe Gitlab::GithubImport::RefreshImportJidWorker do
     context 'when import status is started' do
       let(:project) { create(:project) }
 
-      before do
-        project.create_import_state(status: 'started')
-      end
-
       it 'returns a ProjectImportState' do
+        create(:import_state, :started, project: project)
+
         expect(worker.find_project_import_state(project.id)).to be_an_instance_of(ProjectImportState)
       end
 
       it 'only selects the import JID field' do
-        project.import_state.update_attributes(jid: '123abc')
+        create(:import_state, :started, project: project, jid: '123abc')
 
         expect(worker.find_project_import_state(project.id).attributes)
             .to eq({ 'id' => nil, 'jid' => '123abc' })
@@ -95,7 +90,7 @@ describe Gitlab::GithubImport::RefreshImportJidWorker do
     context 'when import status is not started' do
       it 'returns nil' do
         project = create(:project)
-        project.create_import_state(status: 'failed')
+        create(:import_state, :failed, project: project)
 
         expect(worker.find_project_import_state(project.id)).to be_nil
       end

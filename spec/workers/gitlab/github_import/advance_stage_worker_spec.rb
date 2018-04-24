@@ -2,11 +2,8 @@ require 'spec_helper'
 
 describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_state do
   let(:project) { create(:project) }
+  let(:import_state) { create(:import_state, project: project, jid: '123') }
   let(:worker) { described_class.new }
-
-  before do
-    project.create_import_state(jid: '123')
-  end
 
   describe '#perform' do
     context 'when the project no longer exists' do
@@ -21,7 +18,7 @@ describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_st
       before do
         allow(worker)
           .to receive(:find_project_import_state)
-          .and_return(project.import_state)
+          .and_return(import_state)
       end
 
       it 'reschedules itself' do
@@ -42,7 +39,7 @@ describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_st
       before do
         allow(worker)
           .to receive(:find_project_import_state)
-          .and_return(project.import_state)
+          .and_return(import_state)
 
         allow(worker)
           .to receive(:wait_for_jobs)
@@ -51,7 +48,7 @@ describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_st
       end
 
       it 'schedules the next stage' do
-        expect(project.import_state)
+        expect(import_state)
           .to receive(:refresh_jid_expiration)
 
         expect(Gitlab::GithubImport::Stage::FinishImportWorker)
@@ -101,7 +98,7 @@ describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_st
 
   describe '#find_project' do
     it 'returns a Project' do
-      project.import_state.update_column(:status, 'started')
+      import_state.update_column(:status, 'started')
 
       found = worker.find_project_import_state(project.id)
 

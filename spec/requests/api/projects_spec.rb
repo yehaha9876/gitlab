@@ -888,8 +888,8 @@ describe API::Projects do
         expect(json_response['shared_runners_enabled']).to be_present
         expect(json_response['creator_id']).to be_present
         expect(json_response['namespace']).to be_present
-        expect(json_response['import_status']).to be_nil
-        expect(json_response).not_to include("last_error")
+        expect(json_response['import_status']).to be_present
+        expect(json_response).to include("import_error")
         expect(json_response['avatar_url']).to be_nil
         expect(json_response['star_count']).to be_present
         expect(json_response['forks_count']).to be_present

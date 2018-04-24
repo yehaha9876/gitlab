@@ -172,7 +172,7 @@ class Project < ActiveRecord::Base
   has_one :fork_network_member
   has_one :fork_network, through: :fork_network_member
 
-  has_one :import_state, dependent: :destroy, autosave: true, class_name: 'ProjectImportState'
+  has_one :import_state, autosave: true, class_name: 'ProjectImportState', inverse_of: :project
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id'
@@ -402,7 +402,7 @@ class Project < ActiveRecord::Base
   scope :excluding_project, ->(project) { where.not(id: project) }
 
   scope :joins_import_state, -> { joins("INNER JOIN project_mirror_data import_state ON import_state.project_id = projects.id") }
-  scope :with_started_import, -> { joins_import_state.where(import_state: { status: :started }) }
+  scope :with_import_started, -> { joins_import_state.where(import_state: { status: :started }) }
 
   class << self
     # Searches for a list of projects based on the query given in `query`.
@@ -657,8 +657,7 @@ class Project < ActiveRecord::Base
   end
 
   def import_started?
-    # import? does SQL work so only run it if it looks like there's an import running
-    import_status&.started? && import?
+    import_status&.started?
   end
 
   def import_scheduled?
@@ -666,7 +665,7 @@ class Project < ActiveRecord::Base
   end
 
   def import_failed?
-    import_status&.failed_op?
+    import_status&.failed?
   end
 
   def import_finished?
@@ -1454,7 +1453,7 @@ class Project < ActiveRecord::Base
   def rename_repo_notify!
     # When we import a project overwriting the original project, there
     # is a move operation. In that case we don't want to send the instructions.
-    send_move_instructions(full_path_was) unless import? && import_started?
+    send_move_instructions(full_path_was) unless import_started?
     expires_full_path_cache
 
     self.old_path_with_namespace = full_path_was

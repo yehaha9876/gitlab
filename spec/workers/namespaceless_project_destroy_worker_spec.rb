@@ -60,7 +60,6 @@ describe NamespacelessProjectDestroyWorker do
       context 'project forked from another' do
         let!(:parent_project) { create(:project) }
         let(:project) do
-          namespaceless_project = fork_project(parent_project)
           namespaceless_project.namespace_id = nil
           namespaceless_project.save(validate: false)
           namespaceless_project

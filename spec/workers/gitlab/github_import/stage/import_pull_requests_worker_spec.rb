@@ -4,15 +4,13 @@ describe Gitlab::GithubImport::Stage::ImportPullRequestsWorker do
   let(:project) { create(:project) }
   let(:worker) { described_class.new }
 
-  before do
-    project.create_import_state
-  end
-
   describe '#import' do
     it 'imports all the pull requests' do
       importer = double(:importer)
       client = double(:client)
       waiter = Gitlab::JobWaiter.new(2, '123')
+
+      create(:import_state, project: project)
 
       expect(Gitlab::GithubImport::Importer::PullRequestsImporter)
         .to receive(:new)

@@ -46,7 +46,7 @@ class Import::FogbugzController < Import::BaseController
 
     @repos = client.repos
 
-    @already_added_projects = already_added_projects("fogbugz")
+    @already_added_projects = find_already_added_projects("fogbugz")
     already_added_projects_names = @already_added_projects.pluck(:import_source)
 
     @repos.reject! { |repo| already_added_projects_names.include? repo.name }

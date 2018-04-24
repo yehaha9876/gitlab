@@ -12,7 +12,7 @@ class Import::GitlabController < Import::BaseController
   def status
     @repos = client.projects
 
-    @already_added_projects = already_added_projects("gitlab")
+    @already_added_projects = find_already_added_projects("gitlab")
     already_added_projects_names = @already_added_projects.pluck(:import_source)
 
     @repos = @repos.to_a.reject { |repo| already_added_projects_names.include? repo["path_with_namespace"] }

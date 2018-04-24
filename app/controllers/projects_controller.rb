@@ -104,7 +104,7 @@ class ProjectsController < Projects::ApplicationController
   end
 
   def show
-    if @project.import_state&.import_in_progress?
+    if @project.import_state&.in_progress?
       redirect_to project_import_path(@project, custom_import_params)
       return
     end

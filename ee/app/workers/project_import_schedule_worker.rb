@@ -3,8 +3,8 @@ class ProjectImportScheduleWorker
   prepend WaitableWorker
 
   def perform(project_id)
-    project = Project.find_by(id: project_id)
+    import_state = ProjectImportState.find_by(project_id: project_id)
 
-    project&.import_state&.schedule
+    import_state&.schedule
   end
 end

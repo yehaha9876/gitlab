@@ -8,7 +8,6 @@ module Gitlab
     # stage.
     class AdvanceStageWorker
       include ApplicationWorker
-      include FindProjectImportState
 
       sidekiq_options dead: false
 
@@ -31,7 +30,9 @@ module Gitlab
       # next_stage - The name of the next stage to start when all jobs have been
       #              completed.
       def perform(project_id, waiters, next_stage)
-        return unless (import_state = find_project_import_state(project_id))
+        import_state = find_project_import_state(project_id)
+
+        return unless import_state
 
         new_waiters = wait_for_jobs(waiters)
 
@@ -61,6 +62,10 @@ module Gitlab
 
           new_waiters[waiter.key] = waiter.jobs_remaining
         end
+      end
+
+      def find_project_import_state(project_id)
+        ProjectImportState.select(:jid).with_status(:started).find_by(project_id: project_id)
       end
     end
   end

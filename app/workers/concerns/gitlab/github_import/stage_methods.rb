@@ -23,7 +23,7 @@ module Gitlab
       def find_project(id)
         # If the project has been marked as failed we want to bail out
         # automatically.
-        Project.with_started_import.find_by(id: id)
+        Project.with_import_started.find_by(id: id)
       end
     end
   end

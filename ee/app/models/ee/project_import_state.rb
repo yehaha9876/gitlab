@@ -123,8 +123,8 @@ module EE
       updated? && last_successful_update_at
     end
 
-    override :import_in_progress?
-    def import_in_progress?
+    override :in_progress?
+    def in_progress?
       super && !mirror_with_content?
     end
 

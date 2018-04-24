@@ -1750,6 +1750,7 @@ describe Project do
 
   describe 'Project import job' do
     let(:project) { create(:project, import_url: generate(:url)) }
+    let(:import_state) { project.import_state }
 
     before do
       allow_any_instance_of(Gitlab::Shell).to receive(:import_repository)
@@ -1763,8 +1764,8 @@ describe Project do
     it 'imports a project' do
       expect_any_instance_of(RepositoryImportWorker).to receive(:perform).and_call_original
 
-      expect { project.import_state.schedule }.to change { project.import_state.jid }
-      expect(project.import_state.reload.status).to eq('finished')
+      expect { import_state.schedule }.to change { import_state.jid }
+      expect(import_state.reload.status).to eq('finished')
     end
 
     context 'with a mirrored project' do
@@ -1775,7 +1776,7 @@ describe Project do
         expect_any_instance_of(EE::Project).to receive(:force_import_job!)
         expect_any_instance_of(RepositoryImportWorker).to receive(:perform).with(project.id).and_call_original
 
-        expect { project.import_state.schedule }.to change { project.import_state.jid }
+        expect { import_state.schedule }.to change { import_state.jid }
       end
     end
   end
@@ -1798,10 +1799,9 @@ describe Project do
 
       it 'resets project import_error' do
         error_message = 'Some error'
-        mirror = create(:project_empty_repo, :import_started)
-        mirror.import_state.update_attributes(last_error: error_message)
+        import_state = create(:import_state, :started, project: create(:project_empty_repo), last_error: error_message)
 
-        expect { mirror.import_state.finish }.to change { mirror.import_state.last_error }.from(error_message).to(nil)
+        expect { import_state.finish }.to change { import_state.reload.last_error }.from(error_message).to(nil)
       end
 
       it 'performs housekeeping when an import of a fresh project is completed' do

@@ -4,7 +4,7 @@ describe ProjectImportState, type: :model do
   describe 'when create' do
     it 'sets next execution timestamp to now' do
       Timecop.freeze(Time.now) do
-        import_state = create(:project, :mirror).import_state
+        import_state = create(:import_state, :mirror)
 
         expect(import_state.next_execution_timestamp).to eq(Time.now)
       end
@@ -13,7 +13,7 @@ describe ProjectImportState, type: :model do
 
   describe '#mirror_waiting_duration' do
     it 'returns in seconds the time spent in the queue' do
-      import_state = create(:project, :mirror, :import_scheduled).import_state
+      import_state = create(:import_state, :mirror, :scheduled)
 
       import_state.update_attributes(last_update_started_at: import_state.last_update_scheduled_at + 5.minutes)
 
@@ -23,7 +23,7 @@ describe ProjectImportState, type: :model do
 
   describe '#update_duration' do
     it 'returns in seconds the time spent updating' do
-      import_state = create(:project, :mirror, :import_started).import_state
+      import_state = create(:import_state, :mirror, :started)
 
       import_state.update_attributes(last_update_at: import_state.last_update_started_at + 5.minutes)
 
@@ -34,7 +34,7 @@ describe ProjectImportState, type: :model do
   describe  '#mirror?' do
     context 'when repository is empty' do
       it 'returns false' do
-        import_state = create(:project, :mirror, :import_started).import_state
+        import_state = create(:import_state, :mirror, :started)
 
         expect(import_state.updating?).to be false
       end
@@ -42,7 +42,7 @@ describe ProjectImportState, type: :model do
 
     context 'when project is not a mirror' do
       it 'returns false' do
-        import_state = create(:project, :import_started).import_state
+        import_state = create(:import_state, :started)
 
         expect(import_state.updating?).to be false
       end
@@ -50,7 +50,7 @@ describe ProjectImportState, type: :model do
 
     context 'when mirror is started' do
       it 'returns true' do
-        import_state = create(:project, :mirror, :import_started, :repository).import_state
+        import_state = create(:import_state, :repository, :mirror, :started)
 
         expect(import_state.updating?).to be true
       end
@@ -58,7 +58,7 @@ describe ProjectImportState, type: :model do
 
     context 'when mirror is scheduled' do
       it 'returns true' do
-        import_state = create(:project, :mirror, :import_scheduled, :repository).import_state
+        import_state = create(:import_state, :repository, :mirror, :scheduled)
 
         expect(import_state.updating?).to be true
       end
@@ -69,9 +69,8 @@ describe ProjectImportState, type: :model do
     context 'when mirror is expected to run soon' do
       it 'returns true' do
         timestamp = Time.now
-        import_state = create(:project, :mirror, :import_finished, :repository).import_state
-        import_state.last_update_at = timestamp - 3.minutes
-        import_state.next_execution_timestamp = timestamp - 2.minutes
+        import_state = create(:import_state, :repository, :mirror, :finished,
+                              last_update_at: timestamp - 3.minutes, next_execution_timestamp: timestamp - 2.minutes)
 
         expect(import_state.about_to_update?).to be true
       end
@@ -79,7 +78,7 @@ describe ProjectImportState, type: :model do
 
     context 'when mirror was scheduled' do
       it 'returns false' do
-        import_state = create(:project, :mirror, :import_scheduled, :repository).import_state
+        import_state = create(:import_state, :repository, :mirror, :scheduled)
 
         expect(import_state.about_to_update?).to be false
       end
@@ -87,7 +86,7 @@ describe ProjectImportState, type: :model do
 
     context 'when mirror is hard_failed' do
       it 'returns false' do
-        import_state = create(:project, :mirror, :import_hard_failed).import_state
+        import_state = create(:import_state, :mirror, :hard_failed)
 
         expect(import_state.about_to_update?).to be false
       end
@@ -95,7 +94,7 @@ describe ProjectImportState, type: :model do
   end
 
   describe '#last_update_status' do
-    let(:import_state) { create(:project, :mirror).import_state }
+    let(:import_state) { create(:import_state, :mirror) }
 
     context 'when mirror has not updated' do
       it 'returns nil' do
@@ -128,9 +127,9 @@ describe ProjectImportState, type: :model do
     end
   end
 
-  describe '#import_in_progress?' do
+  describe '#in_progress?' do
     let(:traits) { [] }
-    let(:import_state) { create(:project, *traits, import_url: Project::UNKNOWN_IMPORT_URL).import_state }
+    let(:import_state) { create(:import_state, *traits, import_url: Project::UNKNOWN_IMPORT_URL) }
 
     shared_examples 'import in progress' do
       context 'when project is a mirror' do
@@ -140,7 +139,7 @@ describe ProjectImportState, type: :model do
 
         context 'when repository is empty' do
           it 'returns true' do
-            expect(import_state.import_in_progress?).to be_truthy
+            expect(import_state.in_progress?).to be_truthy
           end
         end
 
@@ -150,21 +149,21 @@ describe ProjectImportState, type: :model do
           end
 
           it 'returns false' do
-            expect(import_state.import_in_progress?).to be_falsey
+            expect(import_state.in_progress?).to be_falsey
           end
         end
       end
 
       context 'when project is not a mirror' do
         it 'returns true' do
-          expect(import_state.import_in_progress?).to be_truthy
+          expect(import_state.in_progress?).to be_truthy
         end
       end
     end
 
     context 'when import status is scheduled' do
       before do
-        traits << :import_scheduled
+        traits << :scheduled
       end
 
       it_behaves_like 'import in progress'
@@ -172,7 +171,7 @@ describe ProjectImportState, type: :model do
 
     context 'when import status is started' do
       before do
-        traits << :import_started
+        traits << :started
       end
 
       it_behaves_like 'import in progress'
@@ -180,27 +179,25 @@ describe ProjectImportState, type: :model do
 
     context 'when import status is finished' do
       before do
-        traits << :import_finished
+        traits << :finished
       end
 
       it 'returns false' do
-        expect(import_state.import_in_progress?).to be_falsey
+        expect(import_state.in_progress?).to be_falsey
       end
     end
   end
 
   describe '#reset_retry_count' do
-    let(:import_state) { create(:project, :mirror, :import_finished).import_state }
+    let(:import_state) { create(:import_state, :mirror, :finished, retry_count: 3) }
 
     it 'resets retry_count to 0' do
-      import_state.retry_count = 3
-
       expect { import_state.reset_retry_count }.to change { import_state.retry_count }.from(3).to(0)
     end
   end
 
   describe '#increment_retry_count' do
-    let(:import_state) { create(:project, :mirror, :import_finished).import_state }
+    let(:import_state) { create(:import_state, :mirror, :finished) }
 
     it 'increments retry_count' do
       expect { import_state.increment_retry_count }.to change { import_state.retry_count }.from(0).to(1)
@@ -208,7 +205,7 @@ describe ProjectImportState, type: :model do
   end
 
   describe '#set_next_execution_timestamp' do
-    let(:import_state) { create(:project, :mirror, :import_finished).import_state }
+    let(:import_state) { create(:import_state, :mirror, :finished) }
     let!(:timestamp) { Time.now }
     let!(:jitter) { 2.seconds }
 

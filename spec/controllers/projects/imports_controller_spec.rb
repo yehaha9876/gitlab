@@ -32,11 +32,12 @@ describe Projects::ImportsController do
     end
 
     context 'when repository exists' do
-      let(:project) { create(:project_empty_repo, import_url: 'https://github.com/vim/vim.git') }
+      let(:import_url) { 'https://github.com/vim/vim.git' }
+      let(:project) { create(:project_empty_repo) }
 
       context 'when import is in progress' do
         before do
-          project.import_state.update_attribute(:status, :started)
+          create(:import_state, :started, project: project, import_url: import_url)
         end
 
         it 'renders template' do
@@ -54,7 +55,7 @@ describe Projects::ImportsController do
 
       context 'when import failed' do
         before do
-          project.import_state.update_attribute(:status, :failed_op)
+          create(:import_state, :failed, project: project, import_url: import_url)
         end
 
         it 'redirects to new_namespace_project_import_path' do
@@ -66,7 +67,7 @@ describe Projects::ImportsController do
 
       context 'when import finished' do
         before do
-          project.import_state.update_attribute(:status, :finished)
+          create(:import_state, :finished, project: project, import_url: import_url)
         end
 
         context 'when project is a fork' do
@@ -115,7 +116,7 @@ describe Projects::ImportsController do
 
       context 'when import never happened' do
         before do
-          project.import_state.update_attribute(:status, :none)
+          create(:import_state, :none, project: project, import_url: import_url)
         end
 
         it 'redirects to namespace_project_path' do

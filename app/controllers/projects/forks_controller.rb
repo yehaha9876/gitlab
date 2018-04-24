@@ -42,7 +42,7 @@ class Projects::ForksController < Projects::ApplicationController
     @forked_project ||= ::Projects::ForkService.new(project, current_user, namespace: namespace).execute
 
     if @forked_project.saved? && @forked_project.forked?
-      if @forked_project.import_state.import_in_progress?
+      if @forked_project.import_state.in_progress?
         redirect_to project_import_path(@forked_project, continue: continue_params)
       else
         if continue_params

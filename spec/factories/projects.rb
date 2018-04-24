@@ -62,77 +62,78 @@ FactoryBot.define do
     end
 
     trait :import_none do
-      after(:create) do |project, _|
-        ProjectImportState.where(project: project).first_or_initialize.tap do |state|
-          state.status = :none
-          state.save
-        end
+      transient do
+        status :none
+      end
 
-        project.reload
+      before(:create) do |project, evaluator|
+        project.create_import_state(status: evaluator.status)
       end
     end
 
     trait :import_scheduled do
-      after(:create) do |project, _|
-        ProjectImportState.where(project: project).first_or_initialize.tap do |state|
-          state.status = :scheduled
-          state.last_update_scheduled_at = Time.now
-          state.save
-        end
+      transient do
+        status :scheduled
+        last_update_scheduled_at Time.now
+      end
 
-        project.reload
+      before(:create) do |project, evaluator|
+        project.create_import_state(status: evaluator.status,
+                                    last_update_scheduled_at: evaluator.last_update_scheduled_at)
       end
     end
 
     trait :import_started do
-      after(:create) do |project, _|
-        ProjectImportState.where(project: project).first_or_initialize.tap do |state|
-          state.status = :started
-          state.last_update_started_at = Time.now
-          state.save
-        end
+      transient do
+        status :started
+        last_update_started_at Time.now
+      end
 
-        project.reload
+      before(:create) do |project, evaluator|
+        project.create_import_state(status: evaluator.status,
+                                    last_update_started_at: evaluator.last_update_started_at)
       end
     end
 
     trait :import_finished do
-      after(:create) do |project, _|
+      transient do
         timestamp = Time.now
 
-        ProjectImportState.where(project: project).first_or_initialize.tap do |state|
-          state.status = :finished
-          state.last_update_at = timestamp
-          state.last_successful_update_at = timestamp
-          state.save
-        end
+        status :finished
+        last_update_at timestamp
+        last_successful_update_at timestamp
+      end
 
-        project.reload
+      before(:create) do |project, evaluator|
+        project.create_import_state(status: evaluator.status,
+                                    last_update_at: evaluator.last_update_at,
+                                    last_successful_update_at: evaluator.last_successful_update_at)
       end
     end
 
     trait :import_failed do
-      after(:create) do |project, _|
-        ProjectImportState.where(project: project).first_or_initialize.tap do |state|
-          state.status = :failed
-          state.last_update_at = Time.now
-          state.save
-        end
+      transient do
+        status :failed
+        last_update_at Time.now
+      end
 
-        project.reload
+      before(:create) do |project, evaluator|
+        project.create_import_state(status: evaluator.status,
+                                    last_update_at: evaluator.last_update_at)
       end
     end
 
     trait :import_hard_failed do
-      after(:create) do |project|
-        ProjectImportState.where(project: project).first_or_initialize.tap do |state|
-          state.status = :failed
-          state.retry_count = Gitlab::Mirror::MAX_RETRY + 1
-          state.last_update_at = Time.now - 1.minute
-          state.save
-        end
+      transient do
+        status :failed
+        retry_count Gitlab::Mirror::MAX_RETRY + 1
+        last_update_at Time.now - 1.minute
+      end
 
-        project.reload
+      before(:create) do |project, evaluator|
+        project.create_import_state(status: evaluator.status,
+                                    retry_count: evaluator.retry_count,
+                                    last_update_at: evaluator.last_update_at)
       end
     end
 

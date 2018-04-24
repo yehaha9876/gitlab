@@ -8,29 +8,29 @@ describe StuckImportJobsWorker do
       context 'when the import status was already updated' do
         before do
           allow(Gitlab::SidekiqStatus).to receive(:completed_jids) do
-            project.import_state.start
-            project.import_state.finish
+            import_state.start
+            import_state.finish
 
-            [project.import_state.jid]
+            [import_state.jid]
           end
         end
 
         it 'does not mark the project as failed' do
           worker.perform
 
-          expect(project.reload.import_status).to eq('finished')
+          expect(import_state.reload.status).to eq('finished')
         end
       end
 
       context 'when the import status was not updated' do
         before do
-          allow(Gitlab::SidekiqStatus).to receive(:completed_jids).and_return([project.import_state.jid])
+          allow(Gitlab::SidekiqStatus).to receive(:completed_jids).and_return([import_state.jid])
         end
 
         it 'marks the project as failed' do
           worker.perform
 
-          expect(project.reload.import_status).to eq('failed')
+          expect(import_state.reload.status).to eq('failed')
         end
       end
     end
@@ -48,21 +48,15 @@ describe StuckImportJobsWorker do
 
   describe 'with scheduled import_status' do
     it_behaves_like 'project import job detection' do
-      let(:project) { create(:project, :import_scheduled) }
-
-      before do
-        project.import_state.update_attributes(jid: '123')
-      end
+      let(:project) { create(:project) }
+      let(:import_state) { create(:import_state, :scheduled, project: project, jid: '123') }
     end
   end
 
   describe 'with started import_status' do
     it_behaves_like 'project import job detection' do
-      let(:project) { create(:project, :import_started) }
-
-      before do
-        project.import_state.update_attributes(jid: '123')
-      end
+      let(:project) { create(:project) }
+      let(:import_state) { create(:import_state, :started, project: project, jid: '123') }
     end
   end
 end

@@ -9,11 +9,10 @@ describe Gitlab::GithubImport::ParallelImporter do
 
   describe '#execute', :clean_gitlab_redis_shared_state do
     let(:project) { create(:project) }
+    let!(:import_state) { create(:import_state, project: project) }
     let(:importer) { described_class.new(project) }
 
     before do
-      project.create_import_state
-
       expect(Gitlab::GithubImport::Stage::ImportRepositoryWorker)
         .to receive(:perform_async)
         .with(project.id)
@@ -36,7 +35,7 @@ describe Gitlab::GithubImport::ParallelImporter do
     it 'updates the import JID of the project' do
       importer.execute
 
-      expect(project.import_state.jid).to eq("github-importer/#{project.id}")
+      expect(import_state.reload.jid).to eq("github-importer/#{project.id}")
     end
   end
 end

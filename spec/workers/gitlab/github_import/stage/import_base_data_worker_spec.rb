@@ -4,14 +4,12 @@ describe Gitlab::GithubImport::Stage::ImportBaseDataWorker do
   let(:project) { create(:project) }
   let(:worker) { described_class.new }
 
-  before do
-    project.create_import_state
-  end
-
   describe '#import' do
     it 'imports the base data of a project' do
       importer = double(:importer)
       client = double(:client)
+
+      create(:import_state, project: project)
 
       described_class::IMPORTERS.each do |klass|
         expect(klass)
