@@ -36,7 +36,6 @@ const defaultValuesComponent = {
   currentDataIndex: 0,
   legendTitle: 'Average',
   currentCoordinates: [],
-  currentHoveredTimeSeriesIndex: 0,
 };
 
 const deploymentFlagData = {

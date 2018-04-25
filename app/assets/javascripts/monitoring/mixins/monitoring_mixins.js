@@ -60,11 +60,9 @@ const mixins = {
         const currentDataIndex = bisectDate(series.values, this.hoverData.hoveredDate, 1);
         const currentData = series.values[currentDataIndex];
         const currentX = Math.floor(timeSeries.timeSeriesScaleX(currentData.time));
-        const currentY = Math.floor(timeSeries.timeSeriesScaleY(currentData.value));
 
         return {
           currentX,
-          currentY,
           currentDataIndex,
         };
       });

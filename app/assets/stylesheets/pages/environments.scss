@@ -447,12 +447,20 @@
       left: auto;
       right: 0;
       margin-right: 10px;
+
+      > .arrow::after {
+        border-left-color: $theme-gray-100;
+      }
     }
 
     &.right {
       left: 0;
       right: auto;
       margin-left: 10px;
+
+      > .arrow::after {
+        border-right-color: $theme-gray-100;
+      }
     }
 
     > .arrow {

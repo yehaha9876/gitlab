@@ -1,6 +1,4 @@
 <script>
-import eventHub from '../../event_hub';
-
 export default {
   props: {
     generatedLinePath: {
@@ -27,10 +25,10 @@ export default {
     currentCoordinates: {
       type: Object,
       required: false,
-      default: () => {},
+      default: () => ({ currentX: 0, currentY: 0 }),
     },
-    currentTimeSeriesIndex: {
-      type: Number,
+    showDot: {
+      type: Boolean,
       required: true,
     },
   },
@@ -41,14 +39,6 @@ export default {
       return null;
     },
   },
-  methods: {
-    areaHovered(e) {
-      eventHub.$emit('areaHovered', {
-        event: e,
-        timeSeriesIndex: this.currentTimeSeriesIndex,
-      });
-    },
-  },
 };
 </script>
 <template>
@@ -56,17 +46,17 @@ export default {
     <circle
       class="circle-path"
       :cx="currentCoordinates.currentX - 5"
-      :cy="currentCoordinates.currentY + 19"
+      :cy="currentCoordinates.currentY + 20"
       :fill="lineColor"
+      :stroke="lineColor"
       r="3"
-      v-if="currentCoordinates"
+      v-if="showDot"
     />
     <path
       class="metric-area"
       :d="generatedAreaPath"
       :fill="areaColor"
       transform="translate(-5, 20)"
-      @mousemove="areaHovered($event)"
     />
     <path
       class="metric-line"

@@ -55,10 +55,6 @@ export default {
       type: Array,
       required: true,
     },
-    currentHoveredTimeSeriesIndex: {
-      type: Number,
-      required: true,
-    },
   },
   computed: {
     formatTime() {
@@ -169,12 +165,8 @@ export default {
             :key="index"
           >
             <track-line :track="series"/>
-            <td v-if="index !== currentHoveredTimeSeriesIndex">
+            <td>
               {{ series.track }} {{ seriesMetricLabel(index, series) }}
-            </td>
-            <td v-else>
-              {{ series.track }}
-              <strong>{{ seriesMetricLabel(index, series) }}</strong>
             </td>
             <td class="flag-metric-value">
               <strong>{{ seriesMetricValue(index, series) }}</strong>
