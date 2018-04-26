@@ -39,6 +39,20 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     error.to_s.humanize if error #TODO: humanize here changes 'SAML' to 'Saml'
   end
 
+  def after_omniauth_failure_path_for(scope)
+    group_saml_failure_path(scope) || super
+  end
+
+  def group_saml_failure_path(scope)
+    return unless OmniAuth::Strategies::GroupSaml === failed_strategy
+    # return unless env['warden'].authenticated?
+
+    # group = group_from(env['PATH_INFO'])
+    group = Group.find_by_full_path('engine-team')
+    flash_as_param = find_message(:failure, kind: 'SAML', reason: failure_message)
+    group_saml_providers_path(group, failure: flash_as_param)
+  end
+
   def saml
     omniauth_flow(Gitlab::Auth::Saml)
   end
