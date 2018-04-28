@@ -491,15 +491,14 @@ export default {
           v-if="jaegerEnabled"
           id="jaeger"
           :title="applications.jaeger.title"
-          title-link="https://github.com/jaegertracing/jaeger"
+          title-link="http://jaeger.readthedocs.io/en/latest/"
           :status="applications.jaeger.status"
           :status-reason="applications.jaeger.statusReason"
           :request-status="applications.jaeger.requestStatus"
           :request-reason="applications.jaeger.requestReason"
         >
           <div slot="description">
-            {{ s__(`ClusterIntegration|Jaeger collects and processes OpenTracing data.
-              Enables tracing requests happening between services in your cluster`) }}
+            {{ s__(`ClusterIntegration|Jaeger is a distributed tracing system, enabling detailed introspection of application performance and behavior. Requires 4 CPU cores and 8GB of RAM.`) }}
           </div>
         </application-row>
         <!--
