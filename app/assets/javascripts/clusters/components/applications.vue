@@ -498,7 +498,9 @@ export default {
           :request-reason="applications.jaeger.requestReason"
         >
           <div slot="description">
-            {{ s__(`ClusterIntegration|Jaeger is a distributed tracing system, enabling detailed introspection of application performance and behavior. Requires 4 CPU cores and 8GB of RAM.`) }}
+            {{ s__(`ClusterIntegration|Jaeger is a distributed tracing system,
+            enabling detailed introspection of application performance and behavior.
+            Requires 4 CPU cores and 8GB of RAM.`) }}
           </div>
         </application-row>
         <!--
