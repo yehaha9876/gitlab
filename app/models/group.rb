@@ -12,6 +12,7 @@ class Group < Namespace
   include SelectForProjectAuthorization
   include LoadedInGroupList
   include GroupDescendant
+  include TokenAuthenticatable
 
   has_many :group_members, -> { where(requested_at: nil) }, dependent: :destroy, as: :source # rubocop:disable Cop/ActiveRecordDependent
   alias_method :members, :group_members
@@ -31,6 +32,8 @@ class Group < Namespace
   has_many :labels, class_name: 'GroupLabel'
   has_many :variables, class_name: 'Ci::GroupVariable'
   has_many :custom_attributes, class_name: 'GroupCustomAttribute'
+  has_many :runner_groups, class_name: 'Ci::RunnerGroup'
+  has_many :runners, through: :runner_groups, source: :runner, class_name: 'Ci::Runner'
 
   has_many :ldap_group_links, foreign_key: 'group_id', dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_many :hooks, dependent: :destroy, class_name: 'GroupHook' # rubocop:disable Cop/ActiveRecordDependent
@@ -54,6 +57,8 @@ class Group < Namespace
 
   validates :repository_size_limit,
             numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
+
+  add_authentication_token_field :runners_token
 
   after_create :post_create_hook
   after_destroy :post_destroy_hook
@@ -336,6 +341,13 @@ class Group < Namespace
 
   def refresh_project_authorizations
     refresh_members_authorized_projects(blocking: false)
+  end
+
+  # each existing group needs to have a `runners_token`.
+  # we do this on read since migrating all existing groups is not a feasible
+  # solution.
+  def runners_token
+    ensure_runners_token!
   end
 
   private

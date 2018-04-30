@@ -237,8 +237,6 @@ class Project < ActiveRecord::Base
   has_many :project_deploy_tokens
   has_many :deploy_tokens, through: :project_deploy_tokens
 
-  has_many :active_runners, -> { active }, through: :runner_projects, source: :runner, class_name: 'Ci::Runner'
-
   has_one :auto_devops, class_name: 'ProjectAutoDevops'
   has_many :custom_attributes, class_name: 'ProjectCustomAttribute'
 
@@ -254,6 +252,7 @@ class Project < ActiveRecord::Base
   delegate :members, to: :team, prefix: true
   delegate :add_user, :add_users, to: :team
   delegate :add_guest, :add_reporter, :add_developer, :add_master, :add_role, to: :team
+  delegate :group_runners_enabled, :group_runners_enabled=, :group_runners_enabled?, to: :ci_cd_settings
 
   # Validations
   validates :creator, presence: true, on: :create
@@ -1315,12 +1314,14 @@ class Project < ActiveRecord::Base
     @shared_runners ||= shared_runners_available? ? Ci::Runner.shared : Ci::Runner.none
   end
 
-  def active_shared_runners
-    @active_shared_runners ||= shared_runners.active
+  def group_runners
+    @group_runners ||= group_runners_enabled? ? Ci::Runner.belonging_to_parent_group_of_project(self.id) : Ci::Runner.none
   end
 
   def any_runners?(&block)
-    active_runners.any?(&block) || active_shared_runners.any?(&block)
+    union = Gitlab::SQL::Union.new([runners, shared_runners, group_runners])
+    runners = Ci::Runner.from("(#{union.to_sql}) ci_runners").active
+    runners.any?(&block)
   end
 
   def valid_runners_token?(token)
@@ -1882,6 +1883,10 @@ class Project < ActiveRecord::Base
 
   def licensed_features
     []
+  end
+
+  def toggle_ci_cd_settings!(settings_attribute)
+    ci_cd_settings.toggle!(settings_attribute)
   end
 
   def gitlab_deploy_token

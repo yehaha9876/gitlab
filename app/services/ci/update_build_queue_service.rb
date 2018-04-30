@@ -1,18 +1,22 @@
 module Ci
   class UpdateBuildQueueService
     def execute(build)
-      build.project.runners.each do |runner|
-        if runner.can_pick?(build)
-          runner.tick_runner_queue
-        end
+      tick_for(build, build.project.runners)
+
+      if build.project.group_runners_enabled?
+        tick_for(build, Ci::Runner.belonging_to_parent_group_of_project(build.project_id))
       end
 
-      return unless build.project.shared_runners_enabled?
+      if build.project.shared_runners_enabled?
+        tick_for(build, Ci::Runner.shared)
+      end
+    end
 
-      Ci::Runner.shared.each do |runner|
-        if runner.can_pick?(build)
-          runner.tick_runner_queue
-        end
+    private
+
+    def tick_for(build, runners)
+      runners.each do |runner|
+        runner.invalidate_build_cache!(build)
       end
     end
   end
