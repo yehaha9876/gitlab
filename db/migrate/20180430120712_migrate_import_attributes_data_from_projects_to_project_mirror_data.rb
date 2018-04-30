@@ -1,9 +1,15 @@
-class RemoveImportRelatedAttributesFromProjectsTable < ActiveRecord::Migration
+class MigrateImportAttributesDataFromProjectsToProjectMirrorData < ActiveRecord::Migration
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false
 
   disable_ddl_transaction!
+
+  class Project < ActiveRecord::Base
+    include EachBatch
+
+    self.table_name = 'projects'
+  end
 
   class ProjectImportState < ActiveRecord::Base
     include EachBatch
@@ -13,7 +19,7 @@ class RemoveImportRelatedAttributesFromProjectsTable < ActiveRecord::Migration
 
   def up
     Project.joins('INNER JOIN project_mirror_data ON project_mirror_data.project_id = projects.id').each_batch do |batch|
-      start, stop = batch.pluck('MIN(id), MAX(id)').first
+      start, stop = batch.pluck('MIN(projects.id), MAX(projects.id)').first
 
       execute <<~SQL
         UPDATE project_mirror_data
@@ -25,14 +31,14 @@ class RemoveImportRelatedAttributesFromProjectsTable < ActiveRecord::Migration
           last_error = proj.import_error
         FROM projects proj
         WHERE proj.id = project_id
-        AND proj.mirror = 't'
+        AND proj.mirror = TRUE
         AND proj.id >= #{start}
         AND proj.id < #{stop}
       SQL
     end
 
     non_mirror_finder_sql = <<~SQL
-      mirror != 't'
+      projects.mirror != TRUE
       AND (import_url IS NOT NULL
            OR import_type IS NOT NULL
            OR EXISTS(SELECT 1
@@ -47,31 +53,14 @@ class RemoveImportRelatedAttributesFromProjectsTable < ActiveRecord::Migration
         INSERT INTO project_mirror_data (project_id, status, jid, last_update_at, last_successful_update_at, last_error)
         SELECT id, import_status, import_jid, mirror_last_update_at, mirror_last_successful_update_at, import_error
         FROM projects
-        WHERE mirror != 't'
-        AND id >= #{start}
-        AND id < #{stop}
-        AND (import_url IS NOT NULL
-             OR import_type IS NOT NULL
-             OR EXISTS(SELECT 1
-                       FROM fork_network_members fork
-                       WHERE fork.project_id = projects.id AND fork.forked_from_project_id IS NOT NULL))
+        WHERE projects.id >= #{start}
+        AND projects.id < #{stop}
+        AND #{non_mirror_finder_sql}
       SQL
     end
-
-    remove_column :projects, :import_status
-    remove_column :projects, :import_jid
-    remove_column :projects, :mirror_last_update_at
-    remove_column :projects, :mirror_last_successful_update_at
-    remove_column :projects, :import_error
   end
 
   def down
-    add_column :projects, :import_status, :string
-    add_column :projects, :import_jid, :string
-    add_column :projects, :mirror_last_update_at, :datetime_with_timezone
-    add_column :projects, :mirror_last_successful_update_at, :datetime_with_timezone
-    add_column :projects, :import_error, :text
-
     # Migrate every row in project_mirror_data back to the projects table
     ProjectImportState.each_batch do |batch|
       start, stop = batch.pluck('MIN(id), MAX(id)').first
@@ -85,19 +74,17 @@ class RemoveImportRelatedAttributesFromProjectsTable < ActiveRecord::Migration
           mirror_last_successful_update_at = mirror_data.last_successful_update_at,
           import_error = mirror_data.last_error
         FROM project_mirror_data mirror_data
-        WHERE mirror_data.project_id = projects.id AND id >= #{start} AND id < #{stop}
+        WHERE mirror_data.project_id = projects.id
+        AND mirror_data.id >= #{start}
+        AND mirror_data.id < #{stop}
       SQL
 
       execute <<~SQL
         DELETE FROM project_mirror_data
-        WHERE AND id >= #{start} AND id < #{stop} AND project_id NOT IN (SELECT id FROM projects WHERE mirror = 't')
+        WHERE project_mirror_data.id >= #{start}
+        AND project_mirror_data.id < #{stop}
+        AND project_id NOT IN (SELECT id FROM projects WHERE mirror = TRUE)
       SQL
     end
-
-    remove_column :project_mirror_data, :status
-    remove_column :project_mirror_data, :jid
-    remove_column :project_mirror_data, :last_update_at
-    remove_column :project_mirror_data, :last_successful_update_at
-    remove_column :project_mirror_data, :last_error
   end
 end

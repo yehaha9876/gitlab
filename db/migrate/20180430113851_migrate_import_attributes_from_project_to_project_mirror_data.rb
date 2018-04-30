@@ -1,4 +1,4 @@
-class MoveImportAttributesFromProjectToProjectMirrorData < ActiveRecord::Migration
+class MigrateImportAttributesFromProjectToProjectMirrorData < ActiveRecord::Migration
   DOWNTIME = false
 
   def up
@@ -10,5 +10,10 @@ class MoveImportAttributesFromProjectToProjectMirrorData < ActiveRecord::Migrati
   end
 
   def down
+    remove_column :project_mirror_data, :status
+    remove_column :project_mirror_data, :jid
+    remove_column :project_mirror_data, :last_update_at
+    remove_column :project_mirror_data, :last_successful_update_at
+    remove_column :project_mirror_data, :last_error
   end
 end
