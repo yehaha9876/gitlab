@@ -443,6 +443,8 @@
   }
 
   &.popover {
+    padding: 0;
+
     &.left {
       left: auto;
       right: 0;
@@ -472,6 +474,10 @@
       padding: 5px 8px;
       font-size: 12px;
       white-space: nowrap;
+    }
+
+    > .popover-title {
+      background-color: $theme-gray-100;
     }
   }
 
