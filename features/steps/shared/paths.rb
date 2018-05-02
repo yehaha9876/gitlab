@@ -188,20 +188,12 @@ module SharedPaths
     visit admin_teams_path
   end
 
-  step 'I visit admin email page' do
-    visit admin_email_path
-  end
-
   step 'I visit admin settings page' do
     visit admin_application_settings_path
   end
 
   step 'I visit spam logs page' do
     visit admin_spam_logs_path
-  end
-
-  step 'I visit push rules page' do
-    visit admin_push_rule_path
   end
 
   step 'I visit admin license page' do
