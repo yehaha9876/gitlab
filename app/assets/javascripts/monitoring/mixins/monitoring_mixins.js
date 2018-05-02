@@ -59,10 +59,12 @@ const mixins = {
       this.currentCoordinates = this.timeSeries.map((series) => {
         const currentDataIndex = bisectDate(series.values, this.hoverData.hoveredDate, 1);
         const currentData = series.values[currentDataIndex];
-        const currentX = Math.floor(timeSeries.timeSeriesScaleX(currentData.time));
+        const currentX = Math.floor(series.timeSeriesScaleX(currentData.time));
+        const currentY = Math.floor(series.timeSeriesScaleY(currentData.value));
 
         return {
           currentX,
+          currentY,
           currentDataIndex,
         };
       });
