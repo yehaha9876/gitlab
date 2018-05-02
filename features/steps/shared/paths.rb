@@ -188,20 +188,12 @@ module SharedPaths
     visit admin_teams_path
   end
 
-  step 'I visit admin email page' do
-    visit admin_email_path
-  end
-
   step 'I visit admin settings page' do
     visit admin_application_settings_path
   end
 
   step 'I visit spam logs page' do
     visit admin_spam_logs_path
-  end
-
-  step 'I visit push rules page' do
-    visit admin_push_rule_path
   end
 
   step 'I visit admin license page' do
@@ -214,10 +206,6 @@ module SharedPaths
 
   step "I visit my project's settings page" do
     visit edit_project_path(@project)
-  end
-
-  step "I visit my project's files page" do
-    visit project_tree_path(@project, root_ref)
   end
 
   step 'I visit a binary file in the repo' do

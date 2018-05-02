@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180419031622) do
+ActiveRecord::Schema.define(version: 20180425131009) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1020,7 +1020,7 @@ ActiveRecord::Schema.define(version: 20180419031622) do
   create_table "geo_hashed_storage_migrated_events", id: :bigserial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.text "repository_storage_name", null: false
-    t.text "repository_storage_path", null: false
+    t.text "repository_storage_path"
     t.text "old_disk_path", null: false
     t.text "new_disk_path", null: false
     t.text "old_wiki_disk_path", null: false
@@ -1094,6 +1094,12 @@ ActiveRecord::Schema.define(version: 20180419031622) do
     t.integer "lfs_objects_synced_missing_on_primary_count"
     t.integer "job_artifacts_synced_missing_on_primary_count"
     t.integer "attachments_synced_missing_on_primary_count"
+    t.integer "repositories_checksummed_count"
+    t.integer "repositories_checksum_failed_count"
+    t.integer "repositories_checksum_mismatch_count"
+    t.integer "wikis_checksummed_count"
+    t.integer "wikis_checksum_failed_count"
+    t.integer "wikis_checksum_mismatch_count"
   end
 
   add_index "geo_node_statuses", ["geo_node_id"], name: "index_geo_node_statuses_on_geo_node_id", unique: true, using: :btree
@@ -1126,7 +1132,7 @@ ActiveRecord::Schema.define(version: 20180419031622) do
   create_table "geo_repository_created_events", id: :bigserial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.text "repository_storage_name", null: false
-    t.text "repository_storage_path", null: false
+    t.text "repository_storage_path"
     t.text "repo_path", null: false
     t.text "wiki_path"
     t.text "project_name", null: false
@@ -1137,7 +1143,7 @@ ActiveRecord::Schema.define(version: 20180419031622) do
   create_table "geo_repository_deleted_events", id: :bigserial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.text "repository_storage_name", null: false
-    t.text "repository_storage_path", null: false
+    t.text "repository_storage_path"
     t.text "deleted_path", null: false
     t.text "deleted_wiki_path"
     t.text "deleted_project_name", null: false
@@ -1148,7 +1154,7 @@ ActiveRecord::Schema.define(version: 20180419031622) do
   create_table "geo_repository_renamed_events", id: :bigserial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.text "repository_storage_name", null: false
-    t.text "repository_storage_path", null: false
+    t.text "repository_storage_path"
     t.text "old_path_with_namespace", null: false
     t.text "new_path_with_namespace", null: false
     t.text "old_wiki_path_with_namespace", null: false
@@ -1881,6 +1887,13 @@ ActiveRecord::Schema.define(version: 20180419031622) do
   end
 
   add_index "project_auto_devops", ["project_id"], name: "index_project_auto_devops_on_project_id", unique: true, using: :btree
+
+  create_table "project_ci_cd_settings", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.boolean "group_runners_enabled", default: true, null: false
+  end
+
+  add_index "project_ci_cd_settings", ["project_id"], name: "index_project_ci_cd_settings_on_project_id", unique: true, using: :btree
 
   create_table "project_custom_attributes", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -2809,6 +2822,7 @@ ActiveRecord::Schema.define(version: 20180419031622) do
   add_foreign_key "project_authorizations", "projects", on_delete: :cascade
   add_foreign_key "project_authorizations", "users", on_delete: :cascade
   add_foreign_key "project_auto_devops", "projects", on_delete: :cascade
+  add_foreign_key "project_ci_cd_settings", "projects", name: "fk_24c15d2f2e", on_delete: :cascade
   add_foreign_key "project_custom_attributes", "projects", on_delete: :cascade
   add_foreign_key "project_deploy_tokens", "deploy_tokens", on_delete: :cascade
   add_foreign_key "project_deploy_tokens", "projects", on_delete: :cascade

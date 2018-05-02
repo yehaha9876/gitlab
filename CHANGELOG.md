@@ -2,6 +2,14 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 10.7.2 (2018-04-25)
+
+### Security (2 changes)
+
+- Serve archive requests with the correct file in all cases.
+- Sanitizes user name to avoid XSS attacks.
+
+
 ## 10.7.1 (2018-04-23)
 
 ### Fixed (11 changes)
@@ -18,11 +26,12 @@ entry.
 - Fixed IDE not showing loading state when tree is loading.
 - Align action icons in pipeline graph.
 
-### Performance (3 changes)
+### Performance (4 changes)
 
 - Validate project path prior to hitting the database. !18322
 - Add index to file_store on ci_job_artifacts. !18444
 - Fix N+1 queries when loading participants for a commit note.
+- Support Markdown rendering using multiple projects.
 
 ### Added (1 change)
 
@@ -234,6 +243,13 @@ entry.
 - Add query counts to profiler output.
 - Move Sidekiq exporter logs to log/sidekiq_exporter.log.
 - Upgrade Gitaly to upgrade its charlock_holmes.
+
+
+## 10.6.5 (2018-04-24)
+
+### Security (1 change)
+
+- Sanitizes user name to avoid XSS attacks.
 
 
 ## 10.6.4 (2018-04-09)
@@ -475,6 +491,13 @@ entry.
 - Move Ruby endpoints to OPT_OUT.
 - Upgrade Workhorse to version 3.8.0 to support structured logging.
 - Use host URL to build JIRA remote link icon.
+
+
+## 10.5.8 (2018-04-24)
+
+### Security (1 change)
+
+- Sanitizes user name to avoid XSS attacks.
 
 
 ## 10.5.7 (2018-04-03)
