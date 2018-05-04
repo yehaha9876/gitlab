@@ -2,6 +2,16 @@
 
 %h3.page-title
   Runner ##{@runner.id}
+  .pull-right
+    - if @runner.shared?
+      %span.runner-state.runner-state-shared
+        Shared
+    - elsif @runner.group_type?
+      %span.runner-state.runner-state-shared
+        Group
+    - else
+      %span.runner-state.runner-state-specific
+        Specific
 
 .table-holder
   %table.table
@@ -18,6 +28,10 @@
     %tr
       %td Can run untagged jobs
       %td= @runner.run_untagged? ? 'Yes' : 'No'
+    - unless @runner.group_type?
+      %tr
+        %td Locked to this project
+        %td= @runner.locked? ? 'Yes' : 'No'
     %tr
       %td Tags
       %td
