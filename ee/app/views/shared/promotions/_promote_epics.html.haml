@@ -4,8 +4,9 @@
   .block.js-epics-sidebar-callout.promotion-issue-sidebar{ data: { uid: promotion_feature } }
     .sidebar-collapsed-icon{ data: { toggle: "dropdown", target: ".js-epics-sidebar-callout" } }
       %span{ data: { toggle: "tooltip", placement: "left", container: "body" }, title: _('Epic') }
-        = icon('balance-scale')
-        %span No
+        = sprite_icon('epic', size: 16)
+        %span
+          = _('None')
     .title.hide-collapsed
       = _('Epic')
     .dropdown
@@ -17,10 +18,7 @@
             %i.fa.fa-times.dropdown-menu-close-icon{ "aria-hidden" => "true", "data-hidden" => "true" }
         %div
           %p
-            - if Gitlab::CurrentSettings.should_check_namespace_plan?
-              = _('Upgrade your plan to activate Issue weight.')
-            - else
-              = _('Epics let you manage your portfolio of projects more efficiently and with less effort by tracking groups of issues that share a theme, across projects and milestones.')
+            = _('Epics let you manage your portfolio of projects more efficiently and with less effort by tracking groups of issues that share a theme, across projects and milestones.')
             = link_to _('Read more'), 'https://docs.gitlab.com/ee/user/group/epics/', class: 'btn-link', target: '_blank'
           %div
             = render 'shared/promotions/promotion_link_project', short_form: true
