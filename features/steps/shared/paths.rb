@@ -48,10 +48,6 @@ module SharedPaths
     visit group_group_members_path(Group.find_by(name: "Owned"))
   end
 
-  step 'I visit group "Owned" settings page' do
-    visit edit_group_path(Group.find_by(name: "Owned"))
-  end
-
   step 'I visit group "Owned" projects page' do
     visit projects_group_path(Group.find_by(name: "Owned"))
   end
@@ -250,10 +246,6 @@ module SharedPaths
 
   step 'I visit project hooks page' do
     visit project_settings_integrations_path(@project)
-  end
-
-  step 'I visit group hooks page' do
-    visit group_hooks_path(@group)
   end
 
   step 'I visit project deploy keys page' do
