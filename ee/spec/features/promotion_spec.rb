@@ -263,8 +263,8 @@ describe 'Promotions', :js do
     it 'should appear on the page', :js do
       visit project_issue_path(project, issue)
       wait_for_requests
-      find('.promote-weight-link').click
-      expect(find('.promotion-info-weight-message')).to have_content 'Improve issues management with Issue weight and GitLab Enterprise Edition'
+      find('.js-weight-sidebar-callout .promote-weight-link').click
+      expect(find('.promotion-issue-sidebar-message')).to have_content 'Improve issues management with Issue weight and GitLab Enterprise Edition'
     end
   end
 
