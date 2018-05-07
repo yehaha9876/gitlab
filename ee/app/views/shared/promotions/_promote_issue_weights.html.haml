@@ -1,14 +1,14 @@
 - if show_promotions? && !@project.feature_available?(:issue_weights)
-  .block.weight
-    .sidebar-collapsed-icon{ data: { toggle: "dropdown", target: ".weight" } }
+  .block.js-weight-sidebar-callout.promotion-issue-sidebar
+    .sidebar-collapsed-icon{ data: { toggle: "dropdown", target: ".js-weight-sidebar-callout" } }
       %span{ data: { toggle: "tooltip", placement: "left", container: "body" }, title: _("Weight") }
         = icon('balance-scale')
         %span No
     .title.hide-collapsed
       = _('Weight')
-      = link_to _('Edit'), '#', class: 'edit-link promote-weight-link pull-right', data: { toggle: "dropdown", target: ".weight" }
-    .promotion-info-weight.dropdown
-      .dropdown-menu.promotion-info-weight-message
+      = link_to _('Edit'), '#', class: 'edit-link promote-weight-link pull-right', data: { toggle: "dropdown", target: ".js-weight-sidebar-callout" }
+    .dropdown
+      .dropdown-menu.promotion-issue-sidebar-message
         .dropdown-title
           %span
             = _('Change Weight')
