@@ -1,11 +1,20 @@
-RSpec.configure do |config|
-  config.around(:each, :allow_forgery_protection) do |example|
+module ForgeryProtection
+  def with_forgery_protection
     begin
       ActionController::Base.allow_forgery_protection = true
-
-      example.call
+      yield
     ensure
       ActionController::Base.allow_forgery_protection = false
+    end
+  end
+
+  module_function :with_forgery_protection
+end
+
+RSpec.configure do |config|
+  config.around(:each, :allow_forgery_protection) do |example|
+    ForgeryProtection.with_forgery_protection do
+      example.call
     end
   end
 end
