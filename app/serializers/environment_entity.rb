@@ -19,6 +19,10 @@ class EnvironmentEntity < Grape::Entity
     project_environment_path(environment.project, environment)
   end
 
+  expose :logs_path do |environment|
+    logs_project_environment_path(environment.project, environment)
+  end
+
   expose :stop_path do |environment|
     stop_project_environment_path(environment.project, environment)
   end
