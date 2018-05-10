@@ -98,6 +98,14 @@ module Clusters
         @kubeclient ||= build_kubeclient!
       end
 
+      def read_pod_logs(pod_name)
+        kubeclient.get_pod_log(pod_name, actual_namespace).as_json
+      rescue Kubeclient::HttpError => err
+        raise err unless err.error_code == 404
+
+        []
+      end
+
       private
 
       def kubeconfig

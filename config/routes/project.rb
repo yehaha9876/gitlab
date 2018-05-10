@@ -261,6 +261,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       resources :environments, except: [:destroy] do
         member do
           post :stop
+          get :logs
           get :terminal
           get :metrics
           get :additional_metrics

@@ -74,6 +74,7 @@
             <instance-component
               :status="instance.status"
               :tooltip-text="instance.tooltip"
+              :pod_name="instance.pod_name"
               :stable="instance.stable"
               :key="i"
             />
