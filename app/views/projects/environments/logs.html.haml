@@ -1,1 +1,18 @@
-= format_kube_logs(@logs)
+%div
+  .build-page
+    .build-trace-container.prepend-top-default
+      .top-bar.js-top-bar
+        .truncated-info.hidden-xs.pull-left
+          Pod logs from pod name
+
+        .controllers.pull-right
+          .has-tooltip.controllers-buttons{ title: 'Scroll to top', data: { placement: 'top', container: 'body'} }
+            %button.js-scroll-up.btn-scroll.btn-transparent.btn-blank{ type: 'button', disabled: true }
+              = custom_icon('scroll_up')
+          .has-tooltip.controllers-buttons{ title: 'Scroll to bottom', data: { placement: 'top', container: 'body'} }
+            %button.js-scroll-down.btn-scroll.btn-transparent.btn-blank{ type: 'button', disabled: true }
+              = custom_icon('scroll_down')
+
+      %pre.build-trace#build-trace
+        %code.bash.js-build-output
+          = format_kube_logs(@logs)
