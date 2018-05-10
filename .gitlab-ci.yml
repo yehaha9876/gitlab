@@ -359,6 +359,11 @@ stages:
   script:
     - bundle exec rake db:migrate:reset
 
+.geo-db-migrate-reset: &geo-db-migrate-reset
+  <<: *dedicated-no-docs-and-no-qa-pull-cache-job
+  script:
+    - bundle exec rake geo:db:migrate:reset
+
 .migration-paths: &migration-paths
   <<: *dedicated-no-docs-and-no-qa-pull-cache-job
   variables:
@@ -772,6 +777,15 @@ db:migrate:reset-mysql:
 db:check-schema-pg:
   <<: *db-migrate-reset
   <<: *use-pg
+  script:
+    - source scripts/schema_changed.sh
+
+db:check-geo-schema-pg:
+  <<: *geo-db-migrate-reset
+  <<: *use-pg
+  variables:
+    SCHEMA_FILE: ee/db/geo/schema.rb
+    RAKE_COMMAND: geo:db:migrate:reset
   script:
     - source scripts/schema_changed.sh
 
