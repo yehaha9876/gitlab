@@ -5,7 +5,7 @@ RAKE_COMMAND=${RAKE_COMMAND:-db:migrate:reset}
 
 schema_changed() {
   if [ ! -z "$(git diff --name-only -- $SCHEMA)" ]; then
-    printf "db/schema.rb after rake db:migrate:reset is different from one in the repository"
+    printf "$SCHEMA after rake $RAKE_COMMAND is different from one in the repository"
     printf "The diff is as follows:\n"
     diff=$(git diff -p --binary -- $SCHEMA)
     printf "%s" "$diff"
