@@ -2,6 +2,7 @@ module Projects
   module Prometheus
     class AlertsController < Projects::ApplicationController
       before_action :authorize_admin_project!
+      before_action :require_alert!, only: [:update, :show, :destroy]
 
       def new
         @alert = project.prometheus_alerts.new
@@ -45,7 +46,7 @@ module Projects
       def show
         respond_to do |format|
           format.json do
-            render json: PrometheusAlertSerializer.new(project: project).represent(alert) if alert
+            render json: PrometheusAlertSerializer.new(project: project).represent(alert)
           end
         end
       end
@@ -63,7 +64,11 @@ module Projects
       private
 
       def alerts_params
-        params.permit(:query, :operator, :threshold, :name)
+        params.permit(:query, :operator, :threshold, :name, :environment_id)
+      end
+
+      def require_alert!
+        return not_found unless alert
       end
 
       def alert
