@@ -1,8 +1,8 @@
-%div
+%div.js-kubernetes-logs{ data: { logs_path: logs_project_environment_path(@project, @environment, format: :json) } }
   .build-page
     .build-trace-container.prepend-top-default
       .top-bar.js-top-bar
-        .truncated-info.hidden-xs.pull-left
+        .truncated-info.hidden-xs.pull-left.js-pod-name
           Pod logs from pod name
 
         .controllers.pull-right
@@ -15,4 +15,4 @@
 
       %pre.build-trace#build-trace
         %code.bash.js-build-output
-          = format_kube_logs(@logs)
+          .build-loader-animation.js-build-refresh
