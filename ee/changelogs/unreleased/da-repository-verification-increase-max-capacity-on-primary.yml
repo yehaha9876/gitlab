@@ -1,0 +1,5 @@
+---
+title: Geo - Increase MAX_CAPACITY of repository verification worker on primary to 1000
+merge_request: 5699
+author:
+type: performance
