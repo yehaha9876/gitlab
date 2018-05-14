@@ -232,6 +232,11 @@
   &-running {
     background-color: $green-100;
     border-color: $green-400;
+
+    &:hover {
+      background-color: $green-300;
+      border-color: $green-500;
+    }
   }
 
   &-succeeded {
