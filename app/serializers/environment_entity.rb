@@ -20,7 +20,7 @@ class EnvironmentEntity < Grape::Entity
   end
 
   expose :logs_path do |environment|
-    logs_project_environment_path(environment.project, environment)
+    logs_project_environment_path(environment.project, environment, format: :json)
   end
 
   expose :stop_path do |environment|

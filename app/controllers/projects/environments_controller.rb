@@ -33,6 +33,17 @@ class Projects::EnvironmentsController < Projects::ApplicationController
 
   def logs
     @logs = environment.deployment_platform.read_pod_logs(params[:pod_name])
+
+    respond_to do |format|
+      format.html
+      format.json do
+        Gitlab::PollingInterval.set_header(response, interval: 3_000)
+
+        render json: {
+          logs: @logs.strip.split("\n").as_json
+        }
+      end
+    end
   end
 
   def folder
