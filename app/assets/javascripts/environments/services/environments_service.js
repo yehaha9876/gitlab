@@ -19,9 +19,4 @@ export default class EnvironmentsService {
   getFolderContent(folderUrl) {
     return axios.get(`${folderUrl}.json?per_page=${this.folderResults}`);
   }
-
-  // eslint-disable-next-line class-methods-use-this
-  getDeployBoard(endpoint) {
-    return axios.get(endpoint);
-  }
 }
