@@ -33,6 +33,17 @@ module Clusters
         80
       end
 
+      def get_command
+        Gitlab::Kubernetes::Helm::GetCommand.new(name)
+      end
+
+      def upgrade_command(values)
+        Gitlab::Kubernetes::Helm::UpgradeCommand.new(
+          name,
+          values: values
+        )
+      end
+
       def install_command
         Gitlab::Kubernetes::Helm::InstallCommand.new(
           name,
