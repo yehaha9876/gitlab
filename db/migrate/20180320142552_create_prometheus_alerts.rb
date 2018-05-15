@@ -6,6 +6,7 @@ class CreatePrometheusAlerts < ActiveRecord::Migration
   def change
     create_table :prometheus_alerts do |t|
       t.integer :iid, null: false
+      t.string :name, null: false
       t.string :query, null: false
       t.string :operator, null: false
       t.float :threshold, null: false

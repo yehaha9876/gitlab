@@ -2181,6 +2181,7 @@ ActiveRecord::Schema.define(version: 20180704204006) do
 
   create_table "prometheus_alerts", force: :cascade do |t|
     t.integer "iid", null: false
+    t.string "name", null: false
     t.string "query", null: false
     t.string "operator", null: false
     t.float "threshold", null: false
