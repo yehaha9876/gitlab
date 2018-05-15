@@ -1,0 +1,5 @@
+---
+title: "[Geo] More accurate exception handling when sync failed"
+merge_request:
+author:
+type: fixed

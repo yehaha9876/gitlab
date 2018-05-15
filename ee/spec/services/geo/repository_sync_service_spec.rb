@@ -94,20 +94,20 @@ describe Geo::RepositorySyncService do
       expect { subject.execute }.not_to raise_error
     end
 
-    it 'rescues exception and fires after_create hook when Gitlab::Git::Repository::NoRepository is raised' do
+    it 'rescues exception and fires after_create hook when Gitlab::Git::Repository::InvalidRepository is raised' do
       allow(repository).to receive(:fetch_as_mirror)
       .with(url_to_repo, remote_name: 'geo', forced: true)
-      .and_raise(Gitlab::Git::Repository::NoRepository)
+      .and_raise(Gitlab::Git::Repository::InvalidRepository)
 
       expect(repository).to receive(:after_create)
 
       expect { subject.execute }.not_to raise_error
     end
 
-    it 'increases retry count when Gitlab::Git::Repository::NoRepository is raised' do
+    it 'increases retry count when Gitlab::Git::Repository::InvalidRepository is raised' do
       allow(repository).to receive(:fetch_as_mirror)
         .with(url_to_repo, remote_name: 'geo', forced: true)
-        .and_raise(Gitlab::Git::Repository::NoRepository)
+        .and_raise(Gitlab::Git::Repository::InvalidRepository)
 
       subject.execute
 
@@ -133,7 +133,7 @@ describe Geo::RepositorySyncService do
 
       allow(repository).to receive(:fetch_as_mirror)
         .with(url_to_repo, remote_name: 'geo', forced: true)
-        .and_raise(Gitlab::Git::Repository::NoRepository)
+        .and_raise(Gitlab::Git::Repository::InvalidRepository)
 
       subject.execute
 

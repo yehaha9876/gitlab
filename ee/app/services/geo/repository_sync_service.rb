@@ -15,17 +15,20 @@ module Geo
       # In some cases repository does not exist, the only way to know about this is to parse the error text.
       # If it does not exist we should consider it as successfully downloaded.
       if e.message.include? Gitlab::GitAccess::ERROR_MESSAGES[:no_repo]
-        log_info('Repository is not found, marking it as successfully synced')
+        log_info('No repository, marking it as successfully synced')
         mark_sync_as_successful
       else
         fail_registry!('Error syncing repository', e)
       end
-    rescue Gitlab::Git::Repository::NoRepository => e
+    rescue Gitlab::Git::Repository::InvalidRepository => e
       log_info('Setting force_to_redownload flag')
       fail_registry!('Invalid repository', e, force_to_redownload_repository: true)
 
       log_info('Expiring caches')
       project.repository.after_create
+    rescue Gitlab::Git::Repository::NoRepository
+      log_info('No repository, marking it as successfully synced')
+      mark_sync_as_successful
     ensure
       clean_up_temporary_repository if redownload
       expire_repository_caches
