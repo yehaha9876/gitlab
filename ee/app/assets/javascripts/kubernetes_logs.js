@@ -50,8 +50,6 @@ export default class KubernetesPodLogs {
     this.$scrollBottomBtn.off('click').on('click', this.scrollToBottom.bind(this));
 
     this.$refreshLogBtn.off('click').on('click', this.getPodLogs.bind(this));
-
-    this.getPodLogs();
   }
 
   // eslint-disable-next-line class-methods-use-this
