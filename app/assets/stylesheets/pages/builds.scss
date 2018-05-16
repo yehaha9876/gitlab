@@ -125,6 +125,7 @@
       align-items: center;
 
       svg {
+        width: 12px;
         height: 15px;
         display: block;
         fill: $gl-text-color;
@@ -159,7 +160,12 @@
         }
       }
 
-      .btn-scroll:disabled {
+      .btn-refresh {
+        border-radius: 4px;
+      }
+
+      .btn-scroll:disabled,
+      .btn-refresh:disabled {
         opacity: 0.35;
         cursor: not-allowed;
       }

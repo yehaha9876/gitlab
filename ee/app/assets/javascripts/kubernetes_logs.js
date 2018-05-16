@@ -10,11 +10,12 @@ export default class KubernetesPodLogs {
     this.options = $(container).data();
     this.podNameContainer = $(container).find('.js-pod-name');
     this.podName = getParameterValues('pod_name')[0];
-    this.buildOutputContainer = $(container).find('.js-build-output');
+    this.$buildOutputContainer = $(container).find('.js-build-output');
     this.$window = $(window);
     // Scroll controllers
     this.$scrollTopBtn = $(container).find('.js-scroll-up');
     this.$scrollBottomBtn = $(container).find('.js-scroll-down');
+    this.$refreshLogBtn = $(container).find('.js-refresh-log');
     this.$buildRefreshAnimation = $(container).find('.js-build-refresh');
     this.isLogComplete = false;
 
@@ -26,7 +27,7 @@ export default class KubernetesPodLogs {
     }
 
     this.podNameContainer.empty();
-    this.podNameContainer.text(`Pod logs from ${this.podName}`);
+    this.podNameContainer.append(`Pod logs from <strong>${this.podName}</strong>`);
 
     this.$window
       .off('scroll')
@@ -46,6 +47,10 @@ export default class KubernetesPodLogs {
     this.$scrollBottomBtn
       .off('click')
       .on('click', this.scrollToBottom.bind(this));
+
+    this.$refreshLogBtn
+      .off('click')
+      .on('click', this.getPodLogs.bind(this));
 
     this.getPodLogs();
   }
@@ -67,16 +72,22 @@ export default class KubernetesPodLogs {
   }
 
   getPodLogs() {
+    this.scrollToTop();
+    this.$buildOutputContainer.empty();
+    this.$buildRefreshAnimation.show();
+    this.toggleDisableButton(this.$refreshLogBtn, 'true');
+
     return axios.get(this.options.logsPath, {
       params: { pod_name: this.podName },
     })
       .then((res) => {
         const logs = res.data.logs;
         const formattedLogs = logs.map(logEntry => `${_.escape(logEntry)} <br />`);
-        this.buildOutputContainer.append(formattedLogs);
+        this.$buildOutputContainer.append(formattedLogs);
         this.scrollDown();
         this.isLogComplete = true;
-        this.$buildRefreshAnimation.remove();
+        this.$buildRefreshAnimation.hide();
+        this.toggleDisableButton(this.$refreshLogBtn, false);
       })
       .catch(() => createFlash(__('Something went wrong on our end')));
   }

@@ -1,4 +1,4 @@
-%div.js-kubernetes-logs{ data: { logs_path: logs_project_environment_path(@project, @environment, format: :json) } }
+.js-kubernetes-logs{ data: { logs_path: logs_project_environment_path(@project, @environment, format: :json) } }
   .build-page
     .build-trace-container.prepend-top-default
       .top-bar.js-top-bar
@@ -12,6 +12,9 @@
           .has-tooltip.controllers-buttons{ title: 'Scroll to bottom', data: { placement: 'top', container: 'body'} }
             %button.js-scroll-down.btn-scroll.btn-transparent.btn-blank{ type: 'button', disabled: true }
               = custom_icon('scroll_down')
+          .has-tooltip.controllers-buttons{ title: 'Refresh', data: { placement: 'top', container: 'body'} }
+            %button.js-refresh-log.btn-default.btn-refresh{ type: 'button', disabled: true }
+              = sprite_icon('retry')
 
       %pre.build-trace#build-trace
         %code.bash.js-build-output
