@@ -8,6 +8,7 @@ export default class ClusterService {
       ingress: this.options.installIngressEndpoint,
       runner: this.options.installRunnerEndpoint,
       prometheus: this.options.installPrometheusEndpoint,
+      jupyter: this.options.installJupyterEndpoint,
     };
   }
 

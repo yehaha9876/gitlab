@@ -12,15 +12,19 @@ module Clusters
       default_value_for :version, VERSION
 
       def chart
-        # TODO: publish jupyterhub charts that we can use for our installation
-        # and provide path to it here.
+        'jupyterhub/jupyterhub'
+      end
+
+      def repository
+        'https://jupyterhub.github.io/helm-chart/'
       end
 
       def install_command
         Gitlab::Kubernetes::Helm::InstallCommand.new(
           name,
           chart: chart,
-          values: values
+          values: values,
+          repository: repository
         )
       end
     end
