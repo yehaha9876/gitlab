@@ -2,7 +2,7 @@ import $ from 'jquery';
 import axios from '~/lib/utils/axios_utils';
 import { getParameterValues } from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
-import { __ } from '~/locale';
+import { __, s__, sprintf } from '~/locale';
 import _ from 'underscore';
 
 export default class KubernetesPodLogs {
@@ -22,35 +22,34 @@ export default class KubernetesPodLogs {
     this.scrollThrottled = _.throttle(this.toggleScroll.bind(this), 100);
 
     if (!this.podName) {
-      createFlash('No pod name has been specified'); // TODO: i18n missing
+      createFlash(s__('Environments|No pod name has been specified'));
       return;
     }
 
+    const podTitle = sprintf(
+      s__('Environments|Pod logs from %{podName}'),
+      {
+        podName: `<strong>${this.podName}</strong>`,
+      },
+      false,
+    );
     this.podNameContainer.empty();
-    this.podNameContainer.append(`Pod logs from <strong>${this.podName}</strong>`);
+    this.podNameContainer.append(podTitle);
 
-    this.$window
-      .off('scroll')
-      .on('scroll', () => {
-        if (!this.isScrolledToBottom()) {
-          this.toggleScrollAnimation(false);
-        } else if (this.isScrolledToBottom() && !this.isLogComplete) {
-          this.toggleScrollAnimation(true);
-        }
-        this.scrollThrottled();
-      });
+    this.$window.off('scroll').on('scroll', () => {
+      if (!this.isScrolledToBottom()) {
+        this.toggleScrollAnimation(false);
+      } else if (this.isScrolledToBottom() && !this.isLogComplete) {
+        this.toggleScrollAnimation(true);
+      }
+      this.scrollThrottled();
+    });
 
-    this.$scrollTopBtn
-      .off('click')
-      .on('click', this.scrollToTop.bind(this));
+    this.$scrollTopBtn.off('click').on('click', this.scrollToTop.bind(this));
 
-    this.$scrollBottomBtn
-      .off('click')
-      .on('click', this.scrollToBottom.bind(this));
+    this.$scrollBottomBtn.off('click').on('click', this.scrollToBottom.bind(this));
 
-    this.$refreshLogBtn
-      .off('click')
-      .on('click', this.getPodLogs.bind(this));
+    this.$refreshLogBtn.off('click').on('click', this.getPodLogs.bind(this));
 
     this.getPodLogs();
   }
@@ -77,10 +76,11 @@ export default class KubernetesPodLogs {
     this.$buildRefreshAnimation.show();
     this.toggleDisableButton(this.$refreshLogBtn, 'true');
 
-    return axios.get(this.options.logsPath, {
-      params: { pod_name: this.podName },
-    })
-      .then((res) => {
+    return axios
+      .get(this.options.logsPath, {
+        params: { pod_name: this.podName },
+      })
+      .then(res => {
         const logs = res.data.logs;
         const formattedLogs = logs.map(logEntry => `${_.escape(logEntry)} <br />`);
         this.$buildOutputContainer.append(formattedLogs);
@@ -126,8 +126,7 @@ export default class KubernetesPodLogs {
 
     const windowHeight = $(window).height();
     if (this.canScroll()) {
-      if (currentPosition > 0 &&
-        (scrollHeight - currentPosition !== windowHeight)) {
+      if (currentPosition > 0 && scrollHeight - currentPosition !== windowHeight) {
         // User is in the middle of the log
 
         this.toggleDisableButton(this.$scrollTopBtn, false);
