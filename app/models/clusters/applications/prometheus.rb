@@ -21,6 +21,10 @@ module Clusters
         end
       end
 
+      def ready?
+        status >= 3
+      end
+
       def chart
         'stable/prometheus'
       end
@@ -40,6 +44,7 @@ module Clusters
       def upgrade_command(values)
         Gitlab::Kubernetes::Helm::UpgradeCommand.new(
           name,
+          chart: chart,
           values: values
         )
       end

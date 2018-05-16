@@ -13,9 +13,11 @@ module Clusters
           state :scheduled, value: 1
           state :installing, value: 2
           state :installed, value: 3
+          state :updating, value: 4
+          state :updated, value: 5
 
           event :make_scheduled do
-            transition [:installable, :errored] => :scheduled
+            transition [:installable, :installed, :updated, :errored] => :scheduled
           end
 
           event :make_installing do
@@ -24,6 +26,14 @@ module Clusters
 
           event :make_installed do
             transition [:installing] => :installed
+          end
+
+          event :make_updating do
+            transition [:scheduled] => :updating
+          end
+
+          event :make_updated do
+            transition [:updating] => :updated
           end
 
           event :make_errored do

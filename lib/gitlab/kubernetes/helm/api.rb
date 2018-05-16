@@ -21,7 +21,7 @@ module Gitlab
         def update(command)
           @namespace.ensure_exists!
           update_config_map(command) if command.config_map?
-          @kubeclient.update_pod(command.pod_resource)
+          @kubeclient.create_pod(command.pod_resource)
         end
 
         ##
@@ -31,15 +31,15 @@ module Gitlab
         #
         # values: "Pending", "Running", "Succeeded", "Failed", "Unknown"
         #
-        def installation_status(pod_name)
+        def status(pod_name)
           @kubeclient.get_pod(pod_name, @namespace.name).status.phase
         end
 
-        def installation_log(pod_name)
+        def log(pod_name)
           @kubeclient.get_pod_log(pod_name, @namespace.name).body
         end
 
-        def delete_installation_pod!(pod_name)
+        def delete_pod!(pod_name)
           @kubeclient.delete_pod(pod_name, @namespace.name)
         end
 
