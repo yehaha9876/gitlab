@@ -38,6 +38,13 @@ export default class ClusterStore {
           requestStatus: null,
           requestReason: null,
         },
+        jupyter: {
+          title: s__('ClusterIntegration|JupyterHub'),
+          status: null,
+          statusReason: null,
+          requestStatus: null,
+          requestReason: null,
+        },
       },
     };
   }

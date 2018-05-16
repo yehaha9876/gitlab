@@ -278,11 +278,28 @@ export default {
               applications to production.`) }}
           </div>
         </application-row>
+        <application-row
+          id="jupyter"
+          :title="applications.jupyter.title"
+          title-link="https://jupyterhub.readthedocs.io/en/stable/"
+          :status="applications.jupyter.status"
+          :status-reason="applications.jupyter.statusReason"
+          :request-status="applications.jupyter.requestStatus"
+          :request-reason="applications.jupyter.requestReason"
+        >
+          <div slot="description">
+            {{ s__(`ClusterIntegration|JupyterHub, a multi-user Hub, spawns, 
+              manages, and proxies multiple instances of the single-user
+              Jupyter notebook server. JupyterHub can be used to serve 
+              notebooks to a class of students, a corporate data science group,
+              or a scientific research group.`) }}
+          </div>
+        </application-row>
         <!--
           NOTE: Don't forget to update `clusters.scss`
           min-height for this block and uncomment `application_spec` tests
         -->
-        <!-- Add GitLab Runner row, all other plumbing is complete -->
+        <!-- Add Jupyter row, all other plumbing is complete -->
       </div>
     </div>
   </section>
