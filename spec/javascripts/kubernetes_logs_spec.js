@@ -1,6 +1,7 @@
 import KubernetesLogs from 'ee/kubernetes_logs';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
+import { logMockData } from './ee/kubernetes_mock_data';
 
 describe('Kubernetes Logs', () => {
   const fixtureTemplate = 'static/environments_logs.html.raw';
@@ -8,41 +9,61 @@ describe('Kubernetes Logs', () => {
   const logMockPath = '/root/kubernetes-app/environments/1/logs';
   let kubernetesLogContainer;
   let kubernetesLog;
-  let response;
   let mock;
   preloadFixtures(fixtureTemplate);
 
-  beforeEach(() => {
-    loadFixtures(fixtureTemplate);
+  describe('When data is requested correctly', () => {
+    beforeEach(() => {
+      loadFixtures(fixtureTemplate);
 
-    spyOnDependency(KubernetesLogs, 'getParameterValues').and.callFake(() => [mockPodName]);
+      spyOnDependency(KubernetesLogs, 'getParameterValues').and.callFake(() => [mockPodName]);
 
-    response = {
-      data: {
-        logs: [
-          'Sweet log',
-        ],
-      },
-    };
+      mock = new MockAdapter(axios);
 
-    mock = new MockAdapter(axios);
+      mock.onGet(logMockPath).reply(200, { logs: logMockData });
 
-    mock.onGet(`${logMockPath}?pod_name=${mockPodName}`).reply(() => [200, response]);
+      kubernetesLogContainer = document.querySelector('.js-kubernetes-logs');
+    });
 
-    kubernetesLogContainer = document.querySelector('.js-kubernetes-logs');
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it('has the pod name placed on the top bar', () => {
+      kubernetesLog = new KubernetesLogs(kubernetesLogContainer);
+      const topBar = document.querySelector('.js-pod-name');
+
+      expect(topBar.textContent).toContain(kubernetesLog.podName);
+    });
+
+    it('queries the pod log data and sets the dom elements', (done) => {
+      kubernetesLog = new KubernetesLogs(kubernetesLogContainer);
+      spyOn(kubernetesLog, 'scrollDown').and.callThrough();
+      spyOn(kubernetesLog, 'toggleDisableButton').and.callThrough();
+
+      kubernetesLog.getPodLogs();
+      setTimeout(() => {
+        expect(kubernetesLog.isLogComplete).toEqual(true);
+        expect(kubernetesLog.$buildOutputContainer.text()).toContain(logMockData[0].trim());
+        expect(kubernetesLog.scrollDown).toHaveBeenCalled();
+        expect(kubernetesLog.toggleDisableButton).toHaveBeenCalled();
+        done();
+      }, 0);
+    });
   });
 
-  it('queries the pod log data', (done) => {
-    kubernetesLog = new KubernetesLogs(kubernetesLogContainer);
+  describe('When no pod name is available', () => {
+    beforeEach(() => {
+      loadFixtures(fixtureTemplate);
 
-    kubernetesLog.getPodLogs()
-    .then(() => {
-      // TODO: Add expectations here
-      done();
-    })
-    .catch(() => {
-      // TODO: Add expectation here
-      done();
+      kubernetesLogContainer = document.querySelector('.js-kubernetes-logs');
+    });
+
+    it('shows up a flash message when no pod name is specified', () => {
+      const createFlashSpy = spyOnDependency(KubernetesLogs, 'createFlash').and.stub();
+      kubernetesLog = new KubernetesLogs(kubernetesLogContainer);
+
+      expect(createFlashSpy).toHaveBeenCalled();
     });
   });
 });
