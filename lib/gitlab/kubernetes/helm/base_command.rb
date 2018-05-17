@@ -29,7 +29,7 @@ module Gitlab
         end
 
         def pod_name
-          raise NotImplementedError
+          "install-#{name}"
         end
 
         private

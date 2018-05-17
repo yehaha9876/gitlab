@@ -28,10 +28,6 @@ module Gitlab
           Gitlab::Kubernetes::ConfigMap.new(name, values).generate
         end
 
-        def pod_name
-          "install-#{name}"
-        end
-
         private
 
         def init_command
