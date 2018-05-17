@@ -12,7 +12,7 @@ module Clusters
       default_value_for :version, VERSION
 
       def chart
-        'jupyterhub/jupyterhub'
+        "#{name}/jupyterhub"
       end
 
       def repository

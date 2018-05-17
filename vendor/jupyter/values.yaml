@@ -1,0 +1,24 @@
+## For RBAC support
+rbac:
+  create: false
+  clusterWideAccess: false
+
+hub:
+  cookieSecret: "$HUB_TOKEN"
+proxy:
+  secretToken: "$PROXY_TOKEN"
+
+ingress:
+  enabled: true
+  #hosts:
+  #  - $HUB_HOSTNAME
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+
+# auth:
+#   type: gitlab
+#   gitlab:
+#     clientId: "$OAUTH_CLIENT_ID"
+#     clientSecret: "$OAUTH_SECRET"
+#     callbackUrl: "$OAUTH_CALLBACK_URL"
