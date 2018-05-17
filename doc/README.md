@@ -148,11 +148,11 @@ scales to run your tests faster.
 - [Review Apps](ci/review_apps/index.md): Preview changes to your app right from a merge request.
 - [Pipeline Graphs](ci/pipelines.md#pipeline-graphs)
 - [Multi-project pipeline graphs](ci/multi_project_pipeline_graphs.md) **[PREMIUM]**
-- [Code Quality](user/project/merge_requests/code_quality_diff.md) **[STARTER]**
-- [Static Application Security Testing (SAST)](user/project/merge_requests/sast.md) **[ULTIMATE]**
+- [Code Quality reports](user/project/merge_requests/code_quality_diff.md) **[STARTER]**
+- [Static Application Security Testing (SAST) reports](user/project/merge_requests/sast.md) **[ULTIMATE]**
 - [Dynamic Application Security Testing (DAST)](user/project/merge_requests/dast.md) **[ULTIMATE]**
-- [Container Scanning](ci/examples/container_scanning.md) **[ULTIMATE]**
-- [Dependency Scanning](ci/examples/dependency_scanning.md) **[ULTIMATE]**
+- [Dependency Scanning reports](user/project/merge_requests/dependency_scanning.md) **[ULTIMATE]**
+- [Container Scanning reports](user/project/merge_requests/container_scanning.md) **[ULTIMATE]**
 
 ### Package
 
@@ -265,7 +265,7 @@ GitLab.com is hosted, managed, and administered by GitLab, Inc., with
 and teams: Free, Bronze, Silver, and Gold.
 
 GitLab.com subscriptions grants access
-to the same features available in GitLab self-hosted, **expect
+to the same features available in GitLab self-hosted, **except
 [administration](administration/index.md) tools and settings**:
 
 - GitLab.com Free includes the same features available in Core
