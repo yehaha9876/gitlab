@@ -102,6 +102,10 @@ class ProjectPolicy < BasePolicy
     @subject.feature_available?(:merge_requests, @user)
   end
 
+  condition(:read_pod_logs, score: 4) do
+    @subject.feature_available?(:pod_logs, @user)
+  end
+
   features = %w[
     merge_requests
     issues
@@ -251,6 +255,8 @@ class ProjectPolicy < BasePolicy
     enable :read_cluster
     enable :create_cluster
   end
+
+  rule { can?(:master_access) && read_pod_logs }.enable :read_pod_logs
 
   rule { (mirror_available & can?(:admin_project)) | admin }.enable :admin_remote_mirror
 

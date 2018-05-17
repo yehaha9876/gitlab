@@ -96,10 +96,24 @@ describe Projects::EnvironmentsController do
     let(:pod_name) { 'foo' }
 
     before do
+      stub_licensed_features(pod_logs: true)
+
       create(:cluster, :provided_by_gcp,
              environment_scope: '*', projects: [project])
 
       allow_any_instance_of(Clusters::Platforms::Kubernetes).to receive(:read_pod_logs).with(pod_name).and_return(logs)
+    end
+
+    context 'when unlicensed' do
+      before do
+        stub_licensed_features(pod_logs: false)
+      end
+
+      it 'renders forbidden' do
+        get :logs, environment_params(pod_name: pod_name)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
     end
 
     context 'when using HTML format' do
