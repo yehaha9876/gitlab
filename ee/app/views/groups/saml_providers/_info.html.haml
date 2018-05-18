@@ -21,7 +21,13 @@
   .well-segment.borderless
     = render 'info_row', field: :issuer, label_text: 'Identifier'
     .help-block= _('Also called "Issuer" or "Relying party trust identifier"')
-  - if @saml_provider.persisted?
+  - if Flipper.enabled?(:group_saml_metadata)
+    .well-segment.borderless
+      %label= _("GitLab metadata URL")
+      - metadata_url = "/users/auth/group_saml/metadata?group_path=#{@group.path}"
+      %div= link_to metadata_url, metadata_url
+      .help-block= _("Used to help configure your identity provider")
+  - if @saml_provider.persisted? || Flipper.enabled?(:group_saml_always_show_sso_url)
     .well-segment.borderless
       %label= _("GitLab single sign on URL")
       - user_login_url = sso_group_saml_providers_url(@group)

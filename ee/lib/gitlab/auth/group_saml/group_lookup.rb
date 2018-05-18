@@ -15,7 +15,11 @@ module Gitlab
         end
 
         def saml_provider
-          group&.saml_provider
+          if Flipper.enabled?(:group_saml_metadata)
+            group&.saml_provider || group&.build_saml_provider
+          else
+            group&.saml_provider
+          end
         end
 
         def group_saml_enabled?
