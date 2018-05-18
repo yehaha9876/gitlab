@@ -6,6 +6,31 @@ module Clusters
 
       prepend EE::KubernetesService
 
+      # We need to monkey-patch until
+      # https://github.com/abonas/kubeclient/pull/326 is merged
+      class Kubeclient::Client
+        def get_pod_log(pod_name, namespace,
+                        container: nil, previous: false,
+                        timestamps: false, since_time: nil,
+                        tail_lines: nil)
+
+          params = {}
+          params[:previous] = true if previous
+          params[:container] = container if container
+          params[:timestamps] = timestamps if timestamps
+          params[:sinceTime] = format_datetime(since_time) if since_time
+          params[:tailLines] = tail_lines if tail_lines
+
+          ns = build_namespace_prefix(namespace)
+          handle_exception do
+            rest_client[ns + "pods/#{pod_name}/log"]
+              .get({ 'params' => params }.merge(@headers))
+          end
+        end
+      end
+
+      LOGS_LIMIT = 100.freeze
+
       self.table_name = 'cluster_platforms_kubernetes'
       self.reactive_cache_key = ->(kubernetes) { [kubernetes.class.model_name.singular, kubernetes.id] }
 
@@ -99,7 +124,7 @@ module Clusters
       end
 
       def read_pod_logs(pod_name, container: nil)
-        kubeclient.get_pod_log(pod_name, actual_namespace, container: container).as_json
+        kubeclient.get_pod_log(pod_name, actual_namespace, container: container, tail_lines: LOGS_LIMIT).as_json
       rescue Kubeclient::HttpError => err
         raise err unless err.error_code == 404
 
