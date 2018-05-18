@@ -27,6 +27,32 @@ module Clusters
           repository: repository
         )
       end
+
+      private
+
+      def ingress_ip
+        @ingress_ip ||= cluster.application_ingress.external_ip
+      end
+
+      def host
+        @host ||= 'jupyter.' + ip_to_domain(ingress_ip)
+      end
+
+      def ip_to_domain(ip)
+        "jupyter.#{ip}.xip.io"
+      end
+
+      def specification
+        {
+          "ingress" => { "hosts" => [host] },
+          "hub" => { "cookieSecret" => SecureRandom.hex(32) },
+          "proxy" => { "secretToken" => SecureRandom.hex(32) }
+        }
+      end
+
+      def content_values
+        YAML.load_file(chart_values_file).deep_merge!(specification)
+      end
     end
   end
 end
