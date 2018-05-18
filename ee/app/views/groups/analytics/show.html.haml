@@ -74,6 +74,9 @@
       %div
         %p.light Issues closed per group member
         %canvas#issues_closed{ height: 250 }
+  
+  .row
+    #merge_requests_created_vue
 
   #js-group-member-contributions{ data: { member_contributions_path: group_analytics_path(@group, { start_date: @start_date, format: :json }) } }
   -# haml-lint:disable InlineJavaScript
