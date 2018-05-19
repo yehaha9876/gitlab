@@ -12,7 +12,7 @@
 #
 # Example:
 #
-#   class User < ActiveRecord::Base
+#   class User < ApplicationRecord
 #     validates :personal_url, url: true
 #
 #     validates :ftp_url, url: { protocols: %w(ftp) }

@@ -1,4 +1,4 @@
-class Namespace < ActiveRecord::Base
+class Namespace < ApplicationRecord
   prepend EE::Namespace
   include CacheMarkdownField
   include Sortable

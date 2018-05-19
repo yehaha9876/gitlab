@@ -1,4 +1,4 @@
-class Appearance < ActiveRecord::Base
+class Appearance < ApplicationRecord
   include CacheMarkdownField
   include AfterCommitQueue
   include ObjectStorage::BackgroundMove

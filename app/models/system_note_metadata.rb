@@ -1,4 +1,4 @@
-class SystemNoteMetadata < ActiveRecord::Base
+class SystemNoteMetadata < ApplicationRecord
   prepend EE::SystemNoteMetadata
 
   # These notes's action text might contain a reference that is external.

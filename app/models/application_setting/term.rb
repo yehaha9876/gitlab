@@ -1,5 +1,5 @@
 class ApplicationSetting
-  class Term < ActiveRecord::Base
+  class Term < ApplicationRecord
     include CacheMarkdownField
 
     validates :terms, presence: true

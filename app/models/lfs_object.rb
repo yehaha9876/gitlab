@@ -1,4 +1,4 @@
-class LfsObject < ActiveRecord::Base
+class LfsObject < ApplicationRecord
   prepend EE::LfsObject
   include AfterCommitQueue
   include ObjectStorage::BackgroundMove
