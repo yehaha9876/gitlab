@@ -116,7 +116,7 @@ class MigrateKubernetesServiceToNewClustersArchitectures < ActiveRecord::Migrati
   end
 
   def up
-    ActiveRecord::Base.transaction do
+    ApplicationRecord.transaction do
       MigrateKubernetesServiceToNewClustersArchitectures::Service
         .unmanaged_kubernetes_service.find_each(batch_size: 1) do |kubernetes_service|
         MigrateKubernetesServiceToNewClustersArchitectures::Cluster.create(
