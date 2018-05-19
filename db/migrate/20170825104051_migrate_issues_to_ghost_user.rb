@@ -4,11 +4,11 @@ class MigrateIssuesToGhostUser < ActiveRecord::Migration
 
   disable_ddl_transaction!
 
-  class User < ActiveRecord::Base
+  class User < ApplicationRecord
     self.table_name = 'users'
   end
 
-  class Issue < ActiveRecord::Base
+  class Issue < ApplicationRecord
     self.table_name = 'issues'
 
     include ::EachBatch

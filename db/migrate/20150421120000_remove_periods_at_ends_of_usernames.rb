@@ -2,7 +2,7 @@
 class RemovePeriodsAtEndsOfUsernames < ActiveRecord::Migration
   include Gitlab::ShellAdapter
 
-  class Namespace < ActiveRecord::Base
+  class Namespace < ApplicationRecord
     class << self
       def find_by_path_or_name(path)
         find_by("lower(path) = :path OR lower(name) = :path", path: path.downcase)
