@@ -238,9 +238,8 @@ export default () => {
       template: `
         <div class="prepend-left-10">
           <button
-            v-tooltip
             :title="tooltipTitle"
-            class="btn btn-inverted"
+            class="btn btn-inverted has-tooltip"
             :class="{ 'dot-highlight': hasScope }"
             type="button"
             @click.prevent="showPage('edit')"
