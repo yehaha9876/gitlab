@@ -1,0 +1,5 @@
+---
+title: Move Edit Board tooltip below button
+merge_request: 5780
+author: Brendan O'Leary
+type: fixed
