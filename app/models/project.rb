@@ -71,7 +71,7 @@ class Project < ActiveRecord::Base
 
   add_authentication_token_field :runners_token
 
-  before_validation :mark_remote_mirrors_for_removal, if: -> { ActiveRecord::Base.connection.table_exists?(:remote_mirrors) }
+  before_validation :mark_remote_mirrors_for_removal, if: -> { ApplicationRecord.connection.table_exists?(:remote_mirrors) }
 
   before_save :ensure_runners_token
 
