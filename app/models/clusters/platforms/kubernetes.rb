@@ -29,7 +29,7 @@ module Clusters
         end
       end
 
-      LOGS_LIMIT = 100.freeze
+      LOGS_LIMIT = 500.freeze
 
       self.table_name = 'cluster_platforms_kubernetes'
       self.reactive_cache_key = ->(kubernetes) { [kubernetes.class.model_name.singular, kubernetes.id] }
