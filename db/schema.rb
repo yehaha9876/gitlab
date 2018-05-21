@@ -1817,6 +1817,7 @@ ActiveRecord::Schema.define(version: 20181008200441) do
     t.integer "project_creation_level"
     t.string "runners_token"
     t.datetime_with_timezone "trial_ends_on"
+    t.string "saml_discovery_token"
   end
 
   add_index "namespaces", ["created_at"], name: "index_namespaces_on_created_at", using: :btree
