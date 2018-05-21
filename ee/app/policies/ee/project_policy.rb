@@ -44,7 +44,13 @@ module EE
         !PushRule.global&.commit_committer_check
       end
 
+      condition(:read_pod_logs, score: 4) do
+        @subject.feature_available?(:pod_logs, @user)
+      end
+
       rule { admin }.enable :change_repository_storage
+
+      rule { read_pod_logs & can?(:master_access) }.enable :read_pod_logs
 
       rule { support_bot }.enable :guest_access
       rule { support_bot & ~service_desk_enabled }.policy do
