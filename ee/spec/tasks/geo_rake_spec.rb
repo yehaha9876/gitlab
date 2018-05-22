@@ -74,4 +74,99 @@ describe 'geo rake tasks', :geo do
       expect { run_rake_task('geo:status') }.to output(/Sync settings: Full/).to_stdout
     end
   end
+
+  describe 'cleanup' do
+    let(:storages) do
+      {
+        'default' => Gitlab::GitalyClient::StorageSettings.new(@default_storage_hash.merge('path' => 'tmp/tests/default_storage'))
+      }
+    end
+
+    before(:all) do
+      @default_storage_hash = Gitlab.config.repositories.storages.default.to_h
+    end
+
+    before do
+      FileUtils.mkdir(Settings.absolute('tmp/tests/default_storage'))
+      allow(Gitlab.config.repositories).to receive(:storages).and_return(storages)
+    end
+
+    after do
+      FileUtils.rm_rf(Settings.absolute('tmp/tests/default_storage'))
+    end
+
+    describe 'cleanup:repository_temp_dirs' do
+      let(:repo_path) { 'tmp/tests/default_storage/namespace_1/project_4eb93a5272496a.git' }
+      let(:wiki_path) { 'tmp/tests/default_storage/namespace_1/project_4eb93a5272496a.wiki.git' }
+      let(:hashed_path) { 'tmp/tests/default_storage/@hashed/12/34/5678.git' }
+      let(:geo_temporary_path) { 'tmp/tests/default_storage/@geo-temporary/project_1234567890abcd.git' }
+      let(:malformed1_path) { 'tmp/tests/default_storage/namespace_1/project_4eb93a5272496abac.git' }
+      let(:malformed2_path) { 'tmp/tests/default_storage/namespace_1/project_4eb93a5272496a.git+deleted' }
+      let(:malformed3_path) { 'tmp/tests/default_storage/namespace_1/project-4eb93a5272496a.git' }
+      let(:malformed4_path) { 'tmp/tests/default_storage/namespace_1/project-xxxxxxxzzzzzzz.git' }
+
+      before do
+        allow(Gitlab::Geo).to receive(:secondary?).and_return(true)
+        expect(Gitlab::Geo).to receive(:license_allows?).and_return(true).at_least(:once)
+
+        FileUtils.mkdir_p(Settings.absolute(repo_path))
+        FileUtils.mkdir_p(Settings.absolute(wiki_path))
+        FileUtils.mkdir_p(Settings.absolute(hashed_path))
+        FileUtils.mkdir_p(Settings.absolute(geo_temporary_path))
+      end
+
+      it 'does not run on a primary node' do
+        allow(Gitlab::Geo).to receive(:secondary?).and_return(false)
+
+        expect { run_rake_task('geo:cleanup:repository_temp_dirs') }.to raise_error(SystemExit)
+      end
+
+      it 'removes old temporary directories' do
+        stub_env('REMOVE', 'true')
+        run_rake_task('geo:cleanup:repository_temp_dirs')
+
+        expect(Dir.exist?(Settings.absolute(repo_path))).to be_falsey
+        expect(Dir.exist?(Settings.absolute(wiki_path))).to be_falsey
+      end
+
+      it 'does not remove if REMOVE not specified' do
+        run_rake_task('geo:cleanup:repository_temp_dirs')
+
+        expect(Dir.exist?(Settings.absolute(repo_path))).to be_truthy
+        expect(Dir.exist?(Settings.absolute(wiki_path))).to be_truthy
+      end
+
+      it 'ignores all directories beginning with @, such as @hashed, @geo-temporary, etc' do
+        stub_env('REMOVE', 'true')
+        run_rake_task('geo:cleanup:repository_temp_dirs')
+
+        expect(Dir.exist?(Settings.absolute(hashed_path))).to be_truthy
+        expect(Dir.exist?(Settings.absolute(geo_temporary_path))).to be_truthy
+      end
+
+      it 'only removes directories that have no associated project' do
+        allow(Project).to receive(:find_by_full_path).with('namespace_1/project_4eb93a5272496a').and_return(true)
+
+        stub_env('REMOVE', 'true')
+        run_rake_task('geo:cleanup:repository_temp_dirs')
+
+        expect(Dir.exist?(Settings.absolute(repo_path))).to be_truthy
+      end
+
+      it 'ignores anything not matching the temporary naming' do
+        FileUtils.mkdir_p(Settings.absolute(malformed1_path))
+        FileUtils.mkdir_p(Settings.absolute(malformed2_path))
+        FileUtils.mkdir_p(Settings.absolute(malformed3_path))
+        FileUtils.mkdir_p(Settings.absolute(malformed4_path))
+
+        stub_env('REMOVE', 'true')
+        run_rake_task('geo:cleanup:repository_temp_dirs')
+
+        expect(Dir.exist?(Settings.absolute(malformed1_path))).to be_truthy
+        expect(Dir.exist?(Settings.absolute(malformed2_path))).to be_truthy
+        expect(Dir.exist?(Settings.absolute(malformed3_path))).to be_truthy
+        expect(Dir.exist?(Settings.absolute(malformed4_path))).to be_truthy
+      end
+    end
+  end
 end

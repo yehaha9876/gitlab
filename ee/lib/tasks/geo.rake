@@ -6,7 +6,8 @@ namespace :geo do
   include ActionView::Helpers::DateHelper
   include ActionView::Helpers::NumberHelper
 
-  GEO_LICENSE_ERROR_TEXT = 'GitLab Geo is not supported with this license. Please contact sales@gitlab.com.'.freeze
+  GEO_LICENSE_ERROR_TEXT     = 'GitLab Geo is not supported with this license. Please contact sales@gitlab.com.'.freeze
+  IGNORABLE_NAMESPACE_PREFIX = '@'.freeze
 
   namespace :db do |ns|
     desc 'Drops the Geo tracking database from config/database_geo.yml for the current RAILS_ENV.'
@@ -278,6 +279,47 @@ namespace :geo do
       # Only primary node can create a status record in the database so if it does not exist
       # we get unsaved record where updated_at is nil
       puts "Never"
+    end
+  end
+
+  namespace :cleanup do
+    desc "Remove previous old-style temporary repository directories"
+    task repository_temp_dirs: :gitlab_environment do
+      abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
+      abort 'This is not a secondary node' unless Gitlab::Geo.secondary?
+
+      remove_flag = ENV['REMOVE']
+
+      pp Gitlab.config.repositories.storages
+      Gitlab.config.repositories.storages.each do |name, repository_storage|
+        repo_root = repository_storage.legacy_disk_path
+
+        # old-style temp direcotries end with an underscore followed by a 14 character hex number
+        IO.popen(%W(find #{repo_root} -mindepth 1 -maxdepth 2 -name *.git)) do |find|
+          find.each_line do |path|
+            path.chomp!
+            repo_with_namespace = path
+              .sub(repo_root, '')
+              .sub(%r{^/*}, '')
+              .chomp('.git')
+              .chomp('.wiki')
+
+            next unless repo_with_namespace =~ /_[\da-f]{14}\z/
+            next if repo_with_namespace.start_with?("#{IGNORABLE_NAMESPACE_PREFIX}") || Project.find_by_full_path(repo_with_namespace)
+            next if File.file?(path)
+
+            if remove_flag
+              if FileUtils.remove_dir(path)
+                puts "Removed...#{path}".color(:green)
+              else
+                puts "Cannot remove #{path}".color(:red)
+              end
+            else
+              puts "Can be removed: #{path}".color(:green)
+            end
+          end
+        end
+      end
     end
   end
 end

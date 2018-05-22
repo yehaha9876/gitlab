@@ -1,0 +1,5 @@
+---
+title: Added rake task for removing old Geo temporary directories
+merge_request: 5793
+author:
+type: fixed
