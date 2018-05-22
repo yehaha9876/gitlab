@@ -46,12 +46,12 @@ module Projects
       end
 
       def create
-        alert = project.prometheus_alerts.create(alerts_params)
+        @alert = project.prometheus_alerts.create(alerts_params)
 
         respond_to do |format|
           format.json do
-            if alert
-              Clusters::Applications::ScheduleUpdateService.new(project,
+            if @alert
+              ::Clusters::Applications::ScheduleUpdateService.new(project,
                                                                 current_user,
                                                                 environment: environment).execute
               head :ok
@@ -63,12 +63,10 @@ module Projects
       end
 
       def update
-        alert.update(alerts_params)
-
         respond_to do |format|
           format.json do
-            if alert.update(alert_params)
-              Clusters::Applications::ScheduleUpdateService.new(project,
+            if alert.update(alerts_params)
+              ::Clusters::Applications::ScheduleUpdateService.new(project,
                                                                 current_user,
                                                                 environment: environment).execute
               head :ok
@@ -83,7 +81,7 @@ module Projects
         respond_to do |format|
           format.json do
             if alert.destroy
-              Clusters::Applications::ScheduleUpdateService.new(project,
+              ::Clusters::Applications::ScheduleUpdateService.new(project,
                                                                 current_user,
                                                                 environment: environment).execute
               head :ok
@@ -101,7 +99,7 @@ module Projects
       end
 
       def alert
-        @alert ||= project.prometheus_alerts.find_by(iid: params[:id]) || render_404
+        @alert ||= project.prometheus_alerts.find_by_iid(params[:id]) || render_404
       end
 
       def environment
