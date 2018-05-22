@@ -4,6 +4,8 @@ class PrometheusAlert < ActiveRecord::Base
   belongs_to :environment
   belongs_to :project
 
+  validates :name, presence: true
+
   has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.prometheus_alerts&.maximum(:iid) }
 
   after_initialize :set_project_from_environment

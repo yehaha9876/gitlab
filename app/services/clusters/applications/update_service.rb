@@ -44,8 +44,11 @@ module Clusters
       def generate_alertmanager(data)
         data["alertmanager"]["enabled"] = true
 
-        data["alertmanagerFiles"] ||= {}
-        data["alertmanagerFiles"]["alertmanager.yml"] ||= { "route" => alertmanager_files_params }
+        data["alertmanagerFiles"] = {}
+        data["alertmanagerFiles"]["alertmanager.yml"] = {
+          "receivers" => alertmanager_receivers_params,
+          "route" => alertmanager_files_params
+        }
 
         data["serverFiles"]["alerts"]["groups"] ||= []
 
@@ -64,7 +67,7 @@ module Clusters
 
       def alert_params(alert)
         {
-          "alert" => alert.name,
+          "alert" => "#{alert.name}_#{alert.iid}",
           "expr" => "#{alert.query} #{alert.operator} #{alert.threshold}",
           "for" => "5m",
           "labels" => {
@@ -77,12 +80,27 @@ module Clusters
         }
       end
 
+      def alertmanager_receivers_params
+        project = app.cluster.project
+        alert_path = Gitlab::Routing.url_helpers.notify_namespace_project_prometheus_alerts_url(namespace_id: project.namespace.path, project_id: project.path, format: :json)
+
+        [
+          {
+            "name" => "gitlab",
+            "webhook_configs" => [
+              { "url" => alert_path }
+            ]
+          }
+        ]
+      end
+
       def alertmanager_files_params
+
         {
-          "receiver" => "default-receiver",
+          "receiver" => "gitlab",
           "group_wait" => "30s",
-          "group_interval" => "5m",
-          "repeat_interval" => "4h"
+          "group_interval" => "1m",
+          "repeat_interval" => "1m"
         }
       end
 

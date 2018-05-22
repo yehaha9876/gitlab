@@ -1,7 +1,9 @@
 module Projects
   module Prometheus
     class AlertsController < Projects::ApplicationController
-      before_action :authorize_admin_project!
+      protect_from_forgery except: [:notify]
+
+      before_action :authorize_admin_project!, except: [:notify]
       before_action :alert, only: [:update, :show, :destroy]
       before_action :environment, only: [:show, :destroy]
 
@@ -28,6 +30,17 @@ module Projects
         respond_to do |format|
           format.json do
             render json: PrometheusAlertSerializer.new(project: project).represent(alert)
+          end
+        end
+      end
+
+      def notify
+        puts "#########################"
+        pp params
+        puts "#########################"
+        respond_to do |format|
+          format.json do
+            head :ok
           end
         end
       end
