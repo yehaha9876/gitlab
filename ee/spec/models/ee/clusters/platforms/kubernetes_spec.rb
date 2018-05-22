@@ -51,7 +51,7 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
         stub_kubeclient_logs(pod_name, status: 500)
       end
 
-      it { expect { subject }.to raise_error(Kubeclient::HttpError) }
+      it { expect { subject }.to raise_error(::Kubeclient::HttpError) }
     end
 
     context 'when kubernetes responds with 404s' do

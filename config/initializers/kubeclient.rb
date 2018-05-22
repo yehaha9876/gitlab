@@ -27,10 +27,11 @@ class Kubeclient::Client
 
   # We need to monkey-patch until
   # https://github.com/abonas/kubeclient/pull/326 is merged
-  def get_pod_log(pod_name, namespace,
-                  container: nil, previous: false,
-                  timestamps: false, since_time: nil,
-                  tail_lines: nil)
+  def get_pod_log(
+    pod_name, namespace,
+    container: nil, previous: false,
+    timestamps: false, since_time: nil,
+    tail_lines: nil)
 
     params = {}
     params[:previous] = true if previous

@@ -1,6 +1,8 @@
 class EnvironmentEntity < Grape::Entity
   include RequestAwareEntity
 
+  prepend ::EE::EnvironmentEntity
+
   expose :id
   expose :name
   expose :state
@@ -17,10 +19,6 @@ class EnvironmentEntity < Grape::Entity
 
   expose :environment_path do |environment|
     project_environment_path(environment.project, environment)
-  end
-
-  expose :logs_path do |environment|
-    logs_project_environment_path(environment.project, environment)
   end
 
   expose :stop_path do |environment|

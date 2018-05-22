@@ -31,7 +31,7 @@ module KubernetesHelpers
 
   def stub_kubeclient_logs(pod_name, response = nil)
     stub_kubeclient_discover(service.api_url)
-    logs_url = service.api_url + "/api/v1/namespaces/#{service.actual_namespace}/pods/#{pod_name}/log"
+    logs_url = service.api_url + "/api/v1/namespaces/#{service.actual_namespace}/pods/#{pod_name}/log?tailLines=#{Clusters::Platforms::Kubernetes::LOGS_LIMIT}"
 
     WebMock.stub_request(:get, logs_url).to_return(response || kube_logs_response)
   end

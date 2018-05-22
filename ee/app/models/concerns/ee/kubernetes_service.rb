@@ -44,7 +44,7 @@ module EE
 
     def read_pod_logs(pod_name, container: nil)
       kubeclient.get_pod_log(pod_name, actual_namespace, container: container, tail_lines: LOGS_LIMIT).as_json
-    rescue Kubeclient::HttpError => err
+    rescue ::Kubeclient::HttpError => err
       raise err unless err.error_code == 404
 
       []
