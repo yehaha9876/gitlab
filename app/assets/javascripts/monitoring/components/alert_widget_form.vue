@@ -75,6 +75,7 @@ export default {
       this.$refs.submitButton.blur();
       this.$emit(this.submitAction, {
         alert: this.alert,
+        name: 'foo',
         query: this.query,
         operator: this.operator,
         threshold: this.threshold,
