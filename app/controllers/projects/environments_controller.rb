@@ -1,12 +1,13 @@
 class Projects::EnvironmentsController < Projects::ApplicationController
+  prepend ::EE::Projects::EnvironmentsController
+
   layout 'project'
   before_action :authorize_read_environment!
   before_action :authorize_create_environment!, only: [:new, :create]
   before_action :authorize_create_deployment!, only: [:stop]
   before_action :authorize_update_environment!, only: [:edit, :update]
   before_action :authorize_admin_environment!, only: [:terminal, :terminal_websocket_authorize]
-  before_action :authorize_read_pod_logs!, only: [:logs]
-  before_action :environment, only: [:logs, :show, :edit, :update, :stop, :terminal, :terminal_websocket_authorize, :metrics]
+  before_action :environment, only: [:show, :edit, :update, :stop, :terminal, :terminal_websocket_authorize, :metrics]
   before_action :verify_api_request!, only: :terminal_websocket_authorize
   before_action :expire_etag_cache, only: [:index]
 
@@ -27,21 +28,6 @@ class Projects::EnvironmentsController < Projects::ApplicationController
             .represent(@environments),
           available_count: project.environments.available.count,
           stopped_count: project.environments.stopped.count
-        }
-      end
-    end
-  end
-
-  def logs
-    @logs = environment.deployment_platform.read_pod_logs(params[:pod_name])
-
-    respond_to do |format|
-      format.html
-      format.json do
-        Gitlab::PollingInterval.set_header(response, interval: 3_000)
-
-        render json: {
-          logs: @logs.strip.split("\n").as_json
         }
       end
     end
