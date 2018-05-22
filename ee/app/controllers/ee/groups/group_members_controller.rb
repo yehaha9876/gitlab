@@ -1,7 +1,15 @@
 module EE
   module Groups
     module GroupMembersController
-      extend ActiveSupport::Concern
+      # ActiveSupport::Concern does not prepend the ClassMethods,
+      # so we cannot call `super` if we use it.
+      def self.prepended(base)
+        class << base
+          prepend ClassMethods
+        end
+
+        base.before_action :authorize_update_group_member!, only: [:update, :override]
+      end
 
       # rubocop:disable Gitlab/ModuleWithInstanceVariables
       def override
@@ -27,6 +35,12 @@ module EE
 
       def override_params
         params.require(:group_member).permit(:override)
+      end
+
+      module ClassMethods
+        def admin_required_endpoints
+          (super + [:update, :override]).freeze
+        end
       end
     end
   end
