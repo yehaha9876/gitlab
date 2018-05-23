@@ -54,7 +54,8 @@ module Projects
               ::Clusters::Applications::ScheduleUpdateService.new(project,
                                                                 current_user,
                                                                 environment: environment).execute
-              head :ok
+
+              render json: PrometheusAlertSerializer.new(project: project).represent(@alert)
             else
               head :no_content
             end
@@ -69,7 +70,7 @@ module Projects
               ::Clusters::Applications::ScheduleUpdateService.new(project,
                                                                 current_user,
                                                                 environment: environment).execute
-              head :ok
+              render json: PrometheusAlertSerializer.new(project: project).represent(alert)
             else
               head :no_content
             end
