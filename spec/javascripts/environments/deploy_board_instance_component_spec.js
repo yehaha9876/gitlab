@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import DeployBoardInstance from 'ee/environments/components/deploy_board_instance_component.vue';
-import { environment } from './mock_data';
+import { folder } from './mock_data';
 
 describe('Deploy Board Instance', () => {
   let DeployBoardInstanceComponent;
@@ -14,7 +14,7 @@ describe('Deploy Board Instance', () => {
       propsData: {
         status: 'ready',
         tooltipText: 'This is a pod',
-        logsPath: environment.log_path,
+        logsPath: folder.log_path,
       },
     }).$mount();
 
@@ -26,7 +26,7 @@ describe('Deploy Board Instance', () => {
     const component = new DeployBoardInstanceComponent({
       propsData: {
         status: 'deploying',
-        logsPath: environment.log_path,
+        logsPath: folder.log_path,
       },
     }).$mount();
 
@@ -39,7 +39,7 @@ describe('Deploy Board Instance', () => {
       propsData: {
         status: 'deploying',
         stable: false,
-        logsPath: environment.log_path,
+        logsPath: folder.log_path,
       },
     }).$mount();
 
