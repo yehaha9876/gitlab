@@ -2,7 +2,7 @@ module QA
   module Page
     module Project
       module Settings
-        class ProtectedBranches < Page::Base
+        class ProtectedBranches < Gitlab::QA::Framework::Page::Base
           prepend EE::Page::Project::Settings::ProtectedBranches
 
           view 'app/views/projects/protected_branches/shared/_dropdown.html.haml' do

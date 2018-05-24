@@ -4,7 +4,7 @@ module QA
       module Admin
         module Geo
           module Nodes
-            class Show < QA::Page::Base
+            class Show < Gitlab::QA::Framework::Page::Base
               view 'ee/app/views/admin/geo_nodes/index.html.haml' do
                 element :new_node_link, /link_to .*New node/
               end

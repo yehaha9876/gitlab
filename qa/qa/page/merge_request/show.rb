@@ -1,8 +1,8 @@
 module QA
   module Page
     module MergeRequest
-      class Show < Page::Base
-        prepend QA::EE::Page::MergeRequest::Show
+      class Show < Gitlab::QA::Framework::Page::Base
+        prepend EE::Page::MergeRequest::Show
 
         view 'app/assets/javascripts/vue_merge_request_widget/components/states/ready_to_merge.vue' do
           element :merge_button

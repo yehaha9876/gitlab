@@ -1,7 +1,7 @@
 module QA
   module Page
     module Menu
-      class Admin < Page::Base
+      class Admin < Gitlab::QA::Framework::Page::Base
         prepend EE::Page::Menu::Admin
 
         view 'app/views/layouts/nav/sidebar/_admin.html.haml' do

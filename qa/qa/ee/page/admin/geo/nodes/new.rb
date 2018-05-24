@@ -4,7 +4,7 @@ module QA
       module Admin
         module Geo
           module Nodes
-            class New < QA::Page::Base
+            class New < Gitlab::QA::Framework::Page::Base
               view 'ee/app/views/admin/geo_nodes/_form.html.haml' do
                 element :node_url_field, 'text_field :url'
                 element :node_url_placeholder, "label :url, 'URL'"

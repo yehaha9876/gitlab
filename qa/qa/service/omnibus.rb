@@ -1,7 +1,7 @@
 module QA
   module Service
     class Omnibus
-      include Scenario::Actable
+      include Gitlab::QA::Framework::Scenario::Actable
       include Service::Shellout
 
       def initialize(container)

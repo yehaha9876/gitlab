@@ -2,7 +2,7 @@ module QA
   module EE
     module Page
       module Admin
-        class License < QA::Page::Base
+        class License < Gitlab::QA::Framework::Page::Base
           view 'ee/app/views/admin/licenses/missing.html.haml' do
             element :missing_license, 'You do not have a license'
           end

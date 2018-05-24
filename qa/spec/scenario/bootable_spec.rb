@@ -1,6 +1,6 @@
 describe QA::Scenario::Bootable do
   subject do
-    Class.new(QA::Scenario::Template)
+    Class.new(Gitlab::QA::Framework::Scenario::Template)
       .include(described_class)
   end
 

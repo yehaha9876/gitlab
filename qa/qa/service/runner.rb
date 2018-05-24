@@ -3,7 +3,7 @@ require 'securerandom'
 module QA
   module Service
     class Runner
-      include Scenario::Actable
+      include Gitlab::QA::Framework::Scenario::Actable
       include Service::Shellout
 
       attr_accessor :token, :address, :tags, :image
