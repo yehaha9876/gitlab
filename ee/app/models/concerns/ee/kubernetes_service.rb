@@ -2,9 +2,7 @@ module EE
   module KubernetesService
     extend ActiveSupport::Concern
 
-    prepended do
-      LOGS_LIMIT = 500.freeze
-    end
+    LOGS_LIMIT = 500.freeze
 
     def rollout_status(environment)
       result = with_reactive_cache do |data|

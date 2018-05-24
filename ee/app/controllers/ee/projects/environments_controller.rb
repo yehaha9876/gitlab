@@ -8,18 +8,22 @@ module EE
       end
 
       def logs
-        @logs = environment.deployment_platform.read_pod_logs(params[:pod_name]) # rubocop:disable Gitlab/ModuleWithInstanceVariables
-
         respond_to do |format|
           format.html
           format.json do
             ::Gitlab::PollingInterval.set_header(response, interval: 3_000)
 
             render json: {
-              logs: @logs.strip.split("\n").as_json # rubocop:disable Gitlab/ModuleWithInstanceVariables
+              logs: pod_logs.strip.split("\n").as_json
             }
           end
         end
+      end
+
+      private
+
+      def pod_logs
+        @pod_logs ||= environment.deployment_platform.read_pod_logs(params[:pod_name])
       end
     end
   end

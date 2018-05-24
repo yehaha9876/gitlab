@@ -261,11 +261,13 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       resources :environments, except: [:destroy] do
         member do
           post :stop
-          get :logs
           get :terminal
           get :metrics
           get :additional_metrics
           get '/terminal.ws/authorize', to: 'environments#terminal_websocket_authorize', constraints: { format: nil }
+
+          # EE
+          get :logs
         end
 
         collection do
