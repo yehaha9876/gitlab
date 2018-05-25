@@ -3,12 +3,6 @@ import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
 import AlertsService from '../services/alerts_service';
 
-let alertId = 1;
-const generateAlertPath = () => {
-  alertId += 1;
-  return `alert${alertId}.json`;
-};
-
 export default {
   components: {
     Icon,
@@ -115,8 +109,8 @@ export default {
       this.isLoading = true;
       this.service
         .createAlert(newAlert)
-        .then(() => {
-          const alertPath = generateAlertPath();
+        .then(response => {
+          const alertPath = response.alert_path;
           this.alerts.unshift(alertPath);
           this.$set(this.alertData, alertPath, newAlert);
           this.isLoading = false;
