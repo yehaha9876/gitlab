@@ -118,19 +118,12 @@ export const folder = {
   environment_type: 'build',
   last_deployment: null,
   'stop_action?': false,
-<<<<<<< HEAD
   environment_path: '/root/review-app/environments/12',
   stop_path: '/root/review-app/environments/12/stop',
   created_at: '2017-02-01T19:42:18.400Z',
   updated_at: '2017-02-01T19:42:18.400Z',
-=======
-  environment_path: '/root/review-app/environments/7',
-  stop_path: '/root/review-app/environments/7/stop',
-  created_at: '2017-01-31T10:53:46.894Z',
-  updated_at: '2017-01-31T10:53:46.894Z',
   rollout_status: {},
-  log_path: '/root/review-app/environments/7/logs',
->>>>>>> Fix deploy board specs, add i18n on missing places
+  log_path: '/root/review-app/environments/12/logs',
 };
 
 export const deployBoardMockData = {
