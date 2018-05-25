@@ -6,6 +6,8 @@ class Environment < ActiveRecord::Base
   NUMBERS = '0'..'9'
   SUFFIX_CHARS = LETTERS.to_a + NUMBERS.to_a
 
+  BACKOFF_DELAY = 5.minutes
+
   belongs_to :project, required: true
 
   has_many :deployments, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -161,6 +163,10 @@ class Environment < ActiveRecord::Base
 
   def additional_metrics
     prometheus_adapter.query(:additional_metrics_environment, self) if has_metrics?
+  end
+
+  def rule_name
+    "#{name}.rules"
   end
 
   def prometheus_adapter

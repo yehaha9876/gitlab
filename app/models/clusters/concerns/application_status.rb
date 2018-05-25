@@ -17,7 +17,7 @@ module Clusters
           state :updated, value: 5
 
           event :make_scheduled do
-            transition [:installable, :installed, :updated, :errored] => :scheduled
+            transition [:installable, :installed, :errored] => :scheduled
           end
 
           event :make_installing do
@@ -29,7 +29,7 @@ module Clusters
           end
 
           event :make_updating do
-            transition [:scheduled] => :updating
+            transition [:installed, :updated, :errored] => :updating
           end
 
           event :make_updated do

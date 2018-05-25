@@ -778,6 +778,7 @@ ActiveRecord::Schema.define(version: 20180704204006) do
     t.text "status_reason"
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.datetime "last_update_started_at"
   end
 
   create_table "clusters_applications_runners", force: :cascade do |t|

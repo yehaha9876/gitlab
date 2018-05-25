@@ -19,6 +19,10 @@ module Clusters
             project.find_or_initialize_service('prometheus').update(active: true)
           end
         end
+
+        after_transition any => :updating do |application|
+          application.update(last_update_started_at: Time.now)
+        end
       end
 
       def ready?
@@ -35,6 +39,20 @@ module Clusters
 
       def service_port
         80
+      end
+
+      def updated_since?(timestamp)
+        last_update_started_at &&
+          last_update_started_at > timestamp &&
+          !update_errored?
+      end
+
+      def update_in_progress?
+        status == 4
+      end
+
+      def update_errored?
+        status == -1
       end
 
       def get_command

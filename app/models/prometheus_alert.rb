@@ -13,4 +13,19 @@ class PrometheusAlert < ActiveRecord::Base
   def set_project_from_environment
     self.project ||= environment.project if environment
   end
+
+  def to_param
+    {
+      "alert" => "#{name}_#{iid}",
+      "expr" => "#{query} #{operator} #{threshold}",
+      "for" => "5m",
+      "labels" => {
+        "gitlab" => "hook"
+      },
+      "annotations" => {
+        "summary" => "Instance {{ $labels.instance }} raised an alert",
+        "description" => "{{ $labels.instance }} of job {{ $labels.job }} has been raising an alert for more than 5 minutes."
+      }
+    }
+  end
 end

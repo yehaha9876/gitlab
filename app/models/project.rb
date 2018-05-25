@@ -1832,6 +1832,13 @@ class Project < ActiveRecord::Base
     deployment_platform(environment: environment)&.predefined_variables || []
   end
 
+  def environments_for_scope(environment_scope)
+    quoted_scope = ActiveRecord::Base.connection.quote(environment_scope)
+
+    # TODO: this can probably be done without the Glob.to_like
+    environments.where("name LIKE (#{Gitlab::SQL::Glob.to_like(quoted_scope)})")
+  end
+
   def auto_devops_variables
     return [] unless auto_devops_enabled?
 

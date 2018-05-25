@@ -5,7 +5,6 @@ module Projects
 
       before_action :authorize_admin_project!, except: [:notify]
       before_action :alert, only: [:update, :show, :destroy]
-      before_action :environment, only: [:show, :destroy]
 
       def new
         @alert = project.prometheus_alerts.new
@@ -35,9 +34,6 @@ module Projects
       end
 
       def notify
-        puts "#########################"
-        pp params
-        puts "#########################"
         respond_to do |format|
           format.json do
             head :ok
@@ -51,9 +47,7 @@ module Projects
         respond_to do |format|
           format.json do
             if @alert
-              ::Clusters::Applications::ScheduleUpdateService.new(project,
-                                                                current_user,
-                                                                environment: environment).execute
+              ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
 
               render json: PrometheusAlertSerializer.new(project: project).represent(@alert)
             else
@@ -67,9 +61,8 @@ module Projects
         respond_to do |format|
           format.json do
             if alert.update(alerts_params)
-              ::Clusters::Applications::ScheduleUpdateService.new(project,
-                                                                current_user,
-                                                                environment: environment).execute
+              ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
+
               render json: PrometheusAlertSerializer.new(project: project).represent(alert)
             else
               head :no_content
@@ -82,9 +75,8 @@ module Projects
         respond_to do |format|
           format.json do
             if alert.destroy
-              ::Clusters::Applications::ScheduleUpdateService.new(project,
-                                                                current_user,
-                                                                environment: environment).execute
+              ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
+
               head :ok
             else
               head :no_content
@@ -103,8 +95,8 @@ module Projects
         @alert ||= project.prometheus_alerts.find_by_iid(params[:id]) || render_404
       end
 
-      def environment
-        @environment ||= alert.environment
+      def application
+        @application ||= alert.environment.prometheus_adapter
       end
     end
   end
