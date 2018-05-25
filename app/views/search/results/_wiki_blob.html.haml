@@ -1,5 +1,10 @@
 - project = @project || find_project_for_blob(wiki_blob)
-- wiki_blob = parse_search_result(wiki_blob)
+
+- if wiki_blob.is_a?(Array)
+  - file_name, wiki_blob = wiki_blob
+- else
+  - wiki_blob = parse_search_result(wiki_blob)
+  - file_name = wiki_blob.filename
 
 .blob-result
   .file-holder
