@@ -6,18 +6,15 @@ module Projects
       before_action :authorize_admin_project!, except: [:notify]
       before_action :alert, only: [:update, :show, :destroy]
 
-      def new
-        @alert = project.prometheus_alerts.new
-      end
-
       def index
         respond_to do |format|
           format.json do
             alerts = project.prometheus_alerts
             response = {}
+
             if alerts.any?
-              response[:alerts] = PrometheusAlertSerializer.new(project: project)
-                                      .represent(alerts.order(created_at: :asc))
+              response[:alerts] =
+                PrometheusAlertSerializer.new(project: project).represent(alerts.order(created_at: :asc))
             end
 
             render json: response
@@ -34,11 +31,17 @@ module Projects
       end
 
       def notify
+        NotificationService.new.prometheus_alert_fired(project, params["alerts"].first)
+
         respond_to do |format|
           format.json do
             head :ok
           end
         end
+      end
+
+      def new
+        @alert = project.prometheus_alerts.new
       end
 
       def create

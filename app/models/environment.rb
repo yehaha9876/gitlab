@@ -6,8 +6,6 @@ class Environment < ActiveRecord::Base
   NUMBERS = '0'..'9'
   SUFFIX_CHARS = LETTERS.to_a + NUMBERS.to_a
 
-  BACKOFF_DELAY = 5.minutes
-
   belongs_to :project, required: true
 
   has_many :deployments, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent

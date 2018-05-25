@@ -6,8 +6,8 @@ module Clusters
       ALERTMANAGER_FILE_PARAMS = {
         "receiver" => "gitlab",
         "group_wait" => "30s",
-        "group_interval" => "1m",
-        "repeat_interval" => "1m"
+        "group_interval" => "5m",
+        "repeat_interval" => "4h"
       }.freeze
 
       def initialize(app, project)

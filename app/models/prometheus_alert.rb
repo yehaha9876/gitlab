@@ -14,14 +14,16 @@ class PrometheusAlert < ActiveRecord::Base
     self.project ||= environment.project if environment
   end
 
+  def full_query
+    "#{query} #{operator} #{threshold}"
+  end
+
   def to_param
     {
       "alert" => "#{name}_#{iid}",
-      "expr" => "#{query} #{operator} #{threshold}",
+      "expr" => full_query,
       "for" => "5m",
-      "labels" => {
-        "gitlab" => "hook"
-      },
+      "labels" => { "gitlab" => "hook" },
       "annotations" => {
         "summary" => "Instance {{ $labels.instance }} raised an alert",
         "description" => "{{ $labels.instance }} of job {{ $labels.job }} has been raising an alert for more than 5 minutes."
