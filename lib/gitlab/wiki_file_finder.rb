@@ -13,11 +13,11 @@ module Gitlab
     def search_filenames(query, except)
       safe_query = Regexp.escape(query.tr(' ', '-'))
       safe_query = Regexp.new(safe_query, Regexp::IGNORECASE)
-      filenames = repository.ls_files(ref).first(BATCH_SIZE)
+      filenames = repository.ls_files(ref)
 
       filenames.delete_if { |filename| except.include?(filename) } unless except.empty?
 
-      filenames.select { |f| f.match(safe_query) }
+      filenames.grep(safe_query).first(BATCH_SIZE)
     end
   end
 end
