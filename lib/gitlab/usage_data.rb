@@ -9,6 +9,7 @@ module Gitlab
         license_usage_data.merge(system_usage_data)
                           .merge(features_usage_data)
                           .merge(components_usage_data)
+                          .merge(cycle_analytics_usage_data)
       end
 
       def to_json(force_refresh: false)
@@ -32,6 +33,7 @@ module Gitlab
 
         if license
           usage_data[:license_md5] = license.md5
+          usage_data[:license_id] = license.license_id
           usage_data[:historical_max_users] = ::HistoricalData.max_historical_user_count
           usage_data[:licensee] = license.licensee
           usage_data[:license_user_count] = license.restricted_user_count
@@ -63,10 +65,17 @@ module Gitlab
             deploy_keys: DeployKey.count,
             deployments: Deployment.count,
             environments: ::Environment.count,
+            epics: ::Epic.count,
             geo_nodes: GeoNode.count,
             clusters: ::Clusters::Cluster.count,
             clusters_enabled: ::Clusters::Cluster.enabled.count,
             clusters_disabled: ::Clusters::Cluster.disabled.count,
+            clusters_platforms_gke: ::Clusters::Cluster.gcp_installed.enabled.count,
+            clusters_platforms_user: ::Clusters::Cluster.user_provided.enabled.count,
+            clusters_applications_helm: ::Clusters::Applications::Helm.installed.count,
+            clusters_applications_ingress: ::Clusters::Applications::Ingress.installed.count,
+            clusters_applications_prometheus: ::Clusters::Applications::Prometheus.installed.count,
+            clusters_applications_runner: ::Clusters::Applications::Runner.installed.count,
             in_review_folder: ::Environment.in_review_folder.count,
             groups: Group.count,
             issues: Issue.count,
@@ -82,10 +91,11 @@ module Gitlab
             pages_domains: PagesDomain.count,
             projects: Project.count,
             projects_imported_from_github: Project.where(import_type: 'github').count,
+            projects_reporting_ci_cd_back_to_github: GithubService.without_defaults.active.count,
+            projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled,
             protected_branches: ProtectedBranch.count,
             releases: Release.count,
             remote_mirrors: RemoteMirror.count,
-            services: Service.where(active: true).count,
             snippets: Snippet.count,
             todos: Todo.count,
             uploads: Upload.count,
@@ -105,6 +115,10 @@ module Gitlab
                                            author: User.support_bot,
                                            confidential: true).count
         }
+      end
+
+      def cycle_analytics_usage_data
+        Gitlab::CycleAnalytics::UsageData.new.to_json
       end
 
       def features_usage_data
@@ -163,6 +177,16 @@ module Gitlab
 
         results = Service.unscoped.where(type: types.keys, active: true).group(:type).count
         results.each_with_object({}) { |(key, value), response| response[types[key.to_sym]] = value  }
+      end
+
+      def projects_mirrored_with_pipelines_enabled
+        Project.joins(:project_feature).where(
+          mirror: true,
+          mirror_trigger_builds: true,
+          project_features: {
+            builds_access_level: ProjectFeature::ENABLED
+          }
+        ).count
       end
     end
   end

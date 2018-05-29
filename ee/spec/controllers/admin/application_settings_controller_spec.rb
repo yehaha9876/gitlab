@@ -47,38 +47,61 @@ describe Admin::ApplicationSettingsController do
       expect(ApplicationSetting.current.elasticsearch_url).to contain_exactly(settings[:elasticsearch_url])
     end
 
-    it 'does not update mirror settings when repository mirrors unlicensed' do
-      stub_licensed_features(repository_mirrors: false)
+    shared_examples 'settings for licensed features' do
+      it 'does not update settings when licesed feature is not available' do
+        stub_licensed_features(feature => false)
+        attribute_names = settings.keys.map(&:to_s)
 
-      settings = {
-        mirror_max_delay: 12,
-        mirror_max_capacity: 2,
-        mirror_capacity_threshold: 2
-      }
+        expect { put :update, application_setting: settings }
+          .not_to change { ApplicationSetting.current.reload.attributes.slice(*attribute_names) }
+      end
 
-      settings.each do |setting, _value|
-        expect do
-          put :update, application_setting: settings
-        end.not_to change(ApplicationSetting.current.reload, setting)
+      it 'updates settings when the feature is available' do
+        stub_licensed_features(feature => true)
+
+        put :update, application_setting: settings
+
+        settings.each do |attribute, value|
+          expect(ApplicationSetting.current.public_send(attribute)).to eq(value)
+        end
       end
     end
 
-    it 'updates mirror settings when repository mirrors is licensed' do
-      stub_licensed_features(repository_mirrors: true)
-
-      mirror_delay = (Gitlab::Mirror.min_delay_upper_bound / 60) + 1
-
-      settings = {
-        mirror_max_delay: mirror_delay,
-        mirror_max_capacity: 2,
-        mirror_capacity_threshold: 2
-      }
-
-      put :update, application_setting: settings
-
-      settings.each do |setting, value|
-        expect(ApplicationSetting.current.public_send(setting)).to eq(value)
+    context 'mirror settings' do
+      let(:settings) do
+        {
+          mirror_max_delay: (Gitlab::Mirror.min_delay_upper_bound / 60) + 1,
+          mirror_max_capacity: 200,
+          mirror_capacity_threshold: 2
+        }
       end
+      let(:feature) { :repository_mirrors }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
+    context 'external policy classification settings' do
+      let(:settings) do
+        {
+          external_authorization_service_enabled: true,
+          external_authorization_service_url: 'https://custom.service/',
+          external_authorization_service_default_label: 'default',
+          external_authorization_service_timeout: 3,
+          external_auth_client_cert: File.read('ee/spec/fixtures/passphrase_x509_certificate.crt'),
+          external_auth_client_key: File.read('ee/spec/fixtures/passphrase_x509_certificate_pk.key'),
+          external_auth_client_key_pass: "5iveL!fe"
+        }
+      end
+      let(:feature) { :external_authorization_service }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
+    context 'additional email footer' do
+      let(:settings) { { email_additional_text: 'scary legal footer' } }
+      let(:feature) { :email_additional_text }
+
+      it_behaves_like 'settings for licensed features'
     end
 
     it 'updates the default_project_creation for string value' do

@@ -3,15 +3,15 @@ import Vue from 'vue';
 import epicItemTimelineComponent from 'ee/roadmap/components/epic_item_timeline.vue';
 import { TIMELINE_CELL_MIN_WIDTH, TIMELINE_END_OFFSET_FULL, TIMELINE_END_OFFSET_HALF } from 'ee/roadmap/constants';
 
-import { mockTimeframe, mockEpic, mockShellWidth } from '../mock_data';
-
-import mountComponent from '../../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { mockTimeframe, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
 
 const createComponent = ({
   timeframe = mockTimeframe,
   timeframeItem = mockTimeframe[0],
   epic = mockEpic,
   shellWidth = mockShellWidth,
+  itemWidth = mockItemWidth,
 }) => {
   const Component = Vue.extend(epicItemTimelineComponent);
 
@@ -20,6 +20,7 @@ const createComponent = ({
     timeframeItem,
     epic,
     shellWidth,
+    itemWidth,
   });
 };
 
@@ -39,10 +40,10 @@ describe('EpicItemTimelineComponent', () => {
   });
 
   describe('computed', () => {
-    describe('tdStyles', () => {
+    describe('itemStyles', () => {
       it('returns CSS min-width based on getCellWidth() method', () => {
         vm = createComponent({});
-        expect(vm.tdStyles).toBe('min-width: 280px;');
+        expect(vm.itemStyles.width).toBe(`${mockItemWidth}px`);
       });
     });
   });
@@ -105,6 +106,16 @@ describe('EpicItemTimelineComponent', () => {
           }),
         });
         expect(vm.getTimelineBarStartOffset()).toBe('left: 0;');
+      });
+
+      it('returns `right: 8px;` when Epic startDate is in last timeframe month and endDate is out of range', () => {
+        vm = createComponent({
+          epic: Object.assign({}, mockEpic, {
+            startDate: mockTimeframe[mockTimeframe.length - 1],
+            endDateOutOfRange: true,
+          }),
+        });
+        expect(vm.getTimelineBarStartOffset()).toBe('right: 8px;');
       });
 
       it('returns proportional `left` value based on Epic startDate and days in the month', () => {
@@ -225,7 +236,7 @@ describe('EpicItemTimelineComponent', () => {
 
     it('renders component container element with `min-width` property applied via style attribute', () => {
       vm = createComponent({});
-      expect(vm.$el.getAttribute('style')).toBe('min-width: 280px;');
+      expect(vm.$el.getAttribute('style')).toBe(`width: ${mockItemWidth}px;`);
     });
 
     it('renders timeline bar element with class `timeline-bar` and class `timeline-bar-wrapper` as container element', () => {

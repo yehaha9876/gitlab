@@ -3,8 +3,8 @@ require 'rails_helper'
 describe MergeRequests::RemoveApprovalService do
   describe '#execute' do
     let(:user) { create(:user) }
-    let(:merge_request) { create(:merge_request) }
-    let(:project) { merge_request.project }
+    let(:project) { create(:project, approvals_before_merge: 1) }
+    let(:merge_request) { create(:merge_request, source_project: project) }
 
     subject(:service) { described_class.new(project, user) }
 
@@ -14,6 +14,8 @@ describe MergeRequests::RemoveApprovalService do
 
     context 'with a user who has approved' do
       before do
+        project.add_developer(create(:user))
+        merge_request.update!(approvals_before_merge: 2)
         merge_request.approvals.create(user: user)
       end
 
@@ -30,23 +32,29 @@ describe MergeRequests::RemoveApprovalService do
       end
 
       it 'does not send a notification' do
-        expect(Notify).not_to receive(:unapprove_mr)
+        expect(service).not_to receive(:notification_service)
+
+        execute!
+      end
+
+      it 'resets the cache for approvals' do
+        expect(merge_request).to receive(:reset_approval_cache!)
 
         execute!
       end
     end
 
     context 'with an approved merge request' do
-      let(:notify) { Object.new }
+      let(:notification_service) { NotificationService.new }
 
       before do
-        merge_request.update_attribute :approvals_before_merge, 1
         merge_request.approvals.create(user: user)
-        allow(service).to receive(:notification_service).and_return(notify)
+        allow(service).to receive(:notification_service).and_return(notification_service)
       end
 
       it 'sends a notification' do
-        expect(notify).to receive(:unapprove_mr)
+        expect(notification_service).to receive_message_chain(:async, :unapprove_mr).with(merge_request, user)
+
         execute!
       end
     end

@@ -22,7 +22,7 @@ module NotesActions
     notes = notes.reject { |n| n.cross_reference_not_visible_for?(current_user) }
 
     notes_json[:notes] =
-      if noteable.discussions_rendered_on_frontend?
+      if use_note_serializer?
         note_serializer.represent(notes)
       else
         notes.map { |note| note_json(note) }
@@ -41,7 +41,7 @@ module NotesActions
     @note = Notes::CreateService.new(note_project, current_user, create_params).execute
 
     if @note.is_a?(Note)
-      Notes::RenderService.new(current_user).execute([@note], @project)
+      Notes::RenderService.new(current_user).execute([@note])
     end
 
     respond_to do |format|
@@ -56,7 +56,7 @@ module NotesActions
     @note = Notes::UpdateService.new(project, current_user, note_params).execute(note)
 
     if @note.is_a?(Note)
-      Notes::RenderService.new(current_user).execute([@note], @project)
+      Notes::RenderService.new(current_user).execute([@note])
     end
 
     respond_to do |format|
@@ -95,7 +95,7 @@ module NotesActions
     if note.persisted?
       attrs[:valid] = true
 
-      if noteable.discussions_rendered_on_frontend?
+      if use_note_serializer?
         attrs.merge!(note_serializer.represent(note))
       else
         attrs.merge!(
@@ -212,12 +212,12 @@ module NotesActions
   end
 
   def note_serializer
-    NoteSerializer.new(project: project, noteable: noteable, current_user: current_user)
+    ProjectNoteSerializer.new(project: project, noteable: noteable, current_user: current_user)
   end
 
   def note_project
     strong_memoize(:note_project) do
-      return nil unless project
+      next nil unless project
 
       note_project_id = params[:note_project_id]
 
@@ -228,9 +228,19 @@ module NotesActions
           project
         end
 
-      return access_denied! unless can?(current_user, :create_note, the_project)
+      next access_denied! unless can?(current_user, :create_note, the_project)
 
       the_project
+    end
+  end
+
+  def use_note_serializer?
+    return false if params['html']
+
+    if noteable.is_a?(MergeRequest)
+      cookies[:vue_mr_discussions] == 'true'
+    else
+      noteable.discussions_rendered_on_frontend?
     end
   end
 end

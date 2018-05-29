@@ -58,10 +58,8 @@ Rails.application.routes.draw do
     get 'liveness' => 'health#liveness'
     get 'readiness' => 'health#readiness'
     post 'storage_check' => 'health#storage_check'
-    get 'ide' => 'ide#index'
-    get 'ide/*vueroute' => 'ide#index', format: false
     resources :metrics, only: [:index]
-    mount Peek::Railtie => '/peek'
+    mount Peek::Railtie => '/peek', as: 'peek_routes'
 
     # Boards resources shared between group and projects
     resources :boards, only: [] do
@@ -78,6 +76,9 @@ Rails.application.routes.draw do
 
     # UserCallouts
     resources :user_callouts, only: [:create]
+
+    get 'ide' => 'ide#index'
+    get 'ide/*vueroute' => 'ide#index', format: false
   end
 
   # Koding route

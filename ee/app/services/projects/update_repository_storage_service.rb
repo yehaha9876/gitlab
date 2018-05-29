@@ -30,7 +30,7 @@ module Projects
       repository = (wiki ? project.wiki.repository : project.repository).raw
 
       # Initialize a git repository on the target path
-      gitlab_shell.add_repository(new_storage_key, repository.relative_path)
+      gitlab_shell.create_repository(new_storage_key, repository.relative_path)
       new_repository = Gitlab::Git::Repository.new(new_storage_key,
                                                    repository.relative_path,
                                                    repository.gl_repository)
@@ -39,20 +39,20 @@ module Projects
     end
 
     def mark_old_paths_for_archive
-      old_repository_storage_path = project.repository_storage_path
+      old_repository_storage = project.repository_storage
       new_project_path = moved_path(project.disk_path)
 
       # Notice that the block passed to `run_after_commit` will run with `project`
       # as its context
       project.run_after_commit do
         GitlabShellWorker.perform_async(:mv_repository,
-                                        old_repository_storage_path,
+                                        old_repository_storage,
                                         disk_path,
                                         new_project_path)
 
         if wiki.repository_exists?
           GitlabShellWorker.perform_async(:mv_repository,
-                                          old_repository_storage_path,
+                                          old_repository_storage,
                                           wiki.disk_path,
                                           "#{new_project_path}.wiki")
         end

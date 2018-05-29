@@ -1,7 +1,7 @@
 = content_for :title do
   %h3.project-title
     Runner ##{@runner.id}
-    .pull-right
+    .float-right
       - if @runner.shared?
         %span.runner-state.runner-state-shared
           Shared
@@ -9,12 +9,19 @@
         %span.runner-state.runner-state-specific
           Specific
 
+- add_to_breadcrumbs _("Runners"), admin_runners_path
+- breadcrumb_title "##{@runner.id}"
+- @no_container = true
+
 - if @runner.shared?
   .bs-callout.bs-callout-success
     %h4 This Runner will process jobs from ALL UNASSIGNED projects
     %p
       If you want Runners to build only specific projects, enable them in the table below.
       Keep in mind that this is a one way transition.
+- elsif @runner.group_type?
+  .bs-callout.bs-callout-success
+    %h4 This runner will process jobs from all projects in its group and subgroups
 - else
   .bs-callout.bs-callout-info
     %h4 This Runner will process jobs only from ASSIGNED projects
@@ -22,7 +29,7 @@
 %hr
 
 .append-bottom-20
-  = render '/projects/runners/form', runner: @runner, runner_form_url: admin_runner_path(@runner)
+  = render 'shared/runners/form', runner: @runner, runner_form_url: admin_runner_path(@runner)
 
 .row
   .col-md-6
@@ -39,10 +46,10 @@
             %tr.alert-info
               %td
                 %strong
-                  = project.name_with_namespace
+                  = project.full_name
               %td
-                .pull-right
-                  = link_to 'Disable', [:admin, project.namespace.becomes(Namespace), project, runner_project], method: :delete, class: 'btn btn-danger btn-xs'
+                .float-right
+                  = link_to 'Disable', [:admin, project.namespace.becomes(Namespace), project, runner_project], method: :delete, class: 'btn btn-danger btn-sm'
 
     %table.table.unassigned-projects
       %thead
@@ -61,12 +68,12 @@
       - @projects.each do |project|
         %tr
           %td
-            = project.name_with_namespace
+            = project.full_name
           %td
-            .pull-right
+            .float-right
               = form_for [:admin, project.namespace.becomes(Namespace), project, project.runner_projects.new] do |f|
                 = f.hidden_field :runner_id, value: @runner.id
-                = f.submit 'Enable', class: 'btn btn-xs'
+                = f.submit 'Enable', class: 'btn btn-sm'
     = paginate @projects, theme: "gitlab"
 
   .col-md-6
@@ -95,7 +102,7 @@
 
           %td.status
             - if project
-              = project.name_with_namespace
+              = project.full_name
 
           %td.build-link
             - if project
@@ -104,4 +111,4 @@
 
           %td.timestamp
             - if build.finished_at
-              %span #{time_ago_in_words build.finished_at} ago
+              %span= time_ago_with_tooltip build.finished_at

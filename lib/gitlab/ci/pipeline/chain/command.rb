@@ -1,4 +1,4 @@
-module Gitlab
+module Gitlab # rubocop:disable Naming/FileName
   module Ci
     module Pipeline
       module Chain
@@ -7,10 +7,11 @@ module Gitlab
           :origin_ref, :checkout_sha, :after_sha, :before_sha,
           :trigger_request, :schedule,
           :ignore_skip_ci, :save_incompleted,
-          :seeds_block,
+          :seeds_block, :variables_attributes,
 
           # EE specific
-          :allow_mirror_update
+          :allow_mirror_update,
+          :chat_data
         ) do
           include Gitlab::Utils::StrongMemoize
 

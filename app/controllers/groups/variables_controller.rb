@@ -2,6 +2,8 @@ module Groups
   class VariablesController < Groups::ApplicationController
     before_action :authorize_admin_build!
 
+    skip_cross_project_access_check :show, :update
+
     def show
       respond_to do |format|
         format.json do
@@ -13,7 +15,7 @@ module Groups
     def update
       if @group.update(group_variables_params)
         respond_to do |format|
-          format.json { return render_group_variables }
+          format.json { render_group_variables }
         end
       else
         respond_to do |format|
@@ -37,7 +39,7 @@ module Groups
     end
 
     def variable_params_attributes
-      %i[id key value protected _destroy]
+      %i[id key secret_value protected _destroy]
     end
 
     def authorize_admin_build!

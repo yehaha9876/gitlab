@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe WikiPages::CreateService do
-  let(:project) { create(:project) }
+  let(:project) { create(:project, :wiki_repo) }
   let(:user)    { create(:user) }
 
   let(:opts) do
@@ -19,17 +19,22 @@ describe WikiPages::CreateService do
   end
 
   describe '#execute' do
-    context 'when running on a Geo primary node' do
-      before do
-        allow(Gitlab::Geo).to receive(:primary?) { true }
-      end
+    it 'calls Geo::RepositoryUpdatedService when running on a Geo primary node' do
+      allow(Gitlab::Geo).to receive(:primary?) { true }
 
-      it 'triggers Geo::RepositoryUpdatedEventStore when Geo is enabled' do
-        expect(::Geo::RepositoryUpdatedEventStore).to receive(:new).with(instance_of(Project), source: Geo::RepositoryUpdatedEvent::WIKI).and_call_original
-        expect_any_instance_of(::Geo::RepositoryUpdatedEventStore).to receive(:create)
+      repository_updated_service = instance_double('::Geo::RepositoryUpdatedService')
+      expect(::Geo::RepositoryUpdatedService).to receive(:new).with(project, source: Geo::RepositoryUpdatedEvent::WIKI) { repository_updated_service }
+      expect(repository_updated_service).to receive(:execute)
 
-        service.execute
-      end
+      service.execute
+    end
+
+    it 'does not call Geo::RepositoryUpdatedService when not running on a Geo primary node' do
+      allow(Gitlab::Geo).to receive(:primary?) { false }
+
+      expect(::Geo::RepositoryUpdatedService).not_to receive(:new).with(project, source: Geo::RepositoryUpdatedEvent::WIKI)
+
+      service.execute
     end
   end
 end

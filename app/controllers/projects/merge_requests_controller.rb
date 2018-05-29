@@ -63,13 +63,13 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
       end
 
       format.patch  do
-        return render_404 unless @merge_request.diff_refs
+        break render_404 unless @merge_request.diff_refs
 
         send_git_patch @project.repository, @merge_request.diff_refs
       end
 
       format.diff do
-        return render_404 unless @merge_request.diff_refs
+        break render_404 unless @merge_request.diff_refs
 
         send_git_diff @project.repository, @merge_request.diff_refs
       end
@@ -191,7 +191,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
       begin
         @merge_request.environments_for(current_user).map do |environment|
           project = environment.project
-          deployment = environment.first_deployment_for(@merge_request.diff_head_commit)
+          deployment = environment.first_deployment_for(@merge_request.diff_head_sha)
 
           stop_url =
             if environment.stop_action? && can?(current_user, :create_deployment, environment)
@@ -333,9 +333,8 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     @target_branches = @merge_request.target_project.repository.branch_names
   end
 
-  def set_issuables_index
-    @finder_type = MergeRequestsFinder
-    super
+  def finder_type
+    MergeRequestsFinder
   end
 
   def check_user_can_push_to_source_branch!

@@ -34,6 +34,7 @@
   - [email_receiver, 2]
   - [emails_on_push, 2]
   - [mailers, 2]
+  - [mail_scheduler, 2]
   - [invalid_gpg_signature_update, 2]
   - [create_gpg_signature, 2]
   - [rebase, 2]
@@ -67,18 +68,31 @@
   - [gcp_cluster, 1]
   - [project_migrate_hashed_storage, 1]
   - [storage_migrator, 1]
+  - [pages_domain_verification, 1]
+  - [object_storage_upload, 1]
+  - [object_storage, 1]
+  - [plugin, 1]
+  - [pipeline_background, 1]
+  - [repository_update_remote_mirror, 1]
+  - [repository_remove_remote, 1]
+  - [create_note_diff_file, 1]
 
   # EE-specific queues
   - [ldap_group_sync, 2]
+  - [create_github_webhook, 2]
+  - [chat_notification, 2]
   - [geo, 1]
-  - [repository_remove_remote, 1]
   - [repository_update_mirror, 1]
-  - [repository_update_remote_mirror, 1]
+  - [project_import_schedule, 1]
   - [project_update_repository_storage, 1]
   - [admin_emails, 1]
   - [elastic_batch_project_indexer, 1]
   - [elastic_indexer, 1]
   - [elastic_commit_indexer, 1]
   - [export_csv, 1]
-  - [object_storage_upload, 1]
-  - [object_storage, 1]
+
+  # Deprecated queues: Remove after 10.7
+  - geo_base_scheduler
+  - geo_file_download
+  - geo_project_sync
+  - geo_repository_shard_sync

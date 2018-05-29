@@ -17,6 +17,8 @@ describe SystemHooksService do
     it { expect(event_data(project, :destroy)).to include(:event_name, :name, :created_at, :updated_at, :path, :project_id, :owner_name, :owner_email, :project_visibility) }
     it { expect(event_data(project_member, :create)).to include(:event_name, :created_at, :updated_at, :project_name, :project_path, :project_path_with_namespace, :project_id, :user_name, :user_username, :user_email, :user_id, :access_level, :project_visibility) }
     it { expect(event_data(project_member, :destroy)).to include(:event_name, :created_at, :updated_at, :project_name, :project_path, :project_path_with_namespace, :project_id, :user_name, :user_username, :user_email, :user_id, :access_level, :project_visibility) }
+    it { expect(event_data(group_member, :create)).to include(:event_name, :created_at, :updated_at, :group_name, :group_path, :group_plan, :group_id, :user_name, :user_username, :user_email, :user_id, :group_access) }
+    it { expect(event_data(group_member, :destroy)).to include(:event_name, :created_at, :updated_at, :group_name, :group_path, :group_plan, :group_id, :user_name, :user_username, :user_email, :user_id, :group_access) }
     it { expect(event_data(key, :create)).to include(:username, :key, :id) }
     it { expect(event_data(key, :destroy)).to include(:username, :key, :id) }
     it { expect(event_data(deploy_key, :create)).to include(:key, :id) }
@@ -30,6 +32,7 @@ describe SystemHooksService do
         :old_path_with_namespace
       )
     end
+
     it do
       project.old_path_with_namespace = 'transfered_from_path'
       expect(event_data(project, :transfer)).to include(
@@ -45,18 +48,21 @@ describe SystemHooksService do
         :owner_name, :owner_email
       )
     end
+
     it do
       expect(event_data(group, :destroy)).to include(
         :event_name, :name, :created_at, :updated_at, :path, :group_id,
         :owner_name, :owner_email
       )
     end
+
     it do
       expect(event_data(group_member, :create)).to include(
         :event_name, :created_at, :updated_at, :group_name, :group_path,
         :group_id, :user_id, :user_username, :user_name, :user_email, :group_access
       )
     end
+
     it do
       expect(event_data(group_member, :destroy)).to include(
         :event_name, :created_at, :updated_at, :group_name, :group_path,
@@ -68,6 +74,14 @@ describe SystemHooksService do
       data = event_data(project, :create)
 
       expect(data[:project_visibility]).to eq('private')
+    end
+
+    it 'handles nil datetime columns' do
+      user.update_attributes(created_at: nil, updated_at: nil)
+      data = event_data(user, :destroy)
+
+      expect(data[:created_at]).to be(nil)
+      expect(data[:updated_at]).to be(nil)
     end
 
     context 'group_rename' do

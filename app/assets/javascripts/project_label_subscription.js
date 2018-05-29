@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import { __ } from './locale';
 import axios from './lib/utils/axios_utils';
 import flash from './flash';
@@ -41,7 +42,7 @@ export default class ProjectLabelSubscription {
         const $button = $(button);
 
         if ($button.attr('data-original-title')) {
-          $button.tooltip('hide').attr('data-original-title', newAction).tooltip('fixTitle');
+          $button.tooltip('hide').attr('data-original-title', newAction).tooltip('_fixTitle');
         }
 
         return button;

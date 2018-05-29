@@ -1,5 +1,7 @@
+import $ from 'jquery';
 import Vue from 'vue';
-import userAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
+import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
+import UserAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
 import eventHub from '../eventhub';
 
 const Store = gl.issueBoards.BoardsStore;
@@ -44,7 +46,8 @@ gl.issueBoards.IssueCardInner = Vue.extend({
     };
   },
   components: {
-    userAvatarLink,
+    UserAvatarLink,
+    IssueCardWeight,
   },
   computed: {
     numberOverLimit() {
@@ -66,15 +69,6 @@ gl.issueBoards.IssueCardInner = Vue.extend({
       }
 
       return this.issue.assignees.length > this.numberOverLimit;
-    },
-    cardUrl() {
-      let baseUrl = this.issueLinkBase;
-
-      if (this.groupId && this.issue.project) {
-        baseUrl = this.issueLinkBase.replace(':project_path', this.issue.project.path);
-      }
-
-      return `${baseUrl}/${this.issue.iid}`;
     },
     issueId() {
       if (this.issue.iid) {
@@ -143,8 +137,8 @@ gl.issueBoards.IssueCardInner = Vue.extend({
   },
   template: `
     <div>
-      <div class="card-header">
-        <h4 class="card-title">
+      <div class="board-card-header">
+        <h4 class="board-card-title">
           <i
             class="fa fa-eye-slash confidential-icon"
             v-if="issue.confidential"
@@ -152,16 +146,19 @@ gl.issueBoards.IssueCardInner = Vue.extend({
           />
           <a
             class="js-no-trigger"
-            :href="cardUrl"
+            :href="issue.path"
             :title="issue.title">{{ issue.title }}</a>
           <span
-            class="card-number"
+            class="board-card-number"
             v-if="issueId"
           >
-            <template v-if="groupId && issue.project">{{issue.project.path}}</template>{{ issueId }}
+            {{ issue.referencePath }}
           </span>
+          <issue-card-weight
+            v-if="issue.weight"
+            :weight="issue.weight" />
         </h4>
-        <div class="card-assignee">
+        <div class="board-card-assignee">
           <user-avatar-link
             v-for="(assignee, index) in issue.assignees"
             :key="assignee.id"
@@ -183,11 +180,11 @@ gl.issueBoards.IssueCardInner = Vue.extend({
         </div>
       </div>
       <div
-        class="card-footer"
+        class="board-card-footer"
         v-if="showLabelFooter"
       >
         <button
-          class="label color-label has-tooltip"
+          class="badge color-label has-tooltip"
           v-for="label in issue.labels"
           type="button"
           v-if="showLabel(label)"

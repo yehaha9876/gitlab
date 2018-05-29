@@ -7,9 +7,9 @@ module Geo
 
       if Gitlab::Geo.primary?
         fetch_secondary_geo_nodes_metrics
-      else
-        fetch_current_geo_node_metrics
       end
+
+      fetch_current_geo_node_metrics
     end
 
     private
@@ -24,7 +24,6 @@ module Geo
 
     def fetch_geo_node_metrics(node)
       return unless node&.enabled?
-      return unless Gitlab::Geo.primary? || Gitlab::Metrics.prometheus_metrics_enabled?
 
       status = node_status(node)
 
@@ -34,6 +33,7 @@ module Geo
       end
 
       update_db_metrics(node, status) if Gitlab::Geo.primary?
+      status.update_cache! if node.current?
       update_prometheus_metrics(node, status) if Gitlab::Metrics.prometheus_metrics_enabled?
     end
 

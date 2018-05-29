@@ -11,41 +11,48 @@ describe MergeRequest do
     it { is_expected.to have_many(:approvals).dependent(:delete_all) }
     it { is_expected.to have_many(:approvers).dependent(:delete_all) }
     it { is_expected.to have_many(:approver_groups).dependent(:delete_all) }
+    it { is_expected.to have_many(:approved_by_users) }
   end
 
   describe '#squash_in_progress?' do
-    # Create merge request and project before we stub file calls
-    before do
-      subject
+    shared_examples 'checking whether a squash is in progress' do
+      let(:repo_path) { subject.source_project.repository.path }
+      let(:squash_path) { File.join(repo_path, "gitlab-worktree", "squash-#{subject.id}") }
+
+      before do
+        system(*%W(#{Gitlab.config.git.bin_path} -C #{repo_path} worktree add --detach #{squash_path} master))
+      end
+
+      it 'returns true when there is a current squash directory' do
+        expect(subject.squash_in_progress?).to be_truthy
+      end
+
+      it 'returns false when there is no squash directory' do
+        FileUtils.rm_rf(squash_path)
+
+        expect(subject.squash_in_progress?).to be_falsey
+      end
+
+      it 'returns false when the squash directory has expired' do
+        time = 20.minutes.ago.to_time
+        File.utime(time, time, squash_path)
+
+        expect(subject.squash_in_progress?).to be_falsey
+      end
+
+      it 'returns false when the source project has been removed' do
+        allow(subject).to receive(:source_project).and_return(nil)
+
+        expect(subject.squash_in_progress?).to be_falsey
+      end
     end
 
-    it 'returns true when there is a current squash directory' do
-      allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:mtime).and_return(Time.now)
-
-      expect(subject.squash_in_progress?).to be_truthy
+    context 'when Gitaly squash_in_progress is enabled' do
+      it_behaves_like 'checking whether a squash is in progress'
     end
 
-    it 'returns false when there is no squash directory' do
-      allow(File).to receive(:exist?).and_return(false)
-
-      expect(subject.squash_in_progress?).to be_falsey
-    end
-
-    it 'returns false when the squash directory has expired' do
-      allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:mtime).and_return(20.minutes.ago)
-
-      expect(subject.squash_in_progress?).to be_falsey
-    end
-
-    it 'returns false when the source project has been removed' do
-      allow(subject).to receive(:source_project).and_return(nil)
-      allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:mtime).and_return(Time.now)
-
-      expect(File).not_to have_received(:exist?)
-      expect(subject.squash_in_progress?).to be_falsey
+    context 'when Gitaly squash_in_progress is disabled', :disable_gitaly do
+      it_behaves_like 'checking whether a squash is in progress'
     end
   end
 
@@ -157,65 +164,61 @@ describe MergeRequest do
     end
   end
 
-  describe '#has_codeclimate_data?' do
-    context 'with codeclimate artifact' do
+  %w(sast dast sast_container container_scanning).each do |type|
+    it { is_expected.to delegate_method(:"expose_#{type}_data?").to(:head_pipeline) }
+    it { is_expected.to delegate_method(:"has_#{type}_data?").to(:base_pipeline).with_prefix(:base) }
+    it { is_expected.to delegate_method(:"#{type}_artifact").to(:head_pipeline).with_prefix(:head) }
+    it { is_expected.to delegate_method(:"#{type}_artifact").to(:base_pipeline).with_prefix(:base) }
+  end
+
+  describe '#expose_codeclimate_data?' do
+    context 'with codeclimate data' do
+      let(:pipeline) { double(expose_codeclimate_data?: true) }
+
       before do
-        artifact = double(success?: true)
-        allow(subject.head_pipeline).to receive(:codeclimate_artifact).and_return(artifact)
-        allow(subject.base_pipeline).to receive(:codeclimate_artifact).and_return(artifact)
+        allow(subject).to receive(:head_pipeline).and_return(pipeline)
+        allow(subject).to receive(:base_pipeline).and_return(pipeline)
       end
 
-      it { expect(subject.has_codeclimate_data?).to be_truthy }
+      it { expect(subject.expose_codeclimate_data?).to be_truthy }
     end
 
-    context 'without codeclimate artifact' do
-      it { expect(subject.has_codeclimate_data?).to be_falsey }
+    context 'without codeclimate data' do
+      it { expect(subject.expose_codeclimate_data?).to be_falsey }
     end
   end
 
-  describe '#head_sast_artifact' do
-    it { is_expected.to delegate_method(:sast_artifact).to(:head_pipeline).with_prefix(:head) }
-  end
+  describe '#expose_code_quality_data?' do
+    context 'with code_quality data' do
+      let(:pipeline) { double(expose_code_quality_data?: true) }
 
-  describe '#base_sast_artifact' do
-    it { is_expected.to delegate_method(:sast_artifact).to(:base_pipeline).with_prefix(:base) }
-  end
+      before do
+        allow(subject).to receive(:head_pipeline).and_return(pipeline)
+        allow(subject).to receive(:base_pipeline).and_return(pipeline)
+      end
 
-  describe '#has_sast_data?' do
-    let(:artifact) { double(success?: true) }
-
-    before do
-      allow(merge_request).to receive(:head_sast_artifact).and_return(artifact)
+      it { expect(subject.expose_code_quality_data?).to be_truthy }
     end
 
-    it { expect(merge_request.has_sast_data?).to be_truthy }
+    context 'without code_quality data' do
+      it { expect(subject.expose_code_quality_data?).to be_falsey }
+    end
   end
 
-  describe '#has_base_sast_data?' do
-    let(:artifact) { double(success?: true) }
+  describe '#expose_performance_data?' do
+    context 'with performance data' do
+      let(:pipeline) { double(expose_performance_data?: true) }
 
-    before do
-      allow(merge_request).to receive(:base_sast_artifact).and_return(artifact)
+      before do
+        allow(subject).to receive(:head_pipeline).and_return(pipeline)
+        allow(subject).to receive(:base_pipeline).and_return(pipeline)
+      end
+
+      it { expect(subject.expose_performance_data?).to be_truthy }
     end
 
-    it { expect(merge_request.has_base_sast_data?).to be_truthy }
-  end
-
-  describe '#sast_container_artifact' do
-    it { is_expected.to delegate_method(:sast_container_artifact).to(:head_pipeline) }
-  end
-
-  describe '#has_dast_data?' do
-    let(:artifact) { double(success?: true) }
-
-    before do
-      allow(merge_request).to receive(:dast_artifact).and_return(artifact)
+    context 'without performance data' do
+      it { expect(subject.expose_performance_data?).to be_falsey }
     end
-
-    it { expect(merge_request.has_dast_data?).to be_truthy }
-  end
-
-  describe '#dast_artifact' do
-    it { is_expected.to delegate_method(:dast_artifact).to(:head_pipeline) }
   end
 end

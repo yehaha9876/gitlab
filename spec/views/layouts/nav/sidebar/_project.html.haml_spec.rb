@@ -12,7 +12,7 @@ describe 'layouts/nav/sidebar/_project' do
   end
 
   describe 'issue boards' do
-    it 'has boards tab when multiple issue boards available' do
+    it 'has board tab' do
       render
 
       expect(rendered).to have_css('a[title="Boards"]')
@@ -20,7 +20,7 @@ describe 'layouts/nav/sidebar/_project' do
 
     it 'has board tab when multiple issue boards is not available' do
       allow(License).to receive(:feature_available?).and_call_original
-      allow(License).to receive(:feature_available?).with(:multiple_issue_boards) { false }
+      allow(License).to receive(:feature_available?).with(:multiple_project_issue_boards) { false }
 
       render
 
@@ -45,16 +45,17 @@ describe 'layouts/nav/sidebar/_project' do
       expect(rendered).to have_text 'Registry'
     end
 
-    it 'highlights only one tab' do
+    it 'highlights sidebar item and flyout' do
       render
 
-      expect(rendered).to have_css('.active', count: 2)
+      expect(rendered).to have_css('.sidebar-top-level-items > li.active', count: 1)
+      expect(rendered).to have_css('.is-fly-out-only > li.active', count: 1)
     end
 
-    it 'highlights container registry tab only' do
+    it 'highlights container registry tab' do
       render
 
-      expect(rendered).to have_css('.active', text: 'Registry')
+      expect(rendered).to have_css('.sidebar-top-level-items > li.active', text: 'Registry')
     end
   end
 end

@@ -13,8 +13,8 @@ describe Gitlab::Elastic::SearchResults do
   end
 
   let(:user) { create(:user) }
-  let(:project_1) { create(:project, :repository) }
-  let(:project_2) { create(:project, :repository) }
+  let(:project_1) { create(:project, :repository, :wiki_repo) }
+  let(:project_2) { create(:project, :repository, :wiki_repo) }
   let(:limit_project_ids) { [project_1.id] }
 
   describe 'parse_search_result' do
@@ -418,6 +418,14 @@ describe Gitlab::Elastic::SearchResults do
       Gitlab::Elastic::Helper.refresh_index
     end
 
+    def search_for(term)
+      blobs = described_class.new(user, term, [project_1.id]).objects('blobs')
+
+      blobs.map do |blob|
+        blob['_source']['blob']['path']
+      end
+    end
+
     it 'finds blobs' do
       results = described_class.new(user, 'def', limit_project_ids)
       blobs = results.objects('blobs')
@@ -459,14 +467,6 @@ describe Gitlab::Elastic::SearchResults do
         Gitlab::Elastic::Helper.refresh_index
       end
 
-      def search_for(term)
-        blobs = described_class.new(user, term, [project_1.id]).objects('blobs')
-
-        blobs.map do |blob|
-          blob['_source']['blob']['path']
-        end
-      end
-
       it 'find by first word' do
         expect(search_for('write')).to include('test.txt')
       end
@@ -483,6 +483,53 @@ describe Gitlab::Elastic::SearchResults do
         expect(search_for('writeStringToFile')).to include('test.txt')
       end
     end
+
+    context 'Searches special characters' do
+      let(:file_content) do
+        <<~FILE
+          us
+
+          some other stuff
+
+          dots.also.need.testing
+
+          and;colons:too$
+          wow
+          yeah!
+
+          Foo.bar(x)
+
+          include "bikes-3.4"
+
+          us-east-2
+          bye
+        FILE
+      end
+      let(:file_name) { 'elastic_specialchars_test.md' }
+
+      before do
+        project_1.repository.create_file(user, file_name, file_content, message: 'Some commit message', branch_name: 'master')
+        project_1.repository.index_blobs
+        Gitlab::Elastic::Helper.refresh_index
+      end
+
+      it 'finds files with dashes' do
+        expect(search_for('"us-east-2"')).to include(file_name)
+        expect(search_for('bikes-3.4')).to include(file_name)
+      end
+
+      it 'finds files with dots' do
+        expect(search_for('"dots.also.need.testing"')).to include(file_name)
+        expect(search_for('dots')).to include(file_name)
+        expect(search_for('need')).to include(file_name)
+        expect(search_for('dots.need')).not_to include(file_name)
+      end
+
+      it 'finds files with other special chars' do
+        expect(search_for('"and;colons:too$"')).to include(file_name)
+        expect(search_for('bar\(x\)')).to include(file_name)
+      end
+    end
   end
 
   describe 'Wikis' do
@@ -490,8 +537,10 @@ describe Gitlab::Elastic::SearchResults do
     subject(:wiki_blobs) { results.objects('wiki_blobs') }
 
     before do
-      project_1.wiki.create_page('index_page', 'term')
-      project_1.wiki.index_blobs
+      if project_1.wiki_enabled?
+        project_1.wiki.create_page('index_page', 'term')
+        project_1.wiki.index_blobs
+      end
 
       Gitlab::Elastic::Helper.refresh_index
     end
@@ -512,7 +561,7 @@ describe Gitlab::Elastic::SearchResults do
     end
 
     it 'finds wiki blobs from public projects only' do
-      project_2 = create :project, :repository, :private
+      project_2 = create :project, :repository, :private, :wiki_repo
       project_2.wiki.create_page('index_page', 'term')
       project_2.wiki.index_blobs
       Gitlab::Elastic::Helper.refresh_index
@@ -546,7 +595,7 @@ describe Gitlab::Elastic::SearchResults do
     end
 
     context 'when wiki is internal' do
-      let(:project_1) { create(:project, :public, :repository, :wiki_private) }
+      let(:project_1) { create(:project, :public, :repository, :wiki_private, :wiki_repo) }
 
       context 'search by member' do
         let(:limit_project_ids) { [project_1.id] }
@@ -597,10 +646,10 @@ describe Gitlab::Elastic::SearchResults do
   end
 
   describe 'Visibility levels' do
-    let(:internal_project) { create(:project, :internal, :repository, description: "Internal project") }
-    let(:private_project1) { create(:project, :private, :repository, description: "Private project") }
-    let(:private_project2) { create(:project, :private, :repository, description: "Private project where I'm a member") }
-    let(:public_project) { create(:project, :public, :repository, description: "Public project") }
+    let(:internal_project) { create(:project, :internal, :repository, :wiki_repo, description: "Internal project") }
+    let(:private_project1) { create(:project, :private, :repository, :wiki_repo, description: "Private project") }
+    let(:private_project2) { create(:project, :private, :repository, :wiki_repo, description: "Private project where I'm a member") }
+    let(:public_project) { create(:project, :public, :repository, :wiki_repo, description: "Public project") }
     let(:limit_project_ids) { [private_project2.id] }
 
     before do

@@ -1,5 +1,6 @@
 /* eslint-disable func-names, space-before-function-paren, no-var, consistent-return, no-new, prefer-arrow-callback, no-return-assign, one-var, one-var-declaration-per-line, object-shorthand, no-else-return, newline-per-chained-call, no-shadow, vars-on-top, prefer-template, max-len */
 
+import $ from 'jquery';
 import Cookies from 'js-cookie';
 import { __ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
@@ -83,7 +84,7 @@ export default class Project {
       selected = $dropdown.data('selected');
       return $dropdown.glDropdown({
         data(term, callback) {
-          axios.get($dropdown.data('refs-url'), {
+          axios.get($dropdown.data('refsUrl'), {
             params: {
               ref: $dropdown.data('ref'),
               search: term,
@@ -96,8 +97,8 @@ export default class Project {
         filterable: true,
         filterRemote: true,
         filterByText: true,
-        inputFieldName: $dropdown.data('input-field-name'),
-        fieldName: $dropdown.data('field-name'),
+        inputFieldName: $dropdown.data('inputFieldName'),
+        fieldName: $dropdown.data('fieldName'),
         renderRow: function(ref) {
           var li = refListItem.cloneNode(false);
 

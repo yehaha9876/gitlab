@@ -5,6 +5,8 @@ describe Backup::Manager do
 
   let(:progress) { StringIO.new }
 
+  subject { described_class.new(progress) }
+
   before do
     allow(progress).to receive(:puts)
     allow(progress).to receive(:print)
@@ -276,6 +278,10 @@ describe Backup::Manager do
       Fog.mock!
       connection = ::Fog::Storage.new(Gitlab.config.backup.upload.connection.symbolize_keys)
       connection.directories.create(key: Gitlab.config.backup.upload.remote_directory)
+    end
+
+    after do
+      Fog.unmock!
     end
 
     context 'target path' do

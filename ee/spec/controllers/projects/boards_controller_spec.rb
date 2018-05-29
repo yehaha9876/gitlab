@@ -1,11 +1,14 @@
 require 'spec_helper'
 
 describe Projects::BoardsController do
+  include Rails.application.routes.url_helpers
+
   let(:project) { create(:project) }
   let(:user)    { create(:user) }
 
   before do
     project.add_master(user)
+    allow(Ability).to receive(:allowed?).and_call_original
     sign_in(user)
   end
 
@@ -22,11 +25,21 @@ describe Projects::BoardsController do
       expect(parsed_response.length).to eq 2
     end
 
+    it_behaves_like 'unauthorized when external service denies access' do
+      subject { list_boards }
+    end
+
     def list_boards(format: :html)
       get :index, namespace_id: project.namespace,
                   project_id: project,
                   format: format
     end
+  end
+
+  describe 'GET show' do
+    let(:parent) { project }
+
+    it_behaves_like 'multiple issue boards show'
   end
 
   describe 'POST create' do
@@ -95,7 +108,7 @@ describe Projects::BoardsController do
     end
 
     it 'renders a 404 when multiple issue boards are not available' do
-      stub_licensed_features(multiple_issue_boards: false)
+      stub_licensed_features(multiple_project_issue_boards: false)
 
       create_board name: 'Backend'
 

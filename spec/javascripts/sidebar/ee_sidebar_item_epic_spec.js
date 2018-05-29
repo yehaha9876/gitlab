@@ -2,7 +2,7 @@ import Vue from 'vue';
 import CESidebarStore from '~/sidebar/stores/sidebar_store';
 import SidebarStore from 'ee/sidebar/stores/sidebar_store';
 import sidebarItemEpic from 'ee/sidebar/components/sidebar_item_epic.vue';
-import mountComponent from '../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('sidebarItemEpic', () => {
   let vm;
@@ -59,8 +59,8 @@ describe('sidebarItemEpic', () => {
     });
 
     it('shows epic title as collapsed title tooltip', () => {
-      expect(vm.$el.querySelector('.collapse-truncated-title').getAttribute('title')).toBeDefined();
-      expect(vm.$el.querySelector('.collapse-truncated-title').getAttribute('data-original-title')).toEqual(epicTitle);
+      expect(vm.$el.querySelector('.sidebar-collapsed-icon').getAttribute('title')).toBeDefined();
+      expect(vm.$el.querySelector('.sidebar-collapsed-icon').getAttribute('data-original-title')).toEqual(epicTitle);
     });
 
     describe('no epic', () => {

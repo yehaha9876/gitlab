@@ -1,4 +1,6 @@
 module NotesHelper
+  prepend EE::NotesHelper
+
   def note_target_fields(note)
     if note.noteable
       hidden_field_tag(:target_type, note.noteable.class.name.underscore) +
@@ -6,12 +8,8 @@ module NotesHelper
     end
   end
 
-  def note_editable?(note)
-    Ability.can_edit_note?(current_user, note)
-  end
-
   def note_supports_quick_actions?(note)
-    Notes::QuickActionsService.supported?(note, current_user)
+    Notes::QuickActionsService.supported?(note)
   end
 
   def noteable_json(noteable)
@@ -151,7 +149,38 @@ module NotesHelper
     }
   end
 
+  def discussions_path(issuable)
+    if issuable.is_a?(Issue)
+      discussions_project_issue_path(@project, issuable, format: :json)
+    else
+      discussions_project_merge_request_path(@project, issuable, format: :json)
+    end
+  end
+
+  def notes_data(issuable)
+    {
+      discussionsPath: discussions_path(issuable),
+      registerPath: new_session_path(:user, redirect_to_referer: 'yes', anchor: 'register-pane'),
+      newSessionPath: new_session_path(:user, redirect_to_referer: 'yes'),
+      markdownDocsPath: help_page_path('user/markdown'),
+      quickActionsDocsPath: help_page_path('user/project/quick_actions'),
+      closePath: close_issuable_path(issuable),
+      reopenPath: reopen_issuable_path(issuable),
+      notesPath: notes_url,
+      totalNotes: issuable.discussions.length,
+      lastFetchedAt: Time.now.to_i
+    }.to_json
+  end
+
   def discussion_resolved_intro(discussion)
     discussion.resolved_by_push? ? 'Automatically resolved' : 'Resolved'
+  end
+
+  def has_vue_discussions_cookie?
+    cookies[:vue_mr_discussions] == 'true'
+  end
+
+  def serialize_notes?
+    has_vue_discussions_cookie? && !params['html']
   end
 end

@@ -3,24 +3,24 @@
 - if lookup_context.template_exists?('help', "projects/services/#{@service.to_param}", true)
   = render "projects/services/#{@service.to_param}/help", subject: subject
 - elsif @service.help.present?
-  .well
+  .card
     = markdown @service.help
 
 .service-settings
   - if @service.show_active_box?
-    .form-group
-      = form.label :active, "Active", class: "control-label"
+    .form-group.row
+      = form.label :active, "Active", class: "col-form-label col-sm-2"
       .col-sm-10
         = form.check_box :active, disabled: disable_fields_service?(@service)
 
-  - if @service.supported_events.present?
-    .form-group
-      = form.label :url, "Trigger", class: 'control-label'
+  - if @service.configurable_events.present?
+    .form-group.row
+      = form.label :url, "Trigger", class: 'col-form-label col-sm-2'
 
       .col-sm-10
-        - @service.supported_events.each do |event|
+        - @service.configurable_events.each do |event|
           %div
-            = form.check_box service_event_field_name(event), class: 'pull-left'
+            = form.check_box service_event_field_name(event), class: 'float-left'
             .prepend-left-20
               = form.label service_event_field_name(event), class: 'list-label' do
                 %strong
@@ -33,7 +33,7 @@
               = form.text_field field[:name], class: "form-control", placeholder: field[:placeholder]
 
           %p.light
-            = service_event_description(event)
+            = @service.class.event_description(event)
 
   - @service.global_fields.each do |field|
     - type = field[:type]

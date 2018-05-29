@@ -18,6 +18,12 @@
       eventTimeStamp: {
         type: Number,
         required: true,
+        default: 0,
+      },
+      eventTypeLogStatus: {
+        type: Boolean,
+        required: false,
+        default: false,
       },
     },
     computed: {
@@ -26,6 +32,9 @@
       },
       timeStampString() {
         return formatDate(this.timeStamp);
+      },
+      eventString() {
+        return this.eventId;
       },
     },
   };
@@ -37,7 +46,7 @@
   >
     <template v-if="eventTimeStamp">
       <strong>
-        {{ eventId }}
+        {{ eventString }}
       </strong>
       <span
         v-tooltip

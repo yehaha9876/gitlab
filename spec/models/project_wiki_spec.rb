@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe ProjectWiki do
-  let(:project) { create(:project) }
+  let(:project) { create(:project, :wiki_repo) }
   let(:repository) { project.repository }
   let(:user) { project.owner }
   let(:gitlab_shell) { Gitlab::Shell.new }
@@ -11,16 +11,16 @@ describe ProjectWiki do
   subject { project_wiki }
 
   it { is_expected.to delegate_method(:empty?).to :pages }
-  it { is_expected.to delegate_method(:repository_storage_path).to :project }
+  it { is_expected.to delegate_method(:repository_storage).to :project }
   it { is_expected.to delegate_method(:hashed_storage?).to :project }
 
-  describe "#path_with_namespace" do
+  describe "#full_path" do
     it "returns the project path with namespace with the .wiki extension" do
-      expect(subject.path_with_namespace).to eq(project.full_path + '.wiki')
+      expect(subject.full_path).to eq(project.full_path + '.wiki')
     end
 
     it 'returns the same value as #full_path' do
-      expect(subject.path_with_namespace).to eq(subject.full_path)
+      expect(subject.full_path).to eq(subject.full_path)
     end
   end
 
@@ -82,7 +82,7 @@ describe ProjectWiki do
       # Create a fresh project which will not have a wiki
       project_wiki = described_class.new(create(:project), user)
       gitlab_shell = double(:gitlab_shell)
-      allow(gitlab_shell).to receive(:add_repository)
+      allow(gitlab_shell).to receive(:create_repository)
       allow(project_wiki).to receive(:gitlab_shell).and_return(gitlab_shell)
 
       expect { project_wiki.send(:wiki) }.to raise_exception(ProjectWiki::CouldNotCreateWikiError)
@@ -167,6 +167,17 @@ describe ProjectWiki do
           expect(page.title).to eq("autre pagé")
         end
       end
+
+      context 'pages with invalidly-encoded content' do
+        before do
+          create_page("encoding is fun", "f\xFCr".b)
+        end
+
+        it "can find the page" do
+          page = subject.find_page("encoding is fun")
+          expect(page.content).to eq("fr")
+        end
+      end
     end
 
     context 'when Gitaly wiki_find_page is enabled' do
@@ -180,11 +191,12 @@ describe ProjectWiki do
 
   describe '#find_file' do
     shared_examples 'finding a wiki file' do
+      let(:image) { File.open(Rails.root.join('spec', 'fixtures', 'big-image.png')) }
+
       before do
-        file = File.open(Rails.root.join('spec', 'fixtures', 'dk.png'))
         subject.wiki # Make sure the wiki repo exists
 
-        BareRepoOperations.new(subject.repository.path_to_repo).commit_file(file, 'image.png')
+        BareRepoOperations.new(subject.repository.path_to_repo).commit_file(image, 'image.png')
       end
 
       it 'returns the latest version of the file if it exists' do
@@ -199,6 +211,13 @@ describe ProjectWiki do
       it 'returns a Gitlab::Git::WikiFile instance' do
         file = subject.find_file('image.png')
         expect(file).to be_a Gitlab::Git::WikiFile
+      end
+
+      it 'returns the whole file' do
+        file = subject.find_file('image.png')
+        image.rewind
+
+        expect(file.raw_data.b).to eq(image.read.b)
       end
     end
 
@@ -328,6 +347,8 @@ describe ProjectWiki do
   end
 
   describe '#create_repo!' do
+    let(:project) { create(:project) }
+
     it 'creates a repository' do
       expect(raw_repository.exists?).to eq(false)
       expect(subject.repository).to receive(:after_create)
@@ -339,6 +360,8 @@ describe ProjectWiki do
   end
 
   describe '#ensure_repository' do
+    let(:project) { create(:project) }
+
     it 'creates the repository if it not exist' do
       expect(raw_repository.exists?).to eq(false)
 
@@ -377,7 +400,7 @@ describe ProjectWiki do
   end
 
   def commit_details
-    Gitlab::Git::Wiki::CommitDetails.new(user.name, user.email, "test commit")
+    Gitlab::Git::Wiki::CommitDetails.new(user.id, user.username, user.name, user.email, "test commit")
   end
 
   def create_page(name, content)

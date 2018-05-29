@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import Flash from './flash';
 import { __ } from './locale';
 import axios from './lib/utils/axios_utils';
@@ -30,7 +31,7 @@ export default class Members {
 
           return !$el.hasClass('is-active');
         },
-        fieldName: $btn.data('field-name'),
+        fieldName: $btn.data('fieldName'),
         id(selected, $el) {
           return $el.data('id');
         },
@@ -89,7 +90,7 @@ export default class Members {
   }
   // eslint-disable-next-line class-methods-use-this
   getMemberListItems($el) {
-    const $memberListItem = $el.is('.member') ? $el : $(`#${$el.data('el-id')}`);
+    const $memberListItem = $el.is('.member') ? $el : $(`#${$el.data('elId')}`);
 
     return {
       $memberListItem,

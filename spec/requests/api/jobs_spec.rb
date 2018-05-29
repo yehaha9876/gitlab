@@ -13,7 +13,10 @@ describe API::Jobs do
                                ref: project.default_branch)
   end
 
-  let!(:job) { create(:ci_build, :success, pipeline: pipeline) }
+  let!(:job) do
+    create(:ci_build, :success, pipeline: pipeline,
+                                artifacts_expire_at: 1.day.since)
+  end
 
   let(:user) { create(:user) }
   let(:api_user) { user }
@@ -21,6 +24,7 @@ describe API::Jobs do
   let(:guest) { create(:project_member, :guest, project: project).user }
 
   before do
+    stub_licensed_features(cross_project_pipelines: true)
     project.add_developer(user)
   end
 
@@ -43,6 +47,7 @@ describe API::Jobs do
       it 'returns correct values' do
         expect(json_response).not_to be_empty
         expect(json_response.first['commit']['id']).to eq project.commit.id
+        expect(Time.parse(json_response.first['artifacts_expire_at'])).to be_like_time(job.artifacts_expire_at)
       end
 
       it 'returns pipeline data' do
@@ -114,6 +119,7 @@ describe API::Jobs do
     let(:query) { Hash.new }
 
     before do
+      job
       get api("/projects/#{project.id}/pipelines/#{pipeline.id}/jobs", api_user), query
     end
 
@@ -127,6 +133,7 @@ describe API::Jobs do
       it 'returns correct values' do
         expect(json_response).not_to be_empty
         expect(json_response.first['commit']['id']).to eq project.commit.id
+        expect(Time.parse(json_response.first['artifacts_expire_at'])).to be_like_time(job.artifacts_expire_at)
       end
 
       it 'returns pipeline data' do
@@ -200,6 +207,7 @@ describe API::Jobs do
         expect(Time.parse(json_response['created_at'])).to be_like_time(job.created_at)
         expect(Time.parse(json_response['started_at'])).to be_like_time(job.started_at)
         expect(Time.parse(json_response['finished_at'])).to be_like_time(job.finished_at)
+        expect(Time.parse(json_response['artifacts_expire_at'])).to be_like_time(job.artifacts_expire_at)
         expect(json_response['duration']).to eq(job.duration)
       end
 
@@ -280,7 +288,7 @@ describe API::Jobs do
           get_artifact_file(artifact)
 
           expect(response).to have_gitlab_http_status(200)
-          expect(response.headers)
+          expect(response.headers.to_h)
             .to include('Content-Type' => 'application/json',
                         'Gitlab-Workhorse-Send-Data' => /artifacts-entry/)
         end
@@ -310,7 +318,7 @@ describe API::Jobs do
 
       it 'returns specific job artifacts' do
         expect(response).to have_gitlab_http_status(200)
-        expect(response.headers).to include(download_headers)
+        expect(response.headers.to_h).to include(download_headers)
         expect(response.body).to match_file(job.artifacts_file.file.file)
       end
     end
@@ -337,10 +345,55 @@ describe API::Jobs do
           end
         end
 
+        context 'when artifacts are stored remotely' do
+          let(:proxy_download) { false }
+
+          before do
+            stub_artifacts_object_storage(proxy_download: proxy_download)
+          end
+
+          let(:job) { create(:ci_build, pipeline: pipeline) }
+          let!(:artifact) { create(:ci_job_artifact, :archive, :remote_store, job: job) }
+
+          before do
+            job.reload
+
+            get api("/projects/#{project.id}/jobs/#{job.id}/artifacts", api_user)
+          end
+
+          context 'when proxy download is enabled' do
+            let(:proxy_download) { true }
+
+            it 'responds with the workhorse send-url' do
+              expect(response.headers[Gitlab::Workhorse::SEND_DATA_HEADER]).to start_with("send-url:")
+            end
+          end
+
+          context 'when proxy download is disabled' do
+            it 'returns location redirect' do
+              expect(response).to have_gitlab_http_status(302)
+            end
+          end
+
+          context 'authorized user' do
+            it 'returns the file remote URL' do
+              expect(response).to redirect_to(artifact.file.url)
+            end
+          end
+
+          context 'unauthorized user' do
+            let(:api_user) { nil }
+
+            it 'does not return specific job artifacts' do
+              expect(response).to have_gitlab_http_status(404)
+            end
+          end
+        end
+
         it 'does not return job artifacts if not uploaded' do
           get api("/projects/#{project.id}/jobs/#{job.id}/artifacts", api_user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -351,6 +404,7 @@ describe API::Jobs do
     let(:job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
 
     before do
+      stub_artifacts_object_storage
       job.success
     end
 
@@ -414,8 +468,23 @@ describe API::Jobs do
                 "attachment; filename=#{job.artifacts_file.filename}" }
           end
 
-          it { expect(response).to have_gitlab_http_status(200) }
-          it { expect(response.headers).to include(download_headers) }
+          it { expect(response).to have_http_status(:ok) }
+          it { expect(response.headers.to_h).to include(download_headers) }
+        end
+
+        context 'when artifacts are stored remotely' do
+          let(:job) { create(:ci_build, pipeline: pipeline, user: api_user) }
+          let!(:artifact) { create(:ci_job_artifact, :archive, :remote_store, job: job) }
+
+          before do
+            job.reload
+
+            get api("/projects/#{project.id}/jobs/#{job.id}/artifacts", api_user)
+          end
+
+          it 'returns location redirect' do
+            expect(response).to have_http_status(:found)
+          end
         end
       end
 
@@ -443,6 +512,29 @@ describe API::Jobs do
         end
 
         it_behaves_like 'a valid file'
+      end
+
+      context 'when using job_token to authenticate' do
+        before do
+          pipeline.reload
+          pipeline.update(ref: 'master',
+                          sha: project.commit('master').sha)
+
+          get api("/projects/#{project.id}/jobs/artifacts/master/download"), job: job.name, job_token: job.token
+        end
+
+        context 'when user is reporter' do
+          it_behaves_like 'a valid file'
+        end
+
+        context 'when user is admin, but not member' do
+          let(:api_user) { create(:admin) }
+          let(:job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
+
+          it 'does not allow to see that artfiact is present' do
+            expect(response).to have_gitlab_http_status(404)
+          end
+        end
       end
     end
   end

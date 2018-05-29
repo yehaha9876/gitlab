@@ -124,6 +124,49 @@ describe Projects::UpdateService, '#execute' do
       end
     end
 
+    context 'when we update project but not enabling a wiki' do
+      it 'does not try to create an empty wiki' do
+        FileUtils.rm_rf(project.wiki.repository.path)
+
+        result = update_project(project, user, { name: 'test1' })
+
+        expect(result).to eq({ status: :success })
+        expect(project.wiki_repository_exists?).to be false
+      end
+
+      it 'handles empty project feature attributes' do
+        project.project_feature.update(wiki_access_level: ProjectFeature::DISABLED)
+
+        result = update_project(project, user, { name: 'test1' })
+
+        expect(result).to eq({ status: :success })
+        expect(project.wiki_repository_exists?).to be false
+      end
+    end
+
+    context 'when enabling a wiki' do
+      it 'creates a wiki' do
+        project.project_feature.update(wiki_access_level: ProjectFeature::DISABLED)
+        FileUtils.rm_rf(project.wiki.repository.path)
+
+        result = update_project(project, user, project_feature_attributes: { wiki_access_level: ProjectFeature::ENABLED })
+
+        expect(result).to eq({ status: :success })
+        expect(project.wiki_repository_exists?).to be true
+        expect(project.wiki_enabled?).to be true
+      end
+
+      it 'logs an error and creates a metric when wiki can not be created' do
+        project.project_feature.update(wiki_access_level: ProjectFeature::DISABLED)
+
+        expect_any_instance_of(ProjectWiki).to receive(:wiki).and_raise(ProjectWiki::CouldNotCreateWikiError)
+        expect_any_instance_of(described_class).to receive(:log_error).with("Could not create wiki for #{project.full_name}")
+        expect(Gitlab::Metrics).to receive(:counter)
+
+        update_project(project, user, project_feature_attributes: { wiki_access_level: ProjectFeature::ENABLED })
+      end
+    end
+
     context 'when updating a project that contains container images' do
       before do
         stub_container_registry_config(enabled: true)
@@ -148,17 +191,17 @@ describe Projects::UpdateService, '#execute' do
 
     context 'when renaming a project' do
       let(:repository_storage) { 'default' }
-      let(:repository_storage_path) { Gitlab.config.repositories.storages[repository_storage]['path'] }
+      let(:repository_storage_path) { Gitlab.config.repositories.storages[repository_storage].legacy_disk_path }
 
       context 'with legacy storage' do
         let(:project) { create(:project, :legacy_storage, :repository, creator: user, namespace: user.namespace) }
 
         before do
-          gitlab_shell.add_repository(repository_storage, "#{user.namespace.full_path}/existing")
+          gitlab_shell.create_repository(repository_storage, "#{user.namespace.full_path}/existing")
         end
 
         after do
-          gitlab_shell.remove_repository(repository_storage_path, "#{user.namespace.full_path}/existing")
+          gitlab_shell.remove_repository(repository_storage, "#{user.namespace.full_path}/existing")
         end
 
         it 'does not allow renaming when new path matches existing repository on disk' do
@@ -197,6 +240,27 @@ describe Projects::UpdateService, '#execute' do
           status: :error,
           message: "Name can contain only letters, digits, emojis, '_', '.', dash, space. It must start with letter, digit, emoji or '_'."
         })
+      end
+    end
+
+    context 'when updating #pages_https_only', :https_pages_enabled do
+      subject(:call_service) do
+        update_project(project, admin, pages_https_only: false)
+      end
+
+      it 'updates the attribute' do
+        expect { call_service }
+          .to change { project.pages_https_only? }
+          .to(false)
+      end
+
+      it 'calls Projects::UpdatePagesConfigurationService' do
+        expect(Projects::UpdatePagesConfigurationService)
+          .to receive(:new)
+          .with(project)
+          .and_call_original
+
+        call_service
       end
     end
   end
@@ -255,22 +319,20 @@ describe Projects::UpdateService, '#execute' do
   describe 'repository_storage' do
     let(:admin_user) { create(:user, admin: true) }
     let(:user) { create(:user) }
-    let(:project) { create(:project, :repository, repository_storage: 'a') }
+    let(:project) { create(:project, :repository) }
     let(:opts) { { repository_storage: 'b' } }
 
     before do
-      FileUtils.mkdir('tmp/tests/storage_a')
       FileUtils.mkdir('tmp/tests/storage_b')
 
       storages = {
-        'a' => { 'path' => 'tmp/tests/storage_a' },
+        'default' => Gitlab.config.repositories.storages.default,
         'b' => { 'path' => 'tmp/tests/storage_b' }
       }
       stub_storage_settings(storages)
     end
 
     after do
-      FileUtils.rm_rf('tmp/tests/storage_a')
       FileUtils.rm_rf('tmp/tests/storage_b')
     end
 

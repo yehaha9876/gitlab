@@ -142,7 +142,7 @@ describe Projects::Clusters::GcpController do
 
         context 'when google project billing is enabled' do
           before do
-            redis_double = double
+            redis_double = double.as_null_object
             allow(Gitlab::Redis::SharedState).to receive(:with).and_yield(redis_double)
             allow(redis_double).to receive(:get).with(CheckGcpProjectBillingWorker.redis_shared_state_key_for('token')).and_return('true')
           end
@@ -161,7 +161,7 @@ describe Projects::Clusters::GcpController do
           it 'renders the cluster form with an error' do
             go
 
-            expect(response).to set_flash[:alert]
+            expect(response).to set_flash.now[:alert]
             expect(response).to render_template('new')
           end
         end

@@ -3,9 +3,8 @@ import Vue from 'vue';
 import timelineTodayIndicatorComponent from 'ee/roadmap/components/timeline_today_indicator.vue';
 import eventHub from 'ee/roadmap/event_hub';
 
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockTimeframe } from '../mock_data';
-
-import mountComponent from '../../helpers/vue_mount_component_helper';
 
 const mockCurrentDate = new Date(
   mockTimeframe[0].getFullYear(),
@@ -47,7 +46,9 @@ describe('TimelineTodayIndicatorComponent', () => {
         vm.handleEpicsListRender({
           height: 100,
         });
-        expect(vm.todayBarStyles).toBe('height: 100px; left: 50%;'); // Current date being 15th
+        const stylesObj = vm.todayBarStyles;
+        expect(stylesObj.height).toBe('120px');
+        expect(stylesObj.left).toBe('50%');
         expect(vm.todayBarReady).toBe(true);
       });
     });

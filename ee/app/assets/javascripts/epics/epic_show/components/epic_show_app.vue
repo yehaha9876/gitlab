@@ -1,10 +1,11 @@
 <script>
   /* eslint-disable vue/require-default-prop */
   import issuableApp from '~/issue_show/components/app.vue';
-  import relatedIssuesRoot from '~/issuable/related_issues/components/related_issues_root.vue';
+  import relatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
   import issuableAppEventHub from '~/issue_show/event_hub';
-  import epicHeader from './epic_header.vue';
   import epicSidebar from '../../sidebar/components/sidebar_app.vue';
+  import SidebarContext from '../sidebar_context';
+  import epicHeader from './epic_header.vue';
 
   export default {
     name: 'EpicShowApp',
@@ -85,6 +86,39 @@
         type: String,
         required: false,
       },
+      labels: {
+        type: Array,
+        required: true,
+      },
+      participants: {
+        type: Array,
+        required: true,
+      },
+      subscribed: {
+        type: Boolean,
+        required: true,
+      },
+      namespace: {
+        type: String,
+        required: false,
+        default: '#',
+      },
+      labelsPath: {
+        type: String,
+        required: true,
+      },
+      toggleSubscriptionPath: {
+        type: String,
+        required: true,
+      },
+      labelsWebUrl: {
+        type: String,
+        required: true,
+      },
+      epicsWebUrl: {
+        type: String,
+        required: true,
+      },
     },
     data() {
       return {
@@ -93,6 +127,9 @@
         projectPath: this.groupPath,
         projectNamespace: '',
       };
+    },
+    mounted() {
+      this.sidebarContext = new SidebarContext();
     },
     methods: {
       deleteEpic() {
@@ -129,7 +166,7 @@
           :project-namespace="projectNamespace"
           :show-inline-edit-button="true"
           :show-delete-button="false"
-          :enable-autocomplete="false"
+          :enable-autocomplete="true"
         />
       </div>
       <epic-sidebar
@@ -137,6 +174,15 @@
         :editable="canUpdate"
         :initial-start-date="startDate"
         :initial-end-date="endDate"
+        :initial-labels="labels"
+        :initial-participants="participants"
+        :initial-subscribed="subscribed"
+        :namespace="namespace"
+        :update-path="updateEndpoint"
+        :labels-path="labelsPath"
+        :toggle-subscription-path="toggleSubscriptionPath"
+        :labels-web-url="labelsWebUrl"
+        :epics-web-url="epicsWebUrl"
       />
       <related-issues-root
         :endpoint="issueLinksEndpoint"

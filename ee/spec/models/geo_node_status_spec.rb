@@ -18,6 +18,34 @@ describe GeoNodeStatus, :geo do
     stub_current_geo_node(secondary)
   end
 
+  describe '#fast_current_node_status' do
+    it 'reads the cache and spawns the worker' do
+      expect(described_class).to receive(:spawn_worker).once
+
+      rails_cache = double
+      expect(rails_cache).to receive(:read).with(described_class.cache_key)
+      expect(Rails).to receive(:cache).and_return(rails_cache)
+
+      described_class.fast_current_node_status
+    end
+
+    it 'returns status for primary with no cache' do
+      stub_current_geo_node(primary)
+
+      expect(described_class.fast_current_node_status).to eq described_class.current_node_status
+    end
+  end
+
+  describe '#update_cache!' do
+    it 'writes a cache' do
+      rails_cache = double
+      expect(rails_cache).to receive(:write).with(described_class.cache_key, kind_of(Hash))
+      expect(Rails).to receive(:cache).and_return(rails_cache)
+
+      described_class.new.update_cache!
+    end
+  end
+
   describe '#healthy?' do
     context 'when health is blank' do
       it 'returns true' do
@@ -95,6 +123,21 @@ describe GeoNodeStatus, :geo do
     end
   end
 
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  describe '#attachments_synced_missing_on_primary_count', :delete do
+    it 'only counts successful syncs' do
+      create_list(:user, 3, avatar: fixture_file_upload(Rails.root + 'spec/fixtures/dk.png', 'image/png'))
+      uploads = Upload.all.pluck(:id)
+
+      create(:geo_file_registry, :avatar, file_id: uploads[0], missing_on_primary: true)
+      create(:geo_file_registry, :avatar, file_id: uploads[1])
+      create(:geo_file_registry, :avatar, file_id: uploads[2], success: false)
+
+      expect(subject.attachments_synced_missing_on_primary_count).to eq(1)
+    end
+  end
+
   describe '#attachments_failed_count', :delete do
     it 'counts failed avatars, attachment, personal snippets and files' do
       # These two should be ignored
@@ -156,7 +199,41 @@ describe GeoNodeStatus, :geo do
     end
   end
 
-  describe '#lfs_objects_failed' do
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  describe '#lfs_objects_synced_count', :delete do
+    it 'counts synced LFS objects' do
+      # These four should be ignored
+      create(:geo_file_registry, success: false)
+      create(:geo_file_registry, :avatar)
+      create(:geo_file_registry, file_type: :attachment)
+      create(:geo_file_registry, :lfs, :with_file, success: false)
+
+      create(:geo_file_registry, :lfs, :with_file, success: true)
+
+      expect(subject.lfs_objects_synced_count).to eq(1)
+    end
+  end
+
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  describe '#lfs_objects_synced_missing_on_primary_count', :delete do
+    it 'counts LFS objects marked as synced due to file missing on the primary' do
+      # These four should be ignored
+      create(:geo_file_registry, success: false)
+      create(:geo_file_registry, :avatar, missing_on_primary: true)
+      create(:geo_file_registry, file_type: :attachment, missing_on_primary: true)
+      create(:geo_file_registry, :lfs, :with_file, success: false)
+
+      create(:geo_file_registry, :lfs, :with_file, success: true, missing_on_primary: true)
+
+      expect(subject.lfs_objects_synced_missing_on_primary_count).to eq(1)
+    end
+  end
+
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  describe '#lfs_objects_failed_count', :delete do
     it 'counts failed LFS objects' do
       # These four should be ignored
       create(:geo_file_registry, success: false)
@@ -170,7 +247,9 @@ describe GeoNodeStatus, :geo do
     end
   end
 
-  describe '#lfs_objects_synced_in_percentage' do
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  describe '#lfs_objects_synced_in_percentage', :delete do
     let(:lfs_object_project) { create(:lfs_objects_project, project: project_1) }
 
     before do
@@ -198,42 +277,60 @@ describe GeoNodeStatus, :geo do
     end
   end
 
-  describe '#job_artifacts_synced_count' do
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  describe '#job_artifacts_synced_count', :delete do
     it 'counts synced job artifacts' do
       # These should be ignored
-      create(:geo_file_registry, success: false)
-      create(:geo_file_registry, :avatar, success: false)
-      create(:geo_file_registry, file_type: :attachment, success: true)
-      create(:geo_file_registry, :lfs, :with_file, success: true)
-      create(:geo_file_registry, :job_artifact, :with_file, success: false)
+      create(:geo_file_registry, success: true)
+      create(:geo_job_artifact_registry, :with_artifact, success: false)
 
-      create(:geo_file_registry, :job_artifact, :with_file, success: true)
+      create(:geo_job_artifact_registry, :with_artifact, success: true)
 
       expect(subject.job_artifacts_synced_count).to eq(1)
     end
   end
 
-  describe '#job_artifacts_failed_count' do
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  describe '#job_artifacts_synced_missing_on_primary_count', :delete do
+    it 'counts job artifacts marked as synced due to file missing on the primary' do
+      # These should be ignored
+      create(:geo_file_registry, success: true, missing_on_primary: true)
+      create(:geo_job_artifact_registry, :with_artifact, success: true)
+
+      create(:geo_job_artifact_registry, :with_artifact, success: true, missing_on_primary: true)
+
+      expect(subject.job_artifacts_synced_missing_on_primary_count).to eq(1)
+    end
+  end
+
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  describe '#job_artifacts_failed_count', :delete do
     it 'counts failed job artifacts' do
       # These should be ignored
       create(:geo_file_registry, success: false)
       create(:geo_file_registry, :avatar, success: false)
       create(:geo_file_registry, file_type: :attachment, success: false)
-      create(:geo_file_registry, :job_artifact, :with_file, success: true)
+      create(:geo_job_artifact_registry, :with_artifact, success: true)
 
-      create(:geo_file_registry, :job_artifact, :with_file, success: false)
+      create(:geo_job_artifact_registry, :with_artifact, success: false)
 
       expect(subject.job_artifacts_failed_count).to eq(1)
     end
   end
 
-  describe '#job_artifacts_synced_in_percentage' do
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  describe '#job_artifacts_synced_in_percentage', :delete do
     context 'when artifacts are available' do
       before do
         [project_1, project_2, project_3, project_4].each_with_index do |project, index|
           build = create(:ci_build, project: project)
           job_artifact = create(:ci_job_artifact, job: build)
-          create(:geo_file_registry, :job_artifact, success: index.even?, file_id: job_artifact.id)
+
+          create(:geo_job_artifact_registry, success: index.even?, artifact_id: job_artifact.id)
         end
       end
 
@@ -388,6 +485,262 @@ describe GeoNodeStatus, :geo do
     end
   end
 
+  describe '#repositories_checksummed_count' do
+    before do
+      stub_current_geo_node(primary)
+    end
+
+    it 'returns the right number of checksummed repositories' do
+      stub_feature_flags(geo_repository_verification: true)
+      create(:repository_state, :repository_verified)
+      create(:repository_state, :repository_verified)
+
+      expect(subject.repositories_checksummed_count).to eq(2)
+    end
+
+    it 'returns existing value when feature flag is off' do
+      stub_feature_flags(geo_repository_verification: false)
+      create(:geo_node_status, :healthy, geo_node: primary)
+
+      expect(subject.repositories_checksummed_count).to eq(600)
+    end
+  end
+
+  describe '#repositories_checksum_failed_count' do
+    before do
+      stub_current_geo_node(primary)
+    end
+
+    it 'returns the right number of failed repositories' do
+      stub_feature_flags(geo_repository_verification: true)
+      create(:repository_state, :repository_failed)
+      create(:repository_state, :repository_failed)
+
+      expect(subject.repositories_checksum_failed_count).to eq(2)
+    end
+
+    it 'returns existing value when feature flag if off' do
+      stub_feature_flags(geo_repository_verification: false)
+      create(:geo_node_status, :healthy, geo_node: primary)
+
+      expect(subject.repositories_checksum_failed_count).to eq(120)
+    end
+  end
+
+  describe '#repositories_checksummed_in_percentage' do
+    before do
+      stub_current_geo_node(primary)
+    end
+
+    it 'returns 0 when no projects are available' do
+      expect(subject.repositories_checksummed_in_percentage).to eq(0)
+    end
+
+    it 'returns 0 when project count is unknown' do
+      allow(subject).to receive(:repositories_count).and_return(nil)
+
+      expect(subject.repositories_checksummed_in_percentage).to eq(0)
+    end
+
+    it 'returns the right percentage' do
+      create(:repository_state, :repository_verified, project: project_1)
+
+      expect(subject.repositories_checksummed_in_percentage).to be_within(0.0001).of(25)
+    end
+  end
+
+  describe '#wikis_checksummed_count' do
+    before do
+      stub_current_geo_node(primary)
+    end
+
+    it 'returns the right number of checksummed wikis' do
+      stub_feature_flags(geo_repository_verification: true)
+      create(:repository_state, :wiki_verified)
+      create(:repository_state, :wiki_verified)
+
+      expect(subject.wikis_checksummed_count).to eq(2)
+    end
+
+    it 'returns existing value when feature flag if off' do
+      stub_feature_flags(geo_repository_verification: false)
+      create(:geo_node_status, :healthy, geo_node: primary)
+
+      expect(subject.wikis_checksummed_count).to eq(585)
+    end
+  end
+
+  describe '#wikis_checksum_failed_count' do
+    before do
+      stub_current_geo_node(primary)
+    end
+
+    it 'returns the right number of failed wikis' do
+      stub_feature_flags(geo_repository_verification: true)
+      create(:repository_state, :wiki_failed)
+      create(:repository_state, :wiki_failed)
+
+      expect(subject.wikis_checksum_failed_count).to eq(2)
+    end
+
+    it 'returns existing value when feature flag if off' do
+      stub_feature_flags(geo_repository_verification: false)
+      create(:geo_node_status, :healthy, geo_node: primary)
+
+      expect(subject.wikis_checksum_failed_count).to eq(55)
+    end
+  end
+
+  describe '#wikis_checksummed_in_percentage', :delete do
+    before do
+      stub_current_geo_node(primary)
+    end
+
+    it 'returns 0 when no projects are available' do
+      expect(subject.wikis_checksummed_in_percentage).to eq(0)
+    end
+
+    it 'returns 0 when project count is unknown' do
+      allow(subject).to receive(:wikis_count).and_return(nil)
+
+      expect(subject.wikis_checksummed_in_percentage).to eq(0)
+    end
+
+    it 'returns the right percentage' do
+      create(:repository_state, :wiki_verified, project: project_1)
+
+      expect(subject.wikis_checksummed_in_percentage).to be_within(0.0001).of(25)
+    end
+  end
+
+  describe '#repositories_verified_count' do
+    before do
+      stub_current_geo_node(secondary)
+    end
+
+    it 'returns the right number of verified repositories' do
+      stub_feature_flags(geo_repository_verification: true)
+      create(:geo_project_registry, :repository_verified)
+      create(:geo_project_registry, :repository_verified)
+
+      expect(subject.repositories_verified_count).to eq(2)
+    end
+
+    it 'returns existing value when feature flag if off' do
+      stub_feature_flags(geo_repository_verification: false)
+      create(:geo_node_status, :healthy, geo_node: secondary)
+
+      expect(subject.repositories_verified_count).to eq(501)
+    end
+  end
+
+  describe '#repositories_checksum_mismatch_count' do
+    before do
+      stub_current_geo_node(secondary)
+    end
+
+    it 'returns the right number of repositories that checksum mismatch' do
+      stub_feature_flags(geo_repository_verification: true)
+      create(:geo_project_registry, :repository_checksum_mismatch)
+      create(:geo_project_registry, :repository_verification_failed)
+      create(:geo_project_registry, :repository_verified)
+
+      expect(subject.repositories_checksum_mismatch_count).to eq(1)
+    end
+
+    it 'returns existing value when feature flag if off' do
+      stub_feature_flags(geo_repository_verification: false)
+      create(:geo_node_status, :healthy, geo_node: secondary)
+
+      expect(subject.repositories_checksum_mismatch_count).to eq(15)
+    end
+  end
+
+  describe '#repositories_verification_failed_count' do
+    before do
+      stub_current_geo_node(secondary)
+    end
+
+    it 'returns the right number of failed repositories' do
+      stub_feature_flags(geo_repository_verification: true)
+      create(:geo_project_registry, :repository_verification_failed)
+      create(:geo_project_registry, :repository_verification_failed)
+
+      expect(subject.repositories_verification_failed_count).to eq(2)
+    end
+
+    it 'returns existing value when feature flag if off' do
+      stub_feature_flags(geo_repository_verification: false)
+      create(:geo_node_status, :healthy, geo_node: secondary)
+
+      expect(subject.repositories_verification_failed_count).to eq(100)
+    end
+  end
+
+  describe '#wikis_verified_count' do
+    before do
+      stub_current_geo_node(secondary)
+    end
+
+    it 'returns the right number of verified wikis' do
+      stub_feature_flags(geo_repository_verification: true)
+      create(:geo_project_registry, :wiki_verified)
+      create(:geo_project_registry, :wiki_verified)
+
+      expect(subject.wikis_verified_count).to eq(2)
+    end
+
+    it 'returns existing value when feature flag if off' do
+      stub_feature_flags(geo_repository_verification: false)
+      create(:geo_node_status, :healthy, geo_node: secondary)
+
+      expect(subject.wikis_verified_count).to eq(499)
+    end
+  end
+
+  describe '#wikis_checksum_mismatch_count' do
+    before do
+      stub_current_geo_node(secondary)
+    end
+
+    it 'returns the right number of wikis that checksum mismatch' do
+      stub_feature_flags(geo_repository_verification: true)
+      create(:geo_project_registry, :wiki_checksum_mismatch)
+      create(:geo_project_registry, :wiki_verification_failed)
+      create(:geo_project_registry, :wiki_verified)
+
+      expect(subject.wikis_checksum_mismatch_count).to eq(1)
+    end
+
+    it 'returns existing value when feature flag if off' do
+      stub_feature_flags(geo_repository_verification: false)
+      create(:geo_node_status, :healthy, geo_node: secondary)
+
+      expect(subject.wikis_checksum_mismatch_count).to eq(10)
+    end
+  end
+
+  describe '#wikis_verification_failed_count' do
+    before do
+      stub_current_geo_node(secondary)
+    end
+
+    it 'returns the right number of failed wikis' do
+      stub_feature_flags(geo_repository_verification: true)
+      create(:geo_project_registry, :wiki_verification_failed)
+      create(:geo_project_registry, :wiki_verification_failed)
+
+      expect(subject.wikis_verification_failed_count).to eq(2)
+    end
+
+    it 'returns existing value when feature flag if off' do
+      stub_feature_flags(geo_repository_verification: false)
+      create(:geo_node_status, :healthy, geo_node: secondary)
+
+      expect(subject.wikis_verification_failed_count).to eq(99)
+    end
+  end
+
   describe '#last_event_id and #last_event_date' do
     it 'returns nil when no events are available' do
       expect(subject.last_event_id).to be_nil
@@ -430,7 +783,7 @@ describe GeoNodeStatus, :geo do
   end
 
   describe '#revision' do
-    it {  expect(status.revision).to eq(Gitlab::REVISION) }
+    it {  expect(status.revision).to eq(Gitlab.revision) }
   end
 
   describe '#[]' do

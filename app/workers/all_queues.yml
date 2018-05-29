@@ -3,6 +3,7 @@
 - cronjob:expire_build_artifacts
 - cronjob:gitlab_usage_ping
 - cronjob:import_export_project_cleanup
+- cronjob:pages_domain_verification_cron
 - cronjob:pipeline_schedule
 - cronjob:prune_old_events
 - cronjob:remove_expired_group_links
@@ -17,12 +18,14 @@
 - cronjob:stuck_import_jobs
 - cronjob:stuck_merge_jobs
 - cronjob:trending_projects
+- cronjob:issue_due_scheduler
 
 - gcp_cluster:cluster_install_app
 - gcp_cluster:cluster_provision
 - gcp_cluster:cluster_wait_for_app_installation
 - gcp_cluster:wait_for_cluster_creation
 - gcp_cluster:check_gcp_project_billing
+- gcp_cluster:cluster_wait_for_ingress_ip_address
 
 - github_import_advance_stage
 - github_importer:github_import_import_diff_note
@@ -37,16 +40,23 @@
 - github_importer:github_import_stage_import_pull_requests
 - github_importer:github_import_stage_import_repository
 
+- mail_scheduler:mail_scheduler_issue_due
+- mail_scheduler:mail_scheduler_notification_service
+
+- object_storage_upload
+- object_storage:object_storage_background_move
+- object_storage:object_storage_migrate_uploads
+
 - pipeline_cache:expire_job_cache
 - pipeline_cache:expire_pipeline_cache
 - pipeline_creation:create_pipeline
 - pipeline_creation:run_pipeline_schedule
+- pipeline_background:archive_trace
+- pipeline_background:ci_build_trace_chunk_flush
 - pipeline_default:build_coverage
 - pipeline_default:build_trace_sections
-- pipeline_default:create_trace_artifact
 - pipeline_default:pipeline_metrics
 - pipeline_default:pipeline_notification
-- pipeline_default:update_head_pipeline_for_merge_request
 - pipeline_hooks:build_hooks
 - pipeline_hooks:pipeline_hooks
 - pipeline_processing:build_finished
@@ -56,6 +66,7 @@
 - pipeline_processing:pipeline_success
 - pipeline_processing:pipeline_update
 - pipeline_processing:stage_update
+- pipeline_processing:update_head_pipeline_for_merge_request
 
 - repository_check:repository_check_clear
 - repository_check:repository_check_single_repository
@@ -82,6 +93,8 @@
 - new_merge_request
 - new_note
 - pages
+- pages_domain_verification
+- plugin
 - post_receive
 - process_commit
 - project_cache
@@ -101,22 +114,41 @@
 - update_user_activity
 - upload_checksum
 - web_hook
+- repository_update_remote_mirror
+- create_note_diff_file
 
 # EE-specific queues
+
+# Deprecated queues: remove after 10.7
+- geo_base_scheduler
+- geo_file_download
+- geo_project_sync
+- geo_repository_shard_sync
+
 - cronjob:clear_shared_runners_minutes
 - cronjob:geo_file_download_dispatch
 - cronjob:geo_metrics_update
 - cronjob:geo_prune_event_log
+- cronjob:geo_migrated_local_files_clean_up
 - cronjob:geo_repository_sync
+- cronjob:geo_repository_verification_primary_batch
+- cronjob:geo_repository_verification_secondary_scheduler
 - cronjob:geo_sidekiq_cron_config
+- cronjob:geo_scheduler_per_shard_scheduler
+- cronjob:geo_scheduler_primary_per_shard_scheduler
+- cronjob:geo_scheduler_secondary_per_shard_scheduler
+- cronjob:geo_repository_verification_secondary_shard
 - cronjob:historical_data
 - cronjob:ldap_all_groups_sync
 - cronjob:ldap_sync
 - cronjob:update_all_mirrors
 
-- geo:geo_base_scheduler
+- geo:geo_scheduler_scheduler
+- geo:geo_scheduler_primary_scheduler
+- geo:geo_scheduler_secondary_scheduler
 - geo:geo_file_download
 - geo:geo_file_removal
+- geo:geo_file_registry_removal
 - geo:geo_hashed_storage_attachments_migration
 - geo:geo_hashed_storage_migration
 - geo:geo_project_sync
@@ -124,18 +156,23 @@
 - geo:geo_repositories_clean_up
 - geo:geo_repository_destroy
 - geo:geo_repository_shard_sync
+- geo:geo_repository_verification_primary_shard
+- geo:geo_repository_verification_primary_single
+- geo:geo_repository_verification_secondary_single
 
 - object_storage_upload
 - object_storage:object_storage_background_move
 - object_storage:object_storage_migrate_uploads
 
 - admin_emails
+- create_github_webhook
 - elastic_batch_project_indexer
 - elastic_commit_indexer
 - elastic_indexer
 - export_csv
 - ldap_group_sync
+- project_import_schedule
 - project_update_repository_storage
 - rebase
 - repository_update_mirror
-- repository_update_remote_mirror
+- chat_notification

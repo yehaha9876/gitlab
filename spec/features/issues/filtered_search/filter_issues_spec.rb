@@ -23,15 +23,6 @@ describe 'Filter issues', :js do
     end
   end
 
-  def expect_issues_list_count(open_count, closed_count = 0)
-    all_count = open_count + closed_count
-
-    expect(page).to have_issuable_counts(open: open_count, closed: closed_count, all: all_count)
-    page.within '.issues-list' do
-      expect(page).to have_selector('.issue', count: open_count)
-    end
-  end
-
   before do
     project.add_master(user)
 
@@ -274,7 +265,7 @@ describe 'Filter issues', :js do
 
     context 'issue label clicked' do
       it 'filters and displays in search bar' do
-        find('.issues-list .issue .issue-main-info .issuable-info a .label', text: multiple_words_label.title).click
+        find('.issues-list .issue .issue-main-info .issuable-info a .badge', text: multiple_words_label.title).click
 
         expect_issues_list_count(1)
         expect_tokens([label_token("\"#{multiple_words_label.title}\"")])

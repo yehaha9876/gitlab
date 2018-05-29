@@ -2,8 +2,7 @@
 
 import Vue from 'vue';
 import bp from '../../../breakpoints';
-
-const ModalStore = gl.issueBoards.ModalStore;
+import ModalStore from '../../stores/modal_store';
 
 gl.issueBoards.ModalList = Vue.extend({
   props: {
@@ -134,9 +133,9 @@ gl.issueBoards.ModalList = Vue.extend({
         <div
           v-for="issue in group"
           v-if="showIssue(issue)"
-          class="card-parent">
+          class="board-card-parent">
           <div
-            class="card"
+            class="board-card"
             :class="{ 'is-active': issue.selected }"
             @click="toggleIssue($event, issue)">
             <issue-card-inner

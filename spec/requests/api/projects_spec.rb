@@ -1,12 +1,24 @@
 # -*- coding: utf-8 -*-
 require 'spec_helper'
 
+shared_examples 'languages and percentages JSON response' do
+  let(:expected_languages) { project.repository.languages.map { |language| language.values_at(:label, :value)}.to_h }
+
+  it 'returns expected language values' do
+    get api("/projects/#{project.id}/languages", user)
+
+    expect(response).to have_gitlab_http_status(:ok)
+    expect(json_response).to eq(expected_languages)
+    expect(json_response.count).to be > 1
+  end
+end
+
 describe API::Projects do
   let(:user) { create(:user) }
   let(:user2) { create(:user) }
   let(:user3) { create(:user) }
   let(:admin) { create(:admin) }
-  let(:project) { create(:project, namespace: user.namespace) }
+  let(:project) { create(:project, :repository, namespace: user.namespace) }
   let(:project2) { create(:project, namespace: user.namespace) }
   let(:snippet) { create(:project_snippet, :public, author: user, project: project, title: 'example') }
   let(:project_member) { create(:project_member, :developer, user: user3, project: project) }
@@ -208,7 +220,7 @@ describe API::Projects do
         it 'returns a simplified version of all the projects' do
           expected_keys = %w(
             id description default_branch tag_list
-            ssh_url_to_repo http_url_to_repo web_url
+            ssh_url_to_repo http_url_to_repo web_url readme_url
             name name_with_namespace
             path path_with_namespace
             star_count forks_count
@@ -452,7 +464,8 @@ describe API::Projects do
         only_allow_merge_if_pipeline_succeeds: false,
         request_access_enabled: true,
         only_allow_merge_if_all_discussions_are_resolved: false,
-        ci_config_path: 'a/custom/path'
+        ci_config_path: 'a/custom/path',
+        merge_method: 'ff'
       })
 
       post api('/projects', user), project
@@ -569,6 +582,22 @@ describe API::Projects do
       expect(json_response['only_allow_merge_if_all_discussions_are_resolved']).to be_truthy
     end
 
+    it 'sets the merge method of a project to rebase merge' do
+      project = attributes_for(:project, merge_method: 'rebase_merge')
+
+      post api('/projects', user), project
+
+      expect(json_response['merge_method']).to eq('rebase_merge')
+    end
+
+    it 'rejects invalid values for merge_method' do
+      project = attributes_for(:project, merge_method: 'totally_not_valid_method')
+
+      post api('/projects', user), project
+
+      expect(response).to have_gitlab_http_status(400)
+    end
+
     it 'ignores import_url when it is nil' do
       project = attributes_for(:project, import_url: nil)
 
@@ -656,7 +685,8 @@ describe API::Projects do
         issues_enabled: false,
         merge_requests_enabled: false,
         wiki_enabled: false,
-        request_access_enabled: true
+        request_access_enabled: true,
+        jobs_enabled: true
       })
 
       post api("/projects/user/#{user.id}", admin), project
@@ -872,6 +902,8 @@ describe API::Projects do
         expect(json_response['shared_with_groups'][0]['group_access_level']).to eq(link.group_access)
         expect(json_response['only_allow_merge_if_pipeline_succeeds']).to eq(project.only_allow_merge_if_pipeline_succeeds)
         expect(json_response['only_allow_merge_if_all_discussions_are_resolved']).to eq(project.only_allow_merge_if_all_discussions_are_resolved)
+        expect(json_response['merge_method']).to eq(project.merge_method.to_s)
+        expect(json_response['readme_url']).to eq(project.readme_url)
         expect(json_response).not_to have_key('repository_storage')
       end
 
@@ -1540,6 +1572,26 @@ describe API::Projects do
           expect(json_response[k.to_s]).to eq(v)
         end
       end
+
+      it 'updates merge_method' do
+        project_param = { merge_method: 'ff' }
+
+        put api("/projects/#{project3.id}", user), project_param
+
+        expect(response).to have_gitlab_http_status(200)
+
+        project_param.each_pair do |k, v|
+          expect(json_response[k.to_s]).to eq(v)
+        end
+      end
+
+      it 'rejects to update merge_method when merge_method is invalid' do
+        project_param = { merge_method: 'invalid' }
+
+        put api("/projects/#{project3.id}", user), project_param
+
+        expect(response).to have_gitlab_http_status(400)
+      end
     end
 
     context 'when authenticated as project master' do
@@ -1557,6 +1609,7 @@ describe API::Projects do
                           wiki_enabled: true,
                           snippets_enabled: true,
                           merge_requests_enabled: true,
+                          merge_method: 'ff',
                           description: 'new description' }
 
         put api("/projects/#{project3.id}", user4), project_param
@@ -1721,6 +1774,42 @@ describe API::Projects do
     end
   end
 
+  describe 'GET /projects/:id/languages' do
+    context 'with an authorized user' do
+      it_behaves_like 'languages and percentages JSON response' do
+        let(:project) { project3 }
+      end
+
+      it 'returns not_found(404) for not existing project' do
+        get api("/projects/9999999999/languages", user)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+
+    context 'with not authorized user' do
+      it 'returns not_found for existing but unauthorized project' do
+        get api("/projects/#{project3.id}/languages", user3)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+
+    context 'without user' do
+      let(:project_public) { create(:project, :public, :repository) }
+
+      it_behaves_like 'languages and percentages JSON response' do
+        let(:project) { project_public }
+      end
+
+      it 'returns not_found for existing but unauthorized project' do
+        get api("/projects/#{project3.id}/languages", nil)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+  end
+
   describe 'DELETE /projects/:id' do
     context 'when authenticated as user' do
       it 'removes project' do
@@ -1780,6 +1869,12 @@ describe API::Projects do
     let(:group) { create(:group) }
     let(:group2) do
       group = create(:group, name: 'group2_name')
+      group.add_owner(user2)
+      group
+    end
+
+    let(:group3) do
+      group = create(:group, name: 'group3_name', parent: group2)
       group.add_owner(user2)
       group
     end
@@ -1879,6 +1974,15 @@ describe API::Projects do
         expect(json_response['namespace']['name']).to eq(group2.name)
       end
 
+      it 'forks to owned subgroup' do
+        full_path = "#{group2.path}/#{group3.path}"
+        post api("/projects/#{project.id}/fork", user2), namespace: full_path
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(json_response['namespace']['name']).to eq(group3.name)
+        expect(json_response['namespace']['full_path']).to eq(full_path)
+      end
+
       it 'fails to fork to not owned group' do
         post api("/projects/#{project.id}/fork", user2), namespace: group.name
 
@@ -1948,146 +2052,6 @@ describe API::Projects do
         post api("/projects/#{project.id}/housekeeping")
 
         expect(response).to have_gitlab_http_status(401)
-      end
-    end
-  end
-
-  describe 'POST /projects/:id/mirror/pull' do
-    context 'when the project is not mirrored' do
-      it 'returns error' do
-        allow(project).to receive(:mirror?).and_return(false)
-
-        post api("/projects/#{project.id}/mirror/pull", user)
-
-        expect(response).to have_gitlab_http_status(400)
-      end
-    end
-
-    context 'when the project is mirrored' do
-      before do
-        allow_any_instance_of(Projects::UpdateMirrorService).to receive(:execute).and_return(status: :success)
-      end
-
-      context 'when import state is' do
-        def project_in_state(state)
-          project = create(:project, :repository, :mirror, state, namespace: user.namespace)
-          project.mirror_data.update_attributes(next_execution_timestamp: 10.minutes.from_now)
-          project
-        end
-
-        it 'none it triggers the pull mirroring operation' do
-          project = project_in_state(:import_none)
-
-          expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
-
-          post api("/projects/#{project.id}/mirror/pull", user)
-
-          expect(response).to have_gitlab_http_status(200)
-        end
-
-        it 'failed it triggers the pull mirroring operation' do
-          project = project_in_state(:import_failed)
-
-          expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
-
-          post api("/projects/#{project.id}/mirror/pull", user)
-
-          expect(response).to have_gitlab_http_status(200)
-        end
-
-        it 'finished it triggers the pull mirroring operation' do
-          project = project_in_state(:import_finished)
-
-          expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
-
-          post api("/projects/#{project.id}/mirror/pull", user)
-
-          expect(response).to have_gitlab_http_status(200)
-        end
-
-        it 'scheduled does not trigger the pull mirroring operation and returns 200' do
-          project = project_in_state(:import_scheduled)
-
-          expect(UpdateAllMirrorsWorker).not_to receive(:perform_async)
-
-          post api("/projects/#{project.id}/mirror/pull", user)
-
-          expect(response).to have_gitlab_http_status(200)
-        end
-
-        it 'started does not trigger the pull mirroring operation and returns 200' do
-          project = project_in_state(:import_started)
-
-          expect(UpdateAllMirrorsWorker).not_to receive(:perform_async)
-
-          post api("/projects/#{project.id}/mirror/pull", user)
-
-          expect(response).to have_gitlab_http_status(200)
-        end
-      end
-
-      context 'when user' do
-        let(:project_mirrored) { create(:project, :repository, :mirror, :import_finished, namespace: user.namespace) }
-
-        def project_member(role, user)
-          create(:project_member, role, user: user, project: project_mirrored)
-        end
-
-        context 'is unauthenticated' do
-          it 'returns authentication error' do
-            post api("/projects/#{project_mirrored.id}/mirror/pull")
-
-            expect(response).to have_gitlab_http_status(401)
-          end
-        end
-
-        context 'is authenticated as developer' do
-          it 'returns forbidden error' do
-            project_member(:developer, user3)
-
-            post api("/projects/#{project_mirrored.id}/mirror/pull", user3)
-
-            expect(response).to have_gitlab_http_status(403)
-          end
-        end
-
-        context 'is authenticated as reporter' do
-          it 'returns forbidden error' do
-            project_member(:reporter, user3)
-
-            post api("/projects/#{project_mirrored.id}/mirror/pull", user3)
-
-            expect(response).to have_gitlab_http_status(403)
-          end
-        end
-
-        context 'is authenticated as guest' do
-          it 'returns forbidden error' do
-            project_member(:guest, user3)
-
-            post api("/projects/#{project_mirrored.id}/mirror/pull", user3)
-
-            expect(response).to have_gitlab_http_status(403)
-          end
-        end
-
-        context 'is authenticated as master' do
-          it 'triggers the pull mirroring operation' do
-            project_member(:master, user3)
-
-            post api("/projects/#{project_mirrored.id}/mirror/pull", user3)
-
-            expect(response).to have_gitlab_http_status(200)
-          end
-        end
-
-        context 'is authenticated as owner' do
-          it 'triggers the pull mirroring operation' do
-            post api("/projects/#{project_mirrored.id}/mirror/pull", user)
-
-            expect(response).to have_gitlab_http_status(200)
-          end
-        end
       end
     end
   end

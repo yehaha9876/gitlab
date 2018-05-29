@@ -9,11 +9,17 @@ describe Issue do
   describe 'modules' do
     subject { described_class }
 
-    it { is_expected.to include_module(InternalId) }
     it { is_expected.to include_module(Issuable) }
     it { is_expected.to include_module(Referable) }
     it { is_expected.to include_module(Sortable) }
     it { is_expected.to include_module(Taskable) }
+
+    it_behaves_like 'AtomicInternalId' do
+      let(:internal_id_attribute) { :iid }
+      let(:instance) { build(:issue) }
+      let(:scope_attrs) { { project: instance.project } }
+      let(:usage) { :issues }
+    end
   end
 
   subject { create(:issue) }
@@ -221,27 +227,55 @@ describe Issue do
   end
 
   describe '#referenced_merge_requests' do
+    let(:project) { create(:project, :public) }
+    let(:issue) do
+      create(:issue, description: merge_request.to_reference, project: project)
+    end
+    let!(:merge_request) do
+      create(:merge_request,
+             source_project: project,
+             source_branch:  'master',
+             target_branch:  'feature')
+    end
+
     it 'returns the referenced merge requests' do
-      project = create(:project, :public)
-
-      mr1 = create(:merge_request,
-                   source_project: project,
-                   source_branch:  'master',
-                   target_branch:  'feature')
-
       mr2 = create(:merge_request,
                    source_project: project,
                    source_branch:  'feature',
                    target_branch:  'master')
-
-      issue = create(:issue, description: mr1.to_reference, project: project)
 
       create(:note_on_issue,
              noteable:   issue,
              note:       mr2.to_reference,
              project_id: project.id)
 
-      expect(issue.referenced_merge_requests).to eq([mr1, mr2])
+      expect(issue.referenced_merge_requests).to eq([merge_request, mr2])
+    end
+
+    it 'returns cross project referenced merge requests' do
+      other_project = create(:project, :public)
+      cross_project_merge_request = create(:merge_request, source_project: other_project)
+      create(:note_on_issue,
+             noteable:   issue,
+             note:       cross_project_merge_request.to_reference(issue.project),
+             project_id: issue.project.id)
+
+      expect(issue.referenced_merge_requests).to eq([merge_request, cross_project_merge_request])
+    end
+
+    it 'excludes cross project references if the user cannot read cross project' do
+      user = create(:user)
+      allow(Ability).to receive(:allowed?).and_call_original
+      expect(Ability).to receive(:allowed?).with(user, :read_cross_project) { false }
+
+      other_project = create(:project, :public)
+      cross_project_merge_request = create(:merge_request, source_project: other_project)
+      create(:note_on_issue,
+             noteable:   issue,
+             note:       cross_project_merge_request.to_reference(issue.project),
+             project_id: issue.project.id)
+
+      expect(issue.referenced_merge_requests(user)).to eq([merge_request])
     end
   end
 
@@ -309,7 +343,7 @@ describe Issue do
   end
 
   describe '#related_branches' do
-    let(:user) { build(:admin) }
+    let(:user) { create(:admin) }
 
     before do
       allow(subject.project.repository).to receive(:branch_names)
@@ -345,21 +379,79 @@ describe Issue do
   describe '#related_issues' do
     let(:user) { create(:user) }
     let(:authorized_project) { create(:project) }
+    let(:authorized_project2) { create(:project) }
     let(:unauthorized_project) { create(:project) }
 
     let(:authorized_issue_a) { create(:issue, project: authorized_project) }
     let(:authorized_issue_b) { create(:issue, project: authorized_project) }
+    let(:authorized_issue_c) { create(:issue, project: authorized_project2) }
+
     let(:unauthorized_issue) { create(:issue, project: unauthorized_project) }
 
     let!(:issue_link_a) { create(:issue_link, source: authorized_issue_a, target: authorized_issue_b) }
     let!(:issue_link_b) { create(:issue_link, source: authorized_issue_a, target: unauthorized_issue) }
+    let!(:issue_link_c) { create(:issue_link, source: authorized_issue_a, target: authorized_issue_c) }
 
     before do
       authorized_project.add_developer(user)
+      authorized_project2.add_developer(user)
     end
 
     it 'returns only authorized related issues for given user' do
-      expect(authorized_issue_a.related_issues(user)).to contain_exactly(authorized_issue_b)
+      expect(authorized_issue_a.related_issues(user))
+        .to contain_exactly(authorized_issue_b, authorized_issue_c)
+    end
+
+    describe 'when a user cannot read cross project' do
+      it 'only returns issues within the same project' do
+        expect(Ability).to receive(:allowed?).with(user, :read_cross_project)
+                             .and_return(false)
+
+        expect(authorized_issue_a.related_issues(user))
+          .to contain_exactly(authorized_issue_b)
+      end
+    end
+  end
+
+  describe '#suggested_branch_name' do
+    let(:repository) { double }
+
+    subject { build(:issue) }
+
+    before do
+      allow(subject.project).to receive(:repository).and_return(repository)
+    end
+
+    context '#to_branch_name does not exists' do
+      before do
+        allow(repository).to receive(:branch_exists?).and_return(false)
+      end
+
+      it 'returns #to_branch_name' do
+        expect(subject.suggested_branch_name).to eq(subject.to_branch_name)
+      end
+    end
+
+    context '#to_branch_name exists not ending with -index' do
+      before do
+        allow(repository).to receive(:branch_exists?).and_return(true)
+        allow(repository).to receive(:branch_exists?).with(/#{subject.to_branch_name}-\d/).and_return(false)
+      end
+
+      it 'returns #to_branch_name ending with -2' do
+        expect(subject.suggested_branch_name).to eq("#{subject.to_branch_name}-2")
+      end
+    end
+
+    context '#to_branch_name exists ending with -index' do
+      before do
+        allow(repository).to receive(:branch_exists?).and_return(true)
+        allow(repository).to receive(:branch_exists?).with("#{subject.to_branch_name}-3").and_return(false)
+      end
+
+      it 'returns #to_branch_name ending with max index + 1' do
+        expect(subject.suggested_branch_name).to eq("#{subject.to_branch_name}-3")
+      end
     end
   end
 
@@ -410,6 +502,27 @@ describe Issue do
       issue = create(:issue, title: 'testing-issue', confidential: true)
       expect(issue.to_branch_name).to match /confidential-issue\z/
     end
+  end
+
+  describe '#can_be_worked_on?' do
+    let(:project) { build(:project) }
+    subject { build(:issue, :opened, project: project) }
+
+    context 'is closed' do
+      subject { build(:issue, :closed) }
+
+      it { is_expected.not_to be_can_be_worked_on }
+    end
+
+    context 'project is forked' do
+      before do
+        allow(project).to receive(:forked?).and_return(true)
+      end
+
+      it { is_expected.not_to be_can_be_worked_on }
+    end
+
+    it { is_expected.to be_can_be_worked_on }
   end
 
   describe '#participants' do

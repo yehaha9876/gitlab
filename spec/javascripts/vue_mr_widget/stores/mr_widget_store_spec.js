@@ -3,18 +3,8 @@ import { stateKey } from '~/vue_merge_request_widget/stores/state_maps';
 import mockData, {
   headIssues,
   baseIssues,
-  securityIssues,
-  securityIssuesBase,
   parsedBaseIssues,
   parsedHeadIssues,
-  parsedSecurityIssuesStore,
-  parsedSecurityIssuesBaseStore,
-  allIssuesParsed,
-  parsedSecurityIssuesHead,
-  dockerReport,
-  dockerReportParsed,
-  dast,
-  parsedDast,
 } from '../mock_data';
 
 describe('MergeRequestStore', () => {
@@ -96,36 +86,12 @@ describe('MergeRequestStore', () => {
     });
   });
 
-  describe('setSecurityReport', () => {
-    it('should set security issues with head', () => {
-      store.setSecurityReport({ head: securityIssues, headBlobPath: 'path' });
-      expect(store.securityReport.newIssues).toEqual(parsedSecurityIssuesStore);
-    });
-
-    it('should set security issues with head and base', () => {
-      store.setSecurityReport({
-        head: securityIssues,
-        headBlobPath: 'path',
-        base: securityIssuesBase,
-        baseBlobPath: 'path',
-      });
-
-      expect(store.securityReport.newIssues).toEqual(parsedSecurityIssuesHead);
-      expect(store.securityReport.resolvedIssues).toEqual(parsedSecurityIssuesBaseStore);
-      expect(store.securityReport.allIssues).toEqual(allIssuesParsed);
-    });
-  });
-
-  describe('parseIssues', () => {
+  describe('parseCodeclimateMetrics', () => {
     it('should parse the received issues', () => {
-      const codequality = MergeRequestStore.parseIssues(baseIssues, 'path')[0];
+      const codequality = MergeRequestStore.parseCodeclimateMetrics(baseIssues, 'path')[0];
       expect(codequality.name).toEqual(baseIssues[0].check_name);
       expect(codequality.path).toEqual(baseIssues[0].location.path);
       expect(codequality.line).toEqual(baseIssues[0].location.lines.begin);
-
-      const security = MergeRequestStore.parseIssues(securityIssues, 'path')[0];
-      expect(security.name).toEqual(securityIssues[0].message);
-      expect(security.path).toEqual(securityIssues[0].file);
     });
   });
 
@@ -138,55 +104,6 @@ describe('MergeRequestStore', () => {
     it('returns false when not nothingToMerge', () => {
       store.state = 'state';
       expect(store.isNothingToMergeState).toEqual(false);
-    });
-  });
-
-  describe('initDockerReport', () => {
-    it('sets the defaults', () => {
-      store.initDockerReport({ sast_container: { path: 'gl-sast-container.json' } });
-
-      expect(store.sastContainer).toEqual({ path: 'gl-sast-container.json' });
-      expect(store.dockerReport).toEqual({
-        approved: [],
-        unapproved: [],
-        vulnerabilities: [],
-      });
-    });
-  });
-
-  describe('setDockerReport', () => {
-    it('sets docker report with approved and unapproved vulnerabilities parsed', () => {
-      store.setDockerReport(dockerReport);
-      expect(store.dockerReport.vulnerabilities).toEqual(dockerReportParsed.vulnerabilities);
-      expect(store.dockerReport.approved).toEqual(dockerReportParsed.approved);
-      expect(store.dockerReport.unapproved).toEqual(dockerReportParsed.unapproved);
-    });
-  });
-
-  describe('parseDockerVulnerabilities', () => {
-    it('parses docker report', () => {
-      expect(
-        MergeRequestStore.parseDockerVulnerabilities(dockerReport.vulnerabilities),
-      ).toEqual(
-        dockerReportParsed.vulnerabilities,
-      );
-    });
-  });
-
-  describe('initDastReport', () => {
-    it('sets the defaults', () => {
-      store.initDastReport({ dast: { path: 'dast.json' } });
-
-      expect(store.dast).toEqual({ path: 'dast.json' });
-      expect(store.dastReport).toEqual([]);
-    });
-  });
-
-  describe('setDastReport', () => {
-    it('parsed data and sets the report', () => {
-      store.setDastReport(dast);
-
-      expect(store.dastReport).toEqual(parsedDast);
     });
   });
 });

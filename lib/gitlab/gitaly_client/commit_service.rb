@@ -3,10 +3,6 @@ module Gitlab
     class CommitService
       include Gitlab::EncodingHelper
 
-      # The ID of empty tree.
-      # See http://stackoverflow.com/a/40884093/1856239 and https://github.com/git/git/blob/3ad8b5bf26362ac67c9020bf8c30eee54a84f56d/cache.h#L1011-L1012
-      EMPTY_TREE_ID = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'.freeze
-
       def initialize(repository)
         @gitaly_repo = repository.gitaly_repository
         @repository = repository
@@ -37,7 +33,7 @@ module Gitlab
       def diff(from, to, options = {})
         from_id = case from
                   when NilClass
-                    EMPTY_TREE_ID
+                    Gitlab::Git::EMPTY_TREE_ID
                   else
                     if from.respond_to?(:oid)
                       # This is meant to match a Rugged::Commit. This should be impossible in
@@ -50,7 +46,7 @@ module Gitlab
 
         to_id = case to
                 when NilClass
-                  EMPTY_TREE_ID
+                  Gitlab::Git::EMPTY_TREE_ID
                 else
                   if to.respond_to?(:oid)
                     # This is meant to match a Rugged::Commit. This should be impossible in
@@ -105,11 +101,12 @@ module Gitlab
         entry unless entry.oid.blank?
       end
 
-      def tree_entries(repository, revision, path)
+      def tree_entries(repository, revision, path, recursive)
         request = Gitaly::GetTreeEntriesRequest.new(
           repository: @gitaly_repo,
           revision: encode_binary(revision),
-          path: path.present? ? encode_binary(path) : '.'
+          path: path.present? ? encode_binary(path) : '.',
+          recursive: recursive
         )
 
         response = GitalyClient.call(@repository.storage, :commit_service, :get_tree_entries, request, timeout: GitalyClient.medium_timeout)
@@ -133,7 +130,8 @@ module Gitlab
       def commit_count(ref, options = {})
         request = Gitaly::CountCommitsRequest.new(
           repository: @gitaly_repo,
-          revision: encode_binary(ref)
+          revision: encode_binary(ref),
+          all: !!options[:all]
         )
         request.after = Google::Protobuf::Timestamp.new(seconds: options[:after].to_i) if options[:after].present?
         request.before = Google::Protobuf::Timestamp.new(seconds: options[:before].to_i) if options[:before].present?
@@ -268,6 +266,7 @@ module Gitlab
           offset:       options[:offset],
           follow:       options[:follow],
           skip_merges:  options[:skip_merges],
+          all:          !!options[:all],
           disable_walk: true # This option is deprecated. The 'walk' implementation is being removed.
         )
         request.after    = GitalyClient.timestamp(options[:after]) if options[:after]
@@ -318,6 +317,39 @@ module Gitlab
         [signature, signed_text]
       end
 
+      def get_commit_signatures(commit_ids)
+        request = Gitaly::GetCommitSignaturesRequest.new(repository: @gitaly_repo, commit_ids: commit_ids)
+        response = GitalyClient.call(@repository.storage, :commit_service, :get_commit_signatures, request)
+
+        signatures = Hash.new { |h, k| h[k] = [''.b, ''.b] }
+        current_commit_id = nil
+
+        response.each do |message|
+          current_commit_id = message.commit_id if message.commit_id.present?
+
+          signatures[current_commit_id].first << message.signature
+          signatures[current_commit_id].last << message.signed_text
+        end
+
+        signatures
+      end
+
+      def get_commit_messages(commit_ids)
+        request = Gitaly::GetCommitMessagesRequest.new(repository: @gitaly_repo, commit_ids: commit_ids)
+        response = GitalyClient.call(@repository.storage, :commit_service, :get_commit_messages, request)
+
+        messages = Hash.new { |h, k| h[k] = ''.b }
+        current_commit_id = nil
+
+        response.each do |rpc_message|
+          current_commit_id = rpc_message.commit_id if rpc_message.commit_id.present?
+
+          messages[current_commit_id] << rpc_message.message
+        end
+
+        messages
+      end
+
       private
 
       def call_commit_diff(request_params, options = {})
@@ -332,7 +364,7 @@ module Gitlab
       end
 
       def diff_from_parent_request_params(commit, options = {})
-        parent_id = commit.parent_ids.first || EMPTY_TREE_ID
+        parent_id = commit.parent_ids.first || Gitlab::Git::EMPTY_TREE_ID
 
         diff_between_commits_request_params(parent_id, commit.id, options)
       end

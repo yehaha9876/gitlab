@@ -2,14 +2,13 @@ import Vue from 'vue';
 
 import geoNodeDetailItemComponent from 'ee/geo_nodes/components/geo_node_detail_item.vue';
 import { VALUE_TYPE, CUSTOM_TYPE } from 'ee/geo_nodes/constants';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { rawMockNodeDetails } from '../mock_data';
-
-import mountComponent from '../../helpers/vue_mount_component_helper';
 
 const createComponent = (config) => {
   const Component = Vue.extend(geoNodeDetailItemComponent);
   const defaultConfig = Object.assign({
-    itemTitle: 'GitLab version:',
+    itemTitle: 'GitLab version',
     cssClass: 'node-version',
     itemValue: '10.4.0-pre',
     successLabel: 'Synced',
@@ -27,7 +26,7 @@ describe('GeoNodeDetailItemComponent', () => {
       const vm = createComponent();
       expect(vm.$el.classList.contains('node-detail-item')).toBeTruthy();
       expect(vm.$el.querySelectorAll('.node-detail-title').length).not.toBe(0);
-      expect(vm.$el.querySelector('.node-detail-title').innerText.trim()).toBe('GitLab version:');
+      expect(vm.$el.querySelector('.node-detail-title').innerText.trim()).toBe('GitLab version');
       vm.$destroy();
     });
 
@@ -38,22 +37,22 @@ describe('GeoNodeDetailItemComponent', () => {
       vm.$destroy();
     });
 
+    it('renders item title help info icon and popover with help info', () => {
+      const helpInfo = { title: 'Foo title tooltip', url: 'https://docs.gitlab.com', urlText: 'Help' };
+      const vm = createComponent({ helpInfo });
+      const helpTextIconEl = vm.$el.querySelector('.node-detail-help-text');
+
+      expect(helpTextIconEl).not.toBeNull();
+      expect(helpTextIconEl.querySelector('use').getAttribute('xlink:href')).toContain('question');
+      vm.$destroy();
+    });
+
     it('renders graph item value', () => {
       const vm = createComponent({
         itemValueType: VALUE_TYPE.GRAPH,
         itemValue: { successCount: 5, failureCount: 3, totalCount: 10 },
       });
       expect(vm.$el.querySelectorAll('.stacked-progress-bar').length).not.toBe(0);
-      vm.$destroy();
-    });
-
-    it('renders health status item value', () => {
-      const vm = createComponent({
-        itemValueType: VALUE_TYPE.CUSTOM,
-        customType: CUSTOM_TYPE.STATUS,
-        itemValue: rawMockNodeDetails.health,
-      });
-      expect(vm.$el.querySelectorAll('.node-health-status').length).not.toBe(0);
       vm.$destroy();
     });
 

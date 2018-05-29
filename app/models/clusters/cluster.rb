@@ -1,15 +1,18 @@
 module Clusters
   class Cluster < ActiveRecord::Base
+    prepend EE::Clusters::Cluster
+
     include Presentable
-    prepend HasEnvironmentScope
 
     self.table_name = 'clusters'
 
     APPLICATIONS = {
       Applications::Helm.application_name => Applications::Helm,
       Applications::Ingress.application_name => Applications::Ingress,
-      Applications::Prometheus.application_name => Applications::Prometheus
+      Applications::Prometheus.application_name => Applications::Prometheus,
+      Applications::Runner.application_name => Applications::Runner
     }.freeze
+    DEFAULT_ENVIRONMENT = '*'.freeze
 
     belongs_to :user
 
@@ -24,12 +27,12 @@ module Clusters
     has_one :application_helm, class_name: 'Clusters::Applications::Helm'
     has_one :application_ingress, class_name: 'Clusters::Applications::Ingress'
     has_one :application_prometheus, class_name: 'Clusters::Applications::Prometheus'
+    has_one :application_runner, class_name: 'Clusters::Applications::Runner'
 
     accepts_nested_attributes_for :provider_gcp, update_only: true
     accepts_nested_attributes_for :platform_kubernetes, update_only: true
 
     validates :name, cluster_name: true
-    validate :unique_environment_scope
     validate :restrict_modification, on: :update
 
     delegate :status, to: :provider, allow_nil: true
@@ -50,9 +53,11 @@ module Clusters
 
     scope :enabled, -> { where(enabled: true) }
     scope :disabled, -> { where(enabled: false) }
+    scope :user_provided, -> { where(provider_type: ::Clusters::Cluster.provider_types[:user]) }
+    scope :gcp_provided, -> { where(provider_type: ::Clusters::Cluster.provider_types[:gcp]) }
+    scope :gcp_installed, -> { gcp_provided.includes(:provider_gcp).where(cluster_providers_gcp: { status: ::Clusters::Providers::Gcp.state_machines[:status].states[:created].value }) }
 
-    scope :for_environment, -> (env) { where(environment_scope: ['*', '', env.slug]) }
-    scope :for_all_environments, -> { where(environment_scope: ['*', '']) }
+    scope :default_environment, -> { where(environment_scope: DEFAULT_ENVIRONMENT) }
 
     def status_name
       if provider
@@ -70,7 +75,8 @@ module Clusters
       [
         application_helm || build_application_helm,
         application_ingress || build_application_ingress,
-        application_prometheus || build_application_prometheus
+        application_prometheus || build_application_prometheus,
+        application_runner || build_application_runner
       ]
     end
 
@@ -98,15 +104,6 @@ module Clusters
     end
 
     private
-
-    def unique_environment_scope
-      if project && project.clusters.where(environment_scope: environment_scope).where.not(id: self.id).exists?
-        errors.add(:base, "cannot add duplicated environment scope")
-        return false
-      end
-
-      true
-    end
 
     def restrict_modification
       if provider&.on_creation?

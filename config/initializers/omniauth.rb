@@ -1,6 +1,6 @@
-if Gitlab::LDAP::Config.enabled?
+if Gitlab::Auth::LDAP::Config.enabled?
   module OmniAuth::Strategies
-    Gitlab::LDAP::Config.available_servers.each do |server|
+    Gitlab::Auth::LDAP::Config.available_servers.each do |server|
       # do not redeclare LDAP
       next if server['provider_name'] == 'ldap'
 
@@ -21,10 +21,16 @@ if Gitlab.config.omniauth.enabled
   provider_names = Gitlab.config.omniauth.providers.map(&:name)
   require 'omniauth-kerberos' if provider_names.include?('kerberos')
   require_dependency 'omni_auth/strategies/kerberos_spnego' if provider_names.include?('kerberos_spnego')
+
+  if provider_names.include?('group_saml')
+    OmniAuth.config.on_failure = ::Gitlab::Auth::GroupSaml::FailureHandler.new(OmniAuth.config.on_failure)
+  end
 end
 
 module OmniAuth
   module Strategies
     autoload :Bitbucket, Rails.root.join('lib', 'omni_auth', 'strategies', 'bitbucket')
+    autoload :GroupSaml, Rails.root.join('ee', 'lib', 'omni_auth', 'strategies', 'group_saml')
+    autoload :Jwt, Rails.root.join('lib', 'omni_auth', 'strategies', 'jwt')
   end
 end

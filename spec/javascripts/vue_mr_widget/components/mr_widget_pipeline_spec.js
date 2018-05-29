@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import pipelineComponent from '~/vue_merge_request_widget/components/mr_widget_pipeline.vue';
+import mountComponent from 'spec/helpers/vue_mount_component_helper'; // eslint-disable-line import/first
 import mockData from '../mock_data';
-import mockLinkedPipelines from '../../pipelines/graph/linked_pipelines_mock_data';
-import mountComponent from '../../helpers/vue_mount_component_helper';
+import mockLinkedPipelines from 'spec/pipelines/graph/linked_pipelines_mock_data'; // eslint-disable-line import/first
 
 describe('MRWidgetPipeline', () => {
   let vm;
@@ -100,6 +100,46 @@ describe('MRWidgetPipeline', () => {
         expect(
           vm.$el.querySelector('.js-commit-link').getAttribute('href'),
         ).toEqual(mockData.pipeline.commit.commit_path);
+      });
+
+      it('should render pipeline graph', () => {
+        expect(vm.$el.querySelector('.mr-widget-pipeline-graph')).toBeDefined();
+        expect(vm.$el.querySelectorAll('.stage-container').length).toEqual(mockData.pipeline.details.stages.length);
+      });
+
+      it('should render coverage information', () => {
+        expect(
+          vm.$el.querySelector('.media-body').textContent,
+        ).toContain(`Coverage ${mockData.pipeline.coverage}`);
+      });
+    });
+
+    describe('without commit path', () => {
+      beforeEach(() => {
+        const mockCopy = Object.assign({}, mockData);
+        delete mockCopy.pipeline.commit;
+
+        vm = mountComponent(Component, {
+          pipeline: mockCopy.pipeline,
+          hasCi: true,
+          ciStatus: 'success',
+        });
+      });
+
+      it('should render pipeline ID', () => {
+        expect(
+          vm.$el.querySelector('.pipeline-id').textContent.trim(),
+        ).toEqual(`#${mockData.pipeline.id}`);
+      });
+
+      it('should render pipeline status', () => {
+        expect(
+          vm.$el.querySelector('.media-body').textContent.trim(),
+        ).toContain(mockData.pipeline.details.status.label);
+
+        expect(
+          vm.$el.querySelector('.js-commit-link'),
+        ).toBeNull();
       });
 
       it('should render pipeline graph', () => {

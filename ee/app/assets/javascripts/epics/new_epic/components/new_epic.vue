@@ -40,8 +40,7 @@
       createEpic() {
         this.creating = true;
         this.service.createEpic(this.title)
-          .then(res => res.json())
-          .then((data) => {
+          .then(({ data }) => {
             visitUrl(data.web_url);
           })
           .catch(() => {
@@ -71,7 +70,7 @@
     </button>
     <div
       class="dropdown-menu"
-      :class="{ 'dropdown-menu-align-right' : alignRight }"
+      :class="{ 'dropdown-menu-right' : alignRight }"
     >
       <input
         ref="title"

@@ -49,27 +49,6 @@ module IssuesHelper
     end
   end
 
-  def milestone_options(object)
-    milestones = object.project.milestones.active.reorder(due_date: :asc, title: :asc).to_a
-    milestones.unshift(object.milestone) if object.milestone.present? && object.milestone.closed?
-    milestones.unshift(Milestone::None)
-
-    options_from_collection_for_select(milestones, 'id', 'title', object.milestone_id)
-  end
-
-  def project_options(issuable, current_user, ability: :read_project)
-    projects = current_user.authorized_projects.order_id_desc
-    projects = projects.select do |project|
-      current_user.can?(ability, project)
-    end
-
-    no_project = OpenStruct.new(id: 0, name_with_namespace: 'No project')
-    projects.unshift(no_project)
-    projects.delete(issuable.project)
-
-    options_from_collection_for_select(projects, :id, :name_with_namespace)
-  end
-
   def status_box_class(item)
     if item.try(:expired?)
       'status-box-expired'
@@ -105,8 +84,8 @@ module IssuesHelper
     names.to_sentence
   end
 
-  def award_state_class(awards, current_user)
-    if !current_user
+  def award_state_class(awardable, awards, current_user)
+    if !can?(current_user, :award_emoji, awardable)
       "disabled"
     elsif current_user && awards.find { |a| a.user_id == current_user.id }
       "active"
@@ -147,6 +126,17 @@ module IssuesHelper
            end
 
     link_to link_text, path
+  end
+
+  def show_new_issue_link?(project)
+    return false unless project
+    return false if project.archived?
+
+    # We want to show the link to users that are not signed in, that way they
+    # get directed to the sign-in/sign-up flow and afterwards to the new issue page.
+    return true unless current_user
+
+    can?(current_user, :create_issue, project)
   end
 
   # Required for Banzai::Filter::IssueReferenceFilter

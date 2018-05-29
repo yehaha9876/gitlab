@@ -1,14 +1,8 @@
 require 'spec_helper'
 
-describe Milestone, elastic: true do
+describe Milestone, :elastic do
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-    Gitlab::Elastic::Helper.create_empty_index
-  end
-
-  after do
-    Gitlab::Elastic::Helper.delete_index
-    stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
   end
 
   it "searches milestones" do
@@ -44,5 +38,10 @@ describe Milestone, elastic: true do
     )
 
     expect(milestone.as_indexed_json).to eq(expected_hash)
+  end
+
+  it_behaves_like 'no results when the user cannot read cross project' do
+    let(:record1) { create(:milestone, project: project, title: 'test-milestone') }
+    let(:record2) { create(:milestone, project: project2, title: 'test-milestone') }
   end
 end

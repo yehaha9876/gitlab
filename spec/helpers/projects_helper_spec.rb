@@ -75,6 +75,12 @@ describe ProjectsHelper do
 
   describe "#project_list_cache_key", :clean_gitlab_redis_shared_state do
     let(:project) { create(:project, :repository) }
+    let(:user) { create(:user) }
+
+    before do
+      allow(helper).to receive(:current_user).and_return(user)
+      allow(helper).to receive(:can?).with(user, :read_cross_project) { true }
+    end
 
     it "includes the route" do
       expect(helper.project_list_cache_key(project)).to include(project.route.cache_key)
@@ -104,6 +110,10 @@ describe ProjectsHelper do
 
     it "includes a version" do
       expect(helper.project_list_cache_key(project).last).to start_with('v')
+    end
+
+    it 'includes wether or not the user can read cross project' do
+      expect(helper.project_list_cache_key(project)).to include('cross-project:true')
     end
 
     it "includes the pipeline status when there is a status" do
@@ -273,42 +283,16 @@ describe ProjectsHelper do
     end
   end
 
-  describe '#license_short_name' do
-    let(:project) { create(:project) }
-
-    context 'when project.repository has a license_key' do
-      it 'returns the nickname of the license if present' do
-        allow(project.repository).to receive(:license_key).and_return('agpl-3.0')
-
-        expect(helper.license_short_name(project)).to eq('GNU AGPLv3')
-      end
-
-      it 'returns the name of the license if nickname is not present' do
-        allow(project.repository).to receive(:license_key).and_return('mit')
-
-        expect(helper.license_short_name(project)).to eq('MIT License')
-      end
-    end
-
-    context 'when project.repository has no license_key but a license_blob' do
-      it 'returns LICENSE' do
-        allow(project.repository).to receive(:license_key).and_return(nil)
-
-        expect(helper.license_short_name(project)).to eq('LICENSE')
-      end
-    end
-  end
-
-  describe '#sanitized_import_error' do
+  describe '#sanitize_repo_path' do
     let(:project) { create(:project, :repository) }
+    let(:storage_path) { Gitlab.config.repositories.storages.default.legacy_disk_path }
 
     before do
-      allow(project).to receive(:repository_storage_path).and_return('/base/repo/path')
       allow(Settings.shared).to receive(:[]).with('path').and_return('/base/repo/export/path')
     end
 
     it 'removes the repo path' do
-      repo = '/base/repo/path/namespace/test.git'
+      repo = File.join(storage_path, 'namespace/test.git')
       import_error = "Could not clone #{repo}\n"
 
       expect(sanitize_repo_path(project, import_error)).to eq('Could not clone [REPOS PATH]/namespace/test.git')
@@ -344,74 +328,6 @@ describe ProjectsHelper do
       expect(user).to receive(:recent_push).with(project).and_return(event)
 
       expect(helper.last_push_event).to eq(event)
-    end
-  end
-
-  describe "#project_feature_access_select" do
-    let(:project) { create(:project, :public) }
-    let(:user)    { create(:user) }
-
-    context "when project is internal or public" do
-      it "shows all options" do
-        helper.instance_variable_set(:@project, project)
-        result = helper.project_feature_access_select(:issues_access_level)
-        expect(result).to include("Disabled")
-        expect(result).to include("Only team members")
-        expect(result).to include("Everyone with access")
-      end
-    end
-
-    context "when project is private" do
-      before do
-        project.update_attributes(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
-      end
-
-      it "shows only allowed options" do
-        helper.instance_variable_set(:@project, project)
-        result = helper.project_feature_access_select(:issues_access_level)
-        expect(result).to include("Disabled")
-        expect(result).to include("Only team members")
-        expect(result).to have_selector('option[disabled]', text: "Everyone with access")
-      end
-    end
-
-    context "when project moves from public to private" do
-      before do
-        project.update_attributes(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
-      end
-
-      it "shows the highest allowed level selected" do
-        helper.instance_variable_set(:@project, project)
-        result = helper.project_feature_access_select(:issues_access_level)
-
-        expect(result).to include("Disabled")
-        expect(result).to include("Only team members")
-        expect(result).to have_selector('option[disabled]', text: "Everyone with access")
-        expect(result).to have_selector('option[selected]', text: "Only team members")
-      end
-    end
-  end
-
-  describe "#visibility_select_options" do
-    let(:project) { create(:project, :repository) }
-    let(:user)    { create(:user) }
-
-    before do
-      allow(helper).to receive(:current_user).and_return(user)
-
-      stub_application_setting(restricted_visibility_levels: [Gitlab::VisibilityLevel::PUBLIC])
-    end
-
-    it "does not include the Public restricted level" do
-      expect(helper.send(:visibility_select_options, project, Gitlab::VisibilityLevel::PRIVATE)).not_to include('Public')
-    end
-
-    it "includes the Internal level" do
-      expect(helper.send(:visibility_select_options, project, Gitlab::VisibilityLevel::PRIVATE)).to include('Internal')
-    end
-
-    it "includes the Private level" do
-      expect(helper.send(:visibility_select_options, project, Gitlab::VisibilityLevel::PRIVATE)).to include('Private')
     end
   end
 
@@ -468,6 +384,22 @@ describe ProjectsHelper do
 
     it 'returns false when there are no projects and there is no name' do
       expect(helper.show_projects?(Project.none, {})).to eq(false)
+    end
+  end
+
+  describe('#push_to_create_project_command') do
+    let(:user) { create(:user, username: 'john') }
+
+    it 'returns the command to push to create project over HTTP' do
+      allow(Gitlab::CurrentSettings.current_application_settings).to receive(:enabled_git_access_protocol) { 'http' }
+
+      expect(helper.push_to_create_project_command(user)).to eq('git push --set-upstream http://test.host/john/$(git rev-parse --show-toplevel | xargs basename).git $(git rev-parse --abbrev-ref HEAD)')
+    end
+
+    it 'returns the command to push to create project over SSH' do
+      allow(Gitlab::CurrentSettings.current_application_settings).to receive(:enabled_git_access_protocol) { 'ssh' }
+
+      expect(helper.push_to_create_project_command(user)).to eq('git push --set-upstream git@localhost:john/$(git rev-parse --show-toplevel | xargs basename).git $(git rev-parse --abbrev-ref HEAD)')
     end
   end
 

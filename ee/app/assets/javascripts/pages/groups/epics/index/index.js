@@ -1,13 +1,14 @@
+import initFilteredSearch from '~/pages/search/init_filtered_search';
 import FilteredSearchTokenKeysEpics from 'ee/filtered_search/filtered_search_token_keys_epics';
+import initNewEpic from 'ee/epics/new_epic/new_epic_bundle';
 
-export default () => {
-  const filteredSearchEnabled = gl.FilteredSearchManager && document.querySelector('.filtered-search');
-  if (filteredSearchEnabled) {
-    const filteredSearchManager = new gl.FilteredSearchManager({
-      page: 'epics',
-      filteredSearchTokenKeys: FilteredSearchTokenKeysEpics,
-      stateFiltersSelector: '.epics-state-filters',
-    });
-    filteredSearchManager.setup();
-  }
-};
+document.addEventListener('DOMContentLoaded', () => {
+  initFilteredSearch({
+    page: 'epics',
+    isGroup: true,
+    isGroupDecendent: true,
+    filteredSearchTokenKeys: FilteredSearchTokenKeysEpics,
+    stateFiltersSelector: '.epics-state-filters',
+  });
+  initNewEpic();
+});

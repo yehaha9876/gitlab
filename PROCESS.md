@@ -53,7 +53,7 @@ Below we describe the contributing process to GitLab for two reasons:
 Several people from the [GitLab team][team] are helping community members to get
 their contributions accepted by meeting our [Definition of done][done].
 
-What you can expect from them is described at https://about.gitlab.com/jobs/merge-request-coach/.
+What you can expect from them is described at https://about.gitlab.com/roles/merge-request-coach/.
 
 ## Assigning issues
 
@@ -69,9 +69,17 @@ star, smile, etc.). Some good tips about code reviews can be found in our
 
 [Code Review Guidelines]: https://docs.gitlab.com/ce/development/code_review.html
 
+## Feature proposals from the 22nd to the 1st
+
+To allow the Product and Engineering teams time to discuss issues that will be placed into an upcoming milestone, 
+Product Managers must have their proposal for that milestone ready by the 22nd of each month.
+
+This proposal will be shared with Engineering for discussion, feedback, and planning. 
+The plan for the upcoming milestone must be finalized by the 1st of the month, one week before kickoff on the 8th.
+
 ## Feature freeze on the 7th for the release on the 22nd
 
-After 7th at 23:59 (Pacific Standard Time Zone) of each month, RC1 of the upcoming release (to be shipped on the 22nd) is created and deployed to GitLab.com and the stable branch for this release is frozen, which means master is no longer merged into it.
+After 7th at 23:59 (Pacific Time Zone) of each month, RC1 of the upcoming release (to be shipped on the 22nd) is created and deployed to GitLab.com and the stable branch for this release is frozen, which means master is no longer merged into it.
 Merge requests may still be merged into master during this period,
 but they will go into the _next_ release, unless they are manually cherry-picked into the stable branch.
 
@@ -201,6 +209,9 @@ you can ask for an exception to be made.
 
 Go to [Release tasks issue tracker](https://gitlab.com/gitlab-org/release/tasks/issues/new) and create an issue
 using the `Exception-request` issue template.
+
+**Do not** set the relevant `Pick into X.Y` label (see above) before request an
+exception; this should be done after the exception is approved.
 
 You can find who is who on the [team page](https://about.gitlab.com/team/).
 

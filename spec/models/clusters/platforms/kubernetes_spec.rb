@@ -245,7 +245,7 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
         stub_kubeclient_deployments
       end
 
-      it { is_expected.to eq(pods: [kube_pod], deployments: [kube_deployment]) }
+      it { is_expected.to include(pods: [kube_pod]) }
     end
 
     context 'when kubernetes responds with 500s' do
@@ -254,7 +254,7 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
         stub_kubeclient_deployments(status: 500)
       end
 
-      it { expect { subject }.to raise_error(KubeException) }
+      it { expect { subject }.to raise_error(Kubeclient::HttpError) }
     end
 
     context 'when kubernetes responds with 404s' do
@@ -263,7 +263,7 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
         stub_kubeclient_deployments(status: 404)
       end
 
-      it { is_expected.to eq(pods: [], deployments: []) }
+      it { is_expected.to include(pods: []) }
     end
   end
 end

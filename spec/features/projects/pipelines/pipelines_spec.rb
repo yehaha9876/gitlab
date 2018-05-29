@@ -86,7 +86,22 @@ describe 'Pipelines', :js do
         it 'updates content when tab is clicked' do
           page.find('.js-pipelines-tab-pending').click
           wait_for_requests
-          expect(page).to have_content('No pipelines to show.')
+          expect(page).to have_content('There are currently no pending pipelines.')
+        end
+      end
+
+      context 'navigation links' do
+        before do
+          visit project_pipelines_path(project)
+          wait_for_requests
+        end
+
+        it 'renders run pipeline link' do
+          expect(page).to have_link('Run Pipeline')
+        end
+
+        it 'renders ci lint link' do
+          expect(page).to have_link('CI Lint')
         end
       end
 
@@ -110,7 +125,7 @@ describe 'Pipelines', :js do
         context 'when canceling' do
           before do
             find('.js-pipelines-cancel-button').click
-            find('.js-primary-button').click
+            find('.js-modal-primary-action').click
             wait_for_requests
           end
 
@@ -141,7 +156,6 @@ describe 'Pipelines', :js do
         context 'when retrying' do
           before do
             find('.js-pipelines-retry-button').click
-            find('.js-primary-button').click
             wait_for_requests
           end
 
@@ -241,7 +255,7 @@ describe 'Pipelines', :js do
           context 'when canceling' do
             before do
               find('.js-pipelines-cancel-button').click
-              find('.js-primary-button').click
+              find('.js-modal-primary-action').click
             end
 
             it 'indicates that pipeline was canceled' do
@@ -334,6 +348,18 @@ describe 'Pipelines', :js do
 
           it { expect(page).not_to have_selector('.build-artifacts') }
         end
+
+        context 'with trace artifact' do
+          before do
+            create(:ci_build, :success, :trace_artifact, pipeline: pipeline)
+
+            visit_project_pipelines
+          end
+
+          it 'does not show trace artifact as artifacts' do
+            expect(page).not_to have_selector('.build-artifacts')
+          end
+        end
       end
 
       context 'mini pipeline graph' do
@@ -361,27 +387,27 @@ describe 'Pipelines', :js do
 
           it 'should be possible to cancel pending build' do
             find('.js-builds-dropdown-button').click
-            find('a.js-ci-action-icon').click
+            find('.js-ci-action').click
+            wait_for_requests
 
-            expect(page).to have_content('canceled')
             expect(build.reload).to be_canceled
           end
         end
 
-        context 'dropdown jobs list' do
-          it 'should keep the dropdown open when the user ctr/cmd + clicks in the job name' do
+        context 'for a failed pipeline' do
+          let!(:build) do
+            create(:ci_build, :failed, pipeline: pipeline,
+                                       stage: 'build',
+                                       name: 'build')
+          end
+
+          it 'should display the failure reason' do
             find('.js-builds-dropdown-button').click
-            dropdown_item = find('.mini-pipeline-graph-dropdown-item').native
 
-            %i(alt control).each do |meta_key|
-              page.driver.browser.action
-                .key_down(meta_key)
-                .click(dropdown_item)
-                .key_up(meta_key)
-                .perform
+            within('.js-builds-dropdown-list') do
+              build_element = page.find('.mini-pipeline-graph-dropdown-item')
+              expect(build_element['data-original-title']).to eq('build - failed <br> (unknown failure)')
             end
-
-            expect(page).to have_selector('.js-ci-action-icon')
           end
         end
       end
@@ -495,6 +521,21 @@ describe 'Pipelines', :js do
 
             expect(Ci::Pipeline.last).to be_web
           end
+
+          context 'when variables are specified' do
+            it 'creates a new pipeline with variables' do
+              page.within '.ci-variable-row-body' do
+                fill_in "Input variable key", with: "key_name"
+                fill_in "Input variable value", with: "value"
+              end
+
+              expect { click_on 'Create pipeline' }
+                .to change { Ci::Pipeline.count }.by(1)
+
+              expect(Ci::Pipeline.last.variables.map { |var| var.slice(:key, :secret_value) })
+                .to eq [{ key: "key_name", secret_value: "value" }.with_indifferent_access]
+            end
+          end
         end
 
         context 'without gitlab-ci.yml' do
@@ -559,7 +600,7 @@ describe 'Pipelines', :js do
       end
 
       it 'has a clear caches button' do
-        expect(page).to have_link 'Clear runner caches'
+        expect(page).to have_button 'Clear Runner Caches'
       end
 
       describe 'user clicks the button' do
@@ -569,17 +610,31 @@ describe 'Pipelines', :js do
           end
 
           it 'increments jobs_cache_index' do
-            click_link 'Clear runner caches'
+            click_button 'Clear Runner Caches'
+            wait_for_requests
             expect(page.find('.flash-notice')).to have_content 'Project cache successfully reset.'
           end
         end
 
         context 'when project does not have jobs_cache_index' do
           it 'sets jobs_cache_index to 1' do
-            click_link 'Clear runner caches'
+            click_button 'Clear Runner Caches'
+            wait_for_requests
             expect(page.find('.flash-notice')).to have_content 'Project cache successfully reset.'
           end
         end
+      end
+    end
+
+    describe 'Empty State' do
+      let(:project) { create(:project, :repository) }
+
+      before do
+        visit project_pipelines_path(project)
+      end
+
+      it 'renders empty state' do
+        expect(page).to have_content 'Build with confidence'
       end
     end
   end
@@ -592,7 +647,9 @@ describe 'Pipelines', :js do
     context 'when project is public' do
       let(:project) { create(:project, :public, :repository) }
 
-      it { expect(page).to have_content 'Build with confidence' }
+      context 'without pipelines' do
+        it { expect(page).to have_content 'This project is not currently set up to run pipelines.' }
+      end
     end
 
     context 'when project is private' do

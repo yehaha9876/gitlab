@@ -5,6 +5,8 @@ module Gitlab
     # The ParallelImporter schedules the importing of a GitHub project using
     # Sidekiq.
     class ParallelImporter
+      prepend ::EE::Gitlab::GithubImport::ParallelImporter
+
       attr_reader :project
 
       def self.async?
@@ -13,6 +15,15 @@ module Gitlab
 
       def self.imports_repository?
         true
+      end
+
+      # This is a workaround for a Ruby 2.3.7 bug. rspec-mocks cannot restore
+      # the visibility of prepended modules. See
+      # https://github.com/rspec/rspec-mocks/issues/1231 for more details.
+      if Rails.env.test?
+        def self.requires_ci_cd_setup?
+          raise NotImplementedError
+        end
       end
 
       def initialize(project)
@@ -32,7 +43,8 @@ module Gitlab
         Gitlab::SidekiqStatus
           .set(jid, StuckImportJobsWorker::IMPORT_JOBS_EXPIRATION)
 
-        project.update_column(:import_jid, jid)
+        project.ensure_import_state
+        project.import_state&.update_column(:jid, jid)
 
         Stage::ImportRepositoryWorker
           .perform_async(project.id)

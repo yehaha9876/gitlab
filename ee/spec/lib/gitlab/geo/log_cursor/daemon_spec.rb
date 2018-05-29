@@ -7,6 +7,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
   set(:secondary) { create(:geo_node) }
 
   let(:options) { {} }
+
   subject(:daemon) { described_class.new(options) }
 
   around do |example|
@@ -65,11 +66,48 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
   end
 
   describe '#run_once!' do
+    context 'when associated shard is unhealthy' do
+      let(:project) { create(:project, :broken_storage) }
+      let(:repository_created_event) { create(:geo_repository_created_event, project: project) }
+      let(:event_log) { create(:geo_event_log, repository_created_event: repository_created_event) }
+      let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
+
+      before do
+        expect(Gitlab::Geo::ShardHealthCache).to receive(:healthy_shard?).with('broken').and_return(false)
+      end
+
+      it 'skips handling the event' do
+        t = Time.now
+        expect(Geo::ProjectSyncWorker).not_to receive(:perform_async).with(project.id, t)
+        Timecop.freeze(t) { daemon.run_once! }
+      end
+    end
+
+    context 'when there is no associated shard for the event' do
+      let(:event_log) { create(:geo_event_log, :job_artifact_deleted_event) }
+      let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
+      let(:job_artifact_deleted_event) { event_log.job_artifact_deleted_event }
+      let(:job_artifact) { job_artifact_deleted_event.job_artifact }
+
+      before do
+        create(:geo_job_artifact_registry, artifact_id: job_artifact.id)
+      end
+
+      it 'handles the event' do
+        expect(Gitlab::Geo::ShardHealthCache).not_to receive(:healthy_shard?).with('default')
+        expect { daemon.run_once! }.to change(Geo::JobArtifactRegistry, :count).by(-1)
+      end
+    end
+
     context 'when replaying a repository created event' do
       let(:project) { create(:project) }
       let(:repository_created_event) { create(:geo_repository_created_event, project: project) }
       let(:event_log) { create(:geo_event_log, repository_created_event: repository_created_event) }
       let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
+
+      before do
+        allow(Gitlab::Geo::ShardHealthCache).to receive(:healthy_shard?).with('default').and_return(true)
+      end
 
       it 'creates a new project registry' do
         expect { daemon.run_once! }.to change(Geo::ProjectRegistry, :count).by(1)
@@ -107,26 +145,60 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
       let(:event_log) { create(:geo_event_log, repository_updated_event: repository_updated_event) }
       let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
 
+      before do
+        allow(Gitlab::Geo::ShardHealthCache).to receive(:healthy_shard?).with('default').and_return(true)
+      end
+
       it 'creates a new project registry if it does not exist' do
         expect { daemon.run_once! }.to change(Geo::ProjectRegistry, :count).by(1)
       end
 
-      it 'sets resync_repository to true if event source is repository' do
-        repository_updated_event.update!(source: Geo::RepositoryUpdatedEvent::REPOSITORY)
-        registry = create(:geo_project_registry, :synced, project: repository_updated_event.project)
+      context 'when event source is repository' do
+        let!(:registry) { create(:geo_project_registry, :synced, :repository_verified, :repository_checksum_mismatch, project: repository_updated_event.project) }
 
-        daemon.run_once!
+        before do
+          repository_updated_event.update!(source: Geo::RepositoryUpdatedEvent::REPOSITORY)
+        end
 
-        expect(registry.reload.resync_repository).to be true
+        it 'sets resync_repository to true' do
+          daemon.run_once!
+
+          expect(registry.reload.resync_repository).to be true
+        end
+
+        it 'resets the repository verification fields' do
+          daemon.run_once!
+
+          expect(registry.reload).to have_attributes(
+            repository_verification_checksum_sha: nil,
+            repository_checksum_mismatch: false,
+            last_repository_verification_failure: nil
+          )
+        end
       end
 
-      it 'sets resync_wiki to true if event source is wiki' do
-        repository_updated_event.update!(source: Geo::RepositoryUpdatedEvent::WIKI)
-        registry = create(:geo_project_registry, :synced, project: repository_updated_event.project)
+      context 'when event source is wiki' do
+        let!(:registry) { create(:geo_project_registry, :synced, :wiki_verified, :wiki_checksum_mismatch, project: repository_updated_event.project) }
 
-        daemon.run_once!
+        before do
+          repository_updated_event.update!(source: Geo::RepositoryUpdatedEvent::WIKI)
+        end
 
-        expect(registry.reload.resync_wiki).to be true
+        it 'sets resync_wiki to true' do
+          daemon.run_once!
+
+          expect(registry.reload.resync_wiki).to be true
+        end
+
+        it 'resets the wiki repository verification fields' do
+          daemon.run_once!
+
+          expect(registry.reload).to have_attributes(
+            wiki_verification_checksum_sha: nil,
+            wiki_checksum_mismatch: false,
+            last_wiki_verification_failure: nil
+          )
+        end
       end
 
       it 'performs Geo::ProjectSyncWorker' do
@@ -142,26 +214,35 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
       let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
       let(:repository_deleted_event) { event_log.repository_deleted_event }
       let(:project) { repository_deleted_event.project }
+      let(:deleted_project_name) { repository_deleted_event.deleted_project_name }
+      let(:deleted_path) { repository_deleted_event.deleted_path }
 
-      it 'does not create a tracking database entry' do
-        expect { daemon.run_once! }.not_to change(Geo::ProjectRegistry, :count)
+      context 'when a tracking entry does not exist' do
+        it 'does not schedule a GeoRepositoryDestroyWorker' do
+          expect(::GeoRepositoryDestroyWorker).not_to receive(:perform_async)
+            .with(project.id, deleted_project_name, deleted_path, project.repository_storage)
+
+          daemon.run_once!
+        end
+
+        it 'does not create a tracking entry' do
+          expect { daemon.run_once! }.not_to change(Geo::ProjectRegistry, :count)
+        end
       end
 
-      it 'schedules a GeoRepositoryDestroyWorker' do
-        project_id   = repository_deleted_event.project_id
-        project_name = repository_deleted_event.deleted_project_name
-        project_path = repository_deleted_event.deleted_path
+      context 'when a tracking entry exists' do
+        let!(:tracking_entry) { create(:geo_project_registry, project: project) }
 
-        expect(::GeoRepositoryDestroyWorker).to receive(:perform_async)
-          .with(project_id, project_name, project_path, project.repository_storage)
+        it 'schedules a GeoRepositoryDestroyWorker' do
+          expect(::GeoRepositoryDestroyWorker).to receive(:perform_async)
+            .with(project.id, deleted_project_name, deleted_path, project.repository_storage)
 
-        daemon.run_once!
-      end
+          daemon.run_once!
+        end
 
-      it 'removes the tracking database entry if exist' do
-        create(:geo_project_registry, :synced, project: project)
-
-        expect { daemon.run_once! }.to change(Geo::ProjectRegistry, :count).by(-1)
+        it 'removes the tracking entry' do
+          expect { daemon.run_once! }.to change(Geo::ProjectRegistry, :count).by(-1)
+        end
       end
     end
 
@@ -192,27 +273,37 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
       let(:repository_updated_event) { create(:geo_repository_updated_event, project: project) }
       let(:event_log) { create(:geo_event_log, repository_updated_event: repository_updated_event) }
       let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
+      let!(:registry) { create(:geo_project_registry, :synced, project: project) }
 
       before do
-        allow(Geo::ProjectSyncWorker).to receive(:perform_async)
+        allow(Gitlab::Geo::ShardHealthCache).to receive(:healthy_shard?).with('default').and_return(true)
       end
 
       it 'replays events for projects that belong to selected namespaces to replicate' do
         secondary.update!(namespaces: [group_1])
 
-        expect { daemon.run_once! }.to change(Geo::ProjectRegistry, :count).by(1)
+        expect(Geo::ProjectSyncWorker).to receive(:perform_async)
+          .with(project.id, anything).once
+
+        daemon.run_once!
       end
 
       it 'does not replay events for projects that do not belong to selected namespaces to replicate' do
         secondary.update!(selective_sync_type: 'namespaces', namespaces: [group_2])
 
-        expect { daemon.run_once! }.not_to change(Geo::ProjectRegistry, :count)
+        expect(Geo::ProjectSyncWorker).not_to receive(:perform_async)
+          .with(project.id, anything)
+
+        daemon.run_once!
       end
 
       it 'does not replay events for projects that do not belong to selected shards to replicate' do
         secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
 
-        expect { daemon.run_once! }.not_to change(Geo::ProjectRegistry, :count)
+        expect(Geo::ProjectSyncWorker).not_to receive(:perform_async)
+          .with(project.id, anything)
+
+        daemon.run_once!
       end
     end
 
@@ -220,20 +311,32 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
       let(:event_log) { create(:geo_event_log, :renamed_event) }
       let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
       let(:repository_renamed_event) { event_log.repository_renamed_event }
+      let(:project) {repository_renamed_event.project }
+      let(:old_path_with_namespace) { repository_renamed_event.old_path_with_namespace }
+      let(:new_path_with_namespace) { repository_renamed_event.new_path_with_namespace }
 
-      it 'does not create a new project registry' do
-        expect { daemon.run_once! }.not_to change(Geo::ProjectRegistry, :count)
+      context 'when a tracking entry does not exist' do
+        it 'does not create a tracking entry' do
+          expect { daemon.run_once! }.not_to change(Geo::ProjectRegistry, :count)
+        end
+
+        it 'does not schedule a Geo::RenameRepositoryWorker' do
+          expect(::Geo::RenameRepositoryWorker).not_to receive(:perform_async)
+            .with(project.id, old_path_with_namespace, new_path_with_namespace)
+
+          daemon.run_once!
+        end
       end
 
-      it 'schedules a Geo::RenameRepositoryWorker' do
-        project_id = repository_renamed_event.project_id
-        old_path_with_namespace = repository_renamed_event.old_path_with_namespace
-        new_path_with_namespace = repository_renamed_event.new_path_with_namespace
+      context 'when a tracking entry does exists' do
+        it 'schedules a Geo::RenameRepositoryWorker' do
+          create(:geo_project_registry, project: project)
 
-        expect(::Geo::RenameRepositoryWorker).to receive(:perform_async)
-          .with(project_id, old_path_with_namespace, new_path_with_namespace)
+          expect(::Geo::RenameRepositoryWorker).to receive(:perform_async)
+            .with(project.id, old_path_with_namespace, new_path_with_namespace)
 
-        daemon.run_once!
+          daemon.run_once!
+        end
       end
     end
 
@@ -241,21 +344,33 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
       let(:event_log) { create(:geo_event_log, :hashed_storage_migration_event) }
       let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
       let(:hashed_storage_migrated_event) { event_log.hashed_storage_migrated_event }
+      let(:project) { hashed_storage_migrated_event.project }
+      let(:old_disk_path) { hashed_storage_migrated_event.old_disk_path }
+      let(:new_disk_path) { hashed_storage_migrated_event.new_disk_path }
+      let(:old_storage_version) { hashed_storage_migrated_event.old_storage_version }
 
-      it 'does not create a new project registry' do
-        expect { daemon.run_once! }.not_to change(Geo::ProjectRegistry, :count)
+      context 'when a tracking entry does not exist' do
+        it 'does not create a tracking entry' do
+          expect { daemon.run_once! }.not_to change(Geo::ProjectRegistry, :count)
+        end
+
+        it 'does not schedule a Geo::HashedStorageMigrationWorker' do
+          expect(::Geo::HashedStorageMigrationWorker).not_to receive(:perform_async)
+            .with(project.id, old_disk_path, new_disk_path, old_storage_version)
+
+          daemon.run_once!
+        end
       end
 
-      it 'schedules a Geo::HashedStorageMigrationWorker' do
-        project = hashed_storage_migrated_event.project
-        old_disk_path = hashed_storage_migrated_event.old_disk_path
-        new_disk_path = hashed_storage_migrated_event.new_disk_path
-        old_storage_version = hashed_storage_migrated_event.old_storage_version
+      context 'when a tracking entry exists' do
+        it 'schedules a Geo::HashedStorageMigrationWorker' do
+          create(:geo_project_registry, project: project)
 
-        expect(::Geo::HashedStorageMigrationWorker).to receive(:perform_async)
-          .with(project.id, old_disk_path, new_disk_path, old_storage_version)
+          expect(::Geo::HashedStorageMigrationWorker).to receive(:perform_async)
+            .with(project.id, old_disk_path, new_disk_path, old_storage_version)
 
-        daemon.run_once!
+          daemon.run_once!
+        end
       end
     end
 
@@ -285,6 +400,10 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
       let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
       let(:lfs_object_deleted_event) { event_log.lfs_object_deleted_event }
       let(:lfs_object) { lfs_object_deleted_event.lfs_object }
+
+      before do
+        allow(Gitlab::Geo::ShardHealthCache).to receive(:healthy_shard?).with('default').and_return(true)
+      end
 
       it 'does not create a tracking database entry' do
         expect { daemon.run_once! }.not_to change(Geo::FileRegistry, :count)
@@ -333,13 +452,13 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
 
       context 'with a tracking database entry' do
         before do
-          create(:geo_file_registry, :job_artifact, file_id: job_artifact.id)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact.id)
         end
 
         context 'with a file' do
           context 'when the delete succeeds' do
             it 'removes the tracking database entry' do
-              expect { daemon.run_once! }.to change(Geo::FileRegistry.job_artifacts, :count).by(-1)
+              expect { daemon.run_once! }.to change(Geo::JobArtifactRegistry, :count).by(-1)
             end
 
             it 'deletes the file' do
@@ -353,7 +472,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
             end
 
             it 'does not remove the tracking database entry' do
-              expect { daemon.run_once! }.not_to change(Geo::FileRegistry.job_artifacts, :count)
+              expect { daemon.run_once! }.not_to change(Geo::JobArtifactRegistry, :count)
             end
           end
         end
@@ -364,14 +483,14 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
           end
 
           it 'removes the tracking database entry' do
-            expect { daemon.run_once! }.to change(Geo::FileRegistry.job_artifacts, :count).by(-1)
+            expect { daemon.run_once! }.to change(Geo::JobArtifactRegistry, :count).by(-1)
           end
         end
       end
 
       context 'without a tracking database entry' do
         it 'does not create a tracking database entry' do
-          expect { daemon.run_once! }.not_to change(Geo::FileRegistry, :count)
+          expect { daemon.run_once! }.not_to change(Geo::JobArtifactRegistry, :count)
         end
 
         it 'does not delete the file (yet, due to possible race condition)' do

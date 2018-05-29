@@ -2,6 +2,7 @@
 /* global CommentsStore */
 /* global ResolveService */
 
+import $ from 'jquery';
 import Vue from 'vue';
 import Flash from '../../flash';
 
@@ -60,7 +61,7 @@ const ResolveBtn = Vue.extend({
       this.$nextTick(() => {
         $(this.$refs.button)
           .tooltip('hide')
-          .tooltip('fixTitle');
+          .tooltip('_fixTitle');
       });
     },
     resolve: function () {
@@ -87,6 +88,7 @@ const ResolveBtn = Vue.extend({
           CommentsStore.update(this.discussionId, this.noteId, !this.isResolved, resolved_by);
           this.discussion.updateHeadline(data);
           gl.mrWidget.checkStatus();
+          document.dispatchEvent(new CustomEvent('refreshVueNotes'));
 
           this.updateTooltip();
         })

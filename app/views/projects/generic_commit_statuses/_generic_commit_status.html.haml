@@ -35,10 +35,10 @@
     .label-container
       - if generic_commit_status.tags.any?
         - generic_commit_status.tags.each do |tag|
-          %span.label.label-primary
+          %span.badge.badge-primary
             = tag
       - if retried
-        %span.label.label-warning retried
+        %span.badge.badge-warning retried
 
   - if pipeline_link
     %td
@@ -53,7 +53,7 @@
   - if admin
     %td
       - if generic_commit_status.project
-        = link_to generic_commit_status.project.name_with_namespace, admin_project_path(generic_commit_status.project)
+        = link_to generic_commit_status.project.full_name, admin_project_path(generic_commit_status.project)
     %td
       - if generic_commit_status.try(:runner)
         = runner_link(generic_commit_status.runner)

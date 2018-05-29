@@ -1,5 +1,6 @@
 /* eslint-disable space-before-function-paren, no-var, one-var, one-var-declaration-per-line, no-unused-expressions, comma-dangle, new-parens, no-unused-vars, quotes, jasmine/no-spec-dupes, prefer-template, max-len */
 
+import $ from 'jquery';
 import Cookies from 'js-cookie';
 import loadAwardsHandler from '~/awards_handler';
 
@@ -138,7 +139,7 @@ import '~/lib/utils/common_utils';
         $thumbsUpEmoji = $votesBlock.find('[data-name=thumbsup]').parent();
         $thumbsUpEmoji.attr('data-title', 'sam');
         awardsHandler.userAuthored($thumbsUpEmoji);
-        return expect($thumbsUpEmoji.data("original-title")).toBe("You cannot vote on your own issue, MR and note");
+        return expect($thumbsUpEmoji.data("originalTitle")).toBe("You cannot vote on your own issue, MR and note");
       });
       it('should restore tooltip back to initial vote list', function() {
         var $thumbsUpEmoji, $votesBlock;
@@ -149,7 +150,7 @@ import '~/lib/utils/common_utils';
         awardsHandler.userAuthored($thumbsUpEmoji);
         jasmine.clock().tick(2801);
         jasmine.clock().uninstall();
-        return expect($thumbsUpEmoji.data("original-title")).toBe("sam");
+        return expect($thumbsUpEmoji.data("originalTitle")).toBe("sam");
       });
     });
     describe('::getAwardUrl', function() {
@@ -194,7 +195,7 @@ import '~/lib/utils/common_utils';
         $thumbsUpEmoji.attr('data-title', 'sam, jerry, max, and andy');
         awardsHandler.addAward($votesBlock, awardUrl, 'thumbsup', false);
         $thumbsUpEmoji.tooltip();
-        return expect($thumbsUpEmoji.data("original-title")).toBe('You, sam, jerry, max, and andy');
+        return expect($thumbsUpEmoji.data("originalTitle")).toBe('You, sam, jerry, max, and andy');
       });
       return it('handles the special case where "You" is not cleanly comma seperated', function() {
         var $thumbsUpEmoji, $votesBlock, awardUrl;
@@ -204,7 +205,7 @@ import '~/lib/utils/common_utils';
         $thumbsUpEmoji.attr('data-title', 'sam');
         awardsHandler.addAward($votesBlock, awardUrl, 'thumbsup', false);
         $thumbsUpEmoji.tooltip();
-        return expect($thumbsUpEmoji.data("original-title")).toBe('You and sam');
+        return expect($thumbsUpEmoji.data("originalTitle")).toBe('You and sam');
       });
     });
     describe('::removeYouToUserList', function() {
@@ -217,7 +218,7 @@ import '~/lib/utils/common_utils';
         $thumbsUpEmoji.addClass('active');
         awardsHandler.addAward($votesBlock, awardUrl, 'thumbsup', false);
         $thumbsUpEmoji.tooltip();
-        return expect($thumbsUpEmoji.data("original-title")).toBe('sam, jerry, max, and andy');
+        return expect($thumbsUpEmoji.data("originalTitle")).toBe('sam, jerry, max, and andy');
       });
       return it('handles the special case where "You" is not cleanly comma seperated', function() {
         var $thumbsUpEmoji, $votesBlock, awardUrl;
@@ -228,7 +229,7 @@ import '~/lib/utils/common_utils';
         $thumbsUpEmoji.addClass('active');
         awardsHandler.addAward($votesBlock, awardUrl, 'thumbsup', false);
         $thumbsUpEmoji.tooltip();
-        return expect($thumbsUpEmoji.data("original-title")).toBe('sam');
+        return expect($thumbsUpEmoji.data("originalTitle")).toBe('sam');
       });
     });
     describe('::searchEmojis', () => {

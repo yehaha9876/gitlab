@@ -1,10 +1,12 @@
-# Epics
+# Epics **[ULTIMATE]**
 
 > Introduced in [GitLab Ultimate][ee] 10.2.
 
 Epics let you manage your portfolio of projects more efficiently and with less
 effort by tracking groups of issues that share a theme, across projects and
 milestones.
+
+![epics list view](img/epics_list_view.png)
 
 ## Creating an epic
 
@@ -57,6 +59,28 @@ link in the issue sidebar.
 
 ![containing epic](img/containing_epic.png)
 
+## Searching for an epic from epics list page
+
+> Introduced in [GitLab Ultimate][ee] 10.5.
+
+You can search for an epic from the list of epics using filtered search bar (similar to
+that of Issues and Merge requests) based on following parameters:
+
+- Title or description
+- Author name / username
+- Labels
+
+![epics search](img/epics_search.png)
+
+To search, go to the list of epics and click on the field **Search or filter results...**.
+It will display a dropdown menu, from which you can add an author. You can also enter plain
+text to search by epic title or description. When done, press <kbd>Enter</kbd> on your
+keyboard to filter the list.
+
+You can also sort epics list by **Created date** or **Last updated**.
+
+![epics sort](img/epics_sort.png)
+
 ## Permissions
 
 If you have access to view an epic and have access to view an issue already
@@ -73,3 +97,20 @@ You may also consult the [group permissions table][permissions].
 
 [ee]: https://about.gitlab.com/products/
 [permissions]: ../../permissions.md#group-members-permissions
+
+## Thread
+
+- Comments: collaborate on that epic by posting comments in its thread.
+These text fields also fully support
+[GitLab Flavored Markdown](../../markdown.md#gitlab-flavored-markdown-gfm).
+
+## Comment, or start a discussion
+
+Once you wrote your comment, you can either:
+
+- Click "Comment" and your comment will be published.
+- Click "Start discussion": start a thread within that epic's thread to discuss specific points.
+
+## Award emoji
+
+- You can [award an emoji](../../award_emojis.md) to that epic or its comments.

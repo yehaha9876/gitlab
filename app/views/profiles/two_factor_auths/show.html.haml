@@ -2,13 +2,6 @@
 - add_to_breadcrumbs("Two-Factor Authentication", profile_account_path)
 - @content_class = "limit-container-width" unless fluid_layout
 
-= render 'profiles/head'
-
-- content_for :page_specific_javascripts do
-  - if inject_u2f_api?
-    = webpack_bundle_tag('u2f')
-  = webpack_bundle_tag('two_factor_auth')
-
 .js-two-factor-auth{ 'data-two-factor-skippable' => "#{two_factor_skippable?}", 'data-two_factor_skip_url' => skip_profile_two_factor_auth_path }
   .row.prepend-top-default
     .col-lg-4
@@ -27,7 +20,7 @@
       - else
         %p
           Download the Google Authenticator application from App Store or Google Play Store and scan this code.
-          More information is available in the #{link_to('documentation', help_page_path('profile/two_factor_authentication'))}.
+          More information is available in the #{link_to('documentation', help_page_path('user/profile/account/two_factor_authentication'))}.
         .row.append-bottom-10
           .col-md-4
             = raw @qr_code
@@ -93,7 +86,7 @@
                 %tr
                   %td= registration.name.presence || "<no name set>"
                   %td= registration.created_at.to_date.to_s(:medium)
-                  %td= link_to "Delete", profile_u2f_registration_path(registration), method: :delete, class: "btn btn-danger pull-right", data: { confirm: "Are you sure you want to delete this device? This action cannot be undone." }
+                  %td= link_to "Delete", profile_u2f_registration_path(registration), method: :delete, class: "btn btn-danger float-right", data: { confirm: "Are you sure you want to delete this device? This action cannot be undone." }
 
       - else
         .settings-message.text-center

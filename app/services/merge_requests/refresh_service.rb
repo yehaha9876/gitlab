@@ -1,8 +1,16 @@
 module MergeRequests
   class RefreshService < MergeRequests::BaseService
+    prepend EE::MergeRequests::RefreshService
+
     def execute(oldrev, newrev, ref)
       return true unless Gitlab::Git.branch_ref?(ref)
 
+      do_execute(oldrev, newrev, ref)
+    end
+
+    private
+
+    def do_execute(oldrev, newrev, ref)
       @oldrev, @newrev = oldrev, newrev
       @branch_name = Gitlab::Git.ref_name(ref)
 
@@ -21,15 +29,12 @@ module MergeRequests
         comment_mr_branch_presence_changed
       end
 
-      comment_mr_with_commits
+      notify_about_push
       mark_mr_as_wip_from_commits
       execute_mr_web_hooks
-      reset_approvals_for_merge_requests
 
       true
     end
-
-    private
 
     def close_upon_missing_source_branch_ref
       # MergeRequest#reload_diff ignores not opened MRs. This means it won't
@@ -97,22 +102,6 @@ module MergeRequests
       merge_requests_for_source_branch(reload: true)
     end
 
-    # Note: Closed merge requests also need approvals reset.
-    def reset_approvals_for_merge_requests
-      merge_requests = merge_requests_for(@branch_name, mr_states: [:opened, :closed])
-
-      merge_requests.each do |merge_request|
-        target_project = merge_request.target_project
-
-        if target_project.approvals_before_merge.nonzero? &&
-            target_project.reset_approvals_on_push &&
-            merge_request.rebase_commit_sha != @newrev
-
-          merge_request.approvals.delete_all
-        end
-      end
-    end
-
     def reset_merge_when_pipeline_succeeds
       merge_requests_for_source_branch.each(&:reset_merge_when_pipeline_succeeds)
     end
@@ -158,8 +147,8 @@ module MergeRequests
       end
     end
 
-    # Add comment about pushing new commits to merge requests
-    def comment_mr_with_commits
+    # Add comment about pushing new commits to merge requests and send nofitication emails
+    def notify_about_push
       return unless @commits.present?
 
       merge_requests_for_source_branch.each do |merge_request|
@@ -172,6 +161,8 @@ module MergeRequests
         SystemNoteService.add_commits(merge_request, merge_request.project,
                                       @current_user, new_commits,
                                       existing_commits, @oldrev)
+
+        notification_service.push_to_merge_request(merge_request, @current_user, new_commits: new_commits, existing_commits: existing_commits)
       end
     end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171115143841) do
+ActiveRecord::Schema.define(version: 20180510223634) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,12 +28,28 @@ ActiveRecord::Schema.define(version: 20171115143841) do
     t.boolean "success", default: false, null: false
     t.integer "retry_count"
     t.datetime "retry_at"
+    t.boolean "missing_on_primary", default: false, null: false
   end
 
   add_index "file_registry", ["file_type", "file_id"], name: "index_file_registry_on_file_type_and_file_id", unique: true, using: :btree
   add_index "file_registry", ["file_type"], name: "index_file_registry_on_file_type", using: :btree
   add_index "file_registry", ["retry_at"], name: "index_file_registry_on_retry_at", using: :btree
   add_index "file_registry", ["success"], name: "index_file_registry_on_success", using: :btree
+
+  create_table "job_artifact_registry", force: :cascade do |t|
+    t.datetime_with_timezone "created_at"
+    t.datetime_with_timezone "retry_at"
+    t.integer "bytes", limit: 8
+    t.integer "artifact_id"
+    t.integer "retry_count"
+    t.boolean "success"
+    t.string "sha256"
+    t.boolean "missing_on_primary", default: false, null: false
+  end
+
+  add_index "job_artifact_registry", ["artifact_id"], name: "index_job_artifact_registry_on_artifact_id", using: :btree
+  add_index "job_artifact_registry", ["retry_at"], name: "index_job_artifact_registry_on_retry_at", using: :btree
+  add_index "job_artifact_registry", ["success"], name: "index_job_artifact_registry_on_success", using: :btree
 
   create_table "project_registry", force: :cascade do |t|
     t.integer "project_id", null: false
@@ -52,14 +68,30 @@ ActiveRecord::Schema.define(version: 20171115143841) do
     t.boolean "force_to_redownload_wiki"
     t.string "last_repository_sync_failure"
     t.string "last_wiki_sync_failure"
+    t.string "last_repository_verification_failure"
+    t.string "last_wiki_verification_failure"
+    t.binary "repository_verification_checksum_sha"
+    t.binary "wiki_verification_checksum_sha"
+    t.boolean "repository_checksum_mismatch", default: false, null: false
+    t.boolean "wiki_checksum_mismatch", default: false, null: false
+    t.boolean "last_repository_check_failed"
+    t.datetime_with_timezone "last_repository_check_at"
   end
 
   add_index "project_registry", ["last_repository_successful_sync_at"], name: "index_project_registry_on_last_repository_successful_sync_at", using: :btree
   add_index "project_registry", ["last_repository_synced_at"], name: "index_project_registry_on_last_repository_synced_at", using: :btree
+  add_index "project_registry", ["project_id"], name: "idx_project_registry_on_repo_checksums_and_failure_partial", where: "((repository_verification_checksum_sha IS NULL) AND (last_repository_verification_failure IS NULL))", using: :btree
+  add_index "project_registry", ["project_id"], name: "idx_project_registry_on_repository_failure_partial", where: "(last_repository_verification_failure IS NOT NULL)", using: :btree
+  add_index "project_registry", ["project_id"], name: "idx_project_registry_on_wiki_checksums_and_failure_partial", where: "((wiki_verification_checksum_sha IS NULL) AND (last_wiki_verification_failure IS NULL))", using: :btree
+  add_index "project_registry", ["project_id"], name: "idx_project_registry_on_wiki_failure_partial", where: "(last_wiki_verification_failure IS NOT NULL)", using: :btree
+  add_index "project_registry", ["project_id"], name: "idx_repository_checksum_mismatch", where: "(repository_checksum_mismatch = true)", using: :btree
+  add_index "project_registry", ["project_id"], name: "idx_wiki_checksum_mismatch", where: "(wiki_checksum_mismatch = true)", using: :btree
   add_index "project_registry", ["project_id"], name: "index_project_registry_on_project_id", unique: true, using: :btree
   add_index "project_registry", ["repository_retry_at"], name: "index_project_registry_on_repository_retry_at", using: :btree
+  add_index "project_registry", ["repository_verification_checksum_sha"], name: "idx_project_registry_on_repository_checksum_sha_partial", where: "(repository_verification_checksum_sha IS NULL)", using: :btree
   add_index "project_registry", ["resync_repository"], name: "index_project_registry_on_resync_repository", using: :btree
   add_index "project_registry", ["resync_wiki"], name: "index_project_registry_on_resync_wiki", using: :btree
   add_index "project_registry", ["wiki_retry_at"], name: "index_project_registry_on_wiki_retry_at", using: :btree
+  add_index "project_registry", ["wiki_verification_checksum_sha"], name: "idx_project_registry_on_wiki_checksum_sha_partial", where: "(wiki_verification_checksum_sha IS NULL)", using: :btree
 
 end

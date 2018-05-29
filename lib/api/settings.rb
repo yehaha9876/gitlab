@@ -5,7 +5,7 @@ module API
     helpers do
       def current_settings
         @current_setting ||=
-          (ApplicationSetting.current || ApplicationSetting.create_from_defaults)
+          (ApplicationSetting.current_without_cache || ApplicationSetting.create_from_defaults)
       end
     end
 
@@ -114,6 +114,7 @@ module API
       optional :version_check_enabled, type: Boolean, desc: 'Let GitLab inform you when an update is available.'
       optional :email_author_in_body, type: Boolean, desc: 'Some email servers do not support overriding the email sender name. Enable this option to include the name of the author of the issue, merge request or comment in the email body instead.'
       optional :html_emails_enabled, type: Boolean, desc: 'By default GitLab sends emails in HTML and plain text formats so mail clients can choose what format to use. Disable this option if you only want to send emails in plain text format.'
+      optional :email_additional_text, type: String, desc: 'Additional text added to the bottom of every email for legal/auditing/compliance reasons'
       optional :housekeeping_enabled, type: Boolean, desc: 'Enable automatic repository housekeeping (git repack, git gc)'
       given housekeeping_enabled: ->(val) { val } do
         requires :housekeeping_bitmaps_enabled, type: Boolean, desc: "Creating pack file bitmaps makes housekeeping take a little longer but bitmaps should accelerate 'git clone' performance."
@@ -150,15 +151,28 @@ module API
       optional :repository_storages, type: Array[String], desc: 'A list of names of enabled storage paths, taken from `gitlab.yml`. New projects will be created in one of these stores, chosen at random.'
       optional :repository_size_limit, type: Integer, desc: 'Size limit per repository (MB)'
 
-      all_attributes = ::EE::ApplicationSettingsHelper.repository_mirror_attributes + ApplicationSettingsHelper.visible_attributes
+      all_attributes = ApplicationSettingsHelper.visible_attributes
+
+      ## EE-only
+      all_attributes += EE::ApplicationSettingsHelper.possible_licensed_attributes
+
       optional(*all_attributes)
       at_least_one_of(*all_attributes)
     end
     put "application/settings" do
       attrs = declared_params(include_missing: false)
 
+      ## EE-only: Remove unlicensed attributes
       unless ::License.feature_available?(:repository_mirrors)
         attrs = attrs.except(*::EE::ApplicationSettingsHelper.repository_mirror_attributes)
+      end
+
+      unless ::License.feature_available?(:external_authorization_service)
+        attrs = attrs.except(*::EE::ApplicationSettingsHelper.external_authorization_service_attributes)
+      end
+
+      unless ::License.feature_available?(:email_additional_text)
+        attrs = attrs.except(:email_additional_text)
       end
 
       # support legacy names, can be removed in v5
@@ -168,7 +182,7 @@ module API
         attrs[:password_authentication_enabled_for_web] = attrs.delete(:password_authentication_enabled)
       end
 
-      if current_settings.update_attributes(attrs)
+      if ApplicationSettings::UpdateService.new(current_settings, current_user, attrs).execute
         present current_settings, with: Entities::ApplicationSetting
       else
         render_validation_error!(current_settings)

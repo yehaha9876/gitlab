@@ -55,9 +55,6 @@ module API
       expose :can_create_project?, as: :can_create_project
       expose :two_factor_enabled?, as: :two_factor_enabled
       expose :external
-
-      # EE-only
-      expose :shared_runners_minutes_limit
     end
 
     class UserWithAdmin < UserPublic
@@ -74,16 +71,9 @@ module API
     end
 
     class ProjectHook < Hook
-      expose :project_id, :issues_events
-      expose :note_events, :pipeline_events, :wiki_page_events
+      expose :project_id, :issues_events, :confidential_issues_events
+      expose :note_events, :confidential_note_events, :pipeline_events, :wiki_page_events
       expose :job_events
-    end
-
-    class ProjectPushRule < Grape::Entity
-      expose :id, :project_id, :created_at
-      expose :commit_message_regex, :branch_name_regex, :deny_delete_tag
-      expose :member_check, :prevent_secrets, :author_email_regex
-      expose :file_name_regex, :max_file_size
     end
 
     class SharedGroup < Grape::Entity
@@ -99,6 +89,21 @@ module API
       expose :name, :name_with_namespace
       expose :path, :path_with_namespace
       expose :created_at
+    end
+
+    class ProjectExportStatus < ProjectIdentity
+      include ::API::Helpers::RelatedResourcesHelpers
+
+      expose :export_status
+      expose :_links, if: lambda { |project, _options| project.export_status == :finished } do
+        expose :api_url do |project|
+          expose_url(api_v4_projects_export_download_path(id: project.id))
+        end
+
+        expose :web_url do |project|
+          Gitlab::Routing.url_helpers.download_export_project_url(project)
+        end
+      end
     end
 
     class ProjectImportStatus < ProjectIdentity
@@ -120,7 +125,7 @@ module API
         # (fixed in https://github.com/rails/rails/pull/25976).
         project.tags.map(&:name).sort
       end
-      expose :ssh_url_to_repo, :http_url_to_repo, :web_url
+      expose :ssh_url_to_repo, :http_url_to_repo, :web_url, :readme_url
       expose :avatar_url do |project, options|
         project.avatar_url(only_path: false)
       end
@@ -131,6 +136,7 @@ module API
 
       def self.preload_relation(projects_relation, options =  {})
         projects_relation.preload(:project_feature, :route)
+                         .preload(:import_state)
                          .preload(namespace: [:route, :owner],
                                   tags: :taggings)
       end
@@ -144,11 +150,11 @@ module API
           expose_url(api_v4_projects_path(id: project.id))
         end
 
-        expose :issues, if: -> (*args) { issues_available?(*args) } do |project|
+        expose :issues, if: -> (project, options) { issues_available?(project, options) } do |project|
           expose_url(api_v4_projects_issues_path(id: project.id))
         end
 
-        expose :merge_requests, if: -> (*args) { mrs_available?(*args) } do |project|
+        expose :merge_requests, if: -> (project, options) { mrs_available?(project, options) } do |project|
           expose_url(api_v4_projects_merge_requests_path(id: project.id))
         end
 
@@ -198,13 +204,10 @@ module API
         SharedGroup.represent(project.project_group_links, options)
       end
       expose :only_allow_merge_if_pipeline_succeeds
-      expose :repository_storage, if: lambda { |_project, options| options[:current_user].try(:admin?) }
       expose :request_access_enabled
       expose :only_allow_merge_if_all_discussions_are_resolved
       expose :printing_merge_request_link_enabled
-
-      # EE only
-      expose :approvals_before_merge, if: ->(project, _) { project.feature_available?(:merge_request_approvers) }
+      expose :merge_method
 
       expose :statistics, using: 'API::Entities::ProjectStatistics', if: :statistics
 
@@ -240,25 +243,18 @@ module API
       expose :requested_at
     end
 
-    class LdapGroupLink < Grape::Entity
-      expose :cn, :group_access, :provider
+    class BasicGroupDetails < Grape::Entity
+      expose :id
+      expose :web_url
+      expose :name
     end
 
-    class Group < Grape::Entity
-      expose :id, :name, :path, :description, :visibility
-
-      ## EE-only
-      expose :ldap_cn, :ldap_access
-      expose :ldap_group_links,
-        using: Entities::LdapGroupLink,
-        if: lambda { |group, options| group.ldap_group_links.any? }
-      ## EE-only
-
+    class Group < BasicGroupDetails
+      expose :path, :description, :visibility
       expose :lfs_enabled?, as: :lfs_enabled
       expose :avatar_url do |group, options|
         group.avatar_url(only_path: false)
       end
-      expose :web_url
       expose :request_access_enabled
       expose :full_name, :full_path
 
@@ -294,9 +290,10 @@ module API
           options: { only_shared: true }
         ).execute
       end
+    end
 
-      # EE-only
-      expose :shared_runners_minutes_limit
+    class DiffRefs < Grape::Entity
+      expose :base_sha, :head_sha, :start_sha
     end
 
     class Commit < Grape::Entity
@@ -397,11 +394,6 @@ module API
     class ProtectedRefAccess < Grape::Entity
       expose :access_level
 
-      ## EE-only
-      expose :user_id
-      expose :group_id
-      ## EE-only
-
       expose :access_level_description do |protected_ref_access|
         protected_ref_access.humanize
       end
@@ -411,6 +403,7 @@ module API
       expose :name
       expose :push_access_levels, using: Entities::ProtectedRefAccess
       expose :merge_access_levels, using: Entities::ProtectedRefAccess
+      expose :unprotect_access_levels, using: Entities::ProtectedRefAccess
     end
 
     class Milestone < Grape::Entity
@@ -425,6 +418,7 @@ module API
 
     class IssueBasic < ProjectEntity
       expose :closed_at
+      expose :closed_by, using: Entities::UserBasic
       expose :labels do |issue, options|
         # Avoids an N+1 query since labels are preloaded
         issue.labels.map(&:title).sort
@@ -455,7 +449,6 @@ module API
       end
       expose :due_date
       expose :confidential
-      expose :weight, if: ->(issue, _) { issue.supports_weight? }
       expose :discussion_locked
 
       expose :web_url do |issue, options|
@@ -493,40 +486,6 @@ module API
       end
     end
 
-    class RelatedIssue < Issue
-      expose :issue_link_id
-    end
-
-    class Epic < Grape::Entity
-      expose :id
-      expose :iid
-      expose :group_id
-      expose :title
-      expose :description
-      expose :author, using: Entities::UserBasic
-      expose :start_date
-      expose :end_date
-      expose :created_at
-      expose :updated_at
-    end
-
-    class EpicIssue < Issue
-      expose :epic_issue_id
-      expose :relative_position
-    end
-
-    class EpicIssueLink < Grape::Entity
-      expose :id
-      expose :relative_position
-      expose :epic, using: Entities::Epic
-      expose :issue, using: Entities::IssueBasic
-    end
-
-    class IssueLink < Grape::Entity
-      expose :source, as: :source_issue, using: Entities::IssueBasic
-      expose :target, as: :target_issue, using: Entities::IssueBasic
-    end
-
     class IssuableTimeStats < Grape::Entity
       format_with(:time_tracking_formatter) do |time_spent|
         Gitlab::TimeTrackingFormatter.output(time_spent)
@@ -549,6 +508,10 @@ module API
     class ExternalIssue < Grape::Entity
       expose :title
       expose :id
+    end
+
+    class PipelineBasic < Grape::Entity
+      expose :id, :sha, :ref, :status
     end
 
     class MergeRequestSimple < ProjectEntity
@@ -595,12 +558,10 @@ module API
       expose :diff_head_sha, as: :sha
       expose :merge_commit_sha
       expose :user_notes_count
-      expose :approvals_before_merge
       expose :discussion_locked
       expose :should_remove_source_branch?, as: :should_remove_source_branch
       expose :force_remove_source_branch?, as: :force_remove_source_branch
-
-      expose :squash, if: -> (mr, _) { mr.project.feature_available?(:merge_request_squash) }
+      expose :allow_maintainer_to_push, if: -> (merge_request, _) { merge_request.for_fork? }
 
       expose :web_url do |merge_request, options|
         Gitlab::UrlBuilder.build(merge_request)
@@ -619,6 +580,44 @@ module API
       expose :changes_count do |merge_request, _options|
         merge_request.merge_request_diff.real_size
       end
+
+      expose :merged_by, using: Entities::UserBasic do |merge_request, _options|
+        merge_request.metrics&.merged_by
+      end
+
+      expose :merged_at do |merge_request, _options|
+        merge_request.metrics&.merged_at
+      end
+
+      expose :closed_by, using: Entities::UserBasic do |merge_request, _options|
+        merge_request.metrics&.latest_closed_by
+      end
+
+      expose :closed_at do |merge_request, _options|
+        merge_request.metrics&.latest_closed_at
+      end
+
+      expose :latest_build_started_at, if: -> (_, options) { build_available?(options) } do |merge_request, _options|
+        merge_request.metrics&.latest_build_started_at
+      end
+
+      expose :latest_build_finished_at, if: -> (_, options) { build_available?(options) } do |merge_request, _options|
+        merge_request.metrics&.latest_build_finished_at
+      end
+
+      expose :first_deployed_to_production_at, if: -> (_, options) { build_available?(options) } do |merge_request, _options|
+        merge_request.metrics&.first_deployed_to_production_at
+      end
+
+      expose :pipeline, using: Entities::PipelineBasic, if: -> (_, options) { build_available?(options) } do |merge_request, _options|
+        merge_request.metrics&.pipeline
+      end
+
+      expose :diff_refs, using: Entities::DiffRefs
+
+      def build_available?(options)
+        options[:project]&.feature_available?(:builds, options[:current_user])
+      end
     end
 
     class MergeRequestChanges < MergeRequest
@@ -627,16 +626,22 @@ module API
       end
     end
 
-    class Approvals < Grape::Entity
+    class Approver < Grape::Entity
       expose :user, using: Entities::UserBasic
+    end
+
+    class ApproverGroup < Grape::Entity
+      expose :group, using: Entities::Group
     end
 
     class MergeRequestApprovals < ProjectEntity
       expose :merge_status
       expose :approvals_required
       expose :approvals_left
-      expose :approvals, as: :approved_by, using: Entities::Approvals
+      expose :approvals, as: :approved_by, using: Entities::Approver
       expose :approvers_left, as: :suggested_approvers, using: Entities::UserBasic
+      expose :approvers, using: Entities::Approver
+      expose :approver_groups, using: Entities::ApproverGroup
 
       expose :user_has_approved do |merge_request, options|
         merge_request.has_approved?(options[:current_user])
@@ -677,11 +682,17 @@ module API
       expose :id, :key, :created_at
     end
 
+    class DiffPosition < Grape::Entity
+      expose :base_sha, :start_sha, :head_sha, :old_path, :new_path,
+        :position_type
+    end
+
     class Note < Grape::Entity
       # Only Issue and MergeRequest have iid
       NOTEABLE_TYPES_WITH_IID = %w(Issue MergeRequest).freeze
 
       expose :id
+      expose :type
       expose :note, as: :body
       expose :attachment_identifier, as: :attachment
       expose :author, using: Entities::UserBasic
@@ -689,8 +700,22 @@ module API
       expose :system?, as: :system
       expose :noteable_id, :noteable_type
 
+      expose :position, if: ->(note, options) { note.diff_note? } do |note|
+        note.position.to_h
+      end
+
+      expose :resolvable?, as: :resolvable
+      expose :resolved?, as: :resolved, if: ->(note, options) { note.resolvable? }
+      expose :resolved_by, using: Entities::UserBasic, if: ->(note, options) { note.resolvable? }
+
       # Avoid N+1 queries as much as possible
       expose(:noteable_iid) { |note| note.noteable.iid if NOTEABLE_TYPES_WITH_IID.include?(note.noteable_type) }
+    end
+
+    class Discussion < Grape::Entity
+      expose :id
+      expose :individual_note?, as: :individual_note
+      expose :notes, using: Entities::Note
     end
 
     class AwardEmoji < Grape::Entity
@@ -744,10 +769,6 @@ module API
       end
     end
 
-    class LdapGroup < Grape::Entity
-      expose :cn
-    end
-
     class ProjectGroupLink < Grape::Entity
       expose :id, :project_id, :group_id, :group_access, :expires_at
     end
@@ -790,12 +811,6 @@ module API
       def expose_members_count_with_descendants?(namespace, opts)
         namespace.kind == 'group' && Ability.allowed?(opts[:current_user], :admin_group, namespace)
       end
-
-      # EE-only
-      expose :shared_runners_minutes_limit, if: lambda { |_, options| options[:current_user]&.admin? }
-      expose :plan, if: -> (namespace, opts) { Ability.allowed?(opts[:current_user], :admin_namespace, namespace) } do |namespace, _|
-        namespace.plan&.name
-      end
     end
 
     class MemberAccess < Grape::Entity
@@ -832,7 +847,7 @@ module API
       expose :id, :title, :created_at, :updated_at, :active
       expose :push_events, :issues_events, :confidential_issues_events
       expose :merge_requests_events, :tag_push_events, :note_events
-      expose :pipeline_events, :wiki_page_events
+      expose :confidential_note_events, :pipeline_events, :wiki_page_events
       expose :job_events
       # Expose serialized properties
       expose :properties do |service, options|
@@ -915,20 +930,6 @@ module API
       expose :lists, using: Entities::List do |board|
         board.lists.destroyable
       end
-
-      # EE-specific START
-      def scoped_issue_available?(board)
-        board.parent.feature_available?(:scoped_issue_board)
-      end
-
-      # Default filtering configuration
-      expose :name
-      expose :group
-      expose :milestone, using: Entities::Milestone, if: -> (board, _) { scoped_issue_available?(board) }
-      expose :assignee, using: Entities::UserBasic, if: -> (board, _) { scoped_issue_available?(board) }
-      expose :labels, using: Entities::LabelBasic, if: -> (board, _) { scoped_issue_available?(board) }
-      expose :weight, if: -> (board, _) { scoped_issue_available?(board) }
-      # EE-specific END
     end
 
     class Compare < Grape::Entity
@@ -962,9 +963,6 @@ module API
     class ApplicationSetting < Grape::Entity
       expose :id
       expose(*::ApplicationSettingsHelper.visible_attributes)
-      expose(*EE::ApplicationSettingsHelper.repository_mirror_attributes, if: lambda do |_instance, _options|
-        ::License.feature_available?(:repository_mirrors)
-      end)
       expose(:restricted_visibility_levels) do |setting, _options|
         setting.restricted_visibility_levels.map { |level| Gitlab::VisibilityLevel.string_level(level) }
       end
@@ -983,7 +981,7 @@ module API
     end
 
     class Tag < Grape::Entity
-      expose :name, :message
+      expose :name, :message, :target
 
       expose :commit, using: Entities::Commit do |repo_tag, options|
         options[:project].repository.commit(repo_tag.dereferenced_target)
@@ -994,25 +992,10 @@ module API
       end
     end
 
-    class GitlabLicense < Grape::Entity
-      expose :starts_at, :expires_at, :licensee, :add_ons
-
-      expose :user_limit do |license, options|
-        license.restricted?(:active_user_count) ? license.restrictions[:active_user_count] : 0
-      end
-
-      expose :active_users do |license, options|
-        ::User.active.count
-      end
-    end
-
-    class TriggerRequest < Grape::Entity
-      expose :id, :variables
-    end
-
     class Runner < Grape::Entity
       expose :id
       expose :description
+      expose :ip_address
       expose :active
       expose :is_shared
       expose :name
@@ -1024,6 +1007,7 @@ module API
       expose :tag_list
       expose :run_untagged
       expose :locked
+      expose :maximum_timeout
       expose :access_level
       expose :version, :revision, :platform, :architecture
       expose :contacted_at
@@ -1035,6 +1019,13 @@ module API
           options[:current_user].authorized_projects.where(id: runner.projects)
         end
       end
+      expose :groups, with: Entities::BasicGroupDetails do |runner, options|
+        if options[:current_user].admin?
+          runner.groups
+        else
+          options[:current_user].authorized_groups.where(id: runner.groups)
+        end
+      end
     end
 
     class RunnerRegistrationDetails < Grape::Entity
@@ -1043,10 +1034,6 @@ module API
 
     class JobArtifactFile < Grape::Entity
       expose :filename, :size
-    end
-
-    class PipelineBasic < Grape::Entity
-      expose :id, :sha, :ref, :status
     end
 
     class JobBasic < Grape::Entity
@@ -1061,6 +1048,7 @@ module API
     class Job < JobBasic
       expose :artifacts_file, using: JobArtifactFile, if: -> (job, opts) { job.artifacts? }
       expose :runner, with: Runner
+      expose :artifacts_expire_at
     end
 
     class JobBasicWithProject < JobBasic
@@ -1077,13 +1065,6 @@ module API
     class Variable < Grape::Entity
       expose :key, :value
       expose :protected?, as: :protected, if: -> (entity, _) { entity.respond_to?(:protected?) }
-
-      # EE
-      expose :environment_scope, if: ->(variable, options) {
-        if variable.respond_to?(:environment_scope)
-          variable.project.feature_available?(:variable_environment_scope)
-        end
-      }
     end
 
     class Pipeline < PipelineBasic
@@ -1147,143 +1128,6 @@ module API
       expose :active?, as: :active
     end
 
-    class GeoNode < Grape::Entity
-      include ::API::Helpers::RelatedResourcesHelpers
-
-      expose :id
-      expose :url
-      expose :primary?, as: :primary
-      expose :enabled
-      expose :current?, as: :current
-      expose :files_max_capacity
-      expose :repos_max_capacity
-
-      # Retained for backwards compatibility. Remove in API v5
-      expose :clone_protocol do |_record, _options|
-        'http'
-      end
-
-      expose :_links do
-        expose :self do |geo_node|
-          expose_url api_v4_geo_nodes_path(id: geo_node.id)
-        end
-
-        expose :repair do |geo_node|
-          expose_url api_v4_geo_nodes_repair_path(id: geo_node.id)
-        end
-      end
-    end
-
-    class GeoNodeStatus < Grape::Entity
-      include ::API::Helpers::RelatedResourcesHelpers
-      include ActionView::Helpers::NumberHelper
-
-      expose :geo_node_id
-
-      expose :healthy?, as: :healthy
-      expose :health do |node|
-        node.healthy? ? 'Healthy' : node.health
-      end
-      expose :health_status
-      expose :missing_oauth_application
-
-      expose :attachments_count
-      expose :attachments_synced_count
-      expose :attachments_failed_count
-      expose :attachments_synced_in_percentage do |node|
-        number_to_percentage(node.attachments_synced_in_percentage, precision: 2)
-      end
-
-      expose :db_replication_lag_seconds
-
-      expose :lfs_objects_count
-      expose :lfs_objects_synced_count
-      expose :lfs_objects_failed_count
-      expose :lfs_objects_synced_in_percentage do |node|
-        number_to_percentage(node.lfs_objects_synced_in_percentage, precision: 2)
-      end
-
-      expose :job_artifacts_count
-      expose :job_artifacts_synced_count
-      expose :job_artifacts_failed_count
-      expose :job_artifacts_synced_in_percentage do |node|
-        number_to_percentage(node.job_artifacts_synced_in_percentage, precision: 2)
-      end
-
-      expose :repositories_count
-      expose :repositories_failed_count
-      expose :repositories_synced_count
-      expose :repositories_synced_in_percentage do |node|
-        number_to_percentage(node.repositories_synced_in_percentage, precision: 2)
-      end
-
-      expose :wikis_count
-      expose :wikis_failed_count
-      expose :wikis_synced_count
-      expose :wikis_synced_in_percentage do |node|
-        number_to_percentage(node.wikis_synced_in_percentage, precision: 2)
-      end
-
-      expose :replication_slots_count
-      expose :replication_slots_used_count
-      expose :replication_slots_used_in_percentage do |node|
-        number_to_percentage(node.replication_slots_used_in_percentage, precision: 2)
-      end
-      expose :replication_slots_max_retained_wal_bytes
-
-      expose :last_event_id
-      expose :last_event_timestamp
-      expose :cursor_last_event_id
-      expose :cursor_last_event_timestamp
-
-      expose :last_successful_status_check_timestamp
-
-      expose :version
-      expose :revision
-
-      expose :selective_sync_type
-
-      # Deprecated: remove in API v5. We use selective_sync_type instead now.
-      expose :namespaces, using: NamespaceBasic
-
-      expose :updated_at
-
-      # We load GeoNodeStatus data in two ways:
-      #
-      # 1. Directly by asking a Geo node via an API call
-      # 2. Via cached state in the database
-      #
-      # We don't yet cached the state of the shard information in the database, so if
-      # we don't have this information omit from the serialization entirely.
-      expose :storage_shards, using: StorageShardEntity, if: ->(status, options) do
-        status.storage_shards.present?
-      end
-
-      expose :storage_shards_match?, as: :storage_shards_match, if: -> (status, options) do
-        Gitlab::Geo.primary? && status.storage_shards.present?
-      end
-
-      expose :_links do
-        expose :self do |geo_node_status|
-          expose_url api_v4_geo_nodes_status_path(id: geo_node_status.geo_node_id)
-        end
-
-        expose :node do |geo_node_status|
-          expose_url api_v4_geo_nodes_path(id: geo_node_status.geo_node_id)
-        end
-      end
-
-      private
-
-      def namespaces
-        object.geo_node.namespaces
-      end
-
-      def missing_oauth_application
-        object.geo_node.missing_oauth_application?
-      end
-    end
-
     class PersonalAccessToken < Grape::Entity
       expose :id, :name, :revoked, :created_at, :scopes
       expose :active?, as: :active
@@ -1340,7 +1184,7 @@ module API
       end
 
       class RunnerInfo < Grape::Entity
-        expose :timeout
+        expose :metadata_timeout, as: :timeout
       end
 
       class Step < Grape::Entity
@@ -1434,6 +1278,10 @@ module API
       expose :domain
       expose :url
       expose :project_id
+      expose :verified?, as: :verified
+      expose :verification_code, as: :verification_code
+      expose :enabled_until
+
       expose :certificate,
         as: :certificate_expiration,
         if: ->(pages_domain, _) { pages_domain.certificate? },
@@ -1445,6 +1293,10 @@ module API
     class PagesDomain < Grape::Entity
       expose :domain
       expose :url
+      expose :verified?, as: :verified
+      expose :verification_code, as: :verification_code
+      expose :enabled_until
+
       expose :certificate,
         if: ->(pages_domain, _) { pages_domain.certificate? },
         using: PagesDomainCertificate do |pages_domain|
@@ -1471,5 +1323,52 @@ module API
       expose :startline
       expose :project_id
     end
+
+    class BasicBadgeDetails < Grape::Entity
+      expose :link_url
+      expose :image_url
+      expose :rendered_link_url do |badge, options|
+        badge.rendered_link_url(options.fetch(:project, nil))
+      end
+      expose :rendered_image_url do |badge, options|
+        badge.rendered_image_url(options.fetch(:project, nil))
+      end
+    end
+
+    class Badge < BasicBadgeDetails
+      expose :id
+      expose :kind do |badge|
+        badge.type == 'ProjectBadge' ? 'project' : 'group'
+      end
+    end
+
+    def self.prepend_entity(klass, with: nil)
+      if with.nil?
+        raise ArgumentError, 'You need to pass either the :with or :namespace option!'
+      end
+
+      klass.descendants.each { |descendant| descendant.prepend(with) }
+      klass.prepend(with)
+    end
+
+    class ApprovalSettings < Grape::Entity
+      expose :approvers, using: Entities::Approver
+      expose :approver_groups, using: Entities::ApproverGroup
+      expose :approvals_before_merge
+      expose :reset_approvals_on_push
+      expose :disable_overriding_approvers_per_merge_request
+    end
   end
 end
+
+API::Entities.prepend_entity(::API::Entities::ApplicationSetting, with: EE::API::Entities::ApplicationSetting)
+API::Entities.prepend_entity(::API::Entities::Board, with: EE::API::Entities::Board)
+API::Entities.prepend_entity(::API::Entities::Group, with: EE::API::Entities::Group)
+API::Entities.prepend_entity(::API::Entities::GroupDetail, with: EE::API::Entities::GroupDetail)
+API::Entities.prepend_entity(::API::Entities::IssueBasic, with: EE::API::Entities::IssueBasic)
+API::Entities.prepend_entity(::API::Entities::MergeRequestBasic, with: EE::API::Entities::MergeRequestBasic)
+API::Entities.prepend_entity(::API::Entities::Namespace, with: EE::API::Entities::Namespace)
+API::Entities.prepend_entity(::API::Entities::Project, with: EE::API::Entities::Project)
+API::Entities.prepend_entity(::API::Entities::ProtectedRefAccess, with: EE::API::Entities::ProtectedRefAccess)
+API::Entities.prepend_entity(::API::Entities::UserPublic, with: EE::API::Entities::UserPublic)
+API::Entities.prepend_entity(::API::Entities::Variable, with: EE::API::Entities::Variable)

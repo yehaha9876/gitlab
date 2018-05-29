@@ -18,6 +18,16 @@ module QA
           end
         end
       end
+
+      module Project
+        module Settings
+          autoload :ProtectedBranches, 'qa/ee/page/project/settings/protected_branches'
+        end
+      end
+
+      module MergeRequest
+        autoload :Show, 'qa/ee/page/merge_request/show'
+      end
     end
 
     module Factory

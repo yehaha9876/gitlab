@@ -6,7 +6,7 @@
 #   klass - actual class like Issue or MergeRequest
 #   current_user - which user use
 #   params:
-#     scope: 'created-by-me' or 'assigned-to-me' or 'all'
+#     scope: 'created_by_me' or 'assigned_to_me' or 'all'
 #     state: 'opened' or 'closed' or 'all'
 #     group_id: integer
 #     project_id: integer
@@ -19,41 +19,51 @@
 #     non_archived: boolean
 #     iids: integer[]
 #     my_reaction_emoji: string
+#     created_after: datetime
+#     created_before: datetime
+#     updated_after: datetime
+#     updated_before: datetime
 #
 class IssuableFinder
+  prepend FinderWithCrossProjectAccess
+  include FinderMethods
   include CreatedAtFilter
+
+  requires_cross_project_access unless: -> { project? }
 
   NONE = '0'.freeze
 
-  SCALAR_PARAMS = %i[
-    assignee_id
-    assignee_username
-    author_id
-    author_username
-    authorized_only
-    due_date
-    group_id
-    iids
-    label_name
-    milestone_title
-    my_reaction_emoji
-    non_archived
-    project_id
-    scope
-    search
-    sort
-    state
-    include_subgroups
-  ].freeze
-  ARRAY_PARAMS = { label_name: [], iids: [], assignee_username: [] }.freeze
-
-  EE_SCALAR_PARAMS = %i[
-    weight
-  ].freeze
-
-  VALID_PARAMS = (SCALAR_PARAMS + [ARRAY_PARAMS] + EE_SCALAR_PARAMS).freeze
-
   attr_accessor :current_user, :params
+
+  def self.scalar_params
+    @scalar_params ||= %i[
+      assignee_id
+      assignee_username
+      author_id
+      author_username
+      authorized_only
+      group_id
+      iids
+      label_name
+      milestone_title
+      my_reaction_emoji
+      non_archived
+      project_id
+      scope
+      search
+      sort
+      state
+      include_subgroups
+    ]
+  end
+
+  def self.array_params
+    @array_params ||= { label_name: [], iids: [], assignee_username: [] }
+  end
+
+  def self.valid_params
+    @valid_params ||= scalar_params + [array_params]
+  end
 
   def initialize(current_user, params = {})
     @current_user = current_user
@@ -62,32 +72,28 @@ class IssuableFinder
 
   def execute
     items = init_collection
+    items = filter_items(items)
+
+    # Filtering by project HAS TO be the last because we use the project IDs yielded by the issuable query thus far
+    items = by_project(items)
+
+    sort(items)
+  end
+
+  def filter_items(items)
     items = by_scope(items)
     items = by_created_at(items)
+    items = by_updated_at(items)
     items = by_state(items)
     items = by_group(items)
     items = by_search(items)
     items = by_assignee(items)
     items = by_author(items)
-    items = by_weight(items)
-    items = by_due_date(items)
     items = by_non_archived(items)
     items = by_iids(items)
     items = by_milestone(items)
     items = by_label(items)
-    items = by_my_reaction_emoji(items)
-
-    # Filtering by project HAS TO be the last because we use the project IDs yielded by the issuable query thus far
-    items = by_project(items)
-    sort(items)
-  end
-
-  def find(*params)
-    execute.find(*params)
-  end
-
-  def find_by(*params)
-    execute.find_by(*params)
+    by_my_reaction_emoji(items)
   end
 
   def row_count
@@ -117,10 +123,6 @@ class IssuableFinder
     counts[:all] = counts.values.sum
 
     counts.with_indifferent_access
-  end
-
-  def find_by!(*params)
-    execute.find_by!(*params)
   end
 
   def group
@@ -157,7 +159,10 @@ class IssuableFinder
         finder_options = { include_subgroups: params[:include_subgroups], only_owned: true }
         GroupProjectsFinder.new(group: group, current_user: current_user, options: finder_options).execute
       else
-        ProjectsFinder.new(current_user: current_user, project_ids_relation: item_project_ids(items)).execute
+        opts = { current_user: current_user }
+        opts[:project_ids_relation] = item_project_ids(items) if items
+
+        ProjectsFinder.new(opts).execute
       end
 
     @projects = projects.with_feature_available_for_user(klass, current_user).reorder(nil)
@@ -277,13 +282,20 @@ class IssuableFinder
     return items.none if current_user_related? && !current_user
 
     case params[:scope]
-    when 'created-by-me', 'authored'
+    when 'created_by_me', 'authored'
       items.where(author_id: current_user.id)
-    when 'assigned-to-me'
+    when 'assigned_to_me'
       items.assigned_to(current_user)
     else
       items
     end
+  end
+
+  def by_updated_at(items)
+    items = items.updated_after(params[:updated_after]) if params[:updated_after].present?
+    items = items.updated_before(params[:updated_before]) if params[:updated_before].present?
+
+    items
   end
 
   def by_state(items)
@@ -307,9 +319,9 @@ class IssuableFinder
   def by_project(items)
     items =
       if project?
-        items.of_projects(projects(items)).references_project
-      elsif projects(items)
-        items.merge(projects(items).reorder(nil)).join_project
+        items.of_projects(projects).references_project
+      elsif projects
+        items.merge(projects.reorder(nil)).join_project
       else
         items.none
       end
@@ -328,7 +340,19 @@ class IssuableFinder
   def sort(items)
     # Ensure we always have an explicit sort order (instead of inheriting
     # multiple orders when combining ActiveRecord::Relation objects).
-    params[:sort] ? items.sort(params[:sort], excluded_labels: label_names) : items.reorder(id: :desc)
+    params[:sort] ? items.sort_by_attribute(params[:sort], excluded_labels: label_names) : items.reorder(id: :desc)
+  end
+
+  def by_assignee(items)
+    if assignee
+      items = items.where(assignee_id: assignee.id)
+    elsif no_assignee?
+      items = items.where(assignee_id: nil)
+    elsif assignee_id? || assignee_username? # assignee not found
+      items = items.none
+    end
+
+    items
   end
 
   def by_author(items)
@@ -381,73 +405,12 @@ class IssuableFinder
     items
   end
 
-  def by_weight(items)
-    return items unless weights?
-
-    if filter_by_no_weight?
-      items.where(weight: [-1, nil])
-    elsif filter_by_any_weight?
-      items.where.not(weight: [-1, nil])
-    else
-      items.where(weight: params[:weight])
-    end
-  end
-
-  def weights?
-    params[:weight].present? && params[:weight] != Issue::WEIGHT_ALL &&
-      klass.column_names.include?('weight')
-  end
-
-  def filter_by_no_weight?
-    params[:weight] == Issue::WEIGHT_NONE
-  end
-
-  def filter_by_any_weight?
-    params[:weight] == Issue::WEIGHT_ANY
-  end
-
   def by_my_reaction_emoji(items)
     if params[:my_reaction_emoji].present? && current_user
       items = items.awarded(current_user, params[:my_reaction_emoji])
     end
 
     items
-  end
-
-  def by_due_date(items)
-    if due_date?
-      if filter_by_no_due_date?
-        items = items.without_due_date
-      elsif filter_by_overdue?
-        items = items.due_before(Date.today)
-      elsif filter_by_due_this_week?
-        items = items.due_between(Date.today.beginning_of_week, Date.today.end_of_week)
-      elsif filter_by_due_this_month?
-        items = items.due_between(Date.today.beginning_of_month, Date.today.end_of_month)
-      end
-    end
-
-    items
-  end
-
-  def filter_by_no_due_date?
-    due_date? && params[:due_date] == Issue::NoDueDate.name
-  end
-
-  def filter_by_overdue?
-    due_date? && params[:due_date] == Issue::Overdue.name
-  end
-
-  def filter_by_due_this_week?
-    due_date? && params[:due_date] == Issue::DueThisWeek.name
-  end
-
-  def filter_by_due_this_month?
-    due_date? && params[:due_date] == Issue::DueThisMonth.name
-  end
-
-  def due_date?
-    params[:due_date].present? && klass.column_names.include?('due_date')
   end
 
   def label_names
@@ -463,6 +426,7 @@ class IssuableFinder
   end
 
   def current_user_related?
-    params[:scope] == 'created-by-me' || params[:scope] == 'authored' || params[:scope] == 'assigned-to-me'
+    scope = params[:scope]
+    scope == 'created_by_me' || scope == 'authored' || scope == 'assigned_to_me'
   end
 end

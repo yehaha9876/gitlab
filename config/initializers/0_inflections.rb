@@ -18,6 +18,8 @@ ActiveSupport::Inflector.inflections do |inflect|
     project_auto_devops
     project_registry
     file_registry
+    job_artifact_registry
+    vulnerability_feedback
   )
   inflect.acronym 'EE'
 end

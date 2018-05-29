@@ -86,7 +86,7 @@ describe BlobHelper do
     it 'verifies blob is text' do
       expect(helper).not_to receive(:blob_text_viewable?)
 
-      button = edit_blob_link(project, 'refs/heads/master', 'README.md')
+      button = edit_blob_button(project, 'refs/heads/master', 'README.md')
 
       expect(button).to start_with('<button')
     end
@@ -96,17 +96,17 @@ describe BlobHelper do
 
       expect(project.repository).not_to receive(:blob_at)
 
-      edit_blob_link(project, 'refs/heads/master', 'README.md', blob: blob)
+      edit_blob_button(project, 'refs/heads/master', 'README.md', blob: blob)
     end
 
     it 'returns a link with the proper route' do
-      link = edit_blob_link(project, 'master', 'README.md')
+      link = edit_blob_button(project, 'master', 'README.md')
 
       expect(Capybara.string(link).find_link('Edit')[:href]).to eq("/#{project.full_path}/edit/master/README.md")
     end
 
     it 'returns a link with the passed link_opts on the expected route' do
-      link = edit_blob_link(project, 'master', 'README.md', link_opts: { mr_id: 10 })
+      link = edit_blob_button(project, 'master', 'README.md', link_opts: { mr_id: 10 })
 
       expect(Capybara.string(link).find_link('Edit')[:href]).to eq("/#{project.full_path}/edit/master/README.md?mr_id=10")
     end
@@ -240,6 +240,37 @@ describe BlobHelper do
           expect(helper.blob_render_error_options(viewer)).to include(/download it/)
         end
       end
+    end
+  end
+
+  describe '#ide_edit_path' do
+    let(:project) { create(:project) }
+
+    around do |example|
+      old_script_name = Rails.application.routes.default_url_options[:script_name]
+      begin
+        example.run
+      ensure
+        Rails.application.routes.default_url_options[:script_name] = old_script_name
+      end
+    end
+
+    it 'returns full IDE path' do
+      Rails.application.routes.default_url_options[:script_name] = nil
+
+      expect(helper.ide_edit_path(project, "master", "")).to eq("/-/ide/project/#{project.namespace.path}/#{project.path}/edit/master")
+    end
+
+    it 'returns full IDE path with second -' do
+      Rails.application.routes.default_url_options[:script_name] = nil
+
+      expect(helper.ide_edit_path(project, "testing/slashes", "readme.md")).to eq("/-/ide/project/#{project.namespace.path}/#{project.path}/edit/testing/slashes/-/readme.md")
+    end
+
+    it 'returns IDE path without relative_url_root' do
+      Rails.application.routes.default_url_options[:script_name] = "/gitlab"
+
+      expect(helper.ide_edit_path(project, "master", "")).to eq("/gitlab/-/ide/project/#{project.namespace.path}/#{project.path}/edit/master")
     end
   end
 end

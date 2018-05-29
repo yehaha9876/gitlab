@@ -11,14 +11,17 @@ module Gitlab
                     hooks: 'ProjectHook',
                     merge_access_levels: 'ProtectedBranch::MergeAccessLevel',
                     push_access_levels: 'ProtectedBranch::PushAccessLevel',
+                    unprotect_access_levels: 'ProtectedBranch::UnprotectAccessLevel',
                     create_access_levels: 'ProtectedTag::CreateAccessLevel',
                     labels: :project_labels,
                     priorities: :label_priorities,
                     auto_devops: :project_auto_devops,
                     label: :project_label,
-                    custom_attributes: 'ProjectCustomAttribute' }.freeze
+                    custom_attributes: 'ProjectCustomAttribute',
+                    project_badges: 'Badge',
+                    ci_cd_settings: 'ProjectCiCdSetting' }.freeze
 
-      USER_REFERENCES = %w[author_id assignee_id updated_by_id user_id created_by_id last_edited_by_id merge_user_id resolved_by_id].freeze
+      USER_REFERENCES = %w[author_id assignee_id updated_by_id user_id created_by_id last_edited_by_id merge_user_id resolved_by_id closed_by_id].freeze
 
       PROJECT_REFERENCES = %w[project_id source_project_id target_project_id].freeze
 
@@ -26,7 +29,7 @@ module Gitlab
 
       IMPORTED_OBJECT_MAX_RETRIES = 5.freeze
 
-      EXISTING_OBJECT_CHECK = %i[milestone milestones label labels project_label project_labels group_label group_labels].freeze
+      EXISTING_OBJECT_CHECK = %i[milestone milestones label labels project_label project_labels group_label group_labels project_feature].freeze
 
       TOKEN_RESET_MODELS = %w[Ci::Trigger Ci::Build ProjectHook].freeze
 
@@ -69,6 +72,7 @@ module Gitlab
 
         update_user_references
         update_project_references
+        remove_duplicate_assignees
 
         reset_tokens!
         remove_encrypted_attributes!
@@ -80,6 +84,14 @@ module Gitlab
             @relation_hash[reference] = @members_mapper.map[@relation_hash[reference]]
           end
         end
+      end
+
+      def remove_duplicate_assignees
+        return unless @relation_hash['issue_assignees']
+
+        # When an assignee did not exist in the members mapper, the importer is
+        # assigned. We only need to assign each user once.
+        @relation_hash['issue_assignees'].uniq!(&:user_id)
       end
 
       def setup_note

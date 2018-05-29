@@ -1,4 +1,4 @@
-module QA
+module QA # rubocop:disable Naming/FileName
   module Page
     module Project
       module Settings
@@ -7,7 +7,7 @@ module QA
 
           view 'app/views/projects/settings/ci_cd/show.html.haml' do
             element :runners_settings, 'Runners settings'
-            element :secret_variables, 'Secret variables'
+            element :secret_variables, 'Variables'
           end
 
           def expand_runners_settings(&block)
@@ -17,7 +17,7 @@ module QA
           end
 
           def expand_secret_variables(&block)
-            expand_section('Secret variables') do
+            expand_section('Variables') do
               Settings::SecretVariables.perform(&block)
             end
           end

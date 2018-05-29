@@ -1,10 +1,7 @@
 - page_title 'Preferences'
 - @content_class = "limit-container-width" unless fluid_layout
-= render 'profiles/head'
 
 = form_for @user, url: profile_preferences_path, remote: true, method: :put, html: { class: 'row prepend-top-default js-preferences-form' } do |f|
-  = render "profiles/preferences/ide", f: f
-
   .col-lg-4.application-theme
     %h4.prepend-top-0
       GitLab navigation theme
@@ -54,7 +51,7 @@
       = f.label :layout, class: 'label-light' do
         Layout width
       = f.select :layout, layout_choices, {}, class: 'form-control'
-      .help-block
+      .form-text.text-muted
         Choose between fixed (max. 1200px) and fluid (100%) application layout.
     .form-group
       = f.label :dashboard, class: 'label-light' do
@@ -64,7 +61,7 @@
       = f.label :project_view, class: 'label-light' do
         Project overview content
       = f.select :project_view, project_view_choices, {}, class: 'form-control'
-      .help-block
+      .form-text.text-muted
         Choose what content you want to see on a project’s overview page
     .form-group
       = f.submit 'Save changes', class: 'btn btn-save'

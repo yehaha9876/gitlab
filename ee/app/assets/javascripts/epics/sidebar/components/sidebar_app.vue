@@ -1,18 +1,29 @@
 <script>
   /* eslint-disable vue/require-default-prop */
+  import _ from 'underscore';
   import Cookies from 'js-cookie';
   import Flash from '~/flash';
+  import { __ } from '~/locale';
   import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
-  import sidebarDatePicker from '~/vue_shared/components/sidebar/date_picker.vue';
-  import sidebarCollapsedGroupedDatePicker from '~/vue_shared/components/sidebar/collapsed_grouped_date_picker.vue';
+  import ListLabel from '~/vue_shared/models/label';
+  import SidebarDatePicker from '~/vue_shared/components/sidebar/date_picker.vue';
+  import SidebarCollapsedGroupedDatePicker from '~/vue_shared/components/sidebar/collapsed_grouped_date_picker.vue';
+  import ToggleSidebar from '~/vue_shared/components/sidebar/toggle_sidebar.vue';
+  import SidebarLabelsSelect from '~/vue_shared/components/sidebar/labels_select/base.vue';
+  import SidebarParticipants from './sidebar_participants.vue';
+  import SidebarSubscriptions from './sidebar_subscriptions.vue';
   import SidebarService from '../services/sidebar_service';
   import Store from '../stores/sidebar_store';
 
   export default {
     name: 'EpicSidebar',
     components: {
-      sidebarDatePicker,
-      sidebarCollapsedGroupedDatePicker,
+      ToggleSidebar,
+      SidebarDatePicker,
+      SidebarCollapsedGroupedDatePicker,
+      SidebarLabelsSelect,
+      SidebarParticipants,
+      SidebarSubscriptions,
     },
     props: {
       endpoint: {
@@ -32,31 +43,89 @@
         type: String,
         required: false,
       },
+      initialLabels: {
+        type: Array,
+        required: true,
+      },
+      initialParticipants: {
+        type: Array,
+        required: true,
+      },
+      initialSubscribed: {
+        type: Boolean,
+        required: true,
+      },
+      namespace: {
+        type: String,
+        required: false,
+        default: '#',
+      },
+      updatePath: {
+        type: String,
+        required: true,
+      },
+      labelsPath: {
+        type: String,
+        required: true,
+      },
+      toggleSubscriptionPath: {
+        type: String,
+        required: true,
+      },
+      labelsWebUrl: {
+        type: String,
+        required: true,
+      },
+      epicsWebUrl: {
+        type: String,
+        required: true,
+      },
     },
     data() {
       const store = new Store({
         startDate: this.initialStartDate,
         endDate: this.initialEndDate,
+        subscribed: this.initialSubscribed,
       });
 
       return {
         store,
         // Backend will pass the appropriate css class for the contentContainer
         collapsed: Cookies.get('collapsed_gutter') === 'true',
+        autoExpanded: false,
         savingStartDate: false,
         savingEndDate: false,
-        service: new SidebarService(this.endpoint),
+        savingSubscription: false,
+        service: new SidebarService(this.endpoint, this.toggleSubscriptionPath),
+        epicContext: {
+          labels: this.initialLabels,
+        },
       };
     },
     methods: {
       toggleSidebar() {
         this.collapsed = !this.collapsed;
 
-        const contentContainer = this.$el.closest('.page-with-sidebar');
+        const contentContainer = this.$el.closest('.page-with-contextual-sidebar');
         contentContainer.classList.toggle('right-sidebar-expanded');
         contentContainer.classList.toggle('right-sidebar-collapsed');
 
         Cookies.set('collapsed_gutter', this.collapsed);
+      },
+      toggleSidebarRevealLabelsDropdown() {
+        const contentContainer = this.$el.closest('.page-with-contextual-sidebar');
+        this.toggleSidebar();
+        // When sidebar is expanded, we need to wait
+        // for rendering to finish before opening
+        // dropdown as otherwise it causes `calc()`
+        // used in CSS to miscalculate collapsed
+        // sidebar size.
+        _.debounce(() => {
+          this.autoExpanded = true;
+          contentContainer
+            .querySelector('.js-sidebar-dropdown-toggle')
+            .dispatchEvent(new Event('click', { bubbles: true, cancelable: false }));
+        }, 100)();
       },
       saveDate(dateType = 'start', newDate) {
         const type = dateType === 'start' ? dateType : 'end';
@@ -82,6 +151,45 @@
       saveEndDate(date) {
         return this.saveDate('end', date);
       },
+      handleLabelClick(label) {
+        if (label.isAny) {
+          this.epicContext.labels = [];
+        } else {
+          const labelIndex = this.epicContext.labels.findIndex(l => l.id === label.id);
+
+          if (labelIndex === -1) {
+            this.epicContext.labels.push(
+              new ListLabel({
+                id: label.id,
+                title: label.title,
+                color: label.color[0],
+                textColor: label.text_color,
+              }),
+            );
+          } else {
+            this.epicContext.labels.splice(labelIndex, 1);
+          }
+        }
+      },
+      handleDropdownClose() {
+        if (this.autoExpanded) {
+          this.autoExpanded = false;
+          this.toggleSidebar();
+        }
+      },
+      handleToggleSubscribed() {
+        this.service.toggleSubscribed()
+          .then(() => {
+            this.store.setSubscribed(!this.store.subscribed);
+          })
+          .catch(() => {
+            if (this.store.subscribed) {
+              Flash(__('An error occurred while unsubscribing to notifications.'));
+            } else {
+              Flash(__('An error occurred while subscribing to notifications.'));
+            }
+          });
+      },
     },
   };
 </script>
@@ -91,9 +199,16 @@
     class="right-sidebar"
     :class="{ 'right-sidebar-expanded' : !collapsed, 'right-sidebar-collapsed': collapsed }"
   >
-    <div class="issuable-sidebar">
+    <div class="issuable-sidebar js-issuable-update">
+      <div class="block issuable-sidebar-header">
+        <toggle-sidebar
+          :collapsed="collapsed"
+          @toggle="toggleSidebar"
+        />
+      </div>
       <sidebar-date-picker
         v-if="!collapsed"
+        block-class="start-date"
         :collapsed="collapsed"
         :is-loading="savingStartDate"
         :editable="editable"
@@ -106,6 +221,7 @@
       />
       <sidebar-date-picker
         v-if="!collapsed"
+        block-class="end-date"
         :collapsed="collapsed"
         :is-loading="savingEndDate"
         :editable="editable"
@@ -120,7 +236,32 @@
         :collapsed="collapsed"
         :min-date="store.startDateTime"
         :max-date="store.endDateTime"
-        :show-toggle-sidebar="true"
+        @toggleCollapse="toggleSidebar"
+      />
+      <sidebar-labels-select
+        ability-name="epic"
+        :context="epicContext"
+        :namespace="namespace"
+        :update-path="updatePath"
+        :labels-path="labelsPath"
+        :labels-web-url="labelsWebUrl"
+        :label-filter-base-path="epicsWebUrl"
+        :can-edit="editable"
+        :show-create="true"
+        @onLabelClick="handleLabelClick"
+        @onDropdownClose="handleDropdownClose"
+        @toggleCollapse="toggleSidebarRevealLabelsDropdown"
+      >
+        {{ __('None') }}
+      </sidebar-labels-select>
+      <sidebar-participants
+        :participants="initialParticipants"
+        @toggleCollapse="toggleSidebar"
+      />
+      <sidebar-subscriptions
+        :loading="savingSubscription"
+        :subscribed="store.subscribed"
+        @toggleSubscription="handleToggleSubscribed"
         @toggleCollapse="toggleSidebar"
       />
     </div>

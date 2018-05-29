@@ -63,7 +63,7 @@ A popover can contain a header section with a different background color if that
 
 ![Popover usage](img/popover-placement-below.png)
 
-This example shows two sections, where each section includes an actionable element. The first section shows a summary of the content shown when clicking the "read more" link. With this information the user can decide to dive deeper or start their GitLab Enterprise Edition trial immediately.
+This example shows two sections, where each section includes an actionable element. The first section shows a summary of the content shown when clicking the "read more" link. With this information the user can decide to dive deeper or start their GitLab Ultimate trial immediately.
 
 ### Placement
 By default, tooltips should be placed below the referring element. However, if there isn’t enough space in the viewport or it blocks related content, the tooltip should be moved to the side or above as needed.
@@ -219,7 +219,7 @@ Blocks are a way to group related information.
 
 #### Content blocks
 
-Content blocks (`.content-block`) are the basic grouping of content. They are commonly used in [lists](#lists), and are separated by a botton border.
+Content blocks (`.content-block`) are the basic grouping of content. They are commonly used in [lists](#lists), and are separated by a button border.
 
 ![Content block](img/components-contentblock.png)
 
@@ -281,7 +281,7 @@ Modals are only used for having a conversation and confirmation with the user. T
 
 | Modal with 2 actions | Modal with 3 actions | Special confirmation |
 | --------------------- | --------------------- | -------------------- |
-| ![two-actions](img/modals-general-confimation-dialog.png) | ![three-actions](img/modals-three-buttons.png) | ![spcial-confirmation](img/modals-special-confimation-dialog.png) |
+| ![two-actions](img/modals-general-confimation-dialog.png) | ![three-actions](img/modals-three-buttons.png) | ![special-confirmation](img/modals-special-confimation-dialog.png) |
 
 > TODO: Special case for modal.
 

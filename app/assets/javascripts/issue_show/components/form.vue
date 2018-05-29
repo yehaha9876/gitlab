@@ -48,6 +48,11 @@
         required: false,
         default: true,
       },
+      canAttachFile: {
+        type: Boolean,
+        required: false,
+        default: true,
+      },
       enableAutocomplete: {
         type: Boolean,
         required: false,
@@ -79,7 +84,7 @@
       <div
         :class="{
           'col-sm-8 col-lg-9': hasIssuableTemplates,
-          'col-xs-12': !hasIssuableTemplates,
+          'col-12': !hasIssuableTemplates,
         }"
       >
         <title-field
@@ -92,6 +97,7 @@
       :form-state="formState"
       :markdown-preview-path="markdownPreviewPath"
       :markdown-docs-path="markdownDocsPath"
+      :can-attach-file="canAttachFile"
       :enable-autocomplete="enableAutocomplete"
     />
     <edit-actions

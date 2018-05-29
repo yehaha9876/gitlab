@@ -1,4 +1,4 @@
-# Working with the bundled Consul service
+# Working with the bundled Consul service **[PREMIUM ONLY]**
 
 ## Overview
 
@@ -59,6 +59,8 @@ To fix this:
    }
    ```
 1. Run `gitlab-ctl reconfigure`
+
+If you still see the errors, you may have to [erase the consul database and reinitialize](#recreate-from-scratch) on the affected node.
 
 ### Consul agents do not start - Multiple private IPs
 

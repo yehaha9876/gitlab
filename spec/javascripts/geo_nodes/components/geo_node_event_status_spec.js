@@ -1,19 +1,20 @@
 import Vue from 'vue';
 
 import geoNodeEventStatusComponent from 'ee/geo_nodes/components/geo_node_event_status.vue';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockNodeDetails } from '../mock_data';
 
-import mountComponent from '../../helpers/vue_mount_component_helper';
-
-const createComponent = (
+const createComponent = ({
   eventId = mockNodeDetails.lastEvent.id,
   eventTimeStamp = mockNodeDetails.lastEvent.timeStamp,
-) => {
+  eventTypeLogStatus = false,
+}) => {
   const Component = Vue.extend(geoNodeEventStatusComponent);
 
   return mountComponent(Component, {
     eventId,
     eventTimeStamp,
+    eventTypeLogStatus,
   });
 };
 
@@ -21,7 +22,7 @@ describe('GeoNodeEventStatus', () => {
   let vm;
 
   beforeEach(() => {
-    vm = createComponent();
+    vm = createComponent({});
   });
 
   afterEach(() => {
@@ -40,6 +41,18 @@ describe('GeoNodeEventStatus', () => {
         expect(vm.timeStampString).toContain('Nov 21, 2017');
       });
     });
+
+    describe('eventString', () => {
+      it('returns computed event string when `eventTypeLogStatus` prop is true', () => {
+        const vmWithLogStatus = createComponent({ eventTypeLogStatus: true });
+        expect(vmWithLogStatus.eventString).toBe(mockNodeDetails.lastEvent.id);
+        vmWithLogStatus.$destroy();
+      });
+
+      it('returns event ID as it is when `eventTypeLogStatus` prop is false', () => {
+        expect(vm.eventString).toBe(mockNodeDetails.lastEvent.id);
+      });
+    });
   });
 
   describe('template', () => {
@@ -51,7 +64,10 @@ describe('GeoNodeEventStatus', () => {
     });
 
     it('renders empty state when timestamp is not present', () => {
-      const vmWithoutTimestamp = createComponent(0, 0);
+      const vmWithoutTimestamp = createComponent({
+        eventId: 0,
+        eventTimeStamp: 0,
+      });
       expect(vmWithoutTimestamp.$el.querySelectorAll('strong').length).not.toBe(0);
       expect(vmWithoutTimestamp.$el.querySelectorAll('.event-status-timestamp').length).toBe(0);
       expect(vmWithoutTimestamp.$el.querySelector('strong').innerText.trim()).toBe('Not available');

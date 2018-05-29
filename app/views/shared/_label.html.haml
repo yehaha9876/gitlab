@@ -2,18 +2,23 @@
 - status = label_subscription_status(label, @project).inquiry if current_user
 - subject = local_assigns[:subject]
 - toggle_subscription_path = toggle_subscription_label_path(label, @project) if current_user
+- show_label_epics_link = @group&.feature_available?(:epics)
 - show_label_merge_requests_link = show_label_issuables_link?(label, :merge_requests, project: @project)
 - show_label_issues_link = show_label_issuables_link?(label, :issues, project: @project)
 
 %li.label-list-item{ id: label_css_id, data: { id: label.id } }
   = render "shared/label_row", label: label
 
-  .visible-xs.visible-sm-inline-block.dropdown
+  .d-inline-block.d-sm-none.dropdown
     %button.btn.btn-default.label-options-toggle{ type: 'button', data: { toggle: "dropdown" } }
       Options
       = icon('caret-down')
-    .dropdown-menu.dropdown-menu-align-right
+    .dropdown-menu.dropdown-menu-right
       %ul
+        - if show_label_epics_link
+          %li
+            = link_to group_epics_path(@group, label_name:[label.name]) do
+              View epics
         - if show_label_merge_requests_link
           %li
             = link_to_label(label, subject: subject, type: :merge_request) do
@@ -46,12 +51,21 @@
               data: {confirm: 'Remove this label? Are you sure?'},
               class: 'text-danger'
 
-  .pull-right.hidden-xs.hidden-sm
-    - if label.is_a?(ProjectLabel) && label.project.group && can?(current_user, :admin_label, label.project.group)
-      = link_to promote_project_label_path(label.project, label), title: "Promote to Group Label", class: 'btn btn-transparent btn-action', data: {confirm: "Promoting #{label.title} will make it available for all projects inside #{label.project.group.name}. Existing project labels with the same name will be merged. This action cannot be reversed.", toggle: "tooltip"}, method: :post do
-        %span.sr-only Promote to Group
-        = sprite_icon('level-up')
+  .float-right.d-none.d-sm-none.d-md-block
     - if can?(current_user, :admin_label, label)
+      - if label.is_a?(ProjectLabel) && label.project.group && can?(current_user, :admin_label, label.project.group)
+        %button.js-promote-project-label-button.btn.btn-transparent.btn-action.has-tooltip{ title: _('Promote to Group Label'),
+          disabled: true,
+          type: 'button',
+          data: { url: promote_project_label_path(label.project, label),
+                  label_title: label.title,
+                  label_color: label.color,
+                  label_text_color: label.text_color,
+                  group_name: label.project.group.name,
+                  target: '#promote-label-modal',
+                  container: 'body',
+                  toggle: 'modal' } }
+          = sprite_icon('level-up')
       = link_to edit_label_path(label), title: "Edit", class: 'btn btn-transparent btn-action', data: {toggle: "tooltip"} do
         %span.sr-only Edit
         = sprite_icon('pencil')

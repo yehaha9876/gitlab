@@ -1,19 +1,26 @@
 module Geo
+  # This class is responsible for:
+  #   * Finding the appropriate Downloader class for a FileRegistry record
+  #   * Executing the Downloader
+  #   * Marking the FileRegistry record as synced or needing retry
   class FileDownloadService < FileService
     LEASE_TIMEOUT = 8.hours.freeze
 
     include Delay
+    include ExclusiveLeaseGuard
 
     def execute
-      try_obtain_lease do |lease|
+      try_obtain_lease do
         start_time = Time.now
-        bytes_downloaded = downloader.execute
-        success = (bytes_downloaded.present? && bytes_downloaded >= 0)
-        log_info("File download",
-                 success: success,
-                 bytes_downloaded: bytes_downloaded,
-                 download_time_s: (Time.now - start_time).to_f.round(3))
-        update_registry(bytes_downloaded, success: success)
+
+        download_result = downloader.execute
+
+        mark_as_synced = download_result.success || download_result.primary_missing_file
+
+        log_file_download(mark_as_synced, download_result, start_time)
+        update_registry(download_result.bytes_downloaded,
+                        mark_as_synced: mark_as_synced,
+                        missing_on_primary: download_result.primary_missing_file)
       end
     end
 
@@ -27,38 +34,54 @@ module Geo
       raise
     end
 
-    def try_obtain_lease
-      uuid = Gitlab::ExclusiveLease.new(lease_key, timeout: LEASE_TIMEOUT).try_obtain
+    def log_file_download(mark_as_synced, download_result, start_time)
+      metadata = {
+        mark_as_synced: mark_as_synced,
+        download_success: download_result.success,
+        bytes_downloaded: download_result.bytes_downloaded,
+        failed_before_transfer: download_result.failed_before_transfer,
+        primary_missing_file: download_result.primary_missing_file,
+        download_time_s: (Time.now - start_time).to_f.round(3)
+      }
 
-      return unless uuid.present?
-
-      begin
-        yield
-      ensure
-        Gitlab::ExclusiveLease.cancel(lease_key, uuid)
-      end
+      log_info("File download", metadata)
     end
 
-    def update_registry(bytes_downloaded, success:)
-      transfer = Geo::FileRegistry.find_or_initialize_by(
-        file_type: object_type,
-        file_id: object_db_id
-      )
+    def update_registry(bytes_downloaded, mark_as_synced:, missing_on_primary: false)
+      registry =
+        if object_type.to_sym == :job_artifact
+          Geo::JobArtifactRegistry.find_or_initialize_by(artifact_id: object_db_id)
+        else
+          Geo::FileRegistry.find_or_initialize_by(
+            file_type: object_type,
+            file_id: object_db_id
+          )
+        end
 
-      transfer.bytes = bytes_downloaded
-      transfer.success = success
+      registry.bytes = bytes_downloaded
+      registry.success = mark_as_synced
+      registry.missing_on_primary = missing_on_primary
 
-      unless success
+      retry_later = !registry.success || registry.missing_on_primary
+
+      if retry_later
         # We don't limit the amount of retries
-        transfer.retry_count = (transfer.retry_count || 0) + 1
-        transfer.retry_at = Time.now + delay(transfer.retry_count).seconds
+        registry.retry_count = (registry.retry_count || 0) + 1
+        registry.retry_at = Time.now + delay(registry.retry_count).seconds
+      else
+        registry.retry_count = 0
+        registry.retry_at = nil
       end
 
-      transfer.save
+      registry.save
     end
 
     def lease_key
       "file_download_service:#{object_type}:#{object_db_id}"
+    end
+
+    def lease_timeout
+      LEASE_TIMEOUT
     end
   end
 end

@@ -22,7 +22,7 @@ class Projects::IssuesController < Projects::ApplicationController
   before_action :authorize_update_issuable!, only: [:edit, :update, :move]
 
   # Allow create a new branch and empty WIP merge request from current issue
-  before_action :authorize_create_merge_request!, only: [:create_merge_request]
+  before_action :authorize_create_merge_request_from!, only: [:create_merge_request]
 
   prepend ::EE::Projects::IssuesController
 
@@ -62,20 +62,6 @@ class Projects::IssuesController < Projects::ApplicationController
 
   def edit
     respond_with(@issue)
-  end
-
-  def discussions
-    notes = @issue.notes
-      .inc_relations_for_view
-      .includes(:noteable)
-      .fresh
-
-    notes = prepare_notes_for_rendering(notes)
-    notes = notes.reject { |n| n.cross_reference_not_visible_for?(current_user) }
-
-    discussions = Discussion.build_collection(notes, @issue)
-
-    render json: DiscussionSerializer.new(project: @project, noteable: @issue, current_user: current_user).represent(discussions)
   end
 
   def create
@@ -152,11 +138,11 @@ class Projects::IssuesController < Projects::ApplicationController
   def can_create_branch
     can_create = current_user &&
       can?(current_user, :push_code, @project) &&
-      @issue.can_be_worked_on?(current_user)
+      @issue.can_be_worked_on?
 
     respond_to do |format|
       format.json do
-        render json: { can_create_branch: can_create, has_related_branch: @issue.has_related_branch? }
+        render json: { can_create_branch: can_create, suggested_branch_name: @issue.suggested_branch_name }
       end
     end
   end
@@ -195,7 +181,7 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def authorize_create_merge_request!
-    render_404 unless can?(current_user, :push_code, @project) && @issue.can_be_worked_on?(current_user)
+    render_404 unless can?(current_user, :push_code, @project) && @issue.can_be_worked_on?
   end
 
   def render_issue_json
@@ -247,9 +233,8 @@ class Projects::IssuesController < Projects::ApplicationController
     Issues::UpdateService.new(project, current_user, update_params)
   end
 
-  def set_issuables_index
-    @finder_type = IssuesFinder
-    super
+  def finder_type
+    IssuesFinder
   end
 
   def whitelist_query_limiting

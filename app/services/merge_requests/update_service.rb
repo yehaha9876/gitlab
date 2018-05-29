@@ -1,5 +1,7 @@
 module MergeRequests
   class UpdateService < MergeRequests::BaseService
+    prepend ::EE::MergeRequests::UpdateService
+
     def execute(merge_request)
       # We don't allow change of source/target projects and source branch
       # after merge request was created
@@ -17,21 +19,11 @@ module MergeRequests
         merge_request.merge_params['force_remove_source_branch'] = params.delete(:force_remove_source_branch)
       end
 
-      old_approvers = merge_request.overall_approvers.to_a
-
       handle_wip_event(merge_request)
       update(merge_request)
-
-      new_approvers = merge_request.overall_approvers.to_a - old_approvers
-
-      if new_approvers.any?
-        todo_service.add_merge_request_approvers(merge_request, new_approvers)
-        notification_service.add_merge_request_approvers(merge_request, new_approvers, current_user)
-      end
-
-      merge_request
     end
 
+    # rubocop:disable Metrics/AbcSize
     def handle_changes(merge_request, options)
       old_associations = options.fetch(:old_associations, {})
       old_labels = old_associations.fetch(:labels, [])
@@ -50,13 +42,14 @@ module MergeRequests
         create_branch_change_note(merge_request, 'target',
                                   merge_request.previous_changes['target_branch'].first,
                                   merge_request.target_branch)
-
-        reset_approvals(merge_request)
       end
 
       if merge_request.previous_changes.include?('assignee_id')
+        old_assignee_id = merge_request.previous_changes['assignee_id'].first
+        old_assignee = User.find(old_assignee_id) if old_assignee_id
+
         create_assignee_note(merge_request)
-        notification_service.reassigned_merge_request(merge_request, current_user)
+        notification_service.async.reassigned_merge_request(merge_request, current_user, old_assignee)
         todo_service.reassigned_merge_request(merge_request, current_user)
       end
 
@@ -67,7 +60,7 @@ module MergeRequests
 
       added_labels = merge_request.labels - old_labels
       if added_labels.present?
-        notification_service.relabeled_merge_request(
+        notification_service.async.relabeled_merge_request(
           merge_request,
           added_labels,
           current_user
@@ -76,13 +69,14 @@ module MergeRequests
 
       added_mentions = merge_request.mentioned_users - old_mentioned_users
       if added_mentions.present?
-        notification_service.new_mentions_in_merge_request(
+        notification_service.async.new_mentions_in_merge_request(
           merge_request,
           added_mentions,
           current_user
         )
       end
     end
+    # rubocop:enable Metrics/AbcSize
 
     def merge_from_quick_action(merge_request)
       last_diff_sha = params.delete(:merge)
@@ -110,25 +104,6 @@ module MergeRequests
     end
 
     private
-
-    def reset_approvals(merge_request)
-      target_project = merge_request.target_project
-
-      if target_project.approvals_before_merge.nonzero? && target_project.reset_approvals_on_push
-        merge_request.approvals.delete_all
-      end
-    end
-
-    def handle_wip_event(merge_request)
-      if wip_event = params.delete(:wip_event)
-        # We update the title that is provided in the params or we use the mr title
-        title = params[:title] || merge_request.title
-        params[:title] = case wip_event
-                         when 'wip' then MergeRequest.wip_title(title)
-                         when 'unwip' then MergeRequest.wipless_title(title)
-                         end
-      end
-    end
 
     def create_branch_change_note(issuable, branch_type, old_branch, new_branch)
       SystemNoteService.change_branch(

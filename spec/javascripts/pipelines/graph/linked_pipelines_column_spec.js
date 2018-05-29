@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import LinkedPipelinesColumn from '~/pipelines/components/graph/linked_pipelines_column.vue';
+import LinkedPipelinesColumn from 'ee/pipelines/components/graph/linked_pipelines_column.vue';
 import mockData from './linked_pipelines_mock_data';
 
 const LinkedPipelinesColumnComponent = Vue.extend(LinkedPipelinesColumn);
 
-describe('Linked Pipelines Column', () => {
+describe('Linked Pipelines Column', function() {
   beforeEach(() => {
     this.propsData = {
       columnTitle: 'Upstream',
@@ -22,7 +22,9 @@ describe('Linked Pipelines Column', () => {
   });
 
   it('renders the pipeline orientation', () => {
-    const titleElement = this.linkedPipelinesColumn.$el.querySelector('.linked-pipelines-column-title');
+    const titleElement = this.linkedPipelinesColumn.$el.querySelector(
+      '.linked-pipelines-column-title',
+    );
     expect(titleElement.innerText).toContain(this.propsData.columnTitle);
   });
 
@@ -31,8 +33,9 @@ describe('Linked Pipelines Column', () => {
   });
 
   it('renders the correct number of linked pipelines', () => {
-    const linkedPipelineElements = this.linkedPipelinesColumn.$el.querySelectorAll('.linked-pipeline');
+    const linkedPipelineElements = this.linkedPipelinesColumn.$el.querySelectorAll(
+      '.linked-pipeline',
+    );
     expect(linkedPipelineElements.length).toBe(this.propsData.linkedPipelines.length);
   });
 });
-

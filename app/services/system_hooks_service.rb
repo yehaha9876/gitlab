@@ -13,6 +13,8 @@ class SystemHooksService
     SystemHook.hooks_for(hooks_scope).find_each do |hook|
       hook.async_execute(data, 'system_hooks')
     end
+
+    Gitlab::Plugin.execute_all_async(data)
   end
 
   private
@@ -20,8 +22,8 @@ class SystemHooksService
   def build_event_data(model, event)
     data = {
       event_name: build_event_name(model, event),
-      created_at: model.created_at.xmlschema,
-      updated_at: model.updated_at.xmlschema
+      created_at: model.created_at&.xmlschema,
+      updated_at: model.updated_at&.xmlschema
     }
 
     case model
@@ -128,6 +130,7 @@ class SystemHooksService
     {
       group_name: model.group.name,
       group_path: model.group.path,
+      group_plan: model.group.plan&.name,
       group_id: model.group.id,
       user_username: model.user.username,
       user_name: model.user.name,

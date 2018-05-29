@@ -1,5 +1,6 @@
 /* global ace */
 
+import $ from 'jquery';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
@@ -59,7 +60,7 @@ export default class EditBlob {
 
     if (paneId === '#preview') {
       this.$toggleButton.hide();
-      axios.post(currentLink.data('preview-url'), {
+      axios.post(currentLink.data('previewUrl'), {
         content: this.editor.getValue(),
       })
       .then(({ data }) => {

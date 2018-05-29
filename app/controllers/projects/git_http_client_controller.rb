@@ -3,10 +3,12 @@
 class Projects::GitHttpClientController < Projects::ApplicationController
   include ActionController::HttpAuthentication::Basic
   include KerberosSpnegoHelper
+  prepend ::EE::Projects::GitHttpClientController
 
   attr_reader :authentication_result, :redirected_path
 
   delegate :actor, :authentication_abilities, to: :authentication_result, allow_nil: true
+  delegate :type, to: :authentication_result, allow_nil: true, prefix: :auth_result
 
   alias_method :user, :actor
   alias_method :authenticated_user, :actor

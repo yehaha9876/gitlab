@@ -64,7 +64,7 @@ namespace :gitlab do
       puts "Repo base directory exists?"
 
       Gitlab.config.repositories.storages.each do |name, repository_storage|
-        repo_base_path = repository_storage['path']
+        repo_base_path = repository_storage.legacy_disk_path
         print "#{name}... "
 
         if File.exist?(repo_base_path)
@@ -89,7 +89,7 @@ namespace :gitlab do
       puts "Repo storage directories are symlinks?"
 
       Gitlab.config.repositories.storages.each do |name, repository_storage|
-        repo_base_path = repository_storage['path']
+        repo_base_path = repository_storage.legacy_disk_path
         print "#{name}... "
 
         unless File.exist?(repo_base_path)
@@ -113,7 +113,7 @@ namespace :gitlab do
       puts "Repo paths access is drwxrws---?"
 
       Gitlab.config.repositories.storages.each do |name, repository_storage|
-        repo_base_path = repository_storage['path']
+        repo_base_path = repository_storage.legacy_disk_path
         print "#{name}... "
 
         unless File.exist?(repo_base_path)
@@ -143,7 +143,7 @@ namespace :gitlab do
       puts "Repo paths owned by #{gitlab_shell_ssh_user}:root, or #{gitlab_shell_ssh_user}:#{Gitlab.config.gitlab_shell.owner_group}?"
 
       Gitlab.config.repositories.storages.each do |name, repository_storage|
-        repo_base_path = repository_storage['path']
+        repo_base_path = repository_storage.legacy_disk_path
         print "#{name}... "
 
         unless File.exist?(repo_base_path)
@@ -339,7 +339,7 @@ namespace :gitlab do
       warn_user_is_not_gitlab
       start_checking "LDAP"
 
-      if Gitlab::LDAP::Config.enabled?
+      if Gitlab::Auth::LDAP::Config.enabled?
         check_ldap(args.limit)
       else
         puts 'LDAP is disabled in config/gitlab.yml'
@@ -349,13 +349,13 @@ namespace :gitlab do
     end
 
     def check_ldap(limit)
-      servers = Gitlab::LDAP::Config.providers
+      servers = Gitlab::Auth::LDAP::Config.providers
 
       servers.each do |server|
         puts "Server: #{server}"
 
         begin
-          Gitlab::LDAP::Adapter.open(server) do |adapter|
+          Gitlab::Auth::LDAP::Adapter.open(server) do |adapter|
             check_ldap_auth(adapter)
 
             puts "LDAP users with access to your GitLab server (only showing the first #{limit} results)"
@@ -430,10 +430,7 @@ namespace :gitlab do
       user = User.find_by(username: username)
       if user
         repo_dirs = user.authorized_projects.map do |p|
-          File.join(
-            p.repository_storage_path,
-            "#{p.disk_path}.git"
-          )
+          p.repository.path_to_repo
         end
 
         repo_dirs.each { |repo_dir| check_repo_integrity(repo_dir) }
@@ -454,7 +451,7 @@ namespace :gitlab do
         SystemCheck::Geo::GeoDatabaseConfiguredCheck,
         SystemCheck::Geo::DatabaseReplicationCheck,
         SystemCheck::Geo::FdwEnabledCheck,
-        SystemCheck::Geo::FdwSchemaUptoDateCheck,
+        SystemCheck::Geo::FdwSchemaUpToDateCheck,
         SystemCheck::Geo::HttpConnectionCheck,
         SystemCheck::Geo::HTTPCloneEnabledCheck,
         SystemCheck::Geo::ClocksSynchronizationCheck,

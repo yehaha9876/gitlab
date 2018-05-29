@@ -1,3 +1,6 @@
+import $ from 'jquery';
+import _ from 'underscore';
+
 function isValidProjectId(id) {
   return id > 0;
 }
@@ -41,7 +44,7 @@ class SidebarMoveIssue {
       renderRow: project => `
         <li>
           <a href="#" class="js-move-issue-dropdown-item">
-            ${project.name_with_namespace}
+            ${_.escape(project.name_with_namespace)}
           </a>
         </li>
       `,
@@ -50,7 +53,7 @@ class SidebarMoveIssue {
         const selectedProjectId = options.isMarking ? project.id : 0;
         this.mediator.setMoveToProjectId(selectedProjectId);
 
-        this.$confirmButton.attr('disabled', !isValidProjectId(selectedProjectId));
+        this.$confirmButton.prop('disabled', !isValidProjectId(selectedProjectId));
       },
     });
   }

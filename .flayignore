@@ -15,8 +15,16 @@ app/models/project_services/packagist_service.rb
 lib/gitlab/background_migration/normalize_ldap_extern_uids_range.rb
 lib/gitlab/background_migration/*
 app/models/project_services/kubernetes_service.rb
+lib/gitlab/workhorse.rb
+lib/gitlab/ci/trace/chunked_io.rb
+lib/gitlab/gitaly_client/ref_service.rb
+lib/gitlab/gitaly_client/commit_service.rb
+lib/gitlab/git/commit.rb
+lib/gitlab/git/tag.rb
 
 ee/db/**/*
 ee/app/serializers/ee/merge_request_widget_entity.rb
 ee/lib/ee/gitlab/ldap/sync/admin_users.rb
+ee/app/workers/geo/file_download_dispatch_worker/job_artifact_job_finder.rb
+ee/app/workers/geo/file_download_dispatch_worker/lfs_object_job_finder.rb
 ee/spec/**/*

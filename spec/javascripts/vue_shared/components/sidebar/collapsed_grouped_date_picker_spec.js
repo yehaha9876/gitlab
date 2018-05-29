@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import collapsedGroupedDatePicker from '~/vue_shared/components/sidebar/collapsed_grouped_date_picker.vue';
-import mountComponent from '../../../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('collapsedGroupedDatePicker', () => {
   let vm;
@@ -11,26 +11,11 @@ describe('collapsedGroupedDatePicker', () => {
     });
   });
 
-  it('should render toggle sidebar if showToggleSidebar', (done) => {
-    expect(vm.$el.querySelector('.issuable-sidebar-header')).toBeDefined();
-
-    vm.showToggleSidebar = false;
-    Vue.nextTick(() => {
-      expect(vm.$el.querySelector('.issuable-sidebar-header')).toBeNull();
-      done();
-    });
-  });
-
   describe('toggleCollapse events', () => {
     beforeEach((done) => {
       spyOn(vm, 'toggleSidebar');
       vm.minDate = new Date('07/17/2016');
       Vue.nextTick(done);
-    });
-
-    it('should emit when sidebar is toggled', () => {
-      vm.$el.querySelector('.gutter-toggle').click();
-      expect(vm.toggleSidebar).toHaveBeenCalled();
     });
 
     it('should emit when collapsed-calendar-icon is clicked', () => {

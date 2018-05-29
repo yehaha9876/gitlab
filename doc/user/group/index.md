@@ -5,7 +5,7 @@ and grant members access to several projects at once.
 
 Groups can also be nested in [subgroups](subgroups/index.md).
 
-Find your groups by expanding the left menu and clicking **Groups**:
+Find your groups by clicking **Groups** on the menu bar.
 
 ![GitLab Groups](img/groups.png)
 
@@ -40,20 +40,20 @@ In GitLab, a namespace is a unique name to be used as a user name, a group name,
 - `http://gitlab.example.com/groupname`
 - `http://gitlab.example.com/groupname/subgroup_name`
 
-For example, consider a user called John:
+For example, consider a user named Alex:
 
-1. John creates his account on GitLab.com with the username `john`;
-his profile will be accessed under `https://gitlab.example.com/john`
-1. John creates a group for his team with the groupname `john-team`;
-his group and its projects will be accessed under `https://gitlab.example.com/john-team`
-1. John creates a subgroup of `john-team` with the subgroup name `marketing`;
-his subgroup and its projects will be accessed under `https://gitlab.example.com/john-team/marketing`
+1. Alex creates an account on GitLab.com with the username `alex`;
+their profile will be accessed under `https://gitlab.example.com/alex`
+1. Alex creates a group for their team with the groupname `alex-team`;
+the group and its projects will be accessed under `https://gitlab.example.com/alex-team`
+1. Alex creates a subgroup of `alex-team` with the subgroup name `marketing`;
+this subgroup and its projects will be accessed under `https://gitlab.example.com/alex-team/marketing`
 
 By doing so:
 
-- Any team member mentions John with `@john`
-- John mentions everyone from his team with `@john-team`
-- John mentions only his marketing team with `@john-team/marketing`
+- Any team member mentions Alex with `@alex`
+- Alex mentions everyone from their team with `@alex-team`
+- Alex mentions only the marketing team with `@alex-team/marketing`
 
 ## Issues and merge requests within a group
 
@@ -69,7 +69,7 @@ together in a single list view.
 
 You can create a group in GitLab from:
 
-1. The Groups page: expand the left menu, click **Groups**, and click the green button **New group**:
+1. The Groups page: from the top menu, click **Groups**, and click the green button **New group**:
 
     ![new group from groups page](img/new_group_from_groups.png)
 
@@ -152,9 +152,10 @@ There are two different ways to add a new project to a group:
 
     ![Select group](img/select_group_dropdown.png)
 
-### Default project creation level
+### Default project creation level **[STARTER]**
 
-> Introduced in [GitLab Premium](https://about.gitlab.com/products/) 10.5.
+> [Introduced][ee-2534] in [GitLab Premium][ee] 10.5.
+> Brought to [GitLab Starter][ee] in 10.7.
 
 Group owners or administrators can set an option that will give users with the
 Developer role the ability to create projects under groups.
@@ -269,10 +270,7 @@ To enable this feature, navigate to the group settings page. Select
 
 ![Checkbox for share with group lock](img/share_with_group_lock.png)
 
-#### Member Lock
-
-> Available in [GitLab Starter](https://about.gitlab.com/products/) and
-[GitLab.com Bronze](https://about.gitlab.com/gitlab-com/).
+#### Member Lock **[STARTER]**
 
 With **Member Lock** it is possible to lock membership in project to the
 level of members in group.
@@ -298,21 +296,17 @@ request to add new user to project through API will not be possible.
 
 - **Projects**: view all projects within that group, add members to each project,
 access each project's settings, and remove any project from the same screen.
-- **Webhooks**: configure [webhooks](../project/integrations/webhooks.md)
-and [push rules](../../push_rules/push_rules.md) to your group
-(Push Rules is available in [GitLab Starter][ee].)
-- **Audit Events**: view [Audit Events](../../administration/audit_events.md)
-for the group (GitLab admins only, available in [GitLab Starter][ee])
-- **Pipelines quota**: keep track of the
-[pipeline quota](../admin_area/settings/continuous_integration.md) for the group
+- **Webhooks**: configure [webhooks](../project/integrations/webhooks.md) to your group.
+- **Push rules**: configure [push rules](https://docs.gitlab.com/ee/push_rules/push_rules.html#push-rules) to your group. **[STARTER]**
+- **Audit Events**: view [Audit Events](https://docs.gitlab.com/ee/administration/audit_events.html#audit-events)
+for the group. **[STARTER ONLY]**
+- **Pipelines quota**: keep track of the [pipeline quota](../admin_area/settings/continuous_integration.md) for the group
 
-## User contribution analysis
-
-> Available in [GitLab Starter](https://about.gitlab.com/products/) and
-[GitLab.com Bronze](https://about.gitlab.com/gitlab-com/).
+## User contribution analysis **[STARTER]**
 
 With [GitLab Contribution Analytics](contribution_analytics/index.md)
 you have an overview of the contributions (pushes, merge requests,
 and issues) performed my your group members.
 
 [ee]: https://about.gitlab.com/products/
+[ee-2534]: https://gitlab.com/gitlab-org/gitlab-ee/issues/2534

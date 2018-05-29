@@ -21,14 +21,6 @@ module GitlabRoutingHelper
     project_commits_path(project, ref_name, *args)
   end
 
-  def runners_path(project, *args)
-    project_runners_path(project, *args)
-  end
-
-  def runner_path(runner, *args)
-    project_runner_path(@project, runner, *args)
-  end
-
   def environment_path(environment, *args)
     project_environment_path(environment.project, environment, *args)
   end
@@ -80,6 +72,14 @@ module GitlabRoutingHelper
       preview_markdown_snippets_path
     else
       preview_markdown_project_path(parent, *args)
+    end
+  end
+
+  def edit_milestone_path(entity, *args)
+    if entity.parent.is_a?(Group)
+      edit_group_milestone_path(entity.parent, entity, *args)
+    else
+      edit_project_milestone_path(entity.parent, entity, *args)
     end
   end
 

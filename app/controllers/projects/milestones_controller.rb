@@ -14,7 +14,7 @@ class Projects::MilestonesController < Projects::ApplicationController
 
   def index
     @sort = params[:sort] || 'due_date_asc'
-    @milestones = milestones.sort(@sort)
+    @milestones = milestones.sort_by_attribute(@sort)
 
     respond_to do |format|
       format.html do
@@ -43,9 +43,8 @@ class Projects::MilestonesController < Projects::ApplicationController
   def show
     @project_namespace = @project.namespace.becomes(Namespace)
 
-    if @project.feature_available?(:burndown_charts, current_user) &&
-        @project.feature_available?(:issue_weights, current_user)
-      @burndown = Burndown.new(@milestone)
+    respond_to do |format|
+      format.html
     end
   end
 
@@ -76,8 +75,16 @@ class Projects::MilestonesController < Projects::ApplicationController
 
   def promote
     promoted_milestone = Milestones::PromoteService.new(project, current_user).execute(milestone)
-    flash[:notice] = "Milestone has been promoted to group milestone."
-    redirect_to group_milestone_path(project.group, promoted_milestone.iid)
+
+    flash[:notice] = "#{milestone.title} promoted to <a href=\"#{group_milestone_path(project.group, promoted_milestone.iid)}\">group milestone</a>.".html_safe
+    respond_to do |format|
+      format.html do
+        redirect_to project_milestones_path(project)
+      end
+      format.json do
+        render json: { url: project_milestones_path(project) }
+      end
+    end
   rescue Milestones::PromoteService::PromoteMilestoneError => error
     redirect_to milestone, alert: error.message
   end

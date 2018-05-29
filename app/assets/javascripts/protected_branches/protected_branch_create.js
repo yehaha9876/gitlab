@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import _ from 'underscore';
 import ProtectedBranchAccessDropdown from './protected_branch_access_dropdown';
 import CreateItemDropdown from '../create_item_dropdown';
@@ -59,7 +60,7 @@ export default class ProtectedBranchCreate {
     );
 
     this.savePreviousSelection($allowedToMergeInput.val(), $allowedToPushInput.val());
-    this.$form.find('input[type="submit"]').attr('disabled', completedForm);
+    this.$form.find('input[type="submit"]').prop('disabled', completedForm);
   }
 
   static getProtectedBranches(term, callback) {

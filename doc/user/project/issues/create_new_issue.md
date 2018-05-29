@@ -37,14 +37,33 @@ It opens a new issue for that project labeled after its respective list.
 
 ![From the issue board](img/new_issue_from_issue_board.png)
 
-## New issue via Service Desk
+## New issue via email
+
+*This feature needs [incoming email](../../../administration/incoming_email.md)
+to be configured by a GitLab administrator to be available for CE/EE users, and
+it's available on GitLab.com.*
+
+At the bottom of a project's issue page, click
+**Email a new issue to this project**, and you will find an email address
+which belongs to you. You could add this address to your contact.
+
+This is a private email address, generated just for you.
+**Keep it to yourself** as anyone who gets ahold of it can create issues or
+merge requests as if they were you. You can add this address to your contact
+list for easy access.
+
+Sending an email to this address will create a new issue on your behalf for
+this project, where the email subject becomes the issue title, and the email
+body becomes the issue description. [Markdown] and [quick actions] are
+supported.
+
+![Bottom of a project issues page](img/new_issue_from_email.png)
+
+## New issue via Service Desk **[PREMIUM]**
 
 Enable [Service Desk](../service_desk.md) to your project and offer email support.
 By doing so, when your customer sends a new email, a new issue can be created in
 the appropriate project and followed up from there.
-
-_Service Desk is available only for [GitLab Premium](https://about.gitlab.com/products/)
-and [GitLab.com Silver](https://about.gitlab.com/gitlab-com/) subscribers._
 
 ## New issue from the group-level Issue Tracker
 
@@ -60,5 +79,5 @@ create issues for the same project.
 
 ![Create issue from group-level issue tracker](img/create_issue_from_group_level_issue_tracker.png)
 
-
-
+[Markdown]: ../../markdown.md
+[quick actions]: ../quick_actions.md

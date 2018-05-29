@@ -1,4 +1,6 @@
-export default () => {
+import $ from 'jquery';
+
+document.addEventListener('DOMContentLoaded', () => {
   const $licenseFile = $('.license-file');
   const $licenseKey = $('.license-key');
 
@@ -11,4 +13,4 @@ export default () => {
 
   $('input[name="license_type"]').on('change', showLicenseType);
   showLicenseType();
-};
+});

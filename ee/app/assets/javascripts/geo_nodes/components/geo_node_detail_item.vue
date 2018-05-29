@@ -1,19 +1,23 @@
 <script>
   import { s__ } from '~/locale';
-  import stackedProgressBar from '~/vue_shared/components/stacked_progress_bar.vue';
+  import popover from '~/vue_shared/directives/popover';
+  import Icon from '~/vue_shared/components/icon.vue';
+  import StackedProgressBar from '~/vue_shared/components/stacked_progress_bar.vue';
 
   import { VALUE_TYPE, CUSTOM_TYPE } from '../constants';
 
-  import geoNodeHealthStatus from './geo_node_health_status.vue';
-  import geoNodeSyncSettings from './geo_node_sync_settings.vue';
-  import geoNodeEventStatus from './geo_node_event_status.vue';
+  import GeoNodeSyncSettings from './geo_node_sync_settings.vue';
+  import GeoNodeEventStatus from './geo_node_event_status.vue';
 
   export default {
     components: {
-      stackedProgressBar,
-      geoNodeHealthStatus,
-      geoNodeSyncSettings,
-      geoNodeEventStatus,
+      Icon,
+      StackedProgressBar,
+      GeoNodeSyncSettings,
+      GeoNodeEventStatus,
+    },
+    directives: {
+      popover,
     },
     props: {
       itemTitle: {
@@ -53,8 +57,21 @@
         required: false,
         default: '',
       },
+      eventTypeLogStatus: {
+        type: Boolean,
+        required: false,
+        default: false,
+      },
+      helpInfo: {
+        type: [Boolean, Object],
+        required: false,
+        default: false,
+      },
     },
     computed: {
+      hasHelpInfo() {
+        return typeof this.helpInfo === 'object';
+      },
       isValueTypePlain() {
         return this.itemValueType === VALUE_TYPE.PLAIN;
       },
@@ -64,20 +81,46 @@
       isValueTypeCustom() {
         return this.itemValueType === VALUE_TYPE.CUSTOM;
       },
-      isCustomTypeStatus() {
-        return this.customType === CUSTOM_TYPE.STATUS;
-      },
       isCustomTypeSync() {
         return this.customType === CUSTOM_TYPE.SYNC;
+      },
+      popoverConfig() {
+        return {
+          html: true,
+          trigger: 'click',
+          placement: 'top',
+          template: `
+            <div class="popover geo-node-detail-popover" role="tooltip">
+              <div class="arrow"></div>
+              <p class="popover-title"></p>
+              <div class="popover-content"></div>
+            </div>
+          `,
+          title: this.helpInfo.title,
+          content: `
+            <a href="${this.helpInfo.url}">
+              ${this.helpInfo.urlText}
+            </a>
+          `,
+        };
       },
     },
   };
 </script>
 
 <template>
-  <li class="row node-detail-item">
+  <div class="node-detail-item prepend-top-15 prepend-left-10">
     <div class="node-detail-title">
-      {{ itemTitle }}
+      <span>
+        {{ itemTitle }}
+      </span>
+      <icon
+        v-popover="popoverConfig"
+        v-if="hasHelpInfo"
+        css-classes="node-detail-help-text prepend-left-5"
+        name="question"
+        :size="12"
+      />
     </div>
     <div
       v-if="isValueTypePlain"
@@ -100,12 +143,9 @@
       />
     </div>
     <template v-if="isValueTypeCustom">
-      <geo-node-health-status
-        v-if="isCustomTypeStatus"
-        :status="itemValue"
-      />
       <geo-node-sync-settings
-        v-else-if="isCustomTypeSync"
+        v-if="isCustomTypeSync"
+        :sync-status-unavailable="itemValue.syncStatusUnavailable"
         :selective-sync-type="itemValue.selectiveSyncType"
         :last-event="itemValue.lastEvent"
         :cursor-last-event="itemValue.cursorLastEvent"
@@ -114,7 +154,8 @@
         v-else
         :event-id="itemValue.eventId"
         :event-time-stamp="itemValue.eventTimeStamp"
+        :event-type-log-status="eventTypeLogStatus"
       />
     </template>
-  </li>
+  </div>
 </template>

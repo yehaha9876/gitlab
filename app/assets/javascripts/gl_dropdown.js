@@ -1,5 +1,7 @@
 /* eslint-disable func-names, no-underscore-dangle, space-before-function-paren, no-var, one-var, one-var-declaration-per-line, prefer-rest-params, max-len, vars-on-top, wrap-iife, no-unused-vars, quotes, no-shadow, no-cond-assign, prefer-arrow-callback, no-return-assign, no-else-return, camelcase, comma-dangle, no-lonely-if, guard-for-in, no-restricted-syntax, consistent-return, prefer-template, no-param-reassign, no-loop-func, no-mixed-operators */
 /* global fuzzaldrinPlus */
+
+import $ from 'jquery';
 import _ from 'underscore';
 import fuzzaldrinPlus from 'fuzzaldrin-plus';
 import axios from './lib/utils/axios_utils';
@@ -372,7 +374,7 @@ GitLabDropdown = (function() {
           $relatedTarget = $(e.relatedTarget);
           $dropdownMenu = $relatedTarget.closest('.dropdown-menu');
           if ($dropdownMenu.length === 0) {
-            return _this.dropdown.removeClass('open');
+            return _this.dropdown.removeClass('show');
           }
         }
       };
@@ -485,7 +487,7 @@ GitLabDropdown = (function() {
       $target = $(e.target);
       if ($target && !$target.hasClass('dropdown-menu-close') &&
                      !$target.hasClass('dropdown-menu-close-icon') &&
-                     !$target.data('is-link')) {
+                     !$target.data('isLink')) {
         e.stopPropagation();
         return false;
       } else {
@@ -576,7 +578,7 @@ GitLabDropdown = (function() {
       for (var i = 0; i < html.length; i += 1) {
         var el = html[i];
 
-        if (el instanceof jQuery) {
+        if (el instanceof $) {
           el = el.get(0);
         }
 
@@ -634,7 +636,7 @@ GitLabDropdown = (function() {
       html.style.display = 'none';
     }
 
-    if ((data === 'divider' || data === 'separator')) {
+    if (data === 'divider' || data === 'separator') {
       html.className = data;
       return html;
     }
@@ -755,7 +757,7 @@ GitLabDropdown = (function() {
     }
 
     if (this.options.isSelectable && !this.options.isSelectable(selectedObject, el)) {
-      return;
+      return [selectedObject];
     }
 
     if (el.hasClass(ACTIVE_CLASS) && value !== 0) {
@@ -803,7 +805,7 @@ GitLabDropdown = (function() {
     if (this.options.filterable) {
       const initialScrollTop = $(window).scrollTop();
 
-      if (this.dropdown.is('.open')) {
+      if (this.dropdown.is('.show') && !this.filterInput.is(':focus')) {
         this.filterInput.focus();
       }
 

@@ -1,19 +1,26 @@
-- failed_builds = @pipeline.statuses.latest.failed
+- expose_sast_data = @pipeline.expose_sast_data?
+- expose_dependency_data = @pipeline.expose_dependency_scanning_data?
+- blob_path = project_blob_path(@project, @pipeline.sha)
 
 .tabs-holder
-  %ul.pipelines-tabs.nav-links.no-top.no-bottom.mobile-separator
+  %ul.pipelines-tabs.nav-links.no-top.no-bottom.mobile-separator.nav.nav-tabs
     %li.js-pipeline-tab-link
-      = link_to project_pipeline_path(@project, @pipeline), data: { target: 'div#js-tab-pipeline', action: 'pipelines', toggle: 'tab' },  class: 'pipeline-tab' do
-        Pipeline
+      = link_to project_pipeline_path(@project, @pipeline), data: { target: '#js-tab-pipeline', action: 'pipelines', toggle: 'tab' }, class: 'pipeline-tab' do
+        = _("Pipeline")
     %li.js-builds-tab-link
-      = link_to builds_project_pipeline_path(@project, @pipeline), data: {target: 'div#js-tab-builds', action: 'builds', toggle: 'tab' }, class: 'builds-tab' do
-        Jobs
-        %span.badge.js-builds-counter= pipeline.total_size
-    - if failed_builds.present?
+      = link_to builds_project_pipeline_path(@project, @pipeline), data: { target: '#js-tab-builds', action: 'builds', toggle: 'tab' }, class: 'builds-tab' do
+        = _("Jobs")
+        %span.badge.badge-pill.js-builds-counter= pipeline.total_size
+    - if @pipeline.failed_builds.present?
       %li.js-failures-tab-link
-        = link_to failures_project_pipeline_path(@project, @pipeline), data: {target: 'div#js-tab-failures', action: 'failures', toggle: 'tab' }, class: 'failures-tab' do
-          Failed Jobs
-          %span.badge.js-failures-counter= failed_builds.count
+        = link_to failures_project_pipeline_path(@project, @pipeline), data: { target: '#js-tab-failures', action: 'failures', toggle: 'tab' }, class: 'failures-tab' do
+          = _("Failed Jobs")
+          %span.badge.badge-pill.js-failures-counter= @pipeline.failed_builds.count
+    - if expose_sast_data || expose_dependency_data
+      %li.js-security-tab-link
+        = link_to security_project_pipeline_path(@project, @pipeline), data: { target: '#js-tab-security', action: 'security', toggle: 'tab' }, class: 'security-tab' do
+          = _("Security report")
+          %span.badge.badge-pill.js-sast-counter.hidden
 
 .tab-content
   #js-tab-pipeline.tab-pane
@@ -26,7 +33,7 @@
         %ul
           - pipeline.yaml_errors.split(",").each do |error|
             %li= error
-        You can also test your .gitlab-ci.yml in the #{link_to "Lint", ci_lint_path}
+        You can also test your .gitlab-ci.yml in the #{link_to "Lint", project_ci_lint_path(@project)}
 
     - if pipeline.project.builds_enabled? && !pipeline.ci_yaml_file
       .bs-callout.bs-callout-warning
@@ -43,9 +50,10 @@
             %th Coverage
             %th
         = render partial: "projects/stage/stage", collection: pipeline.legacy_stages, as: :stage
-  - if failed_builds.present?
+
+  - if @pipeline.failed_builds.present?
     #js-tab-failures.build-failures.tab-pane
-      - failed_builds.each_with_index do |build, index|
+      - @pipeline.failed_builds.each_with_index do |build, index|
         .build-state
           %span.ci-status-icon-failed= custom_icon('icon_status_failed')
           %span.stage
@@ -53,3 +61,13 @@
           %span.build-name
             = link_to build.name, pipeline_job_url(pipeline, build)
         %pre.build-log= build_summary(build, skip: index >= 10)
+  - if expose_sast_data || expose_dependency_data
+    #js-tab-security.build-security.tab-pane
+      #js-security-report-app{ data: { endpoint: expose_sast_data ? sast_artifact_url(@pipeline) : nil,
+      blob_path: blob_path,
+      dependency_scanning_endpoint: expose_dependency_data ? dependency_scanning_artifact_url(@pipeline) : nil,
+      pipeline_id: @pipeline.id,
+      vulnerability_feedback_path: project_vulnerability_feedback_index_path(@project),
+      vulnerability_feedback_help_path: help_page_path("user/project/merge_requests/index", anchor: "interacting-with-security-reports-ultimate"),
+      sast_help_path: help_page_path('user/project/merge_requests/sast'),
+      dependency_scanning_help_path: help_page_path('user/project/merge_requests/dependency_scanning')} }

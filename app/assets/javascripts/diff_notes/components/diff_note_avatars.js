@@ -1,5 +1,6 @@
 /* global CommentsStore */
 
+import $ from 'jquery';
 import Vue from 'vue';
 import collapseIcon from '../icons/collapse_icon.svg';
 import Notes from '../../notes';
@@ -78,7 +79,7 @@ const DiffNoteAvatars = Vue.extend({
     storeState: {
       handler() {
         this.$nextTick(() => {
-          $('.has-tooltip', this.$el).tooltip('fixTitle');
+          $('.has-tooltip', this.$el).tooltip('_fixTitle');
 
           // We need to add/remove a class to an element that is outside the Vue instance
           this.addNoCommentClass();
@@ -137,7 +138,7 @@ const DiffNoteAvatars = Vue.extend({
       this.$nextTick(() => {
         this.setDiscussionVisible();
 
-        $('.has-tooltip', this.$el).tooltip('fixTitle');
+        $('.has-tooltip', this.$el).tooltip('_fixTitle');
         $('.has-tooltip', this.$el).tooltip('hide');
       });
     },

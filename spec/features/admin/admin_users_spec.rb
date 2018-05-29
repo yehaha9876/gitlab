@@ -345,14 +345,14 @@ describe "Admin::Users" do
     end
 
     it "lists group projects" do
-      within(:css, '.append-bottom-default + .panel') do
+      within(:css, '.append-bottom-default + .card') do
         expect(page).to have_content 'Group projects'
-        expect(page).to have_link group.name, admin_group_path(group)
+        expect(page).to have_link group.name, href: admin_group_path(group)
       end
     end
 
     it 'allows navigation to the group details' do
-      within(:css, '.append-bottom-default + .panel') do
+      within(:css, '.append-bottom-default + .card') do
         click_link group.name
       end
       within(:css, 'h3.page-title') do
@@ -362,7 +362,7 @@ describe "Admin::Users" do
     end
 
     it 'shows the group access level' do
-      within(:css, '.append-bottom-default + .panel') do
+      within(:css, '.append-bottom-default + .card') do
         expect(page).to have_content 'Developer'
       end
     end
@@ -444,7 +444,7 @@ describe "Admin::Users" do
 
   describe 'update user identities' do
     before do
-      allow(Gitlab::OAuth::Provider).to receive(:providers).and_return([:twitter, :twitter_updated])
+      allow(Gitlab::Auth::OAuth::Provider).to receive(:providers).and_return([:twitter, :twitter_updated])
     end
 
     it 'modifies twitter identity' do

@@ -2,6 +2,8 @@ module Gitlab
   module Geo
     module LogCursor
       class Daemon
+        include Utils::StrongMemoize
+
         VERSION = '0.2.0'.freeze
         BATCH_SIZE = 250
         SECONDARY_CHECK_INTERVAL = 1.minute
@@ -11,7 +13,6 @@ module Gitlab
         def initialize(options = {})
           @options = options
           @exit = false
-          logger.geo_logger.build.level = options[:debug] ? :debug : Rails.logger.level
         end
 
         def run!
@@ -34,8 +35,14 @@ module Gitlab
         end
 
         def run_once!
-          LogCursor::Events.fetch_in_batches { |batch| handle_events(batch) }
+          # Wrap this with the connection to make it possible to reconnect if
+          # PGbouncer dies: https://github.com/rails/rails/issues/29189
+          ActiveRecord::Base.connection_pool.with_connection do
+            LogCursor::Events.fetch_in_batches { |batch| handle_events(batch) }
+          end
         end
+
+        private
 
         def handle_events(batch)
           batch.each do |event_log|
@@ -52,8 +59,6 @@ module Gitlab
             end
           end
         end
-
-        private
 
         def trap_signals
           trap(:TERM) do
@@ -81,8 +86,19 @@ module Gitlab
           Gitlab::Geo.current_node&.projects_include?(event_log.project_id)
         end
 
+        def healthy_shard_for?(event)
+          return true unless event.respond_to?(:project)
+
+          Gitlab::Geo::ShardHealthCache.healthy_shard?(event.project.repository_storage)
+        end
+
+        def enqueue_job_if_shard_healthy(event)
+          yield if healthy_shard_for?(event)
+        end
+
         def handle_repository_created_event(event, created_at)
-          registry = find_or_initialize_registry(event.project_id, resync_repository: true, resync_wiki: event.wiki_path.present?)
+          registry = find_or_initialize_registry(event.project_id,
+            resync_repository: true, resync_wiki: event.wiki_path.present?)
 
           logger.event_info(
             created_at,
@@ -95,11 +111,25 @@ module Gitlab
 
           registry.save!
 
-          ::Geo::ProjectSyncWorker.perform_async(event.project_id, Time.now)
+          enqueue_job_if_shard_healthy(event) do
+            ::Geo::ProjectSyncWorker.perform_async(event.project_id, Time.now)
+          end
         end
 
         def handle_repository_updated_event(event, created_at)
-          registry = find_or_initialize_registry(event.project_id, "resync_#{event.source}" => true)
+          registry = find_or_initialize_registry(
+            event.project_id,
+            "resync_#{event.source}" => true,
+            "#{event.source}_verification_checksum_sha" => nil,
+            "#{event.source}_checksum_mismatch" => false,
+            "last_#{event.source}_verification_failure" => nil
+          )
+
+          registry.save!
+
+          job_id = enqueue_job_if_shard_healthy(event) do
+            ::Geo::ProjectSyncWorker.perform_async(event.project_id, Time.now)
+          end
 
           logger.event_info(
             created_at,
@@ -107,33 +137,41 @@ module Gitlab
             project_id: event.project_id,
             source: event.source,
             resync_repository: registry.resync_repository,
-            resync_wiki: registry.resync_wiki)
-
-          registry.save!
-
-          ::Geo::ProjectSyncWorker.perform_async(event.project_id, Time.now)
+            resync_wiki: registry.resync_wiki,
+            job_id: job_id)
         end
 
         def handle_repository_deleted_event(event, created_at)
-          job_id = ::Geo::RepositoryDestroyService
-                     .new(event.project_id, event.deleted_project_name, event.deleted_path, event.repository_storage_name)
-                     .async_execute
+          registry = find_or_initialize_registry(event.project_id)
+          skippable = registry.new_record?
 
-          logger.event_info(
-            created_at,
-            'Deleted project',
+          params = {
             project_id: event.project_id,
             repository_storage_name: event.repository_storage_name,
             disk_path: event.deleted_path,
-            job_id: job_id)
+            skippable: skippable
+          }
 
-          # No need to create a project entry if it doesn't exist
-          ::Geo::ProjectRegistry.where(project_id: event.project_id).delete_all
+          unless skippable
+            # Must always schedule - https://gitlab.com/gitlab-org/gitlab-ee/issues/3651
+            # TODO: Wrap in enqueue_job_if_shard_healthy once ^ is resolved
+            params[:job_id] = ::Geo::RepositoryDestroyService.new(
+              event.project_id,
+              event.deleted_project_name,
+              event.deleted_path,
+              event.repository_storage_name
+            ).async_execute
+
+            ::Geo::ProjectRegistry.where(project_id: event.project_id).delete_all
+          end
+
+          logger.event_info(created_at, 'Deleted project', params)
         end
 
         def handle_repositories_changed_event(event, created_at)
           return unless Gitlab::Geo.current_node.id == event.geo_node_id
 
+          # Must always schedule, regardless of shard health
           job_id = ::Geo::RepositoriesCleanUpWorker.perform_in(1.hour, event.geo_node_id)
 
           if job_id
@@ -146,44 +184,58 @@ module Gitlab
         def handle_repository_renamed_event(event, created_at)
           return unless event.project_id
 
-          old_path = event.old_path_with_namespace
-          new_path = event.new_path_with_namespace
+          registry = find_or_initialize_registry(event.project_id)
+          skippable = registry.new_record?
 
-          job_id = ::Geo::RenameRepositoryService
-                     .new(event.project_id, old_path, new_path)
-                     .async_execute
-
-          logger.event_info(
-            created_at,
-            'Renaming project',
+          params = {
             project_id: event.project_id,
-            old_path: old_path,
-            new_path: new_path,
-            job_id: job_id)
+            old_path: event.old_path_with_namespace,
+            new_path: event.new_path_with_namespace,
+            skippable: skippable
+          }
+
+          unless skippable
+            # Must always schedule, regardless of shard health
+            params[:job_id] = ::Geo::RenameRepositoryService.new(
+              event.project_id,
+              event.old_path_with_namespace,
+              event.new_path_with_namespace
+            ).async_execute
+          end
+
+          logger.event_info(created_at, 'Renaming project', params)
         end
 
         def handle_hashed_storage_migrated_event(event, created_at)
           return unless event.project_id
 
-          job_id = ::Geo::HashedStorageMigrationService.new(
-            event.project_id,
-            old_disk_path: event.old_disk_path,
-            new_disk_path: event.new_disk_path,
-            old_storage_version: event.old_storage_version
-          ).async_execute
+          registry = find_or_initialize_registry(event.project_id)
+          skippable = registry.new_record?
 
-          logger.event_info(
-            created_at,
-            'Migrating project to hashed storage',
+          params = {
             project_id: event.project_id,
             old_storage_version: event.old_storage_version,
             new_storage_version: event.new_storage_version,
             old_disk_path: event.old_disk_path,
             new_disk_path: event.new_disk_path,
-            job_id: job_id)
+            skippable: skippable
+          }
+
+          unless skippable
+            # Must always schedule, regardless of shard health
+            params[:job_id] = ::Geo::HashedStorageMigrationService.new(
+              event.project_id,
+              old_disk_path: event.old_disk_path,
+              new_disk_path: event.new_disk_path,
+              old_storage_version: event.old_storage_version
+            ).async_execute
+          end
+
+          logger.event_info(created_at, 'Migrating project to hashed storage', params)
         end
 
         def handle_hashed_storage_attachments_event(event, created_at)
+          # Must always schedule, regardless of shard health
           job_id = ::Geo::HashedStorageAttachmentsMigrationService.new(
             event.project_id,
             old_attachments_path: event.old_attachments_path,
@@ -217,7 +269,7 @@ module Gitlab
         end
 
         def handle_job_artifact_deleted_event(event, created_at)
-          file_registry_job_artifacts = ::Geo::FileRegistry.job_artifacts.where(file_id: event.job_artifact_id)
+          file_registry_job_artifacts = ::Geo::JobArtifactRegistry.where(artifact_id: event.job_artifact_id)
           return unless file_registry_job_artifacts.any? # avoid race condition
 
           file_path = File.join(::JobArtifactUploader.root, event.file_path)
@@ -249,7 +301,7 @@ module Gitlab
           ::Geo::FileRegistry.where(file_id: event.upload_id, file_type: event.upload_type).delete_all
         end
 
-        def find_or_initialize_registry(project_id, attrs)
+        def find_or_initialize_registry(project_id, attrs = nil)
           registry = ::Geo::ProjectRegistry.find_or_initialize_by(project_id: project_id)
           registry.assign_attributes(attrs)
           registry
@@ -271,7 +323,13 @@ module Gitlab
         end
 
         def logger
-          Gitlab::Geo::LogCursor::Logger
+          strong_memoize(:logger) do
+            Gitlab::Geo::LogCursor::Logger.new(self.class, log_level)
+          end
+        end
+
+        def log_level
+          options[:debug] ? :debug : Rails.logger.level
         end
       end
     end

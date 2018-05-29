@@ -1,8 +1,11 @@
 /* eslint-disable class-methods-use-this */
+
+import $ from 'jquery';
 import _ from 'underscore';
 import Cookies from 'js-cookie';
 import { __ } from './locale';
-import { isInIssuePage, updateTooltipTitle } from './lib/utils/common_utils';
+import { updateTooltipTitle } from './lib/utils/common_utils';
+import { isInVueNoteablePage } from './lib/utils/dom_utils';
 import flash from './flash';
 import axios from './lib/utils/axios_utils';
 
@@ -239,9 +242,9 @@ class AwardsHandler {
   }
 
   addAward(votesBlock, awardUrl, emoji, checkMutuality, callback) {
-    const isMainAwardsBlock = votesBlock.closest('.js-issue-note-awards').length;
+    const isMainAwardsBlock = votesBlock.closest('.js-noteable-awards').length;
 
-    if (isInIssuePage() && !isMainAwardsBlock) {
+    if (isInVueNoteablePage() && !isMainAwardsBlock) {
       const id = votesBlock.attr('id').replace('note_', '');
 
       this.hideMenuElement($('.emoji-menu'));
@@ -294,7 +297,7 @@ class AwardsHandler {
   }
 
   getVotesBlock() {
-    if (isInIssuePage()) {
+    if (isInVueNoteablePage()) {
       const $el = $('.js-add-award.is-active').closest('.note.timeline-entry');
 
       if ($el.length) {
@@ -312,7 +315,7 @@ class AwardsHandler {
   }
 
   getAwardUrl() {
-    return this.getVotesBlock().data('award-url');
+    return this.getVotesBlock().data('awardUrl');
   }
 
   checkMutuality(votesBlock, emoji) {
@@ -342,7 +345,7 @@ class AwardsHandler {
       counter.text(counterNumber - 1);
       this.removeYouFromUserList($emojiButton);
     } else if (emoji === 'thumbsup' || emoji === 'thumbsdown') {
-      $emojiButton.tooltip('destroy');
+      $emojiButton.tooltip('dispose');
       counter.text('0');
       this.removeYouFromUserList($emojiButton);
       if ($emojiButton.parents('.note').length) {
@@ -355,7 +358,7 @@ class AwardsHandler {
   }
 
   removeEmoji($emojiButton) {
-    $emojiButton.tooltip('destroy');
+    $emojiButton.tooltip('dispose');
     $emojiButton.remove();
     const $votesBlock = this.getVotesBlock();
     if ($votesBlock.find('.js-emoji-btn').length === 0) {
@@ -389,7 +392,7 @@ class AwardsHandler {
       .removeAttr('data-title')
       .removeAttr('data-original-title')
       .attr('title', this.toSentence(authors))
-      .tooltip('fixTitle');
+      .tooltip('_fixTitle');
   }
 
   addYouToUserList(votesBlock, emoji) {
@@ -402,7 +405,7 @@ class AwardsHandler {
     users.unshift('You');
     return awardBlock
       .attr('title', this.toSentence(users))
-      .tooltip('fixTitle');
+      .tooltip('_fixTitle');
   }
 
   createAwardButtonForVotesBlock(votesBlock, emojiName) {

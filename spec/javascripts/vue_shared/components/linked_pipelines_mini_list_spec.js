@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import LinkedPipelinesMiniList from '~/vue_shared/components/linked_pipelines_mini_list.vue';
-import mockData from '../../pipelines/graph/linked_pipelines_mock_data';
+import LinkedPipelinesMiniList from 'ee/vue_shared/components/linked_pipelines_mini_list.vue';
+import mockData from 'spec/pipelines/graph/linked_pipelines_mock_data';
 
 const ListComponent = Vue.extend(LinkedPipelinesMiniList);
 
-describe('Linked pipeline mini list', () => {
+describe('Linked pipeline mini list', function() {
   describe('when passed an upstream pipeline as prop', () => {
     beforeEach(() => {
       this.component = new ListComponent({
@@ -68,7 +68,11 @@ describe('Linked pipeline mini list', () => {
     });
 
     it('should render one linked pipeline item', () => {
-      expect(this.component.$el.querySelectorAll('.linked-pipeline-mini-item:not(.linked-pipelines-counter)').length).toBe(3);
+      expect(
+        this.component.$el.querySelectorAll(
+          '.linked-pipeline-mini-item:not(.linked-pipelines-counter)',
+        ).length,
+      ).toBe(3);
     });
 
     it('should render three ci status icons', () => {
@@ -110,11 +114,17 @@ describe('Linked pipeline mini list', () => {
     });
 
     it('should set the correct pipeline path', () => {
-      expect(this.component.$el.querySelector('.linked-pipelines-counter').getAttribute('href')).toBe('my/pipeline/path');
+      expect(
+        this.component.$el.querySelector('.linked-pipelines-counter').getAttribute('href'),
+      ).toBe('my/pipeline/path');
     });
 
     it('should render the correct counterTooltipText', () => {
-      expect(this.component.$el.querySelector('.linked-pipelines-counter').getAttribute('data-original-title')).toBe(this.component.counterTooltipText);
+      expect(
+        this.component.$el
+          .querySelector('.linked-pipelines-counter')
+          .getAttribute('data-original-title'),
+      ).toBe(this.component.counterTooltipText);
     });
   });
 });

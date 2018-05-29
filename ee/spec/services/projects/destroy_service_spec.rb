@@ -8,7 +8,6 @@ describe Projects::DestroyService do
   let!(:project_path) { project.disk_path }
   let!(:wiki_path) { project.wiki.disk_path }
   let!(:storage_name) { project.repository_storage }
-  let!(:storage_path) { project.repository_storage_path }
 
   subject { described_class.new(project, user, {}) }
 
@@ -72,6 +71,16 @@ describe Projects::DestroyService do
            }
          }
       end
+    end
+  end
+
+  context 'system hooks exception' do
+    before do
+      allow_any_instance_of(SystemHooksService).to receive(:execute_hooks_for).and_raise('something went wrong')
+    end
+
+    it 'logs an audit event' do
+      expect { subject.execute }.to change(AuditEvent, :count)
     end
   end
 end

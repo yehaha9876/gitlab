@@ -1,6 +1,6 @@
-# Merge request approvals
+# Merge request approvals **[STARTER]**
 
-> Introduced in [GitLab Enterprise Edition 7.12](https://about.gitlab.com/2015/06/22/gitlab-7-12-released/#merge-request-approvers-ee-only), available in [GitLab Starter](https://about.gitlab.com/products/).
+> Introduced in [GitLab Enterprise Edition 7.12](https://about.gitlab.com/2015/06/22/gitlab-7-12-released/#merge-request-approvers-ee-only).
 
 ## Overview
 
@@ -57,8 +57,8 @@ an eligible approver.
 Let's say that `m` is the number of required approvals, and `Ω` is the set of
 explicit approvers. Depending on their number, there are different cases:
 
-- If `m <= Ω`, then only those explicit approvers can approve the merge request.
-- If `m > Ω` , then all the explicit approvers _and_ the members of the given
+- If `m <= count(Ω)`, then only those explicit approvers can approve the merge request.
+- If `m > count(Ω)` , then all the explicit approvers _and_ the members of the given
   project with Developer role or higher are eligible approvers of the merge
   request.
 
@@ -81,8 +81,8 @@ the following is possible:
       ![Approve](img/approve.png)
 
   - If the required number of approvals has already been met, they can still
-    approve it by clicking the displayed **Approve additionally** button.
-      ![Approve additionally](img/approve_additionally.png)
+    approve it by clicking the displayed **Add approval** button.
+      ![Add approval](img/approve_additionally.png)
 
     ---
 
@@ -167,6 +167,7 @@ new commits are pushed to the source branch of the merge request:
 NOTE: **Note:**
 Approvals do not get reset when [rebasing a merge request](fast_forward_merge.md)
 from the UI.
+However, approvals will be reset if the target branch is changed.
 
 If you want approvals to persist, independent of changes to the merge request,
 turn this setting to off by unchecking the box and saving the changes.

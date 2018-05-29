@@ -10,7 +10,7 @@ Parameters:
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
 | `skip_groups` | array of integers | no | Skip the group IDs passed |
-| `all_available` | boolean | no | Show all the groups you have access to (defaults to `false` for authenticated users) |
+| `all_available` | boolean | no | Show all the groups you have access to (defaults to `false` for authenticated users, `true` for admin) |
 | `search` | string | no | Return the list of authorized groups matching the search criteria |
 | `order_by` | string | no | Order groups by `name` or `path`. Default is `name` |
 | `sort` | string | no | Order groups in `asc` or `desc` order. Default is `asc` |
@@ -94,7 +94,7 @@ Parameters:
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) of the parent group |
 | `skip_groups` | array of integers | no | Skip the group IDs passed |
-| `all_available` | boolean | no | Show all the groups you have access to (defaults to `false` for authenticated users) |
+| `all_available` | boolean | no | Show all the groups you have access to (defaults to `false` for authenticated users, `true` for admin) |
 | `search` | string | no | Return the list of authorized groups matching the search criteria |
 | `order_by` | string | no | Order groups by `name` or `path`. Default is `name` |
 | `sort` | string | no | Order groups in `asc` or `desc` order. Default is `asc` |
@@ -492,6 +492,9 @@ Parameters:
 
 - `id` (required) - The ID or path of a user group
 
+This will queue a background job to delete all projects in the group. The
+response will be a 202 Accepted if the user has authorization.
+
 ## Search for group
 
 Get all groups that match your string in their name or path.
@@ -582,3 +585,7 @@ And to switch pages add:
 ```
 
 [ce-15142]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/15142
+
+## Group badges
+
+Read more in the [Group Badges](group_badges.md) documentation.

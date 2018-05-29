@@ -1,6 +1,7 @@
 import Chart from 'chart.js';
+import initGroupMemberContributions from 'ee/group_member_contributions';
 
-export default () => {
+document.addEventListener('DOMContentLoaded', () => {
   const dataEl = document.getElementById('js-analytics-data');
   if (dataEl) {
     const data = JSON.parse(dataEl.innerHTML);
@@ -31,6 +32,6 @@ export default () => {
       );
     });
 
-    $('#event-stats').tablesorter();
+    initGroupMemberContributions();
   }
-};
+});

@@ -13,6 +13,14 @@ describe Gitlab::UsageData do
       create(:service, project: projects[0], type: 'SlackSlashCommandsService', active: true)
       create(:service, project: projects[1], type: 'SlackService', active: true)
       create(:service, project: projects[2], type: 'SlackService', active: true)
+
+      gcp_cluster = create(:cluster, :provided_by_gcp)
+      create(:cluster, :provided_by_user)
+      create(:cluster, :provided_by_user, :disabled)
+      create(:clusters_applications_helm, :installed, cluster: gcp_cluster)
+      create(:clusters_applications_ingress, :installed, cluster: gcp_cluster)
+      create(:clusters_applications_prometheus, :installed, cluster: gcp_cluster)
+      create(:clusters_applications_runner, :installed, cluster: gcp_cluster)
     end
 
     subject { described_class.data }
@@ -30,6 +38,7 @@ describe Gitlab::UsageData do
         license_trial
         licensee
         license_md5
+        license_id
         recorded_at
         mattermost_enabled
         edition
@@ -48,6 +57,7 @@ describe Gitlab::UsageData do
         geo
         git
         database
+        avg_cycle_analytics
       ))
     end
 
@@ -60,6 +70,7 @@ describe Gitlab::UsageData do
       expect(count_data.keys).to match_array(%i(
         boards
         ci_builds
+        projects_mirrored_with_pipelines_enabled
         ci_internal_pipelines
         ci_external_pipelines
         ci_pipeline_config_auto_devops
@@ -72,10 +83,17 @@ describe Gitlab::UsageData do
         deploy_keys
         deployments
         environments
+        epics
         geo_nodes
         clusters
         clusters_enabled
         clusters_disabled
+        clusters_platforms_gke
+        clusters_platforms_user
+        clusters_applications_helm
+        clusters_applications_ingress
+        clusters_applications_prometheus
+        clusters_applications_runner
         in_review_folder
         groups
         issues
@@ -90,6 +108,7 @@ describe Gitlab::UsageData do
         notes
         projects
         projects_imported_from_github
+        projects_reporting_ci_cd_back_to_github
         projects_jira_active
         projects_slack_notifications_active
         projects_slack_slash_active
@@ -98,7 +117,6 @@ describe Gitlab::UsageData do
         protected_branches
         releases
         remote_mirrors
-        services
         snippets
         todos
         uploads
@@ -114,6 +132,15 @@ describe Gitlab::UsageData do
       expect(count_data[:projects_jira_active]).to eq(2)
       expect(count_data[:projects_slack_notifications_active]).to eq(2)
       expect(count_data[:projects_slack_slash_active]).to eq(1)
+
+      expect(count_data[:clusters_enabled]).to eq(6)
+      expect(count_data[:clusters_disabled]).to eq(1)
+      expect(count_data[:clusters_platforms_gke]).to eq(1)
+      expect(count_data[:clusters_platforms_user]).to eq(1)
+      expect(count_data[:clusters_applications_helm]).to eq(1)
+      expect(count_data[:clusters_applications_ingress]).to eq(1)
+      expect(count_data[:clusters_applications_prometheus]).to eq(1)
+      expect(count_data[:clusters_applications_runner]).to eq(1)
     end
   end
 
@@ -160,6 +187,7 @@ describe Gitlab::UsageData do
 
       expect(subject[:uuid]).to eq(Gitlab::CurrentSettings.uuid)
       expect(subject[:license_md5]).to eq(Digest::MD5.hexdigest(license.data))
+      expect(subject[:license_id]).to eq(license.license_id)
       expect(subject[:version]).to eq(Gitlab::VERSION)
       expect(subject[:licensee]).to eq(license.licensee)
       expect(subject[:active_user_count]).to eq(User.active.count)

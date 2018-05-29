@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180208183958) do
+ActiveRecord::Schema.define(version: 20180524132016) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,6 +39,18 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.integer "cached_markdown_version"
     t.text "new_project_guidelines"
     t.text "new_project_guidelines_html"
+    t.text "header_message"
+    t.text "header_message_html"
+    t.text "footer_message"
+    t.text "footer_message_html"
+    t.text "message_background_color"
+    t.text "message_font_color"
+  end
+
+  create_table "application_setting_terms", force: :cascade do |t|
+    t.integer "cached_markdown_version"
+    t.text "terms", null: false
+    t.text "terms_html"
   end
 
   create_table "application_settings", force: :cascade do |t|
@@ -145,7 +157,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.integer "mirror_max_delay", default: 300, null: false
     t.integer "mirror_max_capacity", default: 100, null: false
     t.integer "mirror_capacity_threshold", default: 50, null: false
-    t.boolean "prometheus_metrics_enabled", default: false, null: false
+    t.boolean "prometheus_metrics_enabled", default: true, null: false
     t.boolean "authorized_keys_enabled", default: true, null: false
     t.boolean "help_page_hide_commercial_content", default: false
     t.string "help_page_support_url"
@@ -180,6 +192,19 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.boolean "mirror_available", default: true, null: false
     t.string "auto_devops_domain"
     t.integer "default_project_creation", default: 2, null: false
+    t.boolean "external_authorization_service_enabled", default: false, null: false
+    t.string "external_authorization_service_url"
+    t.string "external_authorization_service_default_label"
+    t.boolean "pages_domain_verification_enabled", default: true, null: false
+    t.float "external_authorization_service_timeout", default: 0.5, null: false
+    t.boolean "allow_local_requests_from_hooks_and_services", default: false, null: false
+    t.text "external_auth_client_cert"
+    t.text "encrypted_external_auth_client_key"
+    t.string "encrypted_external_auth_client_key_iv"
+    t.string "encrypted_external_auth_client_key_pass"
+    t.string "encrypted_external_auth_client_key_pass_iv"
+    t.string "email_additional_text"
+    t.boolean "enforce_terms", default: false
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -236,6 +261,19 @@ ActiveRecord::Schema.define(version: 20180208183958) do
 
   add_index "award_emoji", ["awardable_type", "awardable_id"], name: "index_award_emoji_on_awardable_type_and_awardable_id", using: :btree
   add_index "award_emoji", ["user_id", "name"], name: "index_award_emoji_on_user_id_and_name", using: :btree
+
+  create_table "badges", force: :cascade do |t|
+    t.string "link_url", null: false
+    t.string "image_url", null: false
+    t.integer "project_id"
+    t.integer "group_id"
+    t.string "type", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+  end
+
+  add_index "badges", ["group_id"], name: "index_badges_on_group_id", using: :btree
+  add_index "badges", ["project_id"], name: "index_badges_on_project_id", using: :btree
 
   create_table "board_assignees", force: :cascade do |t|
     t.integer "board_id", null: false
@@ -304,6 +342,15 @@ ActiveRecord::Schema.define(version: 20180208183958) do
 
   add_index "chat_teams", ["namespace_id"], name: "index_chat_teams_on_namespace_id", unique: true, using: :btree
 
+  create_table "ci_build_trace_chunks", id: :bigserial, force: :cascade do |t|
+    t.integer "build_id", null: false
+    t.integer "chunk_index", null: false
+    t.integer "data_store", null: false
+    t.binary "raw_data"
+  end
+
+  add_index "ci_build_trace_chunks", ["build_id", "chunk_index"], name: "index_ci_build_trace_chunks_on_build_id_and_chunk_index", unique: true, using: :btree
+
   create_table "ci_build_trace_section_names", force: :cascade do |t|
     t.integer "project_id", null: false
     t.string "name", null: false
@@ -323,6 +370,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
 
   add_index "ci_build_trace_sections", ["build_id", "section_name_id"], name: "index_ci_build_trace_sections_on_build_id_and_section_name_id", unique: true, using: :btree
   add_index "ci_build_trace_sections", ["project_id"], name: "index_ci_build_trace_sections_on_project_id", using: :btree
+  add_index "ci_build_trace_sections", ["section_name_id"], name: "index_ci_build_trace_sections_on_section_name_id", using: :btree
 
   create_table "ci_builds", force: :cascade do |t|
     t.string "status"
@@ -379,12 +427,23 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_index "ci_builds", ["project_id", "id"], name: "index_ci_builds_on_project_id_and_id", using: :btree
   add_index "ci_builds", ["protected"], name: "index_ci_builds_on_protected", using: :btree
   add_index "ci_builds", ["runner_id"], name: "index_ci_builds_on_runner_id", using: :btree
+  add_index "ci_builds", ["stage_id", "stage_idx"], name: "tmp_build_stage_position_index", where: "(stage_idx IS NOT NULL)", using: :btree
   add_index "ci_builds", ["stage_id"], name: "index_ci_builds_on_stage_id", using: :btree
   add_index "ci_builds", ["status", "type", "runner_id"], name: "index_ci_builds_on_status_and_type_and_runner_id", using: :btree
   add_index "ci_builds", ["status"], name: "index_ci_builds_on_status", using: :btree
   add_index "ci_builds", ["token"], name: "index_ci_builds_on_token", unique: true, using: :btree
   add_index "ci_builds", ["updated_at"], name: "index_ci_builds_on_updated_at", using: :btree
   add_index "ci_builds", ["user_id"], name: "index_ci_builds_on_user_id", using: :btree
+
+  create_table "ci_builds_metadata", force: :cascade do |t|
+    t.integer "build_id", null: false
+    t.integer "project_id", null: false
+    t.integer "timeout"
+    t.integer "timeout_source", default: 1, null: false
+  end
+
+  add_index "ci_builds_metadata", ["build_id"], name: "index_ci_builds_metadata_on_build_id", unique: true, using: :btree
+  add_index "ci_builds_metadata", ["project_id"], name: "index_ci_builds_metadata_on_project_id", using: :btree
 
   create_table "ci_group_variables", force: :cascade do |t|
     t.string "key", null: false
@@ -410,11 +469,21 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.datetime_with_timezone "expire_at"
     t.string "file"
     t.integer "file_store"
+    t.binary "file_sha256"
   end
 
   add_index "ci_job_artifacts", ["expire_at", "job_id"], name: "index_ci_job_artifacts_on_expire_at_and_job_id", using: :btree
+  add_index "ci_job_artifacts", ["file_store"], name: "index_ci_job_artifacts_on_file_store", using: :btree
   add_index "ci_job_artifacts", ["job_id", "file_type"], name: "index_ci_job_artifacts_on_job_id_and_file_type", unique: true, using: :btree
   add_index "ci_job_artifacts", ["project_id"], name: "index_ci_job_artifacts_on_project_id", using: :btree
+
+  create_table "ci_pipeline_chat_data", id: :bigserial, force: :cascade do |t|
+    t.integer "pipeline_id", null: false
+    t.integer "chat_name_id", null: false
+    t.text "response_url", null: false
+  end
+
+  add_index "ci_pipeline_chat_data", ["pipeline_id"], name: "index_ci_pipeline_chat_data_on_pipeline_id", unique: true, using: :btree
 
   create_table "ci_pipeline_schedule_variables", force: :cascade do |t|
     t.string "key", null: false
@@ -488,6 +557,14 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_index "ci_pipelines", ["status"], name: "index_ci_pipelines_on_status", using: :btree
   add_index "ci_pipelines", ["user_id"], name: "index_ci_pipelines_on_user_id", using: :btree
 
+  create_table "ci_runner_namespaces", force: :cascade do |t|
+    t.integer "runner_id"
+    t.integer "namespace_id"
+  end
+
+  add_index "ci_runner_namespaces", ["namespace_id"], name: "index_ci_runner_namespaces_on_namespace_id", using: :btree
+  add_index "ci_runner_namespaces", ["runner_id", "namespace_id"], name: "index_ci_runner_namespaces_on_runner_id_and_namespace_id", unique: true, using: :btree
+
   create_table "ci_runner_projects", force: :cascade do |t|
     t.integer "runner_id", null: false
     t.datetime "created_at"
@@ -514,11 +591,15 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.boolean "run_untagged", default: true, null: false
     t.boolean "locked", default: false, null: false
     t.integer "access_level", default: 0, null: false
+    t.string "ip_address"
+    t.integer "maximum_timeout"
+    t.integer "runner_type", limit: 2, null: false
   end
 
   add_index "ci_runners", ["contacted_at"], name: "index_ci_runners_on_contacted_at", using: :btree
   add_index "ci_runners", ["is_shared"], name: "index_ci_runners_on_is_shared", using: :btree
   add_index "ci_runners", ["locked"], name: "index_ci_runners_on_locked", using: :btree
+  add_index "ci_runners", ["runner_type"], name: "index_ci_runners_on_runner_type", using: :btree
   add_index "ci_runners", ["token"], name: "index_ci_runners_on_token", using: :btree
 
   create_table "ci_sources_pipelines", force: :cascade do |t|
@@ -543,6 +624,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.string "name"
     t.integer "status"
     t.integer "lock_version"
+    t.integer "position"
   end
 
   add_index "ci_stages", ["pipeline_id", "name"], name: "index_ci_stages_on_pipeline_id_and_name", unique: true, using: :btree
@@ -660,6 +742,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.string "version", null: false
     t.string "cluster_ip"
     t.text "status_reason"
+    t.string "external_ip"
   end
 
   create_table "clusters_applications_prometheus", force: :cascade do |t|
@@ -670,6 +753,20 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
   end
+
+  create_table "clusters_applications_runners", force: :cascade do |t|
+    t.integer "cluster_id", null: false
+    t.integer "runner_id"
+    t.integer "status", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.string "version", null: false
+    t.text "status_reason"
+    t.boolean "privileged", default: true, null: false
+  end
+
+  add_index "clusters_applications_runners", ["cluster_id"], name: "index_clusters_applications_runners_on_cluster_id", unique: true, using: :btree
+  add_index "clusters_applications_runners", ["runner_id"], name: "index_clusters_applications_runners_on_runner_id", using: :btree
 
   create_table "container_repositories", force: :cascade do |t|
     t.integer "project_id", null: false
@@ -725,6 +822,19 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   end
 
   add_index "deploy_keys_projects", ["project_id"], name: "index_deploy_keys_projects_on_project_id", using: :btree
+
+  create_table "deploy_tokens", force: :cascade do |t|
+    t.boolean "revoked", default: false
+    t.boolean "read_repository", default: false, null: false
+    t.boolean "read_registry", default: false, null: false
+    t.datetime_with_timezone "expires_at", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.string "name", null: false
+    t.string "token", null: false
+  end
+
+  add_index "deploy_tokens", ["token", "expires_at", "id"], name: "index_deploy_tokens_on_token_and_expires_at_and_id", where: "(revoked IS FALSE)", using: :btree
+  add_index "deploy_tokens", ["token"], name: "index_deploy_tokens_on_token", unique: true, using: :btree
 
   create_table "deployments", force: :cascade do |t|
     t.integer "iid", null: false
@@ -831,7 +941,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   end
 
   add_index "events", ["action"], name: "index_events_on_action", using: :btree
-  add_index "events", ["author_id"], name: "index_events_on_author_id", using: :btree
+  add_index "events", ["author_id", "project_id"], name: "index_events_on_author_id_and_project_id", using: :btree
   add_index "events", ["project_id", "id"], name: "index_events_on_project_id_and_id", using: :btree
   add_index "events", ["target_type", "target_id"], name: "index_events_on_target_type_and_target_id", using: :btree
 
@@ -938,7 +1048,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   create_table "geo_hashed_storage_migrated_events", id: :bigserial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.text "repository_storage_name", null: false
-    t.text "repository_storage_path", null: false
+    t.text "repository_storage_path"
     t.text "old_disk_path", null: false
     t.text "new_disk_path", null: false
     t.text "old_wiki_disk_path", null: false
@@ -1005,6 +1115,19 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.integer "job_artifacts_failed_count"
     t.string "version"
     t.string "revision"
+    t.integer "repositories_verified_count"
+    t.integer "repositories_verification_failed_count"
+    t.integer "wikis_verified_count"
+    t.integer "wikis_verification_failed_count"
+    t.integer "lfs_objects_synced_missing_on_primary_count"
+    t.integer "job_artifacts_synced_missing_on_primary_count"
+    t.integer "attachments_synced_missing_on_primary_count"
+    t.integer "repositories_checksummed_count"
+    t.integer "repositories_checksum_failed_count"
+    t.integer "repositories_checksum_mismatch_count"
+    t.integer "wikis_checksummed_count"
+    t.integer "wikis_checksum_failed_count"
+    t.integer "wikis_checksum_mismatch_count"
   end
 
   add_index "geo_node_statuses", ["geo_node_id"], name: "index_geo_node_statuses_on_geo_node_id", unique: true, using: :btree
@@ -1037,7 +1160,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   create_table "geo_repository_created_events", id: :bigserial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.text "repository_storage_name", null: false
-    t.text "repository_storage_path", null: false
+    t.text "repository_storage_path"
     t.text "repo_path", null: false
     t.text "wiki_path"
     t.text "project_name", null: false
@@ -1048,7 +1171,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   create_table "geo_repository_deleted_events", id: :bigserial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.text "repository_storage_name", null: false
-    t.text "repository_storage_path", null: false
+    t.text "repository_storage_path"
     t.text "deleted_path", null: false
     t.text "deleted_wiki_path"
     t.text "deleted_project_name", null: false
@@ -1059,7 +1182,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   create_table "geo_repository_renamed_events", id: :bigserial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.text "repository_storage_name", null: false
-    t.text "repository_storage_path", null: false
+    t.text "repository_storage_path"
     t.text "old_path_with_namespace", null: false
     t.text "new_path_with_namespace", null: false
     t.text "old_wiki_path_with_namespace", null: false
@@ -1160,8 +1283,10 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "secondary_extern_uid"
+    t.integer "saml_provider_id"
   end
 
+  add_index "identities", ["saml_provider_id"], name: "index_identities_on_saml_provider_id", where: "(saml_provider_id IS NOT NULL)", using: :btree
   add_index "identities", ["user_id"], name: "index_identities_on_user_id", using: :btree
 
   create_table "index_statuses", force: :cascade do |t|
@@ -1174,6 +1299,16 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   end
 
   add_index "index_statuses", ["project_id"], name: "index_index_statuses_on_project_id", unique: true, using: :btree
+
+  create_table "internal_ids", id: :bigserial, force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "usage", null: false
+    t.integer "last_value", null: false
+    t.integer "namespace_id"
+  end
+
+  add_index "internal_ids", ["usage", "namespace_id"], name: "index_internal_ids_on_usage_and_namespace_id", unique: true, where: "(namespace_id IS NOT NULL)", using: :btree
+  add_index "internal_ids", ["usage", "project_id"], name: "index_internal_ids_on_usage_and_project_id", unique: true, where: "(project_id IS NOT NULL)", using: :btree
 
   create_table "issue_assignees", id: false, force: :cascade do |t|
     t.integer "user_id", null: false
@@ -1231,6 +1366,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.integer "last_edited_by_id"
     t.boolean "discussion_locked"
     t.datetime_with_timezone "closed_at"
+    t.integer "closed_by_id"
   end
 
   add_index "issues", ["author_id"], name: "index_issues_on_author_id", using: :btree
@@ -1489,6 +1625,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.string "merge_jid"
     t.boolean "discussion_locked"
     t.integer "latest_merge_request_diff_id"
+    t.boolean "allow_maintainer_to_push"
   end
 
   add_index "merge_requests", ["assignee_id"], name: "index_merge_requests_on_assignee_id", using: :btree
@@ -1504,6 +1641,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_index "merge_requests", ["source_project_id", "source_branch"], name: "index_merge_requests_on_source_project_id_and_source_branch", using: :btree
   add_index "merge_requests", ["target_branch"], name: "index_merge_requests_on_target_branch", using: :btree
   add_index "merge_requests", ["target_project_id", "iid"], name: "index_merge_requests_on_target_project_id_and_iid", unique: true, using: :btree
+  add_index "merge_requests", ["target_project_id", "iid"], name: "index_merge_requests_on_target_project_id_and_iid_opened", where: "((state)::text = 'opened'::text)", using: :btree
   add_index "merge_requests", ["target_project_id", "merge_commit_sha", "id"], name: "index_merge_requests_on_tp_id_and_merge_commit_sha_and_id", using: :btree
   add_index "merge_requests", ["title"], name: "index_merge_requests_on_title", using: :btree
   add_index "merge_requests", ["title"], name: "index_merge_requests_on_title_trigram", using: :gin, opclasses: {"title"=>"gin_trgm_ops"}
@@ -1578,6 +1716,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.integer "cached_markdown_version"
     t.integer "plan_id"
     t.integer "project_creation_level"
+    t.string "runners_token"
   end
 
   add_index "namespaces", ["created_at"], name: "index_namespaces_on_created_at", using: :btree
@@ -1591,7 +1730,22 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_index "namespaces", ["path"], name: "index_namespaces_on_path_trigram", using: :gin, opclasses: {"path"=>"gin_trgm_ops"}
   add_index "namespaces", ["plan_id"], name: "index_namespaces_on_plan_id", using: :btree
   add_index "namespaces", ["require_two_factor_authentication"], name: "index_namespaces_on_require_two_factor_authentication", using: :btree
+  add_index "namespaces", ["runners_token"], name: "index_namespaces_on_runners_token", unique: true, using: :btree
   add_index "namespaces", ["type"], name: "index_namespaces_on_type", using: :btree
+
+  create_table "note_diff_files", force: :cascade do |t|
+    t.integer "diff_note_id", null: false
+    t.text "diff", null: false
+    t.boolean "new_file", null: false
+    t.boolean "renamed_file", null: false
+    t.boolean "deleted_file", null: false
+    t.string "a_mode", null: false
+    t.string "b_mode", null: false
+    t.text "new_path", null: false
+    t.text "old_path", null: false
+  end
+
+  add_index "note_diff_files", ["diff_note_id"], name: "index_note_diff_files_on_diff_note_id", unique: true, using: :btree
 
   create_table "notes", force: :cascade do |t|
     t.text "note"
@@ -1649,6 +1803,8 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.boolean "merge_merge_request"
     t.boolean "failed_pipeline"
     t.boolean "success_pipeline"
+    t.boolean "push_to_merge_request"
+    t.boolean "issue_due"
   end
 
   add_index "notification_settings", ["source_id", "source_type"], name: "index_notification_settings_on_source_id_and_source_type", using: :btree
@@ -1711,10 +1867,16 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.string "encrypted_key_iv"
     t.string "encrypted_key_salt"
     t.string "domain"
+    t.datetime_with_timezone "verified_at"
+    t.string "verification_code", null: false
+    t.datetime_with_timezone "enabled_until"
   end
 
   add_index "pages_domains", ["domain"], name: "index_pages_domains_on_domain", unique: true, using: :btree
+  add_index "pages_domains", ["project_id", "enabled_until"], name: "index_pages_domains_on_project_id_and_enabled_until", using: :btree
   add_index "pages_domains", ["project_id"], name: "index_pages_domains_on_project_id", using: :btree
+  add_index "pages_domains", ["verified_at", "enabled_until"], name: "index_pages_domains_on_verified_at_and_enabled_until", using: :btree
+  add_index "pages_domains", ["verified_at"], name: "index_pages_domains_on_verified_at", using: :btree
 
   create_table "path_locks", force: :cascade do |t|
     t.string "path", null: false
@@ -1755,9 +1917,9 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_index "plans", ["name"], name: "index_plans_on_name", using: :btree
 
   create_table "project_authorizations", id: false, force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "project_id"
-    t.integer "access_level"
+    t.integer "user_id", null: false
+    t.integer "project_id", null: false
+    t.integer "access_level", null: false
   end
 
   add_index "project_authorizations", ["project_id"], name: "index_project_authorizations_on_project_id", using: :btree
@@ -1773,6 +1935,13 @@ ActiveRecord::Schema.define(version: 20180208183958) do
 
   add_index "project_auto_devops", ["project_id"], name: "index_project_auto_devops_on_project_id", unique: true, using: :btree
 
+  create_table "project_ci_cd_settings", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.boolean "group_runners_enabled", default: true, null: false
+  end
+
+  add_index "project_ci_cd_settings", ["project_id"], name: "index_project_ci_cd_settings_on_project_id", unique: true, using: :btree
+
   create_table "project_custom_attributes", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1784,8 +1953,16 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_index "project_custom_attributes", ["key", "value"], name: "index_project_custom_attributes_on_key_and_value", using: :btree
   add_index "project_custom_attributes", ["project_id", "key"], name: "index_project_custom_attributes_on_project_id_and_key", unique: true, using: :btree
 
+  create_table "project_deploy_tokens", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "deploy_token_id", null: false
+    t.datetime_with_timezone "created_at", null: false
+  end
+
+  add_index "project_deploy_tokens", ["project_id", "deploy_token_id"], name: "index_project_deploy_tokens_on_project_id_and_deploy_token_id", unique: true, using: :btree
+
   create_table "project_features", force: :cascade do |t|
-    t.integer "project_id"
+    t.integer "project_id", null: false
     t.integer "merge_requests_access_level"
     t.integer "issues_access_level"
     t.integer "wiki_access_level"
@@ -1796,7 +1973,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.integer "repository_access_level", default: 20, null: false
   end
 
-  add_index "project_features", ["project_id"], name: "index_project_features_on_project_id", using: :btree
+  add_index "project_features", ["project_id"], name: "index_project_features_on_project_id", unique: true, using: :btree
 
   create_table "project_group_links", force: :cascade do |t|
     t.integer "project_id", null: false
@@ -1821,17 +1998,36 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_index "project_import_data", ["project_id"], name: "index_project_import_data_on_project_id", using: :btree
 
   create_table "project_mirror_data", force: :cascade do |t|
-    t.integer "project_id"
+    t.integer "project_id", null: false
     t.integer "retry_count", default: 0, null: false
     t.datetime "last_update_started_at"
     t.datetime "last_update_scheduled_at"
     t.datetime "next_execution_timestamp"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.string "status"
+    t.string "jid"
+    t.datetime_with_timezone "last_update_at"
+    t.datetime_with_timezone "last_successful_update_at"
+    t.text "last_error"
   end
 
+  add_index "project_mirror_data", ["jid"], name: "index_project_mirror_data_on_jid", using: :btree
+  add_index "project_mirror_data", ["last_successful_update_at"], name: "index_project_mirror_data_on_last_successful_update_at", using: :btree
   add_index "project_mirror_data", ["next_execution_timestamp", "retry_count"], name: "index_mirror_data_on_next_execution_and_retry_count", using: :btree
   add_index "project_mirror_data", ["project_id"], name: "index_project_mirror_data_on_project_id", unique: true, using: :btree
+  add_index "project_mirror_data", ["status"], name: "index_project_mirror_data_on_status", using: :btree
+
+  create_table "project_repository_states", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.binary "repository_verification_checksum"
+    t.binary "wiki_verification_checksum"
+    t.string "last_repository_verification_failure"
+    t.string "last_wiki_verification_failure"
+  end
+
+  add_index "project_repository_states", ["last_repository_verification_failure"], name: "idx_repository_states_on_repository_failure_partial", where: "(last_repository_verification_failure IS NOT NULL)", using: :btree
+  add_index "project_repository_states", ["last_wiki_verification_failure"], name: "idx_repository_states_on_wiki_failure_partial", where: "(last_wiki_verification_failure IS NOT NULL)", using: :btree
+  add_index "project_repository_states", ["project_id"], name: "index_project_repository_states_on_project_id", unique: true, using: :btree
+  add_index "project_repository_states", ["repository_verification_checksum", "wiki_verification_checksum"], name: "idx_repository_states_on_checksums_partial", where: "((repository_verification_checksum IS NULL) OR (wiki_verification_checksum IS NULL))", using: :btree
 
   create_table "project_statistics", force: :cascade do |t|
     t.integer "project_id", null: false
@@ -1855,7 +2051,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "creator_id"
-    t.integer "namespace_id"
+    t.integer "namespace_id", null: false
     t.datetime "last_activity_at"
     t.string "import_url"
     t.integer "visibility_level", default: 0, null: false
@@ -1913,12 +2109,18 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.boolean "only_mirror_protected_branches"
     t.boolean "pull_mirror_available_overridden"
     t.integer "jobs_cache_index"
+    t.boolean "mirror_overwrites_diverged_branches"
+    t.string "external_authorization_classification_label"
+    t.string "external_webhook_token"
+    t.boolean "pages_https_only", default: true
   end
 
   add_index "projects", ["ci_id"], name: "index_projects_on_ci_id", using: :btree
   add_index "projects", ["created_at"], name: "index_projects_on_created_at", using: :btree
   add_index "projects", ["creator_id"], name: "index_projects_on_creator_id", using: :btree
   add_index "projects", ["description"], name: "index_projects_on_description_trigram", using: :gin, opclasses: {"description"=>"gin_trgm_ops"}
+  add_index "projects", ["id"], name: "index_projects_on_id_partial_for_visibility", unique: true, where: "(visibility_level = ANY (ARRAY[10, 20]))", using: :btree
+  add_index "projects", ["id"], name: "index_projects_on_mirror_and_mirror_trigger_builds_both_true", where: "((mirror IS TRUE) AND (mirror_trigger_builds IS TRUE))", using: :btree
   add_index "projects", ["last_activity_at"], name: "index_projects_on_last_activity_at", using: :btree
   add_index "projects", ["last_repository_check_failed"], name: "index_projects_on_last_repository_check_failed", using: :btree
   add_index "projects", ["last_repository_updated_at"], name: "index_projects_on_last_repository_updated_at", using: :btree
@@ -1932,6 +2134,21 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_index "projects", ["runners_token"], name: "index_projects_on_runners_token", using: :btree
   add_index "projects", ["star_count"], name: "index_projects_on_star_count", using: :btree
   add_index "projects", ["visibility_level"], name: "index_projects_on_visibility_level", using: :btree
+
+  create_table "prometheus_metrics", force: :cascade do |t|
+    t.integer "project_id"
+    t.string "title", null: false
+    t.string "query", null: false
+    t.string "y_label"
+    t.string "unit"
+    t.string "legend"
+    t.integer "group", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "prometheus_metrics", ["group"], name: "index_prometheus_metrics_on_group", using: :btree
+  add_index "prometheus_metrics", ["project_id"], name: "index_prometheus_metrics_on_project_id", using: :btree
 
   create_table "protected_branch_merge_access_levels", force: :cascade do |t|
     t.integer "protected_branch_id", null: false
@@ -1956,6 +2173,17 @@ ActiveRecord::Schema.define(version: 20180208183958) do
 
   add_index "protected_branch_push_access_levels", ["protected_branch_id"], name: "index_protected_branch_push_access", using: :btree
   add_index "protected_branch_push_access_levels", ["user_id"], name: "index_protected_branch_push_access_levels_on_user_id", using: :btree
+
+  create_table "protected_branch_unprotect_access_levels", force: :cascade do |t|
+    t.integer "protected_branch_id", null: false
+    t.integer "access_level", default: 40
+    t.integer "user_id"
+    t.integer "group_id"
+  end
+
+  add_index "protected_branch_unprotect_access_levels", ["group_id"], name: "index_protected_branch_unprotect_access_levels_on_group_id", using: :btree
+  add_index "protected_branch_unprotect_access_levels", ["protected_branch_id"], name: "index_protected_branch_unprotect_access", using: :btree
+  add_index "protected_branch_unprotect_access_levels", ["user_id"], name: "index_protected_branch_unprotect_access_levels_on_user_id", using: :btree
 
   create_table "protected_branches", force: :cascade do |t|
     t.integer "project_id", null: false
@@ -2017,6 +2245,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.string "branch_name_regex"
     t.boolean "reject_unsigned_commits"
     t.boolean "commit_committer_check"
+    t.boolean "regexp_uses_re2", default: true
   end
 
   add_index "push_rules", ["is_sample"], name: "index_push_rules_on_is_sample", where: "is_sample", using: :btree
@@ -2028,7 +2257,6 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.string "path", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "permanent"
   end
 
   add_index "redirect_routes", ["path"], name: "index_redirect_routes_on_path", unique: true, using: :btree
@@ -2081,6 +2309,15 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_index "routes", ["path"], name: "index_routes_on_path_text_pattern_ops", using: :btree, opclasses: {"path"=>"varchar_pattern_ops"}
   add_index "routes", ["source_type", "source_id"], name: "index_routes_on_source_type_and_source_id", unique: true, using: :btree
 
+  create_table "saml_providers", force: :cascade do |t|
+    t.integer "group_id", null: false
+    t.boolean "enabled", null: false
+    t.string "certificate_fingerprint", null: false
+    t.string "sso_url", null: false
+  end
+
+  add_index "saml_providers", ["group_id"], name: "index_saml_providers_on_group_id", using: :btree
+
   create_table "sent_notifications", force: :cascade do |t|
     t.integer "project_id"
     t.integer "noteable_id"
@@ -2117,6 +2354,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.boolean "confidential_issues_events", default: true, null: false
     t.boolean "commit_events", default: true, null: false
     t.boolean "job_events", default: false, null: false
+    t.boolean "confidential_note_events", default: true
   end
 
   add_index "services", ["project_id"], name: "index_services_on_project_id", using: :btree
@@ -2206,7 +2444,9 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   end
 
   add_index "taggings", ["tag_id", "taggable_id", "taggable_type", "context", "tagger_id", "tagger_type"], name: "taggings_idx", unique: true, using: :btree
+  add_index "taggings", ["tag_id"], name: "index_taggings_on_tag_id", using: :btree
   add_index "taggings", ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context", using: :btree
+  add_index "taggings", ["taggable_id", "taggable_type"], name: "index_taggings_on_taggable_id_and_taggable_type", using: :btree
 
   create_table "tags", force: :cascade do |t|
     t.string "name"
@@ -2214,6 +2454,18 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   end
 
   add_index "tags", ["name"], name: "index_tags_on_name", unique: true, using: :btree
+
+  create_table "term_agreements", force: :cascade do |t|
+    t.integer "term_id", null: false
+    t.integer "user_id", null: false
+    t.boolean "accepted", default: false, null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+  end
+
+  add_index "term_agreements", ["term_id"], name: "index_term_agreements_on_term_id", using: :btree
+  add_index "term_agreements", ["user_id", "term_id"], name: "term_agreements_unique_index", unique: true, using: :btree
+  add_index "term_agreements", ["user_id"], name: "index_term_agreements_on_user_id", using: :btree
 
   create_table "timelogs", force: :cascade do |t|
     t.integer "time_spent", null: false
@@ -2248,6 +2500,8 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_index "todos", ["note_id"], name: "index_todos_on_note_id", using: :btree
   add_index "todos", ["project_id"], name: "index_todos_on_project_id", using: :btree
   add_index "todos", ["target_type", "target_id"], name: "index_todos_on_target_type_and_target_id", using: :btree
+  add_index "todos", ["user_id", "id"], name: "index_todos_on_user_id_and_id_done", where: "((state)::text = 'done'::text)", using: :btree
+  add_index "todos", ["user_id", "id"], name: "index_todos_on_user_id_and_id_pending", where: "((state)::text = 'pending'::text)", using: :btree
   add_index "todos", ["user_id"], name: "index_todos_on_user_id", using: :btree
 
   create_table "trending_projects", force: :cascade do |t|
@@ -2317,6 +2571,14 @@ ActiveRecord::Schema.define(version: 20180208183958) do
 
   add_index "user_custom_attributes", ["key", "value"], name: "index_user_custom_attributes_on_key_and_value", using: :btree
   add_index "user_custom_attributes", ["user_id", "key"], name: "index_user_custom_attributes_on_user_id_and_key", unique: true, using: :btree
+
+  create_table "user_interacted_projects", id: false, force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "project_id", null: false
+  end
+
+  add_index "user_interacted_projects", ["project_id", "user_id"], name: "index_user_interacted_projects_on_project_id_and_user_id", unique: true, using: :btree
+  add_index "user_interacted_projects", ["user_id"], name: "index_user_interacted_projects_on_user_id", using: :btree
 
   create_table "user_synced_attributes_metadata", force: :cascade do |t|
     t.boolean "name_synced", default: false
@@ -2401,6 +2663,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.integer "email_opted_in_source_id"
     t.datetime "email_opted_in_at"
     t.integer "theme_id", limit: 2
+    t.integer "accepted_term_id"
   end
 
   add_index "users", ["admin"], name: "index_users_on_admin", using: :btree
@@ -2428,6 +2691,23 @@ ActiveRecord::Schema.define(version: 20180208183958) do
 
   add_index "users_star_projects", ["project_id"], name: "index_users_star_projects_on_project_id", using: :btree
   add_index "users_star_projects", ["user_id", "project_id"], name: "index_users_star_projects_on_user_id_and_project_id", unique: true, using: :btree
+
+  create_table "vulnerability_feedback", force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "feedback_type", limit: 2, null: false
+    t.integer "category", limit: 2, null: false
+    t.integer "project_id", null: false
+    t.integer "author_id", null: false
+    t.integer "pipeline_id"
+    t.integer "issue_id"
+    t.string "project_fingerprint", limit: 40, null: false
+  end
+
+  add_index "vulnerability_feedback", ["author_id"], name: "index_vulnerability_feedback_on_author_id", using: :btree
+  add_index "vulnerability_feedback", ["issue_id"], name: "index_vulnerability_feedback_on_issue_id", using: :btree
+  add_index "vulnerability_feedback", ["pipeline_id"], name: "index_vulnerability_feedback_on_pipeline_id", using: :btree
+  add_index "vulnerability_feedback", ["project_id", "category", "feedback_type", "project_fingerprint"], name: "vulnerability_feedback_unique_idx", unique: true, using: :btree
 
   create_table "web_hook_logs", force: :cascade do |t|
     t.integer "web_hook_id", null: false
@@ -2466,6 +2746,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
     t.boolean "confidential_issues_events", default: false, null: false
     t.boolean "repository_update_events", default: false, null: false
     t.boolean "job_events", default: false, null: false
+    t.boolean "confidential_note_events"
   end
 
   add_index "web_hooks", ["project_id"], name: "index_web_hooks_on_project_id", using: :btree
@@ -2473,6 +2754,8 @@ ActiveRecord::Schema.define(version: 20180208183958) do
 
   add_foreign_key "approvals", "merge_requests", name: "fk_310d714958", on_delete: :cascade
   add_foreign_key "approver_groups", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "badges", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "badges", "projects", on_delete: :cascade
   add_foreign_key "board_assignees", "boards", on_delete: :cascade
   add_foreign_key "board_assignees", "users", column: "assignee_id", on_delete: :cascade
   add_foreign_key "board_labels", "boards", on_delete: :cascade
@@ -2480,16 +2763,22 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_foreign_key "boards", "namespaces", column: "group_id", name: "fk_1e9a074a35", on_delete: :cascade
   add_foreign_key "boards", "projects", name: "fk_f15266b5f9", on_delete: :cascade
   add_foreign_key "chat_teams", "namespaces", on_delete: :cascade
+  add_foreign_key "ci_build_trace_chunks", "ci_builds", column: "build_id", on_delete: :cascade
   add_foreign_key "ci_build_trace_section_names", "projects", on_delete: :cascade
   add_foreign_key "ci_build_trace_sections", "ci_build_trace_section_names", column: "section_name_id", name: "fk_264e112c66", on_delete: :cascade
   add_foreign_key "ci_build_trace_sections", "ci_builds", column: "build_id", name: "fk_4ebe41f502", on_delete: :cascade
   add_foreign_key "ci_build_trace_sections", "projects", on_delete: :cascade
   add_foreign_key "ci_builds", "ci_pipelines", column: "auto_canceled_by_id", name: "fk_a2141b1522", on_delete: :nullify
+  add_foreign_key "ci_builds", "ci_pipelines", column: "commit_id", name: "fk_d3130c9a7f", on_delete: :cascade
   add_foreign_key "ci_builds", "ci_stages", column: "stage_id", name: "fk_3a9eaa254d", on_delete: :cascade
   add_foreign_key "ci_builds", "projects", name: "fk_befce0568a", on_delete: :cascade
+  add_foreign_key "ci_builds_metadata", "ci_builds", column: "build_id", on_delete: :cascade
+  add_foreign_key "ci_builds_metadata", "projects", on_delete: :cascade
   add_foreign_key "ci_group_variables", "namespaces", column: "group_id", name: "fk_33ae4d58d8", on_delete: :cascade
   add_foreign_key "ci_job_artifacts", "ci_builds", column: "job_id", on_delete: :cascade
   add_foreign_key "ci_job_artifacts", "projects", on_delete: :cascade
+  add_foreign_key "ci_pipeline_chat_data", "chat_names", on_delete: :cascade
+  add_foreign_key "ci_pipeline_chat_data", "ci_pipelines", column: "pipeline_id", on_delete: :cascade
   add_foreign_key "ci_pipeline_schedule_variables", "ci_pipeline_schedules", column: "pipeline_schedule_id", name: "fk_41c35fda51", on_delete: :cascade
   add_foreign_key "ci_pipeline_schedules", "projects", name: "fk_8ead60fcc4", on_delete: :cascade
   add_foreign_key "ci_pipeline_schedules", "users", column: "owner_id", name: "fk_9ea99f58d2", on_delete: :nullify
@@ -2497,6 +2786,8 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_foreign_key "ci_pipelines", "ci_pipeline_schedules", column: "pipeline_schedule_id", name: "fk_3d34ab2e06", on_delete: :nullify
   add_foreign_key "ci_pipelines", "ci_pipelines", column: "auto_canceled_by_id", name: "fk_262d4c2d19", on_delete: :nullify
   add_foreign_key "ci_pipelines", "projects", name: "fk_86635dbd80", on_delete: :cascade
+  add_foreign_key "ci_runner_namespaces", "ci_runners", column: "runner_id", on_delete: :cascade
+  add_foreign_key "ci_runner_namespaces", "namespaces", on_delete: :cascade
   add_foreign_key "ci_runner_projects", "projects", name: "fk_4478a6f1e4", on_delete: :cascade
   add_foreign_key "ci_sources_pipelines", "ci_builds", column: "source_job_id", name: "fk_be5624bf37", on_delete: :cascade
   add_foreign_key "ci_sources_pipelines", "ci_pipelines", column: "pipeline_id", name: "fk_e1bad85861", on_delete: :cascade
@@ -2515,7 +2806,10 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_foreign_key "cluster_providers_gcp", "clusters", on_delete: :cascade
   add_foreign_key "clusters", "users", on_delete: :nullify
   add_foreign_key "clusters_applications_helm", "clusters", on_delete: :cascade
-  add_foreign_key "clusters_applications_ingress", "clusters", on_delete: :cascade
+  add_foreign_key "clusters_applications_ingress", "clusters", name: "fk_753a7b41c1", on_delete: :cascade
+  add_foreign_key "clusters_applications_prometheus", "clusters", name: "fk_557e773639", on_delete: :cascade
+  add_foreign_key "clusters_applications_runners", "ci_runners", column: "runner_id", name: "fk_02de2ded36", on_delete: :nullify
+  add_foreign_key "clusters_applications_runners", "clusters", on_delete: :cascade
   add_foreign_key "container_repositories", "projects"
   add_foreign_key "deploy_keys_projects", "projects", name: "fk_58a901ca7e", on_delete: :cascade
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
@@ -2561,7 +2855,10 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_foreign_key "gpg_signatures", "gpg_keys", on_delete: :nullify
   add_foreign_key "gpg_signatures", "projects", on_delete: :cascade
   add_foreign_key "group_custom_attributes", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "identities", "saml_providers", name: "fk_aade90f0fc", on_delete: :cascade
   add_foreign_key "index_statuses", "projects", name: "fk_74b2492545", on_delete: :cascade
+  add_foreign_key "internal_ids", "namespaces", name: "fk_162941d509", on_delete: :cascade
+  add_foreign_key "internal_ids", "projects", on_delete: :cascade
   add_foreign_key "issue_assignees", "issues", name: "fk_b7d881734a", on_delete: :cascade
   add_foreign_key "issue_assignees", "users", name: "fk_5e0c8d9154", on_delete: :cascade
   add_foreign_key "issue_links", "issues", column: "source_id", name: "fk_c900194ff2", on_delete: :cascade
@@ -2571,6 +2868,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_foreign_key "issues", "milestones", name: "fk_96b1dd429c", on_delete: :nullify
   add_foreign_key "issues", "projects", name: "fk_899c8f3231", on_delete: :cascade
   add_foreign_key "issues", "users", column: "author_id", name: "fk_05f1e72feb", on_delete: :nullify
+  add_foreign_key "issues", "users", column: "closed_by_id", name: "fk_c63cbf6c25", on_delete: :nullify
   add_foreign_key "issues", "users", column: "updated_by_id", name: "fk_ffed080f01", on_delete: :nullify
   add_foreign_key "label_priorities", "labels", on_delete: :cascade
   add_foreign_key "label_priorities", "projects", on_delete: :cascade
@@ -2603,6 +2901,7 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_foreign_key "milestones", "projects", name: "fk_9bd0a0c791", on_delete: :cascade
   add_foreign_key "namespace_statistics", "namespaces", on_delete: :cascade
   add_foreign_key "namespaces", "plans", name: "fk_fdd12e5b80", on_delete: :nullify
+  add_foreign_key "note_diff_files", "notes", column: "diff_note_id", on_delete: :cascade
   add_foreign_key "notes", "projects", name: "fk_99e097b079", on_delete: :cascade
   add_foreign_key "oauth_openid_requests", "oauth_access_grants", column: "access_grant_id", name: "fk_oauth_openid_requests_oauth_access_grants_access_grant_id"
   add_foreign_key "pages_domains", "projects", name: "fk_ea2f6dfc6f", on_delete: :cascade
@@ -2612,18 +2911,26 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_foreign_key "project_authorizations", "projects", on_delete: :cascade
   add_foreign_key "project_authorizations", "users", on_delete: :cascade
   add_foreign_key "project_auto_devops", "projects", on_delete: :cascade
+  add_foreign_key "project_ci_cd_settings", "projects", name: "fk_24c15d2f2e", on_delete: :cascade
   add_foreign_key "project_custom_attributes", "projects", on_delete: :cascade
+  add_foreign_key "project_deploy_tokens", "deploy_tokens", on_delete: :cascade
+  add_foreign_key "project_deploy_tokens", "projects", on_delete: :cascade
   add_foreign_key "project_features", "projects", name: "fk_18513d9b92", on_delete: :cascade
   add_foreign_key "project_group_links", "projects", name: "fk_daa8cee94c", on_delete: :cascade
   add_foreign_key "project_import_data", "projects", name: "fk_ffb9ee3a10", on_delete: :cascade
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
+  add_foreign_key "project_repository_states", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
+  add_foreign_key "prometheus_metrics", "projects", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "namespaces", column: "group_id", name: "fk_98f3d044fe", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "protected_branches", name: "fk_8a3072ccb3", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "users"
   add_foreign_key "protected_branch_push_access_levels", "namespaces", column: "group_id", name: "fk_7111b68cdb", on_delete: :cascade
   add_foreign_key "protected_branch_push_access_levels", "protected_branches", name: "fk_9ffc86a3d9", on_delete: :cascade
   add_foreign_key "protected_branch_push_access_levels", "users"
+  add_foreign_key "protected_branch_unprotect_access_levels", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "protected_branch_unprotect_access_levels", "protected_branches", on_delete: :cascade
+  add_foreign_key "protected_branch_unprotect_access_levels", "users", on_delete: :cascade
   add_foreign_key "protected_branches", "projects", name: "fk_7a9c6d93e7", on_delete: :cascade
   add_foreign_key "protected_tag_create_access_levels", "namespaces", column: "group_id", name: "fk_b4eb82fe3c", on_delete: :cascade
   add_foreign_key "protected_tag_create_access_levels", "protected_tags", name: "fk_f7dfda8c51", on_delete: :cascade
@@ -2633,11 +2940,14 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_foreign_key "push_rules", "projects", name: "fk_83b29894de", on_delete: :cascade
   add_foreign_key "releases", "projects", name: "fk_47fe2a0596", on_delete: :cascade
   add_foreign_key "remote_mirrors", "projects", name: "fk_43a9aa4ca8", on_delete: :cascade
+  add_foreign_key "saml_providers", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "services", "projects", name: "fk_71cce407f9", on_delete: :cascade
   add_foreign_key "slack_integrations", "services", on_delete: :cascade
   add_foreign_key "snippets", "projects", name: "fk_be41fd4bb7", on_delete: :cascade
   add_foreign_key "subscriptions", "projects", on_delete: :cascade
   add_foreign_key "system_note_metadata", "notes", name: "fk_d83a918cb1", on_delete: :cascade
+  add_foreign_key "term_agreements", "application_setting_terms", column: "term_id"
+  add_foreign_key "term_agreements", "users", on_delete: :cascade
   add_foreign_key "timelogs", "issues", name: "fk_timelogs_issues_issue_id", on_delete: :cascade
   add_foreign_key "timelogs", "merge_requests", name: "fk_timelogs_merge_requests_merge_request_id", on_delete: :cascade
   add_foreign_key "todos", "notes", name: "fk_91d1f47b13", on_delete: :cascade
@@ -2648,8 +2958,15 @@ ActiveRecord::Schema.define(version: 20180208183958) do
   add_foreign_key "u2f_registrations", "users"
   add_foreign_key "user_callouts", "users", on_delete: :cascade
   add_foreign_key "user_custom_attributes", "users", on_delete: :cascade
+  add_foreign_key "user_interacted_projects", "projects", name: "fk_722ceba4f7", on_delete: :cascade
+  add_foreign_key "user_interacted_projects", "users", name: "fk_0894651f08", on_delete: :cascade
   add_foreign_key "user_synced_attributes_metadata", "users", on_delete: :cascade
+  add_foreign_key "users", "application_setting_terms", column: "accepted_term_id", name: "fk_789cd90b35", on_delete: :cascade
   add_foreign_key "users_star_projects", "projects", name: "fk_22cd27ddfc", on_delete: :cascade
+  add_foreign_key "vulnerability_feedback", "ci_pipelines", column: "pipeline_id", on_delete: :nullify
+  add_foreign_key "vulnerability_feedback", "issues", on_delete: :nullify
+  add_foreign_key "vulnerability_feedback", "projects", on_delete: :cascade
+  add_foreign_key "vulnerability_feedback", "users", column: "author_id", on_delete: :cascade
   add_foreign_key "web_hook_logs", "web_hooks", on_delete: :cascade
   add_foreign_key "web_hooks", "projects", name: "fk_0c8ca6d9d1", on_delete: :cascade
 end

@@ -1,4 +1,4 @@
-@media (max-width: $screen-md-max) {
+@include media-breakpoint-down(md) {
   .deployments-container {
     width: 100%;
     overflow: auto;
@@ -229,12 +229,12 @@
   justify-content: center;
   align-items: center;
 
-  &-finished {
+  &-running {
     background-color: $green-100;
     border-color: $green-400;
   }
 
-  &-deploying {
+  &-succeeded {
     background-color: $green-50;
     border-color: $green-400;
   }
@@ -244,17 +244,12 @@
     border-color: $red-500;
   }
 
-  &-ready {
-    background-color: lighten($border-color, 1%);
-    border-color: $border-color;
+  &-unknown {
+    background-color: $red-200;
+    border-color: $red-500;
   }
 
-  &-preparing {
-    background-color: lighten($border-color, 5%);
-    border-color: $border-color;
-  }
-
-  &-waiting {
+  &-pending {
     background-color: $white-light;
     border-color: $border-color;
   }
@@ -274,7 +269,7 @@
 .deploy-board-icon {
   display: none;
 
-  @media (min-width: $screen-md-min) {
+  @include media-breakpoint-up(md) {
     float: left;
     display: block;
   }
@@ -298,7 +293,7 @@
   border-left: 0;
   border-right: 0;
 
-  @media (min-width: $screen-sm-max) {
+  @media (min-width: map-get($grid-breakpoints, md)-1) {
     border-top: 0;
   }
 }
@@ -411,7 +406,7 @@
     font-size: 16px;
   }
 
-  @media (max-width: $screen-sm-max) {
+  @include media-breakpoint-down(sm) {
     min-width: 100%;
   }
 }
@@ -433,21 +428,6 @@
     line-height: 1.2;
   }
 
-  table {
-    border-collapse: collapse;
-    padding: 0;
-    margin: 0;
-  }
-
-  td {
-    vertical-align: middle;
-
-    + td {
-      padding-left: 5px;
-      vertical-align: top;
-    }
-  }
-
   .deploy-meta-content {
     border-bottom: 1px solid $white-dark;
 
@@ -458,28 +438,79 @@
   }
 
   &.popover {
+    padding: 0;
+    border: 1px solid $border-color;
+
     &.left {
       left: auto;
       right: 0;
       margin-right: 10px;
+
+      > .arrow {
+        right: -16px;
+        border-left-color: $border-color;
+      }
+
+      > .arrow::after {
+        border-left-color: $theme-gray-50;
+      }
     }
 
     &.right {
       left: 0;
       right: auto;
       margin-left: 10px;
+
+      > .arrow {
+        left: -16px;
+        border-right-color: $border-color;
+      }
+
+      > .arrow::after {
+        border-right-color: $theme-gray-50;
+      }
     }
 
     > .arrow {
-      top: 40px;
+      top: 16px;
+      margin-top: -8px;
+      border-width: 8px;
     }
 
     > .popover-title,
     > .popover-content {
-      padding: 5px 8px;
+      padding: 8px;
       font-size: 12px;
       white-space: nowrap;
     }
+
+    > .popover-title {
+      background-color: $theme-gray-50;
+    }
+  }
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.prometheus-table {
+  border-collapse: collapse;
+  padding: 0;
+  margin: 0;
+
+  td {
+    vertical-align: middle;
+
+    + td {
+      padding-left: 8px;
+      vertical-align: top;
+    }
+  }
+
+  .legend-metric-title {
+    font-size: 12px;
+    vertical-align: middle;
   }
 }
 
@@ -490,8 +521,7 @@
   padding: 0;
   padding-bottom: 100%;
 
-  .text-metric-usage,
-  .legend-metric-title {
+  .text-metric-usage {
     fill: $black;
     font-weight: $gl-font-weight-normal;
     font-size: 12px;
@@ -529,12 +559,9 @@
       }
 
       > text {
-        font-size: 12px;
+        fill: $theme-gray-600;
+        font-size: 10px;
       }
-    }
-
-    .text-metric-title {
-      font-size: 12px;
     }
 
     .y-label-text,
@@ -560,7 +587,7 @@
       }
     }
 
-    @media (max-width: $screen-sm-max) {
+    @include media-breakpoint-down(sm) {
       .label-axis-text,
       .text-metric-usage,
       .legend-axis-text {
@@ -570,6 +597,24 @@
       .tick > text {
         font-size: 8px;
       }
+    }
+  }
+}
+
+.prometheus-table-row-highlight {
+  background-color: $prometheus-table-row-highlight-color;
+}
+
+// EE-only
+.cluster-health-graphs {
+  .prometheus-state {
+    .state-svg img {
+      max-height: 120px;
+    }
+
+    .state-description,
+    .state-button {
+      display: none;
     }
   }
 }

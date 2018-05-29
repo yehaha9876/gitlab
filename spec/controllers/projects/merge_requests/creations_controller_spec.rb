@@ -17,7 +17,7 @@ describe Projects::MergeRequests::CreationsController do
 
   before do
     fork_project.add_master(user)
-
+    Projects::ForkService.new(project, user).execute(fork_project)
     sign_in(user)
   end
 
@@ -123,6 +123,38 @@ describe Projects::MergeRequests::CreationsController do
           expect(response).to have_gitlab_http_status(404)
         end
       end
+    end
+  end
+
+  describe 'GET #branch_to' do
+    before do
+      allow(Ability).to receive(:allowed?).and_call_original
+    end
+
+    it 'fetches the commit if a user has access' do
+      expect(Ability).to receive(:allowed?).with(user, :read_project, project) { true }
+
+      get :branch_to,
+          namespace_id: fork_project.namespace,
+          project_id: fork_project,
+          target_project_id: project.id,
+          ref: 'master'
+
+      expect(assigns(:commit)).not_to be_nil
+      expect(response).to have_gitlab_http_status(200)
+    end
+
+    it 'does not load the commit when the user cannot read the project' do
+      expect(Ability).to receive(:allowed?).with(user, :read_project, project) { false }
+
+      get :branch_to,
+          namespace_id: fork_project.namespace,
+          project_id: fork_project,
+          target_project_id: project.id,
+          ref: 'master'
+
+      expect(assigns(:commit)).to be_nil
+      expect(response).to have_gitlab_http_status(200)
     end
   end
 end

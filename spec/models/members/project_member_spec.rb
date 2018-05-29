@@ -45,14 +45,6 @@ describe ProjectMember do
     let(:project) { owner.project }
     let(:master)  { create(:project_member, project: project) }
 
-    let(:owner_todos)  { (0...2).map { create(:todo, user: owner.user, project: project) } }
-    let(:master_todos) { (0...3).map { create(:todo, user: master.user, project: project) } }
-
-    before do
-      owner_todos
-      master_todos
-    end
-
     it "creates an expired event when left due to expiry" do
       expired = create(:project_member, project: project, expires_at: Time.now - 6.days)
       expired.destroy
@@ -62,21 +54,6 @@ describe ProjectMember do
     it "creates a left event when left due to leave" do
       master.destroy
       expect(Event.recent.first.action).to eq(Event::LEFT)
-    end
-
-    it "destroys itself and delete associated todos" do
-      expect(owner.user.todos.size).to eq(2)
-      expect(master.user.todos.size).to eq(3)
-      expect(Todo.count).to eq(5)
-
-      master_todo_ids = master_todos.map(&:id)
-      master.destroy
-
-      expect(owner.user.todos.size).to eq(2)
-      expect(Todo.count).to eq(2)
-      master_todo_ids.each do |id|
-        expect(Todo.exists?(id)).to eq(false)
-      end
     end
   end
 
@@ -146,15 +123,5 @@ describe ProjectMember do
     it { expect(@project_2.users).to be_empty }
   end
 
-  describe 'notifications' do
-    describe '#after_accept_request' do
-      it 'calls NotificationService.new_project_member' do
-        member = create(:project_member, user: create(:user), requested_at: Time.now)
-
-        expect_any_instance_of(NotificationService).to receive(:new_project_member)
-
-        member.__send__(:after_accept_request)
-      end
-    end
-  end
+  it_behaves_like 'members notifications', :project
 end

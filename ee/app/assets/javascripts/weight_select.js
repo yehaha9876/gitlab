@@ -1,5 +1,7 @@
 /* eslint-disable space-before-function-paren, wrap-iife, prefer-arrow-callback, max-len, one-var, no-var, one-var-declaration-per-line, object-shorthand, comma-dangle, no-shadow, quotes, no-unused-vars, no-else-return, consistent-return, no-param-reassign, prefer-template, padded-blocks, func-names */
 
+import $ from 'jquery';
+
 function WeightSelect(els, options = {}) {
   const $els = $(els || '.js-weight-select');
 
@@ -11,9 +13,9 @@ function WeightSelect(els, options = {}) {
     $block = $selectbox.closest('.block');
     $sidebarCollapsedValue = $block.find('.sidebar-collapsed-icon span');
     $value = $block.find('.value');
-    abilityName = $dropdown.data('ability-name');
+    abilityName = $dropdown.data('abilityName');
     $loading = $block.find('.block-loading').fadeOut();
-    const fieldName = options.fieldName || $dropdown.data("field-name");
+    const fieldName = options.fieldName || $dropdown.data("fieldName");
     const inputField = $dropdown.closest('.selectbox').find(`input[name='${fieldName}']`);
 
     if (Object.keys(options).includes('selected')) {

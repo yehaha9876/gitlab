@@ -17,7 +17,7 @@ When you create a project in GitLab, you'll have access to a large number of
 
 - [Issue tracker](issues/index.md): Discuss implementations with your team within issues
   - [Issue Boards](issue_board.md): Organize and prioritize your workflow
-  - [Multiple Issue Boards](issue_board.md#multiple-issue-boards) (**Starter/Premium**): Allow your teams to create their own workflows (Issue Boards) for the same project
+  - [Multiple Issue Boards](https://docs.gitlab.com/ee/user/project/issue_board.html#multiple-issue-boards): Allow your teams to create their own workflows (Issue Boards) for the same project **[STARTER]**
 - [Repositories](repository/index.md): Host your code in a fully
 integrated platform
   - [Branches](repository/branches/index.md): use Git branching strategies to
@@ -27,17 +27,18 @@ integrated platform
   - [Protected tags](protected_tags.md): Control over who has
   permission to create tags, and prevent accidental update or deletion
   - [Signing commits](gpg_signed_commits/index.md): use GPG to sign your commits
-- **(Ultimate)** [Web IDE](web_ide/index.md)
+  - [Deploy tokens](deploy_tokens/index.md): Manage project-based deploy tokens that allow permanent access to the repository and Container Registry.
+- [Web IDE](web_ide/index.md)
 
 **Issues and merge requests:**
 
 - [Issue tracker](issues/index.md): Discuss implementations with your team within issues
   - [Issue Boards](issue_board.md): Organize and prioritize your workflow
-  - [Multiple Issue Boards](issue_board.md#multiple-issue-boards) (**Starter/Premium**): Allow your teams to create their own workflows (Issue Boards) for the same project
+  - [Multiple Issue Boards](issue_board.md#multiple-issue-boards): Allow your teams to create their own workflows (Issue Boards) for the same project **[STARTER]**
 - [Merge Requests](merge_requests/index.md): Apply your branching
 strategy and get reviewed by your team
-  - [Merge Request Approvals](merge_requests/merge_request_approvals.md) (**Starter/Premium**): Ask for approval before
-  implementing a change
+  - [Merge Request Approvals](https://docs.gitlab.com/ee/user/project/merge_requests/merge_request_approvals.html): Ask for approval before
+  implementing a change **[STARTER]**
   - [Fix merge conflicts from the UI](merge_requests/resolve_conflicts.md):
   Your Git diff tool right from GitLab's UI
   - [Review Apps](../../ci/review_apps/index.md): Live preview the results
@@ -51,6 +52,7 @@ and time spent on
 templates for issue and merge request description fields for your project
 - [Slash commands (quick actions)](quick_actions.md): Textual shortcuts for
 common actions on issues or merge requests
+- [Web IDE](web_ide/index.md)
 
 **GitLab CI/CD:**
 
@@ -80,6 +82,7 @@ website with GitLab Pages
 - [Cycle Analytics](cycle_analytics.md): Review your development lifecycle
 - [Syntax highlighting](highlighting.md): An alternative to customize
 your code blocks, overriding GitLab's default choice of language
+- [Badges](badges.md): Badges for the project overview
 
 ### Project's integrations
 
@@ -115,6 +118,13 @@ Read through the documentation on [project settings](settings/index.md).
 - [Export a project from GitLab](settings/import_export.md#exporting-a-project-and-its-data)
 - [Importing and exporting projects between GitLab instances](settings/import_export.md)
 
+## CI/CD for external repositories
+
+Instead of importing a repository directly to GitLab, you can connect your repository
+as a CI/CD project.
+
+Read through the documentation on [CI/CD for external repositories](../../ci/ci_cd_for_external_repos/index.md).
+
 ## Project's members
 
 Learn how to [add members to your projects](members/index.md).
@@ -135,11 +145,9 @@ and Git push/pull redirects.
 
 Depending on the situation, different things apply.
 
-When [renaming a user](../profile/index.md#changing-your-username) or
-[changing a group path](../group/index.md#changing-a-group-s-path):
+When [renaming a user](../profile/index.md#changing-your-username),
+[changing a group path](../group/index.md#changing-a-group-s-path) or [renaming a repository](settings/index.md#renaming-a-repository):
 
-- **The redirect to the new URL is permanent**, which means that the original
-  namespace can't be claimed again by any group or user.
 - Existing web URLs for the namespace and anything under it (e.g., projects) will
   redirect to the new URLs.
 - Starting with GitLab 10.3, existing Git remote URLs for projects under the
@@ -148,9 +156,5 @@ When [renaming a user](../profile/index.md#changing-your-username) or
   your remote will be displayed instead of rejecting your action.
   This means that any automation scripts, or Git clients will continue to
   work after a rename, making any transition a lot smoother.
-  To avoid pulling from or pushing to an entirely incorrect repository, the old
-  path will be reserved.
-
-When [renaming-a-repository](settings/index.md#renaming-a-repository), the same
-things apply, except for the Git push/pull actions which will be rejected with a
-warning message to change to the new remote URL.
+- The redirects will be available as long as the original path is not claimed by
+  another group, user or project.

@@ -1,4 +1,5 @@
 <script>
+  import $ from 'jquery';
   import Flash from '../../../flash';
   import GLForm from '../../../gl_form';
   import markdownHeader from './header.vue';
@@ -31,6 +32,11 @@
         required: false,
         default: '',
       },
+      canAttachFile: {
+        type: Boolean,
+        required: false,
+        default: true,
+      },
       enableAutocomplete: {
         type: Boolean,
         required: false,
@@ -59,7 +65,7 @@
       return new GLForm($(this.$refs['gl-form']), this.enableAutocomplete);
     },
     beforeDestroy() {
-      const glForm = $(this.$refs['gl-form']).data('gl-form');
+      const glForm = $(this.$refs['gl-form']).data('glForm');
       if (glForm) {
         glForm.destroy();
       }
@@ -138,6 +144,7 @@
         <markdown-toolbar
           :markdown-docs-path="markdownDocsPath"
           :quick-actions-docs-path="quickActionsDocsPath"
+          :can-attach-file="canAttachFile"
         />
       </div>
     </div>

@@ -10,31 +10,29 @@ module EE
 
     prepended do
       include Elastic::ProjectsSearch
-      prepend ImportStatusStateMachine
       include EE::DeploymentPlatform
-
-      before_validation :mark_remote_mirrors_for_removal
+      include EachBatch
 
       before_save :set_override_pull_mirror_available, unless: -> { ::Gitlab::CurrentSettings.mirror_available }
-      after_save :create_mirror_data, if: ->(project) { project.mirror? && project.mirror_changed? }
-      after_save :destroy_mirror_data, if: ->(project) { !project.mirror? && project.mirror_changed? }
+      before_save :set_next_execution_timestamp_to_now, if: ->(project) { project.mirror? && project.mirror_changed? && project.import_state }
 
       after_update :remove_mirror_repository_reference,
         if: ->(project) { project.mirror? && project.import_url_updated? }
 
       belongs_to :mirror_user, foreign_key: 'mirror_user_id', class_name: 'User'
 
-      has_one :mirror_data, autosave: true, class_name: 'ProjectMirrorData'
+      has_one :repository_state, class_name: 'ProjectRepositoryState', inverse_of: :project
       has_one :push_rule, ->(project) { project&.feature_available?(:push_rules) ? all : none }
       has_one :index_status
       has_one :jenkins_service
       has_one :jenkins_deprecated_service
+      has_one :github_service
 
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :audit_events, as: :entity
-      has_many :remote_mirrors, inverse_of: :project
       has_many :path_locks
+      has_many :vulnerability_feedback
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
 
@@ -44,14 +42,22 @@ module EE
 
       scope :mirror, -> { where(mirror: true) }
 
+      scope :inner_joins_import_state, -> { joins("INNER JOIN project_mirror_data import_state ON import_state.project_id = projects.id") }
+
       scope :mirrors_to_sync, ->(freeze_at) do
-        mirror.joins(:mirror_data).without_import_status(:scheduled, :started)
-          .where("next_execution_timestamp <= ?", freeze_at)
-          .where("project_mirror_data.retry_count <= ?", ::Gitlab::Mirror::MAX_RETRY)
+        mirror
+          .inner_joins_import_state
+          .where.not(import_state: { status: [:scheduled, :started] })
+          .where("import_state.next_execution_timestamp <= ?", freeze_at)
+          .where("import_state.retry_count <= ?", ::Gitlab::Mirror::MAX_RETRY)
       end
 
-      scope :with_remote_mirrors, -> { joins(:remote_mirrors).where(remote_mirrors: { enabled: true }).distinct }
-      scope :with_wiki_enabled, -> { with_feature_enabled(:wiki) }
+      scope :with_wiki_enabled,   -> { with_feature_enabled(:wiki) }
+
+      scope :verified_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verified_repos) }
+      scope :verified_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verified_wikis) }
+      scope :verification_failed_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_repos) }
+      scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
@@ -63,10 +69,6 @@ module EE
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
       validates :approvals_before_merge, numericality: true, allow_blank: true
-
-      accepts_nested_attributes_for :remote_mirrors,
-        allow_destroy: true,
-        reject_if: ->(attrs) { attrs[:id].blank? && attrs[:url].blank? }
 
       with_options if: :mirror? do
         validates :import_url, presence: true
@@ -83,6 +85,12 @@ module EE
         joins('LEFT JOIN services ON services.project_id = projects.id AND services.type = \'GitlabSlackApplicationService\' AND services.active IS true')
           .where('services.id IS NULL')
       end
+    end
+
+    def ensure_external_webhook_token
+      return if external_webhook_token.present?
+
+      self.external_webhook_token = Devise.friendly_token
     end
 
     def shared_runners_limit_namespace
@@ -105,31 +113,66 @@ module EE
     def mirror_waiting_duration
       return unless mirror?
 
-      (mirror_data.last_update_started_at.to_i -
-        mirror_data.last_update_scheduled_at.to_i).seconds
+      (import_state.last_update_started_at.to_i -
+        import_state.last_update_scheduled_at.to_i).seconds
     end
 
     def mirror_update_duration
       return unless mirror?
 
       (mirror_last_update_at.to_i -
-        mirror_data.last_update_started_at.to_i).seconds
+        import_state.last_update_started_at.to_i).seconds
     end
 
     def mirror_with_content?
       mirror? && !empty_repo?
     end
 
-    def scheduled_mirror?
+    def import_state_args
+      super.merge(last_update_at: self[:mirror_last_update_at],
+                  last_successful_update_at: self[:mirror_last_successful_update_at])
+    end
+
+    def mirror_last_update_at=(new_value)
+      ensure_import_state
+
+      import_state&.last_update_at = new_value
+    end
+
+    def mirror_last_update_at
+      ensure_import_state
+
+      import_state&.last_update_at
+    end
+
+    def mirror_last_successful_update_at=(new_value)
+      ensure_import_state
+
+      import_state&.last_successful_update_at = new_value
+    end
+
+    def mirror_last_successful_update_at
+      ensure_import_state
+
+      import_state&.last_successful_update_at
+    end
+
+    override :import_in_progress?
+    def import_in_progress?
+      # If we're importing while we do have a repository, we're simply updating the mirror.
+      super && !mirror_with_content?
+    end
+
+    def mirror_about_to_update?
       return false unless mirror_with_content?
       return false if mirror_hard_failed?
-      return true if import_scheduled?
+      return false if updating_mirror?
 
-      self.mirror_data.next_execution_timestamp <= Time.now
+      self.import_state.next_execution_timestamp <= Time.now
     end
 
     def updating_mirror?
-      mirror_with_content? && import_started?
+      (import_scheduled? || import_started?) && mirror_with_content?
     end
 
     def mirror_last_update_status
@@ -155,31 +198,7 @@ module EE
     end
 
     def mirror_hard_failed?
-      self.mirror_data.retry_limit_exceeded?
-    end
-
-    def has_remote_mirror?
-      feature_available?(:repository_mirrors) &&
-        remote_mirror_available? &&
-        remote_mirrors.enabled.exists?
-    end
-
-    def updating_remote_mirror?
-      remote_mirrors.enabled.started.exists?
-    end
-
-    def update_remote_mirrors
-      return unless feature_available?(:repository_mirrors) && remote_mirror_available?
-
-      remote_mirrors.enabled.each(&:sync)
-    end
-
-    def mark_stuck_remote_mirrors_as_failed!
-      remote_mirrors.stuck.update_all(
-        update_status: :failed,
-        last_error: 'The remote mirror took to long to complete.',
-        last_update_at: Time.now
-      )
+      self.import_state.retry_limit_exceeded?
     end
 
     def fetch_mirror
@@ -217,6 +236,11 @@ module EE
       end
     end
 
+    override :multiple_issue_boards_available?
+    def multiple_issue_boards_available?
+      feature_available?(:multiple_project_issue_boards)
+    end
+
     def service_desk_enabled
       ::EE::Gitlab::ServiceDesk.enabled?(project: self) && super
     end
@@ -232,14 +256,14 @@ module EE
     end
 
     def force_import_job!
-      return if scheduled_mirror? || updating_mirror?
+      return if mirror_about_to_update? || updating_mirror?
 
-      mirror_data = self.mirror_data
+      import_state = self.import_state
 
-      mirror_data.set_next_execution_to_now
-      mirror_data.reset_retry_count if mirror_data.retry_limit_exceeded?
+      import_state.set_next_execution_to_now
+      import_state.reset_retry_count if import_state.retry_limit_exceeded?
 
-      mirror_data.save!
+      import_state.save!
 
       UpdateAllMirrorsWorker.perform_async
     end
@@ -261,7 +285,7 @@ module EE
       return super.where(environment_scope: '*') unless
         environment && feature_available?(:variable_environment_scope)
 
-      super.on_environment(environment.name)
+      super.on_environment(environment)
     end
 
     def execute_hooks(data, hooks_scope = :push_hooks)
@@ -306,13 +330,13 @@ module EE
     alias_method :reset_approvals_on_push?, :reset_approvals_on_push
 
     def approver_ids=(value)
-      value.split(",").map(&:strip).each do |user_id|
+      ::Gitlab::Utils.ensure_array_from_string(value).each do |user_id|
         approvers.find_or_create_by(user_id: user_id, target_id: id)
       end
     end
 
     def approver_group_ids=(value)
-      value.split(",").map(&:strip).each do |group_id|
+      ::Gitlab::Utils.ensure_array_from_string(value).each do |group_id|
         approver_groups.find_or_initialize_by(group_id: group_id, target_id: id)
       end
     end
@@ -331,7 +355,9 @@ module EE
     end
 
     def remove_mirror_repository_reference
-      repository.async_remove_remote(::Repository::MIRROR_REMOTE)
+      run_after_commit do
+        repository.async_remove_remote(::Repository::MIRROR_REMOTE)
+      end
     end
 
     def username_only_import_url
@@ -355,10 +381,6 @@ module EE
       create_or_update_import_data(credentials: creds)
 
       username_only_import_url
-    end
-
-    def mark_remote_mirrors_for_removal
-      remote_mirrors.each(&:mark_for_delete_if_blank_url)
     end
 
     def change_repository_storage(new_repository_storage_key)
@@ -426,15 +448,7 @@ module EE
       ).create
     end
 
-    # Override to reject disabled services
-    def find_or_initialize_services(exceptions: [])
-      available_services = super
-
-      available_services.reject do |service|
-        disabled_services.include?(service.to_param)
-      end
-    end
-
+    override :disabled_services
     def disabled_services
       strong_memoize(:disabled_services) do
         disabled_services = []
@@ -443,13 +457,12 @@ module EE
           disabled_services.push('jenkins', 'jenkins_deprecated')
         end
 
+        unless feature_available?(:github_project_service_integration)
+          disabled_services.push('github')
+        end
+
         disabled_services
       end
-    end
-
-    def remote_mirror_available?
-      remote_mirror_available_overridden ||
-        ::Gitlab::CurrentSettings.mirror_available
     end
 
     def pull_mirror_available?
@@ -457,11 +470,31 @@ module EE
         ::Gitlab::CurrentSettings.mirror_available
     end
 
+    def external_authorization_classification_label
+      return nil unless License.feature_available?(:external_authorization_service)
+
+      super || ::Gitlab::CurrentSettings.current_application_settings
+                 .external_authorization_service_default_label
+    end
+
+    override :licensed_features
+    def licensed_features
+      return super unless License.current
+
+      License.current.features.select do |feature|
+        License.global_feature?(feature) || licensed_feature_available?(feature)
+      end
+    end
+
     private
 
     def set_override_pull_mirror_available
       self.pull_mirror_available_overridden = read_attribute(:mirror)
       true
+    end
+
+    def set_next_execution_timestamp_to_now
+      import_state.set_next_execution_to_now
     end
 
     def licensed_feature_available?(feature)
@@ -477,16 +510,12 @@ module EE
     def load_licensed_feature_available(feature)
       globally_available = License.feature_available?(feature)
 
-      if namespace && ::Gitlab::CurrentSettings.should_check_namespace_plan?
+      if ::Gitlab::CurrentSettings.should_check_namespace_plan? && namespace
         globally_available &&
           (public? && namespace.public? || namespace.feature_available_in_plan?(feature))
       else
         globally_available
       end
-    end
-
-    def destroy_mirror_data
-      mirror_data.destroy
     end
 
     def validate_board_limit(board)

@@ -98,109 +98,55 @@ describe Namespace do
       set(:primary) { create(:geo_node, :primary) }
       set(:secondary) { create(:geo_node) }
       let(:gitlab_shell) { Gitlab::Shell.new }
+      let(:parent_group) { create(:group) }
+      let(:child_group) { create(:group, name: 'child', path: 'child', parent: parent_group) }
+      let!(:project_legacy) { create(:project_empty_repo, :legacy_storage, namespace: parent_group) }
+      let!(:project_child_hashed) { create(:project, namespace: child_group) }
+      let!(:project_child_legacy) { create(:project_empty_repo, :legacy_storage, namespace: child_group) }
+      let!(:full_path_was) { "#{parent_group.full_path}_old" }
 
-      it 'logs the Geo::RepositoryRenamedEvent for each project inside namespace' do
-        parent = create(:namespace)
-        child = create(:group, name: 'child', path: 'child', parent: parent)
-        project_legacy_storage = create(:project_empty_repo, :legacy_storage, namespace: parent)
-        create(:project, namespace: child)
-        create(:project_empty_repo, :legacy_storage, namespace: child)
-        full_path_was = "#{parent.full_path}_old"
-        new_path = parent.full_path
+      before do
+        new_path = parent_group.full_path
 
-        allow(parent).to receive(:gitlab_shell).and_return(gitlab_shell)
-        allow(parent).to receive(:path_changed?).and_return(true)
-        allow(parent).to receive(:full_path_was).and_return(full_path_was)
-        allow(parent).to receive(:full_path).and_return(new_path)
+        allow(parent_group).to receive(:gitlab_shell).and_return(gitlab_shell)
+        allow(parent_group).to receive(:path_changed?).and_return(true)
+        allow(parent_group).to receive(:full_path_was).and_return(full_path_was)
+        allow(parent_group).to receive(:full_path).and_return(new_path)
 
         allow(gitlab_shell).to receive(:mv_namespace)
-          .with(project_legacy_storage.repository_storage_path, full_path_was, new_path)
+          .with(project_legacy.repository_storage, full_path_was, new_path)
           .and_return(true)
-
-        expect { parent.move_dir }.to change(Geo::RepositoryRenamedEvent, :count).by(3)
-      end
-    end
-  end
-
-  describe '#features' do
-    let(:plan_license) { :free_plan }
-    let(:group) { create(:group, plan: plan_license) }
-    let(:global_license) { create(:license) }
-
-    before do
-      allow(License).to receive(:current).and_return(global_license)
-      allow(global_license).to receive(:features).and_return([
-        :epics, # Gold only
-        :service_desk, # Silver and up
-        :audit_events, # Bronze and up
-        :geo, # Global feature, should not be checked at namespace level
-      ])
-    end
-
-    subject { group.features }
-
-    context 'when the namespace should be checked' do
-      before do
-        enable_namespace_license_check!
       end
 
-      context 'when bronze' do
-        let(:plan_license) { :bronze_plan }
-
-        it 'filters for bronze features' do
-          is_expected.to contain_exactly(:audit_events, :geo)
-        end
+      it 'logs the Geo::RepositoryRenamedEvent for each project inside namespace' do
+        expect { parent_group.move_dir }.to change(Geo::RepositoryRenamedEvent, :count).by(3)
       end
 
-      context 'when silver' do
-        let(:plan_license) { :silver_plan }
+      it 'properly builds old_path_with_namespace' do
+        parent_group.move_dir
 
-        it 'filters for silver features' do
-          is_expected.to contain_exactly(:service_desk, :audit_events, :geo)
-        end
+        actual = Geo::RepositoryRenamedEvent.last(3).map(&:old_path_with_namespace)
+        expected = %W[
+          #{full_path_was}/#{project_legacy.path}
+          #{full_path_was}/child/#{project_child_hashed.path}
+          #{full_path_was}/child/#{project_child_legacy.path}
+        ]
+
+        expect(actual).to match_array(expected)
       end
-
-      context 'when gold' do
-        let(:plan_license) { :gold_plan }
-
-        it 'filters for gold features' do
-          is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
-        end
-      end
-
-      context 'when free plan' do
-        let(:plan_license) { :free_plan }
-
-        it 'filters out paid features' do
-          is_expected.to contain_exactly(:geo)
-        end
-      end
-    end
-
-    context 'when namespace should not be checked' do
-      it 'includes all features in global license' do
-        is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
-      end
-    end
-
-    context 'when there is no license' do
-      before do
-        allow(License).to receive(:current).and_return(nil)
-      end
-
-      it { is_expected.to be_empty }
     end
   end
 
   describe '#feature_available?' do
     let(:plan_license) { :bronze_plan }
     let(:group) { create(:group, plan: plan_license) }
-    let(:feature) { :service_desk }
+    let(:licensed_feature) { :service_desk }
+    let(:feature) { licensed_feature }
 
     subject { group.feature_available?(feature) }
 
     before do
-      stub_licensed_features(feature => true)
+      stub_licensed_features(licensed_feature => true)
     end
 
     it 'uses the global setting when running on premise' do
@@ -251,6 +197,25 @@ describe Namespace do
         it 'returns false' do
           is_expected.to be_falsy
         end
+      end
+    end
+
+    context 'when the feature is temporarily available on the entire instance' do
+      let(:license_plan) { :free_plan }
+      let(:feature) { :ci_cd_projects }
+
+      before do
+        stub_application_setting_on_object(group, should_check_namespace_plan: true)
+      end
+
+      it 'returns true when the feature is available globally' do
+        stub_licensed_features(feature => true)
+
+        is_expected.to be_truthy
+      end
+
+      it 'returns `false` when the feature is not included in the global license' do
+        is_expected.to be_falsy
       end
     end
   end

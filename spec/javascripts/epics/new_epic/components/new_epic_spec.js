@@ -1,42 +1,37 @@
 import Vue from 'vue';
-import _ from 'underscore';
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import newEpic from 'ee/epics/new_epic/components/new_epic.vue';
-import * as urlUtility from '~/lib/utils/url_utility';
-import mountComponent from '../../../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('newEpic', () => {
   let vm;
-
-  const interceptor = (request, next) => {
-    next(request.respondWith(JSON.stringify({
-      web_url: gl.TEST_HOST,
-    }), {
-      status: 200,
-    }));
-  };
+  let mock;
 
   beforeEach(() => {
-    Vue.http.interceptors.push(interceptor);
-
     const NewEpic = Vue.extend(newEpic);
+
+    mock = new MockAdapter(axios);
+    mock.onPost(gl.TEST_HOST).reply(200, { web_url: gl.TEST_HOST });
     vm = mountComponent(NewEpic, {
       endpoint: gl.TEST_HOST,
     });
   });
 
   afterEach(() => {
-    Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
+    mock.restore();
+    vm.$destroy();
   });
 
   describe('alignRight', () => {
-    it('should not add dropdown-menu-align-right by default', () => {
-      expect(vm.$el.querySelector('.dropdown-menu').classList.contains('dropdown-menu-align-right')).toEqual(false);
+    it('should not add dropdown-menu-right by default', () => {
+      expect(vm.$el.querySelector('.dropdown-menu').classList.contains('dropdown-menu-right')).toEqual(false);
     });
 
-    it('should add dropdown-menu-align-right when alignRight', (done) => {
+    it('should add dropdown-menu-right when alignRight', (done) => {
       vm.alignRight = true;
       Vue.nextTick(() => {
-        expect(vm.$el.querySelector('.dropdown-menu').classList.contains('dropdown-menu-align-right')).toEqual(true);
+        expect(vm.$el.querySelector('.dropdown-menu').classList.contains('dropdown-menu-right')).toEqual(true);
         done();
       });
     });
@@ -44,7 +39,7 @@ describe('newEpic', () => {
 
   describe('creating epic', () => {
     it('should call createEpic service', (done) => {
-      spyOn(urlUtility, 'visitUrl').and.callFake(() => {});
+      spyOnDependency(newEpic, 'visitUrl').and.callFake(done);
       spyOn(vm.service, 'createEpic').and.callThrough();
 
       vm.title = 'test';
@@ -52,12 +47,11 @@ describe('newEpic', () => {
       Vue.nextTick(() => {
         vm.$el.querySelector('.btn-save').click();
         expect(vm.service.createEpic).toHaveBeenCalled();
-        done();
       });
     });
 
     it('should redirect to epic url after epic creation', (done) => {
-      spyOn(urlUtility, 'visitUrl').and.callFake((url) => {
+      spyOnDependency(newEpic, 'visitUrl').and.callFake((url) => {
         expect(url).toEqual(gl.TEST_HOST);
         done();
       });
@@ -70,7 +64,7 @@ describe('newEpic', () => {
     });
 
     it('should toggle loading button while creating', (done) => {
-      spyOn(urlUtility, 'visitUrl').and.callFake(() => {});
+      spyOnDependency(newEpic, 'visitUrl').and.callFake(done);
       vm.title = 'test';
 
       Vue.nextTick(() => {
@@ -80,7 +74,6 @@ describe('newEpic', () => {
         expect(loadingIcon).toBeNull();
         btnSave.click();
         expect(loadingIcon).toBeDefined();
-        done();
       });
     });
   });

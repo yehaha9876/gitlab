@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import sidebarDatePicker from '~/vue_shared/components/sidebar/date_picker.vue';
-import mountComponent from '../../../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('sidebarDatePicker', () => {
   let vm;
@@ -10,14 +10,6 @@ describe('sidebarDatePicker', () => {
       label: 'label',
       isLoading: true,
     });
-  });
-
-  it('should emit toggleCollapse when collapsed toggle sidebar is clicked', () => {
-    const toggleCollapse = jasmine.createSpy();
-    vm.$on('toggleCollapse', toggleCollapse);
-
-    vm.$el.querySelector('.issuable-sidebar-header .gutter-toggle').click();
-    expect(toggleCollapse).toHaveBeenCalled();
   });
 
   it('should render collapsed-calendar-icon', () => {

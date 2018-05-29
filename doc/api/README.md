@@ -13,33 +13,38 @@ following locations:
 - [Broadcast Messages](broadcast_messages.md)
 - [Project-level Variables](project_level_variables.md)
 - [Group-level Variables](group_level_variables.md)
+- [Code Snippets](snippets.md)
 - [Commits](commits.md)
 - [Custom Attributes](custom_attributes.md)
 - [Deployments](deployments.md)
 - [Deploy Keys](deploy_keys.md)
 - [Environments](environments.md)
-- [Epics](epics.md)
-- [Epic Issues](epic_issues.md)
+- [Epics](epics.md) **[ULTIMATE]**
+- [Epic Issues](epic_issues.md) **[ULTIMATE]**
 - [Events](events.md)
 - [Feature flags](features.md)
-- [Geo Nodes](geo_nodes.md)
+- [Geo Nodes](geo_nodes.md) **[PREMIUM]**
 - [Gitignores templates](templates/gitignores.md)
 - [GitLab CI Config templates](templates/gitlab_ci_ymls.md)
 - [Groups](groups.md)
 - [Group Access Requests](access_requests.md)
+- [Group Badges](group_badges.md)
 - [Group Members](members.md)
 - [Issues](issues.md)
 - [Issue Boards](boards.md)
-- **(Premium)** [Group Issue Boards] (group_boards.md)
+- [Group Issue Boards](group_boards.md)
 - [Jobs](jobs.md)
 - [Keys](keys.md)
 - [Labels](labels.md)
 - [License](license.md)
+- [Markdown](markdown.md)
 - [Merge Requests](merge_requests.md)
+- [Merge Request Approvals](merge_request_approvals.md) **[STARTER]**
 - [Project milestones](milestones.md)
 - [Group milestones](group_milestones.md)
 - [Namespaces](namespaces.md)
 - [Notes](notes.md) (comments)
+- [Discussions](discussions.md) (threaded comments)
 - [Notification settings](notification_settings.md)
 - [Open source license templates](templates/licenses.md)
 - [Pages Domains](pages_domains.md)
@@ -48,6 +53,7 @@ following locations:
 - [Pipeline Schedules](pipeline_schedules.md)
 - [Projects](projects.md) including setting Webhooks
 - [Project Access Requests](access_requests.md)
+- [Project Badges](project_badges.md)
 - [Project import/export](project_import_export.md)
 - [Project Members](members.md)
 - [Project Snippets](project_snippets.md)
@@ -85,6 +91,29 @@ Although there were some patenting and licensing concerns with GraphQL, these
 have been resolved to our satisfaction by the relicensing of the reference
 implementations under MIT, and the use of the OWF license for the GraphQL
 specification.
+
+## Compatibility Guidelines
+
+The HTTP API is versioned using a single number, the current one being 4. This
+number symbolises the same as the major version number as described by 
+[SemVer](https://semver.org/). This mean that backward incompatible changes
+will require this version number to change. However, the minor version is
+not explicit. This allows for a stable API endpoint, but also means new 
+features can be added to the API in the same version number.
+
+New features and bug fixes are released in tandem with a new GitLab, and apart
+from incidental patch and security releases, are released on the 22nd each
+month. Backward incompatible changes (e.g. endpoints removal, parameters 
+removal etc.), as well as removal of entire API versions are done in tandem 
+with a major point release of GitLab itself. All deprecations and changes 
+between two versions should be listed in the documentation. For the changes 
+between v3 and v4; please read the [v3 to v4 documentation](v3_to_v4.md)
+
+#### Current status
+
+Currently two API versions are available, v3 and v4. v3 is deprecated and 
+will soon be removed. Deletion is scheduled for 
+[GitLab 11.0](https://gitlab.com/gitlab-org/gitlab-ce/issues/36819).
 
 ## Basic usage
 
@@ -270,7 +299,7 @@ The following table gives an overview of how the API functions generally behave.
 | `GET`   | Access one or more resources and return the result as JSON. |
 | `POST`  | Return `201 Created` if the resource is successfully created and return the newly created resource as JSON. |
 | `GET` / `PUT` | Return `200 OK` if the resource is accessed or modified successfully. The (modified) result is returned as JSON. |
-| `DELETE` | Returns `204 No Content` if the resuource was deleted successfully. |
+| `DELETE` | Returns `204 No Content` if the resource was deleted successfully. |
 
 The following table shows the possible return codes for API requests.
 

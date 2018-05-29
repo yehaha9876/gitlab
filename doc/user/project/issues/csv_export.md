@@ -1,4 +1,4 @@
-# Export Issues to CSV
+# Export Issues to CSV **[STARTER]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1126) in [GitLab Starter 9.0](https://about.gitlab.com/2017/03/22/gitlab-9-0-released/#export-issues-ees-eep).
 
@@ -39,6 +39,8 @@ You will be asked to confirm the number of issues and email address for the expo
 ## Format
 
 > **Time Estimate** and **Time Spent** columns were [introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/2627) in GitLab Starter 10.0.
+>
+> **Weight** and **Locked** columns were [introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/5300) in GitLab Starter 10.8.
 
 Data will be encoded with a comma as the column delimiter, with `"` used to quote fields if needed, and newlines to separate rows. The first row will be the headers, which are listed in the following table along with a description of the values:
 
@@ -55,10 +57,12 @@ Data will be encoded with a comma as the column delimiter, with `"` used to quot
 | Assignee | Full name of the issue assignee |
 | Assignee Username | Username of the author, with the `@` symbol omitted |
 | Confidential | `Yes` or `No` |
+| Locked | `Yes` or `No` |
 | Due Date | Formated as `YYYY-MM-DD` |
 | Created At (UTC) | Formated as `YYYY-MM-DD HH:MM:SS` |
 | Updated At (UTC) | Formated as `YYYY-MM-DD HH:MM:SS` |
 | Milestone | Title of the issue milestone |
+| Weight | Issue weight |
 | Labels | Title of any labels joined with a `,` |
 | Time Estimate | [Time estimate](../../../workflow/time_tracking.md#estimates) in seconds |
 | Time Spent | [Time spent](../../../workflow/time_tracking.md#time-spent) in seconds |

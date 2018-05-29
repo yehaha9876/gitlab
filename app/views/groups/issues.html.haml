@@ -1,18 +1,14 @@
 - page_title "Issues"
-- group_issues_exists = group_issues(@group).exists?
 = content_for :meta_tags do
-  = auto_discovery_link_tag(:atom, params.merge(rss_url_options), title: "#{@group.name} issues")
+  = auto_discovery_link_tag(:atom, safe_params.merge(rss_url_options).to_h, title: "#{@group.name} issues")
 
-- content_for :page_specific_javascripts do
-  = webpack_bundle_tag 'common_vue'
-  = webpack_bundle_tag 'filtered_search'
-  = webpack_bundle_tag 'issues'
-
-- if group_issues_exists
+- if group_issues_count(state: 'all').zero?
+  = render 'shared/empty_states/issues', project_select_button: true
+- else
   .top-area
     = render 'shared/issuable/nav', type: :issues
     .nav-controls
-      = link_to params.merge(rss_url_options), class: 'btn' do
+      = link_to safe_params.merge(rss_url_options), class: 'btn' do
         = icon('rss')
         %span.icon-label
           Subscribe
@@ -21,5 +17,3 @@
   = render 'shared/issuable/search_bar', type: :issues
 
   = render 'shared/issues'
-- else
-  = render 'shared/empty_states/issues', project_select_button: true

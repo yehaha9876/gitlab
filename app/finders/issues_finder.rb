@@ -5,7 +5,7 @@
 # Arguments:
 #   current_user - which user use
 #   params:
-#     scope: 'created-by-me' or 'assigned-to-me' or 'all'
+#     scope: 'created_by_me' or 'assigned_to_me' or 'all'
 #     state: 'open' or 'closed' or 'all'
 #     group_id: integer
 #     project_id: integer
@@ -16,9 +16,20 @@
 #     sort: string
 #     my_reaction_emoji: string
 #     public_only: boolean
+#     due_date: date or '0', '', 'overdue', 'week', or 'month'
+#     created_after: datetime
+#     created_before: datetime
+#     updated_after: datetime
+#     updated_before: datetime
 #
 class IssuesFinder < IssuableFinder
+  prepend EE::IssuesFinder
+
   CONFIDENTIAL_ACCESS_LEVEL = Gitlab::Access::REPORTER
+
+  def self.scalar_params
+    @scalar_params ||= super + [:due_date]
+  end
 
   def klass
     Issue.includes(:author)
@@ -50,6 +61,46 @@ class IssuesFinder < IssuableFinder
 
   def public_only?
     params.fetch(:public_only, false)
+  end
+
+  def filter_items(items)
+    by_due_date(super)
+  end
+
+  def by_due_date(items)
+    if due_date?
+      if filter_by_no_due_date?
+        items = items.without_due_date
+      elsif filter_by_overdue?
+        items = items.due_before(Date.today)
+      elsif filter_by_due_this_week?
+        items = items.due_between(Date.today.beginning_of_week, Date.today.end_of_week)
+      elsif filter_by_due_this_month?
+        items = items.due_between(Date.today.beginning_of_month, Date.today.end_of_month)
+      end
+    end
+
+    items
+  end
+
+  def filter_by_no_due_date?
+    due_date? && params[:due_date] == Issue::NoDueDate.name
+  end
+
+  def filter_by_overdue?
+    due_date? && params[:due_date] == Issue::Overdue.name
+  end
+
+  def filter_by_due_this_week?
+    due_date? && params[:due_date] == Issue::DueThisWeek.name
+  end
+
+  def filter_by_due_this_month?
+    due_date? && params[:due_date] == Issue::DueThisMonth.name
+  end
+
+  def due_date?
+    params[:due_date].present?
   end
 
   def user_can_see_all_confidential_issues?

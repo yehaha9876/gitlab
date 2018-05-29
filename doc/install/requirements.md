@@ -27,8 +27,8 @@ Please see the [installation from source guide](installation.md) and the [instal
 
 ### Non-Unix operating systems such as Windows
 
-GitLab is developed for Unix operating systems.
-GitLab does **not** run on Windows and we have no plans of supporting it in the near future.
+GitLab is developed for Unix operating systems. 
+It does **not** run on Windows, and we have no plans to support it in the near future. For the latest development status view this [issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/46567).
 Please consider using a virtual machine to run GitLab.
 
 ## Ruby versions
@@ -139,6 +139,14 @@ CREATE EXTENSION pg_trgm;
 On some systems you may need to install an additional package (e.g.
 `postgresql-contrib`) for this extension to become available.
 
+#### Additional requirements for GitLab Geo
+
+If you are using [GitLab Geo](https://docs.gitlab.com/ee/development/geo.html), the [tracking database](https://docs.gitlab.com/ee/development/geo.html#geo-tracking-database) also requires the `postgres_fdw` extension.
+
+```
+CREATE EXTENSION postgres_fdw;
+```
+
 ## Unicorn Workers
 
 It's possible to increase the amount of unicorn workers and this will usually help to reduce the response time of the applications and increase the ability to handle parallel requests.
@@ -194,3 +202,6 @@ use the CI features.
 We support the current and the previous major release of Firefox, Chrome/Chromium, Safari and Microsoft browsers (Microsoft Edge and Internet Explorer 11).
 
 Each time a new browser version is released, we begin supporting that version and stop supporting the third most recent version.
+
+Note: We do not support running GitLab with JavaScript disabled in the browser and have no plans of supporting that
+in the future because we have features such as Issue Boards which require JavaScript extensively.

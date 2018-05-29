@@ -51,12 +51,10 @@ module EE
 
       if succeeded
         all_projects.each do |project|
-          old_path_with_namespace = File.join(full_path_was, project.path)
-
           ::Geo::RepositoryRenamedEventStore.new(
             project,
             old_path: project.path,
-            old_path_with_namespace: old_path_with_namespace
+            old_path_with_namespace: old_path_with_namespace_for(project)
           ).create
         end
       end
@@ -64,13 +62,8 @@ module EE
       succeeded
     end
 
-    override :features
-    def features
-      return super unless License.current
-
-      License.current.features.select do |feature|
-        License.global_feature?(feature) || feature_available?(feature)
-      end
+    def old_path_with_namespace_for(project)
+      project.full_path.sub(/\A#{Regexp.escape(full_path)}/, full_path_was)
     end
 
     # Checks features (i.e. https://about.gitlab.com/products/) availabily
@@ -87,6 +80,8 @@ module EE
     end
 
     def feature_available_in_plan?(feature)
+      return true if ::License::ANY_PLAN_FEATURES.include?(feature)
+
       available_features = strong_memoize(:features_available_in_plan) do
         Hash.new do |h, feature|
           h[feature] = (plans.map(&:name) & self.class.plans_with_feature(feature)).any?

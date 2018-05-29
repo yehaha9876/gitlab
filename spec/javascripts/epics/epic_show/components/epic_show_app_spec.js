@@ -6,10 +6,9 @@ import epicHeader from 'ee/epics/epic_show/components/epic_header.vue';
 import epicSidebar from 'ee/epics/sidebar/components/sidebar_app.vue';
 import issuableApp from '~/issue_show/components/app.vue';
 import issuableAppEventHub from '~/issue_show/event_hub';
-import * as urlUtils from '~/lib/utils/url_utility';
-import mountComponent from '../../../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import issueShowData from 'spec/issue_show/mock_data';
 import { props } from '../mock_data';
-import issueShowData from '../../../issue_show/mock_data';
 
 describe('EpicShowApp', () => {
   let mock;
@@ -36,6 +35,14 @@ describe('EpicShowApp', () => {
       markdownDocsPath,
       author,
       created,
+      namespace,
+      labelsPath,
+      labelsWebUrl,
+      epicsWebUrl,
+      labels,
+      participants,
+      subscribed,
+      toggleSubscriptionPath,
     } = props;
 
     const EpicShowApp = Vue.extend(epicShowApp);
@@ -64,6 +71,7 @@ describe('EpicShowApp', () => {
       projectPath: props.groupPath,
       projectNamespace: '',
       showInlineEditButton: true,
+      toggleSubscriptionPath,
     });
 
     const EpicSidebar = Vue.extend(epicSidebar);
@@ -72,6 +80,15 @@ describe('EpicShowApp', () => {
       editable: canUpdate,
       initialStartDate: startDate,
       initialEndDate: endDate,
+      initialLabels: labels,
+      initialParticipants: participants,
+      initialSubscribed: subscribed,
+      updatePath: updateEndpoint,
+      toggleSubscriptionPath,
+      labelsPath,
+      labelsWebUrl,
+      epicsWebUrl,
+      namespace,
     });
 
     setTimeout(done);
@@ -97,7 +114,7 @@ describe('EpicShowApp', () => {
     const deleteIssuable = jasmine.createSpy();
     issuableAppEventHub.$on('delete.issuable', deleteIssuable);
     spyOn(window, 'confirm').and.returnValue(true);
-    spyOn(urlUtils, 'visitUrl').and.callFake(() => {});
+    spyOnDependency(issuableApp, 'visitUrl');
 
     vm.$el.querySelector('.detail-page-header .btn-remove').click();
     expect(deleteIssuable).toHaveBeenCalled();

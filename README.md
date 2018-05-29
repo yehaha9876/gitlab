@@ -2,7 +2,6 @@
 
 [![Build status](https://gitlab.com/gitlab-org/gitlab-ee/badges/master/build.svg)](https://gitlab.com/gitlab-org/gitlab-ee/commits/master)
 [![Overall test coverage](https://gitlab.com/gitlab-org/gitlab-ee/badges/master/coverage.svg)](https://gitlab.com/gitlab-org/gitlab-ee/pipelines)
-[![Dependency Status](https://gemnasium.com/gitlabhq/gitlabhq.svg)](https://gemnasium.com/gitlabhq/gitlabhq)
 [![Code Climate](https://codeclimate.com/github/gitlabhq/gitlabhq.svg)](https://codeclimate.com/github/gitlabhq/gitlabhq)
 [![Core Infrastructure Initiative Best Practices](https://bestpractices.coreinfrastructure.org/projects/42/badge)](https://bestpractices.coreinfrastructure.org/projects/42)
 [![Gitter](https://badges.gitter.im/gitlabhq/gitlabhq.svg)](https://gitter.im/gitlabhq/gitlabhq?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -22,7 +21,7 @@ The source of GitLab Enterprise Edition is [hosted on GitLab.com](https://gitlab
 
 ## Free trial
 
-You can request a free trial of GitLab Enterprise Edition [on our website](https://about.gitlab.com/free-trial/).
+You can request a free trial of GitLab Ultimate [on our website](https://about.gitlab.com/free-trial/).
 
 ## Subscriber onboarding information
 
@@ -42,9 +41,9 @@ http://doc.gitlab.com/ee/
 To upgrade from CE, just perform a normal upgrade, but use an EE package:
 https://about.gitlab.com/update/#ee
 
-If you need help with your GitLab installation and for any technical questions please contact us at subscribers@gitlab.com
+If you need help with your GitLab installation and for any technical questions please see the [support page](https://about.gitlab.com/support/)
 
-For all other questions, contact us at sales@gitlab.com
+For all other questions, please see our [contact page](https://about.gitlab.com/contact/)
 
 ## Open source software to collaborate on code
 
@@ -96,6 +95,14 @@ You can access a new installation with the login **`root`** and password **`5ive
 ## Contributing
 
 GitLab is an open source project and we are very happy to accept community contributions. Please refer to [CONTRIBUTING.md](/CONTRIBUTING.md) for details.
+
+## Licensing
+
+GitLab Community Edition (CE) is available freely under the MIT Expat license.
+
+All third party components incorporated into the GitLab Software are licensed under the original license provided by the owner of the applicable component.
+
+All Documentation content that resides under the doc/ directory of this repository is licensed under Creative Commons: CC BY-SA 4.0.
 
 ## Install a development environment
 

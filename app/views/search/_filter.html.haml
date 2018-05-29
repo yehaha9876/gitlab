@@ -11,7 +11,7 @@
       - else
         Any
     = icon("chevron-down")
-  .dropdown-menu.dropdown-select.dropdown-menu-selectable.dropdown-menu-align-right
+  .dropdown-menu.dropdown-select.dropdown-menu-selectable.dropdown-menu-right
     = dropdown_title("Filter results by group")
     = dropdown_filter("Search groups")
     = dropdown_content
@@ -22,11 +22,11 @@
     %span.dropdown-toggle-text
       Project:
       - if @project.present?
-        = @project.name_with_namespace
+        = @project.full_name
       - else
         Any
     = icon("chevron-down")
-  .dropdown-menu.dropdown-select.dropdown-menu-selectable.dropdown-menu-align-right
+  .dropdown-menu.dropdown-select.dropdown-menu-selectable.dropdown-menu-right
     = dropdown_title("Filter results by project")
     = dropdown_filter("Search projects")
     = dropdown_content

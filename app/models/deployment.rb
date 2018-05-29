@@ -1,10 +1,12 @@
 class Deployment < ActiveRecord::Base
-  include InternalId
+  include AtomicInternalId
 
   belongs_to :project, required: true
   belongs_to :environment, required: true
   belongs_to :user
   belongs_to :deployable, polymorphic: true # rubocop:disable Cop/PolymorphicAssociations
+
+  has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.deployments&.maximum(:iid) }
 
   validates :sha, presence: true
   validates :ref, presence: true
@@ -98,27 +100,28 @@ class Deployment < ActiveRecord::Base
   end
 
   def has_metrics?
-    project.monitoring_service.present?
+    prometheus_adapter&.can_query?
   end
 
   def metrics
     return {} unless has_metrics?
 
-    project.monitoring_service.deployment_metrics(self)
-  end
-
-  def has_additional_metrics?
-    project.prometheus_service.present?
+    metrics = prometheus_adapter.query(:deployment, self)
+    metrics&.merge(deployment_time: created_at.to_i) || {}
   end
 
   def additional_metrics
-    return {} unless project.prometheus_service.present?
+    return {} unless has_metrics?
 
-    metrics = project.prometheus_service.additional_deployment_metrics(self)
+    metrics = prometheus_adapter.query(:additional_metrics_deployment, self)
     metrics&.merge(deployment_time: created_at.to_i) || {}
   end
 
   private
+
+  def prometheus_adapter
+    environment.prometheus_adapter
+  end
 
   def ref_path
     File.join(environment.ref_path, 'deployments', iid.to_s)

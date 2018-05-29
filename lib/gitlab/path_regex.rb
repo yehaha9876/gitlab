@@ -33,8 +33,6 @@ module Gitlab
       favicon.ico
       files
       groups
-      header_logo_dark.png
-      header_logo_light.png
       health_check
       help
       import
@@ -185,10 +183,6 @@ module Gitlab
       @full_project_git_path_regex ||= %r{\A\/?(?<namespace_path>#{full_namespace_route_regex})\/(?<project_path>#{project_route_regex})\.git\z}
     end
 
-    def full_namespace_format_regex
-      @namespace_format_regex ||= /A#{FULL_NAMESPACE_FORMAT_REGEX}\z/.freeze
-    end
-
     def namespace_format_regex
       @namespace_format_regex ||= /\A#{NAMESPACE_FORMAT_REGEX}\z/.freeze
     end
@@ -233,6 +227,10 @@ module Gitlab
         (?<!\.lock)               (?# rule #1)
         (?<![\/.])                (?# rule #6-7)
       }x
+    end
+
+    def saml_callback_regex
+      @saml_callback_regex ||= %r(\A\/groups\/(?<group>#{full_namespace_route_regex})\/\-\/saml\/callback\z).freeze
     end
 
     private

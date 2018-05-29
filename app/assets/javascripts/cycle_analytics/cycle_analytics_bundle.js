@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import Vue from 'vue';
 import Cookies from 'js-cookie';
 import Flash from '../flash';
@@ -14,10 +15,10 @@ import CycleAnalyticsStore from './cycle_analytics_store';
 
 Vue.use(Translate);
 
-$(() => {
+export default () => {
   const OVERVIEW_DIALOG_COOKIE = 'cycle_analytics_help_dismissed';
 
-  gl.cycleAnalyticsApp = new Vue({
+  new Vue({ // eslint-disable-line no-new
     el: '#cycle-analytics',
     name: 'CycleAnalytics',
     components: {
@@ -81,7 +82,6 @@ $(() => {
 
         this.service
           .fetchCycleAnalyticsData(fetchOptions)
-          .then(resp => resp.json())
           .then((response) => {
             this.store.setCycleAnalyticsData(response);
             this.selectDefaultStage();
@@ -115,7 +115,6 @@ $(() => {
             stage,
             startDate: this.startDate,
           })
-          .then(resp => resp.json())
           .then((response) => {
             this.isEmptyStage = !response.events.length;
             this.store.setStageEvents(response.events, stage);
@@ -132,4 +131,4 @@ $(() => {
       },
     },
   });
-});
+};

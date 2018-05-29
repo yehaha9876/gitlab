@@ -24,13 +24,15 @@ module EE
       has_many :epics,                    foreign_key: :author_id
       has_many :assigned_epics,           foreign_key: :assignee_id, class_name: "Epic"
       has_many :path_locks,               dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
+      has_many :vulnerability_feedback,  foreign_key: :author_id
 
       has_many :approvals,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
       has_many :approvers,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
 
       # Protected Branch Access
-      has_many :protected_branch_merge_access_levels, dependent: :destroy, class_name: ProtectedBranch::MergeAccessLevel # rubocop:disable Cop/ActiveRecordDependent
-      has_many :protected_branch_push_access_levels, dependent: :destroy, class_name: ProtectedBranch::PushAccessLevel # rubocop:disable Cop/ActiveRecordDependent
+      has_many :protected_branch_merge_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::MergeAccessLevel # rubocop:disable Cop/ActiveRecordDependent
+      has_many :protected_branch_push_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::PushAccessLevel # rubocop:disable Cop/ActiveRecordDependent
+      has_many :protected_branch_unprotect_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::UnprotectAccessLevel # rubocop:disable Cop/ActiveRecordDependent
     end
 
     module ClassMethods

@@ -1,6 +1,9 @@
 class Groups::EpicsController < Groups::ApplicationController
   include IssuableActions
   include IssuableCollections
+  include ToggleAwardEmoji
+  include ToggleSubscriptionAction
+  include RendersNotes
 
   before_action :check_epics_available!
   before_action :epic, except: [:index, :create]
@@ -23,7 +26,7 @@ class Groups::EpicsController < Groups::ApplicationController
   end
 
   def create
-    @epic = Epics::CreateService.new(@group, current_user, epic_params).execute
+    @epic = ::Epics::CreateService.new(@group, current_user, epic_params).execute
 
     if @epic.persisted?
       render json: {
@@ -45,20 +48,27 @@ class Groups::EpicsController < Groups::ApplicationController
 
     return render_404 unless can?(current_user, :read_epic, @epic)
 
-    @epic
+    @noteable = @epic
   end
   alias_method :issuable, :epic
+  alias_method :awardable, :epic
+  alias_method :subscribable_resource, :epic
+
+  def subscribable_project
+    nil
+  end
 
   def epic_params
     params.require(:epic).permit(*epic_params_attributes)
   end
 
   def epic_params_attributes
-    %i[
-      title
-      description
-      start_date
-      end_date
+    [
+      :title,
+      :description,
+      :start_date,
+      :end_date,
+      label_ids: []
     ]
   end
 
@@ -66,13 +76,16 @@ class Groups::EpicsController < Groups::ApplicationController
     EpicSerializer.new(current_user: current_user)
   end
 
-  def update_service
-    Epics::UpdateService.new(nil, current_user, epic_params)
+  def discussion_serializer
+    DiscussionSerializer.new(project: nil, noteable: issuable, current_user: current_user, note_entity: EpicNoteEntity)
   end
 
-  def set_issuables_index
-    @finder_type = EpicsFinder
-    super
+  def update_service
+    ::Epics::UpdateService.new(@group, current_user, epic_params)
+  end
+
+  def finder_type
+    EpicsFinder
   end
 
   def collection_type

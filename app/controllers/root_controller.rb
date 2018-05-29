@@ -13,7 +13,10 @@ class RootController < Dashboard::ProjectsController
   before_action :redirect_logged_user, if: -> { current_user.present? }
 
   def index
-    super
+    # n+1: https://gitlab.com/gitlab-org/gitlab-ce/issues/37434
+    Gitlab::GitalyClient.allow_n_plus_1_calls do
+      super
+    end
   end
 
   private
@@ -39,6 +42,10 @@ class RootController < Dashboard::ProjectsController
       redirect_to(dashboard_groups_path)
     when 'todos'
       redirect_to(dashboard_todos_path)
+    when 'issues'
+      redirect_to(issues_dashboard_path(assignee_id: current_user.id))
+    when 'merge_requests'
+      redirect_to(merge_requests_dashboard_path(assignee_id: current_user.id))
     end
   end
 

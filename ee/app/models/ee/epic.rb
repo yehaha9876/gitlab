@@ -3,13 +3,16 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
-      include InternalId
-      include Issuable
+      include AtomicInternalId
+      include ::Issuable
       include Noteable
       include Referable
+      include Awardable
 
       belongs_to :assignee, class_name: "User"
       belongs_to :group
+
+      has_internal_id :iid, scope: :group, init: ->(s) { s&.group&.epics&.maximum(:iid) }
 
       has_many :epic_issues
 
@@ -69,6 +72,10 @@ module EE
           super
         end
       end
+
+      def parent_class
+        ::Group
+      end
     end
 
     def assignees
@@ -82,6 +89,23 @@ module EE
     def supports_weight?
       false
     end
+
+    def upcoming?
+      start_date&.future?
+    end
+
+    def expired?
+      end_date&.past?
+    end
+
+    def elapsed_days
+      return 0 if start_date.nil? || start_date.future?
+
+      (Date.today - start_date).to_i
+    end
+
+    # Needed to use EntityDateHelper#remaining_days_in_words
+    alias_attribute(:due_date, :end_date)
 
     def to_reference(from = nil, full: false)
       reference = "#{self.class.reference_prefix}#{iid}"
@@ -109,7 +133,15 @@ module EE
     end
 
     def mentionable_params
-      { group: group }
+      { group: group, label_url_method: :group_epics_url }
+    end
+
+    def discussions_rendered_on_frontend?
+      true
+    end
+
+    def banzai_render_context(field)
+      super.merge(label_url_method: :group_epics_url)
     end
   end
 end

@@ -99,13 +99,13 @@ module ProjectsHelper
   end
 
   def remove_project_message(project)
-    _("You are going to remove %{project_name_with_namespace}. Removed project CANNOT be restored! Are you ABSOLUTELY sure?") %
-      { project_name_with_namespace: project.name_with_namespace }
+    _("You are going to remove %{project_full_name}. Removed project CANNOT be restored! Are you ABSOLUTELY sure?") %
+      { project_full_name: project.full_name }
   end
 
   def transfer_project_message(project)
-    _("You are going to transfer %{project_name_with_namespace} to another owner. Are you ABSOLUTELY sure?") %
-      { project_name_with_namespace: project.name_with_namespace }
+    _("You are going to transfer %{project_full_name} to another owner. Are you ABSOLUTELY sure?") %
+      { project_full_name: project.full_name }
   end
 
   def remove_fork_project_message(project)
@@ -155,47 +155,8 @@ module ProjectsHelper
     end
   end
 
-  def license_short_name(project)
-    license = project.repository.license
-    license&.nickname || license&.name || 'LICENSE'
-  end
-
   def last_push_event
     current_user&.recent_push(@project)
-  end
-
-  def project_feature_access_select(field)
-    # Don't show option "everyone with access" if project is private
-    options = project_feature_options
-
-    level = @project.project_feature.public_send(field) # rubocop:disable GitlabSecurity/PublicSend
-
-    if @project.private?
-      disabled_option = ProjectFeature::ENABLED
-      highest_available_option = ProjectFeature::PRIVATE if level == disabled_option
-    end
-
-    options = options_for_select(
-      options.invert,
-      selected: highest_available_option || level,
-      disabled: disabled_option
-    )
-
-    content_tag :div, class: "select-wrapper" do
-      concat(
-        content_tag(
-          :select,
-          options,
-          name: "project[project_feature_attributes][#{field}]",
-          id: "project_project_feature_attributes_#{field}",
-          class: "pull-right form-control select-control #{repo_children_classes(field)} ",
-          data: { field: field }
-        )
-      )
-      concat(
-        icon('chevron-down')
-      )
-    end.html_safe
   end
 
   def link_to_autodeploy_doc
@@ -215,6 +176,7 @@ module ProjectsHelper
       controller.controller_name,
       controller.action_name,
       Gitlab::CurrentSettings.cache_key,
+      "cross-project:#{can?(current_user, :read_cross_project)}",
       'v2.5'
     ]
 
@@ -267,17 +229,18 @@ module ProjectsHelper
     !!(params[:personal] || params[:name] || any_projects?(projects))
   end
 
-  private
+  def push_to_create_project_command(user = current_user)
+    repository_url =
+      if Gitlab::CurrentSettings.current_application_settings.enabled_git_access_protocol == 'http'
+        user_url(user)
+      else
+        Gitlab.config.gitlab_shell.ssh_path_prefix + user.username
+      end
 
-  def repo_children_classes(field)
-    needs_repo_check = [:merge_requests_access_level, :builds_access_level]
-    return unless needs_repo_check.include?(field)
-
-    classes = "project-repo-select js-repo-select"
-    classes << " disabled" unless @project.feature_available?(:repository, current_user)
-
-    classes
+    "git push --set-upstream #{repository_url}/$(git rev-parse --show-toplevel | xargs basename).git $(git rev-parse --abbrev-ref HEAD)"
   end
+
+  private
 
   def get_project_nav_tabs(project, current_user)
     nav_tabs = [:home]
@@ -296,6 +259,7 @@ module ProjectsHelper
 
     if project.builds_enabled? && can?(current_user, :read_pipeline, project)
       nav_tabs << :pipelines
+      nav_tabs << :operations
     end
 
     if project.external_issue_tracker
@@ -411,55 +375,6 @@ module ProjectsHelper
     end
   end
 
-  def add_special_file_path(project, file_name:, commit_message: nil, branch_name: nil, context: nil)
-    commit_message ||= s_("CommitMessage|Add %{file_name}") % { file_name: file_name }
-    project_new_blob_path(
-      project,
-      project.default_branch || 'master',
-      file_name:      file_name,
-      commit_message: commit_message,
-      branch_name: branch_name,
-      context: context
-    )
-  end
-
-  def add_koding_stack_path(project)
-    project_new_blob_path(
-      project,
-      project.default_branch || 'master',
-      file_name:      '.koding.yml',
-      commit_message: "Add Koding stack script",
-      content: <<-CONTENT.strip_heredoc
-        provider:
-          aws:
-            access_key: '${var.aws_access_key}'
-            secret_key: '${var.aws_secret_key}'
-        resource:
-          aws_instance:
-            #{project.path}-vm:
-              instance_type: t2.nano
-              user_data: |-
-
-                # Created by GitLab UI for :>
-
-                echo _KD_NOTIFY_@Installing Base packages...@
-
-                apt-get update -y
-                apt-get install git -y
-
-                echo _KD_NOTIFY_@Cloning #{project.name}...@
-
-                export KODING_USER=${var.koding_user_username}
-                export REPO_URL=#{root_url}${var.koding_queryString_repo}.git
-                export BRANCH=${var.koding_queryString_branch}
-
-                sudo -i -u $KODING_USER git clone $REPO_URL -b $BRANCH
-
-                echo _KD_NOTIFY_@#{project.name} cloned.@
-      CONTENT
-    )
-  end
-
   def koding_project_url(project = nil, branch = nil, sha = nil)
     if project
       import_path = "/Home/Stacks/import"
@@ -474,36 +389,6 @@ module ProjectsHelper
     end
 
     Gitlab::CurrentSettings.koding_url
-  end
-
-  def contribution_guide_path(project)
-    if project && contribution_guide = project.repository.contribution_guide
-      project_blob_path(
-        project,
-        tree_join(project.default_branch,
-                  contribution_guide.name)
-      )
-    end
-  end
-
-  def readme_path(project)
-    filename_path(project, :readme)
-  end
-
-  def changelog_path(project)
-    filename_path(project, :changelog)
-  end
-
-  def license_path(project)
-    filename_path(project, :license_blob)
-  end
-
-  def version_path(project)
-    filename_path(project, :version)
-  end
-
-  def ci_configuration_path(project)
-    filename_path(project, :gitlab_ci_yml)
   end
 
   def project_wiki_path_with_version(proj, page, version, is_newest)
@@ -522,12 +407,34 @@ module ProjectsHelper
     end
   end
 
+  def project_can_be_shared?
+    !membership_locked? || @project.allowed_to_share_with_group?
+  end
+
   def membership_locked?
     if @project.group && @project.group.membership_lock
       true
     else
       false
     end
+  end
+
+  def share_project_description
+    share_with_group   = @project.allowed_to_share_with_group?
+    share_with_members = !membership_locked?
+    project_name       = content_tag(:strong, @project.name)
+    member_message     = "You can add a new member to #{project_name}"
+
+    description =
+      if share_with_group && share_with_members
+        "#{member_message} or share it with another group."
+      elsif share_with_group
+        "You can share #{project_name} with another group."
+      elsif share_with_members
+        "#{member_message}."
+      end
+
+    description.to_s.html_safe
   end
 
   def readme_cache_key
@@ -539,30 +446,14 @@ module ProjectsHelper
     @ref || @repository.try(:root_ref)
   end
 
-  def filename_path(project, filename)
-    if project && blob = project.repository.public_send(filename) # rubocop:disable GitlabSecurity/PublicSend
-      project_blob_path(
-        project,
-        tree_join(project.default_branch, blob.name)
-      )
-    end
-  end
-
   def sanitize_repo_path(project, message)
     return '' unless message.present?
 
     exports_path = File.join(Settings.shared['path'], 'tmp/project_exports')
     filtered_message = message.strip.gsub(exports_path, "[REPO EXPORT PATH]")
 
-    filtered_message.gsub(project.repository_storage_path.chomp('/'), "[REPOS PATH]")
-  end
-
-  def project_feature_options
-    {
-      ProjectFeature::DISABLED => s_('ProjectFeature|Disabled'),
-      ProjectFeature::PRIVATE => s_('ProjectFeature|Only team members'),
-      ProjectFeature::ENABLED => s_('ProjectFeature|Everyone with access')
-    }
+    disk_path = Gitlab.config.repositories.storages[project.repository_storage].legacy_disk_path
+    filtered_message.gsub(disk_path.chomp('/'), "[REPOS PATH]")
   end
 
   def project_child_container_class(view_path)
@@ -571,20 +462,6 @@ module ProjectsHelper
 
   def project_issues(project)
     IssuesFinder.new(current_user, project_id: project.id).execute
-  end
-
-  def visibility_select_options(project, selected_level)
-    level_options = Gitlab::VisibilityLevel.values.each_with_object([]) do |level, level_options|
-      next if restricted_levels.include?(level)
-
-      level_options << [
-        visibility_level_label(level),
-        { data: { description: visibility_level_description(level, project) } },
-        level
-      ]
-    end
-
-    options_for_select(level_options, selected_level)
   end
 
   def restricted_levels
@@ -617,7 +494,7 @@ module ProjectsHelper
       visibilityHelpPath: help_page_path('public_access/public_access'),
       registryAvailable: Gitlab.config.registry.enabled,
       registryHelpPath: help_page_path('user/project/container_registry'),
-      lfsAvailable: Gitlab.config.lfs.enabled && current_user.admin?,
+      lfsAvailable: Gitlab.config.lfs.enabled,
       lfsHelpPath: help_page_path('workflow/lfs/manage_large_binaries_with_git_lfs')
     }
 
@@ -636,5 +513,27 @@ module ProjectsHelper
     ref = @ref || @project.repository.root_ref
 
     project_find_file_path(@project, ref)
+  end
+
+  def can_show_last_commit_in_list?(project)
+    can?(current_user, :read_cross_project) && project.commit
+  end
+
+  def pages_https_only_disabled?
+    !@project.pages_domains.all?(&:https?)
+  end
+
+  def pages_https_only_title
+    return unless pages_https_only_disabled?
+
+    "You must enable HTTPS for all your domains first"
+  end
+
+  def pages_https_only_label_class
+    if pages_https_only_disabled?
+      "list-label disabled"
+    else
+      "list-label"
+    end
   end
 end

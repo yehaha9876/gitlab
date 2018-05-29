@@ -9,6 +9,7 @@ class Commit
   include Mentionable
   include Referable
   include StaticModel
+  include ::Gitlab::Utils::StrongMemoize
 
   attr_mentionable :safe_message, pipeline: :single_line
 
@@ -19,6 +20,7 @@ class Commit
   attr_accessor :project, :author
   attr_accessor :redacted_description_html
   attr_accessor :redacted_title_html
+  attr_reader :gpg_commit
 
   DIFF_SAFE_LINES = Gitlab::Git::DiffCollection::DEFAULT_LIMITS[:max_lines]
 
@@ -28,9 +30,12 @@ class Commit
 
   MIN_SHA_LENGTH = Gitlab::Git::Commit::MIN_SHA_LENGTH
   COMMIT_SHA_PATTERN = /\h{#{MIN_SHA_LENGTH},40}/.freeze
+  # Used by GFM to match and present link extensions on node texts and hrefs.
+  LINK_EXTENSION_PATTERN = /(patch)/.freeze
 
   def banzai_render_context(field)
-    context = { pipeline: :single_line, project: self.project }
+    pipeline = field == :description ? :commit_description : :single_line
+    context = { pipeline: pipeline, project: self.project }
     context[:author] = self.author if self.author
 
     context
@@ -100,6 +105,10 @@ class Commit
         end
       end
     end
+
+    def parent_class
+      ::Project
+    end
   end
 
   attr_accessor :raw
@@ -110,6 +119,7 @@ class Commit
     @raw = raw_commit
     @project = project
     @statuses = {}
+    @gpg_commit = Gitlab::Gpg::Commit.new(self) if project
   end
 
   def id
@@ -139,7 +149,8 @@ class Commit
   end
 
   def self.link_reference_pattern
-    @link_reference_pattern ||= super("commit", /(?<commit>#{COMMIT_SHA_PATTERN})/)
+    @link_reference_pattern ||=
+      super("commit", /(?<commit>#{COMMIT_SHA_PATTERN})?(\.(?<extension>#{LINK_EXTENSION_PATTERN}))?/)
   end
 
   def to_reference(from = nil, full: false)
@@ -172,7 +183,7 @@ class Commit
       if safe_message.blank?
         no_commit_message
       else
-        safe_message.split("\n", 2).first
+        safe_message.split(/[\r\n]/, 2).first
       end
   end
 
@@ -213,8 +224,34 @@ class Commit
     Gitlab::ClosingIssueExtractor.new(project, current_user).closed_by_message(safe_message)
   end
 
+  def lazy_author
+    BatchLoader.for(author_email.downcase).batch do |emails, loader|
+      # A Hash that maps user Emails to the corresponding User objects. The
+      # Emails at this point are the _primary_ Emails of the Users.
+      users_for_emails = User
+        .by_any_email(emails)
+        .each_with_object({}) { |user, hash| hash[user.email] = user }
+
+      users_for_ids = users_for_emails
+        .values
+        .each_with_object({}) { |user, hash| hash[user.id] = user }
+
+      # Some commits may have used an alternative Email address. In this case we
+      # need to query the "emails" table to map those addresses to User objects.
+      Email
+        .where(email: emails - users_for_emails.keys)
+        .pluck(:email, :user_id)
+        .each { |(email, id)| users_for_emails[email] = users_for_ids[id] }
+
+      users_for_emails.each { |email, user| loader.call(email, user) }
+    end
+  end
+
   def author
-    User.find_by_any_email(author_email.downcase)
+    # We use __sync so that we get the actual objects back (including an actual
+    # nil), instead of a wrapper, as returning a wrapped nil breaks a lot of
+    # code.
+    lazy_author.__sync
   end
   request_cache(:author) { author_email.downcase }
 
@@ -223,11 +260,13 @@ class Commit
   end
 
   def parents
-    @parents ||= parent_ids.map { |id| project.commit(id) }
+    @parents ||= parent_ids.map { |oid| Commit.lazy(project, oid) }
   end
 
   def parent
-    @parent ||= project.commit(self.parent_id) if self.parent_id
+    strong_memoize(:parent) do
+      project.commit_by(oid: self.parent_id) if self.parent_id
+    end
   end
 
   def notes
@@ -239,7 +278,7 @@ class Commit
   end
 
   def notes_with_associations
-    notes.includes(:author)
+    notes.includes(:author, :award_emoji)
   end
 
   def merge_requests
@@ -411,6 +450,12 @@ class Commit
     # no-op but needs to be defined since #persisted? is defined
   end
 
+  def touch_later
+    # No-op.
+    # This method is called by ActiveRecord.
+    # We don't want to do anything for `Commit` model, so this is empty.
+  end
+
   WIP_REGEX = /\A\s*(((?i)(\[WIP\]|WIP:|WIP)\s|WIP$))|(fixup!|squash!)\s/.freeze
 
   def work_in_progress?
@@ -451,9 +496,5 @@ class Commit
 
   def merged_merge_request_no_cache(user)
     MergeRequestsFinder.new(user, project_id: project.id).find_by(merge_commit_sha: id) if merge_commit?
-  end
-
-  def gpg_commit
-    @gpg_commit ||= Gitlab::Gpg::Commit.new(self)
   end
 end

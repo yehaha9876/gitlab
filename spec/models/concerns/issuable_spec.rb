@@ -34,7 +34,7 @@ describe Issuable do
     subject { build(:issue) }
 
     before do
-      allow(subject).to receive(:set_iid).and_return(false)
+      allow(InternalId).to receive(:generate_next).and_return(nil)
     end
 
     it { is_expected.to validate_presence_of(:project) }
@@ -176,25 +176,8 @@ describe Issuable do
     end
   end
 
-  describe "#sort" do
+  describe "#sort_by_attribute" do
     let(:project) { create(:project) }
-
-    context "by weight" do
-      let!(:issue)  { create(:issue, project: project) }
-      let!(:issue2) { create(:issue, weight: 1, project: project) }
-      let!(:issue3) { create(:issue, weight: 2, project: project) }
-      let!(:issue4) { create(:issue, weight: 3, project: project) }
-
-      it "sorts desc" do
-        issues = project.issues.sort('weight_desc')
-        expect(issues).to match_array([issue4, issue3, issue2, issue])
-      end
-
-      it "sorts asc" do
-        issues = project.issues.sort('weight_asc')
-        expect(issues).to match_array([issue2, issue3, issue4, issue])
-      end
-    end
 
     context "by milestone due date" do
       # Correct order is:
@@ -210,12 +193,12 @@ describe Issuable do
       let!(:issue3) { create(:issue, project: project) }
 
       it "sorts desc" do
-        issues = project.issues.sort('milestone_due_desc')
+        issues = project.issues.sort_by_attribute('milestone_due_desc')
         expect(issues).to match_array([issue2, issue1, issue, issue3])
       end
 
       it "sorts asc" do
-        issues = project.issues.sort('milestone_due_asc')
+        issues = project.issues.sort_by_attribute('milestone_due_asc')
         expect(issues).to match_array([issue1, issue2, issue, issue3])
       end
     end
@@ -227,7 +210,7 @@ describe Issuable do
 
       it 'has no duplicates across pages' do
         sorted_issue_ids = 1.upto(10).map do |i|
-          project.issues.sort('milestone_due_desc').page(i).per(1).first.id
+          project.issues.sort_by_attribute('milestone_due_desc').page(i).per(1).first.id
         end
 
         expect(sorted_issue_ids).to eq(sorted_issue_ids.uniq)
@@ -280,6 +263,19 @@ describe Issuable do
 
         expect(issue.subscribed?(user, project)).to be_falsey
       end
+    end
+  end
+
+  describe '#time_estimate=' do
+    it 'coerces the value below Gitlab::Database::MAX_INT_VALUE' do
+      expect { issue.time_estimate = 100 }.to change { issue.time_estimate }.to(100)
+      expect { issue.time_estimate = Gitlab::Database::MAX_INT_VALUE + 100 }.to change { issue.time_estimate }.to(Gitlab::Database::MAX_INT_VALUE)
+    end
+
+    it 'skips coercion for not Integer values' do
+      expect { issue.time_estimate = nil }.to change { issue.time_estimate }.to(nil)
+      expect { issue.time_estimate = 'invalid time' }.not_to raise_error(StandardError)
+      expect { issue.time_estimate = 22.33 }.not_to raise_error(StandardError)
     end
   end
 
@@ -529,6 +525,14 @@ describe Issuable do
 
         expect(issue.total_time_spent).to eq(1800)
       end
+
+      it 'updates issues updated_at' do
+        issue
+
+        Timecop.travel(1.minute.from_now) do
+          expect { spend_time(1800) }.to change { issue.updated_at }
+        end
+      end
     end
 
     context 'substracting time' do
@@ -544,9 +548,13 @@ describe Issuable do
 
       context 'when time to substract exceeds the total time spent' do
         it 'raise a validation error' do
-          expect do
-            spend_time(-3600)
-          end.to raise_error(ActiveRecord::RecordInvalid)
+          Timecop.travel(1.minute.from_now) do
+            expect do
+              expect do
+                spend_time(-3600)
+              end.to raise_error(ActiveRecord::RecordInvalid)
+            end.not_to change { issue.updated_at }
+          end
         end
       end
     end

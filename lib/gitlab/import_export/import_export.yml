@@ -27,8 +27,6 @@ project_tree:
   - :releases
   - project_members:
     - :user
-  - lfs_file_locks:
-    - :user
   - merge_requests:
     - notes:
       - :author
@@ -61,10 +59,14 @@ project_tree:
   - protected_branches:
     - :merge_access_levels
     - :push_access_levels
+    - :unprotect_access_levels
   - protected_tags:
     - :create_access_levels
   - :project_feature
   - :custom_attributes
+  - :prometheus_metrics
+  - :project_badges
+  - :ci_cd_settings
 
 # Only include the following attributes for the models specified.
 included_attributes:
@@ -74,6 +76,8 @@ included_attributes:
     - :username
   author:
     - :name
+  ci_cd_settings:
+    - :group_runners_enabled
 
 # Do not include the following attributes for the models specified.
 excluded_attributes:
@@ -111,6 +115,8 @@ excluded_attributes:
     - :remote_mirror_available_overridden
     - :only_mirror_protected_branches
     - :pull_mirror_available_overridden
+    - :mirror_overwrites_diverged_branches
+    - :description_html
   snippets:
     - :expired_at
   merge_request_diff:
@@ -130,8 +136,12 @@ excluded_attributes:
     - :trace
     - :token
     - :when
+    - :artifacts_file
+    - :artifacts_metadata
   push_event_payload:
     - :event_id
+  project_badges:
+    - :group_id
 
 methods:
   labels:
@@ -148,9 +158,9 @@ methods:
     - :diff_head_sha
     - :source_branch_sha
     - :target_branch_sha
-  project:
-    - :description_html
   events:
     - :action
   push_event_payload:
     - :action
+  project_badges:
+    - :type

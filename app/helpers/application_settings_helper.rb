@@ -75,10 +75,12 @@ module ApplicationSettingsHelper
       css_class = 'btn'
       css_class << ' active' unless disabled
       checkbox_name = 'application_setting[enabled_oauth_sign_in_sources][]'
+      name = Gitlab::Auth::OAuth::Provider.label_for(source)
 
       label_tag(checkbox_name, class: css_class) do
         check_box_tag(checkbox_name, source, !disabled,
-                      autocomplete: 'off') + Gitlab::OAuth::Provider.label_for(source)
+                      autocomplete: 'off',
+                      id: name.tr(' ', '_')) + name
       end
     end
   end
@@ -97,7 +99,7 @@ module ApplicationSettingsHelper
 
   def repository_storages_options_for_select(selected)
     options = Gitlab.config.repositories.storages.map do |name, storage|
-      ["#{name} - #{storage['path']}", name]
+      ["#{name} - #{storage['gitaly_address']}", name]
     end
 
     options_for_select(options, selected)
@@ -200,6 +202,7 @@ module ApplicationSettingsHelper
       :metrics_port,
       :metrics_sample_interval,
       :metrics_timeout,
+      :pages_domain_verification_enabled,
       :password_authentication_enabled_for_web,
       :password_authentication_enabled_for_git,
       :performance_bar_allowed_group_id,
@@ -245,7 +248,11 @@ module ApplicationSettingsHelper
       :usage_ping_enabled,
       :user_default_external,
       :user_oauth_applications,
-      :version_check_enabled
+      :version_check_enabled,
+      :allow_local_requests_from_hooks_and_services,
+      :enforce_terms,
+      :terms,
+      :mirror_available
     ]
   end
 end

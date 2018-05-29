@@ -13,7 +13,6 @@ class ProjectMember < Member
 
   scope :in_project, ->(project) { where(source_id: project.id) }
 
-  before_destroy :delete_member_todos
   before_destroy :delete_member_branch_protection
 
   class << self
@@ -94,10 +93,6 @@ class ProjectMember < Member
 
   private
 
-  def delete_member_todos
-    user.todos.where(project_id: source_id).destroy_all if user
-  end
-
   def delete_member_branch_protection
     if user.present? && project.present?
       project.protected_branches.merge_access_by_user(user).destroy_all
@@ -106,7 +101,7 @@ class ProjectMember < Member
   end
 
   def send_invite
-    notification_service.invite_project_member(self, @raw_invite_token) unless @skip_notification
+    run_after_commit_or_now { notification_service.invite_project_member(self, @raw_invite_token) } unless @skip_notification
 
     super
   end
@@ -114,7 +109,7 @@ class ProjectMember < Member
   def post_create_hook
     unless owner?
       event_service.join_project(self.project, self.user)
-      notification_service.new_project_member(self) unless @skip_notification
+      run_after_commit_or_now { notification_service.new_project_member(self) } unless @skip_notification
     end
 
     super
@@ -122,7 +117,7 @@ class ProjectMember < Member
 
   def post_update_hook
     if access_level_changed?
-      notification_service.update_project_member(self)  unless @skip_notification
+      run_after_commit { notification_service.update_project_member(self) } unless @skip_notification
     end
 
     super

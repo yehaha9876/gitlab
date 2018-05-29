@@ -7,6 +7,8 @@ describe Geo::RepositorySyncService do
   set(:secondary) { create(:geo_node) }
 
   let(:lease) { double(try_obtain: true) }
+  set(:project) { create(:project_empty_repo) }
+  let(:repository) { project.repository }
 
   subject { described_class.new(project) }
 
@@ -15,16 +17,13 @@ describe Geo::RepositorySyncService do
   end
 
   it_behaves_like 'geo base sync execution'
+  it_behaves_like 'geo base sync fetch and repack'
 
   describe '#execute' do
-    let(:project) { create(:project_empty_repo) }
-    let(:repository) { project.repository }
     let(:url_to_repo) { "#{primary.url}#{project.full_path}.git" }
 
     before do
-      allow(Gitlab::ExclusiveLease).to receive(:new)
-        .with(subject.lease_key, anything)
-        .and_return(lease)
+      allow(subject).to receive(:exclusive_lease).and_return(lease)
 
       allow_any_instance_of(Repository).to receive(:fetch_as_mirror)
         .and_return(true)
@@ -112,10 +111,42 @@ describe Geo::RepositorySyncService do
 
       subject.execute
 
+      expect(Geo::ProjectRegistry.last.resync_repository).to be true
       expect(Geo::ProjectRegistry.last.repository_retry_count).to eq(1)
     end
 
+    it 'marks sync as successful if no repository found' do
+      registry = create(:geo_project_registry, project: project)
+
+      allow(repository).to receive(:fetch_as_mirror)
+        .with(url_to_repo, remote_name: 'geo', forced: true)
+        .and_raise(Gitlab::Shell::Error.new(Gitlab::GitAccess::ERROR_MESSAGES[:no_repo]))
+
+      subject.execute
+
+      expect(registry.reload.resync_repository).to be false
+      expect(registry.reload.last_repository_successful_sync_at).not_to be nil
+    end
+
+    it 'marks resync as true after a failure' do
+      subject.execute
+
+      allow(repository).to receive(:fetch_as_mirror)
+        .with(url_to_repo, remote_name: 'geo', forced: true)
+        .and_raise(Gitlab::Git::Repository::NoRepository)
+
+      subject.execute
+
+      expect(Geo::ProjectRegistry.last.resync_repository).to be true
+    end
+
     context 'tracking database' do
+      context 'temporary repositories' do
+        include_examples 'cleans temporary repositories' do
+          let(:repository) { project.repository }
+        end
+      end
+
       it 'creates a new registry if does not exists' do
         expect { subject.execute }.to change(Geo::ProjectRegistry, :count).by(1)
       end
@@ -139,6 +170,24 @@ describe Geo::RepositorySyncService do
           subject.execute
 
           expect(registry.last_repository_successful_sync_at).not_to be_nil
+        end
+
+        it 'resets the repository_verification_checksum_sha' do
+          subject.execute
+
+          expect(registry.repository_verification_checksum_sha).to be_nil
+        end
+
+        it 'resets the last_repository_verification_failure' do
+          subject.execute
+
+          expect(registry.last_repository_verification_failure).to be_nil
+        end
+
+        it 'resets the repository_checksum_mismatch' do
+          subject.execute
+
+          expect(registry.repository_checksum_mismatch).to eq false
         end
 
         it 'logs success with timings' do
@@ -203,15 +252,15 @@ describe Geo::RepositorySyncService do
 
     context 'retries' do
       it 'tries to fetch repo' do
-        create(:geo_project_registry, project: project, repository_retry_count: Geo::BaseSyncService::RETRY_BEFORE_REDOWNLOAD - 1)
+        create(:geo_project_registry, project: project, repository_retry_count: Geo::BaseSyncService::RETRIES_BEFORE_REDOWNLOAD - 1)
 
-        expect_any_instance_of(described_class).to receive(:fetch_project_repository).with(false)
+        expect(subject).to receive(:sync_repository).with(no_args)
 
         subject.execute
       end
 
       it 'sets the redownload flag to false after success' do
-        registry = create(:geo_project_registry, project: project, repository_retry_count: Geo::BaseSyncService::RETRY_BEFORE_REDOWNLOAD + 1, force_to_redownload_repository: true)
+        registry = create(:geo_project_registry, project: project, repository_retry_count: Geo::BaseSyncService::RETRIES_BEFORE_REDOWNLOAD + 1, force_to_redownload_repository: true)
 
         subject.execute
 
@@ -219,18 +268,25 @@ describe Geo::RepositorySyncService do
       end
 
       it 'tries to redownload repo' do
-        create(:geo_project_registry, project: project, repository_retry_count: Geo::BaseSyncService::RETRY_BEFORE_REDOWNLOAD + 1)
+        create(:geo_project_registry, project: project, repository_retry_count: Geo::BaseSyncService::RETRIES_BEFORE_REDOWNLOAD + 1)
 
-        expect(subject).to receive(:fetch_project_repository).with(true).and_call_original
+        expect(subject).to receive(:sync_repository).with(true).and_call_original
         expect(subject.gitlab_shell).to receive(:mv_repository).exactly(2).times.and_call_original
-        expect(subject.gitlab_shell).to receive(:remove_repository).exactly(3).times.and_call_original
+
+        expect(subject.gitlab_shell).to receive(:add_namespace).with(
+          project.repository_storage,
+          "@failed-geo-sync/#{File.dirname(repository.disk_path)}"
+        ).and_call_original
+
+        expect(subject.gitlab_shell).to receive(:add_namespace).with(
+          project.repository_storage,
+          File.dirname(repository.disk_path)
+        ).and_call_original
+
+        expect(subject.gitlab_shell).to receive(:remove_repository).exactly(2).times.and_call_original
 
         subject.execute
 
-        # gitlab-shell always appends .git to the end of the repository, so
-        # we're relying on the fact that projects can't contain + in the name
-        deleted_dir = File.join(project.repository_storage_path, project.path) + "+failed-geo-sync.git"
-        expect(File.directory?(deleted_dir)).to be false
         expect(File.directory?(project.repository.path)).to be true
       end
 
@@ -238,11 +294,26 @@ describe Geo::RepositorySyncService do
         create(
           :geo_project_registry,
           project: project,
-          repository_retry_count: Geo::BaseSyncService::RETRY_BEFORE_REDOWNLOAD - 1,
+          repository_retry_count: Geo::BaseSyncService::RETRIES_BEFORE_REDOWNLOAD - 1,
           force_to_redownload_repository: true
         )
 
-        expect_any_instance_of(described_class).to receive(:fetch_project_repository).with(true)
+        expect(subject).to receive(:sync_repository).with(true)
+
+        subject.execute
+      end
+
+      it 'cleans temporary repo after redownload' do
+        create(
+          :geo_project_registry,
+          project: project,
+          repository_retry_count: Geo::BaseSyncService::RETRIES_BEFORE_REDOWNLOAD - 1,
+          force_to_redownload_repository: true
+        )
+
+        expect(subject).to receive(:fetch_geo_mirror)
+        expect(subject).to receive(:clean_up_temporary_repository).twice.and_call_original
+        expect(subject.gitlab_shell).to receive(:exists?).twice.with(project.repository_storage, /.git$/)
 
         subject.execute
       end
@@ -252,7 +323,7 @@ describe Geo::RepositorySyncService do
         registry = create(
           :geo_project_registry,
           project: project,
-          repository_retry_count: Geo::BaseSyncService::RETRY_BEFORE_REDOWNLOAD + 2000,
+          repository_retry_count: Geo::BaseSyncService::RETRIES_BEFORE_REDOWNLOAD + 2000,
           repository_retry_at: timestamp,
           force_to_redownload_repository: true
         )
@@ -276,9 +347,38 @@ describe Geo::RepositorySyncService do
             force_to_redownload_repository: true
           )
 
+          expect(project.repository).to receive(:expire_exists_cache).twice.and_call_original
+          expect(subject).not_to receive(:fail_registry!)
+
           subject.execute
         end
       end
+    end
+
+    it_behaves_like 'sync retries use the snapshot RPC' do
+      let(:repository) { project.repository }
+    end
+  end
+
+  describe '#schedule_repack' do
+    it 'schedule GitGarbageCollectWorker for full repack' do
+      Sidekiq::Testing.fake! do
+        expect { subject.send(:schedule_repack) }.to change { GitGarbageCollectWorker.jobs.count }.by(1)
+      end
+    end
+  end
+
+  context 'repository housekeeping' do
+    let(:registry) { Geo::ProjectRegistry.find_or_initialize_by(project_id: project.id) }
+
+    it 'increases sync count after execution' do
+      expect { subject.execute }.to change { registry.syncs_since_gc }.by(1)
+    end
+
+    it 'initiate housekeeping at end of execution' do
+      expect_any_instance_of(Geo::ProjectHousekeepingService).to receive(:execute)
+
+      subject.execute
     end
   end
 end

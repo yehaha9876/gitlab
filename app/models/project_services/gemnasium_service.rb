@@ -3,6 +3,7 @@ require "gemnasium/gitlab_service"
 class GemnasiumService < Service
   prop_accessor :token, :api_key
   validates :token, :api_key, presence: true, if: :activated?
+  validate :deprecation_validation
 
   def title
     'Gemnasium'
@@ -27,6 +28,18 @@ class GemnasiumService < Service
     %w(push)
   end
 
+  def deprecated?
+    true
+  end
+
+  def deprecation_message
+    "Gemnasium has been acquired by GitLab in January 2018. Since May 15, 2018, the service provided by Gemnasium is no longer available."
+  end
+
+  def deprecation_validation
+    errors[:base] << deprecation_message
+  end
+
   def execute(data)
     return unless supported_events.include?(data[:object_kind])
 
@@ -36,7 +49,7 @@ class GemnasiumService < Service
       after: data[:after],
       token: token,
       api_key: api_key,
-      repo: project.repository.path_to_repo
+      repo: project.repository.path_to_repo # Gitaly: fixed by https://gitlab.com/gitlab-org/security-products/gemnasium-migration/issues/9
     )
   end
 end

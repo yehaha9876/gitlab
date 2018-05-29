@@ -9,14 +9,12 @@ module MergeRequests
       currently_approved = merge_request.approved?
 
       if approval.destroy_all
-        # bust the cache here, otherwise will show results from
-        # before the deletion
-        merge_request.approvals(true)
+        merge_request.reset_approval_cache!
 
         create_note(merge_request)
 
         if currently_approved
-          notification_service.unapprove_mr(merge_request, current_user)
+          notification_service.async.unapprove_mr(merge_request, current_user)
           execute_hooks(merge_request, 'unapproved')
         end
       end

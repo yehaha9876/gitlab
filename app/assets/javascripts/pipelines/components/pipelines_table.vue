@@ -1,7 +1,8 @@
 <script>
-  import pipelinesTableRowComponent from './pipelines_table_row.vue';
-  import stopConfirmationModal from './stop_confirmation_modal.vue';
-  import retryConfirmationModal from './retry_confirmation_modal.vue';
+  import Modal from '~/vue_shared/components/gl_modal.vue';
+  import { s__, sprintf } from '~/locale';
+  import PipelinesTableRowComponent from './pipelines_table_row.vue';
+  import eventHub from '../event_hub';
 
   /**
    * Pipelines Table Component.
@@ -10,9 +11,8 @@
    */
   export default {
     components: {
-      pipelinesTableRowComponent,
-      stopConfirmationModal,
-      retryConfirmationModal,
+      PipelinesTableRowComponent,
+      Modal,
     },
     props: {
       pipelines: {
@@ -31,6 +31,41 @@
       viewType: {
         type: String,
         required: true,
+      },
+    },
+    data() {
+      return {
+        pipelineId: '',
+        endpoint: '',
+        cancelingPipeline: null,
+      };
+    },
+    computed: {
+      modalTitle() {
+        return sprintf(s__('Pipeline|Stop pipeline #%{pipelineId}?'), {
+          pipelineId: `${this.pipelineId}`,
+        }, false);
+      },
+      modalText() {
+        return sprintf(s__('Pipeline|You’re about to stop pipeline %{pipelineId}.'), {
+          pipelineId: `<strong>#${this.pipelineId}</strong>`,
+        }, false);
+      },
+    },
+    created() {
+      eventHub.$on('openConfirmationModal', this.setModalData);
+    },
+    beforeDestroy() {
+      eventHub.$off('openConfirmationModal', this.setModalData);
+    },
+    methods: {
+      setModalData(data) {
+        this.pipelineId = data.pipelineId;
+        this.endpoint = data.endpoint;
+      },
+      onSubmit() {
+        eventHub.$emit('postAction', this.endpoint);
+        this.cancelingPipeline = this.pipelineId;
       },
     },
   };
@@ -73,8 +108,18 @@
       :update-graph-dropdown="updateGraphDropdown"
       :auto-devops-help-path="autoDevopsHelpPath"
       :view-type="viewType"
+      :canceling-pipeline="cancelingPipeline"
     />
-    <stop-confirmation-modal />
-    <retry-confirmation-modal />
+
+    <modal
+      id="confirmation-modal"
+      :header-title-text="modalTitle"
+      footer-primary-button-variant="danger"
+      :footer-primary-button-text="s__('Pipeline|Stop pipeline')"
+      @submit="onSubmit"
+    >
+      <span v-html="modalText"></span>
+    </modal>
+
   </div>
 </template>

@@ -2,6 +2,13 @@ module EE
   module ProjectPolicy
     extend ActiveSupport::Concern
 
+    READONLY_FEATURES_WHEN_ARCHIVED = %i[
+      board
+      issue_link
+      approvers
+      vulnerability_feedback
+    ].freeze
+
     prepended do
       with_scope :subject
       condition(:service_desk_enabled) { @subject.service_desk_enabled? }
@@ -14,6 +21,15 @@ module EE
 
       with_scope :subject
       condition(:deploy_board_disabled) { !@subject.feature_available?(:deploy_board) }
+
+      with_scope :subject
+      condition(:classification_label_authorized, score: 32) do
+        EE::Gitlab::ExternalAuthorization.access_allowed?(
+          @user,
+          @subject.external_authorization_classification_label,
+          @subject.full_path
+        )
+      end
 
       with_scope :global
       condition(:is_development) { Rails.env.development? }
@@ -28,11 +44,6 @@ module EE
         !PushRule.global&.commit_committer_check
       end
 
-      with_scope :global
-      condition(:mirror_available, score: 0) do
-        ::Gitlab::CurrentSettings.current_application_settings.mirror_available
-      end
-
       rule { admin }.enable :change_repository_storage
 
       rule { support_bot }.enable :guest_access
@@ -43,7 +54,8 @@ module EE
 
       rule { license_block }.policy do
         prevent :create_issue
-        prevent :create_merge_request
+        prevent :create_merge_request_in
+        prevent :create_merge_request_from
         prevent :push_code
       end
 
@@ -61,7 +73,12 @@ module EE
         enable :admin_epic_issue
       end
 
-      rule { can?(:developer_access) }.enable :admin_board
+      rule { can?(:developer_access) }.policy do
+        enable :admin_board
+        enable :admin_vulnerability_feedback
+      end
+
+      rule { can?(:read_project) }.enable :read_vulnerability_feedback
 
       rule { repository_mirrors_enabled & ((mirror_available & can?(:admin_project)) | admin) }.enable :admin_mirror
 
@@ -95,6 +112,33 @@ module EE
       rule { admin | (reject_unsigned_commits_disabled_globally & can?(:master_access)) }.enable :change_reject_unsigned_commits
 
       rule { admin | (commit_committer_check_disabled_globally & can?(:master_access)) }.enable :change_commit_committer_check
+
+      rule { owner | reporter }.enable :build_read_project
+
+      rule { ~can?(:read_cross_project) & ~classification_label_authorized }.policy do
+        # Preventing access here still allows the projects to be listed. Listing
+        # projects doesn't check the `:read_project` ability. But instead counts
+        # on the `project_authorizations` table.
+        #
+        # All other actions should explicitly check read project, which would
+        # trigger the `classification_label_authorized` condition.
+        #
+        # `:read_project_for_iids` is not prevented by this condition, as it is
+        # used for cross-project reference checks.
+        prevent :guest_access
+        prevent :public_access
+        prevent :public_user_access
+        prevent :reporter_access
+        prevent :developer_access
+        prevent :master_access
+        prevent :owner_access
+      end
+
+      rule { archived }.policy do
+        READONLY_FEATURES_WHEN_ARCHIVED.each do |feature|
+          prevent(*::ProjectPolicy.create_update_admin_destroy(feature))
+        end
+      end
     end
   end
 end

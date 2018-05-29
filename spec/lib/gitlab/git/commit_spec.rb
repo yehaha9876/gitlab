@@ -66,7 +66,8 @@ describe Gitlab::Git::Commit, seed_helper: true do
   describe "Commit info from gitaly commit" do
     let(:subject) { "My commit".force_encoding('ASCII-8BIT') }
     let(:body) { subject + "My body".force_encoding('ASCII-8BIT') }
-    let(:gitaly_commit) { build(:gitaly_commit, subject: subject, body: body) }
+    let(:body_size) { body.length }
+    let(:gitaly_commit) { build(:gitaly_commit, subject: subject, body: body, body_size: body_size) }
     let(:id) { gitaly_commit.id }
     let(:committer) { gitaly_commit.committer }
     let(:author) { gitaly_commit.author }
@@ -83,10 +84,30 @@ describe Gitlab::Git::Commit, seed_helper: true do
     it { expect(commit.committer_email).to eq(committer.email) }
     it { expect(commit.parent_ids).to eq(gitaly_commit.parent_ids) }
 
-    context 'no body' do
+    context 'body_size != body.size' do
       let(:body) { "".force_encoding('ASCII-8BIT') }
 
-      it { expect(commit.safe_message).to eq(subject) }
+      context 'zero body_size' do
+        it { expect(commit.safe_message).to eq(subject) }
+      end
+
+      context 'body_size less than threshold' do
+        let(:body_size) { 123 }
+
+        it 'fetches commit message seperately' do
+          expect(described_class).to receive(:get_message).with(repository, id)
+
+          commit.safe_message
+        end
+      end
+
+      context 'body_size greater than threshold' do
+        let(:body_size) { described_class::MAX_COMMIT_MESSAGE_DISPLAY_SIZE + 1 }
+
+        it 'returns the suject plus a notice about message size' do
+          expect(commit.safe_message).to eq("My commit\n\n--commit message is too big")
+        end
+      end
     end
   end
 
@@ -100,6 +121,10 @@ describe Gitlab::Git::Commit, seed_helper: true do
 
       it "should return valid commit" do
         expect(described_class.find(repository, SeedRepo::Commit::ID)).to be_valid_commit
+      end
+
+      it "returns an array of parent ids" do
+        expect(described_class.find(repository, SeedRepo::Commit::ID).parent_ids).to be_an(Array)
       end
 
       it "should return valid commit for tag" do
@@ -389,81 +414,111 @@ describe Gitlab::Git::Commit, seed_helper: true do
       end
     end
 
+    shared_examples 'extracting commit signature' do
+      context 'when the commit is signed' do
+        let(:commit_id) { '0b4bc9a49b562e85de7cc9e834518ea6828729b9' }
+
+        it 'returns signature and signed text' do
+          signature, signed_text = subject
+
+          expected_signature = <<~SIGNATURE
+            -----BEGIN PGP SIGNATURE-----
+            Version: GnuPG/MacGPG2 v2.0.22 (Darwin)
+            Comment: GPGTools - https://gpgtools.org
+
+            iQEcBAABCgAGBQJTDvaZAAoJEGJ8X1ifRn8XfvYIAMuB0yrbTGo1BnOSoDfyrjb0
+            Kw2EyUzvXYL72B63HMdJ+/0tlSDC6zONF3fc+bBD8z+WjQMTbwFNMRbSSy2rKEh+
+            mdRybOP3xBIMGgEph0/kmWln39nmFQBsPRbZBWoU10VfI/ieJdEOgOphszgryRar
+            TyS73dLBGE9y9NIININVaNISet9D9QeXFqc761CGjh4YIghvPpi+YihMWapGka6v
+            hgKhX+hc5rj+7IEE0CXmlbYR8OYvAbAArc5vJD7UTxAY4Z7/l9d6Ydt9GQ25khfy
+            ANFgltYzlR6evLFmDjssiP/mx/ZMN91AL0ueJ9nNGv411Mu2CUW+tDCaQf35mdc=
+            =j51i
+            -----END PGP SIGNATURE-----
+          SIGNATURE
+
+          expect(signature).to eq(expected_signature.chomp)
+          expect(signature).to be_a_binary_string
+
+          expected_signed_text = <<~SIGNED_TEXT
+            tree 22bfa2fbd217df24731f43ff43a4a0f8db759dae
+            parent ae73cb07c9eeaf35924a10f713b364d32b2dd34f
+            author Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com> 1393489561 +0200
+            committer Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com> 1393489561 +0200
+
+            Feature added
+
+            Signed-off-by: Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com>
+          SIGNED_TEXT
+
+          expect(signed_text).to eq(expected_signed_text)
+          expect(signed_text).to be_a_binary_string
+        end
+      end
+
+      context 'when the commit has no signature' do
+        let(:commit_id) { '4b4918a572fa86f9771e5ba40fbd48e1eb03e2c6' }
+
+        it 'returns nil' do
+          expect(subject).to be_nil
+        end
+      end
+
+      context 'when the commit cannot be found' do
+        let(:commit_id) { Gitlab::Git::BLANK_SHA }
+
+        it 'returns nil' do
+          expect(subject).to be_nil
+        end
+      end
+
+      context 'when the commit ID is invalid' do
+        let(:commit_id) { '4b4918a572fa86f9771e5ba40fbd48e' }
+
+        it 'raises ArgumentError' do
+          expect { subject }.to raise_error(ArgumentError)
+        end
+      end
+    end
+
+    describe '.extract_signature_lazily' do
+      shared_examples 'loading signatures in batch once' do
+        it 'fetches signatures in batch once' do
+          commit_ids = %w[0b4bc9a49b562e85de7cc9e834518ea6828729b9 4b4918a572fa86f9771e5ba40fbd48e1eb03e2c6]
+          signatures = commit_ids.map do |commit_id|
+            described_class.extract_signature_lazily(repository, commit_id)
+          end
+
+          expect(described_class).to receive(:batch_signature_extraction)
+            .with(repository, commit_ids)
+            .once
+            .and_return({})
+
+          2.times { signatures.each(&:itself) }
+        end
+      end
+
+      subject { described_class.extract_signature_lazily(repository, commit_id).itself }
+
+      context 'with Gitaly extract_commit_signature_in_batch feature enabled' do
+        it_behaves_like 'extracting commit signature'
+        it_behaves_like 'loading signatures in batch once'
+      end
+
+      context 'with Gitaly extract_commit_signature_in_batch feature disabled', :disable_gitaly do
+        it_behaves_like 'extracting commit signature'
+        it_behaves_like 'loading signatures in batch once'
+      end
+    end
+
     describe '.extract_signature' do
       subject { described_class.extract_signature(repository, commit_id) }
 
-      shared_examples '.extract_signature' do
-        context 'when the commit is signed' do
-          let(:commit_id) { '0b4bc9a49b562e85de7cc9e834518ea6828729b9' }
-
-          it 'returns signature and signed text' do
-            signature, signed_text = subject
-
-            expected_signature = <<~SIGNATURE
-              -----BEGIN PGP SIGNATURE-----
-              Version: GnuPG/MacGPG2 v2.0.22 (Darwin)
-              Comment: GPGTools - https://gpgtools.org
-
-              iQEcBAABCgAGBQJTDvaZAAoJEGJ8X1ifRn8XfvYIAMuB0yrbTGo1BnOSoDfyrjb0
-              Kw2EyUzvXYL72B63HMdJ+/0tlSDC6zONF3fc+bBD8z+WjQMTbwFNMRbSSy2rKEh+
-              mdRybOP3xBIMGgEph0/kmWln39nmFQBsPRbZBWoU10VfI/ieJdEOgOphszgryRar
-              TyS73dLBGE9y9NIININVaNISet9D9QeXFqc761CGjh4YIghvPpi+YihMWapGka6v
-              hgKhX+hc5rj+7IEE0CXmlbYR8OYvAbAArc5vJD7UTxAY4Z7/l9d6Ydt9GQ25khfy
-              ANFgltYzlR6evLFmDjssiP/mx/ZMN91AL0ueJ9nNGv411Mu2CUW+tDCaQf35mdc=
-              =j51i
-              -----END PGP SIGNATURE-----
-            SIGNATURE
-
-            expect(signature).to eq(expected_signature.chomp)
-            expect(signature).to be_a_binary_string
-
-            expected_signed_text = <<~SIGNED_TEXT
-              tree 22bfa2fbd217df24731f43ff43a4a0f8db759dae
-              parent ae73cb07c9eeaf35924a10f713b364d32b2dd34f
-              author Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com> 1393489561 +0200
-              committer Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com> 1393489561 +0200
-
-              Feature added
-
-              Signed-off-by: Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com>
-            SIGNED_TEXT
-
-            expect(signed_text).to eq(expected_signed_text)
-            expect(signed_text).to be_a_binary_string
-          end
-        end
-
-        context 'when the commit has no signature' do
-          let(:commit_id) { '4b4918a572fa86f9771e5ba40fbd48e1eb03e2c6' }
-
-          it 'returns nil' do
-            expect(subject).to be_nil
-          end
-        end
-
-        context 'when the commit cannot be found' do
-          let(:commit_id) { Gitlab::Git::BLANK_SHA }
-
-          it 'returns nil' do
-            expect(subject).to be_nil
-          end
-        end
-
-        context 'when the commit ID is invalid' do
-          let(:commit_id) { '4b4918a572fa86f9771e5ba40fbd48e' }
-
-          it 'raises ArgumentError' do
-            expect { subject }.to raise_error(ArgumentError)
-          end
-        end
-      end
-
       context 'with gitaly' do
-        it_behaves_like '.extract_signature'
+        it_behaves_like 'extracting commit signature'
       end
 
-      context 'without gitaly', :skip_gitaly_mock do
-        it_behaves_like '.extract_signature'
+      context 'without gitaly', :disable_gitaly do
+        it_behaves_like 'extracting commit signature'
       end
     end
   end
@@ -520,22 +575,8 @@ describe Gitlab::Git::Commit, seed_helper: true do
     it_should_behave_like '#stats'
   end
 
-  describe '#to_diff' do
-    subject { commit.to_diff }
-
-    it { is_expected.not_to include "From #{SeedRepo::Commit::ID}" }
-    it { is_expected.to include 'diff --git a/files/ruby/popen.rb b/files/ruby/popen.rb'}
-  end
-
   describe '#has_zero_stats?' do
     it { expect(commit.has_zero_stats?).to eq(false) }
-  end
-
-  describe '#to_patch' do
-    subject { commit.to_patch }
-
-    it { is_expected.to include "From #{SeedRepo::Commit::ID}" }
-    it { is_expected.to include 'diff --git a/files/ruby/popen.rb b/files/ruby/popen.rb'}
   end
 
   describe '#to_hash' do
@@ -567,6 +608,35 @@ describe Gitlab::Git::Commit, seed_helper: true do
     end
     it { is_expected.to include("master") }
     it { is_expected.not_to include("feature") }
+  end
+
+  describe '.get_message' do
+    let(:commit_ids) { %w[6d394385cf567f80a8fd85055db1ab4c5295806f cfe32cf61b73a0d5e9f13e774abde7ff789b1660] }
+
+    subject do
+      commit_ids.map { |id| described_class.get_message(repository, id) }
+    end
+
+    shared_examples 'getting commit messages' do
+      it 'gets commit messages' do
+        expect(subject).to contain_exactly(
+          "Added contributing guide\n\nSigned-off-by: Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com>\n",
+          "Add submodule\n\nSigned-off-by: Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com>\n"
+        )
+      end
+    end
+
+    context 'when Gitaly commit_messages feature is enabled' do
+      it_behaves_like 'getting commit messages'
+
+      it 'gets messages in one batch', :request_store do
+        expect { subject.map(&:itself) }.to change { Gitlab::GitalyClient.get_request_count }.by(1)
+      end
+    end
+
+    context 'when Gitaly commit_messages feature is disabled', :disable_gitaly do
+      it_behaves_like 'getting commit messages'
+    end
   end
 
   def sample_commit_hash

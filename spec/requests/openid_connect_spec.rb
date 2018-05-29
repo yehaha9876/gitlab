@@ -68,10 +68,10 @@ describe 'OpenID Connect requests' do
       let!(:public_email) { build :email, email: 'public@example.com' }
       let!(:private_email) { build :email, email: 'private@example.com' }
 
-      let!(:group1) { create :group, path: 'group1' }
-      let!(:group2) { create :group, path: 'group2' }
-      let!(:group3) { create :group, path: 'group3', parent: group2 }
-      let!(:group4) { create :group, path: 'group4', parent: group3 }
+      let!(:group1) { create :group }
+      let!(:group2) { create :group }
+      let!(:group3) { create :group, parent: group2 }
+      let!(:group4) { create :group, parent: group3 }
 
       before do
         group1.add_user(user, GroupMember::OWNER)
@@ -93,8 +93,8 @@ describe 'OpenID Connect requests' do
           'groups'         => anything
         }))
 
-        expected_groups = %w[group1 group2/group3]
-        expected_groups << 'group2/group3/group4' if Group.supports_nested_groups?
+        expected_groups = [group1.full_path, group3.full_path]
+        expected_groups << group4.full_path if Group.supports_nested_groups?
         expect(json_response['groups']).to match_array(expected_groups)
       end
     end
@@ -151,6 +151,17 @@ describe 'OpenID Connect requests' do
           request_access_token
         end.to raise_error UncaughtThrowError
       end
+    end
+  end
+
+  context 'OpenID configuration information' do
+    it 'correctly returns the configuration' do
+      get '/.well-known/openid-configuration'
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(json_response['issuer']).to eq('http://localhost')
+      expect(json_response['jwks_uri']).to eq('http://www.example.com/oauth/discovery/keys')
+      expect(json_response['scopes_supported']).to eq(%w[api read_user sudo read_repository openid])
     end
   end
 end

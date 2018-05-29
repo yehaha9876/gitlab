@@ -251,6 +251,26 @@ describe Gitlab::Git::Blob, seed_helper: true do
     end
   end
 
+  describe '.batch_metadata' do
+    let(:blob_references) do
+      [
+        [SeedRepo::Commit::ID, "files/ruby/popen.rb"],
+        [SeedRepo::Commit::ID, 'six']
+      ]
+    end
+
+    subject { described_class.batch_metadata(repository, blob_references) }
+
+    it 'returns an empty data attribute' do
+      first_blob, last_blob = subject
+
+      expect(first_blob.data).to be_blank
+      expect(first_blob.path).to eq("files/ruby/popen.rb")
+      expect(last_blob.data).to be_blank
+      expect(last_blob.path).to eq("six")
+    end
+  end
+
   describe '.batch_lfs_pointers' do
     let(:tree_object) { repository.rugged.rev_parse('master^{tree}') }
 
@@ -276,6 +296,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
 
         expect(blobs.count).to eq(1)
         expect(blobs).to all( be_a(Gitlab::Git::Blob) )
+        expect(blobs).to be_an(Array)
       end
 
       it 'accepts blob IDs as a lazy enumerator' do
@@ -496,6 +517,35 @@ describe Gitlab::Git::Blob, seed_helper: true do
         it { expect(blob.path).to eq("files/lfs/file-invalid.zip") }
         it { expect(blob.size).to eq(60) }
         it { expect(blob.mode).to eq("100644") }
+      end
+    end
+  end
+
+  describe '#load_all_data!' do
+    let(:full_data) { 'abcd' }
+    let(:blob) { Gitlab::Git::Blob.new(name: 'test', size: 4, data: 'abc') }
+
+    subject { blob.load_all_data!(repository) }
+
+    it 'loads missing data' do
+      expect(Gitlab::GitalyClient).to receive(:migrate)
+        .with(:git_blob_load_all_data).and_return(full_data)
+
+      subject
+
+      expect(blob.data).to eq(full_data)
+    end
+
+    context 'with a fully loaded blob' do
+      let(:blob) { Gitlab::Git::Blob.new(name: 'test', size: 4, data: full_data) }
+
+      it "doesn't perform any loading" do
+        expect(Gitlab::GitalyClient).not_to receive(:migrate)
+          .with(:git_blob_load_all_data)
+
+        subject
+
+        expect(blob.data).to eq(full_data)
       end
     end
   end

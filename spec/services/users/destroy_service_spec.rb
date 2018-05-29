@@ -167,24 +167,6 @@ describe Users::DestroyService do
       end
     end
 
-    context "when the user was the mirror_user for a group project" do
-      let(:group_owner) { create(:user) }
-      let(:mirror_user) { create(:user) }
-      let(:group)       { create(:group) }
-
-      before do
-        group.add_owner(group_owner)
-        group.add_master(mirror_user)
-      end
-
-      it 'updates the mirror_user to one of the group owners' do
-        project = create(:project, namespace_id: group.id, creator: group_owner, mirror_user: mirror_user)
-        service.execute(mirror_user)
-
-        expect(project.reload.mirror_user).to eq group_owner
-      end
-    end
-
     describe "user personal's repository removal" do
       before do
         Sidekiq::Testing.inline! { service.execute(user) }
@@ -194,7 +176,7 @@ describe Users::DestroyService do
         let!(:project) { create(:project, :empty_repo, :legacy_storage, namespace: user.namespace) }
 
         it 'removes repository' do
-          expect(gitlab_shell.exists?(project.repository_storage_path, "#{project.disk_path}.git")).to be_falsey
+          expect(gitlab_shell.exists?(project.repository_storage, "#{project.disk_path}.git")).to be_falsey
         end
       end
 
@@ -202,7 +184,7 @@ describe Users::DestroyService do
         let!(:project) { create(:project, :empty_repo, namespace: user.namespace) }
 
         it 'removes repository' do
-          expect(gitlab_shell.exists?(project.repository_storage_path, "#{project.disk_path}.git")).to be_falsey
+          expect(gitlab_shell.exists?(project.repository_storage, "#{project.disk_path}.git")).to be_falsey
         end
       end
     end

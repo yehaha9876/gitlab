@@ -4,7 +4,7 @@ class Issue < ActiveRecord::Base
   prepend EE::Issue
   prepend EE::RelativePositioning
 
-  include InternalId
+  include AtomicInternalId
   include Issuable
   include Noteable
   include Referable
@@ -18,11 +18,6 @@ class Issue < ActiveRecord::Base
 
   ignore_column :assignee_id, :branch_name, :deleted_at
 
-  WEIGHT_RANGE = 1..9
-  WEIGHT_ALL = 'Everything'.freeze
-  WEIGHT_ANY = 'Any Weight'.freeze
-  WEIGHT_NONE = 'No Weight'.freeze
-
   DueDateStruct = Struct.new(:title, :name).freeze
   NoDueDate     = DueDateStruct.new('No Due Date', '0').freeze
   AnyDueDate    = DueDateStruct.new('Any Due Date', '').freeze
@@ -32,6 +27,9 @@ class Issue < ActiveRecord::Base
 
   belongs_to :project
   belongs_to :moved_to, class_name: 'Issue'
+  belongs_to :closed_by, class_name: 'User'
+
+  has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.issues&.maximum(:iid) }
 
   has_many :events, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
@@ -58,12 +56,10 @@ class Issue < ActiveRecord::Base
   scope :without_due_date, -> { where(due_date: nil) }
   scope :due_before, ->(date) { where('issues.due_date < ?', date) }
   scope :due_between, ->(from_date, to_date) { where('issues.due_date >= ?', from_date).where('issues.due_date <= ?', to_date) }
+  scope :due_tomorrow, -> { where(due_date: Date.tomorrow) }
 
   scope :order_due_date_asc, -> { reorder('issues.due_date IS NULL, issues.due_date ASC') }
   scope :order_due_date_desc, -> { reorder('issues.due_date IS NULL, issues.due_date DESC') }
-
-  scope :order_weight_desc, -> { reorder('weight IS NOT NULL, weight DESC') }
-  scope :order_weight_asc, -> { reorder('weight ASC') }
 
   scope :preload_associations, -> { preload(:labels, project: :namespace) }
 
@@ -90,6 +86,11 @@ class Issue < ActiveRecord::Base
 
     before_transition any => :closed do |issue|
       issue.closed_at = Time.zone.now
+    end
+
+    before_transition closed: :opened do |issue|
+      issue.closed_at = nil
+      issue.closed_by = nil
     end
   end
 
@@ -123,14 +124,11 @@ class Issue < ActiveRecord::Base
     'project_id'
   end
 
-  def self.sort(method, excluded_labels: [])
+  def self.sort_by_attribute(method, excluded_labels: [])
     case method.to_s
     when 'due_date'      then order_due_date_asc
     when 'due_date_asc'  then order_due_date_asc
     when 'due_date_desc' then order_due_date_desc
-    when 'weight'        then order_weight_asc
-    when 'weight_asc'    then order_weight_asc
-    when 'weight_desc'   then order_weight_desc
     else
       super
     end
@@ -177,7 +175,18 @@ class Issue < ActiveRecord::Base
       object.all_references(current_user, extractor: ext)
     end
 
-    ext.merge_requests.sort_by(&:iid)
+    merge_requests = ext.merge_requests.sort_by(&:iid)
+
+    cross_project_filter = -> (merge_requests) do
+      merge_requests.select { |mr| mr.target_project == project }
+    end
+
+    Ability.merge_requests_readable_by_user(
+      merge_requests, current_user,
+      filters: {
+        read_cross_project: cross_project_filter
+      }
+    )
   end
 
   # All branches containing the current issue's ID, except for
@@ -202,7 +211,20 @@ class Issue < ActiveRecord::Base
                        .preload(preload)
                        .reorder('issue_link_id')
 
-    Ability.issues_readable_by_user(related_issues, current_user)
+    cross_project_filter = -> (issues) { issues.where(project: project) }
+    Ability.issues_readable_by_user(
+      related_issues, current_user,
+      filters: { read_cross_project: cross_project_filter }
+    )
+  end
+
+  def suggested_branch_name
+    return to_branch_name unless project.repository.branch_exists?(to_branch_name)
+
+    start_counting_from = 2
+    Uniquify.new(start_counting_from).string(-> (counter) { "#{to_branch_name}-#{counter}" }) do |suggested_branch_name|
+      project.repository.branch_exists?(suggested_branch_name)
+    end
   end
 
   # Returns boolean if a related branch exists for the current issue
@@ -238,14 +260,6 @@ class Issue < ActiveRecord::Base
     end
   end
 
-  def self.weight_filter_options
-    WEIGHT_RANGE.to_a
-  end
-
-  def self.weight_options
-    [WEIGHT_NONE] + WEIGHT_RANGE.to_a
-  end
-
   def moved?
     !moved_to.nil?
   end
@@ -267,11 +281,8 @@ class Issue < ActiveRecord::Base
     end
   end
 
-  def can_be_worked_on?(current_user)
-    !self.closed? &&
-      !self.project.forked? &&
-      self.related_branches(current_user).empty? &&
-      self.closed_by_merge_requests(current_user).empty?
+  def can_be_worked_on?
+    !self.closed? && !self.project.forked?
   end
 
   # Returns `true` if the current issue can be viewed by either a logged in User
@@ -292,11 +303,17 @@ class Issue < ActiveRecord::Base
 
   def as_json(options = {})
     super(options).tap do |json|
-      if options.key?(:sidebar_endpoints) && project
+      if options.key?(:issue_endpoints) && project
         url_helper = Gitlab::Routing.url_helpers
 
-        json.merge!(issue_sidebar_endpoint: url_helper.project_issue_path(project, self, format: :json, serializer: 'sidebar'),
-                    toggle_subscription_endpoint: url_helper.toggle_subscription_project_issue_path(project, self))
+        issue_reference = options[:include_full_project_path] ? to_reference(full: true) : to_reference
+
+        json.merge!(
+          reference_path: issue_reference,
+          real_path: url_helper.project_issue_path(project, self),
+          issue_sidebar_endpoint: url_helper.project_issue_path(project, self, format: :json, serializer: 'sidebar'),
+          toggle_subscription_endpoint: url_helper.toggle_subscription_project_issue_path(project, self)
+        )
       end
 
       if options.key?(:labels)

@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import eventHub from '~/projects/settings_service_desk/event_hub';
-import serviceDeskSetting from '~/projects/settings_service_desk/components/service_desk_setting.vue';
+import eventHub from 'ee/projects/settings_service_desk/event_hub';
+import serviceDeskSetting from 'ee/projects/settings_service_desk/components/service_desk_setting.vue';
 
 describe('ServiceDeskSetting', () => {
   let ServiceDeskSetting;
@@ -32,7 +32,7 @@ describe('ServiceDeskSetting', () => {
         });
 
         it('should see main panel with the email info', () => {
-          expect(vm.$el.querySelector('.panel')).toBeDefined();
+          expect(vm.$el.querySelector('.card')).toBeDefined();
         });
 
         it('should see loading spinner', () => {
@@ -71,7 +71,7 @@ describe('ServiceDeskSetting', () => {
     });
 
     it('should not see panel', () => {
-      expect(vm.$el.querySelector('.panel')).toBeNull();
+      expect(vm.$el.querySelector('.card')).toBeNull();
     });
 
     it('should not see warning message', () => {

@@ -2,6 +2,7 @@ import Vue from 'vue';
 
 import Translate from '~/vue_shared/translate';
 
+import { convertPermissionToBoolean } from '~/lib/utils/common_utils';
 import { getTimeframeWindow } from '~/lib/utils/datetime_utility';
 
 import { TIMEFRAME_LENGTH } from './constants';
@@ -13,7 +14,7 @@ import roadmapApp from './components/app.vue';
 
 Vue.use(Translate);
 
-document.addEventListener('DOMContentLoaded', () => {
+export default () => {
   const el = document.getElementById('js-roadmap');
 
   if (!el) {
@@ -27,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     data() {
       const dataset = this.$options.el.dataset;
+      const hasFiltersApplied = convertPermissionToBoolean(dataset.hasFiltersApplied);
+      const filterQueryString = window.location.search.substring(1);
 
       // Construct Epic API path to include
       // `start_date` & `end_date` query params to get list of
@@ -36,7 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const end = timeframe[TIMEFRAME_LENGTH - 1];
       const startDate = `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`;
       const endDate = `${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`;
-      const epicsPath = `${dataset.epicsPath}?start_date=${startDate}&end_date=${endDate}`;
+      let epicsPath = `${dataset.epicsPath}?start_date=${startDate}&end_date=${endDate}`;
+
+      if (filterQueryString) {
+        epicsPath += `&${filterQueryString}`;
+      }
 
       const store = new RoadmapStore(parseInt(dataset.groupId, 0), timeframe);
       const service = new RoadmapService(epicsPath);
@@ -44,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return {
         store,
         service,
+        hasFiltersApplied,
+        newEpicEndpoint: dataset.newEpicEndpoint,
         emptyStateIllustrationPath: dataset.emptyStateIllustration,
       };
     },
@@ -52,9 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
         props: {
           store: this.store,
           service: this.service,
+          hasFiltersApplied: this.hasFiltersApplied,
+          newEpicEndpoint: this.newEpicEndpoint,
           emptyStateIllustrationPath: this.emptyStateIllustrationPath,
         },
       });
     },
   });
-});
+};

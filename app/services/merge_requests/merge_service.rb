@@ -36,31 +36,6 @@ module MergeRequests
       handle_merge_error(log_message: e.message, save_message_on_model: true)
     end
 
-    def hooks_validation_pass?(merge_request)
-      @merge_request = merge_request
-
-      return true if project.merge_requests_ff_only_enabled
-      return true unless project.feature_available?(:push_rules)
-
-      push_rule = merge_request.project.push_rule
-      return true unless push_rule
-
-      unless push_rule.commit_message_allowed?(params[:commit_message])
-        handle_merge_error(log_message: "Commit message does not follow the pattern '#{push_rule.commit_message_regex}'", save_message_on_model: true)
-        return false
-      end
-
-      unless push_rule.author_email_allowed?(current_user.email)
-        handle_merge_error(log_message: "Commit author's email '#{current_user.email}' does not follow the pattern '#{push_rule.author_email_regex}'", save_message_on_model: true)
-        return false
-      end
-
-      true
-    rescue PushRule::MatchError => e
-      handle_merge_error(log_message: e.message, save_message_on_model: true)
-      false
-    end
-
     private
 
     def error_check!
@@ -77,21 +52,30 @@ module MergeRequests
     end
 
     def commit
+      log_info("Git merge started on JID #{merge_jid}")
+      commit_id = try_merge
+
+      if commit_id
+        log_info("Git merge finished on JID #{merge_jid} commit #{commit_id}")
+      else
+        raise MergeError, 'Conflicts detected during merge'
+      end
+
+      merge_request.update!(merge_commit_sha: commit_id)
+    end
+
+    def try_merge
       message = params[:commit_message] || merge_request.merge_commit_message
 
-      log_info("Git merge started on JID #{merge_jid}")
-      commit_id = repository.merge(current_user, source, merge_request, message)
-      log_info("Git merge finished on JID #{merge_jid} commit #{commit_id}")
-
-      raise MergeError, 'Conflicts detected during merge' unless commit_id
-
-      merge_request.update(merge_commit_sha: commit_id)
+      repository.merge(current_user, source, merge_request, message)
     rescue Gitlab::Git::HooksService::PreReceiveError => e
-      raise MergeError, e.message
-    rescue StandardError => e
-      raise MergeError, "Something went wrong during merge: #{e.message}"
+      handle_merge_error(log_message: e.message)
+      raise MergeError, 'Something went wrong during merge pre-receive hook'
+    rescue => e
+      handle_merge_error(log_message: e.message)
+      raise MergeError, 'Something went wrong during merge'
     ensure
-      merge_request.update(in_progress_merge_commit_sha: nil)
+      merge_request.update!(in_progress_merge_commit_sha: nil)
     end
 
     def after_merge

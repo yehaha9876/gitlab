@@ -1,7 +1,6 @@
 - @no_container = true
 - @sort ||= sort_value_recently_updated
 - page_title s_('TagsPage|Tags')
-- add_to_breadcrumbs("Repository", project_tree_path(@project))
 
 .flex-list{ class: container_class }
   .top-area.adjust
@@ -17,7 +16,7 @@
           %span.light
             = tags_sort_options_hash[@sort]
           = icon('chevron-down')
-        %ul.dropdown-menu.dropdown-menu-align-right.dropdown-menu-selectable
+        %ul.dropdown-menu.dropdown-menu-right.dropdown-menu-selectable
           %li.dropdown-header
             = s_('TagsPage|Sort by')
           - tags_sort_options_hash.each do |value, title|

@@ -1,15 +1,16 @@
 import Vue from 'vue';
 import clipboardButton from '~/vue_shared/components/clipboard_button.vue';
-import mountComponent from '../../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('clipboard button', () => {
+  const Component = Vue.extend(clipboardButton);
   let vm;
 
   beforeEach(() => {
-    const Component = Vue.extend(clipboardButton);
     vm = mountComponent(Component, {
       text: 'copy me',
       title: 'Copy this value into Clipboard!',
+      cssClass: 'btn-danger',
     });
   });
 
@@ -27,5 +28,9 @@ describe('clipboard button', () => {
     expect(vm.$el.getAttribute('data-original-title')).toEqual('Copy this value into Clipboard!');
     expect(vm.$el.getAttribute('data-placement')).toEqual('top');
     expect(vm.$el.getAttribute('data-container')).toEqual(null);
+  });
+
+  it('should render provided classname', () => {
+    expect(vm.$el.classList).toContain('btn-danger');
   });
 });

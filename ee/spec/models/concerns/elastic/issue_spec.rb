@@ -1,14 +1,8 @@
 require 'spec_helper'
 
-describe Issue, elastic: true do
+describe Issue, :elastic do
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-    Gitlab::Elastic::Helper.create_empty_index
-  end
-
-  after do
-    Gitlab::Elastic::Helper.delete_index
-    stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
   end
 
   let(:project) { create :project }
@@ -43,5 +37,10 @@ describe Issue, elastic: true do
     expected_hash['assignee_id'] = [assignee.id]
 
     expect(issue.as_indexed_json).to eq(expected_hash)
+  end
+
+  it_behaves_like 'no results when the user cannot read cross project' do
+    let(:record1) { create(:issue, project: project, title: 'test-issue') }
+    let(:record2) { create(:issue, project: project2, title: 'test-issue') }
   end
 end

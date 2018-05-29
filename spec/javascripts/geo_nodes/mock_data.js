@@ -15,6 +15,12 @@ export const mockNodes = [
     files_max_capacity: 10,
     repos_max_capacity: 25,
     clone_protocol: 'http',
+    _links: {
+      self: 'http://127.0.0.1:3001/api/v4/geo_nodes/1',
+      repair: 'http://127.0.0.1:3001/api/v4/geo_nodes/1/repair',
+      status: 'http://127.0.0.1:3001/api/v4/geo_nodes/1/status',
+      web_edit: 'http://127.0.0.1:3001/admin/geo_nodes/1/edit',
+    },
   },
   {
     id: 2,
@@ -25,8 +31,27 @@ export const mockNodes = [
     files_max_capacity: 10,
     repos_max_capacity: 25,
     clone_protocol: 'http',
+    _links: {
+      self: 'http://127.0.0.1:3001/api/v4/geo_nodes/2',
+      repair: 'http://127.0.0.1:3001/api/v4/geo_nodes/2/repair',
+      status: 'http://127.0.0.1:3001/api/v4/geo_nodes/2/status',
+      web_edit: 'http://127.0.0.1:3001/admin/geo_nodes/2/edit',
+    },
   },
 ];
+
+export const mockNode = {
+  id: 1,
+  url: 'http://127.0.0.1:3001/',
+  primary: true,
+  current: true,
+  enabled: true,
+  nodeActionActive: false,
+  basePath: 'http://127.0.0.1:3001/api/v4/geo_nodes/1',
+  repairPath: 'http://127.0.0.1:3001/api/v4/geo_nodes/1/repair',
+  statusPath: 'http://127.0.0.1:3001/api/v4/geo_nodes/1/status',
+  editPath: 'http://127.0.0.1:3001/admin/geo_nodes/1/edit',
+};
 
 export const rawMockNodeDetails = {
   geo_node_id: 2,
@@ -55,6 +80,18 @@ export const rawMockNodeDetails = {
   wikis_failed_count: 0,
   wikis_synced_count: 12,
   wikis_synced_in_percentage: '100.00%',
+  repositories_verification_failed_count: 0,
+  repositories_verified_count: 12,
+  repositories_verified_in_percentage: '100.00%',
+  wikis_verification_failed_count: 0,
+  wikis_verified_count: 12,
+  wikis_verified_in_percentage: '100.00%',
+  repositories_checksummed_count: 12,
+  repositories_checksum_failed_count: 0,
+  repositories_checksummed_in_percentage: '100.00%',
+  wikis_checksummed_count: 12,
+  wikis_checksum_failed_count: 0,
+  wikis_checksummed_in_percentage: '100.00%',
   replication_slots_count: null,
   replication_slots_used_count: null,
   replication_slots_used_in_percentage: '0.00%',
@@ -114,6 +151,7 @@ export const mockNodeDetails = {
   replicationSlotWAL: 502658737,
   missingOAuthApplication: false,
   storageShardsMatch: false,
+  repositoryVerificationEnabled: true,
   replicationSlots: {
     totalCount: null,
     successCount: null,
@@ -142,6 +180,26 @@ export const mockNodeDetails = {
   attachments: {
     totalCount: 0,
     successCount: 0,
+    failureCount: 0,
+  },
+  repositoriesChecksummed: {
+    totalCount: 12,
+    successCount: 12,
+    failureCount: 0,
+  },
+  wikisChecksummed: {
+    totalCount: 12,
+    successCount: 12,
+    failureCount: 0,
+  },
+  verifiedRepositories: {
+    totalCount: 12,
+    successCount: 12,
+    failureCount: 0,
+  },
+  verifiedWikis: {
+    totalCount: 12,
+    successCount: 12,
     failureCount: 0,
   },
   lastEvent: {

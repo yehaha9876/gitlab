@@ -11,4 +11,19 @@ class EpicEntity < IssuableEntity
   expose :web_url do |epic|
     group_epic_path(epic.group, epic)
   end
+  expose :labels, using: LabelEntity
+
+  expose :current_user do
+    expose :can_create_note do |epic|
+      can?(request.current_user, :create_note, epic)
+    end
+  end
+
+  expose :create_note_path do |epic|
+    group_epic_notes_path(epic.group, epic)
+  end
+
+  expose :preview_note_path do |epic|
+    preview_markdown_path(epic.group, quick_actions_target_type: 'Epic', quick_actions_target_id: epic.id)
+  end
 end

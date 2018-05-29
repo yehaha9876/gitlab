@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import { getParameterByName } from '~/lib/utils/common_utils';
 import axios from './lib/utils/axios_utils';
 import { removeParams } from './lib/utils/url_utility';
@@ -56,7 +57,7 @@ export default {
   },
 
   initLoadMore() {
-    $(document).unbind('scroll');
+    $(document).off('scroll');
     $(document).endlessScroll({
       bottomPixels: ENDLESS_SCROLL_BOTTOM_PX,
       fireDelay: ENDLESS_SCROLL_FIRE_DELAY_MS,

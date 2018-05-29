@@ -95,7 +95,7 @@ module API
         post ":id/merge_requests" do
           Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42126')
 
-          authorize! :create_merge_request, user_project
+          authorize! :create_merge_request_from, user_project
 
           mr_params = declared_params(include_missing: false)
           mr_params[:force_remove_source_branch] = mr_params.delete(:remove_source_branch) if mr_params[:remove_source_branch].present?
@@ -312,7 +312,7 @@ module API
             merge_request = user_project.merge_requests.find(params[:merge_request_id])
 
             authorize! :read_merge_request, merge_request
-            present merge_request, with: ::API::Entities::MergeRequestApprovals, current_user: current_user
+            present merge_request, with: EE::API::Entities::MergeRequestApprovals, current_user: current_user
           end
 
           # Approve a merge request
@@ -332,7 +332,7 @@ module API
               .new(user_project, current_user)
               .execute(merge_request)
 
-            present merge_request, with: ::API::Entities::MergeRequestApprovals, current_user: current_user
+            present merge_request, with: EE::API::Entities::MergeRequestApprovals, current_user: current_user
           end
 
           delete "#{path}/unapprove" do
@@ -344,7 +344,7 @@ module API
               .new(user_project, current_user)
               .execute(merge_request)
 
-            present merge_request, with: ::API::Entities::MergeRequestApprovals, current_user: current_user
+            present merge_request, with: EE::API::Entities::MergeRequestApprovals, current_user: current_user
           end
         end
       end

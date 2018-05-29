@@ -3,16 +3,12 @@
 - @content_class = "limit-container-width" unless fluid_layout
 - expanded = Rails.env.test?
 
-- content_for :page_specific_javascripts do
-  = webpack_bundle_tag('common_vue')
-  = webpack_bundle_tag('service_desk')
-
 .project-edit-container
   %section.settings.general-settings.no-animate{ class: ('expanded' if expanded) }
     .settings-header
       %h4
         General project settings
-      %button.btn.js-settings-toggle
+      %button.btn.js-settings-toggle{ type: 'button' }
         = expanded ? 'Collapse' : 'Expand'
       %p
         Update your project name, description, avatar, and other general settings.
@@ -37,6 +33,8 @@
               %span.light (optional)
             = f.text_area :description, class: "form-control", rows: 3, maxlength: 250
 
+          = render 'projects/ee/classification_policy_settings',  f: f
+
           - unless @project.empty_repo?
             .form-group
               = f.label :default_branch, "Default Branch", class: 'label-light'
@@ -47,7 +45,7 @@
         .form-group
           = f.label :tag_list, "Tags", class: 'label-light'
           = f.text_field :tag_list, value: @project.tag_list.sort.join(', '), maxlength: 2000, class: "form-control"
-          %p.help-block Separate tags with commas.
+          %p.form-text.text-muted Separate tags with commas.
         %fieldset.features
           %h5.prepend-top-0= _("Project avatar")
           .form-group
@@ -61,7 +59,7 @@
               %button.btn.js-choose-project-avatar-button{ type: 'button' }= _("Choose file...")
               %span.file_name.prepend-left-default.js-avatar-filename= _("No file chosen")
               = f.file_field :avatar, class: "js-project-avatar-input hidden"
-            .help-block= _("The maximum file size allowed is 200KB.")
+            .form-text.text-muted= _("The maximum file size allowed is 200KB.")
             - if @project.avatar?
               %hr
               = link_to _('Remove avatar'), project_avatar_path(@project), data: { confirm: _("Avatar will be removed. Are you sure?") }, method: :delete, class: "btn btn-danger btn-inverted"
@@ -71,12 +69,13 @@
     .settings-header
       %h4
         Permissions
-      %button.btn.js-settings-toggle
+      %button.btn.js-settings-toggle{ type: 'button' }
         = expanded ? 'Collapse' : 'Expand'
       %p
         Enable or disable certain project features and choose access levels.
     .settings-content
       = form_for [@project.namespace.becomes(Namespace), @project], remote: true, html: { multipart: true, class: "sharing-permissions-form" }, authenticity_token: true do |f|
+        -# haml-lint:disable InlineJavaScript
         %script.js-project-permissions-form-data{ type: "application/json" }= project_permissions_panel_data(@project)
         .js-project-permissions-form
         = f.submit 'Save changes', class: "btn btn-save"
@@ -87,7 +86,7 @@
     .settings-header
       %h4
         Merge request settings
-      %button.btn.js-settings-toggle
+      %button.btn.js-settings-toggle{ type: 'button' }
         = expanded ? 'Collapse' : 'Expand'
       %p
         Customize your merge request restrictions.
@@ -96,7 +95,7 @@
 
       = form_for [@project.namespace.becomes(Namespace), @project], remote: true, html: { multipart: true, class: "merge-request-settings-form" }, authenticity_token: true do |f|
         = render 'projects/ee/merge_request_settings', form: f
-        = f.submit 'Save changes', class: "btn btn-save"
+        = f.submit 'Save changes', class: "btn btn-save qa-save-merge-request-changes"
 
   = render 'projects/ee/service_desk_settings'
 
@@ -106,7 +105,7 @@
     .settings-header
       %h4
         Advanced settings
-      %button.btn.js-settings-toggle
+      %button.btn.js-settings-toggle{ type: 'button' }
         = expanded ? 'Collapse' : 'Expand'
       %p
         Perform advanced options such as housekeeping, archiving, renaming, transferring, or removing your project.
@@ -126,17 +125,18 @@
               Archive project
           - if @project.archived?
             %p
-              Unarchiving the project will mark its repository as active. The project can be committed to.
+              Unarchiving the project will restore people's ability to make changes to it.
+              The repository can be committed to, and issues, comments and other entities can be created.
               %strong Once active this project shows up in the search and on the dashboard.
             = link_to 'Unarchive project', unarchive_project_path(@project),
-                data: { confirm: "Are you sure that you want to unarchive this project?\nWhen this project is unarchived it is active and can be committed to again." },
+                data: { confirm: "Are you sure that you want to unarchive this project?" },
                 method: :post, class: "btn btn-success"
           - else
             %p
-              Archiving the project will mark its repository as read-only. It is hidden from the dashboard and doesn't show up in searches.
-              %strong Archived projects cannot be committed to!
+              Archiving the project will make it entirely read-only. It is hidden from the dashboard and doesn't show up in searches.
+              %strong The repository cannot be committed to, and no issues, comments or other entities can be created.
             = link_to 'Archive project', archive_project_path(@project),
-                data: { confirm: "Are you sure that you want to archive this project?\nAn archived project cannot be committed to." },
+                data: { confirm: "Are you sure that you want to archive this project?" },
                 method: :post, class: "btn btn-warning"
       .sub-section.rename-respository
         %h4.warning-title
@@ -153,8 +153,9 @@
               %span Path
             .form-group
               .input-group
-                .input-group-addon
-                  #{URI.join(root_url, @project.namespace.full_path)}/
+                .input-group-prepend
+                  .input-group-text
+                    #{URI.join(root_url, @project.namespace.full_path)}/
                 = f.text_field :path, class: 'form-control'
             %ul
               %li Be careful. Renaming a project's repository can have unintended side effects.

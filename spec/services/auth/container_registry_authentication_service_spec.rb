@@ -177,7 +177,7 @@ describe Auth::ContainerRegistryAuthenticationService do
         end
 
         let(:current_params) do
-          { scope: "repository:#{project.path_with_namespace}:*" }
+          { scope: "repository:#{project.full_path}:*" }
         end
 
         it_behaves_like 'an inaccessible'
@@ -205,7 +205,7 @@ describe Auth::ContainerRegistryAuthenticationService do
         end
 
         let(:current_params) do
-          { scope: "repository:#{project.path_with_namespace}:*" }
+          { scope: "repository:#{project.full_path}:*" }
         end
 
         it_behaves_like 'an inaccessible'
@@ -244,7 +244,7 @@ describe Auth::ContainerRegistryAuthenticationService do
         end
 
         let(:current_params) do
-          { scope: "repository:#{project.path_with_namespace}:*" }
+          { scope: "repository:#{project.full_path}:*" }
         end
 
         it_behaves_like 'an inaccessible'
@@ -275,7 +275,7 @@ describe Auth::ContainerRegistryAuthenticationService do
 
       context 'disallow anyone to delete images' do
         let(:current_params) do
-          { scope: "repository:#{project.path_with_namespace}:*" }
+          { scope: "repository:#{project.full_path}:*" }
         end
 
         it_behaves_like 'an inaccessible'
@@ -316,7 +316,7 @@ describe Auth::ContainerRegistryAuthenticationService do
 
         context 'disallow anyone to delete images' do
           let(:current_params) do
-            { scope: "repository:#{project.path_with_namespace}:*" }
+            { scope: "repository:#{project.full_path}:*" }
           end
 
           it_behaves_like 'an inaccessible'
@@ -328,7 +328,7 @@ describe Auth::ContainerRegistryAuthenticationService do
         context 'disallow anyone to pull or push images' do
           let(:current_user) { create(:user, external: true) }
           let(:current_params) do
-            { scope: "repository:#{project.path_with_namespace}:pull,push" }
+            { scope: "repository:#{project.full_path}:pull,push" }
           end
 
           it_behaves_like 'an inaccessible'
@@ -338,7 +338,7 @@ describe Auth::ContainerRegistryAuthenticationService do
         context 'disallow anyone to delete images' do
           let(:current_user) { create(:user, external: true) }
           let(:current_params) do
-            { scope: "repository:#{project.path_with_namespace}:*" }
+            { scope: "repository:#{project.full_path}:*" }
           end
 
           it_behaves_like 'an inaccessible'
@@ -364,7 +364,7 @@ describe Auth::ContainerRegistryAuthenticationService do
 
     context 'allow to delete images' do
       let(:current_params) do
-        { scope: "repository:#{current_project.path_with_namespace}:*" }
+        { scope: "repository:#{current_project.full_path}:*" }
       end
 
       it_behaves_like 'a deletable' do
@@ -411,7 +411,7 @@ describe Auth::ContainerRegistryAuthenticationService do
 
     context 'disallow to delete images' do
       let(:current_params) do
-        { scope: "repository:#{current_project.path_with_namespace}:*" }
+        { scope: "repository:#{current_project.full_path}:*" }
       end
 
       it_behaves_like 'an inaccessible' do
@@ -596,6 +596,142 @@ describe Auth::ContainerRegistryAuthenticationService do
 
       it_behaves_like 'a forbidden'
       it_behaves_like 'not a container repository factory'
+    end
+  end
+
+  context 'for deploy tokens' do
+    let(:current_params) do
+      { scope: "repository:#{project.full_path}:pull" }
+    end
+
+    context 'when deploy token has read_registry as a scope' do
+      let(:current_user) { create(:deploy_token, projects: [project]) }
+
+      context 'for public project' do
+        let(:project) { create(:project, :public) }
+
+        context 'when pulling' do
+          it_behaves_like 'a pullable'
+        end
+
+        context 'when pushing' do
+          let(:current_params) do
+            { scope: "repository:#{project.full_path}:push" }
+          end
+
+          it_behaves_like 'an inaccessible'
+        end
+      end
+
+      context 'for internal project' do
+        let(:project) { create(:project, :internal) }
+
+        context 'when pulling' do
+          it_behaves_like 'a pullable'
+        end
+
+        context 'when pushing' do
+          let(:current_params) do
+            { scope: "repository:#{project.full_path}:push" }
+          end
+
+          it_behaves_like 'an inaccessible'
+        end
+      end
+
+      context 'for private project' do
+        let(:project) { create(:project, :private) }
+
+        context 'when pulling' do
+          it_behaves_like 'a pullable'
+        end
+
+        context 'when pushing' do
+          let(:current_params) do
+            { scope: "repository:#{project.full_path}:push" }
+          end
+
+          it_behaves_like 'an inaccessible'
+        end
+      end
+    end
+
+    context 'when deploy token does not have read_registry scope' do
+      let(:current_user) { create(:deploy_token, projects: [project], read_registry: false) }
+
+      context 'for public project' do
+        let(:project) { create(:project, :public) }
+
+        context 'when pulling' do
+          it_behaves_like 'a pullable'
+        end
+      end
+
+      context 'for internal project' do
+        let(:project) { create(:project, :internal) }
+
+        context 'when pulling' do
+          it_behaves_like 'an inaccessible'
+        end
+      end
+
+      context 'for private project' do
+        let(:project) { create(:project, :internal) }
+
+        context 'when pulling' do
+          it_behaves_like 'an inaccessible'
+        end
+      end
+    end
+
+    context 'when deploy token is not related to the project' do
+      let(:current_user) { create(:deploy_token, read_registry: false) }
+
+      context 'for public project' do
+        let(:project) { create(:project, :public) }
+
+        context 'when pulling' do
+          it_behaves_like 'a pullable'
+        end
+      end
+
+      context 'for internal project' do
+        let(:project) { create(:project, :internal) }
+
+        context 'when pulling' do
+          it_behaves_like 'an inaccessible'
+        end
+      end
+
+      context 'for private project' do
+        let(:project) { create(:project, :internal) }
+
+        context 'when pulling' do
+          it_behaves_like 'an inaccessible'
+        end
+      end
+    end
+
+    context 'when deploy token has been revoked' do
+      let(:current_user) { create(:deploy_token, :revoked, projects: [project]) }
+
+      context 'for public project' do
+        let(:project) { create(:project, :public) }
+
+        it_behaves_like 'a pullable'
+      end
+
+      context 'for internal project' do
+        let(:project) { create(:project, :internal) }
+
+        it_behaves_like 'an inaccessible'
+      end
+
+      context 'for private project' do
+        let(:project) { create(:project, :internal) }
+
+        it_behaves_like 'an inaccessible'
+      end
     end
   end
 end

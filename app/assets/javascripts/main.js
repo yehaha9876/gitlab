@@ -1,26 +1,22 @@
-/* eslint-disable import/first */
-/* global ConfirmDangerModal */
+/* global $ */
 
 import jQuery from 'jquery';
 import Cookies from 'js-cookie';
 import svg4everybody from 'svg4everybody';
 
-// expose common libraries as globals (TODO: remove these)
-window.jQuery = jQuery;
-window.$ = jQuery;
+// bootstrap webpack, common libs, polyfills, and behaviors
+import './webpack';
+import './commons';
+import './behaviors';
 
 // lib/utils
-import { handleLocationHash } from './lib/utils/common_utils';
+import { handleLocationHash, addSelectOnFocusBehaviour } from './lib/utils/common_utils';
 import { localTimeAgo } from './lib/utils/datetime_utility';
 import { getLocationHash, visitUrl } from './lib/utils/url_utility';
-
-// behaviors
-import './behaviors/';
 
 // everything else
 import loadAwardsHandler from './awards_handler';
 import bp from './breakpoints';
-import './confirm_danger_modal';
 import Flash, { removeFlashClickListener } from './flash';
 import './gl_dropdown';
 import initTodoToggle from './header';
@@ -31,16 +27,21 @@ import LazyLoader from './lazy_loader';
 import initLogoAnimation from './logo';
 import './milestone_select';
 import './projects_dropdown';
-import './render_gfm';
 import initBreadcrumbs from './breadcrumb';
-
-// EE-only scripts
-import 'ee/main';
-
 import initDispatcher from './dispatcher';
 
-// eslint-disable-next-line global-require, import/no-commonjs
-if (process.env.NODE_ENV !== 'production') require('./test_utils/');
+// EE-only scripts
+import 'ee/main'; // eslint-disable-line import/first
+
+// expose jQuery as global (TODO: remove these)
+window.jQuery = jQuery;
+window.$ = jQuery;
+
+// inject test utilities if necessary
+if (process.env.NODE_ENV !== 'production' && gon && gon.test_env) {
+  $.fx.off = true;
+  import(/* webpackMode: "eager" */ './test_utils/');
+}
 
 svg4everybody();
 
@@ -48,23 +49,27 @@ document.addEventListener('beforeunload', () => {
   // Unbind scroll events
   $(document).off('scroll');
   // Close any open tooltips
-  $('.has-tooltip, [data-toggle="tooltip"]').tooltip('destroy');
+  $('.has-tooltip, [data-toggle="tooltip"]').tooltip('dispose');
   // Close any open popover
-  $('[data-toggle="popover"]').popover('destroy');
+  $('[data-toggle="popover"]').popover('dispose');
 });
 
 window.addEventListener('hashchange', handleLocationHash);
-window.addEventListener('load', function onLoad() {
-  window.removeEventListener('load', onLoad, false);
-  handleLocationHash();
-}, false);
+window.addEventListener(
+  'load',
+  function onLoad() {
+    window.removeEventListener('load', onLoad, false);
+    handleLocationHash();
+  },
+  false,
+);
 
 gl.lazyLoader = new LazyLoader({
   scrollContainer: window,
   observerNode: '#content-body',
 });
 
-$(() => {
+document.addEventListener('DOMContentLoaded', () => {
   const $body = $('body');
   const $document = $(document);
   const $window = $(window);
@@ -91,9 +96,7 @@ $(() => {
   if (bootstrapBreakpoint === 'xs') {
     const $rightSidebar = $('aside.right-sidebar, .layout-page');
 
-    $rightSidebar
-      .removeClass('right-sidebar-expanded')
-      .addClass('right-sidebar-collapsed');
+    $rightSidebar.removeClass('right-sidebar-expanded').addClass('right-sidebar-collapsed');
   }
 
   // prevent default action for disabled buttons
@@ -107,16 +110,11 @@ $(() => {
     return true;
   });
 
-  // Click a .js-select-on-focus field, select the contents
-  // Prevent a mouseup event from deselecting the input
-  $('.js-select-on-focus').on('focusin', function selectOnFocusCallback() {
-    $(this).select().one('mouseup', (e) => {
-      e.preventDefault();
-    });
-  });
+  addSelectOnFocusBehaviour('.js-select-on-focus');
 
   $('.remove-row').on('ajax:success', function removeRowAjaxSuccessCallback() {
-    $(this).tooltip('destroy')
+    $(this)
+      .tooltip('dispose')
       .closest('li')
       .fadeOut();
   });
@@ -126,7 +124,9 @@ $(() => {
   });
 
   $('.js-remove-tr').on('ajax:success', function removeTRAjaxSuccessCallback() {
-    $(this).closest('tr').fadeOut();
+    $(this)
+      .closest('tr')
+      .fadeOut();
   });
 
   // Initialize select2 selects
@@ -144,9 +144,9 @@ $(() => {
   });
 
   // Initialize tooltips
-  $.fn.tooltip.Constructor.DEFAULTS.trigger = 'hover';
   $body.tooltip({
     selector: '.has-tooltip, [data-toggle="tooltip"]',
+    trigger: 'hover',
     placement(tip, el) {
       return $(el).data('placement') || 'bottom';
     },
@@ -163,7 +163,9 @@ $(() => {
 
   // Form submitter
   $('.trigger-submit').on('change', function triggerSubmitCallback() {
-    $(this).parents('form').submit();
+    $(this)
+      .parents('form')
+      .submit();
   });
 
   localTimeAgo($('abbr.timeago, .js-timeago'), true);
@@ -197,7 +199,7 @@ $(() => {
     $container.remove();
   });
 
-  $('.navbar-toggle').on('click', () => {
+  $('.navbar-toggler').on('click', () => {
     $('.header-content').toggleClass('menu-expanded');
     gl.lazyLoader.loadCheck();
   });
@@ -212,22 +214,18 @@ $(() => {
     $this.toggleClass('active');
 
     if ($this.hasClass('active')) {
-      notesHolders.show().find('.hide, .content').show();
+      notesHolders
+        .show()
+        .find('.hide, .content')
+        .show();
     } else {
-      notesHolders.hide().find('.content').hide();
+      notesHolders
+        .hide()
+        .find('.content')
+        .hide();
     }
 
     $(document).trigger('toggle.comments');
-  });
-
-  $document.on('click', '.js-confirm-danger', (e) => {
-    const btn = $(e.target);
-    const form = btn.closest('form');
-    const text = btn.data('confirm-danger-message');
-    e.preventDefault();
-
-    // eslint-disable-next-line no-new
-    new ConfirmDangerModal(form, text);
   });
 
   $document.on('breakpoint:change', (e, breakpoint) => {
@@ -265,9 +263,11 @@ $(() => {
   const flashContainer = document.querySelector('.flash-container');
 
   if (flashContainer && flashContainer.children.length) {
-    flashContainer.querySelectorAll('.flash-alert, .flash-notice, .flash-success').forEach((flashEl) => {
-      removeFlashClickListener(flashEl);
-    });
+    flashContainer
+      .querySelectorAll('.flash-alert, .flash-notice, .flash-success')
+      .forEach(flashEl => {
+        removeFlashClickListener(flashEl);
+      });
   }
 
   initDispatcher();

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import skeletonLoadingContainer from '~/vue_shared/components/skeleton_loading_container.vue';
-import mountComponent from '../../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('Skeleton loading container', () => {
   let vm;
@@ -14,8 +14,8 @@ describe('Skeleton loading container', () => {
     vm.$destroy();
   });
 
-  it('renders 6 skeleton lines by default', () => {
-    expect(vm.$el.querySelector('.skeleton-line-6')).not.toBeNull();
+  it('renders 3 skeleton lines by default', () => {
+    expect(vm.$el.querySelector('.skeleton-line-3')).not.toBeNull();
   });
 
   it('renders in full mode by default', () => {

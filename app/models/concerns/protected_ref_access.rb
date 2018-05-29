@@ -4,7 +4,8 @@ module ProtectedRefAccess
   ALLOWED_ACCESS_LEVELS = [
     Gitlab::Access::MASTER,
     Gitlab::Access::DEVELOPER,
-    Gitlab::Access::NO_ACCESS
+    Gitlab::Access::NO_ACCESS,
+    Gitlab::Access::ADMIN
   ].freeze
 
   HUMAN_ACCESS_LEVELS = {
@@ -35,6 +36,7 @@ module ProtectedRefAccess
   def check_access(user)
     return true if user.admin?
 
-    project.team.max_member_access(user.id) >= access_level
+    user.can?(:push_code, project) &&
+      project.team.max_member_access(user.id) >= access_level
   end
 end

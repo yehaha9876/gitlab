@@ -1,112 +1,65 @@
 <script>
-import { mapState, mapActions } from 'vuex';
-import tooltip from '../../vue_shared/directives/tooltip';
-import icon from '../../vue_shared/components/icon.vue';
-import modal from '../../vue_shared/components/modal.vue';
-import commitFilesList from './commit_sidebar/list.vue';
+import { mapState, mapActions, mapGetters } from 'vuex';
+import tooltip from '~/vue_shared/directives/tooltip';
+import Icon from '~/vue_shared/components/icon.vue';
+import DeprecatedModal from '~/vue_shared/components/deprecated_modal.vue';
+import CommitFilesList from './commit_sidebar/list.vue';
+import EmptyState from './commit_sidebar/empty_state.vue';
+import * as consts from '../stores/modules/commit/constants';
+import { activityBarViews } from '../constants';
 
 export default {
   components: {
-    modal,
-    icon,
-    commitFilesList,
+    DeprecatedModal,
+    Icon,
+    CommitFilesList,
+    EmptyState,
   },
   directives: {
     tooltip,
   },
-  props: {
-    noChangesStateSvgPath: {
-      type: String,
-      required: true,
-    },
-    committedStateSvgPath: {
-      type: String,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      showNewBranchModal: false,
-      submitCommitsLoading: false,
-      startNewMR: false,
-      commitMessage: '',
-    };
-  },
   computed: {
     ...mapState([
-      'currentProjectId',
-      'currentBranchId',
+      'changedFiles',
+      'stagedFiles',
       'rightPanelCollapsed',
       'lastCommitMsg',
-      'changedFiles',
+      'unusedSeal',
     ]),
-    commitButtonDisabled() {
-      return this.commitMessage === '' || this.submitCommitsLoading || !this.changedFiles.length;
-    },
-    commitMessageCount() {
-      return this.commitMessage.length;
-    },
-    statusSvg() {
-      return this.lastCommitMsg ? this.committedStateSvgPath : this.noChangesStateSvgPath;
+    ...mapState('commit', ['commitMessage', 'submitCommitLoading']),
+    ...mapGetters(['lastOpenedFile', 'hasChanges', 'someUncommitedChanges']),
+    ...mapGetters('commit', ['commitButtonDisabled', 'discardDraftButtonDisabled']),
+    showStageUnstageArea() {
+      return !!(this.someUncommitedChanges || this.lastCommitMsg || !this.unusedSeal);
     },
   },
-  methods: {
-    ...mapActions([
-      'checkCommitStatus',
-      'commitChanges',
-      'getTreeData',
-      'setPanelCollapsedStatus',
-    ]),
-    makeCommit(newBranch = false) {
-      const createNewBranch = newBranch || this.startNewMR;
-
-      const payload = {
-        branch: createNewBranch ?
-          `${this.currentBranchId}-${new Date().getTime().toString()}` :
-          this.currentBranchId,
-        commit_message: this.commitMessage,
-        actions: this.changedFiles.map(f => ({
-          action: f.tempFile ? 'create' : 'update',
-          file_path: f.path,
-          content: f.content,
-          encoding: f.base64 ? 'base64' : 'text',
-        })),
-        start_branch: createNewBranch ? this.currentBranchId : undefined,
-      };
-
-      this.showNewBranchModal = false;
-      this.submitCommitsLoading = true;
-
-      this.commitChanges({ payload, newMr: this.startNewMR })
-        .then(() => {
-          this.submitCommitsLoading = false;
-          this.commitMessage = '';
-          this.startNewMR = false;
-        })
-        .catch(() => {
-          this.submitCommitsLoading = false;
-        });
+  watch: {
+    hasChanges() {
+      if (!this.hasChanges) {
+        this.updateActivityBarView(activityBarViews.edit);
+      }
     },
-    tryCommit() {
-      this.submitCommitsLoading = true;
-
-      this.checkCommitStatus()
-        .then((branchChanged) => {
-          if (branchChanged) {
-            this.showNewBranchModal = true;
-          } else {
-            this.makeCommit();
+  },
+  mounted() {
+    if (this.lastOpenedFile) {
+      this.openPendingTab({
+        file: this.lastOpenedFile,
+      })
+        .then(changeViewer => {
+          if (changeViewer) {
+            this.updateViewer('diff');
           }
         })
-        .catch(() => {
-          this.submitCommitsLoading = false;
+        .catch(e => {
+          throw e;
         });
-    },
-    toggleCollapsed() {
-      this.setPanelCollapsedStatus({
-        side: 'right',
-        collapsed: !this.rightPanelCollapsed,
-      });
+    }
+  },
+  methods: {
+    ...mapActions(['openPendingTab', 'updateViewer', 'updateActivityBarView']),
+    ...mapActions('commit', ['commitChanges', 'updateCommitAction']),
+    forceCreateNewBranch() {
+      return this.updateCommitAction(consts.COMMIT_TO_NEW_BRANCH).then(() => this.commitChanges());
     },
   },
 };
@@ -115,112 +68,43 @@ export default {
 <template>
   <div
     class="multi-file-commit-panel-section"
-    :class="{
-      'multi-file-commit-empty-state-container': !changedFiles.length
-    }"
   >
-    <modal
-      v-if="showNewBranchModal"
+    <deprecated-modal
+      id="ide-create-branch-modal"
       :primary-button-label="__('Create new branch')"
-      kind="primary"
+      kind="success"
       :title="__('Branch has changed')"
-      :text="__(`This branch has changed since
-you started editing. Would you like to create a new branch?`)"
-      @cancel="showNewBranchModal = false"
-      @submit="makeCommit(true)"
-    />
-    <commit-files-list
-      title="Staged"
-      :file-list="changedFiles"
-      :collapsed="rightPanelCollapsed"
-      @toggleCollapsed="toggleCollapsed"
-    />
+      @submit="forceCreateNewBranch"
+    >
+      <template slot="body">
+        {{ __(`This branch has changed since you started editing.
+          Would you like to create a new branch?`) }}
+      </template>
+    </deprecated-modal>
     <template
-      v-if="changedFiles.length"
+      v-if="showStageUnstageArea"
     >
-      <form
-        class="form-horizontal multi-file-commit-form"
-        @submit.prevent="tryCommit"
-        v-if="!rightPanelCollapsed"
-      >
-        <div class="multi-file-commit-fieldset">
-          <textarea
-            class="form-control multi-file-commit-message ref-name"
-            name="commit-message"
-            v-model="commitMessage"
-            placeholder="Commit message"
-          >
-          </textarea>
-        </div>
-        <div class="multi-file-commit-fieldset">
-          <label
-            v-tooltip
-            title="Create a new merge request with these changes"
-            data-container="body"
-            data-placement="top"
-          >
-            <input
-              type="checkbox"
-              v-model="startNewMR"
-            />
-            {{ __('Merge Request') }}
-          </label>
-          <button
-            type="submit"
-            :disabled="commitButtonDisabled"
-            class="btn btn-default btn-sm append-right-10 prepend-left-10"
-            :class="{ disabled: submitCommitsLoading }"
-          >
-            <i
-              v-if="submitCommitsLoading"
-              class="js-commit-loading-icon fa fa-spinner fa-spin"
-              aria-hidden="true"
-              aria-label="loading"
-            >
-            </i>
-            {{ __('Commit') }}
-          </button>
-          <div
-            class="multi-file-commit-message-count"
-          >
-            {{ commitMessageCount }}
-          </div>
-        </div>
-      </form>
+      <commit-files-list
+        class="is-first"
+        icon-name="unstaged"
+        :title="__('Unstaged')"
+        :file-list="changedFiles"
+        action="stageAllChanges"
+        :action-btn-text="__('Stage all')"
+        item-action-component="stage-button"
+      />
+      <commit-files-list
+        icon-name="staged"
+        :title="__('Staged')"
+        :file-list="stagedFiles"
+        action="unstageAllChanges"
+        :action-btn-text="__('Unstage all')"
+        item-action-component="unstage-button"
+        :staged-list="true"
+      />
     </template>
-    <div
-      v-else-if="!rightPanelCollapsed"
-      class="row js-empty-state"
-    >
-      <div class="col-xs-10 col-xs-offset-1">
-        <div class="svg-content svg-80">
-          <img :src="statusSvg" />
-        </div>
-      </div>
-      <div class="col-xs-10 col-xs-offset-1">
-        <div
-          class="text-content text-center"
-          v-if="!lastCommitMsg"
-        >
-          <h4>
-            {{ __('No changes') }}
-          </h4>
-          <p>
-            {{ __('Edit files in the editor and commit changes here') }}
-          </p>
-        </div>
-        <div
-          class="text-content text-center"
-          v-else
-        >
-          <h4>
-            {{ __('All changes are committed') }}
-          </h4>
-          <p>
-            {{ lastCommitMsg }}
-          </p>
-        </div>
-      </div>
-    </div>
+    <empty-state
+      v-if="unusedSeal"
+    />
   </div>
 </template>

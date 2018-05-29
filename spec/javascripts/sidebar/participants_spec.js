@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import participants from '~/sidebar/components/participants/participants.vue';
-import mountComponent from '../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 const PARTICIPANT = {
   id: 1,
@@ -169,6 +169,20 @@ describe('Participants', function () {
       moreParticipantLink.click();
 
       expect(vm.isShowingMoreParticipants).toBe(true);
+    });
+
+    it('clicking on participants icon emits `toggleSidebar` event', () => {
+      vm = mountComponent(Participants, {
+        loading: false,
+        participants: PARTICIPANT_LIST,
+        numberOfLessParticipants: 2,
+      });
+      spyOn(vm, '$emit');
+
+      const participantsIconEl = vm.$el.querySelector('.sidebar-collapsed-icon');
+
+      participantsIconEl.click();
+      expect(vm.$emit).toHaveBeenCalledWith('toggleSidebar');
     });
   });
 });

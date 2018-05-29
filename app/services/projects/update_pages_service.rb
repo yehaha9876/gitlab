@@ -1,5 +1,8 @@
 module Projects
   class UpdatePagesService < BaseService
+    InvalidStateError = Class.new(StandardError)
+    FailedToExtractError = Class.new(StandardError)
+
     BLOCK_SIZE = 32.kilobytes
     MAX_SIZE = 1.terabyte
     SITE_PATH = 'public/'.freeze
@@ -11,13 +14,15 @@ module Projects
     end
 
     def execute
+      register_attempt
+
       # Create status notifying the deployment of pages
       @status = create_status
       @status.enqueue!
       @status.run!
 
-      raise 'missing pages artifacts' unless build.artifacts?
-      raise 'pages are outdated' unless latest?
+      raise InvalidStateError, 'missing pages artifacts' unless build.artifacts?
+      raise InvalidStateError, 'pages are outdated' unless latest?
 
       # Create temporary directory in which we will extract the artifacts
       FileUtils.mkdir_p(tmp_path)
@@ -26,18 +31,17 @@ module Projects
 
         # Check if we did extract public directory
         archive_public_path = File.join(archive_path, 'public')
-        raise 'pages miss the public folder' unless Dir.exist?(archive_public_path)
-        raise 'pages are outdated' unless latest?
+        raise InvalidStateError, 'pages miss the public folder' unless Dir.exist?(archive_public_path)
+        raise InvalidStateError, 'pages are outdated' unless latest?
 
         deploy_page!(archive_public_path)
         success
       end
-    rescue => e
-      register_failure
+    rescue InvalidStateError => e
       error(e.message)
-    ensure
-      register_attempt
-      build.erase_artifacts! unless build.has_expiring_artifacts?
+    rescue => e
+      error(e.message)
+      raise e
     end
 
     private
@@ -47,7 +51,8 @@ module Projects
       super
     end
 
-    def error(message, http_status = nil)
+    def error(message)
+      register_failure
       log_error("Projects::UpdatePagesService: #{message}")
       @status.allow_failure = !latest?
       @status.description = message
@@ -67,33 +72,21 @@ module Projects
     end
 
     def extract_archive!(temp_path)
-      if artifacts_filename.ends_with?('.tar.gz') || artifacts_filename.ends_with?('.tgz')
-        extract_tar_archive!(temp_path)
-      elsif artifacts_filename.ends_with?('.zip')
+      if artifacts.ends_with?('.zip')
         extract_zip_archive!(temp_path)
       else
-        raise 'unsupported artifacts format'
-      end
-    end
-
-    def extract_tar_archive!(temp_path)
-      build.artifacts_file.use_file do |artifacts_path|
-        results = Open3.pipeline(%W(gunzip -c #{artifacts_path}),
-                                %W(dd bs=#{BLOCK_SIZE} count=#{blocks}),
-                                %W(tar -x -C #{temp_path} #{SITE_PATH}),
-                                err: '/dev/null')
-        raise 'pages failed to extract' unless results.compact.all?(&:success?)
+        raise InvalidStateError, 'unsupported artifacts format'
       end
     end
 
     def extract_zip_archive!(temp_path)
-      raise 'missing artifacts metadata' unless build.artifacts_metadata?
+      raise InvalidStateError, 'missing artifacts metadata' unless build.artifacts_metadata?
 
       # Calculate page size after extract
       public_entry = build.artifacts_metadata_entry(SITE_PATH, recursive: true)
 
       if public_entry.total_size > max_size
-        raise "artifacts for pages are too large: #{public_entry.total_size}"
+        raise InvalidStateError, "artifacts for pages are too large: #{public_entry.total_size}"
       end
 
       # Requires UnZip at least 6.00 Info-ZIP.
@@ -102,8 +95,8 @@ module Projects
       # We add * to end of SITE_PATH, because we want to extract SITE_PATH and all subdirectories
       site_path = File.join(SITE_PATH, '*')
       build.artifacts_file.use_file do |artifacts_path|
-        unless system(*%W(unzip -qq -n #{artifacts_path} #{site_path} -d #{temp_path}))
-          raise 'pages failed to extract'
+        unless system(*%W(unzip -n #{artifacts_path} #{site_path} -d #{temp_path}))
+          raise FailedToExtractError, 'pages failed to extract'
         end
       end
     end
@@ -135,10 +128,6 @@ module Projects
       1 + max_size / BLOCK_SIZE
     end
 
-    def artifacts_filename
-      build.artifacts_file.filename
-    end
-
     def max_size
       max_pages_size = Gitlab::CurrentSettings.max_pages_size.megabytes
 
@@ -167,8 +156,15 @@ module Projects
       build.ref
     end
 
+    def artifacts
+      build.artifacts_file.path
+    end
+
     def latest_sha
       project.commit(build.ref).try(:sha).to_s
+    ensure
+      # Close any file descriptors that were opened and free libgit2 buffers
+      project.cleanup
     end
 
     def sha

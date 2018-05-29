@@ -20,6 +20,7 @@ issues:
 - issue_assignees
 - epic_issue
 - epic
+- closed_by
 events:
 - author
 - project
@@ -36,6 +37,7 @@ notes:
 - todos
 - events
 - system_note_metadata
+- note_diff_file
 label_links:
 - target
 - label
@@ -95,6 +97,7 @@ merge_requests:
 - timelogs
 - head_pipeline
 - latest_merge_request_diff
+- approved_by_users
 merge_request_diff:
 - merge_request
 - merge_request_diff_commits
@@ -125,6 +128,7 @@ pipelines:
 - sourced_pipelines
 - triggered_by_pipeline
 - triggered_pipelines
+- chat_data # EE only
 pipeline_variables:
 - pipeline
 stages:
@@ -154,6 +158,9 @@ pipeline_schedule:
 - pipelines
 pipeline_schedule_variables:
 - pipeline_schedule
+deploy_tokens:
+- project_deploy_tokens
+- projects
 deploy_keys:
 - user
 - deploy_keys_projects
@@ -168,6 +175,7 @@ protected_branches:
 - project
 - merge_access_levels
 - push_access_levels
+- unprotect_access_levels
 protected_tags:
 - project
 - create_access_levels
@@ -176,6 +184,10 @@ merge_access_levels:
 - protected_branch
 - group
 push_access_levels:
+- user
+- protected_branch
+- group
+unprotect_access_levels:
 - user
 - protected_branch
 - group
@@ -195,6 +207,7 @@ project:
 - cluster
 - clusters
 - cluster_project
+- cluster_ingresses
 - creator
 - group
 - namespace
@@ -208,6 +221,7 @@ project:
 - mattermost_slash_commands_service
 - slack_slash_commands_service
 - gitlab_slack_application_service
+- github_service
 - irker_service
 - packagist_service
 - pivotaltracker_service
@@ -269,7 +283,6 @@ project:
 - builds
 - runner_projects
 - runners
-- active_runners
 - variables
 - triggers
 - pipeline_schedules
@@ -296,21 +309,34 @@ project:
 - statistics
 - container_repositories
 - uploads
-- mirror_data
+- import_state
+- repository_state
 - source_pipelines
 - sourced_pipelines
 - members_and_requesters
 - build_trace_section_names
+- build_trace_chunks
 - root_of_fork_network
 - fork_network_member
 - fork_network
 - custom_attributes
+- prometheus_metrics
 - lfs_file_locks
+- project_badges
+- source_of_merge_requests
+- internal_ids
+- project_deploy_tokens
+- deploy_tokens
+- settings
+- ci_cd_settings
+- vulnerability_feedback
 award_emoji:
 - awardable
 - user
 priorities:
 - label
+prometheus_metrics:
+- project
 timelogs:
 - issue
 - merge_request
@@ -325,3 +351,5 @@ epic_issues:
 - epic
 lfs_file_locks:
 - user
+project_badges:
+- project

@@ -1,7 +1,7 @@
-import _ from 'underscore';
-
 export const dataStructure = () => ({
   id: '',
+  // Key will contain a mixture of ID and path
+  // it can also contain a prefix `pending-` for files opened in review mode
   key: '',
   type: '',
   projectId: '',
@@ -9,14 +9,13 @@ export const dataStructure = () => ({
   name: '',
   url: '',
   path: '',
-  level: 0,
   tempFile: false,
-  icon: '',
   tree: [],
   loading: false,
   opened: false,
   active: false,
   changed: false,
+  staged: false,
   lastCommitPath: '',
   lastCommit: {
     id: '',
@@ -25,7 +24,6 @@ export const dataStructure = () => ({
     updatedAt: '',
     author: '',
   },
-  tree_url: '',
   blamePath: '',
   commitsPath: '',
   permalink: '',
@@ -41,9 +39,15 @@ export const dataStructure = () => ({
   editorColumn: 1,
   fileLanguage: '',
   eol: '',
+  viewMode: 'edit',
+  previewMode: null,
+  size: 0,
+  parentPath: null,
+  lastOpenedAt: 0,
+  mrChange: null,
 });
 
-export const decorateData = (entity) => {
+export const decorateData = entity => {
   const {
     id,
     projectId,
@@ -51,8 +55,6 @@ export const decorateData = (entity) => {
     type,
     url,
     name,
-    icon,
-    tree_url,
     path,
     renderError,
     content = '',
@@ -61,11 +63,11 @@ export const decorateData = (entity) => {
     opened = false,
     changed = false,
     parentTreeUrl = '',
-    level = 0,
     base64 = false,
-
+    previewMode,
     file_lock,
-
+    html,
+    parentPath = '',
   } = entity;
 
   return {
@@ -77,11 +79,8 @@ export const decorateData = (entity) => {
     type,
     name,
     url,
-    tree_url,
     path,
-    level,
     tempFile,
-    icon: `fa-${icon}`,
     opened,
     active,
     parentTreeUrl,
@@ -89,101 +88,59 @@ export const decorateData = (entity) => {
     renderError,
     content,
     base64,
-
+    previewMode,
     file_lock,
-
+    html,
+    parentPath,
   };
 };
 
-/*
-  Takes the multi-dimensional tree and returns a flattened array.
-  This allows for the table to recursively render the table rows but keeps the data
-  structure nested to make it easier to add new files/directories.
-*/
-export const treeList = (state, treeId) => {
-  const baseTree = state.trees[treeId];
-  if (baseTree) {
-    const mapTree = arr => (!arr.tree || !arr.tree.length ?
-                            [] : _.map(arr.tree, a => [a, mapTree(a)]));
-
-    return _.chain(baseTree.tree)
-      .map(arr => [arr, mapTree(arr)])
-      .flatten()
-      .value();
-  }
-  return [];
-};
-
-export const getTree = state => (namespace, projectId, branch) => state.trees[`${namespace}/${projectId}/${branch}`];
-
-export const getTreeEntry = (store, treeId, path) => {
-  const fileList = treeList(store.state, treeId);
-  return fileList ? fileList.find(file => file.path === path) : null;
-};
-
-export const findEntry = (tree, type, name) => tree.find(
-  f => f.type === type && f.name === name,
-);
+export const findEntry = (tree, type, name, prop = 'name') =>
+  tree.find(f => f.type === type && f[prop] === name);
 
 export const findIndexOfFile = (state, file) => state.findIndex(f => f.path === file.path);
 
-export const setPageTitle = (title) => {
+export const setPageTitle = title => {
   document.title = title;
 };
 
-export const createTemp = ({
-  projectId, branchId, name, path, type, level, changed, content, base64, url,
-}) => {
-  const treePath = path ? `${path}/${name}` : name;
+export const createCommitPayload = (branch, newBranch, state, rootState) => ({
+  branch,
+  commit_message: state.commitMessage,
+  actions: rootState.stagedFiles.map(f => ({
+    action: f.tempFile ? 'create' : 'update',
+    file_path: f.path,
+    content: f.content,
+    encoding: f.base64 ? 'base64' : 'text',
+  })),
+  start_branch: newBranch ? rootState.currentBranchId : undefined,
+});
 
-  return decorateData({
-    id: new Date().getTime().toString(),
-    projectId,
-    branchId,
-    name,
-    type,
-    tempFile: true,
-    path: treePath,
-    icon: type === 'tree' ? 'folder' : 'file-text-o',
-    changed,
-    content,
-    parentTreeUrl: '',
-    level,
-    base64,
-    renderError: base64,
-    url,
-  });
+export const createNewMergeRequestUrl = (projectUrl, source, target) =>
+  `${projectUrl}/merge_requests/new?merge_request[source_branch]=${source}&merge_request[target_branch]=${target}`;
+
+const sortTreesByTypeAndName = (a, b) => {
+  if (a.type === 'tree' && b.type === 'blob') {
+    return -1;
+  } else if (a.type === 'blob' && b.type === 'tree') {
+    return 1;
+  }
+  if (a.name < b.name) return -1;
+  if (a.name > b.name) return 1;
+  return 0;
 };
 
-export const createOrMergeEntry = ({ projectId,
-                                     branchId,
-                                     entry,
-                                     type,
-                                     parentTreeUrl,
-                                     level,
-                                     state }) => {
-  if (state.changedFiles.length) {
-    const foundChangedFile = findEntry(state.changedFiles, type, entry.name);
+export const sortTree = sortedTree =>
+  sortedTree
+    .map(entity =>
+      Object.assign(entity, {
+        tree: entity.tree.length ? sortTree(entity.tree) : [],
+      }),
+    )
+    .sort(sortTreesByTypeAndName);
 
-    if (foundChangedFile) {
-      return foundChangedFile;
-    }
-  }
+export const filePathMatches = (f, path) =>
+  f.path.replace(new RegExp(`${f.name}$`), '').indexOf(`${path}/`) === 0;
 
-  if (state.openFiles.length) {
-    const foundOpenFile = findEntry(state.openFiles, type, entry.name);
-
-    if (foundOpenFile) {
-      return foundOpenFile;
-    }
-  }
-
-  return decorateData({
-    ...entry,
-    projectId,
-    branchId,
-    type,
-    parentTreeUrl,
-    level,
-  });
-};
+export const getChangesCountForFiles = (files, path) =>
+  files.filter(f => filePathMatches(f, path)).length;

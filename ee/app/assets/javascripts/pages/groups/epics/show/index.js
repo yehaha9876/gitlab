@@ -1,3 +1,8 @@
 import ZenMode from '~/zen_mode';
+import initEpicShow from 'ee/epics/epic_show/epic_show_bundle';
+import '~/notes/index';
 
-export default () => new ZenMode();
+document.addEventListener('DOMContentLoaded', () => {
+  new ZenMode(); // eslint-disable-line no-new
+  initEpicShow();
+});

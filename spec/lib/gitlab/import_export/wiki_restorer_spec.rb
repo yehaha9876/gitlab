@@ -6,7 +6,7 @@ describe Gitlab::ImportExport::WikiRestorer do
     let!(:project_without_wiki) { create(:project) }
     let!(:project) { create(:project) }
     let(:export_path) { "#{Dir.tmpdir}/project_tree_saver_spec" }
-    let(:shared) { Gitlab::ImportExport::Shared.new(relative_path: project.full_path) }
+    let(:shared) { project.import_export_shared }
     let(:bundler) { Gitlab::ImportExport::WikiRepoSaver.new(project: project_with_wiki, shared: shared) }
     let(:bundle_path) { File.join(shared.export_path, Gitlab::ImportExport.project_bundle_filename) }
     let(:restorer) do
@@ -24,8 +24,8 @@ describe Gitlab::ImportExport::WikiRestorer do
 
     after do
       FileUtils.rm_rf(export_path)
-      Gitlab::Shell.new.remove_repository(project_with_wiki.wiki.repository_storage_path, project_with_wiki.wiki.disk_path)
-      Gitlab::Shell.new.remove_repository(project.wiki.repository_storage_path, project.wiki.disk_path)
+      Gitlab::Shell.new.remove_repository(project_with_wiki.wiki.repository_storage, project_with_wiki.wiki.disk_path)
+      Gitlab::Shell.new.remove_repository(project.wiki.repository_storage, project.wiki.disk_path)
     end
 
     it 'restores the wiki repo successfully' do

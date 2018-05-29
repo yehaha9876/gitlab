@@ -3,7 +3,7 @@ import Vue from 'vue';
 import searchComponent from '~/projects_dropdown/components/search.vue';
 import eventHub from '~/projects_dropdown/event_hub';
 
-import mountComponent from '../../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 const createComponent = () => {
   const Component = Vue.extend(searchComponent);
@@ -92,7 +92,6 @@ describe('SearchComponent', () => {
       const inputEl = vm.$el.querySelector('input.form-control');
 
       expect(vm.$el.classList.contains('search-input-container')).toBeTruthy();
-      expect(vm.$el.classList.contains('hidden-xs')).toBeTruthy();
       expect(inputEl).not.toBe(null);
       expect(inputEl.getAttribute('placeholder')).toBe('Search your projects');
       expect(vm.$el.querySelector('.search-icon')).toBeDefined();

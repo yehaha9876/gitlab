@@ -79,6 +79,15 @@ describe EpicsFinder do
           end
         end
 
+        context 'by label' do
+          let(:label) { create(:label) }
+          let!(:labeled_epic) { create(:labeled_epic, group: group, labels: [label]) }
+
+          it 'returns all epics with given label' do
+            expect(epics(label_name: label.title)).to contain_exactly(labeled_epic)
+          end
+        end
+
         context 'when subgroups are supported', :nested_groups do
           let(:subgroup) { create(:group, :private, parent: group) }
           let(:subgroup2) { create(:group, :private, parent: subgroup) }
@@ -119,6 +128,24 @@ describe EpicsFinder do
           end
         end
       end
+    end
+  end
+
+  describe '#row_count' do
+    let(:label) { create(:label) }
+    let(:label2) { create(:label) }
+    let!(:labeled_epic) { create(:labeled_epic, group: group, labels: [label]) }
+    let!(:labeled_epic2) { create(:labeled_epic, group: group, labels: [label, label2]) }
+
+    before do
+      group.add_developer(search_user)
+      stub_licensed_features(epics: true)
+    end
+
+    it 'returns number of rows when epics are grouped' do
+      params = { group_id: group.id, label_name: [label.title, label2.title] }
+
+      expect(described_class.new(search_user, params).row_count).to eq(1)
     end
   end
 end

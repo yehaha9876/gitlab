@@ -5,12 +5,8 @@ feature 'Multi-file editor new file', :js do
   let(:project) { create(:project, :repository) }
 
   before do
-    stub_licensed_features(ide: true)
-
     project.add_master(user)
     sign_in(user)
-
-    set_cookie('new_repo', 'true')
 
     visit project_path(project)
 
@@ -37,6 +33,11 @@ feature 'Multi-file editor new file', :js do
     end
 
     wait_for_requests
+
+    find('.js-ide-commit-mode').click
+
+    find('.multi-file-commit-list-item').hover
+    first('.multi-file-discard-btn .btn').click
 
     fill_in('commit-message', with: 'commit message ide')
 

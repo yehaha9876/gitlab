@@ -14,6 +14,11 @@
       collapsedCalendarIcon,
     },
     props: {
+      blockClass: {
+        type: String,
+        required: false,
+        default: '',
+      },
       collapsed: {
         type: Boolean,
         required: false,
@@ -91,13 +96,10 @@
 </script>
 
 <template>
-  <div class="block">
-    <div class="issuable-sidebar-header">
-      <toggle-sidebar
-        :collapsed="collapsed"
-        @toggle="toggleSidebar"
-      />
-    </div>
+  <div
+    class="block"
+    :class="blockClass"
+  >
     <collapsed-calendar-icon
       class="sidebar-collapsed-icon"
       :text="collapsedText"
@@ -108,7 +110,7 @@
         v-if="isLoading"
         :inline="true"
       />
-      <div class="pull-right">
+      <div class="float-right">
         <button
           v-if="editable && !editing"
           type="button"
@@ -147,7 +149,7 @@
             -
             <button
               type="button"
-              class="btn-blank btn-link btn-secondary-hover-link"
+              class="btn-blank btn-link btn-default-hover-link"
               @click="newDateSelected(null)"
             >
               remove

@@ -34,7 +34,7 @@ describe "Admin::Projects"  do
 
       expect(page).to have_content(project.name)
       expect(page).to have_content(archived_project.name)
-      expect(page).to have_xpath("//span[@class='label label-warning']", text: 'archived')
+      expect(page).to have_xpath("//span[@class='badge badge-warning']", text: 'archived')
     end
 
     it 'renders only archived projects', :js do
@@ -58,7 +58,7 @@ describe "Admin::Projects"  do
       expect(current_path).to eq admin_project_path(project)
       expect(page).to have_content(project.path)
       expect(page).to have_content(project.name)
-      expect(page).to have_content(project.name_with_namespace)
+      expect(page).to have_content(project.full_name)
       expect(page).to have_content(project.creator.name)
     end
   end

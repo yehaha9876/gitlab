@@ -9,13 +9,12 @@ Labels allow you to categorize issues or merge requests using descriptive titles
 In GitLab, you can create project and group labels:
 
 - **Project labels** can be assigned to issues or merge requests in that project only. 
-- **Group labels** can be assigned to any issue or merge request of any project in that group. 
-- In the [future](https://gitlab.com/gitlab-org/gitlab-ce/issues/40915), you will be able to assign group labels to issues and merge reqeusts of projects in [subgroups](../group/subgroups/index.md).
+- **Group labels** can be assigned to any issue or merge request of any project in that group or any subgroups of the group.
 
 ## Creating labels
 
 >**Note:**
-A permission level of `Developer` or higher is required in order to create labels.
+A permission level of `Developer` or higher is required to create labels.
 
 ### New project label
 
@@ -27,13 +26,16 @@ If a project has no labels, you can generate a default set of project labels fro
 
 ![Labels generate default](img/labels_generate_default.png)
 
-GitLab will add the following default labels to the  project:
+GitLab will add the following default labels to the project:
 
 ![Labels default](img/labels_default.png)
 
 ### New group label
 
 To create a **group label**, follow similar steps from above to project labels. Navigate to **Issues > Labels** in the group and create it from there.
+Alternatively, you can create group labels also from Epic sidebar. Please note that the created label will belong to the immediate group to which epic belongs.
+
+![Create Labels from Epic](img/labels_epic_sidebar.png) 
 
 Group labels appear in every label list page of the group's child projects.
 
@@ -48,9 +50,9 @@ From the sidebar of an issue or a merge request, you can create a create a new *
 ## Editing labels
 
 NOTE: **Note:**
-A permission level of `Developer` or higher is required in order to edit labels.
+A permission level of `Developer` or higher is required to edit labels.
 
-You can update a label by navigating to **Issues > Labels** in the project ot group and clicking the pencil icon.
+You can update a label by navigating to **Issues > Labels** in the project or group and clicking the pencil icon.
 
 You can delete a label by clicking the trash icon.
 
@@ -70,22 +72,24 @@ Every issue and merge request can be assigned any number of labels. The labels a
 |:---:|:---:|
 | ![Labels sidebar](img/labels_sidebar.png) | ![Labels sidebar assign](img/labels_sidebar_assign.png) |
 
-## Filtering issues and merge requests by label
+## Filtering issues, merge requests and epics by label
 
 ### Filtering in list pages
 
-From the project issue list page and the project merge request list page, you can [filter](../search/index.md#issues-and-merge-requests) by both group labels and project labels.
+From the project issue list page and the project merge request list page, you can [filter](../search/index.md#issues-and-merge-requests) by both group (including subgroup ancestors) labels and project labels.
 
-From the group issue list page and the group merge request list page, you can [filter](../search/index.md#issues-and-merge-requests) by both group labels and project labels.
+From the group issue list page and the group merge request list page, you can [filter](../search/index.md#issues-and-merge-requests) by both group labels (including subgroup ancestors and subgroup descendants) and project labels.
+
+From the group epic list page, you can [filter](../search/index.md#issues-and-merge-requests) by both current group labels as well as decendent group labels.
 
 ![Labels group issues](img/labels_group_issues.png)
 
 ### Filtering in issue boards
 
 - From [project boards](issue_board.md), you can filter by both group labels and project labels in the [search and filter bar](../search/index.md#issue-boards).
-- From [group issue boards](issue_board.md#group-issue-boards), you can filter by only group labels in the [search and filter bar](../search/index.md#issue-boards) (available in GitLab Premium).
-- From [project boards](issue_board.md), you can filter by both group labels and project labels in the [issue board configuration](issue_board.md#board-with-configuration) (available in GitLab Premium).
-- From [group issue boards](issue_board.md#group-issue-boards), you can filter by only group labels in the [issue board configuration](issue_board.md#board-with-configuration) (available in GitLab Premium).
+- From [group issue boards](issue_board.md#group-issue-boards), you can filter by only group labels in the [search and filter bar](../search/index.md#issue-boards). **[PREMIUM]**
+- From [project boards](issue_board.md), you can filter by both group labels and project labels in the [issue board configuration](issue_board.md#board-with-configuration). **[PREMIUM]**
+- From [group issue boards](issue_board.md#group-issue-boards), you can filter by only group labels in the [issue board configuration](issue_board.md#board-with-configuration). **[PREMIUM]**
 
 ## Subscribing to labels
 

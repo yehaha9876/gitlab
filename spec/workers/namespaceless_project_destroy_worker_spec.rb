@@ -23,10 +23,10 @@ describe NamespacelessProjectDestroyWorker do
     end
 
     context 'project has no namespace' do
-      let!(:project) do
-        project = build(:project, namespace_id: nil)
-        project.save(validate: false)
-        project
+      let!(:project) { create(:project) }
+
+      before do
+        allow_any_instance_of(Project).to receive(:namespace).and_return(nil)
       end
 
       context 'project not a fork of another project' do
@@ -59,8 +59,7 @@ describe NamespacelessProjectDestroyWorker do
         let!(:parent_project) { create(:project) }
         let(:project) do
           namespaceless_project = fork_project(parent_project)
-          namespaceless_project.namespace_id = nil
-          namespaceless_project.save(validate: false)
+          namespaceless_project.save
           namespaceless_project
         end
 

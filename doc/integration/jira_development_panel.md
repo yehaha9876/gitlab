@@ -1,4 +1,4 @@
-# GitLab JIRA Development Panel integration
+# GitLab JIRA Development Panel integration **[PREMIUM]**
 
 > [Introduced][ee-2381] in [GitLab Premium][eep] 10.0.
 
@@ -33,7 +33,6 @@ account, in order to maximize the integrated GitLab projects used by your team.
     this would be `https://gitlab.com/-/jira/login/oauth/callback`.
 
     ![GitLab Application setup](img/jira_dev_panel_gl_setup_1.png)
-
     - Check `api` in the Scopes section.
 
 2. Click `Save application`. You will see the generated 'Application Id' and 'Secret' values.
@@ -83,13 +82,16 @@ Specify the GitLab group name accordingly. (Note that you can also specify GitLa
 are really GitLab "groups" behind the scenes. In that case, all the projects for that user would
 be made known to JIRA, up to the permissions of the user setting up the integration.)
 
-You can now see the linked `branches` and `commits` when entering a JIRA issue.
+You can now see the linked `branches`, `commits`, and `merge requests` when entering a JIRA issue.
+(Inside the Jira issue, merge requests will be called "pull requests").
 
-![Branch and Commit links on JIRA issue](img/jira_dev_panel_jira_setup_3.png)
+![Branch, Commit and Pull Requests links on JIRA issue](img/jira_dev_panel_jira_setup_3.png)
 
-Click these links to see your GitLab repository data.
+Click the links to see your GitLab repository data.
 
-![GitLab commit details on a JIRA issue](img/jira_dev_panel_jira_setup_4.png)
+![GitLab commits details on a JIRA issue](img/jira_dev_panel_jira_setup_4.png)
+
+![GitLab merge requests details on a JIRA issue](img/jira_dev_panel_jira_setup_5.png)
 
 
 ## Limitations

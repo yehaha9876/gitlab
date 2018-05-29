@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import { refreshCurrentPage } from '../../lib/utils/url_utility';
 
 function showBlacklistType() {
@@ -16,15 +17,15 @@ export default function adminInit() {
   $('input#user_force_random_password').on('change', function randomPasswordClick() {
     const $elems = $('#user_password, #user_password_confirmation');
     if ($(this).attr('checked')) {
-      $elems.val('').attr('disabled', true);
+      $elems.val('').prop('disabled', true);
     } else {
-      $elems.removeAttr('disabled');
+      $elems.prop('disabled', false);
     }
   });
 
   $('body').on('click', '.js-toggle-colors-link', (e) => {
     e.preventDefault();
-    $('.js-toggle-colors-container').toggle();
+    $('.js-toggle-colors-container').toggleClass('hide');
   });
 
   $('.log-tabs a').on('click', function logTabsClick(e) {

@@ -3,7 +3,6 @@
 - page_title "Edit", @blob.path, @ref
 - content_for :page_specific_javascripts do
   = page_specific_javascript_tag('lib/ace.js')
-  = webpack_bundle_tag('blob')
 
 %div{ class: container_class }
   - if @conflict
@@ -16,7 +15,7 @@
       Edit file
     = render 'template_selectors'
   .file-editor
-    %ul.nav-links.no-bottom.js-edit-mode
+    %ul.nav-links.no-bottom.js-edit-mode.nav.nav-tabs
       %li.active
         = link_to '#editor' do
           Write
@@ -25,7 +24,7 @@
         = link_to '#preview', 'data-preview-url' => project_preview_blob_path(@project, @id) do
           = editing_preview_title(@blob.name)
 
-    = form_tag(project_update_blob_path(@project, @id), method: :put, class: 'form-horizontal js-quick-submit js-requires-input js-edit-blob-form', data: blob_editor_paths) do
+    = form_tag(project_update_blob_path(@project, @id), method: :put, class: 'js-quick-submit js-requires-input js-edit-blob-form', data: blob_editor_paths) do
       = render 'projects/blob/editor', ref: @ref, path: @path, blob_data: @blob.data
       = render 'shared/new_commit_form', placeholder: "Update #{@blob.name}"
       = hidden_field_tag 'last_commit_sha', @last_commit_sha

@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Project do
+  include ExternalAuthorizationServiceHelpers
   using RSpec::Parameterized::TableSyntax
 
   describe 'associations' do
@@ -12,8 +13,11 @@ describe Project do
     it { is_expected.to delegate_method(:shared_runners_minutes_limit_enabled?).to(:shared_runners_limit_namespace) }
     it { is_expected.to delegate_method(:shared_runners_minutes_used?).to(:shared_runners_limit_namespace) }
 
-    it { is_expected.to have_one(:mirror_data).class_name('ProjectMirrorData') }
+    it { is_expected.to have_one(:import_state).class_name('ProjectImportState') }
+    it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState').inverse_of(:project) }
+
     it { is_expected.to have_many(:path_locks) }
+    it { is_expected.to have_many(:vulnerability_feedback) }
     it { is_expected.to have_many(:sourced_pipelines) }
     it { is_expected.to have_many(:source_pipelines) }
     it { is_expected.to have_many(:audit_events).dependent(false) }
@@ -45,6 +49,52 @@ describe Project do
     end
   end
 
+  describe 'setting up a mirror' do
+    context 'when new project' do
+      it 'creates import_state and sets next_execution_timestamp to now' do
+        project = build(:project, :mirror)
+
+        Timecop.freeze do
+          expect do
+            project.save
+          end.to change { ProjectImportState.count }.by(1)
+
+          expect(project.import_state.next_execution_timestamp).to eq(Time.now)
+        end
+      end
+    end
+
+    context 'when project already exists' do
+      context 'when project is not import' do
+        it 'creates import_state and sets next_execution_timestamp to now' do
+          project = create(:project)
+
+          Timecop.freeze do
+            expect do
+              project.update_attributes(mirror: true, mirror_user_id: project.creator.id, import_url: generate(:url))
+            end.to change { ProjectImportState.count }.by(1)
+
+            expect(project.import_state.next_execution_timestamp).to eq(Time.now)
+          end
+        end
+      end
+
+      context 'when project is import' do
+        it 'sets current import_state next_execution_timestamp to now' do
+          project = create(:project, import_url: generate(:url))
+
+          Timecop.freeze do
+            expect do
+              project.update_attributes(mirror: true, mirror_user_id: project.creator.id)
+            end.not_to change { ProjectImportState.count }
+
+            expect(project.import_state.next_execution_timestamp).to eq(Time.now)
+          end
+        end
+      end
+    end
+  end
+
   describe '.mirrors_to_sync' do
     let(:timestamp) { Time.now }
 
@@ -65,14 +115,15 @@ describe Project do
     end
 
     context 'when mirror is finished' do
-      let!(:project) { create(:project, :mirror, :import_finished) }
+      let!(:project) { create(:project) }
+      let!(:import_state) { create(:import_state, :mirror, :finished, project: project) }
 
       it 'returns project if next_execution_timestamp is not in the future' do
         expect(described_class.mirrors_to_sync(timestamp)).to match_array(project)
       end
 
       it 'returns empty if next_execution_timestamp is in the future' do
-        project.mirror_data.update_attributes(next_execution_timestamp: timestamp + 2.minutes)
+        import_state.update_attributes(next_execution_timestamp: timestamp + 2.minutes)
 
         expect(described_class.mirrors_to_sync(timestamp)).to be_empty
       end
@@ -86,7 +137,7 @@ describe Project do
       end
 
       it 'returns empty if next_execution_timestamp is in the future' do
-        project.mirror_data.update_attributes(next_execution_timestamp: timestamp + 2.minutes)
+        project.import_state.update_attributes(next_execution_timestamp: timestamp + 2.minutes)
 
         expect(described_class.mirrors_to_sync(timestamp)).to be_empty
       end
@@ -98,6 +149,29 @@ describe Project do
           expect(described_class.mirrors_to_sync(timestamp)).to be_empty
         end
       end
+    end
+  end
+
+  describe '#ensure_external_webhook_token' do
+    let(:project) { create(:project, :repository) }
+
+    it "sets external_webhook_token when it's missing" do
+      project.update_attribute(:external_webhook_token, nil)
+      expect(project.external_webhook_token).to be_blank
+
+      project.ensure_external_webhook_token
+      expect(project.external_webhook_token).to be_present
+    end
+  end
+
+  describe 'hard failing a mirror' do
+    it 'sends a notification' do
+      project = create(:project, :mirror, :import_started)
+      project.import_state.update_attributes(retry_count: Gitlab::Mirror::MAX_RETRY)
+
+      expect_any_instance_of(EE::NotificationService).to receive(:mirror_was_hard_failed).with(project)
+
+      project.import_fail
     end
   end
 
@@ -290,7 +364,7 @@ describe Project do
       expect(UpdateAllMirrorsWorker).to receive(:perform_async)
 
       Timecop.freeze(timestamp) do
-        expect { project.force_import_job! }.to change(project.mirror_data, :next_execution_timestamp).to(timestamp)
+        expect { project.force_import_job! }.to change(project.import_state, :next_execution_timestamp).to(timestamp)
       end
     end
 
@@ -302,8 +376,8 @@ describe Project do
         expect(UpdateAllMirrorsWorker).to receive(:perform_async)
 
         Timecop.freeze(timestamp) do
-          expect { project.force_import_job! }.to change(project.mirror_data, :retry_count).to(0)
-          expect(project.mirror_data.next_execution_timestamp).to eq(timestamp)
+          expect { project.force_import_job! }.to change(project.import_state, :retry_count).to(0)
+          expect(project.import_state.next_execution_timestamp).to eq(timestamp)
         end
       end
     end
@@ -327,12 +401,22 @@ describe Project do
     end
   end
 
+  describe 'updating import_url' do
+    it 'removes previous remote' do
+      project = create(:project, :repository, :mirror)
+
+      expect(RepositoryRemoveRemoteWorker).to receive(:perform_async).with(project.id, ::Repository::MIRROR_REMOTE).and_call_original
+
+      project.update_attributes(import_url: "http://test.com")
+    end
+  end
+
   describe '#mirror_waiting_duration' do
     it 'returns in seconds the time spent in the queue' do
       project = create(:project, :mirror, :import_scheduled)
-      mirror_data = project.mirror_data
+      import_state = project.import_state
 
-      mirror_data.update_attributes(last_update_started_at: mirror_data.last_update_scheduled_at + 5.minutes)
+      import_state.update_attributes(last_update_started_at: import_state.last_update_scheduled_at + 5.minutes)
 
       expect(project.mirror_waiting_duration).to eq(300)
     end
@@ -342,29 +426,29 @@ describe Project do
     it 'returns in seconds the time spent updating' do
       project = create(:project, :mirror, :import_started)
 
-      project.update_attributes(mirror_last_update_at: project.mirror_data.last_update_started_at + 5.minutes)
+      project.update_attributes(mirror_last_update_at: project.import_state.last_update_started_at + 5.minutes)
 
       expect(project.mirror_update_duration).to eq(300)
     end
   end
 
-  describe '#scheduled_mirror?' do
+  describe '#mirror_about_to_update?' do
     context 'when mirror is expected to run soon' do
       it 'returns true' do
         timestamp = Time.now
         project = create(:project, :mirror, :import_finished, :repository)
         project.mirror_last_update_at = timestamp - 3.minutes
-        project.mirror_data.next_execution_timestamp = timestamp - 2.minutes
+        project.import_state.next_execution_timestamp = timestamp - 2.minutes
 
-        expect(project.scheduled_mirror?).to be true
+        expect(project.mirror_about_to_update?).to be true
       end
     end
 
     context 'when mirror was scheduled' do
-      it 'returns true' do
+      it 'returns false' do
         project = create(:project, :mirror, :import_scheduled, :repository)
 
-        expect(project.scheduled_mirror?).to be true
+        expect(project.mirror_about_to_update?).to be false
       end
     end
 
@@ -372,7 +456,68 @@ describe Project do
       it 'returns false' do
         project = create(:project, :mirror, :import_hard_failed)
 
-        expect(project.scheduled_mirror?).to be false
+        expect(project.mirror_about_to_update?).to be false
+      end
+    end
+  end
+
+  describe '#import_in_progress?' do
+    let(:traits) { [] }
+    let(:project) { create(:project, *traits, import_url: Project::UNKNOWN_IMPORT_URL) }
+
+    shared_examples 'import in progress' do
+      context 'when project is a mirror' do
+        before do
+          traits << :mirror
+        end
+
+        context 'when repository is empty' do
+          it 'returns true' do
+            expect(project.import_in_progress?).to be_truthy
+          end
+        end
+
+        context 'when repository is not empty' do
+          before do
+            traits << :repository
+          end
+
+          it 'returns false' do
+            expect(project.import_in_progress?).to be_falsey
+          end
+        end
+      end
+
+      context 'when project is not a mirror' do
+        it 'returns true' do
+          expect(project.import_in_progress?).to be_truthy
+        end
+      end
+    end
+
+    context 'when import status is scheduled' do
+      before do
+        traits << :import_scheduled
+      end
+
+      it_behaves_like 'import in progress'
+    end
+
+    context 'when import status is started' do
+      before do
+        traits << :import_started
+      end
+
+      it_behaves_like 'import in progress'
+    end
+
+    context 'when import status is finished' do
+      before do
+        traits << :import_finished
+      end
+
+      it 'returns false' do
+        expect(project.import_in_progress?).to be_falsey
       end
     end
   end
@@ -394,9 +539,17 @@ describe Project do
       end
     end
 
-    context 'when mirror is in progress' do
+    context 'when mirror is started' do
       it 'returns true' do
         project = create(:project, :mirror, :import_started, :repository)
+
+        expect(project.updating_mirror?).to be true
+      end
+    end
+
+    context 'when mirror is scheduled' do
+      it 'returns true' do
+        project = create(:project, :mirror, :import_scheduled, :repository)
 
         expect(project.updating_mirror?).to be true
       end
@@ -434,71 +587,6 @@ describe Project do
           expect(project.mirror_last_update_status).to eq(:failed)
         end
       end
-    end
-  end
-
-  describe '#has_remote_mirror?' do
-    let(:project) { create(:project, :remote_mirror, :import_started) }
-    subject { project.has_remote_mirror? }
-
-    before do
-      allow_any_instance_of(RemoteMirror).to receive(:refresh_remote)
-    end
-
-    it 'returns true when a remote mirror is enabled' do
-      is_expected.to be_truthy
-    end
-
-    it 'returns false when unlicensed' do
-      stub_licensed_features(repository_mirrors: false)
-
-      is_expected.to be_falsy
-    end
-
-    it 'returns false when remote mirror is disabled' do
-      project.remote_mirrors.first.update_attributes(enabled: false)
-
-      is_expected.to be_falsy
-    end
-  end
-
-  describe '#update_remote_mirrors' do
-    let(:project) { create(:project, :remote_mirror, :import_started) }
-    delegate :update_remote_mirrors, to: :project
-
-    before do
-      allow_any_instance_of(RemoteMirror).to receive(:refresh_remote)
-    end
-
-    it 'syncs enabled remote mirror' do
-      expect_any_instance_of(RemoteMirror).to receive(:sync)
-
-      update_remote_mirrors
-    end
-
-    it 'does nothing when remote mirror is disabled globally and not overridden' do
-      stub_application_setting(mirror_available: false)
-      project.remote_mirror_available_overridden = false
-
-      expect_any_instance_of(RemoteMirror).not_to receive(:sync)
-
-      update_remote_mirrors
-    end
-
-    it 'does nothing when unlicensed' do
-      stub_licensed_features(repository_mirrors: false)
-
-      expect_any_instance_of(RemoteMirror).not_to receive(:sync)
-
-      update_remote_mirrors
-    end
-
-    it 'does not sync disabled remote mirrors' do
-      project.remote_mirrors.first.update_attributes(enabled: false)
-
-      expect_any_instance_of(RemoteMirror).not_to receive(:sync)
-
-      update_remote_mirrors
     end
   end
 
@@ -747,8 +835,8 @@ describe Project do
         default_branch_protection: Gitlab::Access::PROTECTION_NONE)
     end
 
-    context 'when environment is specified' do
-      let(:environment) { create(:environment, name: 'review/name') }
+    context 'when environment name is specified' do
+      let(:environment) { 'review/name' }
 
       subject do
         project.secret_variables_for(ref: 'ref', environment: environment)
@@ -833,11 +921,14 @@ describe Project do
           is_expected.not_to contain_exactly(secret_variable)
         end
 
-        it 'matches literally for _' do
-          secret_variable.update(environment_scope: 'foo_bar/*')
-          environment.update(name: 'foo_bar/test')
+        context 'when environment name contains underscore' do
+          let(:environment) { 'foo_bar/test' }
 
-          is_expected.to contain_exactly(secret_variable)
+          it 'matches literally for _' do
+            secret_variable.update(environment_scope: 'foo_bar/*')
+
+            is_expected.to contain_exactly(secret_variable)
+          end
         end
       end
 
@@ -856,11 +947,14 @@ describe Project do
           is_expected.not_to contain_exactly(secret_variable)
         end
 
-        it 'matches literally for _' do
-          secret_variable.update(environment_scope: 'foo%bar/*')
-          environment.update_attribute(:name, 'foo%bar/test')
+        context 'when environment name contains a percent' do
+          let(:environment) { 'foo%bar/test' }
 
-          is_expected.to contain_exactly(secret_variable)
+          it 'matches literally for _' do
+            secret_variable.update(environment_scope: 'foo%bar/*')
+
+            is_expected.to contain_exactly(secret_variable)
+          end
         end
       end
 
@@ -991,6 +1085,8 @@ describe Project do
 
   shared_examples 'project with disabled services' do
     it 'has some disabled services' do
+      stub_const('License::ANY_PLAN_FEATURES', [])
+
       expect(project.disabled_services).to match_array(disabled_services)
     end
   end
@@ -1004,7 +1100,7 @@ describe Project do
   describe '#disabled_services' do
     let(:namespace) { create(:group, :private) }
     let(:project) { create(:project, :private, namespace: namespace) }
-    let(:disabled_services) { %w(jenkins jenkins_deprecated) }
+    let(:disabled_services) { %w(jenkins jenkins_deprecated github) }
 
     context 'without a license key' do
       before do
@@ -1015,6 +1111,10 @@ describe Project do
     end
 
     context 'with a license key' do
+      before do
+        allow_any_instance_of(License).to receive(:plan).and_return(License::PREMIUM_PLAN)
+      end
+
       context 'when checking of namespace plan is enabled' do
         before do
           stub_application_setting_on_object(project, should_check_namespace_plan: true)
@@ -1025,7 +1125,7 @@ describe Project do
         end
 
         context 'and namespace has a plan' do
-          let(:namespace) { create(:group, :private, plan: :bronze_plan) }
+          let(:namespace) { create(:group, :private, plan: :silver_plan) }
 
           it_behaves_like 'project without disabled services'
         end
@@ -1037,32 +1137,6 @@ describe Project do
         end
 
         it_behaves_like 'project without disabled services'
-      end
-    end
-  end
-
-  describe '#remote_mirror_available?' do
-    let(:project) { create(:project) }
-
-    context 'when remote mirror global setting is enabled' do
-      it 'returns true' do
-        expect(project.remote_mirror_available?).to be(true)
-      end
-    end
-
-    context 'when remote mirror global setting is disabled' do
-      before do
-        stub_application_setting(mirror_available: false)
-      end
-
-      it 'returns true when overridden' do
-        project.remote_mirror_available_overridden = true
-
-        expect(project.remote_mirror_available?).to be(true)
-      end
-
-      it 'returns false when not overridden' do
-        expect(project.remote_mirror_available?).to be(false)
       end
     end
   end
@@ -1153,6 +1227,167 @@ describe Project do
 
       expect(projects).to include(project1)
       expect(projects).not_to include(project2)
+    end
+  end
+
+  describe '#external_authorization_classification_label' do
+    it 'falls back to the default when none is configured' do
+      enable_external_authorization_service_check
+
+      expect(build(:project).external_authorization_classification_label)
+        .to eq('default_label')
+    end
+
+    it 'returns `nil` if the feature is disabled' do
+      stub_licensed_features(external_authorization_service: false)
+
+      project = build(:project,
+                      external_authorization_classification_label: 'hello')
+
+      expect(project.external_authorization_classification_label)
+        .to eq(nil)
+    end
+
+    it 'returns the classification label if it was configured on the project' do
+      enable_external_authorization_service_check
+
+      project = build(:project,
+                      external_authorization_classification_label: 'hello')
+
+      expect(project.external_authorization_classification_label)
+        .to eq('hello')
+    end
+
+    it 'does not break when not stubbing the license check' do
+      enable_external_authorization_service_check
+      enable_namespace_license_check!
+      project = build(:project)
+
+      expect { project.external_authorization_classification_label }.not_to raise_error
+    end
+  end
+
+  describe 'project import state transitions' do
+    context 'state transition: [:started] => [:finished]' do
+      context 'elasticsearch indexing disabled' do
+        before do
+          stub_ee_application_setting(elasticsearch_indexing: false)
+        end
+
+        it 'does not index the repository' do
+          project = create(:project, :import_started, import_type: :github)
+
+          expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
+
+          project.import_finish
+        end
+      end
+
+      context 'elasticsearch indexing enabled' do
+        let(:project) { create(:project, :import_started, import_type: :github) }
+
+        before do
+          stub_ee_application_setting(elasticsearch_indexing: true)
+        end
+
+        context 'no index status' do
+          it 'schedules a full index of the repository' do
+            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil)
+
+            project.import_finish
+          end
+        end
+
+        context 'with index status' do
+          let!(:index_status) { project.create_index_status!(indexed_at: Time.now, last_commit: 'foo') }
+
+          it 'schedules a progressive index of the repository' do
+            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, index_status.last_commit)
+
+            project.import_finish
+          end
+        end
+      end
+    end
+  end
+
+  describe '#licensed_features' do
+    let(:plan_license) { :free_plan }
+    let(:global_license) { create(:license) }
+    let(:group) { create(:group, plan: plan_license) }
+    let(:project) { create(:project, group: group) }
+
+    before do
+      allow(License).to receive(:current).and_return(global_license)
+      allow(global_license).to receive(:features).and_return([
+        :epics, # Gold only
+        :service_desk, # Silver and up
+        :audit_events, # Bronze and up
+        :geo, # Global feature, should not be checked at namespace level
+      ])
+    end
+
+    subject { project.licensed_features }
+
+    context 'when the namespace should be checked' do
+      before do
+        enable_namespace_license_check!
+      end
+
+      context 'when bronze' do
+        let(:plan_license) { :bronze_plan }
+
+        it 'filters for bronze features' do
+          is_expected.to contain_exactly(:audit_events, :geo)
+        end
+      end
+
+      context 'when silver' do
+        let(:plan_license) { :silver_plan }
+
+        it 'filters for silver features' do
+          is_expected.to contain_exactly(:service_desk, :audit_events, :geo)
+        end
+      end
+
+      context 'when gold' do
+        let(:plan_license) { :gold_plan }
+
+        it 'filters for gold features' do
+          is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
+        end
+      end
+
+      context 'when free plan' do
+        let(:plan_license) { :free_plan }
+
+        it 'filters out paid features' do
+          is_expected.to contain_exactly(:geo)
+        end
+
+        context 'when public project and namespace' do
+          let(:group) { create(:group, :public, plan: plan_license) }
+          let(:project) { create(:project, :public, group: group) }
+
+          it 'includes all features in global license' do
+            is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
+          end
+        end
+      end
+    end
+
+    context 'when namespace should not be checked' do
+      it 'includes all features in global license' do
+        is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
+      end
+    end
+
+    context 'when there is no license' do
+      before do
+        allow(License).to receive(:current).and_return(nil)
+      end
+
+      it { is_expected.to be_empty }
     end
   end
 end

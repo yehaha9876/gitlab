@@ -26,6 +26,8 @@ module Projects
 
       transfer(project)
 
+      current_user.invalidate_personal_projects_count
+
       true
     rescue Projects::TransferService::TransferError => ex
       project.reload
@@ -127,7 +129,7 @@ module Projects
     end
 
     def move_repo_folder(from_name, to_name)
-      gitlab_shell.mv_repository(project.repository_storage_path, from_name, to_name)
+      gitlab_shell.mv_repository(project.repository_storage, from_name, to_name)
     end
 
     def execute_system_hooks

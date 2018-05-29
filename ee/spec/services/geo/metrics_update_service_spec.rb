@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Geo::MetricsUpdateService, :geo do
+describe Geo::MetricsUpdateService, :geo, :prometheus do
   include ::EE::GeoHelpers
 
   set(:primary) { create(:geo_node, :primary) }
@@ -25,12 +25,15 @@ describe Geo::MetricsUpdateService, :geo do
       lfs_objects_count: 100,
       lfs_objects_synced_count: 50,
       lfs_objects_failed_count: 12,
+      lfs_objects_synced_missing_on_primary_count: 4,
       job_artifacts_count: 100,
       job_artifacts_synced_count: 50,
       job_artifacts_failed_count: 12,
+      job_artifacts_synced_missing_on_primary_count: 5,
       attachments_count: 30,
       attachments_synced_count: 30,
       attachments_failed_count: 25,
+      attachments_synced_missing_on_primary_count: 6,
       last_event_id: 2,
       last_event_date: event_date,
       cursor_last_event_id: 1,
@@ -49,6 +52,27 @@ describe Geo::MetricsUpdateService, :geo do
     }
   end
 
+  let(:primary_data) do
+    {
+      success: true,
+      status_message: nil,
+      repositories_count: 10,
+      wikis_count: 10,
+      lfs_objects_count: 100,
+      job_artifacts_count: 100,
+      attachments_count: 30,
+      last_event_id: 2,
+      last_event_date: event_date,
+      event_log_count: 55,
+      event_log_max_id: 555
+    }
+  end
+
+  # FIXME: we don't clear prometheus state between specs, so these specs below
+  # create *persistent* entries in the prometheus database that may cause other
+  # specs to transiently fail.
+  #
+  # Issue: https://gitlab.com/gitlab-org/gitlab-ce/issues/39968
   before do
     allow(Gitlab::Metrics).to receive(:prometheus_metrics_enabled?).and_return(true)
   end
@@ -56,7 +80,7 @@ describe Geo::MetricsUpdateService, :geo do
   describe '#execute' do
     before do
       request = double(success?: true, parsed_response: data.stringify_keys, code: 200)
-      allow(Geo::NodeStatusFetchService).to receive(:get).and_return(request)
+      allow(Gitlab::HTTP).to receive(:get).and_return(request)
     end
 
     context 'when current node is nil' do
@@ -65,7 +89,7 @@ describe Geo::MetricsUpdateService, :geo do
       end
 
       it 'skips fetching the status' do
-        expect(Geo::NodeStatusFetchService).to receive(:get).never
+        expect(Gitlab::HTTP).to receive(:get).never
 
         subject.execute
       end
@@ -77,16 +101,19 @@ describe Geo::MetricsUpdateService, :geo do
       end
 
       it 'attempts to retrieve metrics from all nodes' do
+        allow(GeoNodeStatus).to receive(:current_node_status).and_return(GeoNodeStatus.from_json(primary_data.as_json))
+
         subject.execute
 
         expect(Gitlab::Metrics.registry.get(:geo_db_replication_lag_seconds).values.count).to eq(2)
-        expect(Gitlab::Metrics.registry.get(:geo_repositories).values.count).to eq(2)
+        expect(Gitlab::Metrics.registry.get(:geo_repositories).values.count).to eq(3)
         expect(Gitlab::Metrics.registry.get(:geo_repositories).get({ url: secondary.url })).to eq(10)
-        expect(Gitlab::Metrics.registry.get(:geo_repositories).get({ url: secondary.url })).to eq(10)
+        expect(Gitlab::Metrics.registry.get(:geo_repositories).get({ url: another_secondary.url })).to eq(10)
+        expect(Gitlab::Metrics.registry.get(:geo_repositories).get({ url: primary.url })).to eq(10)
       end
 
       it 'updates the GeoNodeStatus entry' do
-        expect { subject.execute }.to change { GeoNodeStatus.count }.by(2)
+        expect { subject.execute }.to change { GeoNodeStatus.count }.by(3)
 
         status = secondary.status.load_data_from_current_node
 
@@ -97,7 +124,7 @@ describe Geo::MetricsUpdateService, :geo do
       it 'updates only the active node' do
         secondary.update_attributes(enabled: false)
 
-        expect { subject.execute }.to change { GeoNodeStatus.count }.by(1)
+        expect { subject.execute }.to change { GeoNodeStatus.count }.by(2)
 
         expect(another_secondary.status).not_to be_nil
       end
@@ -124,12 +151,15 @@ describe Geo::MetricsUpdateService, :geo do
         expect(metric_value(:geo_lfs_objects)).to eq(100)
         expect(metric_value(:geo_lfs_objects_synced)).to eq(50)
         expect(metric_value(:geo_lfs_objects_failed)).to eq(12)
+        expect(metric_value(:geo_lfs_objects_synced_missing_on_primary)).to eq(4)
         expect(metric_value(:geo_job_artifacts)).to eq(100)
         expect(metric_value(:geo_job_artifacts_synced)).to eq(50)
         expect(metric_value(:geo_job_artifacts_failed)).to eq(12)
+        expect(metric_value(:geo_job_artifacts_synced_missing_on_primary)).to eq(5)
         expect(metric_value(:geo_attachments)).to eq(30)
         expect(metric_value(:geo_attachments_synced)).to eq(30)
         expect(metric_value(:geo_attachments_failed)).to eq(25)
+        expect(metric_value(:geo_attachments_synced_missing_on_primary)).to eq(6)
         expect(metric_value(:geo_last_event_id)).to eq(2)
         expect(metric_value(:geo_last_event_timestamp)).to eq(event_date.to_i)
         expect(metric_value(:geo_cursor_last_event_id)).to eq(1)
@@ -155,6 +185,16 @@ describe Geo::MetricsUpdateService, :geo do
         subject.execute
 
         expect { subject.execute }.to change { metric_value(:geo_status_failed_total) }.by(1)
+      end
+
+      it 'updates cache' do
+        status = GeoNodeStatus.new(success: true)
+
+        expect(status).to receive(:update_cache!)
+
+        allow(subject).to receive(:node_status).and_return(status)
+
+        subject.execute
       end
 
       it 'does not create GeoNodeStatus entries' do

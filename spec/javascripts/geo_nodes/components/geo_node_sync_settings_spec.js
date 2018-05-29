@@ -1,17 +1,18 @@
 import Vue from 'vue';
 
 import geoNodeSyncSettingsComponent from 'ee/geo_nodes/components/geo_node_sync_settings.vue';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockNodeDetails } from '../mock_data';
 
-import mountComponent from '../../helpers/vue_mount_component_helper';
-
 const createComponent = (
+  syncStatusUnavailable = false,
   selectiveSyncType = mockNodeDetails.selectiveSyncType,
   lastEvent = mockNodeDetails.lastEvent,
   cursorLastEvent = mockNodeDetails.cursorLastEvent) => {
   const Component = Vue.extend(geoNodeSyncSettingsComponent);
 
   return mountComponent(Component, {
+    syncStatusUnavailable,
     selectiveSyncType,
     lastEvent,
     cursorLastEvent,
@@ -30,7 +31,7 @@ describe('GeoNodeSyncSettingsComponent', () => {
 
     describe('eventTimestampEmpty', () => {
       it('returns `true` if one of the event timestamp is empty', () => {
-        const vmEmptyTimestamp = createComponent(mockNodeDetails.namespaces, {
+        const vmEmptyTimestamp = createComponent(false, mockNodeDetails.namespaces, {
           id: 0,
           timeStamp: 0,
         }, {
@@ -86,6 +87,14 @@ describe('GeoNodeSyncSettingsComponent', () => {
         expect(vm.statusTooltip(1000)).toBe('Node is slow, overloaded, or it just recovered after an outage.');
         expect(vm.statusTooltip(4000)).toBe('Node is failing or broken.');
       });
+    });
+  });
+
+  describe('template', () => {
+    it('renders `Unknown` when `syncStatusUnavailable` prop is true', () => {
+      const vmSyncUnavailable = createComponent(true);
+      expect(vmSyncUnavailable.$el.innerText.trim()).toBe('Unknown');
+      vmSyncUnavailable.$destroy();
     });
   });
 });

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe API::GeoNodes, :geo, api: true do
+describe API::GeoNodes, :geo, :prometheus, api: true do
   include ApiHelpers
   include ::EE::GeoHelpers
 
@@ -34,9 +34,11 @@ describe API::GeoNodes, :geo, api: true do
 
       expect(response).to have_gitlab_http_status(200)
       expect(response).to match_response_schema('public_api/v4/geo_node', dir: 'ee')
+      expect(json_response['web_edit_url']).to end_with("/admin/geo_nodes/#{primary.id}/edit")
 
       links = json_response['_links']
       expect(links['self']).to end_with("/api/v4/geo_nodes/#{primary.id}")
+      expect(links['status']).to end_with("/api/v4/geo_nodes/#{primary.id}/status")
       expect(links['repair']).to end_with("/api/v4/geo_nodes/#{primary.id}/repair")
     end
 
@@ -149,7 +151,7 @@ describe API::GeoNodes, :geo, api: true do
 
   describe 'PUT /geo_nodes/:id' do
     it_behaves_like '404 response' do
-      let(:request) { get api("/geo_nodes/#{unexisting_node_id}/status", admin) }
+      let(:request) { put api("/geo_nodes/#{unexisting_node_id}", admin), {} }
     end
 
     it 'denies access if not admin' do
@@ -171,6 +173,32 @@ describe API::GeoNodes, :geo, api: true do
       expect(response).to have_gitlab_http_status(200)
       expect(response).to match_response_schema('public_api/v4/geo_node', dir: 'ee')
       expect(json_response).to include(params)
+    end
+  end
+
+  describe 'DELETE /geo_nodes/:id' do
+    it_behaves_like '404 response' do
+      let(:request) { delete api("/geo_nodes/#{unexisting_node_id}", admin) }
+    end
+
+    it 'denies access if not admin' do
+      delete api("/geo_nodes/#{secondary.id}", user)
+
+      expect(response).to have_gitlab_http_status(403)
+    end
+
+    it 'deletes the node' do
+      delete api("/geo_nodes/#{secondary.id}", admin)
+
+      expect(response).to have_gitlab_http_status(204)
+    end
+
+    it 'returns 400 if Geo Node could not be deleted' do
+      allow_any_instance_of(GeoNode).to receive(:destroy!).and_raise(StandardError, 'Something wrong')
+
+      delete api("/geo_nodes/#{secondary.id}", admin)
+
+      expect(response).to have_gitlab_http_status(500)
     end
   end
 

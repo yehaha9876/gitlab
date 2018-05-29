@@ -24,7 +24,7 @@ module Gitlab
             address = val['gitaly_address']
           end
 
-          storages << { name: key, path: val['path'] }
+          storages << { name: key, path: val.legacy_disk_path }
         end
 
         if Rails.env.test?
@@ -37,7 +37,7 @@ module Gitlab
         config[:'gitlab-shell'] = { dir: Gitlab.config.gitlab_shell.path }
         config[:bin_dir] = Gitlab.config.gitaly.client_path
 
-        TOML.dump(config)
+        TomlRB.dump(config)
       end
 
       # rubocop:disable Rails/Output

@@ -1,9 +1,9 @@
-import ProjectNew from '../shared/project_new';
+import initProjectLoadingSpinner from '../shared/save_project_loader';
 import initProjectVisibilitySelector from '../../../project_visibility';
 import initProjectNew from '../../../projects/project_new';
 
-export default () => {
-  new ProjectNew(); // eslint-disable-line no-new
+document.addEventListener('DOMContentLoaded', () => {
+  initProjectLoadingSpinner();
   initProjectVisibilitySelector();
   initProjectNew.bindEvents();
-};
+});

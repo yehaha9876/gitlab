@@ -40,8 +40,8 @@ describe API::Epics do
     end
   end
 
-  describe 'GET /groups/:id/-/epics' do
-    let(:url) { "/groups/#{group.path}/-/epics" }
+  describe 'GET /groups/:id/epics' do
+    let(:url) { "/groups/#{group.path}/epics" }
 
     it_behaves_like 'error requests'
 
@@ -78,6 +78,8 @@ describe API::Epics do
                created_at: 2.days.ago,
                updated_at: 3.days.ago)
       end
+      let!(:label) { create(:group_label, title: 'a-test', group: group) }
+      let!(:label_link) { create(:label_link, label: label, target: epic2) }
 
       before do
         stub_licensed_features(epics: true)
@@ -130,11 +132,17 @@ describe API::Epics do
 
         expect_array_response([epic2.id, epic.id])
       end
+
+      it 'returns an array of labeled epics' do
+        get api(url, user), labels: label.title
+
+        expect_array_response([epic2.id])
+      end
     end
   end
 
-  describe 'GET /groups/:id/-/epics/:epic_iid' do
-    let(:url) { "/groups/#{group.path}/-/epics/#{epic.iid}" }
+  describe 'GET /groups/:id/epics/:epic_iid' do
+    let(:url) { "/groups/#{group.path}/epics/#{epic.iid}" }
 
     it_behaves_like 'error requests'
 
@@ -155,9 +163,9 @@ describe API::Epics do
     end
   end
 
-  describe 'POST /groups/:id/-/epics' do
-    let(:url) { "/groups/#{group.path}/-/epics" }
-    let(:params) { { title: 'new epic', description: 'epic description' } }
+  describe 'POST /groups/:id/epics' do
+    let(:url) { "/groups/#{group.path}/epics" }
+    let(:params) { { title: 'new epic', description: 'epic description', labels: 'label1' } }
 
     it_behaves_like 'error requests'
 
@@ -196,14 +204,15 @@ describe API::Epics do
 
           expect(epic.title).to eq('new epic')
           expect(epic.description).to eq('epic description')
+          expect(epic.labels.first.title).to eq('label1')
         end
       end
     end
   end
 
-  describe 'PUT /groups/:id/-/epics/:epic_iid' do
-    let(:url) { "/groups/#{group.path}/-/epics/#{epic.iid}" }
-    let(:params) { { title: 'new title', description: 'new description' } }
+  describe 'PUT /groups/:id/epics/:epic_iid' do
+    let(:url) { "/groups/#{group.path}/epics/#{epic.iid}" }
+    let(:params) { { title: 'new title', description: 'new description', labels: 'label2' } }
 
     it_behaves_like 'error requests'
 
@@ -250,13 +259,14 @@ describe API::Epics do
 
           expect(result.title).to eq('new title')
           expect(result.description).to eq('new description')
+          expect(result.labels.first.title).to eq('label2')
         end
       end
     end
   end
 
-  describe 'DELETE /groups/:id/-/epics/:epic_iid' do
-    let(:url) { "/groups/#{group.path}/-/epics/#{epic.iid}" }
+  describe 'DELETE /groups/:id/epics/:epic_iid' do
+    let(:url) { "/groups/#{group.path}/epics/#{epic.iid}" }
 
     it_behaves_like 'error requests'
 

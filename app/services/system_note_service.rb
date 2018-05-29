@@ -3,6 +3,7 @@
 # Used for creating system notes (e.g., when a user references a merge request
 # from an issue, an issue's assignee changes, an issue is closed, etc.)
 module SystemNoteService
+  prepend EE::SystemNoteService
   extend self
 
   # Called when commits are added to a Merge Request
@@ -429,7 +430,7 @@ module SystemNoteService
   def cross_reference(noteable, mentioner, author)
     return if cross_reference_disallowed?(noteable, mentioner)
 
-    gfm_reference = mentioner.gfm_reference(noteable.project)
+    gfm_reference = mentioner.gfm_reference(noteable.project || noteable.group)
     body = cross_reference_note_content(gfm_reference)
 
     if noteable.is_a?(ExternalIssue)
@@ -687,7 +688,7 @@ module SystemNoteService
       text = "#{cross_reference_note_prefix}%#{mentioner.to_reference(nil)}"
       notes.where('(note LIKE ? OR note LIKE ?)', text, text.capitalize)
     else
-      gfm_reference = mentioner.gfm_reference(noteable.project)
+      gfm_reference = mentioner.gfm_reference(noteable.project || noteable.group)
       text = cross_reference_note_content(gfm_reference)
       notes.where(note: [text, text.capitalize])
     end

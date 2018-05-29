@@ -1,3 +1,8 @@
+---
+description: 'Learn how to spin up a 
+pre-configured GitLab VM on Microsoft Azure and have your very own private GitLab instance up and running in around 30 minutes.'
+---
+
 # Install GitLab on Microsoft Azure
 
 > _This article was originally written by Dave Wentzel and [published on the GitLab Blog][Original-Blog-Post]._
@@ -38,9 +43,10 @@ create SQL Databases, author websites, and perform lots of other cloud tasks.
 ## Create New VM
 
 The [Azure Marketplace][Azure-Marketplace] is an online store for pre-configured applications and 
-services which have been optimized for the cloud by software vendors like GitLab, and both 
-the [Community Edition ("CE")][CE] and the [Enterprise Edition ("EE")][EE] versions of GitLab are 
-available on the Azure Marketplace as pre-configured solutions.
+services which have been optimized for the cloud by software vendors like GitLab,
+available on the Azure Marketplace as pre-configured solutions. In this tutorial
+we will install GitLab Community Edition, but for GitLab Enterprise Edition you
+can follow the same process.
 
 To begin creating a new GitLab VM, click on the **+ New** icon, type "GitLab" into the search 
 box, and then click the **"GitLab Community Edition"** search result:

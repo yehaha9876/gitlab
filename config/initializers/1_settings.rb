@@ -1,156 +1,4 @@
-# rubocop:disable GitlabSecurity/PublicSend
-
-require_dependency Rails.root.join('lib/gitlab') # Load Gitlab as soon as possible
-
-class Settings < Settingslogic
-  source ENV.fetch('GITLAB_CONFIG') { "#{Rails.root}/config/gitlab.yml" }
-  namespace Rails.env
-
-  class << self
-    def gitlab_on_standard_port?
-      on_standard_port?(gitlab)
-    end
-
-    def host_without_www(url)
-      host(url).sub('www.', '')
-    end
-
-    def build_gitlab_ci_url
-      custom_port =
-        if on_standard_port?(gitlab)
-          nil
-        else
-          ":#{gitlab.port}"
-        end
-
-      [
-        gitlab.protocol,
-        "://",
-        gitlab.host,
-        custom_port,
-        gitlab.relative_url_root
-      ].join('')
-    end
-
-    def build_pages_url
-      base_url(pages).join('')
-    end
-
-    def build_gitlab_shell_ssh_path_prefix
-      user_host = "#{gitlab_shell.ssh_user}@#{gitlab_shell.ssh_host}"
-
-      if gitlab_shell.ssh_port != 22
-        "ssh://#{user_host}:#{gitlab_shell.ssh_port}/"
-      else
-        if gitlab_shell.ssh_host.include? ':'
-          "[#{user_host}]:"
-        else
-          "#{user_host}:"
-        end
-      end
-    end
-
-    def build_base_gitlab_url
-      base_url(gitlab).join('')
-    end
-
-    def build_gitlab_url
-      (base_url(gitlab) + [gitlab.relative_url_root]).join('')
-    end
-
-    def kerberos_protocol
-      kerberos.https ? "https" : "http"
-    end
-
-    def kerberos_port
-      kerberos.use_dedicated_port ? kerberos.port : gitlab.port
-    end
-
-    # Curl expects username/password for authentication. However when using GSS-Negotiate not credentials should be needed.
-    # By inserting in the Kerberos dedicated URL ":@", we give to curl an empty username and password and GSS auth goes ahead
-    # Known bug reported in http://sourceforge.net/p/curl/bugs/440/ and http://curl.haxx.se/docs/knownbugs.html
-    def build_gitlab_kerberos_url
-      [
-        kerberos_protocol,
-        "://:@",
-        gitlab.host,
-        ":#{kerberos_port}",
-        gitlab.relative_url_root
-      ].join('')
-    end
-
-    def alternative_gitlab_kerberos_url?
-      kerberos.enabled && (build_gitlab_kerberos_url != build_gitlab_url)
-    end
-
-    # check that values in `current` (string or integer) is a contant in `modul`.
-    def verify_constant_array(modul, current, default)
-      values = default || []
-      unless current.nil?
-        values = []
-        current.each do |constant|
-          values.push(verify_constant(modul, constant, nil))
-        end
-        values.delete_if { |value| value.nil? }
-      end
-
-      values
-    end
-
-    # check that `current` (string or integer) is a contant in `modul`.
-    def verify_constant(modul, current, default)
-      constant = modul.constants.find { |name| modul.const_get(name) == current }
-      value = constant.nil? ? default : modul.const_get(constant)
-      if current.is_a? String
-        value = modul.const_get(current.upcase) rescue default
-      end
-
-      value
-    end
-
-    def absolute(path)
-      File.expand_path(path, Rails.root)
-    end
-
-    private
-
-    def base_url(config)
-      custom_port = on_standard_port?(config) ? nil : ":#{config.port}"
-
-      [
-        config.protocol,
-        "://",
-        config.host,
-        custom_port
-      ]
-    end
-
-    def on_standard_port?(config)
-      config.port.to_i == (config.https ? 443 : 80)
-    end
-
-    # Extract the host part of the given +url+.
-    def host(url)
-      url = url.downcase
-      url = "http://#{url}" unless url.start_with?('http')
-
-      # Get rid of the path so that we don't even have to encode it
-      url_without_path = url.sub(%r{(https?://[^/]+)/?.*}, '\1')
-
-      URI.parse(url_without_path).host
-    end
-
-    # Runs every minute in a random ten-minute period on Sundays, to balance the
-    # load on the server receiving these pings. The usage ping is safe to run
-    # multiple times because of a 24 hour exclusive lock.
-    def cron_for_usage_ping
-      hour = rand(24)
-      minute = rand(6)
-
-      "#{minute}0-#{minute}9 #{hour} * * 0"
-    end
-  end
-end
+require_relative '../settings'
 
 # Default settings
 Settings['ldap'] ||= Settingslogic.new({})
@@ -350,7 +198,9 @@ Settings.artifacts['max_size'] ||= 100 # in megabytes
 Settings.artifacts['object_store'] ||= Settingslogic.new({})
 Settings.artifacts['object_store']['enabled'] = false if Settings.artifacts['object_store']['enabled'].nil?
 Settings.artifacts['object_store']['remote_directory'] ||= nil
+Settings.artifacts['object_store']['direct_upload'] = false if Settings.artifacts['object_store']['direct_upload'].nil?
 Settings.artifacts['object_store']['background_upload'] = true if Settings.artifacts['object_store']['background_upload'].nil?
+Settings.artifacts['object_store']['proxy_download'] = false if Settings.artifacts['object_store']['proxy_download'].nil?
 # Convert upload connection settings to use string keys, to make Fog happy
 Settings.artifacts['object_store']['connection']&.deep_stringify_keys!
 
@@ -382,6 +232,9 @@ Settings.pages['external_http']     ||= false unless Settings.pages['external_ht
 Settings.pages['external_https']    ||= false unless Settings.pages['external_https'].present?
 Settings.pages['artifacts_server']  ||= Settings.pages['enabled'] if Settings.pages['artifacts_server'].nil?
 
+Settings.pages['admin'] ||= Settingslogic.new({})
+Settings.pages.admin['certificate'] ||= ''
+
 #
 # Geo
 #
@@ -396,7 +249,9 @@ Settings.lfs['storage_path'] = Settings.absolute(Settings.lfs['storage_path'] ||
 Settings.lfs['object_store'] ||= Settingslogic.new({})
 Settings.lfs['object_store']['enabled'] = false if Settings.lfs['object_store']['enabled'].nil?
 Settings.lfs['object_store']['remote_directory'] ||= nil
+Settings.lfs['object_store']['direct_upload'] = false if Settings.lfs['object_store']['direct_upload'].nil?
 Settings.lfs['object_store']['background_upload'] = true if Settings.lfs['object_store']['background_upload'].nil?
+Settings.lfs['object_store']['proxy_download'] = false if Settings.lfs['object_store']['proxy_download'].nil?
 # Convert upload connection settings to use string keys, to make Fog happy
 Settings.lfs['object_store']['connection']&.deep_stringify_keys!
 
@@ -409,7 +264,9 @@ Settings.uploads['base_dir'] = Settings.uploads['base_dir'] || 'uploads/-/system
 Settings.uploads['object_store'] ||= Settingslogic.new({})
 Settings.uploads['object_store']['enabled'] = false if Settings.uploads['object_store']['enabled'].nil?
 Settings.uploads['object_store']['remote_directory'] ||= 'uploads'
+Settings.uploads['object_store']['direct_upload'] = false if Settings.uploads['object_store']['direct_upload'].nil?
 Settings.uploads['object_store']['background_upload'] = true if Settings.uploads['object_store']['background_upload'].nil?
+Settings.uploads['object_store']['proxy_download'] = false if Settings.uploads['object_store']['proxy_download'].nil?
 # Convert upload connection settings to use string keys, to make Fog happy
 Settings.uploads['object_store']['connection']&.deep_stringify_keys!
 
@@ -472,6 +329,15 @@ Settings.cron_jobs['geo_file_download_dispatch_worker']['job_class'] ||= 'Geo::F
 Settings.cron_jobs['geo_prune_event_log_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['geo_prune_event_log_worker']['cron'] ||= '0 */6 * * *'
 Settings.cron_jobs['geo_prune_event_log_worker']['job_class'] ||= 'Geo::PruneEventLogWorker'
+Settings.cron_jobs['geo_repository_verification_primary_batch_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['geo_repository_verification_primary_batch_worker']['cron'] ||= '*/1 * * * *'
+Settings.cron_jobs['geo_repository_verification_primary_batch_worker']['job_class'] ||= 'Geo::RepositoryVerification::Primary::BatchWorker'
+Settings.cron_jobs['geo_repository_verification_secondary_scheduler_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['geo_repository_verification_secondary_scheduler_worker']['cron'] ||= '*/1 * * * *'
+Settings.cron_jobs['geo_repository_verification_secondary_scheduler_worker']['job_class'] ||= 'Geo::RepositoryVerification::Secondary::SchedulerWorker'
+Settings.cron_jobs['geo_migrated_local_files_clean_up_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['geo_migrated_local_files_clean_up_worker']['cron'] ||= '15 */6 * * *'
+Settings.cron_jobs['geo_migrated_local_files_clean_up_worker']['job_class'] ||= 'Geo::MigratedLocalFilesCleanUpWorker'
 Settings.cron_jobs['import_export_project_cleanup_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['import_export_project_cleanup_worker']['cron'] ||= '0 * * * *'
 Settings.cron_jobs['import_export_project_cleanup_worker']['job_class'] = 'ImportExportProjectCleanupWorker'
@@ -517,6 +383,20 @@ Settings.cron_jobs['stuck_merge_jobs_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['stuck_merge_jobs_worker']['cron'] ||= '0 */2 * * *'
 Settings.cron_jobs['stuck_merge_jobs_worker']['job_class'] = 'StuckMergeJobsWorker'
 
+Settings.cron_jobs['pages_domain_verification_cron_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['pages_domain_verification_cron_worker']['cron'] ||= '*/15 * * * *'
+Settings.cron_jobs['pages_domain_verification_cron_worker']['job_class'] = 'PagesDomainVerificationCronWorker'
+
+Settings.cron_jobs['issue_due_scheduler_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['issue_due_scheduler_worker']['cron'] ||= '50 00 * * *'
+Settings.cron_jobs['issue_due_scheduler_worker']['job_class'] = 'IssueDueSchedulerWorker'
+
+#
+# Sidekiq
+#
+Settings['sidekiq'] ||= Settingslogic.new({})
+Settings['sidekiq']['log_format'] ||= 'default'
+
 #
 # GitLab Shell
 #
@@ -553,12 +433,7 @@ unless Settings.repositories.storages['default']
 end
 
 Settings.repositories.storages.each do |key, storage|
-  storage = Settingslogic.new(storage)
-
-  # Expand relative paths
-  storage['path'] = Settings.absolute(storage['path'])
-
-  Settings.repositories.storages[key] = storage
+  Settings.repositories.storages[key] = Gitlab::GitalyClient::StorageSettings.new(storage)
 end
 
 #
@@ -572,7 +447,7 @@ repositories_storages          = Settings.repositories.storages.values
 repository_downloads_path      = Settings.gitlab['repository_downloads_path'].to_s.gsub(%r{/$}, '')
 repository_downloads_full_path = File.expand_path(repository_downloads_path, Settings.gitlab['user_home'])
 
-if repository_downloads_path.blank? || repositories_storages.any? { |rs| [repository_downloads_path, repository_downloads_full_path].include?(rs['path'].gsub(%r{/$}, '')) }
+if repository_downloads_path.blank? || repositories_storages.any? { |rs| [repository_downloads_path, repository_downloads_full_path].include?(rs.legacy_disk_path.gsub(%r{/$}, '')) }
   Settings.gitlab['repository_downloads_path'] = File.join(Settings.shared['path'], 'cache/archive')
 end
 
@@ -666,6 +541,3 @@ if Rails.env.test?
   Settings.gitlab['default_can_create_group'] = true
   Settings.gitlab['default_can_create_team']  = false
 end
-
-# Force a refresh of application settings at startup
-ApplicationSetting.expire

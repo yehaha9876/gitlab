@@ -3,7 +3,7 @@ module EE
     def node_vue_list_properties
       version, revision =
         if ::Gitlab::Geo.primary?
-          [::Gitlab::VERSION, ::Gitlab::REVISION]
+          [::Gitlab::VERSION, ::Gitlab.revision]
         else
           status = ::Gitlab::Geo.primary_node&.status
 
@@ -13,7 +13,6 @@ module EE
       {
         primary_version: version.to_s,
         primary_revision: revision.to_s,
-        node_details_path: admin_geo_nodes_path.to_s,
         node_actions_allowed: ::Gitlab::Database.read_write?.to_s,
         node_edit_allowed: ::Gitlab::Geo.license_allows?.to_s
       }

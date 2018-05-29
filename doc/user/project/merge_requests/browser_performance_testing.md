@@ -1,4 +1,4 @@
-# Browser Performance Testing
+# Browser Performance Testing **[PREMIUM]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3507) in [GitLab Premium](https://about.gitlab.com/products/) 10.3.
 
@@ -14,7 +14,7 @@ tool for measuring the performance of web sites, and has built a simple
 which outputs the results in a file called `performance.json`. This plugin
 outputs the performance score for each page that is analyzed.
 
-The [Sitespeed.io performance score](https://examples.sitespeed.io/6.0/2017-11-23-23-43-35/help.html#performanceAdvice)
+The [Sitespeed.io performance score](https://examples.sitespeed.io/6.0/2017-11-23-23-43-35/help.html)
 is a composite value based on best practices, and we will be expanding support
 for [additional metrics](https://gitlab.com/gitlab-org/gitlab-ee/issues/4370)
 in a future release.
@@ -36,7 +36,7 @@ First of all, you need to define a job named `performance` in your `.gitlab-ci.y
 file. [Check how the `performance` job should look like](../../../ci/examples/browser_performance.md).
 
 GitLab runs the [Sitespeed.io container](https://hub.docker.com/r/sitespeedio/sitespeed.io/)
-and compares the performance scores for each page between the source and target
+and compares key performance metrics for each page between the source and target
 branches of a merge request. The difference for each page is then shown right on
 the merge request.
 

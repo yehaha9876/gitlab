@@ -22,11 +22,15 @@ describe IssuablesHelper do
   end
 
   describe '#issuable_labels_tooltip' do
-    it 'returns label text' do
+    it 'returns label text with no labels' do
+      expect(issuable_labels_tooltip([])).to eq("Labels")
+    end
+
+    it 'returns label text with labels within max limit' do
       expect(issuable_labels_tooltip([label])).to eq(label.title)
     end
 
-    it 'returns label text' do
+    it 'returns label text with labels exceeding max limit' do
       expect(issuable_labels_tooltip([label, label2], limit: 1)).to eq("#{label.title}, and 1 more")
     end
   end
@@ -40,23 +44,23 @@ describe IssuablesHelper do
       end
 
       it 'returns "Open" when state is :opened' do
-        expect(helper.issuables_state_counter_text(:issues, :opened))
-          .to eq('<span>Open</span> <span class="badge">42</span>')
+        expect(helper.issuables_state_counter_text(:issues, :opened, true))
+          .to eq('<span>Open</span> <span class="badge badge-pill">42</span>')
       end
 
       it 'returns "Closed" when state is :closed' do
-        expect(helper.issuables_state_counter_text(:issues, :closed))
-          .to eq('<span>Closed</span> <span class="badge">42</span>')
+        expect(helper.issuables_state_counter_text(:issues, :closed, true))
+          .to eq('<span>Closed</span> <span class="badge badge-pill">42</span>')
       end
 
       it 'returns "Merged" when state is :merged' do
-        expect(helper.issuables_state_counter_text(:merge_requests, :merged))
-          .to eq('<span>Merged</span> <span class="badge">42</span>')
+        expect(helper.issuables_state_counter_text(:merge_requests, :merged, true))
+          .to eq('<span>Merged</span> <span class="badge badge-pill">42</span>')
       end
 
       it 'returns "All" when state is :all' do
-        expect(helper.issuables_state_counter_text(:merge_requests, :all))
-          .to eq('<span>All</span> <span class="badge">42</span>')
+        expect(helper.issuables_state_counter_text(:merge_requests, :all, true))
+          .to eq('<span>All</span> <span class="badge badge-pill">42</span>')
       end
     end
   end
@@ -98,27 +102,6 @@ describe IssuablesHelper do
           expect(helper.issuable_reference(issue)).to eql(issue.to_reference(project))
         end
       end
-    end
-  end
-
-  describe '#issuable_filter_present?' do
-    it 'returns true when any key is present' do
-      allow(helper).to receive(:params).and_return(
-        ActionController::Parameters.new(milestone_title: 'Velit consectetur asperiores natus delectus.',
-                                         project_id: 'gitlabhq',
-                                         scope: 'all')
-      )
-
-      expect(helper.issuable_filter_present?).to be_truthy
-    end
-
-    it 'returns false when no key is present' do
-      allow(helper).to receive(:params).and_return(
-        ActionController::Parameters.new(project_id: 'gitlabhq',
-                                         scope: 'all')
-      )
-
-      expect(helper.issuable_filter_present?).to be_falsey
     end
   end
 
@@ -168,54 +151,54 @@ describe IssuablesHelper do
       allow(helper).to receive(:can?).and_return(true)
     end
 
-    it 'returns the correct json for an issue' do
+    it 'returns the correct data for an issue' do
       issue = create(:issue, author: user, description: 'issue text')
       @project = issue.project
 
       expected_data = {
-        'endpoint' => "/#{@project.full_path}/issues/#{issue.iid}",
-        'updateEndpoint' => "/#{@project.full_path}/issues/#{issue.iid}.json",
-        'canUpdate' => true,
-        'canDestroy' => true,
-        'canAdmin' => true,
-        'issuableRef' => "##{issue.iid}",
-        'markdownPreviewPath' => "/#{@project.full_path}/preview_markdown",
-        'markdownDocsPath' => '/help/user/markdown',
-        'issuableTemplates' => [],
-        'projectPath' => @project.path,
-        'projectNamespace' => @project.namespace.path,
-        'initialTitleHtml' => issue.title,
-        'initialTitleText' => issue.title,
-        'initialDescriptionHtml' => '<p dir="auto">issue text</p>',
-        'initialDescriptionText' => 'issue text',
-        'initialTaskStatus' => '0 of 0 tasks completed'
+        endpoint: "/#{@project.full_path}/issues/#{issue.iid}",
+        updateEndpoint: "/#{@project.full_path}/issues/#{issue.iid}.json",
+        canUpdate: true,
+        canDestroy: true,
+        canAdmin: true,
+        issuableRef: "##{issue.iid}",
+        markdownPreviewPath: "/#{@project.full_path}/preview_markdown",
+        markdownDocsPath: '/help/user/markdown',
+        issuableTemplates: [],
+        projectPath: @project.path,
+        projectNamespace: @project.namespace.path,
+        initialTitleHtml: issue.title,
+        initialTitleText: issue.title,
+        initialDescriptionHtml: '<p dir="auto">issue text</p>',
+        initialDescriptionText: 'issue text',
+        initialTaskStatus: '0 of 0 tasks completed'
       }
-      expect(JSON.parse(helper.issuable_initial_data(issue))).to eq(expected_data)
+      expect(helper.issuable_initial_data(issue)).to eq(expected_data)
     end
 
-    it 'returns the correct json for an epic' do
+    it 'returns the correct data for an epic' do
       epic = create(:epic, author: user, description: 'epic text')
       @group = epic.group
 
       expected_data = {
-        'endpoint' => "/groups/#{@group.full_path}/-/epics/#{epic.iid}",
-        'updateEndpoint' => "/groups/#{@group.full_path}/-/epics/#{epic.iid}.json",
-        'issueLinksEndpoint' => "/groups/#{@group.full_path}/-/epics/#{epic.iid}/issues",
-        'canUpdate' => true,
-        'canDestroy' => true,
-        'canAdmin' => true,
-        'issuableRef' => "&#{epic.iid}",
-        'markdownPreviewPath' => "/groups/#{@group.full_path}/preview_markdown",
-        'markdownDocsPath' => '/help/user/markdown',
-        'issuableTemplates' => nil,
-        'groupPath' => @group.path,
-        'initialTitleHtml' => epic.title,
-        'initialTitleText' => epic.title,
-        'initialDescriptionHtml' => '<p dir="auto">epic text</p>',
-        'initialDescriptionText' => 'epic text',
-        'initialTaskStatus' => '0 of 0 tasks completed'
+        endpoint: "/groups/#{@group.full_path}/-/epics/#{epic.iid}",
+        updateEndpoint: "/groups/#{@group.full_path}/-/epics/#{epic.iid}.json",
+        issueLinksEndpoint: "/groups/#{@group.full_path}/-/epics/#{epic.iid}/issues",
+        canUpdate: true,
+        canDestroy: true,
+        canAdmin: true,
+        issuableRef: "&#{epic.iid}",
+        markdownPreviewPath: "/groups/#{@group.full_path}/preview_markdown",
+        markdownDocsPath: '/help/user/markdown',
+        issuableTemplates: nil,
+        groupPath: @group.path,
+        initialTitleHtml: epic.title,
+        initialTitleText: epic.title,
+        initialDescriptionHtml: '<p dir="auto">epic text</p>',
+        initialDescriptionText: 'epic text',
+        initialTaskStatus: '0 of 0 tasks completed'
       }
-      expect(JSON.parse(helper.issuable_initial_data(epic))).to eq(expected_data)
+      expect(helper.issuable_initial_data(epic)).to eq(expected_data)
     end
   end
 

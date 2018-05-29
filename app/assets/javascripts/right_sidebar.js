@@ -1,9 +1,11 @@
 /* eslint-disable func-names, space-before-function-paren, no-var, prefer-rest-params, wrap-iife, no-unused-vars, consistent-return, one-var, one-var-declaration-per-line, quotes, prefer-template, object-shorthand, comma-dangle, no-else-return, no-param-reassign, max-len */
 
+import $ from 'jquery';
 import _ from 'underscore';
 import Cookies from 'js-cookie';
 import flash from './flash';
 import axios from './lib/utils/axios_utils';
+import { __ } from './locale';
 
 function Sidebar(currentUser) {
   this.toggleTodo = this.toggleTodo.bind(this);
@@ -40,12 +42,14 @@ Sidebar.prototype.addEventListeners = function() {
 };
 
 Sidebar.prototype.sidebarToggleClicked = function (e, triggered) {
-  var $allGutterToggleIcons, $this, $thisIcon;
+  var $allGutterToggleIcons, $this, isExpanded, tooltipLabel;
   e.preventDefault();
   $this = $(this);
-  $thisIcon = $this.find('i');
+  isExpanded = $this.find('i').hasClass('fa-angle-double-right');
+  tooltipLabel = isExpanded ? __('Expand sidebar') : __('Collapse sidebar');
   $allGutterToggleIcons = $('.js-sidebar-toggle i');
-  if ($thisIcon.hasClass('fa-angle-double-right')) {
+
+  if (isExpanded) {
     $allGutterToggleIcons.removeClass('fa-angle-double-right').addClass('fa-angle-double-left');
     $('aside.right-sidebar').removeClass('right-sidebar-expanded').addClass('right-sidebar-collapsed');
     $('.layout-page').removeClass('right-sidebar-expanded').addClass('right-sidebar-collapsed');
@@ -56,6 +60,9 @@ Sidebar.prototype.sidebarToggleClicked = function (e, triggered) {
 
     if (gl.lazyLoader) gl.lazyLoader.loadCheck();
   }
+
+  $this.attr('data-original-title', tooltipLabel);
+
   if (!triggered) {
     Cookies.set("collapsed_gutter", $('.right-sidebar').hasClass('right-sidebar-collapsed'));
   }
@@ -76,8 +83,8 @@ Sidebar.prototype.toggleTodo = function(e) {
   $('.js-issuable-todo').disable().addClass('is-loading');
 
   axios[ajaxType](url, {
-    issuable_id: $this.data('issuable-id'),
-    issuable_type: $this.data('issuable-type'),
+    issuable_id: $this.data('issuableId'),
+    issuable_type: $this.data('issuableType'),
   }).then(({ data }) => {
     this.todoUpdateDone(data);
   }).catch(() => flash(`There was an error ${ajaxType === 'post' ? 'adding a' : 'deleting the'} todo.`));
@@ -96,18 +103,18 @@ Sidebar.prototype.todoUpdateDone = function(data) {
 
     $el.removeClass('is-loading')
       .enable()
-      .attr('aria-label', $el.data(`${attrPrefix}-text`))
+      .attr('aria-label', $el.data(`${attrPrefix}Text`))
       .attr('data-delete-path', deletePath)
-      .attr('title', $el.data(`${attrPrefix}-text`));
+      .attr('title', $el.data(`${attrPrefix}Text`));
 
     if ($el.hasClass('has-tooltip')) {
-      $el.tooltip('fixTitle');
+      $el.tooltip('_fixTitle');
     }
 
-    if ($el.data(`${attrPrefix}-icon`)) {
-      $elText.html($el.data(`${attrPrefix}-icon`));
+    if ($el.data(`${attrPrefix}Icon`)) {
+      $elText.html($el.data(`${attrPrefix}Icon`));
     } else {
-      $elText.text($el.data(`${attrPrefix}-text`));
+      $elText.text($el.data(`${attrPrefix}Text`));
     }
   });
 };

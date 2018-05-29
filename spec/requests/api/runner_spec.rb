@@ -1,11 +1,13 @@
 require 'spec_helper'
 
-describe API::Runner do
+describe API::Runner, :clean_gitlab_redis_shared_state do
   include StubGitlabCalls
+  include RedisHelpers
 
   let(:registration_token) { 'abcdefg123456' }
 
   before do
+    stub_feature_flags(ci_enable_live_trace: true)
     stub_gitlab_calls
     stub_application_setting(runners_registration_token: registration_token)
     allow_any_instance_of(Ci::Runner).to receive(:cache_attributes)
@@ -39,19 +41,38 @@ describe API::Runner do
           expect(json_response['id']).to eq(runner.id)
           expect(json_response['token']).to eq(runner.token)
           expect(runner.run_untagged).to be true
+          expect(runner.active).to be true
           expect(runner.token).not_to eq(registration_token)
+          expect(runner).to be_instance_type
         end
 
         context 'when project token is used' do
           let(:project) { create(:project) }
 
-          it 'creates runner' do
+          it 'creates project runner' do
             post api('/runners'), token: project.runners_token
 
             expect(response).to have_gitlab_http_status 201
             expect(project.runners.size).to eq(1)
-            expect(Ci::Runner.first.token).not_to eq(registration_token)
-            expect(Ci::Runner.first.token).not_to eq(project.runners_token)
+            runner = Ci::Runner.first
+            expect(runner.token).not_to eq(registration_token)
+            expect(runner.token).not_to eq(project.runners_token)
+            expect(runner).to be_project_type
+          end
+        end
+
+        context 'when group token is used' do
+          let(:group) { create(:group) }
+
+          it 'creates a group runner' do
+            post api('/runners'), token: group.runners_token
+
+            expect(response).to have_http_status 201
+            expect(group.runners.size).to eq(1)
+            runner = Ci::Runner.first
+            expect(runner.token).not_to eq(registration_token)
+            expect(runner.token).not_to eq(group.runners_token)
+            expect(runner).to be_group_type
           end
         end
       end
@@ -109,6 +130,48 @@ describe API::Runner do
         end
       end
 
+      context 'when option for activating a Runner is provided' do
+        context 'when active is set to true' do
+          it 'creates runner' do
+            post api('/runners'), token: registration_token,
+                                  active: true
+
+            expect(response).to have_gitlab_http_status 201
+            expect(Ci::Runner.first.active).to be true
+          end
+        end
+
+        context 'when active is set to false' do
+          it 'creates runner' do
+            post api('/runners'), token: registration_token,
+                                  active: false
+
+            expect(response).to have_gitlab_http_status 201
+            expect(Ci::Runner.first.active).to be false
+          end
+        end
+      end
+
+      context 'when maximum job timeout is specified' do
+        it 'creates runner' do
+          post api('/runners'), token: registration_token,
+                                maximum_timeout: 9000
+
+          expect(response).to have_gitlab_http_status 201
+          expect(Ci::Runner.first.maximum_timeout).to eq(9000)
+        end
+
+        context 'when maximum job timeout is empty' do
+          it 'creates runner' do
+            post api('/runners'), token: registration_token,
+                                  maximum_timeout: ''
+
+            expect(response).to have_gitlab_http_status 201
+            expect(Ci::Runner.first.maximum_timeout).to be_nil
+          end
+        end
+      end
+
       %w(name version revision platform architecture).each do |param|
         context "when info parameter '#{param}' info is present" do
           let(:value) { "#{param}_value" }
@@ -121,6 +184,15 @@ describe API::Runner do
             expect(Ci::Runner.first.read_attribute(param.to_sym)).to eq(value)
           end
         end
+      end
+
+      it "sets the runner's ip_address" do
+        post api('/runners'),
+          { token: registration_token },
+          { 'REMOTE_ADDR' => '123.111.123.111' }
+
+        expect(response).to have_gitlab_http_status 201
+        expect(Ci::Runner.first.ip_address).to eq('123.111.123.111')
       end
     end
 
@@ -208,6 +280,7 @@ describe API::Runner do
       let(:user_agent) { 'gitlab-runner 9.0.0 (9-0-stable; go1.7.4; linux/amd64)' }
 
       before do
+        job
         stub_container_registry_config(enabled: false)
       end
 
@@ -332,12 +405,12 @@ describe API::Runner do
           let(:expected_steps) do
             [{ 'name' => 'script',
                'script' => %w(ls date),
-               'timeout' => job.timeout,
+               'timeout' => job.metadata_timeout,
                'when' => 'on_success',
                'allow_failure' => false },
              { 'name' => 'after_script',
                'script' => %w(ls date),
-               'timeout' => job.timeout,
+               'timeout' => job.metadata_timeout,
                'when' => 'always',
                'allow_failure' => true }]
           end
@@ -378,7 +451,7 @@ describe API::Runner do
             expect(json_response['image']).to eq({ 'name' => 'ruby:2.1', 'entrypoint' => '/bin/sh' })
             expect(json_response['services']).to eq([{ 'name' => 'postgres', 'entrypoint' => nil,
                                                        'alias' => nil, 'command' => nil },
-                                                     { 'name' => 'docker:dind', 'entrypoint' => '/bin/sh',
+                                                     { 'name' => 'docker:stable-dind', 'entrypoint' => '/bin/sh',
                                                        'alias' => 'docker', 'command' => 'sleep 30' }])
             expect(json_response['steps']).to eq(expected_steps)
             expect(json_response['artifacts']).to eq(expected_artifacts)
@@ -422,6 +495,15 @@ describe API::Runner do
                 expect(runner.reload.read_attribute(param.to_sym)).to eq(value)
               end
             end
+          end
+
+          it "sets the runner's ip_address" do
+            post api('/jobs/request'),
+              { token: runner.token },
+              { 'User-Agent' => user_agent, 'REMOTE_ADDR' => '123.222.123.222' }
+
+            expect(response).to have_gitlab_http_status 201
+            expect(runner.reload.ip_address).to eq('123.222.123.222')
           end
 
           context 'when concurrently updating a job' do
@@ -631,6 +713,41 @@ describe API::Runner do
               end
             end
           end
+
+          describe 'timeout support' do
+            context 'when project specifies job timeout' do
+              let(:project) { create(:project, shared_runners_enabled: false, build_timeout: 1234) }
+
+              it 'contains info about timeout taken from project' do
+                request_job
+
+                expect(response).to have_gitlab_http_status(201)
+                expect(json_response['runner_info']).to include({ 'timeout' => 1234 })
+              end
+
+              context 'when runner specifies lower timeout' do
+                let(:runner) { create(:ci_runner, maximum_timeout: 1000) }
+
+                it 'contains info about timeout overridden by runner' do
+                  request_job
+
+                  expect(response).to have_gitlab_http_status(201)
+                  expect(json_response['runner_info']).to include({ 'timeout' => 1000 })
+                end
+              end
+
+              context 'when runner specifies bigger timeout' do
+                let(:runner) { create(:ci_runner, maximum_timeout: 2000) }
+
+                it 'contains info about timeout not overridden by runner' do
+                  request_job
+
+                  expect(response).to have_gitlab_http_status(201)
+                  expect(json_response['runner_info']).to include({ 'timeout' => 1234 })
+                end
+              end
+            end
+          end
         end
 
         def request_job(token = runner.token, **params)
@@ -682,10 +799,10 @@ describe API::Runner do
         end
       end
 
-      context 'when tace is given' do
+      context 'when trace is given' do
         it 'creates a trace artifact' do
-          allow_any_instance_of(BuildFinishedWorker).to receive(:perform).with(job.id) do
-            CreateTraceArtifactWorker.new.perform(job.id)
+          allow(BuildFinishedWorker).to receive(:perform_async).with(job.id) do
+            ArchiveTraceWorker.new.perform(job.id)
           end
 
           update_job(state: 'success', trace: 'BUILD TRACE UPDATED')
@@ -712,6 +829,21 @@ describe API::Runner do
           update_job
 
           expect(response).to have_gitlab_http_status(403)
+        end
+      end
+
+      context 'when job has already been finished' do
+        before do
+          job.trace.set('Job failed')
+          job.drop!(:script_failure)
+        end
+
+        it 'does not update job status and job trace' do
+          update_job(state: 'success', trace: 'BUILD TRACE UPDATED')
+
+          expect(response).to have_gitlab_http_status(403)
+          expect(job.trace.raw).to eq 'Job failed'
+          expect(job).to be_failed
         end
       end
 
@@ -792,6 +924,65 @@ describe API::Runner do
             expect(response.status).to eq(403)
           end
         end
+
+        context 'when trace is patched' do
+          before do
+            patch_the_trace
+          end
+
+          it 'has valid trace' do
+            expect(response.status).to eq(202)
+            expect(job.reload.trace.raw).to eq 'BUILD TRACE appended appended'
+          end
+
+          context 'when job is cancelled' do
+            before do
+              job.cancel
+            end
+
+            context 'when trace is patched' do
+              before do
+                patch_the_trace
+              end
+
+              it 'returns Forbidden ' do
+                expect(response.status).to eq(403)
+              end
+            end
+          end
+
+          context 'when redis data are flushed' do
+            before do
+              redis_shared_state_cleanup!
+            end
+
+            it 'has empty trace' do
+              expect(job.reload.trace.raw).to eq ''
+            end
+
+            context 'when we perform partial patch' do
+              before do
+                patch_the_trace('hello', headers.merge({ 'Content-Range' => "28-32/5" }))
+              end
+
+              it 'returns an error' do
+                expect(response.status).to eq(416)
+                expect(response.header['Range']).to eq('0-0')
+              end
+            end
+
+            context 'when we resend full trace' do
+              before do
+                patch_the_trace('BUILD TRACE appended appended hello', headers.merge({ 'Content-Range' => "0-34/35" }))
+              end
+
+              it 'succeeds with updating trace' do
+                expect(response.status).to eq(202)
+                expect(job.reload.trace.raw).to eq 'BUILD TRACE appended appended hello'
+              end
+            end
+          end
+        end
       end
 
       context 'when Runner makes a force-patch' do
@@ -808,7 +999,7 @@ describe API::Runner do
       end
 
       context 'when content-range start is too big' do
-        let(:headers_with_range) { headers.merge({ 'Content-Range' => '15-20' }) }
+        let(:headers_with_range) { headers.merge({ 'Content-Range' => '15-20/6' }) }
 
         it 'gets 416 error response with range headers' do
           expect(response.status).to eq 416
@@ -818,7 +1009,7 @@ describe API::Runner do
       end
 
       context 'when content-range start is too small' do
-        let(:headers_with_range) { headers.merge({ 'Content-Range' => '8-20' }) }
+        let(:headers_with_range) { headers.merge({ 'Content-Range' => '8-20/13' }) }
 
         it 'gets 416 error response with range headers' do
           expect(response.status).to eq 416
@@ -878,12 +1069,53 @@ describe API::Runner do
 
       describe 'POST /api/v4/jobs/:id/artifacts/authorize' do
         context 'when using token as parameter' do
-          it 'authorizes posting artifacts to running job' do
-            authorize_artifacts_with_token_in_params
+          context 'posting artifacts to running job' do
+            subject do
+              authorize_artifacts_with_token_in_params
+            end
 
-            expect(response).to have_gitlab_http_status(200)
-            expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
-            expect(json_response['TempPath']).not_to be_nil
+            shared_examples 'authorizes local file' do
+              it 'succeeds' do
+                subject
+
+                expect(response).to have_gitlab_http_status(200)
+                expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+                expect(json_response['TempPath']).to eq(JobArtifactUploader.workhorse_local_upload_path)
+                expect(json_response['RemoteObject']).to be_nil
+              end
+            end
+
+            context 'when using local storage' do
+              it_behaves_like 'authorizes local file'
+            end
+
+            context 'when using remote storage' do
+              context 'when direct upload is enabled' do
+                before do
+                  stub_artifacts_object_storage(enabled: true, direct_upload: true)
+                end
+
+                it 'succeeds' do
+                  subject
+
+                  expect(response).to have_gitlab_http_status(200)
+                  expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+                  expect(json_response['TempPath']).to eq(JobArtifactUploader.workhorse_local_upload_path)
+                  expect(json_response['RemoteObject']).to have_key('ID')
+                  expect(json_response['RemoteObject']).to have_key('GetURL')
+                  expect(json_response['RemoteObject']).to have_key('StoreURL')
+                  expect(json_response['RemoteObject']).to have_key('DeleteURL')
+                end
+              end
+
+              context 'when direct upload is disabled' do
+                before do
+                  stub_artifacts_object_storage(enabled: true, direct_upload: false)
+                end
+
+                it_behaves_like 'authorizes local file'
+              end
+            end
           end
 
           it 'fails to post too large artifact' do
@@ -979,20 +1211,45 @@ describe API::Runner do
               end
             end
 
-            context 'when uses regular file post' do
-              before do
-                upload_artifacts(file_upload, headers_with_token, false)
-              end
-
-              it_behaves_like 'successful artifacts upload'
-            end
-
             context 'when uses accelerated file post' do
-              before do
-                upload_artifacts(file_upload, headers_with_token, true)
+              context 'for file stored locally' do
+                before do
+                  upload_artifacts(file_upload, headers_with_token)
+                end
+
+                it_behaves_like 'successful artifacts upload'
               end
 
-              it_behaves_like 'successful artifacts upload'
+              context 'for file stored remotelly' do
+                let!(:fog_connection) do
+                  stub_artifacts_object_storage(direct_upload: true)
+                end
+
+                before do
+                  fog_connection.directories.get('artifacts').files.create(
+                    key: 'tmp/uploads/12312300',
+                    body: 'content'
+                  )
+
+                  upload_artifacts(file_upload, headers_with_token,
+                    { 'file.remote_id' => remote_id })
+                end
+
+                context 'when valid remote_id is used' do
+                  let(:remote_id) { '12312300' }
+
+                  it_behaves_like 'successful artifacts upload'
+                end
+
+                context 'when invalid remote_id is used' do
+                  let(:remote_id) { 'invalid id' }
+
+                  it 'responds with bad request' do
+                    expect(response).to have_gitlab_http_status(500)
+                    expect(json_response['message']).to eq("Missing file")
+                  end
+                end
+              end
             end
 
             context 'when using runners token' do
@@ -1085,11 +1342,15 @@ describe API::Runner do
 
           context 'posts artifacts file and metadata file' do
             let!(:artifacts) { file_upload }
+            let!(:artifacts_sha256) { Digest::SHA256.file(artifacts.path).hexdigest }
             let!(:metadata) { file_upload2 }
+            let!(:metadata_sha256) { Digest::SHA256.file(metadata.path).hexdigest }
 
             let(:stored_artifacts_file) { job.reload.artifacts_file.file }
             let(:stored_metadata_file) { job.reload.artifacts_metadata.file }
             let(:stored_artifacts_size) { job.reload.artifacts_size }
+            let(:stored_artifacts_sha256) { job.reload.job_artifacts_archive.file_sha256 }
+            let(:stored_metadata_sha256) { job.reload.job_artifacts_metadata.file_sha256 }
 
             before do
               post(api("/jobs/#{job.id}/artifacts"), post_data, headers_with_token)
@@ -1099,8 +1360,10 @@ describe API::Runner do
               let(:post_data) do
                 { 'file.path' => artifacts.path,
                   'file.name' => artifacts.original_filename,
+                  'file.sha256' => artifacts_sha256,
                   'metadata.path' => metadata.path,
-                  'metadata.name' => metadata.original_filename }
+                  'metadata.name' => metadata.original_filename,
+                  'metadata.sha256' => metadata_sha256 }
               end
 
               it 'stores artifacts and artifacts metadata' do
@@ -1108,6 +1371,8 @@ describe API::Runner do
                 expect(stored_artifacts_file.original_filename).to eq(artifacts.original_filename)
                 expect(stored_metadata_file.original_filename).to eq(metadata.original_filename)
                 expect(stored_artifacts_size).to eq(72821)
+                expect(stored_artifacts_sha256).to eq(artifacts_sha256)
+                expect(stored_metadata_sha256).to eq(metadata_sha256)
               end
             end
 
@@ -1128,15 +1393,19 @@ describe API::Runner do
         end
 
         context 'when artifacts are being stored outside of tmp path' do
+          let(:new_tmpdir) { Dir.mktmpdir }
+
           before do
+            # init before overwriting tmp dir
+            file_upload
+
             # by configuring this path we allow to pass file from @tmpdir only
             # but all temporary files are stored in system tmp directory
-            @tmpdir = Dir.mktmpdir
-            allow(JobArtifactUploader).to receive(:workhorse_upload_path).and_return(@tmpdir)
+            allow(Dir).to receive(:tmpdir).and_return(new_tmpdir)
           end
 
           after do
-            FileUtils.remove_entry @tmpdir
+            FileUtils.remove_entry(new_tmpdir)
           end
 
           it' "fails to post artifacts for outside of tmp path"' do
@@ -1146,12 +1415,11 @@ describe API::Runner do
           end
         end
 
-        def upload_artifacts(file, headers = {}, accelerated = true)
-          params = if accelerated
-                     { 'file.path' => file.path, 'file.name' => file.original_filename }
-                   else
-                     { 'file' => file }
-                   end
+        def upload_artifacts(file, headers = {}, params = {})
+          params = params.merge({
+            'file.path' => file.path,
+            'file.name' => file.original_filename
+          })
 
           post api("/jobs/#{job.id}/artifacts"), params, headers
         end
@@ -1181,7 +1449,7 @@ describe API::Runner do
 
               it 'download artifacts' do
                 expect(response).to have_gitlab_http_status(200)
-                expect(response.headers).to include download_headers
+                expect(response.headers.to_h).to include download_headers
               end
             end
 
@@ -1196,7 +1464,7 @@ describe API::Runner do
 
                 it 'uses workhorse send-url' do
                   expect(response).to have_gitlab_http_status(200)
-                  expect(response.headers).to include(
+                  expect(response.headers.to_h).to include(
                     'Gitlab-Workhorse-Send-Data' => /send-url:/)
                 end
               end

@@ -66,6 +66,7 @@ class Note < ActiveRecord::Base
   has_many :todos
   has_many :events, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_one :system_note_metadata
+  has_one :note_diff_file, inverse_of: :diff_note, foreign_key: :diff_note_id
 
   delegate :gfm_reference, :local_reference, to: :noteable
   delegate :name, to: :project, prefix: true
@@ -84,7 +85,7 @@ class Note < ActiveRecord::Base
   validates :author, presence: true
   validates :discussion_id, presence: true, format: { with: /\A\h{40}\z/ }
 
-  validate unless: [:for_commit?, :importing?, :for_personal_snippet?] do |note|
+  validate unless: [:for_commit?, :importing?, :skip_project_check?] do |note|
     unless note.noteable.try(:project) == note.project
       errors.add(:project, 'does not match noteable project')
     end
@@ -104,7 +105,8 @@ class Note < ActiveRecord::Base
   scope :inc_author_project, -> { includes(:project, :author) }
   scope :inc_author, -> { includes(:author) }
   scope :inc_relations_for_view, -> do
-    includes(:project, :author, :updated_by, :resolved_by, :award_emoji, :system_note_metadata)
+    includes(:project, :author, :updated_by, :resolved_by, :award_emoji,
+             :system_note_metadata, :note_diff_file)
   end
 
   scope :diff_notes, -> { where(type: %w(LegacyDiffNote DiffNote)) }
@@ -137,6 +139,7 @@ class Note < ActiveRecord::Base
 
     def find_discussion(discussion_id)
       notes = where(discussion_id: discussion_id).fresh.to_a
+
       return if notes.empty?
 
       Discussion.build(notes)
@@ -235,7 +238,7 @@ class Note < ActiveRecord::Base
   end
 
   def skip_project_check?
-    for_personal_snippet?
+    !for_project_noteable?
   end
 
   def commit
@@ -273,6 +276,10 @@ class Note < ActiveRecord::Base
     return unless noteable.author_id == self.author_id
 
     self.special_role = Note::SpecialRole::FIRST_TIME_CONTRIBUTOR
+  end
+
+  def confidential?
+    noteable.try(:confidential?)
   end
 
   def editable?
@@ -313,6 +320,11 @@ class Note < ActiveRecord::Base
 
   def can_be_discussion_note?
     self.noteable.supports_discussions? && !part_of_discussion?
+  end
+
+  def can_create_todo?
+    # Skip system notes, and notes on project snippet
+    !system? && !for_snippet?
   end
 
   def discussion_class(noteable = nil)
@@ -381,12 +393,15 @@ class Note < ActiveRecord::Base
   def expire_etag_cache
     return unless noteable&.discussions_rendered_on_frontend?
 
-    key = Gitlab::Routing.url_helpers.project_noteable_notes_path(
+    Gitlab::EtagCaching::Store.new.touch(etag_key)
+  end
+
+  def etag_key
+    Gitlab::Routing.url_helpers.project_noteable_notes_path(
       project,
       target_type: noteable_type.underscore,
       target_id: noteable_id
     )
-    Gitlab::EtagCaching::Store.new.touch(key)
   end
 
   def touch(*args)

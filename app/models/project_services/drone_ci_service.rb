@@ -49,7 +49,7 @@ class DroneCiService < CiService
   end
 
   def calculate_reactive_cache(sha, ref)
-    response = HTTParty.get(commit_status_path(sha, ref), verify: enable_ssl_verification)
+    response = Gitlab::HTTP.get(commit_status_path(sha, ref), verify: enable_ssl_verification)
 
     status =
       if response.code == 200 && response['status']
@@ -115,6 +115,6 @@ class DroneCiService < CiService
 
   def merge_request_valid?(data)
     data[:object_attributes][:state] == 'opened' &&
-      data[:object_attributes][:merge_status] == 'unchecked'
+      MergeRequest.state_machines[:merge_status].check_state?(data[:object_attributes][:merge_status])
   end
 end

@@ -20,6 +20,8 @@ describe ProjectMirrorEntity do
           username_only_import_url: project.username_only_import_url,
           mirror_user_id: project.mirror_user_id,
           mirror_trigger_builds: project.mirror_trigger_builds,
+          only_mirror_protected_branches: project.only_mirror_protected_branches,
+          mirror_overwrites_diverged_branches: project.mirror_overwrites_diverged_branches,
           import_data_attributes: {
             id: import_data.id,
             auth_method: 'password',
@@ -48,6 +50,8 @@ describe ProjectMirrorEntity do
           username_only_import_url: project.username_only_import_url,
           mirror_user_id: project.mirror_user_id,
           mirror_trigger_builds: project.mirror_trigger_builds,
+          only_mirror_protected_branches: project.only_mirror_protected_branches,
+          mirror_overwrites_diverged_branches: project.mirror_overwrites_diverged_branches,
           import_data_attributes: {
             id: import_data.id,
             auth_method: 'ssh_public_key',
@@ -60,30 +64,6 @@ describe ProjectMirrorEntity do
           remote_mirrors_attributes: []
         )
       end
-    end
-  end
-
-  describe 'push mirror' do
-    let(:project) { create(:project, :repository, :remote_mirror) }
-    let(:remote_mirror) { project.remote_mirrors.first }
-
-    it 'represents the push mirror' do
-      is_expected.to eq(
-        id: project.id,
-        mirror: false,
-        import_url: nil,
-        username_only_import_url: nil,
-        mirror_user_id: nil,
-        mirror_trigger_builds: false,
-        import_data_attributes: nil,
-        remote_mirrors_attributes: [
-          {
-            id: remote_mirror.id,
-            url: remote_mirror.url,
-            enabled: true
-          }
-        ]
-      )
     end
   end
 end

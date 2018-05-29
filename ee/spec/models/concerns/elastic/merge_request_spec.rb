@@ -1,14 +1,8 @@
 require 'spec_helper'
 
-describe MergeRequest, elastic: true do
+describe MergeRequest, :elastic do
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-    Gitlab::Elastic::Helper.create_empty_index
-  end
-
-  after do
-    Gitlab::Elastic::Helper.delete_index
-    stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
   end
 
   it "searches merge requests" do
@@ -53,5 +47,10 @@ describe MergeRequest, elastic: true do
     )
 
     expect(merge_request.as_indexed_json).to eq(expected_hash)
+  end
+
+  it_behaves_like 'no results when the user cannot read cross project' do
+    let(:record1) { create(:merge_request, source_project: project, title: 'test-mr') }
+    let(:record2) { create(:merge_request, source_project: project2, title: 'test-mr') }
   end
 end

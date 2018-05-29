@@ -18,11 +18,11 @@ module LicenseHelper
     return unless (is_admin && current_license.notify_admins?) || current_license.notify_users?
 
     is_trial = current_license.trial?
-    message = ["Your Enterprise Edition #{'trial ' if is_trial}license"]
+    message = ["Your #{'trial ' if is_trial}license"]
 
     message << expiration_message
 
-    message << link_to('Buy now!', Gitlab::SUBSCRIPTIONS_PLANS_URL, target: '_blank') if is_trial
+    message << link_to('Buy now!', ::EE::SUBSCRIPTIONS_PLANS_URL, target: '_blank') if is_trial
 
     if current_license.expired? && current_license.will_block_changes?
       message << 'Pushing code and creation of issues and merge requests'
@@ -69,7 +69,7 @@ module LicenseHelper
 
   def new_trial_url
     return_to_url = CGI.escape(Gitlab.config.gitlab.url)
-    uri = URI.parse(Gitlab::SUBSCRIPTIONS_URL)
+    uri = URI.parse(::EE::SUBSCRIPTIONS_URL)
     uri.path = '/trials/new'
     uri.query = "return_to=#{return_to_url}"
     uri.to_s
@@ -94,10 +94,6 @@ module LicenseHelper
       license = License.current
       license.nil? || license.expired?
     end
-  end
-
-  def show_project_feature_promotion?(project_feature, callout_id = nil)
-    !@project.feature_available?(project_feature) && show_promotions? && (callout_id.nil? || show_callout?(callout_id))
   end
 
   def show_advanced_search_promotion?

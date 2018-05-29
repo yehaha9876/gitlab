@@ -1,13 +1,13 @@
 <script>
-  export default {
-    name: 'NoteAttachment',
-    props: {
-      attachment: {
-        type: Object,
-        required: true,
-      },
+export default {
+  name: 'NoteAttachment',
+  props: {
+    attachment: {
+      type: Object,
+      required: true,
     },
-  };
+  },
+};
 </script>
 
 <template>
@@ -30,8 +30,7 @@
         rel="noopener noreferrer">
         <i
           class="fa fa-paperclip"
-          aria-hidden="true"
-        >
+          aria-hidden="true">
         </i>
         {{ attachment.filename }}
       </a>
