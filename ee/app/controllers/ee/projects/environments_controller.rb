@@ -5,6 +5,7 @@ module EE
 
       prepended do
         before_action :authorize_read_pod_logs!, only: [:logs]
+        before_action :environment, only: [:show, :edit, :update, :stop, :terminal, :terminal_websocket_authorize, :metrics, :logs]
       end
 
       def logs

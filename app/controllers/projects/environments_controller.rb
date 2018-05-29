@@ -1,6 +1,4 @@
 class Projects::EnvironmentsController < Projects::ApplicationController
-  prepend ::EE::Projects::EnvironmentsController
-
   layout 'project'
   before_action :authorize_read_environment!
   before_action :authorize_create_environment!, only: [:new, :create]
@@ -10,6 +8,8 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   before_action :environment, only: [:show, :edit, :update, :stop, :terminal, :terminal_websocket_authorize, :metrics]
   before_action :verify_api_request!, only: :terminal_websocket_authorize
   before_action :expire_etag_cache, only: [:index]
+
+  prepend ::EE::Projects::EnvironmentsController
 
   def index
     @environments = project.environments
