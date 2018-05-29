@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import { logMockData } from './ee/kubernetes_mock_data';
 
-describe('Kubernetes Logs', () => {
+fdescribe('Kubernetes Logs', () => {
   const fixtureTemplate = 'static/environments_logs.html.raw';
   const mockPodName = 'production-tanuki-1';
   const logMockPath = '/root/kubernetes-app/environments/1/logs';
@@ -37,16 +37,17 @@ describe('Kubernetes Logs', () => {
     });
 
     it('queries the pod log data and sets the dom elements', (done) => {
+      const scrollSpy = spyOnDependency(KubernetesLogs, 'scrollDown').and.callThrough();
+      const toggleDisableSpy = spyOnDependency(KubernetesLogs, 'toggleDisableButton').and.stub();
       kubernetesLog = new KubernetesLogs(kubernetesLogContainer);
-      spyOn(kubernetesLog, 'scrollDown').and.callThrough();
-      spyOn(kubernetesLog, 'toggleDisableButton').and.callThrough();
+      
 
       kubernetesLog.getPodLogs();
       setTimeout(() => {
         expect(kubernetesLog.isLogComplete).toEqual(true);
         expect(kubernetesLog.$buildOutputContainer.text()).toContain(logMockData[0].trim());
-        expect(kubernetesLog.scrollDown).toHaveBeenCalled();
-        expect(kubernetesLog.toggleDisableButton).toHaveBeenCalled();
+        expect(scrollSpy).toHaveBeenCalled();
+        expect(toggleDisableSpy).toHaveBeenCalled();
         done();
       }, 0);
     });

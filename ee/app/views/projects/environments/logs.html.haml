@@ -5,13 +5,13 @@
         .truncated-info.hidden-xs.pull-left.js-pod-name
 
         .controllers.pull-right
-          .has-tooltip.controllers-buttons{ title: 'Scroll to top', data: { placement: 'top', container: 'body'} }
+          .has-tooltip.controllers-buttons{ title: _('Scroll to top'), data: { placement: 'top', container: 'body'} }
             %button.js-scroll-up.btn-scroll.btn-transparent.btn-blank{ type: 'button', disabled: true }
               = custom_icon('scroll_up')
-          .has-tooltip.controllers-buttons{ title: 'Scroll to bottom', data: { placement: 'top', container: 'body'} }
+          .has-tooltip.controllers-buttons{ title: _('Scroll to bottom'), data: { placement: 'top', container: 'body'} }
             %button.js-scroll-down.btn-scroll.btn-transparent.btn-blank{ type: 'button', disabled: true }
               = custom_icon('scroll_down')
-          .has-tooltip.controllers-buttons{ title: 'Refresh', data: { placement: 'top', container: 'body'} }
+          .has-tooltip.controllers-buttons{ title: _('Refresh'), data: { placement: 'top', container: 'body'} }
             %button.js-refresh-log.btn-default.btn-refresh{ type: 'button', disabled: true }
               = sprite_icon('retry')
 

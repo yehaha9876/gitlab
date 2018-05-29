@@ -45,4 +45,17 @@ describe('Deploy Board Instance', () => {
 
     expect(component.$el.classList.contains('deploy-board-instance-canary')).toBe(true);
   });
+
+  it('should have a log path computed with a pod name as a parameter', () => {
+    const component = new DeployBoardInstanceComponent({
+      propsData: {
+        status: 'deploying',
+        stable: false,
+        logsPath: folder.log_path,
+        podName: 'tanuki-1',
+      },
+    }).$mount();
+
+    expect(component.computedLogPath).toEqual('/root/review-app/environments/12/logs?pod_name=tanuki-1');
+  });
 });
