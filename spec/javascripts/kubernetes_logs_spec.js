@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import { logMockData } from './ee/kubernetes_mock_data';
 
-fdescribe('Kubernetes Logs', () => {
+describe('Kubernetes Logs', () => {
   const fixtureTemplate = 'static/environments_logs.html.raw';
   const mockPodName = 'production-tanuki-1';
   const logMockPath = '/root/kubernetes-app/environments/1/logs';
@@ -40,7 +40,6 @@ fdescribe('Kubernetes Logs', () => {
       const scrollSpy = spyOnDependency(KubernetesLogs, 'scrollDown').and.callThrough();
       const toggleDisableSpy = spyOnDependency(KubernetesLogs, 'toggleDisableButton').and.stub();
       kubernetesLog = new KubernetesLogs(kubernetesLogContainer);
-      
 
       kubernetesLog.getPodLogs();
       setTimeout(() => {

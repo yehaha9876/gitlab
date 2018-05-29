@@ -2,10 +2,10 @@ import $ from 'jquery';
 import { canScroll, isScrolledToBottom, toggleDisableButton } from './scroll_utils';
 
 export default class LogOutputBehaviours {
-  constructor(container) {
+  constructor() {
     // Scroll buttons
-    this.$scrollTopBtn = $(container).find('.js-scroll-up');
-    this.$scrollBottomBtn = $(container).find('.js-scroll-down');
+    this.$scrollTopBtn = $('.js-scroll-up');
+    this.$scrollBottomBtn = $('.js-scroll-down');
 
     this.$scrollTopBtn.off('click').on('click', this.scrollToTop.bind(this));
     this.$scrollBottomBtn.off('click').on('click', this.scrollToBottom.bind(this));
