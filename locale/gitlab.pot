@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-29 11:32+0200\n"
-"PO-Revision-Date: 2018-05-29 11:32+0200\n"
+"POT-Creation-Date: 2018-05-29 12:05-0500\n"
+"PO-Revision-Date: 2018-05-29 12:05-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -199,6 +199,21 @@ msgid "1st contribution!"
 msgstr ""
 
 msgid "2FA enabled"
+msgstr ""
+
+msgid "403|Please contact your GitLab administrator to get the permission."
+msgstr ""
+
+msgid "403|You don't have the permission to access this page."
+msgstr ""
+
+msgid "404|Make sure the address is correct and the page hasn't moved."
+msgstr ""
+
+msgid "404|Page Not Found"
+msgstr ""
+
+msgid "404|Please contact your GitLab administrator if you think this is a mistake."
 msgstr ""
 
 msgid "<strong>Removes</strong> source branch"
@@ -2665,6 +2680,9 @@ msgstr ""
 msgid "Gitaly Servers"
 msgstr ""
 
+msgid "Go Back"
+msgstr ""
+
 msgid "Go back"
 msgstr ""
 
@@ -3329,6 +3347,18 @@ msgid "Name"
 msgstr ""
 
 msgid "Name new label"
+msgstr ""
+
+msgid "Nav|Help"
+msgstr ""
+
+msgid "Nav|Home"
+msgstr ""
+
+msgid "Nav|Sign In / Register"
+msgstr ""
+
+msgid "Nav|Sign out and sign in with a different account"
 msgstr ""
 
 msgid "New Issue"
@@ -4368,6 +4398,9 @@ msgid "Search branches and tags"
 msgstr ""
 
 msgid "Search files"
+msgstr ""
+
+msgid "Search for projects, issues, etc."
 msgstr ""
 
 msgid "Search milestones"

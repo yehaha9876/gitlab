@@ -116,6 +116,9 @@ module Gitlab
     # Enable the asset pipeline
     config.assets.enabled = true
 
+    # Import node_modules to path
+    config.assets.paths << "#{config.root}/node_modules"
+
     # Support legacy unicode file named img emojis, `1F939.png`
     config.assets.paths << Gemojione.images_path
     config.assets.paths << "#{config.root}/vendor/assets/fonts"
@@ -130,6 +133,7 @@ module Gitlab
     config.assets.precompile << "snippets.css"
     config.assets.precompile << "locale/**/app.js"
     config.assets.precompile << "emoji_sprites.css"
+    config.assets.precompile << "errors.css"
 
     # Import gitlab-svgs directly from vendored directory
     config.assets.paths << "#{config.root}/node_modules/@gitlab-org/gitlab-svgs/dist"
