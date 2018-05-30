@@ -97,6 +97,8 @@ describe 'geo rake tasks', :geo do
 
     describe 'cleanup:repository_temp_dirs' do
       let(:repo_path) { 'tmp/tests/default_storage/namespace_1/project_4eb93a5272496a.git' }
+      let(:repo_subgroup_path) { 'tmp/tests/default_storage/namespace_1/subgroup_1/subgroup_2/project_4eb93a5272496a.git' }
+      let(:repo_spaced_path) { 'tmp/tests/default_storage/namespace_1/project with spaces_4eb93a5272496a.git' }
       let(:wiki_path) { 'tmp/tests/default_storage/namespace_1/project_4eb93a5272496a.wiki.git' }
       let(:hashed_path) { 'tmp/tests/default_storage/@hashed/12/34/5678.git' }
       let(:geo_temporary_path) { 'tmp/tests/default_storage/@geo-temporary/project_1234567890abcd.git' }
@@ -104,6 +106,7 @@ describe 'geo rake tasks', :geo do
       let(:malformed2_path) { 'tmp/tests/default_storage/namespace_1/project_4eb93a5272496a.git+deleted' }
       let(:malformed3_path) { 'tmp/tests/default_storage/namespace_1/project-4eb93a5272496a.git' }
       let(:malformed4_path) { 'tmp/tests/default_storage/namespace_1/project-xxxxxxxzzzzzzz.git' }
+      let(:file_path) { 'tmp/tests/default_storage/namespace_1/file_4eb93a5272496a.git' }
 
       before do
         allow(Gitlab::Geo).to receive(:secondary?).and_return(true)
@@ -127,6 +130,8 @@ describe 'geo rake tasks', :geo do
 
         expect(Dir.exist?(Settings.absolute(repo_path))).to be_falsey
         expect(Dir.exist?(Settings.absolute(wiki_path))).to be_falsey
+        expect(Dir.exist?(Settings.absolute(repo_subgroup_path))).to be_falsey
+        expect(Dir.exist?(Settings.absolute(repo_spaced_path))).to be_falsey
       end
 
       it 'does not remove if REMOVE not specified' do
@@ -144,8 +149,20 @@ describe 'geo rake tasks', :geo do
         expect(Dir.exist?(Settings.absolute(geo_temporary_path))).to be_truthy
       end
 
+      it 'only finds directories' do
+        FileUtils.touch(file_path)
+
+        expect(File.exists?(file_path)).to be_truthy
+
+        stub_env('REMOVE', 'true')
+        run_rake_task('geo:cleanup:repository_temp_dirs')
+
+        expect(File.exists?(file_path)).to be_truthy
+      end
+
       it 'only removes directories that have no associated project' do
-        allow(Project).to receive(:find_by_full_path).with('namespace_1/project_4eb93a5272496a').and_return(true)
+        namespace = create(:namespace, name: 'namespace_1')
+        project   = create(:project, name: 'project_4eb93a5272496a', namespace: namespace)
 
         stub_env('REMOVE', 'true')
         run_rake_task('geo:cleanup:repository_temp_dirs')

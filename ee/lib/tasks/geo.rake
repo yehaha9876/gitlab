@@ -290,22 +290,24 @@ namespace :geo do
 
       remove_flag = ENV['REMOVE']
 
-      pp Gitlab.config.repositories.storages
       Gitlab.config.repositories.storages.each do |name, repository_storage|
-        repo_root = repository_storage.legacy_disk_path
+        repo_root      = repository_storage.legacy_disk_path
+        dir_pattern    = "*_#{'[[:xdigit:]]'*14}.*git"
+        null_seperator = "\u0000"
 
-        # old-style temp direcotries end with an underscore followed by a 14 character hex number
-        IO.popen(%W(find #{repo_root} -mindepth 1 -maxdepth 2 -name *.git)) do |find|
-          find.each_line do |path|
-            path.chomp!
+        # old-style temp directories end with an underscore followed by a 14 character hex number
+        IO.popen(%W(find #{repo_root} -mindepth 1 -type d -name #{dir_pattern} -print0)) do |find|
+          find.each_line(null_seperator) do |path|
+            path.chomp!(null_seperator)
             repo_with_namespace = path
               .sub(repo_root, '')
               .sub(%r{^/*}, '')
               .chomp('.git')
               .chomp('.wiki')
 
-            next unless repo_with_namespace =~ /_[\da-f]{14}\z/
-            next if repo_with_namespace.start_with?("#{IGNORABLE_NAMESPACE_PREFIX}") || Project.find_by_full_path(repo_with_namespace)
+            next unless repo_with_namespace =~ /_[[:xdigit:]]{14}\z/
+            next if repo_with_namespace.start_with?("#{IGNORABLE_NAMESPACE_PREFIX}")
+            next if Project.where_full_path_in([repo_with_namespace]).exists?
             next if File.file?(path)
 
             if remove_flag
