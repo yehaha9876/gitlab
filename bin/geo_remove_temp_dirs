@@ -8,8 +8,16 @@ IGNORABLE_NAMESPACE_PREFIX = '@'.freeze
 
 class UtilityOptionParser
   def self.parse(argv)
-    options = { remove: false, rails_root: '.' }
-    options[:rails_root] = '..' if File.exist?("../config/environment.rb")
+    options = { remove: false }
+
+    if File.exist?('../config/environment.rb')
+      options[:rails_root] = '..'
+    elsif File.exist?('./config/environment.rb')
+      options[:rails_root] = '.'
+    else
+      puts "This utility must be run from with the Rails application directory"
+      exit
+    end
 
     op = OptionParser.new
     op.banner = 'GitLab Geo: Remove previous old-style temporary repository directories from a Geo secondary'
