@@ -13,9 +13,9 @@
         %i.fa.fa-file
         %strong
           - if @project
-            = wiki_blob.basename
+            = file_name
           - else
             #{project.full_name}:
-            %i= wiki_blob.basename
+            %i= file_name
     .file-content.code.term
       = render 'shared/file_highlight', blob: wiki_blob, first_line_number: wiki_blob.startline

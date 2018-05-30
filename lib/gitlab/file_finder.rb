@@ -38,7 +38,7 @@ module Gitlab
         Gitlab::SearchResults::FoundBlob.new(
           id: blob.id,
           filename: blob.path,
-          basename: File.basename(blob.path),
+          basename: File.basename(blob.path, File.extname(blob.path)),
           ref: ref,
           startline: 1,
           data: blob.data,
