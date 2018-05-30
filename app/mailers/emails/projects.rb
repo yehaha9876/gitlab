@@ -40,18 +40,5 @@ module Emails
            reply_to:  @message.reply_to,
            subject:   @message.subject)
     end
-
-    def prometheus_alert_fired_email(project_id, user_id, alert_params)
-      alert_iid = alert_params["labels"]["alertname"].split("_").last
-
-      @project = Project.find(project_id)
-      @alert = @project.prometheus_alerts.find_by_iid(alert_iid)
-      @environment = @alert.environment
-      user = User.find(user_id)
-
-      subject_text = "#{@project.full_path} | Alert: #{@environment.name} - #{@alert.name} #{@alert.operator} #{@alert.threshold} for 5 minutes"
-
-      mail(to: user.notification_email, subject: subject(subject_text))
-    end
   end
 end

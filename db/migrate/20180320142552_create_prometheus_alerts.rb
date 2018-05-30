@@ -1,8 +1,6 @@
 class CreatePrometheusAlerts < ActiveRecord::Migration
   DOWNTIME = false
 
-  disable_ddl_transaction!
-
   def change
     create_table :prometheus_alerts do |t|
       t.integer :iid, null: false
@@ -10,8 +8,8 @@ class CreatePrometheusAlerts < ActiveRecord::Migration
       t.string :query, null: false
       t.string :operator, null: false
       t.float :threshold, null: false
-      t.references :environment, index: true, foreign_key: true
-      t.references :project, index: true, foreign_key: true
+      t.references :environment, index: true, foreign_key: true, on_delete: :cascade
+      t.references :project, index: true, foreign_key: true, on_delete: :cascade
       t.timestamps null: false
     end
 

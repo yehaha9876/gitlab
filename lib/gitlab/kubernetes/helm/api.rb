@@ -7,9 +7,12 @@ module Gitlab
           @namespace = Gitlab::Kubernetes::Namespace.new(Gitlab::Kubernetes::Helm::NAMESPACE, kubeclient)
         end
 
-        def get(command)
+        def get_config_map(command)
           @namespace.ensure_exists!
-          get_config_map(command) if command.config_map?
+
+          if command.config_map?
+            @kubeclient.get_config_map(command.config_map_name, @namespace.name)
+          end
         end
 
         def install(command)
@@ -44,10 +47,6 @@ module Gitlab
         end
 
         private
-
-        def get_config_map(command)
-          @kubeclient.get_config_map(command.config_map_name, @namespace.name)
-        end
 
         def create_config_map(command)
           command.config_map_resource.tap do |config_map_resource|

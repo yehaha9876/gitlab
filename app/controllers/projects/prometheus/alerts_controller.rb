@@ -1,90 +1,56 @@
 module Projects
   module Prometheus
     class AlertsController < Projects::ApplicationController
+      respond_to :json
+
       protect_from_forgery except: [:notify]
 
       before_action :authorize_admin_project!, except: [:notify]
       before_action :alert, only: [:update, :show, :destroy]
 
       def index
-        respond_to do |format|
-          format.json do
-            alerts = project.prometheus_alerts
-            response = {}
-
-            if alerts.any?
-              response[:alerts] =
-                PrometheusAlertSerializer.new(project: project).represent(alerts.order(created_at: :asc))
-            end
-
-            render json: response
-          end
-        end
+        render json: serializer.represent(alerts.order(created_at: :asc))
       end
 
       def show
-        respond_to do |format|
-          format.json do
-            render json: PrometheusAlertSerializer.new(project: project).represent(alert)
-          end
-        end
+        render json: serialize_as_json(alert)
       end
 
       def notify
         NotificationService.new.prometheus_alert_fired(project, params["alerts"].first)
 
-        respond_to do |format|
-          format.json do
-            head :ok
-          end
-        end
-      end
-
-      def new
-        @alert = project.prometheus_alerts.new
+        head :ok
       end
 
       def create
         @alert = project.prometheus_alerts.create(alerts_params)
 
-        respond_to do |format|
-          format.json do
-            if @alert
-              ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
+        if @alert
+          schedule_prometheus_update!
 
-              render json: PrometheusAlertSerializer.new(project: project).represent(@alert)
-            else
-              head :no_content
-            end
-          end
+          render json: serialize_as_json(@alert)
+        else
+          head :no_content
         end
       end
 
       def update
-        respond_to do |format|
-          format.json do
-            if alert.update(alerts_params)
-              ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
+        if alert.update(alerts_params)
+          schedule_prometheus_update!
 
-              render json: PrometheusAlertSerializer.new(project: project).represent(alert)
-            else
-              head :no_content
-            end
-          end
+          render json: serialize_as_json(alert)
+        else
+          head :no_content
         end
       end
 
       def destroy
-        respond_to do |format|
-          format.json do
-            if alert.destroy
-              ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
+        if alert.destroy
+          schedule_prometheus_update!
 
-              head :ok
-            else
-              head :no_content
-            end
-          end
+          head :ok
+        else
+          head :no_content
         end
       end
 
@@ -92,6 +58,18 @@ module Projects
 
       def alerts_params
         params.permit(:query, :operator, :threshold, :name, :environment_id)
+      end
+
+      def schedule_prometheus_update!
+        ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
+      end
+
+      def serialize_as_json(alert)
+        serializer.represent(alert)
+      end
+
+      def serializer
+        PrometheusAlertSerializer.new(project: project)
       end
 
       def alert

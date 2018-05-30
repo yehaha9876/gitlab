@@ -26,7 +26,7 @@ module Clusters
       end
 
       def ready?
-        status >= 3
+        [:installed, :updating, :updated].include?(status_name)
       end
 
       def chart
@@ -48,11 +48,11 @@ module Clusters
       end
 
       def update_in_progress?
-        status == 4
+        status_name == :updating
       end
 
       def update_errored?
-        status == -1
+        status_name == :errored
       end
 
       def get_command
