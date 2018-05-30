@@ -42,13 +42,12 @@
     }
   }
 
-  .form-horizontal {
-    margin-top: 20px;
+  .form-group {
+    margin-bottom: 0;
 
-    @include media-breakpoint-up(sm) {
-      display: -webkit-flex;
-      display: flex;
-      margin-top: 3px;
+    @include media-breakpoint-down(sm) {
+      display: block;
+      margin-left: 5px;
     }
   }
 
@@ -257,10 +256,6 @@
     align-self: flex-start;
   }
 
-  .form-horizontal ~ .btn {
-    margin-right: 0;
-  }
-
   @include media-breakpoint-down(xs) {
     display: block;
 
@@ -281,10 +276,6 @@
 
     .member-controls {
       margin-top: 5px;
-    }
-
-    .form-horizontal {
-      margin-top: 10px;
     }
   }
 }
@@ -307,10 +298,6 @@
 
     .dropdown-menu {
       margin-top: 0;
-    }
-
-    .form-horizontal {
-      display: block;
     }
 
     .member-form-control {
