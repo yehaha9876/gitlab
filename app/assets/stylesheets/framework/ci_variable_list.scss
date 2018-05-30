@@ -4,6 +4,14 @@
   padding-left: 0;
   list-style: none;
   clear: both;
+
+  .table-section {
+    font-size: $gl-font-size;
+
+    &:not(:first-child) {
+      padding-left: $gl-btn-padding;
+}
+  }
 }
 
 .ci-variable-row {
@@ -15,7 +23,7 @@
   }
 
   &:not(:last-child) {
-    margin-bottom: $gl-btn-padding;
+    border-bottom: none;
 
     @include media-breakpoint-down(xs) {
       margin-bottom: 3 * $gl-btn-padding;
@@ -56,8 +64,12 @@
 .ci-variable-body-item {
   flex: 1;
 
+  &:not(:first-child) {
+    padding-left: $gl-btn-padding;
+  }
+
   &:not(:last-child) {
-    margin-right: $gl-btn-padding;
+    padding-right: $gl-btn-padding;
 
     @include media-breakpoint-down(xs) {
       margin-right: 0;
