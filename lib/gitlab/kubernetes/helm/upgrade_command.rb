@@ -2,10 +2,10 @@ module Gitlab
   module Kubernetes
     module Helm
       class UpgradeCommand < BaseCommand
-        attr_reader :name, :chart, :repository, :values
+        attr_reader :chart, :repository, :values
 
         def initialize(name, chart:, values:, repository: nil)
-          @name = name
+          super(name)
           @chart = chart
           @values = values
           @repository = repository

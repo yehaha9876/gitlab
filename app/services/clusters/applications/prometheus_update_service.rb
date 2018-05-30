@@ -1,10 +1,10 @@
 module Clusters
   module Applications
     class PrometheusUpdateService < BaseHelmService
-      attr_accessor :app, :cluster, :project
+      attr_accessor :cluster, :project
 
       def initialize(app, project)
-        @app = app
+        super(app)
         @project = project
         @cluster = @app.cluster
       end

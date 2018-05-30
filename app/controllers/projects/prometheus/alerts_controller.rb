@@ -9,7 +9,9 @@ module Projects
       before_action :alert, only: [:update, :show, :destroy]
 
       def index
-        render json: serializer.represent(alerts.order(created_at: :asc))
+        alerts = project.prometheus_alerts.order(created_at: :asc)
+
+        render json: serialize_as_json(alerts)
       end
 
       def show

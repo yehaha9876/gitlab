@@ -12,10 +12,10 @@ module Gitlab
 
         # ee
         def query_with_alert(project, environment)
-          alerts_map = {}
-          project.prometheus_alerts.each do |alert|
-            alerts_map[alert[:query]] = alert.iid
-          end
+          alerts_map =
+            project.prometheus_alerts.each_with_object({}) do |alert, hsh|
+              hsh[alert[:query]] = alert.iid
+            end
 
           proc do |group|
             group[:metrics]&.map! do |metric|

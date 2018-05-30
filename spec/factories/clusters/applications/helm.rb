@@ -22,6 +22,14 @@ FactoryBot.define do
       status 3
     end
 
+    trait :updating do
+      status 4
+    end
+
+    trait :updated do
+      status 5
+    end
+
     trait :errored do
       status(-1)
       status_reason 'something went wrong'

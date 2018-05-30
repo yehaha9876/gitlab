@@ -1832,8 +1832,8 @@ class Project < ActiveRecord::Base
     deployment_platform(environment: environment)&.predefined_variables || []
   end
 
-  def environments_for_scope(environment_scope)
-    quoted_scope = ActiveRecord::Base.connection.quote(environment_scope)
+  def environments_for_scope(scope)
+    quoted_scope = Gitlab::SQL::Glob.q(scope)
 
     environments.where("name LIKE (#{Gitlab::SQL::Glob.to_like(quoted_scope)})") # rubocop:disable GitlabSecurity/SqlInjection
   end

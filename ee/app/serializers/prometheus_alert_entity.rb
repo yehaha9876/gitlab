@@ -3,6 +3,7 @@ class PrometheusAlertEntity < Grape::Entity
 
   expose :id
   expose :iid
+  expose :name
   expose :query
   expose :operator
   expose :threshold
