@@ -15,6 +15,4 @@
             %button.js-refresh-log.btn-default.btn-refresh{ type: 'button', disabled: true }
               = sprite_icon('retry')
 
-      %pre.build-trace#build-trace
-        %code.bash.js-build-output
-          .build-loader-animation.js-build-refresh
+      = render 'shared/builds/build_output'
