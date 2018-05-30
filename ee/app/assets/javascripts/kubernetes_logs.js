@@ -9,7 +9,7 @@ import _ from 'underscore';
 
 export default class KubernetesPodLogs extends LogOutputBehaviours {
   constructor(container) {
-    super(container);
+    super();
     this.options = $(container).data();
     this.podNameContainer = $(container).find('.js-pod-name');
     this.podName = getParameterValues('pod_name')[0];
