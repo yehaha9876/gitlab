@@ -1835,8 +1835,7 @@ class Project < ActiveRecord::Base
   def environments_for_scope(environment_scope)
     quoted_scope = ActiveRecord::Base.connection.quote(environment_scope)
 
-    # TODO: this can probably be done without the Glob.to_like
-    environments.where("name LIKE (#{Gitlab::SQL::Glob.to_like(quoted_scope)})")
+    environments.where("name LIKE (#{Gitlab::SQL::Glob.to_like(quoted_scope)})") # rubocop:disable GitlabSecurity/SqlInjection
   end
 
   def auto_devops_variables

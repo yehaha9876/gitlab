@@ -2990,9 +2990,9 @@ ActiveRecord::Schema.define(version: 20180704204006) do
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
+  add_foreign_key "prometheus_alerts", "environments", on_delete: :cascade
+  add_foreign_key "prometheus_alerts", "projects", on_delete: :cascade
   add_foreign_key "prometheus_metrics", "projects", on_delete: :cascade
-  add_foreign_key "prometheus_alerts", "environments"
-  add_foreign_key "prometheus_alerts", "projects"
   add_foreign_key "protected_branch_merge_access_levels", "namespaces", column: "group_id", name: "fk_98f3d044fe", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "protected_branches", name: "fk_8a3072ccb3", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "users"

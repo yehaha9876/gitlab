@@ -17,7 +17,7 @@ class ClusterUpdateAppWorker
     project = Project.find(project_id)
 
     find_application(app_name, app_id) do |app|
-      return if app.updated_since?(scheduled_time)
+      break if app.updated_since?(scheduled_time)
       raise UpdateAlreadyInProgressError if app.update_in_progress?
 
       Clusters::Applications::PrometheusUpdateService.new(app, project).execute

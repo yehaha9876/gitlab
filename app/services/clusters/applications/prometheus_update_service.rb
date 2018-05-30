@@ -113,7 +113,7 @@ module Clusters
       end
 
       def extract_config(response)
-        YAML.load(response.data.values)
+        YAML.safe_load(response.data.values)
       end
 
       def has_alerts?

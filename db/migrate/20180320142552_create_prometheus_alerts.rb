@@ -8,8 +8,8 @@ class CreatePrometheusAlerts < ActiveRecord::Migration
       t.string :query, null: false
       t.string :operator, null: false
       t.float :threshold, null: false
-      t.references :environment, index: true, foreign_key: true, on_delete: :cascade
-      t.references :project, index: true, foreign_key: true, on_delete: :cascade
+      t.references :environment, index: true, foreign_key: { on_delete: :cascade }
+      t.references :project, index: true, foreign_key: { on_delete: :cascade }
       t.timestamps null: false
     end
 
