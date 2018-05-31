@@ -30,6 +30,7 @@ export default {
   data() {
     return {
       service: null,
+      errorMessage: null,
       isLoading: false,
       isOpen: false,
       alerts: this.currentAlerts,
@@ -56,6 +57,9 @@ export default {
     },
     firstAlertData() {
       return this.hasAlerts ? this.alertData[this.alerts[0]] : undefined;
+    },
+    formDisabled() {
+      return this.errorMessage || this.isLoading;
     },
   },
   watch: {
@@ -89,7 +93,7 @@ export default {
           this.isLoading = false;
         })
         .catch(() => {
-          // TODO: produce an error message and/or fail state
+          this.errorMessage = 'Error fetching alert';
           this.isLoading = false;
         });
     },
@@ -117,7 +121,8 @@ export default {
           this.handleDropdownClose();
         })
         .catch(() => {
-          // TODO: add error handling
+          this.errorMessage = 'Error creating alert';
+          this.isLoading = false;
         });
     },
     handleUpdate({ alert, name, query, operator, threshold }) {
@@ -131,7 +136,8 @@ export default {
           this.handleDropdownClose();
         })
         .catch(() => {
-          // TODO: add error handling
+          this.errorMessage = 'Error saving alert';
+          this.isLoading = false;
         });
     },
     handleDelete({ alert }) {
@@ -145,7 +151,8 @@ export default {
           this.handleDropdownClose();
         })
         .catch(() => {
-          // TODO: add error handling
+          this.errorMessage = 'Error deleting alert';
+          this.isLoading = false;
         });
     },
   },
@@ -157,7 +164,16 @@ export default {
     class="prometheus-alert-widget dropdown"
     :class="{ show: isOpen }"
   >
-    <span class="alert-current-setting">
+    <span
+      v-if="errorMessage"
+      class="alert-error-message"
+    >
+      {{ errorMessage }}
+    </span>
+    <span
+      v-else
+      class="alert-current-setting"
+    >
       <i
         v-if="isLoading"
         class="fa fa-spinner fa-spin"
@@ -203,7 +219,7 @@ export default {
       </div>
       <div class="dropdown-content">
         <alert-widget-form
-          :is-loading="isLoading"
+          :disabled="formDisabled"
           :alert="firstAlert"
           :alert-data="firstAlertData"
           :name="name"

@@ -691,6 +691,11 @@
   }
 }
 
+.alert-error-message {
+  color: $gl-danger;
+  vertical-align: middle;
+}
+
 .alert-current-setting {
   color: $gl-text-color-disabled;
   vertical-align: middle;

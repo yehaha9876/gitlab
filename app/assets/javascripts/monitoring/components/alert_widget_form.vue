@@ -13,7 +13,7 @@ const SUBMIT_BUTTON_CLASS = {
 
 export default {
   props: {
-    isLoading: {
+    disabled: {
       type: Boolean,
       required: true,
     },
@@ -62,7 +62,7 @@ export default {
       return SUBMIT_BUTTON_CLASS[this.submitAction];
     },
     isSubmitDisabled() {
-      return this.isLoading || (this.submitAction === 'create' && !this.haveValuesChanged);
+      return this.disabled || (this.submitAction === 'create' && !this.haveValuesChanged);
     },
   },
   watch: {
@@ -105,7 +105,7 @@ export default {
         class="btn btn-default"
         :class="{ active: operator === '>' }"
         @click="operator = '>'"
-        :disabled="isLoading"
+        :disabled="disabled"
       >
         &gt;
       </button>
@@ -114,7 +114,7 @@ export default {
         class="btn btn-default"
         :class="{ active: operator === '=' }"
         @click="operator = '='"
-        :disabled="isLoading"
+        :disabled="disabled"
       >
         =
       </button>
@@ -123,7 +123,7 @@ export default {
         class="btn btn-default"
         :class="{ active: operator === '<' }"
         @click="operator = '<'"
-        :disabled="isLoading"
+        :disabled="disabled"
       >
         &lt;
       </button>
@@ -134,7 +134,7 @@ export default {
         type="number"
         class="form-control"
         v-model.number="threshold"
-        :disabled="isLoading"
+        :disabled="disabled"
       />
     </div>
     <div class="action-group">
@@ -142,7 +142,7 @@ export default {
         type="button"
         class="btn btn-default"
         @click="handleCancel"
-        :disabled="isLoading"
+        :disabled="disabled"
       >
         Cancel
       </button>
