@@ -17,6 +17,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
     query: {
       type: String,
       required: true,
@@ -75,7 +79,7 @@ export default {
       this.$refs.submitButton.blur();
       this.$emit(this.submitAction, {
         alert: this.alert,
-        name: 'foo',
+        name: this.name,
         query: this.query,
         operator: this.operator,
         threshold: this.threshold,

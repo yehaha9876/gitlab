@@ -206,6 +206,7 @@ export default {
           :is-loading="isLoading"
           :alert="firstAlert"
           :alert-data="firstAlertData"
+          :name="name"
           :query="query"
           @create="handleCreate"
           @update="handleUpdate"
