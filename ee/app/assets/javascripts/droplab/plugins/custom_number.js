@@ -3,18 +3,19 @@ const CustomNumber = {
   keydown: function(e) {
     if (this.destroyed) return;
 
-    var list = e.detail.hook.list;
-    var data = list.data;
-    var value = parseInt(e.detail.hook.trigger.value, 0);
-    var config = e.detail.hook.config.CustomNumber;
+    const list = e.detail.hook.list;
+    const value = parseInt(e.detail.hook.trigger.value, 0);
+    const config = e.detail.hook.config.CustomNumber;
+    const { defaultOptions } = config;
 
-    const isOutOfBounds = config.defaultOptions.indexOf(value) === -1;
+    const isOutOfBounds = defaultOptions.indexOf(value) === -1;
     const isValidNumber = !isNaN(value);
+    const defaultDropdownOptions = defaultOptions.map(o => ({ id: o, title: o }));
 
-    if (isValidNumber && isOutOfBounds) {
-      list.setData([{ id: value, title: value }]);
-      list.currentIndex = 0;
-    }
+    list.setData(
+      isValidNumber && isOutOfBounds ? [{ id: value, title: value }] : defaultDropdownOptions,
+    );
+    list.currentIndex = 0;
   },
 
   debounceKeydown: function debounceKeydown(e) {
