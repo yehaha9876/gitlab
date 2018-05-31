@@ -37,20 +37,16 @@ module SearchHelper
     Gitlab::ProjectSearchResults.parse_search_result(result)
   end
 
-  def find_project_for_blob(raw_blob)
+  def find_project_for_result_blob(result)
     @project
   end
 
-  def parse_search_blob_file_name(raw_blob)
-    raw_blob[0]
+  def parse_search_result_blob_file_name(result)
+    result[0]
   end
 
-  def parse_search_blob(raw_blob)
-    raw_blob[1]
-  end
-
-  def parse_search_blob_ref(blob)
-    @search_results.repository_ref
+  def parse_search_result_blob(result)
+    result[1]
   end
 
   def search_wiki_blob_link(wiki_blob, project)

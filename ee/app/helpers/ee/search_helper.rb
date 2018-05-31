@@ -9,26 +9,26 @@ module EE
 
     def parse_search_result(result)
       if result.is_a?(String)
-        Gitlab::ProjectSearchResults.parse_search_result(result)
+        super
       else
         Gitlab::Elastic::SearchResults.parse_search_result(result)
       end
     end
 
-    def find_project_for_blob(raw_blob)
-      super || Project.find(blob['_parent'])
+    def find_project_for_result_blob(result)
+      super || Project.find(result['_parent'])
     end
 
-    def parse_search_blob_file_name(raw_blob)
-      return super if raw_blob.is_a?(Array)
+    def parse_search_result_blob_file_name(result)
+      return super if result.is_a?(Array)
 
-      raw_blob.filename
+      result.filename
     end
 
-    def parse_search_blob(raw_blob)
-      return super if raw_blob.is_a?(Array)
+    def parse_search_result_blob(result)
+      return super if result.is_a?(Array)
 
-      parse_search_result(raw_blob)
+      parse_search_result(result)
     end
 
     def parse_search_blob_ref(blob)
