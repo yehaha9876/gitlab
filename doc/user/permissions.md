@@ -40,7 +40,6 @@ The following table depicts the various user permission levels in a project.
 | View wiki pages                       | ✓ [^1]  | ✓          | ✓           | ✓        | ✓      |
 | Pull project code                     | [^1]    | ✓          | ✓           | ✓        | ✓      |
 | Download project                      | [^1]    | ✓          | ✓           | ✓        | ✓      |
-| Assign issues and merge requests      |         | ✓          | ✓           | ✓        | ✓      |
 | Label issues and merge requests       |         | ✓          | ✓           | ✓        | ✓      |
 | Create code snippets                  |         | ✓          | ✓           | ✓        | ✓      |
 | Manage issue tracker                  |         | ✓          | ✓           | ✓        | ✓      |
@@ -51,6 +50,8 @@ The following table depicts the various user permission levels in a project.
 | See a list of merge requests          |         | ✓          | ✓           | ✓        | ✓      |
 | Manage related issues                 |         | ✓          | ✓           | ✓        | ✓      |
 | Lock issue discussions                |         | ✓          | ✓           | ✓        | ✓      |
+| Assign issues                         |         | ✓          | ✓           | ✓        | ✓      |
+| Assign merge requests                 |         |            | ✓           | ✓        | ✓      |
 | Lock merge request discussions        |         |            | ✓           | ✓        | ✓      |
 | Create new environments               |         |            | ✓           | ✓        | ✓      |
 | Stop environments                     |         |            | ✓           | ✓        | ✓      |
