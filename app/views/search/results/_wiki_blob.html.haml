@@ -1,21 +1,6 @@
-- project = @project || find_project_for_blob(wiki_blob)
+- project = find_project_for_blob(wiki_blob)
+- file_name = parse_search_blob_file_name(wiki_blob)
+- wiki_blob = parse_search_blob(wiki_blob)
+- wiki_blob_link = search_wiki_blob_link(wiki_blob, project)
 
-- if wiki_blob.is_a?(Array)
-  - file_name, wiki_blob = wiki_blob
-- else
-  - wiki_blob = parse_search_result(wiki_blob)
-  - file_name = wiki_blob.filename
-
-.blob-result
-  .file-holder
-    .js-file-title.file-title
-      = link_to project_wiki_path(project, wiki_blob.basename) do
-        %i.fa.fa-file
-        %strong
-          - if @project
-            = file_name
-          - else
-            #{project.full_name}:
-            %i= file_name
-    .file-content.code.term
-      = render 'shared/file_highlight', blob: wiki_blob, first_line_number: wiki_blob.startline
+= render partial: 'search/results/blob_data', locals: { blob: wiki_blob, project: project, file_name: file_name, blob_link: wiki_blob_link }

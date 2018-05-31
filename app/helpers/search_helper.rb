@@ -34,15 +34,37 @@ module SearchHelper
   end
 
   def parse_search_result(result)
-    if result.is_a?(String)
-      Gitlab::ProjectSearchResults.parse_search_result(result)
-    else
-      Gitlab::Elastic::SearchResults.parse_search_result(result)
-    end
+    Gitlab::ProjectSearchResults.parse_search_result(result)
   end
 
-  def find_project_for_blob(blob)
-    Project.find(blob['_parent'])
+  def find_project_for_blob(raw_blob)
+    @project
+  end
+
+  def parse_search_blob_file_name(raw_blob)
+    raw_blob[0]
+  end
+
+  def parse_search_blob(raw_blob)
+    raw_blob[1]
+  end
+
+  def parse_search_blob_ref(blob)
+    @search_results.repository_ref
+  end
+
+  def search_wiki_blob_link(wiki_blob, project)
+    project_wiki_path(project, wiki_blob.basename)
+  end
+
+  def search_blob_link(blob, project, file_name)
+    ref = parse_search_blob_ref(blob)
+
+    project_blob_path(project, tree_join(ref, file_name))
+  end
+
+  def search_blob_title(project, filename)
+    content_tag(:strong, filename)
   end
 
   private
