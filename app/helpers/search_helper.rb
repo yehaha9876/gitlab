@@ -49,6 +49,10 @@ module SearchHelper
     result[1]
   end
 
+  def parse_search_blob_ref(blob)
+    @search_results.repository_ref
+  end
+
   def search_wiki_blob_link(wiki_blob, project)
     project_wiki_path(project, wiki_blob.basename)
   end
