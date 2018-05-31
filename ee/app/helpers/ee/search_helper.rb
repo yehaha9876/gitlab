@@ -11,18 +11,18 @@ module EE
       if result.is_a?(String)
         super
       else
-        Gitlab::Elastic::SearchResults.parse_search_result(result)
+        ::Gitlab::Elastic::SearchResults.parse_search_result(result)
       end
     end
 
     def find_project_for_result_blob(result)
-      super || Project.find(result['_parent'])
+      super || ::Project.find(result['_parent'])
     end
 
     def parse_search_result_blob_file_name(result)
       return super if result.is_a?(Array)
 
-      result.filename
+      parse_search_result(result).filename
     end
 
     def parse_search_result_blob(result)
