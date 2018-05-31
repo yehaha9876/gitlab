@@ -684,7 +684,7 @@
 .alert-dropdown-menu {
   right: 0;
   left: auto;
-  z-index: 950; // must be higher than .popover z-index
+  z-index: 1070; // must be higher than .popover z-index
 
   .dropdown-title {
     margin: 0;
