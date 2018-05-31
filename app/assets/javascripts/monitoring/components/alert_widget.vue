@@ -155,7 +155,7 @@ export default {
 <template>
   <div
     class="prometheus-alert-widget dropdown"
-    :class="{ open: isOpen }"
+    :class="{ show: isOpen }"
   >
     <span class="alert-current-setting">
       <i
