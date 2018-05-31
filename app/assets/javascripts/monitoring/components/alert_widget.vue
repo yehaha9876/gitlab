@@ -1,4 +1,5 @@
 <script>
+import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
 import AlertsService from '../services/alerts_service';
@@ -47,7 +48,9 @@ export default {
       return this.hasAlerts ? 'notifications' : 'notifications-off';
     },
     dropdownTitle() {
-      return this.hasAlerts ? 'Edit alert' : 'Add alert';
+      return this.hasAlerts
+        ? s__('PrometheusAlerts|Edit alert')
+        : s__('PrometheusAlerts|Add alert');
     },
     hasAlerts() {
       return this.alerts.length > 0;
@@ -93,7 +96,7 @@ export default {
           this.isLoading = false;
         })
         .catch(() => {
-          this.errorMessage = 'Error fetching alert';
+          this.errorMessage = s__('PrometheusAlerts|Error fetching alert');
           this.isLoading = false;
         });
     },
@@ -121,7 +124,7 @@ export default {
           this.handleDropdownClose();
         })
         .catch(() => {
-          this.errorMessage = 'Error creating alert';
+          this.errorMessage = s__('PrometheusAlerts|Error creating alert');
           this.isLoading = false;
         });
     },
@@ -136,7 +139,7 @@ export default {
           this.handleDropdownClose();
         })
         .catch(() => {
-          this.errorMessage = 'Error saving alert';
+          this.errorMessage = s__('PrometheusAlerts|Error saving alert');
           this.isLoading = false;
         });
     },
@@ -151,7 +154,7 @@ export default {
           this.handleDropdownClose();
         })
         .catch(() => {
-          this.errorMessage = 'Error deleting alert';
+          this.errorMessage = s__('PrometheusAlerts|Error deleting alert');
           this.isLoading = false;
         });
     },
