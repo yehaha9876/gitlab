@@ -47,6 +47,11 @@ export default {
     alertIcon() {
       return this.hasAlerts ? 'notifications' : 'notifications-off';
     },
+    alertStatus() {
+      return this.hasAlerts
+        ? s__('PrometheusAlerts|Alert set')
+        : s__('PrometheusAlerts|No alert set');
+    },
     dropdownTitle() {
       return this.hasAlerts
         ? s__('PrometheusAlerts|Edit alert')
@@ -188,6 +193,7 @@ export default {
       class="btn btn-sm alert-dropdown-button"
       type="button"
       @click="handleDropdownToggle"
+      :aria-label="alertStatus"
     >
       <icon
         :name="alertIcon"
