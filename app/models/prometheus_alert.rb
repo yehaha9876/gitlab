@@ -8,7 +8,7 @@ class PrometheusAlert < ActiveRecord::Base
 
   has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.prometheus_alerts&.maximum(:iid) }
 
-  after_initialize :set_project
+  after_save :clear_prometheus_adapter_cache!
 
   def full_query
     "#{query} #{operator} #{threshold}"
@@ -29,9 +29,7 @@ class PrometheusAlert < ActiveRecord::Base
 
   private
 
-  def set_project
-    return unless project.nil?
-
-    self.project = environment.project if environment
+  def clear_prometheus_adapter_cache!
+    environment.cluster_prometheus_adapter&.clear_prometheus_reactive_cache!(:additional_metrics_environment, environment)
   end
 end

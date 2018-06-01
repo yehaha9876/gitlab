@@ -13,7 +13,7 @@ module Clusters
           check_timeout
         end
       rescue Kubeclient::HttpError => ke
-        app.make_errored!("Kubernetes error: #{ke.message}") unless app.errored?
+        app.make_update_errored!("Kubernetes error: #{ke.message}") unless app.update_errored?
       end
 
       private
@@ -25,7 +25,7 @@ module Clusters
       end
 
       def on_failed
-        app.make_errored!(errors || 'Update silently failed')
+        app.make_update_errored!(errors || 'Update silently failed')
       ensure
         remove_pod
       end
@@ -33,7 +33,7 @@ module Clusters
       def check_timeout
         if timeouted?
           begin
-            app.make_errored!('Update timed out')
+            app.make_update_errored!('Update timed out')
           ensure
             remove_pod
           end

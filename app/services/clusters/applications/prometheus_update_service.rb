@@ -26,9 +26,9 @@ module Clusters
 
         ClusterWaitForAppUpdateWorker.perform_in(ClusterWaitForAppUpdateWorker::INTERVAL, app.name, app.id)
       rescue Kubeclient::HttpError => ke
-        app.make_errored!("Kubernetes error: #{ke.message}")
+        app.make_update_errored!("Kubernetes error: #{ke.message}")
       rescue StandardError => e
-        app.make_errored!(e.message)
+        app.make_update_errored!(e.message)
       end
 
       private

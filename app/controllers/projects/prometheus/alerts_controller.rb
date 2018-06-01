@@ -79,7 +79,7 @@ module Projects
       end
 
       def application
-        @application ||= alert.environment.prometheus_adapter
+        @application ||= alert.environment.cluster_prometheus_adapter
       end
     end
   end

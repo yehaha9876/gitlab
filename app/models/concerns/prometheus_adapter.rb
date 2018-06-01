@@ -24,17 +24,17 @@ module PrometheusAdapter
     def query(query_name, *args)
       return unless can_query?
 
-      query_class = Gitlab::Prometheus::Queries.const_get("#{query_name.to_s.classify}Query")
+      query_class = get_query_class(query_name)
+      prometheus_args = build_args(*args)
 
-      args.map! do |arg|
-        if arg.respond_to?(:id)
-          arg.id
-        else
-          arg
-        end
-      end
+      with_reactive_cache(query_class.name, *prometheus_args, &query_class.method(:transform_reactive_result))
+    end
 
-      with_reactive_cache(query_class.name, *args, &query_class.method(:transform_reactive_result))
+    def clear_prometheus_reactive_cache!(query_name, *args)
+      query_class = get_query_class(query_name)
+      prometheus_args = build_args(*args)
+
+      clear_reactive_cache!(query_class.name, *prometheus_args)
     end
 
     # Cache metrics for specific environment
@@ -49,6 +49,20 @@ module PrometheusAdapter
       }
     rescue Gitlab::PrometheusClient::Error => err
       { success: false, result: err.message }
+    end
+
+    def get_query_class(query_name)
+      Gitlab::Prometheus::Queries.const_get("#{query_name.to_s.classify}Query")
+    end
+
+    def build_args(*args)
+      args.map do |arg|
+        if arg.respond_to?(:id)
+          arg.id
+        else
+          arg
+        end
+      end
     end
   end
 end
