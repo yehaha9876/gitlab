@@ -1,8 +1,14 @@
 <script>
+import { __ } from '~/locale';
+import Vue from 'vue';
+import Translate from '~/vue_shared/translate';
+
+Vue.use(Translate);
+
 const SUBMIT_ACTION_TEXT = {
-  create: 'Add',
-  update: 'Save',
-  delete: 'Delete',
+  create: __('Add'),
+  update: __('Save'),
+  delete: __('Delete'),
 };
 
 const SUBMIT_BUTTON_CLASS = {
@@ -98,7 +104,7 @@ export default {
     <div
       class="form-group btn-group"
       role="group"
-      aria-label="Operator"
+      :aria-label="s__('PrometheusAlerts|Operator')"
     >
       <button
         type="button"
@@ -129,7 +135,7 @@ export default {
       </button>
     </div>
     <div class="form-group">
-      <label>Threshold</label>
+      <label>{{ s__('PrometheusAlerts|Threshold') }}</label>
       <input
         type="number"
         class="form-control"
@@ -144,7 +150,7 @@ export default {
         @click="handleCancel"
         :disabled="disabled"
       >
-        Cancel
+        {{ __('Cancel') }}
       </button>
       <button
         ref="submitButton"
