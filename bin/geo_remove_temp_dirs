@@ -97,7 +97,7 @@ def list_shards
 
   shards.each do |shard|
     health = Gitlab::Geo::ShardHealthCache.healthy_shard?(shard.name) ? 'Healthy  ' : 'Unhealthy'
-    puts "#{health} : #{shard.name}"
+    puts "#{health} : #{shard.name} : #{shard.path}"
   end
 
   exit
@@ -117,6 +117,8 @@ if $0 == __FILE__
   if options[:shard]
     shards.select! { |shard| shard.name == options[:shard] }
     abort "Shard named '#{options[:shard]}' does not exist" if shards.empty?
+  else
+    shards.uniq! { |shard| shard.path }
   end
 
   puts "Will perform a #{options[:remove] ? 'DELETION' : 'DRYRUN'}..."
