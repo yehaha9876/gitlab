@@ -49,7 +49,7 @@ describe 'Dropdown weight', :js do
     it 'should load all the weights when opened' do
       send_keys_to_filtered_search('weight:')
 
-      expect(page.all('#js-dropdown-weight .filter-dropdown .filter-dropdown-item').size).to eq(9)
+      expect(page.all('#js-dropdown-weight .filter-dropdown .filter-dropdown-item').size).to eq(21)
     end
   end
 

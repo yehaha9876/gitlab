@@ -532,7 +532,7 @@ describe 'Issues' do
           expect(page).to have_content "None"
           click_link 'Edit'
 
-          find('.dropdown-content a', text: '1').click
+          find('.dropdown-content a', text: '1', exact_text: true).click
 
           page.within('.value') do
             expect(page).to have_content "1"
