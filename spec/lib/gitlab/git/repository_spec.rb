@@ -15,7 +15,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
     it 'wraps gRPC unknown error' do
       expect_any_instance_of(gitaly_client_class).to receive(gitaly_client_method)
         .and_raise(GRPC::Unknown)
-      expect { subject }.to raise_error(Gitlab::Git::CommandError)
+      expect { subject }.to raise_error(Gitlab::Git::CommandError, Regexp.new(Regexp.escape(gitaly_client_method)))
     end
   end
 

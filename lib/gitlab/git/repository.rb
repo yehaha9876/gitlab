@@ -1451,7 +1451,7 @@ module Gitlab
       rescue GRPC::InvalidArgument => e
         raise ArgumentError.new(e)
       rescue GRPC::BadStatus => e
-        raise CommandError.new(e)
+        raise CommandError.new("#{e} (#{method})")
       end
 
       def clean_stale_repository_files
