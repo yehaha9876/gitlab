@@ -187,9 +187,7 @@ export default {
       return graphData.queries[0].label;
     },
     getQueryAlerts(graphData) {
-      if (!graphData.queries) {
-        return undefined;
-      }
+      if (!graphData.queries) return [];
       return graphData.queries.map(query => query.alert_path).filter(Boolean);
     },
   },
