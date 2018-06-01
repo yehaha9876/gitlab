@@ -33,10 +33,6 @@ module SearchHelper
     "Showing #{from} - #{to} of #{count} #{scope.humanize(capitalize: false)} for \"#{term}\""
   end
 
-  # def parse_search_result(result)
-  #   Gitlab::ProjectSearchResults.parse_search_result(result)
-  # end
-
   def find_project_for_result_blob(result)
     @project
   end
