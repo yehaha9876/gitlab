@@ -267,7 +267,7 @@
       border: 1px solid $white-light;
       background-color: $orange-300;
       border-radius: 50%;
-      content: "";
+      content: '';
     }
   }
 }
@@ -286,8 +286,6 @@
     padding-right: 10px;
   }
 }
-
-
 
 .gl-responsive-table-row {
   .branch-commit {
@@ -440,6 +438,7 @@
   align-items: center;
   justify-content: space-between;
 <<<<<<< HEAD
+<<<<<<< HEAD
   margin-bottom: $gl-padding-8;
 
   h5 {
@@ -448,6 +447,11 @@
 
   h3 {
 >>>>>>> add slot for monitoring graph widgets within prometheus graphs
+=======
+  margin-bottom: $gl-padding-8;
+
+  h5 {
+>>>>>>> fix scss values and harmonize with upstream changes
     margin: 0;
   }
 }
@@ -667,12 +671,12 @@
     background: $white-normal;
     outline: 0;
   }
-  
+
   svg {
     margin: 0;
 
     + svg {
-      margin-left: -4px;
+      margin-left: -$gl-padding-4;
     }
 
     &.chevron {
@@ -684,7 +688,7 @@
 .alert-dropdown-menu {
   right: 0;
   left: auto;
-  z-index: 1070; // must be higher than .popover z-index
+  z-index: $zindex-popover + 5; // must be higher than graph flag popover
 
   .dropdown-title {
     margin: 0;
@@ -702,7 +706,7 @@
 }
 
 .alert-form {
-  padding: 16px 16px 8px;
+  padding: $gl-padding $gl-padding $gl-padding-8;
 
   label {
     font-weight: normal;
@@ -711,7 +715,7 @@
   .btn-group,
   .action-group {
     display: flex;
-    
+
     .btn {
       flex: 1 auto;
       box-shadow: none;
@@ -719,6 +723,6 @@
   }
 
   .action-group .btn + .btn {
-    margin-left: 8px;
+    margin-left: $gl-padding-8;
   }
 }
