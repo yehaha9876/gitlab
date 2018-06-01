@@ -4,7 +4,6 @@ describe Projects::Prometheus::AlertsController do
   let(:user) { create(:user) }
   let(:project) { create(:project) }
   let(:environment) { create(:environment, project: project) }
-
   let(:prometheus_adapter) { double('prometheus_adapter', can_query?: true) }
 
   before do

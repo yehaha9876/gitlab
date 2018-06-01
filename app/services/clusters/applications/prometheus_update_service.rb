@@ -89,7 +89,10 @@ module Clusters
           {
             "name" => "gitlab",
             "webhook_configs" => [
-              { "url" => notify_url }
+              {
+                "url" => notify_url,
+                "send_resolved" => false
+              }
             ]
           }
         ]
