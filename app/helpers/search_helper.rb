@@ -42,7 +42,7 @@ module SearchHelper
   end
 
   def search_blob_title(project, filename)
-    content_tag(:strong, filename)
+    filename
   end
 
   private
