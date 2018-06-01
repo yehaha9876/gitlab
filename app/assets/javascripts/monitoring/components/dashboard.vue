@@ -11,7 +11,8 @@ import MonitoringStore from '../stores/monitoring_store';
 import eventHub from '../event_hub';
 
 // ee-only
-import AlertWidget from './alert_widget.vue';
+// eslint-disable-next-line import/first
+import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
 
 export default {
   components: {
