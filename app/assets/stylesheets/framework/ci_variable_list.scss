@@ -15,19 +15,15 @@
 }
 
 .ci-variable-row {
-  display: flex;
   align-items: flex-start;
 
   @include media-breakpoint-down(xs) {
     align-items: flex-end;
+    border: none;
   }
 
   &:not(:last-child) {
     border-bottom: none;
-
-    @include media-breakpoint-down(xs) {
-      margin-bottom: 3 * $gl-btn-padding;
-    }
   }
 
   &:last-child {
@@ -76,8 +72,8 @@
     padding-right: $gl-btn-padding;
 
     @include media-breakpoint-down(xs) {
-      margin-right: 0;
-      margin-bottom: $gl-btn-padding;
+      border: none;
+      min-height: unset;
     }
   }
 }

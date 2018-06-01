@@ -716,7 +716,7 @@ $ci-action-dropdown-svg-size: 12px;
 /*
 CI variable lists
 */
-$ci-variable-remove-button-width: calc(1em + $gl-padding);
+$ci-variable-remove-button-width: calc(1em + #{$gl-padding});
 
 /*
 Filtered Search
