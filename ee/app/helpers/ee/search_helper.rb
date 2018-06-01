@@ -7,32 +7,26 @@ module EE
       options
     end
 
-    def parse_search_result(result)
-      if result.is_a?(String)
-        super
-      else
-        ::Gitlab::Elastic::SearchResults.parse_search_result(result)
-      end
-    end
+    # def parse_search_result(result)
+    #   if result.is_a?(String)
+    #     super
+    #   else
+    #     blob = ::Gitlab::Elastic::SearchResults.parse_search_result(result)
+    #
+    #     [blob.file_name, blob]
+    #   end
+    # end
 
     def find_project_for_result_blob(result)
       super || ::Project.find(result['_parent'])
     end
 
-    def parse_search_result_blob_file_name(result)
+    def parse_search_result(result)
       return super if result.is_a?(Array)
 
-      parse_search_result(result).filename
-    end
+      blob = ::Gitlab::Elastic::SearchResults.parse_search_result(result)
 
-    def parse_search_result_blob(result)
-      return super if result.is_a?(Array)
-
-      parse_search_result(result)
-    end
-
-    def parse_search_blob_ref(blob)
-      blob.ref
+      [blob.file_name, blob]
     end
 
     def search_blob_title(project, file_name)
