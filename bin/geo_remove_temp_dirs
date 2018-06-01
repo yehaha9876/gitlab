@@ -27,7 +27,11 @@ class UtilityOptionParser
     op.separator 'By default will perform a dryrun - use `--remove` to delete the directories.'
     op.separator ''
     op.on('--dryrun', 'Perform a dryrun, simply scanning the repositories (default)') { options[:remove] = false }
+    op.on('--list-shards', 'List available shards') { options[:list_shards] = true }
     op.on('--remove', 'Permantely deletes the temporary directories') { options[:remove] = true }
+    op.on('--shard NAME',  'Specify the shard name to check (leave empty to scan all shards)') do |name|
+      options[:shard] = name
+    end
 
     op.separator ''
     op.on('-h', '--help', 'Usage help') do
@@ -42,16 +46,22 @@ class UtilityOptionParser
   end
 end
 
-def remove_repository_temp_dirs(remove_flag = false)
+def remove_repository_temp_dirs(shard, remove_flag = false)
   abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
   abort 'This is not a secondary node' unless Gitlab::Geo.secondary?
 
-  Gitlab.config.repositories.storages.each do |name, repository_storage|
-    repo_root      = repository_storage.legacy_disk_path
+  unless Gitlab::Geo::ShardHealthCache.healthy_shard?(shard.name)
+    puts "!!Shard named '#{shard.name}' is unhealthy, skipping: #{shard.path}"
+    return
+  end
+
+  # Gitlab.config.repositories.storages.each do |name, repository_storage|
+    # repo_root      = repository_storage.legacy_disk_path
+    repo_root      = shard.path
     dir_pattern    = "*_#{'[[:xdigit:]]' * 14}.*git"
     null_seperator = "\u0000"
 
-    puts "\nScanning #{repo_root} ..."
+    puts "\nScanning shard '#{shard.name}' : #{repo_root} ..."
 
     # old-style temp directories end with an underscore followed by a 14 character hex number
     IO.popen(%W(find #{repo_root} -mindepth 1 -type d -name #{dir_pattern} -print0)) do |find|
@@ -79,9 +89,19 @@ def remove_repository_temp_dirs(remove_flag = false)
         end
       end
     end
-  end
+  # end
 end
 
+def list_shards
+  shards = StorageShard.all
+
+  shards.each do |shard|
+    health = Gitlab::Geo::ShardHealthCache.healthy_shard?(shard.name) ? 'Healthy  ' : 'Unhealthy'
+    puts "#{health} : #{shard.name}"
+  end
+
+  exit
+end
 
 if $0 == __FILE__
   options = UtilityOptionParser.parse(ARGV)
@@ -90,6 +110,17 @@ if $0 == __FILE__
   puts "Loading Rails..."
   require "#{options[:rails_root]}/config/environment"
 
+  list_shards if options[:list_shards]
+
+  shards = StorageShard.all
+
+  if options[:shard]
+    shards.select! { |shard| shard.name == options[:shard] }
+    abort "Shard named '#{options[:shard]}' does not exist" if shards.empty?
+  end
+
   puts "Will perform a #{options[:remove] ? 'DELETION' : 'DRYRUN'}..."
-  remove_repository_temp_dirs(options[:remove])
+  shards.each do |shard|
+    remove_repository_temp_dirs(shard, options[:remove])
+  end
 end
