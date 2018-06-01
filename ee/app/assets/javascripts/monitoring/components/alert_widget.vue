@@ -185,7 +185,7 @@ export default {
       {{ alertSummary }}
     </span>
     <button
-      class="btn btn-xs alert-dropdown-button"
+      class="btn btn-sm alert-dropdown-button"
       type="button"
       @click="handleDropdownToggle"
     >
