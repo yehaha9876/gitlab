@@ -5,7 +5,7 @@ module EE
 
       prepended do
         before_action :authorize_read_pod_logs!, only: [:logs]
-        before_action :environment, only: [:show, :edit, :update, :stop, :terminal, :terminal_websocket_authorize, :metrics, :logs]
+        before_action :environment_ee, only: [:logs]
       end
 
       def logs
@@ -22,6 +22,10 @@ module EE
       end
 
       private
+
+      def environment_ee
+        environment
+      end
 
       def pod_logs
         @pod_logs ||= environment.deployment_platform.read_pod_logs(params[:pod_name])
