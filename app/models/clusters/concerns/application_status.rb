@@ -42,7 +42,7 @@ module Clusters
           end
 
           event :make_update_errored do
-            transition any => :errored
+            transition any => :update_errored
           end
 
           before_transition any => [:scheduled] do |app_status, _|

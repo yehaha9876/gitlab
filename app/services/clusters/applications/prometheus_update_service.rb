@@ -131,7 +131,7 @@ module Clusters
       end
 
       def rule_name(environment)
-        "#{environment.rule_name}.rules"
+        "#{environment.name}.rules"
       end
 
       def environments
