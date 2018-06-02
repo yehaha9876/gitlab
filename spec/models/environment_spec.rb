@@ -702,12 +702,6 @@ describe Environment do
     end
   end
 
-  describe '#rule_name' do
-    it 'returns the rule name' do
-      expect(subject.rule_name).to eq("#{subject.name}.rules")
-    end
-  end
-
   describe '#prometheus_adapter' do
     it 'calls prometheus adapter service' do
       expect_any_instance_of(Prometheus::AdapterService).to receive(:prometheus_adapter)

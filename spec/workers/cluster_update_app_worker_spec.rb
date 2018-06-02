@@ -3,6 +3,7 @@ require 'spec_helper'
 describe ClusterUpdateAppWorker do
   let(:project) { create(:project) }
   let(:scheduled_time) { Time.now - 5.minutes }
+  let(:prometheus_update_service) { spy }
 
   subject { described_class.new }
 
@@ -10,12 +11,16 @@ describe ClusterUpdateAppWorker do
     Timecop.freeze(Time.now) { example.run }
   end
 
+  before do
+    allow(Clusters::Applications::PrometheusUpdateService).to receive(:new).and_return(prometheus_update_service)
+  end
+
   describe '#perform' do
     context 'when the application last_update_started_at is higher than the time the job was scheduled in' do
       it 'does nothing' do
         application = create(:clusters_applications_prometheus, :updated, last_update_started_at: Time.now)
-        expect_any_instance_of(Clusters::Applications::Prometheus).to receive(:updated_since?).with(scheduled_time).and_return(true)
-        expect_any_instance_of(Clusters::Applications::PrometheusUpdateService).not_to receive(:execute)
+
+        expect(prometheus_update_service).not_to receive(:execute)
 
         expect(subject.perform(application.name, application.id, project.id, scheduled_time)).to be_nil
       end
@@ -32,7 +37,9 @@ describe ClusterUpdateAppWorker do
     end
 
     it 'executes PrometheusUpdateService' do
-      expect_any_instance_of(Clusters::Applications::PrometheusUpdateService).to receive(:execute)
+      application = create(:clusters_applications_prometheus, :installed)
+
+      expect(prometheus_update_service).to receive(:execute)
 
       subject.perform(application.name, application.id, project.id, Time.now)
     end

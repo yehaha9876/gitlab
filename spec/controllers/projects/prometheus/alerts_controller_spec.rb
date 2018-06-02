@@ -66,6 +66,12 @@ describe Projects::Prometheus::AlertsController do
   end
 
   describe 'POST #notify' do
+    let(:notification_service) { spy }
+
+    before do
+      allow(NotificationService).to receive(:new).and_return(notification_service)
+    end
+
     it 'sends a notification' do
       alert = create(:prometheus_alert, project: project)
       alert_params = {
@@ -79,7 +85,7 @@ describe Projects::Prometheus::AlertsController do
         }
       }
 
-      expect_any_instance_of(NotificationService).to receive(:prometheus_alert_fired).with(project, alert_params)
+      expect(notification_service).to receive(:prometheus_alert_fired).with(project, alert_params)
 
       post :notify, project_params(alerts: [alert])
 
@@ -88,6 +94,12 @@ describe Projects::Prometheus::AlertsController do
   end
 
   describe 'POST #create' do
+    let(:schedule_update_service) { spy }
+
+    before do
+      allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
+    end
+
     it 'creates a new prometheus alert' do
       alert_params = {
         "name" => "bar",
@@ -96,7 +108,7 @@ describe Projects::Prometheus::AlertsController do
         "threshold" => 1
       }
 
-      expect_any_instance_of(::Clusters::Applications::ScheduleUpdateService).to receive(:execute)
+      expect(schedule_update_service).to receive(:execute)
 
       post :create, project_params(query: "foo", operator: ">", threshold: "1", name: "bar", environment_id: environment.id)
 
@@ -106,6 +118,12 @@ describe Projects::Prometheus::AlertsController do
   end
 
   describe 'POST #update' do
+    let(:schedule_update_service) { spy }
+
+    before do
+      allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
+    end
+
     it 'updates an already existing prometheus alert' do
       alert = create(:prometheus_alert, project: project)
       alert_params = {
@@ -118,7 +136,7 @@ describe Projects::Prometheus::AlertsController do
         "alert_path" => Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alert.iid, environment_id: alert.environment.id, format: :json)
       }
 
-      expect_any_instance_of(::Clusters::Applications::ScheduleUpdateService).to receive(:execute)
+      expect(schedule_update_service).to receive(:execute)
 
       expect do
         put :update, project_params(id: alert.iid, name: "bar")
@@ -130,10 +148,16 @@ describe Projects::Prometheus::AlertsController do
   end
 
   describe 'DELETE #destroy' do
+    let(:schedule_update_service) { spy }
+
+    before do
+      allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
+    end
+
     it 'destroys the specified prometheus alert' do
       alert = create(:prometheus_alert, project: project)
 
-      expect_any_instance_of(::Clusters::Applications::ScheduleUpdateService).to receive(:execute)
+      expect(schedule_update_service).to receive(:execute)
 
       expect do
         delete :destroy, project_params(id: alert.iid)

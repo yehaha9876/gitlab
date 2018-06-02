@@ -9,6 +9,7 @@ class PrometheusAlert < ActiveRecord::Base
   has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.prometheus_alerts&.maximum(:iid) }
 
   after_save :clear_prometheus_adapter_cache!
+  after_destroy :clear_prometheus_adapter_cache!
 
   def full_query
     "#{query} #{operator} #{threshold}"

@@ -4,15 +4,13 @@ describe Gitlab::Kubernetes::Helm::UpgradeCommand do
   let(:application) { create(:clusters_applications_prometheus) }
   let(:namespace) { Gitlab::Kubernetes::Helm::NAMESPACE }
 
-  let(:upgrade_command) do
+  subject do
     described_class.new(
       application.name,
       chart: application.chart,
       values: application.values
     )
   end
-
-  subject { upgrade_command }
 
   it_behaves_like 'helm commands' do
     let(:commands) do
@@ -26,7 +24,8 @@ describe Gitlab::Kubernetes::Helm::UpgradeCommand do
   context 'with an application with a repository' do
     let(:ci_runner) { create(:ci_runner) }
     let(:application) { create(:clusters_applications_runner, runner: ci_runner) }
-    let(:upgrade_command) do
+
+    subject do
       described_class.new(
         application.name,
         chart: application.chart,
@@ -47,9 +46,9 @@ describe Gitlab::Kubernetes::Helm::UpgradeCommand do
   end
 
   describe '#config_map?' do
-    subject { upgrade_command.config_map? }
-
-    it { is_expected.to be_truthy }
+    it 'returns true' do
+      expect(subject.config_map?).to be_truthy
+    end
   end
 
   describe '#config_map_resource' do
@@ -63,16 +62,14 @@ describe Gitlab::Kubernetes::Helm::UpgradeCommand do
 
     let(:resource) { ::Kubeclient::Resource.new(metadata: metadata, data: { values: application.values }) }
 
-    subject { upgrade_command.config_map_resource }
-
     it 'returns a KubeClient resource with config map content for the application' do
-      is_expected.to eq(resource)
+      expect(subject.config_map_resource).to eq(resource)
     end
   end
 
   describe '#pod_name' do
     it 'returns the pod name' do
-      expect(upgrade_command.pod_name).to eq("upgrade-#{application.name}")
+      expect(subject.pod_name).to eq("upgrade-#{application.name}")
     end
   end
 end

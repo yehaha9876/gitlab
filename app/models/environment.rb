@@ -9,7 +9,7 @@ class Environment < ActiveRecord::Base
   belongs_to :project, required: true
 
   has_many :deployments, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
-  has_many :prometheus_alerts
+  has_many :prometheus_alerts, inverse_of: :environment
 
   has_one :last_deployment, -> { order('deployments.id DESC') }, class_name: 'Deployment'
 
@@ -161,10 +161,6 @@ class Environment < ActiveRecord::Base
 
   def additional_metrics
     prometheus_adapter.query(:additional_metrics_environment, self) if has_metrics?
-  end
-
-  def rule_name
-    "#{name}.rules"
   end
 
   def prometheus_adapter

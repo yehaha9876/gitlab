@@ -1,12 +1,11 @@
 module Clusters
   module Applications
     class PrometheusUpdateService < BaseHelmService
-      attr_accessor :cluster, :project
+      attr_accessor :project
 
       def initialize(app, project)
         super(app)
         @project = project
-        @cluster = @app.cluster
       end
 
       def execute
@@ -126,8 +125,13 @@ module Clusters
       def environments_with_alerts
         @environments_with_alerts ||=
           environments.each_with_object({}) do |environment, hsh|
-            hsh[environment.rule_name] = environment.prometheus_alerts.map(&:to_param)
+            name = rule_name(environment)
+            hsh[name] = environment.prometheus_alerts.map(&:to_param)
           end
+      end
+
+      def rule_name(environment)
+        "#{environment.rule_name}.rules"
       end
 
       def environments

@@ -13,8 +13,6 @@ describe Gitlab::Kubernetes::Helm::GetCommand do
 
   describe '#config_map_name' do
     it 'returns the ConfigMap name' do
-      expect_any_instance_of(Gitlab::Kubernetes::ConfigMap).to receive(:config_map_name).and_call_original
-
       expect(get_command.config_map_name).to eq("values-content-configuration-#{application.name}")
     end
   end

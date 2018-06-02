@@ -1,16 +1,22 @@
 require 'spec_helper'
 
 describe ClusterWaitForAppUpdateWorker do
+  let(:check_upgrade_progress_service) { spy }
+
+  before do
+    allow(Clusters::Applications::CheckUpgradeProgressService).to receive(:new).and_return(check_upgrade_progress_service)
+  end
+
   it 'runs CheckUpgradeProgressService when application is found' do
     application = create(:clusters_applications_prometheus)
 
-    expect_any_instance_of(Clusters::Applications::CheckUpgradeProgressService).to receive(:execute)
+    expect(check_upgrade_progress_service).to receive(:execute)
 
     subject.perform(application.name, application.id)
   end
 
   it 'does not run CheckUpgradeProgressService when application is not found' do
-    expect_any_instance_of(Clusters::Applications::CheckUpgradeProgressService).not_to receive(:execute)
+    expect(check_upgrade_progress_service).not_to receive(:execute)
 
     expect do
       subject.perform("prometheus", -1)

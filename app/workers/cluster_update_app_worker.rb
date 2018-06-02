@@ -22,7 +22,5 @@ class ClusterUpdateAppWorker
 
       Clusters::Applications::PrometheusUpdateService.new(app, project).execute
     end
-  rescue UpdateAlreadyInProgressError
-    raise
   end
 end
