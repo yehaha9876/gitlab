@@ -37,6 +37,7 @@ notes:
 - todos
 - events
 - system_note_metadata
+- note_diff_file
 label_links:
 - target
 - label
@@ -206,6 +207,7 @@ project:
 - cluster
 - clusters
 - cluster_project
+- cluster_ingresses
 - creator
 - group
 - namespace
@@ -351,3 +353,8 @@ lfs_file_locks:
 - user
 project_badges:
 - project
+metrics:
+- merge_request
+- latest_closed_by
+- merged_by
+- pipeline

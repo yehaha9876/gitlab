@@ -1,9 +1,5 @@
 module Gitlab
   module Auth
-    #
-    # Exceptions
-    #
-
     AuthenticationError = Class.new(StandardError)
     MissingTokenError = Class.new(AuthenticationError)
     TokenNotFoundError = Class.new(AuthenticationError)
@@ -19,25 +15,27 @@ module Gitlab
     end
 
     module UserAuthFinders
+      prepend ::EE::Gitlab::Auth::UserAuthFinders
+
       include Gitlab::Utils::StrongMemoize
 
       PRIVATE_TOKEN_HEADER = 'HTTP_PRIVATE_TOKEN'.freeze
       PRIVATE_TOKEN_PARAM = :private_token
-      JOB_TOKEN_HEADER = "HTTP_JOB_TOKEN".freeze
-      JOB_TOKEN_PARAM = :job_token
 
       # Check the Rails session for valid authentication details
       def find_user_from_warden
         current_request.env['warden']&.authenticate if verified_request?
       end
 
-      def find_user_from_rss_token
-        return unless current_request.path.ends_with?('.atom') || current_request.format.atom?
+      def find_user_from_feed_token
+        return unless rss_request? || ics_request?
 
-        token = current_request.params[:rss_token].presence
+        # NOTE: feed_token was renamed from rss_token but both needs to be supported because
+        #       users might have already added the feed to their RSS reader before the rename
+        token = current_request.params[:feed_token].presence || current_request.params[:rss_token].presence
         return unless token
 
-        User.find_by_rss_token(token) || raise(UnauthorizedError)
+        User.find_by_feed_token(token) || raise(UnauthorizedError)
       end
 
       def find_user_from_access_token
@@ -46,20 +44,6 @@ module Gitlab
         validate_access_token!
 
         access_token.user || raise(UnauthorizedError)
-      end
-
-      def find_user_from_job_token
-        return unless route_authentication_setting[:job_token_allowed]
-
-        token = (params[JOB_TOKEN_PARAM] || env[JOB_TOKEN_HEADER]).to_s
-        return unless token.present?
-
-        job = ::Ci::Build.find_by(token: token)
-        raise UnauthorizedError unless job
-
-        @job_token_authentication = true # rubocop:disable Gitlab/ModuleWithInstanceVariables
-
-        job.user
       end
 
       def validate_access_token!(scopes: [])
@@ -123,6 +107,14 @@ module Gitlab
 
       def current_request
         @current_request ||= ensure_action_dispatch_request(request)
+      end
+
+      def rss_request?
+        current_request.path.ends_with?('.atom') || current_request.format.atom?
+      end
+
+      def ics_request?
+        current_request.path.ends_with?('.ics') || current_request.format.ics?
       end
     end
   end

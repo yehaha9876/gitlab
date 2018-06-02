@@ -11,6 +11,7 @@ const Api = {
   projectPath: '/api/:version/projects/:id',
   projectLabelsPath: '/:namespace_path/:project_path/labels',
   mergeRequestPath: '/api/:version/projects/:id/merge_requests/:mrid',
+  mergeRequestsPath: '/api/:version/merge_requests',
   mergeRequestChangesPath: '/api/:version/projects/:id/merge_requests/:mrid/changes',
   mergeRequestVersionsPath: '/api/:version/projects/:id/merge_requests/:mrid/versions',
   groupLabelsPath: '/groups/:namespace_path/-/labels',
@@ -22,6 +23,7 @@ const Api = {
   issuableTemplatePath: '/:namespace_path/:project_path/templates/:type/:key',
   usersPath: '/api/:version/users.json',
   commitPath: '/api/:version/projects/:id/repository/commits',
+  commitPipelinesPath: '/:project_id/commit/:sha/pipelines',
   branchSinglePath: '/api/:version/projects/:id/repository/branches/:branch',
   createBranchPath: '/api/:version/projects/:id/repository/branches',
   geoNodesPath: '/api/:version/geo_nodes',
@@ -108,6 +110,12 @@ const Api = {
     return axios.get(url);
   },
 
+  mergeRequests(params = {}) {
+    const url = Api.buildUrl(Api.mergeRequestsPath);
+
+    return axios.get(url, { params });
+  },
+
   mergeRequestChanges(projectPath, mergeRequestId) {
     const url = Api.buildUrl(Api.mergeRequestChangesPath)
       .replace(':id', encodeURIComponent(projectPath))
@@ -164,6 +172,19 @@ const Api = {
         'Content-Type': 'application/json; charset=utf-8',
       },
     });
+  },
+
+  commitPipelines(projectId, sha) {
+    const encodedProjectId = projectId
+      .split('/')
+      .map(fragment => encodeURIComponent(fragment))
+      .join('/');
+
+    const url = Api.buildUrl(Api.commitPipelinesPath)
+      .replace(':project_id', encodedProjectId)
+      .replace(':sha', encodeURIComponent(sha));
+
+    return axios.get(url);
   },
 
   branchSingle(id, branch) {
@@ -226,31 +247,38 @@ const Api = {
 
   approverUsers(search, options, callback = $.noop) {
     const url = Api.buildUrl('/autocomplete/users.json');
-    return axios.get(url, {
-      params: Object.assign({
-        search,
-        per_page: 20,
-      }, options),
-    }).then(({ data }) => {
-      callback(data);
+    return axios
+      .get(url, {
+        params: Object.assign(
+          {
+            search,
+            per_page: 20,
+          },
+          options,
+        ),
+      })
+      .then(({ data }) => {
+        callback(data);
 
-      return data;
-    });
+        return data;
+      });
   },
 
   ldap_groups(query, provider, callback) {
     const url = Api.buildUrl(this.ldapGroupsPath).replace(':provider', provider);
-    return axios.get(url, {
-      params: {
-        search: query,
-        per_page: 20,
-        active: true,
-      },
-    }).then(({ data }) => {
-      callback(data);
+    return axios
+      .get(url, {
+        params: {
+          search: query,
+          per_page: 20,
+          active: true,
+        },
+      })
+      .then(({ data }) => {
+        callback(data);
 
-      return data;
-    });
+        return data;
+      });
   },
 
   buildUrl(url) {

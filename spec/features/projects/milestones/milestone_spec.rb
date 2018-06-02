@@ -17,8 +17,8 @@ feature 'Project milestone' do
     it 'shows issues tab' do
       within('#content-body') do
         expect(page).to have_link 'Issues', href: '#tab-issues'
-        expect(page).to have_selector '.nav-links li.active', count: 1
-        expect(find('.nav-links li.active')).to have_content 'Issues'
+        expect(page).to have_selector '.nav-links li a.active', count: 1
+        expect(find('.nav-links li a.active')).to have_content 'Issues'
       end
     end
 
@@ -44,8 +44,8 @@ feature 'Project milestone' do
     it 'hides issues tab' do
       within('#content-body') do
         expect(page).not_to have_link 'Issues', href: '#tab-issues'
-        expect(page).to have_selector '.nav-links li.active', count: 1
-        expect(find('.nav-links li.active')).to have_content 'Merge Requests'
+        expect(page).to have_selector '.nav-links li a.active', count: 1
+        expect(find('.nav-links li a.active')).to have_content 'Merge Requests'
       end
     end
 
@@ -62,10 +62,6 @@ feature 'Project milestone' do
     it 'does not show an informative message' do
       expect(page).not_to have_content('Assign some issues to this milestone.')
     end
-  end
-
-  def milestone_path
-    project_milestone_path(project, milestone)
   end
 
   context 'when project has an issue' do

@@ -78,7 +78,7 @@ describe Project do
     it { is_expected.to have_many(:notification_settings).dependent(:delete_all) }
     it { is_expected.to have_many(:forks).through(:forked_project_links) }
     it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
-    it { is_expected.to have_many(:uploads).dependent(:destroy) }
+    it { is_expected.to have_many(:uploads) }
     it { is_expected.to have_many(:pipeline_schedules) }
     it { is_expected.to have_many(:members_and_requesters) }
     it { is_expected.to have_many(:clusters) }
@@ -509,6 +509,34 @@ describe Project do
 
     it 'returns valid kerberos url for this repo' do
       expect(project.kerberos_url_to_repo).to eq("#{Gitlab.config.build_gitlab_kerberos_url}/#{project.namespace.path}/somewhere.git")
+    end
+  end
+
+  describe "#readme_url" do
+    let(:project) { create(:project, :repository, path: "somewhere") }
+
+    context 'with a non-existing repository' do
+      it 'returns nil' do
+        allow(project.repository).to receive(:tree).with(:head).and_return(nil)
+
+        expect(project.readme_url).to be_nil
+      end
+    end
+
+    context 'with an existing repository' do
+      context 'when no README exists' do
+        it 'returns nil' do
+          allow_any_instance_of(Tree).to receive(:readme).and_return(nil)
+
+          expect(project.readme_url).to be_nil
+        end
+      end
+
+      context 'when a README exists' do
+        it 'returns the README' do
+          expect(project.readme_url).to eql("#{Gitlab.config.gitlab.url}/#{project.namespace.full_path}/somewhere/blob/master/README.md")
+        end
+      end
     end
   end
 
@@ -1278,8 +1306,8 @@ describe Project do
   describe '#any_runners?' do
     context 'shared runners' do
       let(:project) { create(:project, shared_runners_enabled: shared_runners_enabled) }
-      let(:specific_runner) { create(:ci_runner) }
-      let(:shared_runner) { create(:ci_runner, :shared) }
+      let(:specific_runner) { create(:ci_runner, :project, projects: [project]) }
+      let(:shared_runner) { create(:ci_runner, :instance) }
 
       context 'for shared runners disabled' do
         let(:shared_runners_enabled) { false }
@@ -1289,7 +1317,7 @@ describe Project do
         end
 
         it 'has a specific runner' do
-          project.runners << specific_runner
+          specific_runner
 
           expect(project.any_runners?).to be_truthy
         end
@@ -1301,13 +1329,13 @@ describe Project do
         end
 
         it 'checks the presence of specific runner' do
-          project.runners << specific_runner
+          specific_runner
 
           expect(project.any_runners? { |runner| runner == specific_runner }).to be_truthy
         end
 
         it 'returns false if match cannot be found' do
-          project.runners << specific_runner
+          specific_runner
 
           expect(project.any_runners? { false }).to be_falsey
         end
@@ -1339,7 +1367,7 @@ describe Project do
     context 'group runners' do
       let(:project) { create(:project, group_runners_enabled: group_runners_enabled) }
       let(:group) { create(:group, projects: [project]) }
-      let(:group_runner) { create(:ci_runner, groups: [group]) }
+      let(:group_runner) { create(:ci_runner, :group, groups: [group]) }
 
       context 'for group runners disabled' do
         let(:group_runners_enabled) { false }
@@ -1380,7 +1408,7 @@ describe Project do
   end
 
   describe '#shared_runners' do
-    let!(:runner) { create(:ci_runner, :shared) }
+    let!(:runner) { create(:ci_runner, :instance) }
 
     subject { project.shared_runners }
 
@@ -4123,6 +4151,14 @@ describe Project do
       let!(:deploy_token) { create(:deploy_token, projects: [project_2]) }
 
       it { is_expected.to be_nil }
+    end
+  end
+
+  context 'with uploads' do
+    it_behaves_like 'model with mounted uploader', true do
+      let(:model_object) { create(:project, :with_avatar) }
+      let(:upload_attribute) { :avatar }
+      let(:uploader_class) { AttachmentUploader }
     end
   end
 end

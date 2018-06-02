@@ -23,6 +23,8 @@ class Project < ActiveRecord::Base
   include ::Gitlab::Utils::StrongMemoize
   include ChronicDurationAttribute
   include FastDestroyAll::Helpers
+  include WithUploads
+  include BatchDestroyDependentAssociations
 
   # EE specific modules
   prepend EE::Project
@@ -222,6 +224,7 @@ class Project < ActiveRecord::Base
 
   has_one :cluster_project, class_name: 'Clusters::Project'
   has_many :clusters, through: :cluster_project, class_name: 'Clusters::Cluster'
+  has_many :cluster_ingresses, through: :clusters, source: :application_ingress, class_name: 'Clusters::Applications::Ingress'
 
   has_many :prometheus_metrics
 
@@ -240,7 +243,7 @@ class Project < ActiveRecord::Base
   has_many :builds, class_name: 'Ci::Build', inverse_of: :project, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_many :build_trace_section_names, class_name: 'Ci::BuildTraceSectionName'
   has_many :build_trace_chunks, class_name: 'Ci::BuildTraceChunk', through: :builds, source: :trace_chunks
-  has_many :runner_projects, class_name: 'Ci::RunnerProject'
+  has_many :runner_projects, class_name: 'Ci::RunnerProject', inverse_of: :project
   has_many :runners, through: :runner_projects, source: :runner, class_name: 'Ci::Runner'
   has_many :variables, class_name: 'Ci::Variable'
   has_many :triggers, class_name: 'Ci::Trigger'
@@ -293,8 +296,9 @@ class Project < ActiveRecord::Base
 
   validates :namespace, presence: true
   validates :name, uniqueness: { scope: :namespace_id }
-  validates :import_url, addressable_url: true, if: :external_import?
-  validates :import_url, importable_url: true, if: [:external_import?, :import_url_changed?]
+  validates :import_url, url: { protocols: %w(http https ssh git),
+                                allow_localhost: false,
+                                ports: VALID_IMPORT_PORTS }, if: [:external_import?, :import_url_changed?]
   validates :star_count, numericality: { greater_than_or_equal_to: 0 }
   validate :check_limit, on: :create
   validate :check_repository_path_availability, on: :update, if: ->(project) { project.renamed? }
@@ -306,8 +310,6 @@ class Project < ActiveRecord::Base
     presence: true,
     inclusion: { in: ->(_object) { Gitlab.config.repositories.storages.keys } }
   validates :variables, variable_duplicates: { scope: :environment_scope }
-
-  has_many :uploads, as: :model, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
   # Scopes
   scope :pending_delete, -> { where(pending_delete: true) }
@@ -911,6 +913,13 @@ class Project < ActiveRecord::Base
     Gitlab::Routing.url_helpers.project_url(self)
   end
 
+  def readme_url
+    readme = repository.readme
+    if readme
+      Gitlab::Routing.url_helpers.project_blob_url(self, File.join(default_branch, readme.path))
+    end
+  end
+
   def new_issuable_address(author, address_type)
     return unless Gitlab::IncomingEmail.supports_issue_creation? && author
 
@@ -1014,7 +1023,7 @@ class Project < ActiveRecord::Base
 
     available_services_names = Service.available_services_names - exceptions
 
-    available_services_names.map do |service_name|
+    available_services = available_services_names.map do |service_name|
       service = find_service(services, service_name)
 
       if service
@@ -1031,6 +1040,14 @@ class Project < ActiveRecord::Base
         end
       end
     end
+
+    available_services.reject do |service|
+      disabled_services.include?(service.to_param)
+    end
+  end
+
+  def disabled_services
+    []
   end
 
   def find_or_initialize_service(name)
@@ -1434,8 +1451,8 @@ class Project < ActiveRecord::Base
     self.runners_token && ActiveSupport::SecurityUtils.variable_size_secure_compare(token, self.runners_token)
   end
 
-  def open_issues_count
-    Projects::OpenIssuesCountService.new(self).count
+  def open_issues_count(current_user = nil)
+    Projects::OpenIssuesCountService.new(self, current_user).count
   end
 
   def open_merge_requests_count

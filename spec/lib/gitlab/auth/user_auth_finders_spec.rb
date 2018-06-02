@@ -10,7 +10,6 @@ describe Gitlab::Auth::UserAuthFinders do
     }
   end
   let(:request) { Rack::Request.new(env)}
-  let(:params) { request.params }
 
   def set_param(key, value)
     request.update_param(key, value)
@@ -47,34 +46,54 @@ describe Gitlab::Auth::UserAuthFinders do
     end
   end
 
-  describe '#find_user_from_rss_token' do
+  describe '#find_user_from_feed_token' do
     context 'when the request format is atom' do
       before do
         env['HTTP_ACCEPT'] = 'application/atom+xml'
       end
 
-      it 'returns user if valid rss_token' do
-        set_param(:rss_token, user.rss_token)
+      context 'when feed_token param is provided' do
+        it 'returns user if valid feed_token' do
+          set_param(:feed_token, user.feed_token)
 
-        expect(find_user_from_rss_token).to eq user
+          expect(find_user_from_feed_token).to eq user
+        end
+
+        it 'returns nil if feed_token is blank' do
+          expect(find_user_from_feed_token).to be_nil
+        end
+
+        it 'returns exception if invalid feed_token' do
+          set_param(:feed_token, 'invalid_token')
+
+          expect { find_user_from_feed_token }.to raise_error(Gitlab::Auth::UnauthorizedError)
+        end
       end
 
-      it 'returns nil if rss_token is blank' do
-        expect(find_user_from_rss_token).to be_nil
-      end
+      context 'when rss_token param is provided' do
+        it 'returns user if valid rssd_token' do
+          set_param(:rss_token, user.feed_token)
 
-      it 'returns exception if invalid rss_token' do
-        set_param(:rss_token, 'invalid_token')
+          expect(find_user_from_feed_token).to eq user
+        end
 
-        expect { find_user_from_rss_token }.to raise_error(Gitlab::Auth::UnauthorizedError)
+        it 'returns nil if rss_token is blank' do
+          expect(find_user_from_feed_token).to be_nil
+        end
+
+        it 'returns exception if invalid rss_token' do
+          set_param(:rss_token, 'invalid_token')
+
+          expect { find_user_from_feed_token }.to raise_error(Gitlab::Auth::UnauthorizedError)
+        end
       end
     end
 
     context 'when the request format is not atom' do
       it 'returns nil' do
-        set_param(:rss_token, user.rss_token)
+        set_param(:feed_token, user.feed_token)
 
-        expect(find_user_from_rss_token).to be_nil
+        expect(find_user_from_feed_token).to be_nil
       end
     end
 
@@ -82,7 +101,7 @@ describe Gitlab::Auth::UserAuthFinders do
       it 'the method call does not modify the original value' do
         env['action_dispatch.request.formats'] = nil
 
-        find_user_from_rss_token
+        find_user_from_feed_token
 
         expect(env['action_dispatch.request.formats']).to be_nil
       end
@@ -109,55 +128,6 @@ describe Gitlab::Auth::UserAuthFinders do
 
         expect { find_user_from_access_token }.to raise_error(Gitlab::Auth::UnauthorizedError)
       end
-    end
-  end
-
-  describe '#find_user_from_job_token' do
-    let(:job) { create(:ci_build, user: user) }
-
-    shared_examples 'find user from job token' do
-      context 'when route is allowed to be authenticated' do
-        let(:route_authentication_setting) { { job_token_allowed: true } }
-
-        it "returns an Unauthorized exception for an invalid token" do
-          set_token('invalid token')
-
-          expect { find_user_from_job_token }.to raise_error(Gitlab::Auth::UnauthorizedError)
-        end
-
-        it "return user if token is valid" do
-          set_token(job.token)
-
-          expect(find_user_from_job_token).to eq(user)
-        end
-      end
-
-      context 'when route is not allowed to be authenticated' do
-        let(:route_authentication_setting) { { job_token_allowed: false } }
-
-        it "sets current_user to nil" do
-          set_token(job.token)
-          allow_any_instance_of(Gitlab::UserAccess).to receive(:allowed?).and_return(true)
-
-          expect(find_user_from_job_token).to be_nil
-        end
-      end
-    end
-
-    context 'when the job token is in the headers' do
-      def set_token(token)
-        env[Gitlab::Auth::UserAuthFinders::JOB_TOKEN_HEADER] = token
-      end
-
-      it_behaves_like 'find user from job token'
-    end
-
-    context 'when the job token is in the params' do
-      def set_token(token)
-        set_param(Gitlab::Auth::UserAuthFinders::JOB_TOKEN_PARAM, token)
-      end
-
-      it_behaves_like 'find user from job token'
     end
   end
 

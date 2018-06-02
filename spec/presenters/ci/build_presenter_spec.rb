@@ -10,7 +10,7 @@ describe Ci::BuildPresenter do
   end
 
   it 'inherits from Gitlab::View::Presenter::Delegated' do
-    expect(described_class.superclass).to eq(Gitlab::View::Presenter::Delegated)
+    expect(described_class.ancestors).to include(Gitlab::View::Presenter::Delegated)
   end
 
   describe '#initialize' do
@@ -219,11 +219,11 @@ describe Ci::BuildPresenter do
   end
 
   describe '#callout_failure_message' do
-    let(:build) { create(:ci_build, :failed, :script_failure) }
+    let(:build) { create(:ci_build, :failed, :api_failure) }
 
     it 'returns a verbose failure reason' do
       description = subject.callout_failure_message
-      expect(description).to eq('There has been a script failure. Check the job log for more information')
+      expect(description).to eq('There has been an API failure, please try again')
     end
   end
 

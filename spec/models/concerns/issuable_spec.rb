@@ -12,6 +12,7 @@ describe Issuable do
     it { is_expected.to belong_to(:author) }
     it { is_expected.to have_many(:notes).dependent(:destroy) }
     it { is_expected.to have_many(:todos).dependent(:destroy) }
+    it { is_expected.to have_many(:labels) }
 
     context 'Notes' do
       let!(:note) { create(:note, noteable: issue, project: issue.project) }
@@ -263,6 +264,19 @@ describe Issuable do
 
         expect(issue.subscribed?(user, project)).to be_falsey
       end
+    end
+  end
+
+  describe '#time_estimate=' do
+    it 'coerces the value below Gitlab::Database::MAX_INT_VALUE' do
+      expect { issue.time_estimate = 100 }.to change { issue.time_estimate }.to(100)
+      expect { issue.time_estimate = Gitlab::Database::MAX_INT_VALUE + 100 }.to change { issue.time_estimate }.to(Gitlab::Database::MAX_INT_VALUE)
+    end
+
+    it 'skips coercion for not Integer values' do
+      expect { issue.time_estimate = nil }.to change { issue.time_estimate }.to(nil)
+      expect { issue.time_estimate = 'invalid time' }.not_to raise_error
+      expect { issue.time_estimate = 22.33 }.not_to raise_error
     end
   end
 
