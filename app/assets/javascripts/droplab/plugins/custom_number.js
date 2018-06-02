@@ -1,20 +1,18 @@
-/* eslint-disable */
 const CustomNumber = {
-  keydown: function(e) {
+  keydown(e) {
     if (this.destroyed) return;
 
-    const list = e.detail.hook.list;
+    const { list } = e.detail.hook;
     const value = parseInt(e.detail.hook.trigger.value, 0);
     const config = e.detail.hook.config.CustomNumber;
     const { defaultOptions } = config;
 
     const isOutOfBounds = defaultOptions.indexOf(value) === -1;
-    const isValidNumber = !isNaN(value);
+    const isValidNumber = !Number.isNaN(value);
+    const customOption = [{ id: value, title: value }];
     const defaultDropdownOptions = defaultOptions.map(o => ({ id: o, title: o }));
 
-    list.setData(
-      isValidNumber && isOutOfBounds ? [{ id: value, title: value }] : defaultDropdownOptions,
-    );
+    list.setData(isValidNumber && isOutOfBounds ? customOption : defaultDropdownOptions);
     list.currentIndex = 0;
   },
 
