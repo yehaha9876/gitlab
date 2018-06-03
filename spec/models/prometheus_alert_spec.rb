@@ -20,7 +20,7 @@ describe PrometheusAlert do
 
   describe '#to_param' do
     it 'returns the params of the prometheus alert' do
-      expect(alert.to_param.keys).to include("name", "expr", "for", "labels", "annotations")
+      expect(alert.to_param.keys).to include("alert", "expr", "for", "labels", "annotations")
     end
   end
 end

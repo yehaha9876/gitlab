@@ -35,6 +35,11 @@ FactoryBot.define do
       status_reason 'something went wrong'
     end
 
+    trait :update_errored do
+      status(6)
+      status_reason 'something went wrong'
+    end
+
     trait :timeouted do
       installing
       updated_at ClusterWaitForAppInstallationWorker::TIMEOUT.ago

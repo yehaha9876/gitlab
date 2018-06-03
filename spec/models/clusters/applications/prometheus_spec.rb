@@ -172,7 +172,7 @@ describe Clusters::Applications::Prometheus do
       prometheus_app.update_attributes(last_update_started_at: Time.now)
     end
 
-    context 'when remote mirror does not have status failed' do
+    context 'when app does not have status failed' do
       it 'returns true when last update started after the timestamp' do
         expect(prometheus_app.updated_since?(timestamp)).to be true
       end
@@ -182,9 +182,9 @@ describe Clusters::Applications::Prometheus do
       end
     end
 
-    context 'when remote mirror has status failed' do
+    context 'when app has status failed' do
       it 'returns false when last update started after the timestamp' do
-        prometheus_app.update_attributes(status: -1)
+        prometheus_app.update_attributes(status: 6)
 
         expect(prometheus_app.updated_since?(timestamp)).to be false
       end
@@ -206,7 +206,7 @@ describe Clusters::Applications::Prometheus do
     context 'when app errored' do
       it 'returns true' do
         cluster = create(:cluster)
-        prometheus_app = create(:clusters_applications_prometheus, :errored, cluster: cluster)
+        prometheus_app = create(:clusters_applications_prometheus, :update_errored, cluster: cluster)
 
         expect(prometheus_app.update_errored?).to be true
       end
@@ -218,7 +218,7 @@ describe Clusters::Applications::Prometheus do
     let(:prometheus) { create(:clusters_applications_prometheus) }
 
     it 'returns an instance of Gitlab::Kubernetes::Helm::GetCommand' do
-      expect(prometheus.get_command).to be_an_instance_of(Gitlab::Kubernetes::Helm::GetCommand) }
+      expect(prometheus.get_command).to be_an_instance_of(Gitlab::Kubernetes::Helm::GetCommand)
     end
 
     it 'should be initialized with 1 argument' do
@@ -231,17 +231,18 @@ describe Clusters::Applications::Prometheus do
   describe '#upgrade_command' do
     let(:kubeclient) { double('kubernetes client') }
     let(:prometheus) { create(:clusters_applications_prometheus) }
+    let(:values) { { foo: 'bar' } }
 
     it 'returns an instance of Gitlab::Kubernetes::Helm::GetCommand' do
-      expect(prometheus.upgrade_command).to be_an_instance_of(Gitlab::Kubernetes::Helm::UpgradeCommand) }
+      expect(prometheus.upgrade_command(values)).to be_an_instance_of(Gitlab::Kubernetes::Helm::UpgradeCommand)
     end
 
     it 'should be initialized with 3 arguments' do
-      command = prometheus.upgrade_command
+      command = prometheus.upgrade_command(values)
 
       expect(command.name).to eq('prometheus')
       expect(command.chart).to eq('stable/prometheus')
-      expect(command.values).to eq({foo: "bar"})
+      expect(command.values).to eq(values)
     end
   end
 
@@ -250,7 +251,7 @@ describe Clusters::Applications::Prometheus do
     let(:prometheus) { create(:clusters_applications_prometheus) }
 
     it 'returns an instance of Gitlab::Kubernetes::Helm::GetCommand' do
-      expect(prometheus.install_command).to be_an_instance_of(Gitlab::Kubernetes::Helm::InstallCommand) }
+      expect(prometheus.install_command).to be_an_instance_of(Gitlab::Kubernetes::Helm::InstallCommand)
     end
 
     it 'should be initialized with 3 arguments' do

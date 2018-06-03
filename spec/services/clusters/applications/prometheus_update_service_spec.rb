@@ -59,15 +59,13 @@ describe Clusters::Applications::PrometheusUpdateService do
     end
 
     context 'when k8s cluster communication fails' do
-      before do
+      it 'make the application update errored' do
         error = Kubeclient::HttpError.new(500, 'system failure', nil)
         expect(helm_client).to receive(:get_config_map).and_raise(error)
-      end
 
-      it 'make the application errored' do
         service.execute
 
-        expect(application).to be_errored
+        expect(application).to be_update_errored
         expect(application.status_reason).to match(/kubernetes error:/i)
       end
     end
@@ -75,14 +73,14 @@ describe Clusters::Applications::PrometheusUpdateService do
     context 'when application cannot be persisted' do
       let(:application) { build(:clusters_applications_prometheus, :installed) }
 
-      it 'make the application errored' do
+      it 'make the application update errored' do
         expect(application).to receive(:make_updating!).once.and_raise(ActiveRecord::RecordInvalid)
         expect(helm_client).not_to receive(:get_config_map)
         expect(helm_client).not_to receive(:update)
 
         service.execute
 
-        expect(application).to be_errored
+        expect(application).to be_update_errored
       end
     end
   end

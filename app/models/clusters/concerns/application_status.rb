@@ -53,7 +53,7 @@ module Clusters
             app_status.status_reason = nil
           end
 
-          before_transition any => [:errored] do |app_status, transition|
+          before_transition any => [:errored, :update_errored] do |app_status, transition|
             status_reason = transition.args.first
             app_status.status_reason = status_reason if status_reason
           end

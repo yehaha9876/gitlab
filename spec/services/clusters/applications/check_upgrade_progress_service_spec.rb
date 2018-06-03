@@ -37,12 +37,12 @@ describe Clusters::Applications::CheckUpgradeProgressService do
 
         it_behaves_like 'a terminated upgrade'
 
-        it 'make the application errored' do
+        it 'make the application update errored' do
           expect(ClusterWaitForAppUpdateWorker).not_to receive(:perform_in)
 
           service.execute
 
-          expect(application).to be_errored
+          expect(application).to be_update_errored
           expect(application.status_reason).to eq("Update timed out")
         end
       end
@@ -78,10 +78,10 @@ describe Clusters::Applications::CheckUpgradeProgressService do
 
       it_behaves_like 'a terminated upgrade'
 
-      it 'make the application errored' do
+      it 'make the application update errored' do
         service.execute
 
-        expect(application).to be_errored
+        expect(application).to be_update_errored
         expect(application.status_reason).to eq(errors)
       end
     end

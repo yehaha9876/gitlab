@@ -75,13 +75,13 @@ describe Projects::Prometheus::AlertsController do
     it 'sends a notification' do
       alert = create(:prometheus_alert, project: project)
       alert_params = {
-        "alert"=>"#{alert.name}_#{alert.iid}",
-        "expr"=>"#{alert.query} #{alert.operator} #{alert.threshold}",
-        "for"=>"5m",
-        "labels"=>{"gitlab"=>"hook"},
-        "annotations"=> {
-          "summary"=>"Instance {{ $labels.instance }} raised an alert",
-          "description"=> "{{ $labels.instance }} of job {{ $labels.job }} has been raising an alert for more than 5 minutes."
+        "alert" => "#{alert.name}_#{alert.iid}",
+        "expr" => "#{alert.query} #{alert.operator} #{alert.threshold}",
+        "for" => "5m",
+        "labels" => { "gitlab"=>"hook" },
+        "annotations" => {
+          "summary" => "Instance {{ $labels.instance }} raised an alert",
+          "description" => "{{ $labels.instance }} of job {{ $labels.job }} has been raising an alert for more than 5 minutes."
         }
       }
 
