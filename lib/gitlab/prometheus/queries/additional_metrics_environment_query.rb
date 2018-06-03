@@ -5,6 +5,7 @@ module Gitlab
         include QueryAdditionalMetrics
 
         def query(environment_id)
+          # TODO: Make this CE compat
           ::Environment.find_by(id: environment_id).try do |environment|
             query_metrics(
               environment.project,

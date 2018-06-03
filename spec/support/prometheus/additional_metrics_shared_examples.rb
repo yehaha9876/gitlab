@@ -25,12 +25,14 @@ RSpec.shared_examples 'additional metrics query' do
 
     shared_examples 'query context containing environment slug and filter' do
       it 'contains ci_environment_slug' do
+        # TODO: Make it CE compat
         expect(subject).to receive(:query_metrics).with(project, environment, hash_including(ci_environment_slug: environment.slug))
 
         subject.query(*query_params)
       end
 
       it 'contains environment filter' do
+        # TODO: Make it CE compat
         expect(subject).to receive(:query_metrics).with(
           project,
           environment,
@@ -50,6 +52,7 @@ RSpec.shared_examples 'additional metrics query' do
 
         it_behaves_like 'query context containing environment slug and filter'
 
+        # TODO: Make it CE compat
         it 'query context contains kube_namespace' do
           expect(subject).to receive(:query_metrics).with(project, environment, hash_including(kube_namespace: kube_namespace))
 
@@ -74,6 +77,7 @@ RSpec.shared_examples 'additional metrics query' do
     describe 'project without Kubernetes service' do
       it_behaves_like 'query context containing environment slug and filter'
 
+      # TODO: Make it CE compat
       it 'query context contains empty kube_namespace' do
         expect(subject).to receive(:query_metrics).with(project, environment, hash_including(kube_namespace: ''))
 

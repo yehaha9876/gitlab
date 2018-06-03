@@ -23,8 +23,8 @@ module Clusters
 
         helm_api.update(upgrade_command(data.to_yaml))
 
-        ClusterWaitForAppUpdateWorker.perform_in(ClusterWaitForAppUpdateWorker::INTERVAL, app.name, app.id)
-      rescue Kubeclient::HttpError => ke
+        ::ClusterWaitForAppUpdateWorker.perform_in(::ClusterWaitForAppUpdateWorker::INTERVAL, app.name, app.id)
+      rescue ::Kubeclient::HttpError => ke
         app.make_update_errored!("Kubernetes error: #{ke.message}")
       rescue StandardError => e
         app.make_update_errored!(e.message)
@@ -107,7 +107,7 @@ module Clusters
       end
 
       def notify_url
-        Gitlab::Routing.url_helpers.notify_namespace_project_prometheus_alerts_url(
+        ::Gitlab::Routing.url_helpers.notify_namespace_project_prometheus_alerts_url(
           namespace_id: project.namespace.path,
           project_id: project.path,
           format: :json

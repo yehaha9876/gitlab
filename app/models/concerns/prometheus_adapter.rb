@@ -3,6 +3,7 @@ module PrometheusAdapter
 
   included do
     include ReactiveCaching
+    prepend EE::PrometheusAdapter
 
     self.reactive_cache_key = ->(adapter) { [adapter.class.model_name.singular, adapter.id] }
     self.reactive_cache_lease_timeout = 30.seconds
@@ -28,13 +29,6 @@ module PrometheusAdapter
       query_args = build_query_args(*args)
 
       with_reactive_cache(query_class.name, *query_args, &query_class.method(:transform_reactive_result))
-    end
-
-    def clear_prometheus_reactive_cache!(query_name, *args)
-      query_class = query_klass_for(query_name)
-      query_args = build_query_args(*args)
-
-      clear_reactive_cache!(query_class.name, *query_args)
     end
 
     # Cache metrics for specific environment

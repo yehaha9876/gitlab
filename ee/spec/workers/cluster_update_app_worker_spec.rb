@@ -12,7 +12,7 @@ describe ClusterUpdateAppWorker do
   end
 
   before do
-    allow(Clusters::Applications::PrometheusUpdateService).to receive(:new).and_return(prometheus_update_service)
+    allow(::Clusters::Applications::PrometheusUpdateService).to receive(:new).and_return(prometheus_update_service)
   end
 
   describe '#perform' do

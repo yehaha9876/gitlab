@@ -4,7 +4,7 @@ describe ClusterWaitForAppUpdateWorker do
   let(:check_upgrade_progress_service) { spy }
 
   before do
-    allow(Clusters::Applications::CheckUpgradeProgressService).to receive(:new).and_return(check_upgrade_progress_service)
+    allow(::Clusters::Applications::CheckUpgradeProgressService).to receive(:new).and_return(check_upgrade_progress_service)
   end
 
   it 'runs CheckUpgradeProgressService when application is found' do

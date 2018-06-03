@@ -229,7 +229,6 @@ class Project < ActiveRecord::Base
   has_many :cluster_ingresses, through: :clusters, source: :application_ingress, class_name: 'Clusters::Applications::Ingress'
 
   has_many :prometheus_metrics
-  has_many :prometheus_alerts, inverse_of: :project
 
   # Container repositories need to remove data from the container registry,
   # which is not managed by the DB. Hence we're still using dependent: :destroy
@@ -1830,12 +1829,6 @@ class Project < ActiveRecord::Base
 
   def deployment_variables(environment: nil)
     deployment_platform(environment: environment)&.predefined_variables || []
-  end
-
-  def environments_for_scope(scope)
-    quoted_scope = Gitlab::SQL::Glob.q(scope)
-
-    environments.where("name LIKE (#{Gitlab::SQL::Glob.to_like(quoted_scope)})") # rubocop:disable GitlabSecurity/SqlInjection
   end
 
   def auto_devops_variables

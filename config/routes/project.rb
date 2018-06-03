@@ -81,6 +81,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :active_common, on: :collection
         end
 
+        # EE-specific
         resources :alerts, constraints: { id: /\d+/ }, only: [:index, :create, :show, :update, :destroy] do
           post :notify, on: :collection
         end

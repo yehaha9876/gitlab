@@ -1081,23 +1081,6 @@ describe NotificationService, :mailer do
     end
   end
 
-  describe '#prometheus_alert_fired' do
-    let(:project) { create(:project) }
-    let(:prometheus_alert) { create(:prometheus_alert, project: project) }
-    let(:user1) { create(:user) }
-    let(:user2) { create(:user) }
-
-    it 'sends the email to owners and masters' do
-      project.add_master(user1)
-
-      notification.prometheus_alert_fired(prometheus_alert.project, prometheus_alert)
-
-      should_email(user_1)
-      should_email(project.owner)
-      should_not_email(user2)
-    end
-  end
-
   describe 'Merge Requests' do
     let(:group) { create(:group) }
     let(:project) { create(:project, :public, :repository, namespace: group) }

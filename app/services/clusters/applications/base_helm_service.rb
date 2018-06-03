@@ -3,6 +3,8 @@ module Clusters
     class BaseHelmService
       attr_accessor :app
 
+      prepend EE::Clusters::Applications::BaseHelmService
+
       def initialize(app)
         @app = app
       end
@@ -23,10 +25,6 @@ module Clusters
 
       def install_command
         @install_command ||= app.install_command
-      end
-
-      def upgrade_command(new_values = "")
-        @upgrade_command ||= app.upgrade_command(new_values)
       end
     end
   end

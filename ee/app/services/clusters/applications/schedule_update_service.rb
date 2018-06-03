@@ -23,7 +23,7 @@ module Clusters
       private
 
       def worker_class
-        ClusterUpdateAppWorker
+        ::ClusterUpdateAppWorker
       end
 
       def recently_scheduled?

@@ -11,6 +11,8 @@ module Clusters
       include ::Clusters::Concerns::ApplicationStatus
       include ::Clusters::Concerns::ApplicationData
 
+      prepend EE::Clusters::Applications::Prometheus
+
       default_value_for :version, VERSION
 
       state_machine :status do
@@ -19,14 +21,11 @@ module Clusters
             project.find_or_initialize_service('prometheus').update(active: true)
           end
         end
-
-        after_transition any => :updating do |application|
-          application.update(last_update_started_at: Time.now)
-        end
       end
 
+      # TODO: Make this CE compat
       def ready?
-        [:installed, :updating, :updated, :update_errored].include?(status_name)
+        status_name == :installed
       end
 
       def chart
@@ -39,32 +38,6 @@ module Clusters
 
       def service_port
         80
-      end
-
-      def updated_since?(timestamp)
-        last_update_started_at &&
-          last_update_started_at > timestamp &&
-          !update_errored?
-      end
-
-      def update_in_progress?
-        status_name == :updating
-      end
-
-      def update_errored?
-        status_name == :update_errored
-      end
-
-      def get_command
-        Gitlab::Kubernetes::Helm::GetCommand.new(name)
-      end
-
-      def upgrade_command(values)
-        Gitlab::Kubernetes::Helm::UpgradeCommand.new(
-          name,
-          chart: chart,
-          values: values
-        )
       end
 
       def install_command

@@ -28,6 +28,7 @@ module Prometheus
       return unless deployment_platform.respond_to?(:cluster)
 
       cluster = deployment_platform.cluster
+      # TODO: Make this CE compat
       return unless cluster.application_prometheus&.ready?
 
       cluster.application_prometheus

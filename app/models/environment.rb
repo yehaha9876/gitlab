@@ -9,7 +9,6 @@ class Environment < ActiveRecord::Base
   belongs_to :project, required: true
 
   has_many :deployments, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
-  has_many :prometheus_alerts, inverse_of: :environment
 
   has_one :last_deployment, -> { order('deployments.id DESC') }, class_name: 'Deployment'
 
@@ -165,10 +164,6 @@ class Environment < ActiveRecord::Base
 
   def prometheus_adapter
     @prometheus_adapter ||= Prometheus::AdapterService.new(project, deployment_platform).prometheus_adapter
-  end
-
-  def cluster_prometheus_adapter
-    @cluster_prometheus_adapter ||= Prometheus::AdapterService.new(project, deployment_platform).cluster_prometheus_adapter
   end
 
   def slug

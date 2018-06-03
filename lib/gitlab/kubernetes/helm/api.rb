@@ -2,29 +2,19 @@ module Gitlab
   module Kubernetes
     module Helm
       class Api
+        attr_reader :kubeclient, :namespace
+
+        prepend EE::Gitlab::Kubernetes::Helm::Api
+
         def initialize(kubeclient)
           @kubeclient = kubeclient
           @namespace = Gitlab::Kubernetes::Namespace.new(Gitlab::Kubernetes::Helm::NAMESPACE, kubeclient)
         end
 
-        def get_config_map(command)
-          @namespace.ensure_exists!
-
-          if command.config_map?
-            @kubeclient.get_config_map(command.config_map_name, @namespace.name)
-          end
-        end
-
         def install(command)
-          @namespace.ensure_exists!
+          namespace.ensure_exists!
           create_config_map(command) if command.config_map?
-          @kubeclient.create_pod(command.pod_resource)
-        end
-
-        def update(command)
-          @namespace.ensure_exists!
-          update_config_map(command) if command.config_map?
-          @kubeclient.create_pod(command.pod_resource)
+          kubeclient.create_pod(command.pod_resource)
         end
 
         ##
@@ -34,29 +24,26 @@ module Gitlab
         #
         # values: "Pending", "Running", "Succeeded", "Failed", "Unknown"
         #
+        # TODO: Make this CE compat
         def status(pod_name)
-          @kubeclient.get_pod(pod_name, @namespace.name).status.phase
+          kubeclient.get_pod(pod_name, namespace.name).status.phase
         end
 
+        # TODO: Make this CE compat
         def log(pod_name)
-          @kubeclient.get_pod_log(pod_name, @namespace.name).body
+          kubeclient.get_pod_log(pod_name, namespace.name).body
         end
 
+        # TODO: Make this CE compat
         def delete_pod!(pod_name)
-          @kubeclient.delete_pod(pod_name, @namespace.name)
+          kubeclient.delete_pod(pod_name, namespace.name)
         end
 
         private
 
         def create_config_map(command)
           command.config_map_resource.tap do |config_map_resource|
-            @kubeclient.create_config_map(config_map_resource)
-          end
-        end
-
-        def update_config_map(command)
-          command.config_map_resource.tap do |config_map_resource|
-            @kubeclient.update_config_map(config_map_resource)
+            kubeclient.create_config_map(config_map_resource)
           end
         end
       end

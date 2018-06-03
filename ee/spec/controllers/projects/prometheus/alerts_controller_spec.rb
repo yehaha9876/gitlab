@@ -78,7 +78,7 @@ describe Projects::Prometheus::AlertsController do
         "alert" => "#{alert.name}_#{alert.iid}",
         "expr" => "#{alert.query} #{alert.operator} #{alert.threshold}",
         "for" => "5m",
-        "labels" => { "gitlab"=>"hook" },
+        "labels" => { "gitlab "=> "hook" },
         "annotations" => {
           "summary" => "Instance {{ $labels.instance }} raised an alert",
           "description" => "{{ $labels.instance }} of job {{ $labels.job }} has been raising an alert for more than 5 minutes."

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Gitlab::Kubernetes::Helm::GetCommand do
   let(:application) { create(:clusters_applications_prometheus) }
-  let(:namespace) { Gitlab::Kubernetes::Helm::NAMESPACE }
+  let(:namespace) { ::Gitlab::Kubernetes::Helm::NAMESPACE }
   let(:get_command) { described_class.new(application.name) }
 
   describe '#config_map?' do

@@ -1,3 +1,5 @@
+require_dependency 'lib/gitlab/kubernetes/helm.rb'
+
 module Gitlab
   module Kubernetes
     module Helm
@@ -24,7 +26,7 @@ module Gitlab
         end
 
         def config_map_resource
-          Gitlab::Kubernetes::ConfigMap.new(name, values).generate
+          ::Gitlab::Kubernetes::ConfigMap.new(name, values).generate
         end
 
         def pod_name
@@ -43,7 +45,7 @@ module Gitlab
 
         def script_command
           <<~HEREDOC
-          helm upgrade #{name} #{chart} --reset-values --install --namespace #{Gitlab::Kubernetes::Helm::NAMESPACE} -f /data/helm/#{name}/config/values.yaml >/dev/null
+          helm upgrade #{name} #{chart} --reset-values --install --namespace #{::Gitlab::Kubernetes::Helm::NAMESPACE} -f /data/helm/#{name}/config/values.yaml >/dev/null
           HEREDOC
         end
       end

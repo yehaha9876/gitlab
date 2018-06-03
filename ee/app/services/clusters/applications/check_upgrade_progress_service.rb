@@ -5,14 +5,14 @@ module Clusters
         return unless app.updating?
 
         case phase
-        when Gitlab::Kubernetes::Pod::SUCCEEDED
+        when ::Gitlab::Kubernetes::Pod::SUCCEEDED
           on_success
-        when Gitlab::Kubernetes::Pod::FAILED
+        when ::Gitlab::Kubernetes::Pod::FAILED
           on_failed
         else
           check_timeout
         end
-      rescue Kubeclient::HttpError => ke
+      rescue ::Kubeclient::HttpError => ke
         app.make_update_errored!("Kubernetes error: #{ke.message}") unless app.update_errored?
       end
 
@@ -38,13 +38,13 @@ module Clusters
             remove_pod
           end
         else
-          ClusterWaitForAppUpdateWorker.perform_in(
-            ClusterWaitForAppUpdateWorker::INTERVAL, app.name, app.id)
+          ::ClusterWaitForAppUpdateWorker.perform_in(
+            ::ClusterWaitForAppUpdateWorker::INTERVAL, app.name, app.id)
         end
       end
 
       def timeouted?
-        Time.now.utc - app.updated_at.to_time.utc > ClusterWaitForAppUpdateWorker::TIMEOUT
+        Time.now.utc - app.updated_at.to_time.utc > ::ClusterWaitForAppUpdateWorker::TIMEOUT
       end
 
       def remove_pod

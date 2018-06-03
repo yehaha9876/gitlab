@@ -239,7 +239,6 @@ describe EE::NotificationService, :mailer do
   end
 
   describe '#prometheus_alert_fired' do
-
     it 'sends the email to owners and masters' do
       project = create(:project)
       prometheus_alert = create(:prometheus_alert, project: project)

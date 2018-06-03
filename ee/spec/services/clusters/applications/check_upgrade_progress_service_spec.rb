@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe Clusters::Applications::CheckUpgradeProgressService do
-  RESCHEDULE_PHASES = Gitlab::Kubernetes::Pod::PHASES - [Gitlab::Kubernetes::Pod::SUCCEEDED, Gitlab::Kubernetes::Pod::FAILED].freeze
+  RESCHEDULE_PHASES = ::Gitlab::Kubernetes::Pod::PHASES - [::Gitlab::Kubernetes::Pod::SUCCEEDED, ::Gitlab::Kubernetes::Pod::FAILED].freeze
 
   let(:application) { create(:clusters_applications_prometheus, :updating) }
   let(:service) { described_class.new(application) }
-  let(:phase) { Gitlab::Kubernetes::Pod::UNKNOWN }
+  let(:phase) { ::Gitlab::Kubernetes::Pod::UNKNOWN }
   let(:errors) { nil }
 
   shared_examples 'a terminated upgrade' do
@@ -22,7 +22,7 @@ describe Clusters::Applications::CheckUpgradeProgressService do
     context "when phase is #{a_phase}" do
       context 'when not timeouted' do
         it 'reschedule a new check' do
-          expect(ClusterWaitForAppUpdateWorker).to receive(:perform_in).once
+          expect(::ClusterWaitForAppUpdateWorker).to receive(:perform_in).once
           expect(service).not_to receive(:remove_pod)
 
           service.execute
@@ -38,7 +38,7 @@ describe Clusters::Applications::CheckUpgradeProgressService do
         it_behaves_like 'a terminated upgrade'
 
         it 'make the application update errored' do
-          expect(ClusterWaitForAppUpdateWorker).not_to receive(:perform_in)
+          expect(::ClusterWaitForAppUpdateWorker).not_to receive(:perform_in)
 
           service.execute
 
@@ -58,12 +58,12 @@ describe Clusters::Applications::CheckUpgradeProgressService do
 
   describe '#execute' do
     context 'when upgrade POD succeeded' do
-      let(:phase) { Gitlab::Kubernetes::Pod::SUCCEEDED }
+      let(:phase) { ::Gitlab::Kubernetes::Pod::SUCCEEDED }
 
       it_behaves_like 'a terminated upgrade'
 
       it 'make the application upgraded' do
-        expect(ClusterWaitForAppUpdateWorker).not_to receive(:perform_in)
+        expect(::ClusterWaitForAppUpdateWorker).not_to receive(:perform_in)
 
         service.execute
 
@@ -73,7 +73,7 @@ describe Clusters::Applications::CheckUpgradeProgressService do
     end
 
     context 'when upgrade POD failed' do
-      let(:phase) { Gitlab::Kubernetes::Pod::FAILED }
+      let(:phase) { ::Gitlab::Kubernetes::Pod::FAILED }
       let(:errors) { 'test installation failed' }
 
       it_behaves_like 'a terminated upgrade'

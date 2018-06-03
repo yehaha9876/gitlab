@@ -14,7 +14,7 @@ describe Clusters::Applications::ScheduleUpdateService do
         let(:application) { create(:clusters_applications_prometheus, :installed, last_update_started_at: Time.now + 5.minutes) }
 
         it 'schedules worker with a backoff delay' do
-          expect(ClusterUpdateAppWorker).to receive(:perform_in).with(described_class::BACKOFF_DELAY, application.name, application.id, project.id, Time.now).once
+          expect(::ClusterUpdateAppWorker).to receive(:perform_in).with(described_class::BACKOFF_DELAY, application.name, application.id, project.id, Time.now).once
 
           service.execute
         end
@@ -25,7 +25,7 @@ describe Clusters::Applications::ScheduleUpdateService do
       let(:application) { create(:clusters_applications_prometheus, :installed) }
 
       it 'schedules worker' do
-        expect(ClusterUpdateAppWorker).to receive(:perform_async).with(application.name, application.id, project.id, Time.now).once
+        expect(::ClusterUpdateAppWorker).to receive(:perform_async).with(application.name, application.id, project.id, Time.now).once
 
         service.execute
       end

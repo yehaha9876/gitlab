@@ -9,7 +9,7 @@ describe Clusters::Applications::PrometheusUpdateService do
     let!(:get_command_values) { OpenStruct.new(data: OpenStruct.new(values: application.values)) }
     let!(:upgrade_command) { application.upgrade_command("") }
     let(:service) { described_class.new(application, project) }
-    let(:helm_client) { instance_double(Gitlab::Kubernetes::Helm::Api) }
+    let(:helm_client) { instance_double(::Gitlab::Kubernetes::Helm::Api) }
 
     before do
       allow(service).to receive(:upgrade_command).and_return(upgrade_command)
@@ -20,7 +20,7 @@ describe Clusters::Applications::PrometheusUpdateService do
       before do
         expect(helm_client).to receive(:get_config_map).and_return(get_command_values)
         expect(helm_client).to receive(:update).with(upgrade_command)
-        allow(ClusterWaitForAppUpdateWorker).to receive(:perform_in).and_return(nil)
+        allow(::ClusterWaitForAppUpdateWorker).to receive(:perform_in).and_return(nil)
       end
 
       context 'when prometheus alerts exist' do
@@ -52,7 +52,7 @@ describe Clusters::Applications::PrometheusUpdateService do
       end
 
       it 'schedule async update status check' do
-        expect(ClusterWaitForAppUpdateWorker).to receive(:perform_in).once
+        expect(::ClusterWaitForAppUpdateWorker).to receive(:perform_in).once
 
         service.execute
       end
@@ -60,7 +60,7 @@ describe Clusters::Applications::PrometheusUpdateService do
 
     context 'when k8s cluster communication fails' do
       it 'make the application update errored' do
-        error = Kubeclient::HttpError.new(500, 'system failure', nil)
+        error = ::Kubeclient::HttpError.new(500, 'system failure', nil)
         expect(helm_client).to receive(:get_config_map).and_raise(error)
 
         service.execute

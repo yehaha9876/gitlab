@@ -449,18 +449,6 @@ class NotificationService
     end
   end
 
-  def prometheus_alert_fired(project, alert)
-    recipients = project.members.active_without_invites_and_requests.owners_and_masters
-
-    if recipients.empty? && project.group
-      recipients = project.group.members.active_without_invites_and_requests.owners_and_masters
-    end
-
-    recipients.each do |recipient|
-      mailer.prometheus_alert_fired_email(project.id, recipient.user.id, alert).deliver_later
-    end
-  end
-
   protected
 
   def new_resource_email(target, method)
