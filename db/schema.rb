@@ -2186,8 +2186,8 @@ ActiveRecord::Schema.define(version: 20180704204006) do
     t.string "query", null: false
     t.string "operator", null: false
     t.float "threshold", null: false
-    t.integer "environment_id"
-    t.integer "project_id"
+    t.integer "environment_id", null: false
+    t.integer "project_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

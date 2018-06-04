@@ -5,6 +5,7 @@ module Projects
 
       protect_from_forgery except: [:notify]
 
+      before_action :authorize_read_prometheus_alerts!, except: [:notify]
       before_action :authorize_admin_project!, except: [:notify]
       before_action :alert, only: [:update, :show, :destroy]
 
@@ -71,7 +72,7 @@ module Projects
       end
 
       def serializer
-        PrometheusAlertSerializer.new(project: project)
+        PrometheusAlertSerializer.new(project: project, current_user: current_user)
       end
 
       def alert

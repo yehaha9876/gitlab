@@ -52,17 +52,14 @@ describe Gitlab::Kubernetes::Helm::UpgradeCommand do
   end
 
   describe '#config_map_resource' do
-    let(:metadata) do
-      {
+    it 'returns a KubeClient resource with config map content for the application' do
+      metadata = {
         name: "values-content-configuration-#{application.name}",
         namespace: namespace,
         labels: { name: "values-content-configuration-#{application.name}" }
       }
-    end
+      resource = ::Kubeclient::Resource.new(metadata: metadata, data: { values: application.values })
 
-    let(:resource) { ::Kubeclient::Resource.new(metadata: metadata, data: { values: application.values }) }
-
-    it 'returns a KubeClient resource with config map content for the application' do
       expect(subject.config_map_resource).to eq(resource)
     end
   end

@@ -92,7 +92,6 @@ describe Clusters::Applications::Prometheus do
   end
 
   describe '#get_command' do
-    let(:kubeclient) { double('kubernetes client') }
     let(:prometheus) { create(:clusters_applications_prometheus) }
 
     it 'returns an instance of Gitlab::Kubernetes::Helm::GetCommand' do
@@ -107,7 +106,6 @@ describe Clusters::Applications::Prometheus do
   end
 
   describe '#upgrade_command' do
-    let(:kubeclient) { double('kubernetes client') }
     let(:prometheus) { create(:clusters_applications_prometheus) }
     let(:values) { { foo: 'bar' } }
 

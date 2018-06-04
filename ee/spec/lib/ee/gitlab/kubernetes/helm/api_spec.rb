@@ -2,12 +2,11 @@ require 'spec_helper'
 
 describe Gitlab::Kubernetes::Helm::Api do
   let(:client) { double('kubernetes client') }
-  let(:helm) { described_class.new(client) }
   let(:gitlab_namespace) { ::Gitlab::Kubernetes::Helm::NAMESPACE }
   let(:namespace) { ::Gitlab::Kubernetes::Namespace.new(gitlab_namespace, client) }
   let(:application) { create(:clusters_applications_prometheus) }
 
-  subject { helm }
+  subject { described_class.new(client) }
 
   before do
     allow(Gitlab::Kubernetes::Namespace).to receive(:new).with(gitlab_namespace, client).and_return(namespace)
@@ -59,9 +58,9 @@ describe Gitlab::Kubernetes::Helm::Api do
     end
 
     context 'with a ConfigMap' do
-      let(:resource) { Gitlab::Kubernetes::ConfigMap.new(application.name, application.values).generate }
-
       it 'creates a ConfigMap on kubeclient' do
+        resource = Gitlab::Kubernetes::ConfigMap.new(application.name, application.values).generate
+
         expect(client).to receive(:update_config_map).with(resource).once
 
         subject.update(command)

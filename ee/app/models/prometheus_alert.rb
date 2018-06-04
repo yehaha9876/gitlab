@@ -31,6 +31,6 @@ class PrometheusAlert < ActiveRecord::Base
   private
 
   def clear_prometheus_adapter_cache!
-    environment.cluster_prometheus_adapter&.clear_prometheus_reactive_cache!(:additional_metrics_environment, environment)
+    environment.clear_prometheus_reactive_cache!(:additional_metrics_environment)
   end
 end

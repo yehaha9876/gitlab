@@ -9,7 +9,6 @@ module EE
 
           protected
 
-          # ee
           def query_with_alert(project, environment)
             alerts_map =
               project.prometheus_alerts.each_with_object({}) do |alert, hsh|
