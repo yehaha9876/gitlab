@@ -77,7 +77,7 @@ describe('GeoNodeDetailsComponent', () => {
 
   describe('template', () => {
     it('renders container elements correctly', () => {
-      expect(vm.$el.classList.contains('panel-body')).toBe(true);
+      expect(vm.$el.classList.contains('card-body')).toBe(true);
     });
   });
 });
