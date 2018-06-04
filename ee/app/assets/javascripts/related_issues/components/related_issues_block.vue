@@ -228,7 +228,6 @@ issue-count-badge-add-button btn btn-sm btn-default"
             :class="{
               'user-can-drag': canReorder,
               'sortable-row': canReorder,
-              card: canReorder,
               'card-slim': canReorder
             }"
             :data-key="issue.id"
