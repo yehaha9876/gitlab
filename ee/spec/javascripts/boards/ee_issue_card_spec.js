@@ -1,4 +1,8 @@
 import Vue from 'vue';
+import '~/vue_shared/models/label';
+import '~/boards/models/list';
+import '~/boards/models/assignee';
+import '~/boards/stores/boards_store';
 import '~/boards/components/issue_card_inner';
 import ListIssue from '~/boards/models/issue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
@@ -30,9 +34,7 @@ describe('Issue card component', () => {
       groupId: null,
     });
 
-    expect(
-      vm.$el.querySelector('.card-weight'),
-    ).toBeNull();
+    expect(vm.$el.querySelector('.card-weight')).toBeNull();
   });
 
   it('renders issue weight if specified', () => {
