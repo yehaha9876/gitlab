@@ -6,8 +6,8 @@ module EE
     prepended do
       WEIGHT_RANGE = 0..20
       WEIGHT_ALL = 'Everything'.freeze
-      WEIGHT_ANY = 'Any Weight'.freeze
-      WEIGHT_NONE = 'No Weight'.freeze
+      WEIGHT_ANY = 'Any'.freeze
+      WEIGHT_NONE = 'None'.freeze
 
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }
       scope :order_weight_asc, -> { reorder ::Gitlab::Database.nulls_last_order('weight') }

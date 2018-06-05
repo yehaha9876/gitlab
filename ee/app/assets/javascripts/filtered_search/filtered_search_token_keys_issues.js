@@ -10,13 +10,13 @@ const weightTokenKey = {
 };
 
 const weightConditions = [{
-  url: 'weight=No+Weight',
+  url: 'weight=None',
   tokenKey: 'weight',
-  value: 'none',
+  value: 'None',
 }, {
-  url: 'weight=Any+Weight',
+  url: 'weight=Any',
   tokenKey: 'weight',
-  value: 'any',
+  value: 'Any',
 }];
 
 const alternativeTokenKeys = [{
