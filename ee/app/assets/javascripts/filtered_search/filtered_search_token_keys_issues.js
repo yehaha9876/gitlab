@@ -6,7 +6,7 @@ const weightTokenKey = {
   param: '',
   symbol: '',
   icon: 'balance-scale',
-  tag: 'weight',
+  tag: 'number',
 };
 
 const weightConditions = [{
