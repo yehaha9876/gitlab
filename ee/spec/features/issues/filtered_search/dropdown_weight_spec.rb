@@ -17,7 +17,7 @@ describe 'Dropdown weight', :js do
   end
 
   def click_weight(text)
-    find('#js-dropdown-weight .filter-dropdown .filter-dropdown-item', text: text).click
+    find('#js-dropdown-weight .filter-dropdown .filter-dropdown-item', text: text, exact_text: true).click
   end
 
   def click_static_weight(text)
@@ -83,10 +83,10 @@ describe 'Dropdown weight', :js do
     end
 
     it 'fills in `no weight`' do
-      click_static_weight('No Weight')
+      click_static_weight('None')
 
       expect(page).to have_css(js_dropdown_weight, visible: false)
-      expect_tokens([{ name: 'Weight', value: 'none' }])
+      expect_tokens([{ name: 'Weight', value: 'None' }])
       expect_filtered_search_input_empty
     end
   end
