@@ -35,7 +35,7 @@ export default {
 </script>
 
 <template>
-  <div 
+  <div
     class="hide-collapsed value issuable-show-labels js-value"
     :class="{
       'has-labels':!isEmpty,
