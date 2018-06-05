@@ -16,6 +16,7 @@
 
 .ci-variable-row {
   align-items: flex-start;
+  position: relative;
 
   @include media-breakpoint-down(xs) {
     align-items: flex-end;
@@ -108,6 +109,13 @@
 
   &[disabled] {
     color: $gl-text-color-disabled;
+  }
+
+  @include media-breakpoint-down(xs) {
+    position: absolute;
+    right: $gl-btn-padding * -2;
+    bottom: $gl-btn-padding;
+    min-height: auto;
   }
 }
 
