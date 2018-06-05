@@ -2,10 +2,11 @@ import $ from 'jquery';
 import { convertPermissionToBoolean } from '../lib/utils/common_utils';
 import { s__ } from '../locale';
 import setupToggleButtons from '../toggle_buttons';
-import CreateItemDropdown from '../create_item_dropdown';
 import SecretValues from '../behaviors/secret_values';
 
 const ALL_ENVIRONMENTS_STRING = s__('CiVariable|All environments');
+const SCOPE_DOC_LINK = `https://docs.gitlab.com/ee/ci/variables/README.html
+#limiting-environment-scopes-of-secret-variables`;
 
 function createEnvironmentItem(value) {
   return {
@@ -16,10 +17,7 @@ function createEnvironmentItem(value) {
 }
 
 export default class VariableList {
-  constructor({
-    container,
-    formField,
-  }) {
+  constructor({ container, formField }) {
     this.$container = $(container);
     this.formField = formField;
     this.environmentDropdownMap = new WeakMap();
@@ -71,7 +69,7 @@ export default class VariableList {
       this.initRow(rowEl);
     });
 
-    this.$container.on('click', '.js-row-remove-button', (e) => {
+    this.$container.on('click', '.js-row-remove-button', e => {
       e.preventDefault();
       this.removeRow($(e.currentTarget).closest('.js-row'));
     });
@@ -81,7 +79,7 @@ export default class VariableList {
       .join(',');
 
     // Remove any empty rows except the last row
-    this.$container.on('blur', inputSelector, (e) => {
+    this.$container.on('blur', inputSelector, e => {
       const $row = $(e.currentTarget).closest('.js-row');
 
       if ($row.is(':not(:last-child)') && !this.checkIfRowTouched($row)) {
@@ -107,27 +105,45 @@ export default class VariableList {
     // Reset the resizable textarea
     $row.find(this.inputMap.secret_value.selector).css('height', '');
 
-    const $environmentSelect = $row.find('.js-variable-environment-toggle');
+    const $environmentSelect = $row.find('.js-variable-environment-trigger');
     if ($environmentSelect.length) {
-      const createItemDropdown = new CreateItemDropdown({
-        $dropdown: $environmentSelect,
-        defaultToggleLabel: ALL_ENVIRONMENTS_STRING,
-        fieldName: `${this.formField}[variables_attributes][][environment_scope]`,
-        getData: (term, callback) => callback(this.getEnvironmentValues()),
-        createNewItemFromValue: createEnvironmentItem,
-        onSelect: () => {
-          // Refresh the other dropdowns in the variable list
-          // so they have the new value we just picked
-          this.refreshDropdownData();
+      const dropdownTrigger = $row.find(this.inputMap.environment_scope.selector);
+      const environmentValues = this.getEnvironmentValues();
 
-          $row.find(this.inputMap.environment_scope.selector).trigger('trigger-change');
+      $(dropdownTrigger).select2({
+        data: [
+          {
+            id: 0,
+            locked: true,
+            disabled: true,
+            text: '',
+          },
+          ...environmentValues,
+        ],
+        // multiple: true,
+        allowClear: true,
+        formatResult: result => {
+          if (result.id === 0) {
+            return `<span class="ci-variable-environment-scope-help-text">
+            Enter scope (wildcards allowed) or select a past value. <a href="${SCOPE_DOC_LINK}">Learn more</a></span>`;
+          }
+
+          return result.text;
         },
+        createSearchChoice: value => {
+          const result = createEnvironmentItem(value);
+          result.text = `"${result.text}"`;
+          return result;
+        },
+        createSearchChoicePosition: 'bottom',
       });
 
-      // Clear out any data that might have been left-over from the row clone
-      createItemDropdown.clearDropdown();
+      $(dropdownTrigger).on('select2-selecting', e => {
+        $(dropdownTrigger).select2('val', e.choice.text.replace(/"/g, ''));
+        $(dropdownTrigger).val(e.choice.id);
+      });
 
-      this.environmentDropdownMap.set($row[0], createItemDropdown);
+      this.environmentDropdownMap.set($row[0], $(dropdownTrigger));
     }
   }
 
@@ -136,19 +152,21 @@ export default class VariableList {
     $rowClone.removeAttr('data-is-persisted');
 
     // Reset the inputs to their defaults
-    Object.keys(this.inputMap).forEach((name) => {
+    Object.keys(this.inputMap).forEach(name => {
       const entry = this.inputMap[name];
       $rowClone.find(entry.selector).val(entry.default);
     });
 
-    // Close any dropdowns
-    $rowClone.find('.dropdown-menu.show').each((index, $dropdown) => {
-      $dropdown.classList.remove('show');
+    // Remove any dropdowns
+    $rowClone.find('.select2-container').each((index, $el) => {
+      $el.remove();
     });
 
-    this.initRow($rowClone);
+    $rowClone.find(this.inputMap.environment_scope.selector).show();
 
     $row.after($rowClone);
+
+    this.initRow($rowClone);
   }
 
   removeRow(row) {
@@ -164,14 +182,10 @@ export default class VariableList {
     } else {
       $row.remove();
     }
-
-    // Refresh the other dropdowns in the variable list
-    // so any value with the variable deleted is gone
-    this.refreshDropdownData();
   }
 
   checkIfRowTouched($row) {
-    return Object.keys(this.inputMap).some((name) => {
+    return Object.keys(this.inputMap).some(name => {
       const entry = this.inputMap[name];
       const $el = $row.find(entry.selector);
       return $el.length && $el.val() !== entry.default;
@@ -190,11 +204,14 @@ export default class VariableList {
   getAllData() {
     // Ignore the last empty row because we don't want to try persist
     // a blank variable and run into validation problems.
-    const validRows = this.$container.find('.js-row').toArray().slice(0, -1);
+    const validRows = this.$container
+      .find('.js-row')
+      .toArray()
+      .slice(0, -1);
 
-    return validRows.map((rowEl) => {
+    return validRows.map(rowEl => {
       const resultant = {};
-      Object.keys(this.inputMap).forEach((name) => {
+      Object.keys(this.inputMap).forEach(name => {
         const entry = this.inputMap[name];
         const $input = $(rowEl).find(entry.selector);
         if ($input.length) {
@@ -207,21 +224,17 @@ export default class VariableList {
   }
 
   getEnvironmentValues() {
-    const valueMap = this.$container.find(this.inputMap.environment_scope.selector).toArray()
-      .reduce((prevValueMap, envInput) => ({
-        ...prevValueMap,
-        [envInput.value]: envInput.value,
-      }), {});
+    const valueMap = this.$container
+      .find(this.inputMap.environment_scope.selector)
+      .toArray()
+      .reduce(
+        (prevValueMap, envInput) => ({
+          ...prevValueMap,
+          [envInput.value]: envInput.value,
+        }),
+        {},
+      );
 
     return Object.keys(valueMap).map(createEnvironmentItem);
-  }
-
-  refreshDropdownData() {
-    this.$container.find('.js-row').each((index, rowEl) => {
-      const environmentDropdown = this.environmentDropdownMap.get(rowEl);
-      if (environmentDropdown) {
-        environmentDropdown.refreshData();
-      }
-    });
   }
 }

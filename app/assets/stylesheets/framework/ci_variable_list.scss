@@ -110,3 +110,21 @@
     color: $gl-text-color-disabled;
   }
 }
+
+.ci-variable-environment-trigger {
+  .select2-choices .select2-search-choice {
+    border: none;
+    background: transparent;
+  }
+
+  .select2-search-choice-close {
+    display: none;
+  }
+}
+
+.ci-variable-environment-scope-help-text {
+  display: block;
+  margin: ($gl-padding-8 * -1) ($gl-padding * -1);
+  padding: $gl-padding-8 $gl-padding;
+  background: white;
+}
