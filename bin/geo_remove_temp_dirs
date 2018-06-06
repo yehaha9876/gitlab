@@ -104,13 +104,24 @@ def perform_removals(list, options)
   end
 
   if options[:remove]
+    error_list = []
+
     puts ''
     list.each do |path|
-      if FileUtils.remove_dir(path)
+      begin
+        FileUtils.remove_dir(path)
         puts "Removed...#{path}"
-      else
+      rescue
         puts "Cannot remove #{path}"
+        error_list << path
       end
+    end
+
+    unless error_list.empty?
+      puts '------------------------------------------------------------------------------'
+      puts "Errors during deletion: #{error_list.size}"
+      puts 'The following paths were unable to be removed:'
+      error_list.each { |path| puts path }
     end
   end
 end
