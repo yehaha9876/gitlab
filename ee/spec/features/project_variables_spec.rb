@@ -24,12 +24,13 @@ describe 'Project variables EE', :js do
         find('.js-ci-variable-input-key').set('somekey')
         find('.js-ci-variable-input-value').set('somevalue')
 
-        find('.js-variable-environment-toggle').click
-        find('.js-variable-environment-dropdown-wrapper .dropdown-input-field').set('review/*')
-        find('.js-variable-environment-dropdown-wrapper .js-dropdown-create-new-item').click
-
+        find('.js-variable-environment-trigger.select2-container').click
+        
         expect(find('input[name="variables[variables_attributes][][environment_scope]"]', visible: false).value).to eq('review/*')
       end
+
+      find('#select2-drop .select2-input').set('review/*')
+      find('.#select2-drop .select2-highlighted').click
 
       click_button('Save variables')
       wait_for_requests
