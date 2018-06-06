@@ -167,7 +167,7 @@ module EESpecificCheck
   end
 
   def find_remote_ce_branch
-    ls_remote_output = run_git_command("ls-remote #{ce_repo_url} \"*#{minimal_ce_branch_name}*\"")
+    ls_remote_output = run_git_command("ls-remote --heads #{ce_repo_url} \"*#{minimal_ce_branch_name}*\"")
 
     if ls_remote_output.include?(minimal_ce_branch_name)
       branch_to_fetch = ls_remote_output.scan(%r{(?<=refs/heads/).+}).sort_by(&:size).first
