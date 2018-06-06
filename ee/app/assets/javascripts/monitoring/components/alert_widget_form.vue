@@ -17,6 +17,12 @@ const SUBMIT_BUTTON_CLASS = {
   delete: 'btn-remove',
 };
 
+const OPERATORS = {
+  greaterThan: '>',
+  equalTo: '=',
+  lessThan: '<',
+};
+
 export default {
   props: {
     disabled: {
@@ -44,6 +50,7 @@ export default {
   },
   data() {
     return {
+      operators: OPERATORS,
       operator: this.alertData.operator,
       threshold: this.alertData.threshold,
     };
@@ -109,29 +116,29 @@ export default {
       <button
         type="button"
         class="btn btn-default"
-        :class="{ active: operator === '>' }"
-        @click="operator = '>'"
+        :class="{ active: operator === operators.greaterThan }"
+        @click="operator = operators.greaterThan"
         :disabled="disabled"
       >
-        &gt;
+        {{ operators.greaterThan }}
       </button>
       <button
         type="button"
         class="btn btn-default"
-        :class="{ active: operator === '=' }"
-        @click="operator = '='"
+        :class="{ active: operator === operators.equalTo }"
+        @click="operator = operators.equalTo"
         :disabled="disabled"
       >
-        =
+        {{ operators.equalTo }}
       </button>
       <button
         type="button"
         class="btn btn-default"
-        :class="{ active: operator === '<' }"
-        @click="operator = '<'"
+        :class="{ active: operator === operators.lessThan }"
+        @click="operator = operators.lessThan"
         :disabled="disabled"
       >
-        &lt;
+        {{ operators.lessThan }}
       </button>
     </div>
     <div class="form-group">
