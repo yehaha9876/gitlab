@@ -34,7 +34,7 @@ export default {
   },
   computed: {
     shouldShowMergeWhenPipelineSucceedsText() {
-      return this.mr.isPipelineActive;
+      return this.mr.buildsEnabled && this.mr.isPipelineActive;
     },
     commitMessageLinkTitle() {
       const withDesc = 'Include description in commit message';
@@ -43,9 +43,11 @@ export default {
       return this.useCommitMessageWithDescription ? withoutDesc : withDesc;
     },
     status() {
-      const { pipeline, isPipelineActive, isPipelineFailed, hasCI, ciStatus } = this.mr;
+      const { pipeline, isPipelineActive, isPipelineFailed, buildsEnabled, ciStatus } = this.mr;
 
-      if (hasCI && !ciStatus) {
+      if (!buildsEnabled) {
+        return 'success';
+      } else if (!ciStatus) {
         return 'failed';
       } else if (!pipeline) {
         return 'success';
@@ -86,7 +88,9 @@ export default {
       return 'Merge';
     },
     shouldShowMergeOptionsDropdown() {
-      return this.mr.isPipelineActive && !this.mr.onlyAllowMergeIfPipelineSucceeds;
+      return this.mr.buildsEnabled &&
+        this.mr.isPipelineActive &&
+        !this.mr.onlyAllowMergeIfPipelineSucceeds;
     },
     isMergeButtonDisabled() {
       const { commitMessage } = this;

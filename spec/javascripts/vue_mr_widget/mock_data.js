@@ -216,6 +216,7 @@ export default {
   diverged_commits_count: 0,
   only_allow_merge_if_pipeline_succeeds: false,
   commit_change_content_path: '/root/acets-app/merge_requests/22/commit_change_content',
+  builds_enabled: true,
   codeclimate: {
     head_path: 'head.json',
     base_path: 'base.json',
