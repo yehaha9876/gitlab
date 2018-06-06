@@ -1142,10 +1142,15 @@ class MergeRequest < ActiveRecord::Base
     true
   end
 
+<<<<<<< HEAD
   def base_pipeline
     @base_pipeline ||= project.pipelines
       .order(id: :desc)
       .find_by(sha: diff_base_sha)
+=======
+  def discussions_rendered_on_frontend?
+    true
+>>>>>>> local-ce/changes_tab_vue_refactoring
   end
 
   def update_project_counter_caches

@@ -12,6 +12,7 @@ import noteable from '../mixins/noteable';
 import resolvable from '../mixins/resolvable';
 
 export default {
+  name: 'NoteableNote',
   components: {
     userAvatarLink,
     noteHeader,
@@ -34,22 +35,24 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['targetNoteHash', 'getUserData']),
+    ...mapGetters(['targetNoteHash', 'getNoteableData', 'getUserData']),
     author() {
       return this.note.author;
     },
     classNameBindings() {
       return {
+        [`note-row-${this.note.id}`]: true,
         'is-editing': this.isEditing && !this.isRequesting,
         'is-requesting being-posted': this.isRequesting,
         'disabled-content': this.isDeleting,
         target: this.targetNoteHash === this.noteAnchorId,
       };
     },
+    canResolve() {
+      return this.note.resolvable && !!this.getUserData.id;
+    },
     canReportAsAbuse() {
-      return (
-        this.note.report_abuse_path && this.author.id !== this.getUserData.id
-      );
+      return this.note.report_abuse_path && this.author.id !== this.getUserData.id;
     },
     noteAnchorId() {
       return `note_${this.note.id}`;
@@ -66,12 +69,7 @@ export default {
   },
 
   methods: {
-    ...mapActions([
-      'deleteNote',
-      'updateNote',
-      'toggleResolveNote',
-      'scrollToNoteIfNeeded',
-    ]),
+    ...mapActions(['deleteNote', 'updateNote', 'toggleResolveNote', 'scrollToNoteIfNeeded']),
     editHandler() {
       this.isEditing = true;
     },
@@ -85,9 +83,7 @@ export default {
             this.isDeleting = false;
           })
           .catch(() => {
-            Flash(
-              'Something went wrong while deleting your note. Please try again.',
-            );
+            Flash('Something went wrong while deleting your note. Please try again.');
             this.isDeleting = false;
           });
       }
@@ -96,7 +92,7 @@ export default {
       const data = {
         endpoint: this.note.path,
         note: {
-          target_type: this.noteableType,
+          target_type: this.getNoteableData.targetType,
           target_id: this.note.noteable_id,
           note: { note: noteText },
         },
@@ -118,8 +114,7 @@ export default {
           this.isRequesting = false;
           this.isEditing = true;
           this.$nextTick(() => {
-            const msg =
-              'Something went wrong while editing your comment. Please try again.';
+            const msg = 'Something went wrong while editing your comment. Please try again.';
             Flash(msg, 'alert', this.$el);
             this.recoverNoteContent(noteText);
             callback();
@@ -129,8 +124,7 @@ export default {
     formCancelHandler(shouldConfirm, isDirty) {
       if (shouldConfirm && isDirty) {
         // eslint-disable-next-line no-alert
-        if (!confirm('Are you sure you want to cancel editing this comment?'))
-          return;
+        if (!confirm('Are you sure you want to cancel editing this comment?')) return;
       }
       this.$refs.noteBody.resetAutoSave();
       if (this.oldContent) {
@@ -143,7 +137,7 @@ export default {
       // we need to do this to prevent noteForm inconsistent content warning
       // this is something we intentionally do so we need to recover the content
       this.note.note = noteText;
-      this.$refs.noteBody.$refs.noteForm.note.note = noteText;
+      this.$refs.noteBody.note.note = noteText;
     },
   },
 };
@@ -154,7 +148,9 @@ export default {
     class="note timeline-entry"
     :id="noteAnchorId"
     :class="classNameBindings"
-    :data-award-url="note.toggle_award_path">
+    :data-award-url="note.toggle_award_path"
+    :data-note-id="note.id"
+  >
     <div class="timeline-entry-inner">
       <div class="timeline-icon">
         <user-avatar-link
@@ -175,13 +171,14 @@ export default {
           <note-actions
             :author-id="author.id"
             :note-id="note.id"
+            :note-url="note.noteable_note_url"
             :access-level="note.human_access"
             :can-edit="note.current_user.can_edit"
             :can-award-emoji="note.current_user.can_award_emoji"
             :can-delete="note.current_user.can_edit"
             :can-report-as-abuse="canReportAsAbuse"
             :report-abuse-path="note.report_abuse_path"
-            :resolvable="note.resolvable"
+            :resolvable="canResolve"
             :is-resolved="note.resolved"
             :is-resolving="isResolving"
             :resolved-by="note.resolved_by"
@@ -195,7 +192,7 @@ export default {
           :can-edit="note.current_user.can_edit"
           :is-editing="isEditing"
           @handleFormUpdate="formUpdateHandler"
-          @cancelFormEdition="formCancelHandler"
+          @cancelForm="formCancelHandler"
           ref="noteBody"
         />
       </div>

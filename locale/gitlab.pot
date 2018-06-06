@@ -8,8 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2018-06-01 01:47-0500\n"
 "PO-Revision-Date: 2018-06-01 01:47-0500\n"
+=======
+"POT-Creation-Date: 2018-05-23 07:40-0500\n"
+"PO-Revision-Date: 2018-05-23 07:40-0500\n"
+>>>>>>> local-ce/changes_tab_vue_refactoring
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -18,6 +23,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
+<<<<<<< HEAD
 msgid " and"
 msgstr ""
 
@@ -28,6 +34,10 @@ msgstr[1] ""
 
 msgid " improved on %d point"
 msgid_plural " improved on %d points"
+=======
+msgid "%d changed file"
+msgid_plural "%d changed files"
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr[0] ""
 msgstr[1] ""
 
@@ -97,10 +107,10 @@ msgid_plural "%{count} participants"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "%{loadingIcon} Started"
+msgid "%{filePath} deleted"
 msgstr ""
 
-msgid "%{lock_path} is locked by GitLab User %{lock_user_id}"
+msgid "%{loadingIcon} Started"
 msgstr ""
 
 msgid "%{nip_domain} can be used as an alternative to a custom domain."
@@ -199,21 +209,6 @@ msgid "1st contribution!"
 msgstr ""
 
 msgid "2FA enabled"
-msgstr ""
-
-msgid "403|Please contact your GitLab administrator to get the permission."
-msgstr ""
-
-msgid "403|You don't have the permission to access this page."
-msgstr ""
-
-msgid "404|Make sure the address is correct and the page hasn't moved."
-msgstr ""
-
-msgid "404|Page Not Found"
-msgstr ""
-
-msgid "404|Please contact your GitLab administrator if you think this is a mistake."
 msgstr ""
 
 msgid "<strong>Removes</strong> source branch"
@@ -352,9 +347,6 @@ msgid "AdminUsers|To confirm, type %{projectName}"
 msgstr ""
 
 msgid "AdminUsers|To confirm, type %{username}"
-msgstr ""
-
-msgid "Advanced"
 msgstr ""
 
 msgid "Advanced settings"
@@ -585,7 +577,7 @@ msgstr ""
 msgid "Auto Review Apps and Auto Deploy need a domain name to work correctly."
 msgstr ""
 
-msgid "AutoDevOps|Auto DevOps"
+msgid "AutoDevOps|Auto DevOps (Beta)"
 msgstr ""
 
 msgid "AutoDevOps|Auto DevOps documentation"
@@ -606,7 +598,7 @@ msgstr ""
 msgid "AutoDevOps|add a Kubernetes cluster"
 msgstr ""
 
-msgid "AutoDevOps|enable Auto DevOps"
+msgid "AutoDevOps|enable Auto DevOps (Beta)"
 msgstr ""
 
 msgid "Available"
@@ -941,7 +933,7 @@ msgstr ""
 msgid "CICD|An explicit %{ci_file} needs to be specified before you can begin using Continuous Integration and Delivery."
 msgstr ""
 
-msgid "CICD|Auto DevOps"
+msgid "CICD|Auto DevOps (Beta)"
 msgstr ""
 
 msgid "CICD|Auto DevOps will automatically build, test, and deploy your application based on a predefined Continuous Integration and Delivery configuration."
@@ -1160,6 +1152,9 @@ msgstr ""
 msgid "Click the button below to begin the install process by navigating to the Kubernetes page"
 msgstr ""
 
+msgid "Click to expand it."
+msgstr ""
+
 msgid "Click to expand text"
 msgstr ""
 
@@ -1197,12 +1192,6 @@ msgid "ClusterIntegration|Add an existing Kubernetes cluster"
 msgstr ""
 
 msgid "ClusterIntegration|Advanced options on this Kubernetes cluster's integration"
-msgstr ""
-
-msgid "ClusterIntegration|An error occured while trying to fetch project zones: %{error}"
-msgstr ""
-
-msgid "ClusterIntegration|An error occured while trying to fetch your projects: %{error}"
 msgstr ""
 
 msgid "ClusterIntegration|Applications"
@@ -1263,15 +1252,6 @@ msgid "ClusterIntegration|Environment scope"
 msgstr ""
 
 msgid "ClusterIntegration|Every new Google Cloud Platform (GCP) account receives $300 in credit upon %{sign_up_link}. In partnership with Google, GitLab is able to offer an additional $200 for new GCP accounts to get started with GitLab's Google Kubernetes Engine Integration."
-msgstr ""
-
-msgid "ClusterIntegration|Fetching machine types"
-msgstr ""
-
-msgid "ClusterIntegration|Fetching projects"
-msgstr ""
-
-msgid "ClusterIntegration|Fetching zones"
 msgstr ""
 
 msgid "ClusterIntegration|GitLab Integration"
@@ -1379,6 +1359,7 @@ msgstr ""
 msgid "ClusterIntegration|More information"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "ClusterIntegration|Multiple Kubernetes clusters are available in GitLab Enterprise Edition Premium and Ultimate"
 msgstr ""
 
@@ -1394,6 +1375,8 @@ msgstr ""
 msgid "ClusterIntegration|No zones matched your search"
 msgstr ""
 
+=======
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgid "ClusterIntegration|Note:"
 msgstr ""
 
@@ -1404,6 +1387,9 @@ msgid "ClusterIntegration|Please enter access information for your Kubernetes cl
 msgstr ""
 
 msgid "ClusterIntegration|Please make sure that your Google account meets the following requirements:"
+msgstr ""
+
+msgid "ClusterIntegration|Project ID"
 msgstr ""
 
 msgid "ClusterIntegration|Project namespace"
@@ -1436,40 +1422,19 @@ msgstr ""
 msgid "ClusterIntegration|Save changes"
 msgstr ""
 
-msgid "ClusterIntegration|Search machine types"
-msgstr ""
-
-msgid "ClusterIntegration|Search projects"
-msgstr ""
-
-msgid "ClusterIntegration|Search zones"
-msgstr ""
-
 msgid "ClusterIntegration|Security"
 msgstr ""
 
 msgid "ClusterIntegration|See and edit the details for your Kubernetes cluster"
 msgstr ""
 
+msgid "ClusterIntegration|See machine types"
+msgstr ""
+
+msgid "ClusterIntegration|See your projects"
+msgstr ""
+
 msgid "ClusterIntegration|See zones"
-msgstr ""
-
-msgid "ClusterIntegration|Select machine type"
-msgstr ""
-
-msgid "ClusterIntegration|Select project"
-msgstr ""
-
-msgid "ClusterIntegration|Select project and zone to choose machine type"
-msgstr ""
-
-msgid "ClusterIntegration|Select project to choose zone"
-msgstr ""
-
-msgid "ClusterIntegration|Select zone"
-msgstr ""
-
-msgid "ClusterIntegration|Select zone to choose machine type"
 msgstr ""
 
 msgid "ClusterIntegration|Service token"
@@ -1500,9 +1465,6 @@ msgid "ClusterIntegration|Toggle Kubernetes cluster"
 msgstr ""
 
 msgid "ClusterIntegration|Token"
-msgstr ""
-
-msgid "ClusterIntegration|Validating project billing status"
 msgstr ""
 
 msgid "ClusterIntegration|With a Kubernetes cluster associated to this project, you can use review apps, deploy your applications, run your pipelines, and much more in an easy way."
@@ -1544,10 +1506,10 @@ msgstr ""
 msgid "Collapse sidebar"
 msgstr ""
 
-msgid "Comment and resolve discussion"
+msgid "Comment & resolve discussion"
 msgstr ""
 
-msgid "Comment and unresolve discussion"
+msgid "Comment & unresolve discussion"
 msgstr ""
 
 msgid "Comments"
@@ -1731,7 +1693,7 @@ msgstr ""
 msgid "ContainerRegistry|With the Docker Container Registry integrated into GitLab, every project can have its own space to store its Docker images."
 msgstr ""
 
-msgid "ContainerRegistry|You can also use a %{deploy_token} for read-only access to the registry images."
+msgid "ContainerRegistry|You can also %{deploy_token} for read-only access to the registry images."
 msgstr ""
 
 msgid "Continuous Integration and Deployment"
@@ -1782,6 +1744,12 @@ msgstr ""
 msgid "Copy commit SHA to clipboard"
 msgstr ""
 
+msgid "Copy file name to clipboard"
+msgstr ""
+
+msgid "Copy file path to clipboard"
+msgstr ""
+
 msgid "Copy reference to clipboard"
 msgstr ""
 
@@ -1804,6 +1772,9 @@ msgid "Create a personal access token on your account to pull or push via %{prot
 msgstr ""
 
 msgid "Create branch"
+msgstr ""
+
+msgid "Create commit"
 msgstr ""
 
 msgid "Create directory"
@@ -2081,6 +2052,9 @@ msgstr ""
 msgid "Diffs|No file name available"
 msgstr ""
 
+msgid "Diffs|Something went wrong while fetching diff lines."
+msgstr ""
+
 msgid "Directory name"
 msgstr ""
 
@@ -2177,6 +2151,9 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+msgid "Email patch"
+msgstr ""
+
 msgid "Emails"
 msgstr ""
 
@@ -2210,9 +2187,6 @@ msgstr ""
 msgid "Enable group Runners"
 msgstr ""
 
-msgid "Enable or disable certain group features and choose access levels."
-msgstr ""
-
 msgid "Enable or disable version check and usage ping."
 msgstr ""
 
@@ -2222,12 +2196,15 @@ msgstr ""
 msgid "Enable the Performance Bar for a given group."
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Enabled"
 msgstr ""
 
 msgid "Ends at (UTC)"
 msgstr ""
 
+=======
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgid "Environments"
 msgstr ""
 
@@ -2321,15 +2298,6 @@ msgstr ""
 msgid "Error fetching usage ping data."
 msgstr ""
 
-msgid "Error loading branch data. Please try again."
-msgstr ""
-
-msgid "Error loading last commit."
-msgstr ""
-
-msgid "Error loading project data. Please try again."
-msgstr ""
-
 msgid "Error occurred when toggling the notification subscription"
 msgstr ""
 
@@ -2373,6 +2341,9 @@ msgid "Every week (Sundays at 4:00am)"
 msgstr ""
 
 msgid "Expand"
+msgstr ""
+
+msgid "Expand all"
 msgstr ""
 
 msgid "Expand sidebar"
@@ -2536,10 +2507,14 @@ msgstr ""
 msgid "GeoNodes|Full"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "GeoNodes|GitLab version"
 msgstr ""
 
 msgid "GeoNodes|GitLab version does not match the primary node version"
+=======
+msgid "Go back"
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr ""
 
 msgid "GeoNodes|Health status"
@@ -2886,6 +2861,9 @@ msgid_plural "Hide values"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Hide whitespace changes"
+msgstr ""
+
 msgid "History"
 msgstr ""
 
@@ -2950,6 +2928,9 @@ msgid "Improve search with Advanced Global Search and GitLab Enterprise Edition.
 msgstr ""
 
 msgid "Include a Terms of Service agreement that all users must accept."
+msgstr ""
+
+msgid "Inline"
 msgstr ""
 
 msgid "Install Runner on Kubernetes"
@@ -3051,6 +3032,9 @@ msgid "Kubernetes configured"
 msgstr ""
 
 msgid "Kubernetes service integration has been deprecated. %{deprecated_message_content} your Kubernetes clusters using the new <a href=\"%{url}\"/>Kubernetes Clusters</a> page"
+msgstr ""
+
+msgid "LFS"
 msgstr ""
 
 msgid "LFSStatus|Disabled"
@@ -3166,9 +3150,6 @@ msgstr ""
 msgid "Lock %{issuableDisplayName}"
 msgstr ""
 
-msgid "Lock not found"
-msgstr ""
-
 msgid "Lock to current projects"
 msgstr ""
 
@@ -3254,6 +3235,18 @@ msgid "Merge requests"
 msgstr ""
 
 msgid "Merge requests are a place to propose changes you've made to a project and discuss those changes with others"
+msgstr ""
+
+msgid "MergeRequests|Toggle comments for this file"
+msgstr ""
+
+msgid "MergeRequests|View file @ %{commitId}"
+msgstr ""
+
+msgid "MergeRequests|View on environment"
+msgstr ""
+
+msgid "MergeRequests|View replaced file @ %{commitId}"
 msgstr ""
 
 msgid "Merged"
@@ -3400,18 +3393,6 @@ msgstr ""
 msgid "Name new label"
 msgstr ""
 
-msgid "Nav|Help"
-msgstr ""
-
-msgid "Nav|Home"
-msgstr ""
-
-msgid "Nav|Sign In / Register"
-msgstr ""
-
-msgid "Nav|Sign out and sign in with a different account"
-msgstr ""
-
 msgid "New Issue"
 msgid_plural "New Issues"
 msgstr[0] ""
@@ -3490,6 +3471,9 @@ msgid "No estimate or time spent"
 msgstr ""
 
 msgid "No file chosen"
+msgstr ""
+
+msgid "No files found"
 msgstr ""
 
 msgid "No files found."
@@ -3630,6 +3614,9 @@ msgstr ""
 msgid "Online IDE integration settings."
 msgstr ""
 
+msgid "Only comments from the following commit are shown below"
+msgstr ""
+
 msgid "Only project members can comment."
 msgstr ""
 
@@ -3699,13 +3686,14 @@ msgstr ""
 msgid "Pending"
 msgstr ""
 
-msgid "Perform advanced options such as changing path, transferring, or removing the group."
-msgstr ""
-
 msgid "Performance optimization"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Permissions"
+=======
+msgid "Permalink"
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr ""
 
 msgid "Personal Access Token"
@@ -3864,16 +3852,23 @@ msgstr ""
 msgid "Pipeline|with stages"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Planned finish date"
 msgstr ""
 
 msgid "Planned start date"
+=======
+msgid "Plain diff"
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr ""
 
 msgid "PlantUML"
 msgstr ""
 
 msgid "Play"
+msgstr ""
+
+msgid "Please <a href=%{link_to_billing} target=\"_blank\" rel=\"noopener noreferrer\">enable billing for one of your projects to be able to create a Kubernetes cluster</a>, then try again."
 msgstr ""
 
 msgid "Please accept the Terms of Service before continuing."
@@ -4323,7 +4318,7 @@ msgstr ""
 msgid "Reset runners registration token"
 msgstr ""
 
-msgid "Resolve conflicts on source branch"
+msgid "Resolve all discussions in new issue"
 msgstr ""
 
 msgid "Resolve discussion"
@@ -4442,9 +4437,6 @@ msgstr ""
 msgid "Search files"
 msgstr ""
 
-msgid "Search for projects, issues, etc."
-msgstr ""
-
 msgid "Search milestones"
 msgstr ""
 
@@ -4460,10 +4452,14 @@ msgstr ""
 msgid "Seconds to wait for a storage access attempt"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Security report"
 msgstr ""
 
 msgid "Select"
+=======
+msgid "Variables"
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr ""
 
 msgid "Select Archive Format"
@@ -4482,15 +4478,6 @@ msgid "Select assignee"
 msgstr ""
 
 msgid "Select branch/tag"
-msgstr ""
-
-msgid "Select project"
-msgstr ""
-
-msgid "Select project and zone to choose machine type"
-msgstr ""
-
-msgid "Select project to choose zone"
 msgstr ""
 
 msgid "Select source branch"
@@ -4577,10 +4564,19 @@ msgstr ""
 msgid "Show command"
 msgstr ""
 
+msgid "Show latest version"
+msgstr ""
+
+msgid "Show latest version of the diff"
+msgstr ""
+
 msgid "Show parent pages"
 msgstr ""
 
 msgid "Show parent subgroups"
+msgstr ""
+
+msgid "Show whitespace changes"
 msgstr ""
 
 msgid "Showing %d event"
@@ -4588,6 +4584,7 @@ msgid_plural "Showing %d events"
 msgstr[0] ""
 msgstr[1] ""
 
+<<<<<<< HEAD
 msgid "Sidebar|Change weight"
 msgstr ""
 
@@ -4604,6 +4601,9 @@ msgid "Sign in to %{group_name}"
 msgstr ""
 
 msgid "Sign in with Single Sign-On"
+=======
+msgid "Side-by-side"
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr ""
 
 msgid "Sign out"
@@ -4630,19 +4630,32 @@ msgstr ""
 msgid "Something went wrong on our end."
 msgstr ""
 
+msgid "Something went wrong on our end. Please try again!"
+msgstr ""
+
 msgid "Something went wrong when toggling the button"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Something went wrong while fetching group member contributions"
 msgstr ""
 
 msgid "Something went wrong while fetching the latest pipeline status."
+=======
+msgid "Something went wrong while closing the %{issuable}. Please try again later"
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr ""
 
 msgid "Something went wrong while fetching the projects."
 msgstr ""
 
 msgid "Something went wrong while fetching the registry list."
+msgstr ""
+
+msgid "Something went wrong while reopening the %{issuable}. Please try again later"
+msgstr ""
+
+msgid "Something went wrong while resolving this discussion. Please try again."
 msgstr ""
 
 msgid "Something went wrong. Please try again."
@@ -4810,12 +4823,15 @@ msgstr ""
 msgid "Started"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Starts at (UTC)"
 msgstr ""
 
 msgid "State your message to activate"
 msgstr ""
 
+=======
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgid "Status"
 msgstr ""
 
@@ -5079,7 +5095,11 @@ msgstr ""
 msgid "This GitLab instance does not provide any shared Runners yet. Instance administrators can register shared Runners in the admin area."
 msgstr ""
 
+<<<<<<< HEAD
 msgid "This board\\'s scope is reduced"
+=======
+msgid "This diff is collapsed."
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr ""
 
 msgid "This directory"
@@ -5157,10 +5177,14 @@ msgstr ""
 msgid "This repository"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "This will delete the custom metric, Are you sure?"
 msgstr ""
 
 msgid "Those emails automatically become issues (with the comments becoming the email conversation) listed here."
+=======
+msgid "This source diff could not be displayed because it is too large."
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr ""
 
 msgid "Time before an issue gets scheduled"
@@ -5395,7 +5419,11 @@ msgstr ""
 msgid "ToggleButton|Toggle Status: ON"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Total Contributions"
+=======
+msgid "Too many changes to show."
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr ""
 
 msgid "Total Time"
@@ -5467,6 +5495,7 @@ msgstr ""
 msgid "Up to date"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Update your group name, description, avatar, and other general settings."
 msgstr ""
 
@@ -5485,6 +5514,8 @@ msgstr ""
 msgid "Upgrade your plan to improve Issue boards."
 msgstr ""
 
+=======
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgid "Upload New File"
 msgstr ""
 
@@ -5519,9 +5550,6 @@ msgid "Used by members to sign in to your group in GitLab"
 msgstr ""
 
 msgid "User and IP Rate Limits"
-msgstr ""
-
-msgid "Variables"
 msgstr ""
 
 msgid "Variables are applied to environments via the runner. They can be protected by only exposing them to protected branches or tags. You can use variables for passwords, secret keys, or whatever you want."
@@ -5582,6 +5610,9 @@ msgid "VisibilityLevel|Unknown"
 msgstr ""
 
 msgid "Want to see the data? Please ask an administrator for access."
+msgstr ""
+
+msgid "We could not verify that one of your projects on GCP has billing enabled. Please try again."
 msgstr ""
 
 msgid "We don't have enough data to show this stage."
@@ -5776,7 +5807,11 @@ msgstr ""
 msgid "You are on a read-only GitLab instance."
 msgstr ""
 
+<<<<<<< HEAD
 msgid "You are on a secondary (read-only) Geo node. If you want to make any changes, you must visit the %{primary_node}."
+=======
+msgid "You can %{linkStart}view the blob%{linkEnd} instead."
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr ""
 
 msgid "You can also create a project from the command line."
@@ -5797,6 +5832,7 @@ msgstr ""
 msgid "You can only edit files when you are on a branch"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "You can resolve the merge conflict using either the Interactive mode, by choosing %{use_ours} or %{use_theirs} buttons, or by editing the files directly. Commit these changes into %{branch_name}"
 msgstr ""
 
@@ -5818,6 +5854,14 @@ msgstr ""
 msgid "You must have maintainer access to force delete a lock"
 msgstr ""
 
+=======
+msgid "You cannot write to this read-only GitLab instance."
+msgstr ""
+
+msgid "You have reached your project limit"
+msgstr ""
+
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgid "You must sign in to star a project"
 msgstr ""
 
@@ -6135,6 +6179,7 @@ msgstr ""
 msgid "importing"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "is invalid because there is downstream lock"
 msgstr ""
 
@@ -6145,6 +6190,9 @@ msgid "is not a valid X509 certificate."
 msgstr ""
 
 msgid "locked by %{path_lock_user_name} %{created_at}"
+=======
+msgid "latest version"
+>>>>>>> local-ce/changes_tab_vue_refactoring
 msgstr ""
 
 msgid "merge request"
