@@ -4,16 +4,7 @@
   .col-lg-12.js-ci-variable-list-section{ data: { save_endpoint: save_endpoint } }
     .hide.alert.alert-danger.js-ci-variable-error-box
 
-    .table-holder.ci-variable-list
-      .gl-responsive-table-row.table-row-header
-        .table-section.section-30
-          = s_("CiVariable|Variable key")
-        .table-section.section-30
-          = s_("CiVariable|Variable value")
-        .table-section.section-10
-          = s_("CiVariable|Protected")
-        .table-section.section-30
-          = s_("CiVariable|Enviroment Scope")
+    %ul.ci-variable-list
       - @variables.each.each do |variable|
         = render 'ci/variables/variable_row', form_field: 'variables', variable: variable
       = render 'ci/variables/variable_row', form_field: 'variables'
