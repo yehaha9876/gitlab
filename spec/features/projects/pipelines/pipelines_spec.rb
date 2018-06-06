@@ -523,8 +523,8 @@ describe 'Pipelines', :js do
           end
 
           context 'when variables are specified' do
-            it 'creates a new pipeline with variables' do
-              page.within '.ci-variable-row-body' do
+            it 'creates a new pipeline with variables' do 
+              page.within '.ci-variable-row' do
                 fill_in "Input variable key", with: "key_name"
                 fill_in "Input variable value", with: "value"
               end
