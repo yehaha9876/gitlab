@@ -142,7 +142,7 @@ if $0 == __FILE__
 
   # We load rails environment / initializers only here to get faster command line startup when `--help` and `--version`
   puts "Loading Rails..."
-  require "#{options[:rails_root]}/config/environment"
+  require File.join(options[:rails_root], 'config', 'environment')
 
   list_shards if options[:list_shards]
 
