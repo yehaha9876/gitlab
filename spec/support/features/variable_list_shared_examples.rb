@@ -6,7 +6,7 @@ shared_examples 'variable list' do
   end
 
   it 'adds new secret variable' do
-    page.within('.js-ci-variable-list-section .js-row:last-child') do
+    page.within('.js-ci-variable-list .js-row:last-child') do
       find('.js-ci-variable-input-key').set('key')
       find('.js-ci-variable-input-value').set('key value')
     end
@@ -17,14 +17,14 @@ shared_examples 'variable list' do
     visit page_path
 
     # We check the first row because it re-sorts to alphabetical order on refresh
-    page.within('.js-ci-variable-list-section .js-row:nth-child(1)') do
+    page.within('.js-ci-variable-list .js-row:nth-child(1)') do
       expect(find('.js-ci-variable-input-key').value).to eq('key')
       expect(find('.js-ci-variable-input-value', visible: false).value).to eq('key value')
     end
   end
 
   it 'adds empty variable' do
-    page.within('.js-ci-variable-list-section .js-row:last-child') do
+    page.within('.js-ci-variable-list .js-row:last-child') do
       find('.js-ci-variable-input-key').set('key')
       find('.js-ci-variable-input-value').set('')
     end
@@ -35,14 +35,14 @@ shared_examples 'variable list' do
     visit page_path
 
     # We check the first row because it re-sorts to alphabetical order on refresh
-    page.within('.js-ci-variable-list-section .js-row:nth-child(1)') do
+    page.within('.js-ci-variable-list .js-row:nth-child(1)') do
       expect(find('.js-ci-variable-input-key').value).to eq('key')
       expect(find('.js-ci-variable-input-value', visible: false).value).to eq('')
     end
   end
 
   it 'adds new protected variable' do
-    page.within('.js-ci-variable-list-section .js-row:last-child') do
+    page.within('.js-ci-variable-list .js-row:last-child') do
       find('.js-ci-variable-input-key').set('key')
       find('.js-ci-variable-input-value').set('key value')
       find('.ci-variable-protected-item .js-project-feature-toggle').click
@@ -56,7 +56,7 @@ shared_examples 'variable list' do
     visit page_path
 
     # We check the first row because it re-sorts to alphabetical order on refresh
-    page.within('.js-ci-variable-list-section .js-row:nth-child(1)') do
+    page.within('.js-ci-variable-list .js-row:nth-child(1)') do
       expect(find('.js-ci-variable-input-key').value).to eq('key')
       expect(find('.js-ci-variable-input-value', visible: false).value).to eq('key value')
       expect(find('.js-ci-variable-input-protected', visible: false).value).to eq('true')
@@ -140,7 +140,7 @@ shared_examples 'variable list' do
 
   it 'edits variable to be protected' do
     # Create the unprotected variable
-    page.within('.js-ci-variable-list-section .js-row:last-child') do
+    page.within('.js-ci-variable-list .js-row:last-child') do
       find('.js-ci-variable-input-key').set('unprotected_key')
       find('.js-ci-variable-input-value').set('unprotected_value')
 
@@ -153,7 +153,7 @@ shared_examples 'variable list' do
     visit page_path
 
     # We check the first row because it re-sorts to alphabetical order on refresh
-    page.within('.js-ci-variable-list-section .js-row:nth-child(2)') do
+    page.within('.js-ci-variable-list .js-row:nth-child(2)') do
       find('.ci-variable-protected-item .js-project-feature-toggle').click
 
       expect(find('.js-ci-variable-input-protected', visible: false).value).to eq('true')
@@ -165,7 +165,7 @@ shared_examples 'variable list' do
     visit page_path
 
     # We check the first row because it re-sorts to alphabetical order on refresh
-    page.within('.js-ci-variable-list-section .js-row:nth-child(2)') do
+    page.within('.js-ci-variable-list .js-row:nth-child(2)') do
       expect(find('.js-ci-variable-input-key').value).to eq('unprotected_key')
       expect(find('.js-ci-variable-input-value', visible: false).value).to eq('unprotected_value')
       expect(find('.js-ci-variable-input-protected', visible: false).value).to eq('true')
@@ -174,7 +174,7 @@ shared_examples 'variable list' do
 
   it 'edits variable to be unprotected' do
     # Create the protected variable
-    page.within('.js-ci-variable-list-section .js-row:last-child') do
+    page.within('.js-ci-variable-list .js-row:last-child') do
       find('.js-ci-variable-input-key').set('protected_key')
       find('.js-ci-variable-input-value').set('protected_value')
       find('.ci-variable-protected-item .js-project-feature-toggle').click
@@ -187,7 +187,7 @@ shared_examples 'variable list' do
 
     visit page_path
 
-    page.within('.js-ci-variable-list-section .js-row:nth-child(1)') do
+    page.within('.js-ci-variable-list .js-row:nth-child(1)') do
       find('.ci-variable-protected-item .js-project-feature-toggle').click
 
       expect(find('.js-ci-variable-input-protected', visible: false).value).to eq('false')
@@ -198,7 +198,7 @@ shared_examples 'variable list' do
 
     visit page_path
 
-    page.within('.js-ci-variable-list-section .js-row:nth-child(1)') do
+    page.within('.js-ci-variable-list .js-row:nth-child(1)') do
       expect(find('.js-ci-variable-input-key').value).to eq('protected_key')
       expect(find('.js-ci-variable-input-value', visible: false).value).to eq('protected_value')
       expect(find('.js-ci-variable-input-protected', visible: false).value).to eq('false')
@@ -249,11 +249,11 @@ shared_examples 'variable list' do
   end
 
   it 'shows validation error box about duplicate keys' do
-    page.within('.js-ci-variable-list-section .js-row:last-child') do
+    page.within('.js-ci-variable-list .js-row:last-child') do
       find('.js-ci-variable-input-key').set('samekey')
       find('.js-ci-variable-input-value').set('value1')
     end
-    page.within('.js-ci-variable-list-section .js-row:last-child') do
+    page.within('.js-ci-variable-list .js-row:last-child') do
       find('.js-ci-variable-input-key').set('samekey')
       find('.js-ci-variable-input-value').set('value2')
     end
@@ -261,7 +261,7 @@ shared_examples 'variable list' do
     click_button('Save variables')
     wait_for_requests
 
-    expect(all('.js-ci-variable-list-section .js-ci-variable-error-box ul li').count).to eq(1)
+    expect(all('.js-ci-variable-list .js-ci-variable-error-box ul li').count).to eq(1)
 
     # We check the first row because it re-sorts to alphabetical order on refresh
     page.within('.js-ci-variable-list-section') do
