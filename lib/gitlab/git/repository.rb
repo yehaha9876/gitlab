@@ -1568,6 +1568,7 @@ module Gitlab
         end
 
         args.push('--objects') if objects
+        args.push('--in-commit-order')
 
         run_git!(args, lazy_block: block)
       end
