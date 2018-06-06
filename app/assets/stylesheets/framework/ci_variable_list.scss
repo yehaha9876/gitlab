@@ -110,13 +110,6 @@
   &[disabled] {
     color: $gl-text-color-disabled;
   }
-
-  @include media-breakpoint-down(xs) {
-    position: absolute;
-    right: $gl-btn-padding * -2;
-    bottom: $gl-btn-padding;
-    min-height: auto;
-  }
 }
 
 .ci-variable-environment-trigger {
@@ -135,4 +128,15 @@
   margin: ($gl-padding-8 * -1) ($gl-padding * -1);
   padding: $gl-padding-8 $gl-padding;
   background: white;
+}
+
+.ci-variable-environment-dropdown-wrapper +
+.ci-variable-row-remove-button {
+  @include media-breakpoint-down(xs) {
+    position: absolute;
+    border: none;
+    right: $gl-padding * -2;
+    bottom: $gl-btn-padding;
+    min-height: auto;
+  }
 }
