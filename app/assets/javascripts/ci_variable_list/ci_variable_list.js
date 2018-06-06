@@ -88,7 +88,7 @@ export default class VariableList {
     });
 
     // Always make sure there is an empty last row
-    this.$container.on('input trigger-change', inputSelector, () => {
+    this.$container.on('input trigger-change change select2-selecting', inputSelector, () => {
       const $lastRow = this.$container.find('.js-row').last();
 
       if (this.checkIfRowTouched($lastRow)) {
@@ -108,18 +108,19 @@ export default class VariableList {
     const $environmentSelect = $row.find('.js-variable-environment-trigger');
     if ($environmentSelect.length) {
       const dropdownTrigger = $row.find(this.inputMap.environment_scope.selector);
-      const environmentValues = this.getEnvironmentValues();
 
       $(dropdownTrigger).select2({
-        data: [
-          {
-            id: 0,
-            locked: true,
-            disabled: true,
-            text: '',
-          },
-          ...environmentValues,
-        ],
+        data: () => {
+          return {
+            results: [{
+              id: 0,
+              locked: true,
+              disabled: true,
+              text: '',
+            },
+              ...this.getEnvironmentValues()],
+          };
+        },
         // multiple: true,
         allowClear: true,
         formatResult: result => {
