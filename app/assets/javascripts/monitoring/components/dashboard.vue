@@ -1,4 +1,7 @@
 <script>
+// ee-only
+import DashboardMixin from 'ee/monitoring/components/dashboard_mixin';
+
 import _ from 'underscore';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -10,20 +13,17 @@ import EmptyState from './empty_state.vue';
 import MonitoringStore from '../stores/monitoring_store';
 import eventHub from '../event_hub';
 
-// ee-only
-// eslint-disable-next-line import/first
-import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
-
 export default {
   components: {
     Graph,
     GraphGroup,
     EmptyState,
     Icon,
-
-    // ee-only
-    AlertWidget,
   },
+
+  // ee-only
+  mixins: [DashboardMixin],
+
   props: {
     hasMetrics: {
       type: Boolean,
@@ -97,13 +97,6 @@ export default {
     currentEnvironmentName: {
       type: String,
       required: true,
-
-    // ee-only
-    alertsEndpoint: {
-      type: String,
-      required: false,
-      default: null,
-    },
   },
   data() {
     return {
@@ -176,20 +169,6 @@ export default {
     },
     hoverChanged(data) {
       this.hoverData = data;
-    },
-
-    // ee-only
-    getGraphQuery(graphData) {
-      if (!graphData.queries || !graphData.queries[0]) return undefined;
-      return graphData.queries[0].query || graphData.queries[0].query_range;
-    },
-    getGraphLabel(graphData) {
-      if (!graphData.queries || !graphData.queries[0]) return undefined;
-      return graphData.queries[0].label;
-    },
-    getQueryAlerts(graphData) {
-      if (!graphData.queries) return [];
-      return graphData.queries.map(query => query.alert_path).filter(Boolean);
     },
   },
 };
