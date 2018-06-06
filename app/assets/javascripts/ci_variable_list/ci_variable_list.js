@@ -110,17 +110,15 @@ export default class VariableList {
       const dropdownTrigger = $row.find(this.inputMap.environment_scope.selector);
 
       $(dropdownTrigger).select2({
-        data: () => {
-          return {
-            results: [{
-              id: 0,
-              locked: true,
-              disabled: true,
-              text: '',
-            },
-              ...this.getEnvironmentValues()],
-          };
-        },
+        data: () => ({
+          results: [{
+            id: 0,
+            locked: true,
+            disabled: true,
+            text: '',
+          },
+            ...this.getEnvironmentValues()],
+        }),
         // multiple: true,
         allowClear: true,
         formatResult: result => {
