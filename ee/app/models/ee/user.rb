@@ -10,6 +10,8 @@ module EE
     included do
       EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM = 1
 
+      attr_accessor :terms_of_service_opted_in, :privacy_policy_opted_in
+
       # We aren't using the `auditor?` method for the `if` condition here
       # because `auditor?` returns `false` when the `auditor` column is `true`
       # and the auditor add-on absent. We want to run this validation
