@@ -1,0 +1,9 @@
+.form-group
+  = f.check_box :terms_of_service_opted_in
+  - terms_of_service_link = link_to 'terms of service', 'https://about.gitlab.com/terms/#gitlab_com', target: '_blank'
+  = f.label :terms_of_service_opted_in, "I've read and accept GitLab's %{terms_of_service_link}.".html_safe % { terms_of_service_link: terms_of_service_link }, required: true
+
+.form-group
+  = f.check_box :privacy_policy_opted_in
+  - privacy_policy_link = link_to 'privacy policy', 'https://about.gitlab.com/privacy/', target: '_blank'
+  = f.label :privacy_policy_opted_in, "I've read and accept GitLab's %{privacy_policy_link}.".html_safe % { privacy_policy_link: privacy_policy_link }, required: true

@@ -18,6 +18,9 @@ module EE
       validate :auditor_requires_license_add_on, if: :auditor
       validate :cannot_be_admin_and_auditor
 
+      validates :terms_of_service_opted_in, acceptance: true
+      validates :privacy_policy_opted_in, acceptance: true
+
       delegate :shared_runners_minutes_limit, :shared_runners_minutes_limit=,
                to: :namespace
 

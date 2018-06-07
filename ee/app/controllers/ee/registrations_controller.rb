@@ -5,7 +5,7 @@ module EE
     private
 
     def sign_up_params
-      clean_params = params.require(:user).permit(:username, :email, :email_confirmation, :name, :password, :email_opted_in)
+      clean_params = params.require(:user).permit(:username, :email, :email_confirmation, :name, :password, :email_opted_in, :terms_of_service_opted_in, :privacy_policy_opted_in)
 
       if clean_params[:email_opted_in] == '1'
         clean_params[:email_opted_in_ip] = request.remote_ip
