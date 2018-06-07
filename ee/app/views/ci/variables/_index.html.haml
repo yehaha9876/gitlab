@@ -1,7 +1,8 @@
 - save_endpoint = local_assigns.fetch(:save_endpoint, nil)
+- scope_docs_link = help_page_path('ci/variables/README.html', anchor: 'limiting-environment-scopes-of-variables')
 
 .row
-  .col-lg-12.js-ci-variable-list-section{ data: { save_endpoint: save_endpoint } }
+  .col-lg-12.js-ci-variable-list-section{ data: { save_endpoint: save_endpoint, scope_docs_link: scope_docs_link } }
     .hide.alert.alert-danger.js-ci-variable-error-box
 
     .table-holder.ci-variable-list

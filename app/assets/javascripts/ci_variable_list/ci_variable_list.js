@@ -5,8 +5,7 @@ import setupToggleButtons from '../toggle_buttons';
 import SecretValues from '../behaviors/secret_values';
 
 const ALL_ENVIRONMENTS_STRING = s__('CiVariable|All environments');
-const SCOPE_DOC_LINK = `https://docs.gitlab.com/ee/ci/variables/README.html#
-limiting-environment-scopes-of-variables`;
+const SCOPE_DOC_LINK = $('.js-ci-variable-list-section').data('scopeDocsLink');
 
 function createEnvironmentItem(value) {
   return {
