@@ -5,8 +5,8 @@ import setupToggleButtons from '../toggle_buttons';
 import SecretValues from '../behaviors/secret_values';
 
 const ALL_ENVIRONMENTS_STRING = s__('CiVariable|All environments');
-const SCOPE_DOC_LINK = `https://docs.gitlab.com/ee/ci/variables/README.html
-#limiting-environment-scopes-of-secret-variables`;
+const SCOPE_DOC_LINK = `https://docs.gitlab.com/ee/ci/variables/README.html#
+limiting-environment-scopes-of-variables`;
 
 function createEnvironmentItem(value) {
   return {
@@ -111,20 +111,21 @@ export default class VariableList {
 
       $(dropdownTrigger).select2({
         data: () => ({
-          results: [{
-            id: 0,
-            locked: true,
-            disabled: true,
-            text: '',
-          },
-            ...this.getEnvironmentValues()],
+          results: [
+            {
+              id: 0,
+              locked: true,
+              disabled: true,
+              text: '',
+            },
+            ...this.getEnvironmentValues(),
+          ],
         }),
-        // multiple: true,
         allowClear: true,
         formatResult: result => {
           if (result.id === 0) {
-            return `<span class="ci-variable-environment-scope-help-text">
-            Enter scope (wildcards allowed) or select a past value. <a href="${SCOPE_DOC_LINK}">Learn more</a></span>`;
+            return `<span class="ci-variable-environment-help-text">
+            Enter scope (wildcards allowed) or select a past value. <a target="_blank" rel="noopener noreferrer" href="${SCOPE_DOC_LINK}">Learn more</a></span>`;
           }
 
           return result.text;
@@ -138,8 +139,14 @@ export default class VariableList {
       });
 
       $(dropdownTrigger).on('select2-selecting', e => {
-        $(dropdownTrigger).select2('val', e.choice.text.replace(/"/g, ''));
+        e.choice.text = e.choice.text.replace(/"/g, '');
+        $(dropdownTrigger).select2('val', e.choice.text);
         $(dropdownTrigger).val(e.choice.id);
+      });
+
+      // Remove select2 mouse trap
+      $(dropdownTrigger).on('select2-open', () => {
+        $('#select2-drop').off('click');
       });
 
       this.environmentDropdownMap.set($row[0], $(dropdownTrigger));
