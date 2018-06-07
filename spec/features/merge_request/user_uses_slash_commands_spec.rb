@@ -221,6 +221,11 @@ describe 'Merge request > User uses quick actions', :js do
     end
 
     describe 'adding a weight from a note' do
+      before do
+        sign_in(user)
+        visit project_merge_request_path(project, merge_request)
+      end
+
       it 'does not recognize the command nor create a note' do
         add_note("/weight 5")
 
