@@ -12,15 +12,6 @@ class UtilityOptionParser
   def self.parse(argv)
     options = { remove: false }
 
-    if File.exist?('../config/environment.rb')
-      options[:rails_root] = '..'
-    elsif File.exist?('./config/environment.rb')
-      options[:rails_root] = '.'
-    else
-      puts "This utility must be run from with the Rails application directory"
-      exit
-    end
-
     op = OptionParser.new
     op.banner = 'GitLab Geo: Remove previous old-style temporary repository directories from a Geo secondary'
     op.separator ''
@@ -142,7 +133,7 @@ if $0 == __FILE__
 
   # We load rails environment / initializers only here to get faster command line startup when `--help` and `--version`
   puts "Loading Rails..."
-  require File.join(options[:rails_root], 'config', 'environment')
+  require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'config', 'environment')
 
   list_shards if options[:list_shards]
 
