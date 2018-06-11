@@ -160,6 +160,10 @@ table {
   }
 }
 
+.input-group-prepend svg.active {
+  border: 0 !important;
+}
+
 // Polyfill deprecated selectors
 
 .hidden {
