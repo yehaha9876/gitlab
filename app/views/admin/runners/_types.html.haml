@@ -1,0 +1,13 @@
+- active_runner_type = params[:runner_type].presence
+
+- toggle_text = 'Type'
+- if active_runner_type
+  = hidden_field_tag :runner_type, params[:runner_type]
+  - toggle_text = params[:runner_type].titleize
+
+= dropdown_tag(toggle_text, options: { wrapper_class: 'dropdown-menu-selectable', title: 'Types' }) do
+  %ul
+    %li= link_to 'Any Type', admin_runners_path(safe_params.slice(:search)), class: ('is-active' unless active_runner_type)
+    %li.divider
+    - Ci::Runner::AVAILABLE_TYPES.each do |runner_type|
+      %li= link_to runner_type.titleize, admin_runners_path(safe_params.slice(:search).merge(runner_type: runner_type)), class: ('is-active' if active_runner_type == runner_type)
