@@ -3,6 +3,7 @@
 import $ from 'jquery';
 import 'vendor/jasmine-jquery';
 import '~/commons';
+import '~/behaviors';
 import Vue from 'vue';
 import VueResource from 'vue-resource';
 import Translate from '~/vue_shared/translate';

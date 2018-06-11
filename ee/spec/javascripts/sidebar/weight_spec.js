@@ -9,7 +9,7 @@ const DEFAULT_PROPS = {
   weightNoneValue: 'No Weight',
 };
 
-describe('Weight', function () {
+describe('Weight', function() {
   let vm;
   let Weight;
 
@@ -51,9 +51,13 @@ describe('Weight', function () {
       weight: WEIGHT,
     });
 
-    expect(vm.$el.querySelector('.js-weight-collapsed-weight-label').textContent.trim()).toEqual(`${WEIGHT}`);
+    expect(vm.$el.querySelector('.js-weight-collapsed-weight-label').textContent.trim()).toEqual(
+      `${WEIGHT}`,
+    );
     expect(vm.$el.querySelector('.js-weight-weight-label').textContent.trim()).toEqual(`${WEIGHT}`);
-    expect(vm.$el.querySelector('.js-weight-dropdown-toggle-text').textContent.trim()).toEqual(`${WEIGHT}`);
+    expect(vm.$el.querySelector('.js-weight-dropdown-toggle-text').textContent.trim()).toEqual(
+      `${WEIGHT}`,
+    );
   });
 
   it('shows weight no-value', () => {
@@ -64,20 +68,25 @@ describe('Weight', function () {
       weight: WEIGHT,
     });
 
-    expect(vm.$el.querySelector('.js-weight-collapsed-weight-label').textContent.trim()).toEqual('No');
+    expect(vm.$el.querySelector('.js-weight-collapsed-weight-label').textContent.trim()).toEqual(
+      'No',
+    );
     expect(vm.$el.querySelector('.js-weight-weight-label').textContent.trim()).toEqual('None');
     // Put a placeholder in the dropdown toggle
-    expect(vm.$el.querySelector('.js-weight-dropdown-toggle-text').textContent.trim()).toEqual('Weight');
+    expect(vm.$el.querySelector('.js-weight-dropdown-toggle-text').textContent.trim()).toEqual(
+      'Weight',
+    );
   });
 
-  it('adds `collapse-after-update` class when clicking the collapsed block', (done) => {
+  it('adds `collapse-after-update` class when clicking the collapsed block', done => {
     vm = mountComponent(Weight, {
       ...DEFAULT_PROPS,
     });
 
     vm.$el.querySelector('.js-weight-collapsed-block').click();
 
-    vm.$nextTick()
+    vm
+      .$nextTick()
       .then(() => {
         expect(vm.$el.classList.contains('collapse-after-update')).toEqual(true);
       })
@@ -85,7 +94,7 @@ describe('Weight', function () {
       .catch(done.fail);
   });
 
-  it('shows dropdown on "Edit" link click', (done) => {
+  it('shows dropdown on "Edit" link click', done => {
     vm = mountComponent(Weight, {
       ...DEFAULT_PROPS,
       editable: true,
@@ -95,7 +104,8 @@ describe('Weight', function () {
 
     vm.$el.querySelector('.js-weight-edit-link').click();
 
-    vm.$nextTick()
+    vm
+      .$nextTick()
       .then(() => {
         expect(vm.shouldShowDropdown).toEqual(true);
       })
@@ -103,7 +113,7 @@ describe('Weight', function () {
       .catch(done.fail);
   });
 
-  it('emits event on dropdown item click', (done) => {
+  it('emits event on dropdown item click', done => {
     const ID = 123;
     spyOn(eventHub, '$emit');
     vm = mountComponent(Weight, {
@@ -114,13 +124,18 @@ describe('Weight', function () {
 
     vm.$el.querySelector('.js-weight-edit-link').click();
 
-    vm.$nextTick()
+    vm
+      .$nextTick()
       .then(() => getSetTimeoutPromise())
       .then(() => {
         vm.$el.querySelector('.js-weight-dropdown-content li:nth-child(2) a').click();
       })
       .then(() => {
-        expect(eventHub.$emit).toHaveBeenCalledWith('updateWeight', DEFAULT_PROPS.weightOptions[1], ID);
+        expect(eventHub.$emit).toHaveBeenCalledWith(
+          'updateWeight',
+          DEFAULT_PROPS.weightOptions[1],
+          ID,
+        );
       })
       .then(done)
       .catch(done.fail);
