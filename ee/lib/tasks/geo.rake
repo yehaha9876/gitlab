@@ -55,6 +55,11 @@ namespace :geo do
       Gitlab::Geo::DatabaseTasks.load_seed
     end
 
+    desc 'Remove orphaned entries'
+    task clean: [:environment] do
+      Gitlab::Geo::GeoTasks.clean_registry!
+    end
+
     desc 'Refresh Foreign Tables definition in Geo Secondary node'
     task refresh_foreign_tables: [:environment] do
       if Gitlab::Geo::GeoTasks.foreign_server_configured?

@@ -60,6 +60,39 @@ module Gitlab
           ActiveRecord::Base.connection.execute(sql).first.fetch('count').to_i == 1
         end
       end
+
+      def clean_registry!
+        if Gitlab::Geo.secondary?
+          $stdout.puts "This operation can only be performed on a Geo secondary node."
+          exit 1
+        end
+
+        clean_orphaned_project_registry!
+      end
+
+      def clean_orphaned_project_registry!
+        registry_projects = ::Geo::ProjectRegistry.pluck(:project_id)
+        project_ids = ::Project.pluck(:id)
+        should_not_be_present = registry_projects - project_ids
+        count = should_not_be_present.count
+
+        $stdout.puts "There are #{count} orphaned #{'project'.pluralize(count)} in the Geo tracking database."
+
+        return unless should_not_be_present.count > 0
+
+        $stdout.puts "Here is the list of orphaned project IDs:"
+        $stdout.puts should_not_be_present
+        $stdout.puts "The current database replication lag is #{Gitlab::Geo::HealthCheck.db_replication_lag_seconds.to_i} seconds. You should only perform this task if the lag is less than 60 seconds."
+        $stdout.print "Are you sure you want to delete these orphans? Enter 'delete' to confirm: "
+
+        return unless prompt == 'delete'
+
+        ::Geo::ProjectRegistry.where(project_id: should_not_be_present).delete_all
+      end
+
+      def prompt
+        STDIN.gets.chomp
+      end
     end
   end
 end

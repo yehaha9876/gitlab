@@ -226,5 +226,14 @@ to start again from scratch, there are a few steps that can help you:
     gitlab-ctl start
     ```
 
+#### In the Geo Admin page, why do I see project sync percentages above 100%?
+
+Most likely the issue is that there are orphaned entries in the Geo tracking database
+that need to be removed. This can be done by running the following on a Geo secondary node:
+
+    ```
+    gitlab-rake geo:db:clean
+    ```
+
 [database-start-replication]: database.md#step-3-initiate-the-replication-process
 [database-pg-replication]: database.md#postgresql-replication
