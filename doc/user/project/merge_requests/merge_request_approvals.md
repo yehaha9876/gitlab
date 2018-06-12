@@ -5,6 +5,8 @@
 ## Overview
 
 Merge request approvals enable enforced code review by requiring specified people to approve a merge request before it can be unblocked for merging.
+Per default the required approvals are set to zero, which means that they are not required in order to merge a merge request,
+but allow [*eligible approvers*][approvers] to express their approval.
 
 ## Use cases
 
@@ -13,35 +15,36 @@ Merge request approvals enable enforced code review by requiring specified peopl
 3. Specifying reviewers for a given proposed code change.
 4. Specifying categories of reviewers, such as BE, FE, QA, DB, etc., for all proposed code changes.
 
-## Editing approvals
+## Enforce merge request approvals
 
-To edit the merge request approvals:
+As described in the overview, merge request approvals are optional per default;
+to make merge request approvals a requirement for a certain project:
 
-1. Navigate to your project's **Settings > General** and expand the
-   **Merge requests settings**
-1. Tick the "Merge requests approvals" checkbox
-1. Search for users or groups that will be [eligible to approve](#eligible-approvers)
-   merge requests and click the **Add** button to add them as approvers
-1. Set the minimum number of required approvals under the "Approvals required"
-   box. Note: the minimum can be 0. 
-1. Click **Save changes**
+1.  Navigate to your project's **Settings > General** and expand the **Merge requests settings**
+1.  Search for users or groups that will be [explicit approvers][approvers] for
+    merge requests and click the **Add** button to add them as approvers
+1.  Set the minimum number of required approvals in the "Approvals required" field.
+    Note: The required approvals can be set to zero, making approvals optional.
+1.  Click **Save changes**
 
     ![Approvals config project](img/approvals_config_project.png)
 
-The steps above are the minimum required to get approvals working in your
-merge requests, but there are a couple more options available that might be
-suitable to your workflow:
+There are a couple more options available that might be suitable to your workflow:
 
 - Choose whether the default settings can be
   [overridden per merge request](#overriding-the-merge-request-approvals-default-settings)
 - Choose whether [approvals will be reset with new pushed commits](#resetting-approvals-on-push)
 
 NOTE: **Note:**
-If the approvers are changed via the project's settings after a merge request
-is created, the merge request retains the previous approvers, but you can always
-change them by [editing the merge request](#overriding-the-merge-request-approvals-default-settings).
+Approval settings are copied to a merge request on creation.
+If the project approval settings are changed after a merge request is created,
+the merge request retains it's previous settings, but you may adjust them by
+[editing the merge request](#overriding-the-merge-request-approvals-default-settings).
 
-## Eligible approvers
+## Explicit and eligible approvers
+
+NOTE: **Note:**
+The merge request author is not allowed to approve their own merge request.
 
 An individual user is an eligible approver if they are a member of the given project,
 a member of the project's immediate parent group, or a member of a group that has share access
@@ -69,9 +72,9 @@ union of the default approvers and the extra approvers set in the merge request.
 
 ## Adding or removing an approval
 
-If approvals are activated for the given project, when a user visits an open
-merge request, depending on their [eligibility](#eligible-approvers), one of
-the following is possible:
+When a user visits an open merge request,
+depending on their [eligibility](#eligible-approvers),
+one of the following is possible:
 
 - **They are not an eligible approver**: They cannot do anything with respect
   to approving this merge request.
@@ -84,14 +87,9 @@ the following is possible:
     approve it by clicking the displayed **Add approval** button.
       ![Add approval](img/approve_additionally.png)
 
-    ---
-
 - **They have already approved this merge request**: They can remove their approval.
 
     ![Remove approval](img/remove_approval.png)
-
-NOTE: **Note:**
-The merge request author is not allowed to approve their own merge request.
 
 For the given merge request, if the required number of approvals has been met
 (i.e., the number of approvals given to the merge request is greater or equal
@@ -136,13 +134,8 @@ The default approval settings can now be overridden when creating a
    in the "Approvals required" box
 1. Click **Save changes**
 
-There are however some restrictions:
-
-- The amount of required approvals, if changed, must be greater than the default
-  set at the project level. This ensures that you're not forced to adjust settings
-  when someone is unavailable for approval, yet the process is still enforced.
-- The number of Approvers must be greater or equal to the as the minimum required
-  approvals as set in the default settings.
+There is a restriction however:
+The number of required approvals must be greater or equal to the number of required approvals in the project settings.
 
 NOTE: **Note:**
 If you are contributing to a forked project, things are a little different.
@@ -164,13 +157,12 @@ new commits are pushed to the source branch of the merge request:
 
 1. Click **Save changes**
 
-NOTE: **Note:**
-Approvals do not get reset when [rebasing a merge request](fast_forward_merge.md)
-from the UI.
-However, approvals will be reset if the target branch is changed.
-
 If you want approvals to persist, independent of changes to the merge request,
-turn this setting to off by unchecking the box and saving the changes.
+turn this setting off by unchecking the box and saving the changes.
+
+NOTE: **Note:**
+Approvals do not get reset when [rebasing a merge request](fast_forward_merge.md) from the UI.
+However, approvals will be reset if the target branch is changed.
 
 ## Merge requests with different source branch and target branch projects
 
@@ -182,3 +174,5 @@ branch's project, the relevant settings are the target project's. The source
 branch's project settings are not applicable. Even if you start the merge
 request from the source branch's project UI, pay attention to the created merge
 request itself. It belongs to the target branch's project.
+
+[approvers]: #explicit-and-eligible-approvers
