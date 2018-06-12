@@ -6,9 +6,9 @@
       .row
         .blank-state-welcome
           %h2.blank-state-welcome-title
-            Welcome to GitLab
+            = _('Welcome to GitLab')
           %p.blank-state-text
-            Code, test, and deploy together
+            = _('Code, test, and deploy together')
         .blank-state-row
           %div{ class: ('column-large' if admin_without_ee_license) }
             - if current_user.admin?

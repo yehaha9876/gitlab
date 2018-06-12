@@ -1,8 +1,8 @@
 - @hide_top_links = true
 - @no_container = true
-- breadcrumb_title "Projects"
-- page_title "Starred Projects"
-- header_title "Projects", dashboard_projects_path
+- breadcrumb_title _("Projects")
+- page_title _("Starred Projects")
+- header_title _("Projects"), dashboard_projects_path
 
 %div{ class: container_class }
   = render "projects/last_push"
@@ -11,5 +11,5 @@
   - if params[:filter_projects] || any_projects?(@projects)
     = render 'projects'
   - else
-    %h3.page-title You don't have starred projects yet
-    %p.slead Visit project page and press on star icon and it will appear on this page.
+    %h3.page-title= _("You don't have starred projects yet")
+    %p.slead= _("Visit project page and press on star icon and it will appear on this page.")

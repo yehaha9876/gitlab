@@ -8,18 +8,18 @@
           = custom_icon("add_new_project", size: 50)
         .blank-state-body
           %h3.blank-state-title
-            Create a project
+            = _('Create a project')
           %p.blank-state-text
-            Projects are where you store your code, access issues, wiki and other features of GitLab.
+            = _("Projects are where you store your code, access issues, wiki and other features of GitLab.")
   - else
     .blank-state
       .blank-state-icon
         = custom_icon("add_new_project", size: 50)
       .blank-state-body
         %h3.blank-state-title
-          Create a project
+          = _('Create a project')
         %p.blank-state-text
-          If you are added to a project, it will be displayed here.
+          = _('If you are added to a project, it will be displayed here.')
 
   - if current_user.can_create_group?
     = link_to new_group_path, class: "blank-state-link" do
@@ -28,9 +28,9 @@
           = custom_icon("add_new_group", size: 50)
         .blank-state-body
           %h3.blank-state-title
-            Create a group
+            = _('Create a group')
           %p.blank-state-text
-            Groups are the best way to manage projects and members.
+            = _("Groups are the best way to manage projects and members.")
 
   - if public_project_count > 0
     = link_to trending_explore_projects_path, class: "blank-state-link" do
@@ -39,13 +39,9 @@
           = custom_icon("globe", size: 50)
         .blank-state-body
           %h3.blank-state-title
-            Explore public projects
+            = _('Explore public projects')
           %p.blank-state-text
-            There are
-            = number_with_delimiter(public_project_count)
-            public projects on this server.
-            Public projects are an easy way to allow
-            everyone to have read-only access.
+            = _("There are %{project_count} public projects on this server. Public projects are an easy way to allow everyone to have read-only access.") % { project_count: number_with_delimiter(public_project_count) }
 
   = link_to "https://docs.gitlab.com/", class: "blank-state-link" do
     .blank-state
@@ -53,6 +49,6 @@
         = custom_icon("lightbulb", size: 50)
       .blank-state-body
         %h3.blank-state-title
-          Learn more about GitLab
+          = _('Learn more about GitLab')
         %p.blank-state-text
-          Take a look at the documentation to discover all of GitLab's capabilities.
+          = _("Take a look at the documentation to discover all of GitLab's capabilities.")

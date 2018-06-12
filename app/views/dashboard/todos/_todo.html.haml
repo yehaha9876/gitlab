@@ -11,7 +11,7 @@
           - if todo.author
             = link_to_author(todo, self_added: todo.self_added?)
           - else
-            (removed)
+            = _("(removed)")
 
       .title-item.action-name
         = todo_action_name(todo)
@@ -20,11 +20,11 @@
         - if todo.target
           = todo_target_link(todo)
         - else
-          (removed)
+          = _("(removed)")
 
       - if todo.self_assigned?
         .title-item.action-name
-          to yourself
+          = _("to yourself")
 
       .title-item
         &middot;
@@ -41,13 +41,13 @@
   - if todo.pending?
     .todo-actions
       = link_to dashboard_todo_path(todo), method: :delete, class: 'btn btn-loading js-done-todo', data: { href: dashboard_todo_path(todo) } do
-        Done
+        = _("Done")
         = icon('spinner spin')
       = link_to restore_dashboard_todo_path(todo), method: :patch, class: 'btn btn-loading js-undo-todo hidden', data: { href: restore_dashboard_todo_path(todo) } do
-        Undo
+        = _("Undo")
         = icon('spinner spin')
   - else
     .todo-actions
       = link_to restore_dashboard_todo_path(todo), method: :patch, class: 'btn btn-loading js-add-todo', data: { href: restore_dashboard_todo_path(todo) } do
-        Add todo
+        = _("Add todo")
         = icon('spinner spin')

@@ -2,10 +2,10 @@
 - @no_container = true
 
 = content_for :meta_tags do
-  = auto_discovery_link_tag(:atom, dashboard_projects_url(rss_url_options), title: "All activity")
+  = auto_discovery_link_tag(:atom, dashboard_projects_url(rss_url_options), title: _("All activity"))
 
-- page_title    "Activity"
-- header_title  "Activity", activity_dashboard_path
+- page_title    _("Activity")
+- header_title  _("Activity"), activity_dashboard_path
 
 %div{ class: container_class }
   = render "projects/last_push"

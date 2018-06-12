@@ -8,7 +8,7 @@
   = render 'shared/issuable/nav', type: :issues, display_count: !@no_filters_set
   .nav-controls
     = render 'shared/issuable/feed_buttons'
-    = render 'shared/new_project_item_select', path: 'issues/new', label: "New issue", with_feature_enabled: 'issues', type: :issues
+    = render 'shared/new_project_item_select', path: 'issues/new', label: _("New issue"), with_feature_enabled: 'issues', type: :issues
 
 = render 'shared/issuable/filter', type: :issues
 
