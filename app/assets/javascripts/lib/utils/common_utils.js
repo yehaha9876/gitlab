@@ -57,7 +57,8 @@ export const rstrip = val => {
   return val;
 };
 
-export const updateTooltipTitle = ($tooltipEl, newTitle) => $tooltipEl.attr('title', newTitle).tooltip('_fixTitle');
+export const updateTooltipTitle = ($tooltipEl, newTitle) =>
+  $tooltipEl.attr('title', newTitle).tooltip('_fixTitle');
 
 export const disableButtonIfEmptyField = (fieldSelector, buttonSelector, eventName = 'input') => {
   const field = $(fieldSelector);
@@ -327,7 +328,7 @@ export const objectToQueryString = (params = {}) =>
     .join('&');
 
 export const buildUrlWithCurrentLocation = param =>
-  (param ? `${window.location.pathname}${param}` : window.location.pathname);
+  param ? `${window.location.pathname}${param}` : window.location.pathname;
 
 /**
  * Based on the current location and the string parameters provided
@@ -400,13 +401,10 @@ export const backOff = (fn, timeout = 60000) => {
   });
 };
 
-<<<<<<< HEAD
-export const setFavicon = faviconPath => {
-=======
 export const createOverlayIcon = (iconPath, overlayPath) => {
   const faviconImage = document.createElement('img');
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     faviconImage.onload = () => {
       const size = 32;
 
@@ -417,13 +415,29 @@ export const createOverlayIcon = (iconPath, overlayPath) => {
       const context = canvas.getContext('2d');
       context.clearRect(0, 0, size, size);
       context.drawImage(
-        faviconImage, 0, 0, faviconImage.width, faviconImage.height, 0, 0, size, size,
+        faviconImage,
+        0,
+        0,
+        faviconImage.width,
+        faviconImage.height,
+        0,
+        0,
+        size,
+        size,
       );
 
       const overlayImage = document.createElement('img');
       overlayImage.onload = () => {
         context.drawImage(
-          overlayImage, 0, 0, overlayImage.width, overlayImage.height, 0, 0, size, size,
+          overlayImage,
+          0,
+          0,
+          overlayImage.width,
+          overlayImage.height,
+          0,
+          0,
+          size,
+          size,
         );
 
         const faviconWithOverlayUrl = canvas.toDataURL();
@@ -436,18 +450,21 @@ export const createOverlayIcon = (iconPath, overlayPath) => {
   });
 };
 
-export const setFaviconOverlay = (overlayPath) => {
+export const setFaviconOverlay = overlayPath => {
   const faviconEl = document.getElementById('favicon');
 
-  if (!faviconEl) { return null; }
+  if (!faviconEl) {
+    return null;
+  }
 
   const iconPath = faviconEl.getAttribute('data-original-href');
 
-  return createOverlayIcon(iconPath, overlayPath).then(faviconWithOverlayUrl => faviconEl.setAttribute('href', faviconWithOverlayUrl));
+  return createOverlayIcon(iconPath, overlayPath).then(faviconWithOverlayUrl =>
+    faviconEl.setAttribute('href', faviconWithOverlayUrl),
+  );
 };
 
-export const setFavicon = (faviconPath) => {
->>>>>>> master
+export const setFavicon = faviconPath => {
   const faviconEl = document.getElementById('favicon');
   if (faviconEl && faviconPath) {
     faviconEl.setAttribute('href', faviconPath);
