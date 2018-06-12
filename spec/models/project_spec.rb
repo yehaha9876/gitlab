@@ -265,18 +265,25 @@ describe Project do
       expect(project2.import_data).to be_nil
     end
 
-    it "does not allow blocked import_url localhost" do
+    it "does not allow import_url pointing to localhost" do
       project2 = build(:project, import_url: 'http://localhost:9000/t.git')
 
       expect(project2).to be_invalid
       expect(project2.errors[:import_url].first).to include('Requests to localhost are not allowed')
     end
 
-    it "does not allow blocked import_url port" do
+    it "does not allow import_url with invalid ports" do
       project2 = build(:project, import_url: 'http://github.com:25/t.git')
 
       expect(project2).to be_invalid
       expect(project2.errors[:import_url].first).to include('Only allowed ports are 22, 80, 443')
+    end
+
+    it "does not allow import_url with invalid user" do
+      project2 = build(:project, import_url: 'http://$user:password@github.com/t.git')
+
+      expect(project2).to be_invalid
+      expect(project2.errors[:import_url].first).to include('Username needs to start with an alphanumeric character')
     end
 
     it 'creates import state when mirror gets enabled' do
@@ -1089,7 +1096,7 @@ describe Project do
 
     it 'is false if avatar is html page' do
       project.update_attribute(:avatar, 'uploads/avatar.html')
-      expect(project.avatar_type).to eq(['file format is not supported. Please try one of the following supported formats: png, jpg, jpeg, gif, bmp, tiff'])
+      expect(project.avatar_type).to eq(['file format is not supported. Please try one of the following supported formats: png, jpg, jpeg, gif, bmp, tiff, ico'])
     end
   end
 
@@ -1841,6 +1848,31 @@ describe Project do
       project.update!(ci_config_path: "f\0oo/\0/.gitlab_ci.yml")
 
       expect(project.ci_config_path).to eq('foo//.gitlab_ci.yml')
+    end
+  end
+
+  describe '#human_import_status_name' do
+    context 'when import_state exists' do
+      it 'returns the humanized status name' do
+        project = create(:project)
+        create(:import_state, :started, project: project)
+
+        expect(project.human_import_status_name).to eq("started")
+      end
+    end
+
+    context 'when import_state was not created yet' do
+      let(:project) { create(:project, :import_started) }
+
+      it 'ensures import_state is created and returns humanized status name' do
+        expect do
+          project.human_import_status_name
+        end.to change { ProjectImportState.count }.from(0).to(1)
+      end
+
+      it 'returns humanized status name' do
+        expect(project.human_import_status_name).to eq("started")
+      end
     end
   end
 
