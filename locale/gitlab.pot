@@ -8,13 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2018-06-06 20:50+0200\n"
-"PO-Revision-Date: 2018-06-06 20:50+0200\n"
-=======
-"POT-Creation-Date: 2018-06-08 18:27+0200\n"
-"PO-Revision-Date: 2018-06-08 18:27+0200\n"
->>>>>>> master
+"POT-Creation-Date: 2018-06-12 10:39+0200\n"
+"PO-Revision-Date: 2018-06-12 10:39+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -1016,15 +1011,9 @@ msgstr ""
 msgid "CICD|The Auto DevOps pipeline configuration will be used when there is no %{ci_file} in the project."
 msgstr ""
 
-<<<<<<< HEAD
-=======
 msgid "CICD|You need to specify a domain if you want to use Auto Review Apps and Auto Deploy stages."
 msgstr ""
 
-msgid "Can run untagged jobs"
-msgstr ""
-
->>>>>>> master
 msgid "Cancel"
 msgstr ""
 
@@ -1953,9 +1942,6 @@ msgstr ""
 msgid "Creating epic"
 msgstr ""
 
-msgid "Created by me"
-msgstr ""
-
 msgid "Cron Timezone"
 msgstr ""
 
@@ -2160,9 +2146,6 @@ msgid "Deprioritize label"
 msgstr ""
 
 msgid "Descending"
-msgstr ""
-
-msgid "Deprioritize label"
 msgstr ""
 
 msgid "Description"
@@ -3678,9 +3661,6 @@ msgstr ""
 msgid "No messages were logged"
 msgstr ""
 
-msgid "No messages were logged"
-msgstr ""
-
 msgid "No repository"
 msgstr ""
 
@@ -3850,9 +3830,6 @@ msgid "Other Labels"
 msgstr ""
 
 msgid "Other information"
-msgstr ""
-
-msgid "Other Labels"
 msgstr ""
 
 msgid "Otherwise it is recommended you start with one of the options below."
@@ -4811,15 +4788,12 @@ msgstr ""
 msgid "Show complete raw log"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Show latest version"
 msgstr ""
 
 msgid "Show latest version of the diff"
 msgstr ""
 
-=======
->>>>>>> master
 msgid "Show parent pages"
 msgstr ""
 
@@ -4885,11 +4859,10 @@ msgstr ""
 msgid "Something went wrong when toggling the button"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Something went wrong while closing the %{issuable}. Please try again later"
-=======
+msgstr ""
+
 msgid "Something went wrong while fetching assignees list"
->>>>>>> master
 msgstr ""
 
 msgid "Something went wrong while fetching group member contributions"
@@ -5222,9 +5195,6 @@ msgid "Thanks! Don't show me this again"
 msgstr ""
 
 msgid "The Advanced Global Search in GitLab is a powerful search service that saves you time. Instead of creating duplicate code and wasting time, you can now search for code within other teams that can help your own project."
-msgstr ""
-
-msgid "Terms of Service and Privacy Policy"
 msgstr ""
 
 msgid "The Issue Tracker is the place to add things that need to be improved or solved in a project"
@@ -6123,9 +6093,6 @@ msgid "You do not have any assigned merge requests"
 msgstr ""
 
 msgid "You do not have the correct permissions to override the settings from the LDAP group sync."
-msgstr ""
-
-msgid "You do not have any assigned merge requests"
 msgstr ""
 
 msgid "You have no permissions"
