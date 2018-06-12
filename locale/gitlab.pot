@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-08 18:27+0200\n"
-"PO-Revision-Date: 2018-06-08 18:27+0200\n"
+"POT-Creation-Date: 2018-06-12 19:53+0200\n"
+"PO-Revision-Date: 2018-06-12 19:53+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -1925,9 +1925,6 @@ msgstr ""
 msgid "Creating epic"
 msgstr ""
 
-msgid "Created by me"
-msgstr ""
-
 msgid "Cron Timezone"
 msgstr ""
 
@@ -2132,9 +2129,6 @@ msgid "Deprioritize label"
 msgstr ""
 
 msgid "Descending"
-msgstr ""
-
-msgid "Deprioritize label"
 msgstr ""
 
 msgid "Description"
@@ -2814,10 +2808,10 @@ msgstr ""
 msgid "Gitaly"
 msgstr ""
 
-msgid "Gitaly|Address"
+msgid "Gitaly Servers"
 msgstr ""
 
-msgid "Gitaly Servers"
+msgid "Gitaly|Address"
 msgstr ""
 
 msgid "Go Back"
@@ -3795,9 +3789,6 @@ msgid "Other Labels"
 msgstr ""
 
 msgid "Other information"
-msgstr ""
-
-msgid "Other Labels"
 msgstr ""
 
 msgid "Otherwise it is recommended you start with one of the options below."
@@ -5135,9 +5126,6 @@ msgstr ""
 msgid "The Advanced Global Search in GitLab is a powerful search service that saves you time. Instead of creating duplicate code and wasting time, you can now search for code within other teams that can help your own project."
 msgstr ""
 
-msgid "Terms of Service and Privacy Policy"
-msgstr ""
-
 msgid "The Issue Tracker is the place to add things that need to be improved or solved in a project"
 msgstr ""
 
@@ -5619,6 +5607,9 @@ msgstr ""
 msgid "Turn on Service Desk"
 msgstr ""
 
+msgid "URL"
+msgstr ""
+
 msgid "Unable to load the diff. %{button_try_again}"
 msgstr ""
 
@@ -5722,6 +5713,12 @@ msgid "Used by members to sign in to your group in GitLab"
 msgstr ""
 
 msgid "User and IP Rate Limits"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "Username or URL"
 msgstr ""
 
 msgid "Variables"
@@ -6027,9 +6024,6 @@ msgstr ""
 msgid "You do not have the correct permissions to override the settings from the LDAP group sync."
 msgstr ""
 
-msgid "You do not have any assigned merge requests"
-msgstr ""
-
 msgid "You have no permissions"
 msgstr ""
 
@@ -6185,6 +6179,9 @@ msgstr ""
 msgid "ciReport|Confidence"
 msgstr ""
 
+msgid "ciReport|Container scanning detected"
+msgstr ""
+
 msgid "ciReport|Container scanning detects known vulnerabilities in your docker images."
 msgstr ""
 
@@ -6192,6 +6189,9 @@ msgid "ciReport|Container scanning is loading"
 msgstr ""
 
 msgid "ciReport|Container scanning resulted in error while loading results"
+msgstr ""
+
+msgid "ciReport|DAST detected"
 msgstr ""
 
 msgid "ciReport|DAST is loading"
@@ -6308,7 +6308,13 @@ msgstr ""
 msgid "ciReport|There was an error dismissing the vulnerability. Please try again."
 msgstr ""
 
+msgid "ciReport|There was an error loading DAST report"
+msgstr ""
+
 msgid "ciReport|There was an error loading SAST report"
+msgstr ""
+
+msgid "ciReport|There was an error loading container scanning report"
 msgstr ""
 
 msgid "ciReport|There was an error loading dependency scanning report"
