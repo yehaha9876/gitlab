@@ -41,7 +41,7 @@ describe('report link', () => {
   });
 
   describe('with line', () => {
-    it('renders line  number', () => {
+    it('renders line number and links to line number', () => {
       vm = mountComponent(Component, {
         issue: {
           path: 'Gemfile.lock',
@@ -52,11 +52,13 @@ describe('report link', () => {
       });
 
       expect(vm.$el.querySelector('a').textContent.trim()).toContain('Gemfile.lock:22');
+      expect(vm.$el.querySelector('a').getAttribute('href')).toEqual('/Gemfile.lock#L22');
+
     });
   });
 
   describe('without line', () => {
-    it('does not render line  number', () => {
+    it('does not render line number and does not link to line number', () => {
       vm = mountComponent(Component, {
         issue: {
           path: 'Gemfile.lock',

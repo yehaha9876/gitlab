@@ -7,6 +7,11 @@ export default {
       required: true,
     },
   },
+  computed: {
+    issueLink() {
+      return this.issue.line ? `${this.issue.urlPath}#L${this.issue.line}` : this.issue.urlPath;
+    },
+  },
 };
 </script>
 <template>
@@ -15,7 +20,7 @@ export default {
 
     <a
       v-if="issue.urlPath"
-      :href="issue.urlPath"
+      :href="issueLink"
       target="_blank"
       rel="noopener noreferrer nofollow"
       class="break-link"
