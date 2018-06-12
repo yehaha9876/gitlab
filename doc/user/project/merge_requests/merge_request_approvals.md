@@ -76,18 +76,20 @@ When a user visits an open merge request,
 depending on their [eligibility](#eligible-approvers),
 one of the following is possible:
 
-- **They are not an eligible approver**: They cannot do anything with respect
+-   **They are not an eligible approver**: They cannot do anything with respect
   to approving this merge request.
-- **They have not approved this merge request**:
-  - If the required number of approvals has _not_ been yet met, they can approve
-    it by clicking the displayed **Approve** button.
-      ![Approve](img/approve.png)
+-   **They have not approved this merge request**:
+    -   If the required number of approvals has _not_ been yet met,
+        they can approve it by clicking the displayed **Approve** button.
 
-  - If the required number of approvals has already been met, they can still
-    approve it by clicking the displayed **Add approval** button.
-      ![Add approval](img/approve_additionally.png)
+        ![Approve](img/approve.png)
 
-- **They have already approved this merge request**: They can remove their approval.
+    -   If the required number of approvals has already been met,
+        they can still approve it by clicking the displayed **Add approval** button.
+
+        ![Add approval](img/approve_additionally.png)
+
+-   **They have already approved this merge request**: They can remove their approval.
 
     ![Remove approval](img/remove_approval.png)
 
