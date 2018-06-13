@@ -64,12 +64,11 @@ export default function initMrNotes() {
       },
     },
     render(createElement) {
-      return createElement('notes-app', {
+      return this.activeTab === 'show' && createElement('notes-app', {
         props: {
           noteableData: this.noteableData,
           notesData: this.notesData,
           userData: this.currentUserData,
-          shouldShow: this.activeTab === 'show',
         },
       });
     },

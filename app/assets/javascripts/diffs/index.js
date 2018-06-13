@@ -27,11 +27,10 @@ export default function initDiffsApp(store) {
       }),
     },
     render(createElement) {
-      return createElement('diffs-app', {
+      return this.activeTab === 'diffs' && createElement('diffs-app', {
         props: {
           endpoint: this.endpoint,
           currentUser: this.currentUser,
-          shouldShow: this.activeTab === 'diffs',
         },
       });
     },

@@ -26,11 +26,6 @@ export default {
       type: String,
       required: true,
     },
-    shouldShow: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
     currentUser: {
       type: Object,
       required: true,
@@ -89,9 +84,6 @@ export default {
     diffViewType() {
       this.adjustView();
     },
-    shouldShow() {
-      this.adjustView();
-    },
   },
   mounted() {
     this.setEndpoint(this.endpoint);
@@ -115,7 +107,7 @@ export default {
       }
     },
     adjustView() {
-      if (this.shouldShow && this.isParallelView) {
+      if (this.isParallelView) {
         window.mrTabs.expandViewContainer();
       } else {
         window.mrTabs.resetViewContainer();
@@ -126,7 +118,7 @@ export default {
 </script>
 
 <template>
-  <div v-if="shouldShow">
+  <div>
     <div
       v-if="isLoading"
       class="loading"
@@ -136,8 +128,7 @@ export default {
     <div
       v-else
       id="diffs"
-      :class="{ active: shouldShow }"
-      class="diffs tab-pane"
+      class="diffs tab-pane active"
     >
       <compare-versions
         v-if="!commit && mergeRequestDiffs.length > 1"
