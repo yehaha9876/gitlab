@@ -307,13 +307,8 @@ Please check your network connection and try again.`;
   <div>
     <note-signed-out-widget v-if="!isLoggedIn" />
     <discussion-locked-widget
-<<<<<<< HEAD
-      :issuable-type="issuableTypeTitle"
       v-else-if="!canCreateNote"
-=======
-      v-else-if="isLocked(getNoteableData) && !canCreateNote"
-      issuable-type="issue"
->>>>>>> master
+      :issuable-type="issuableTypeTitle"
     />
     <ul
       v-else-if="canCreateNote"
@@ -361,7 +356,7 @@ Please check your network connection and try again.`;
 js-gfm-input js-autosize markdown-area js-vue-textarea"
                   data-supports-quick-actions="true"
                   aria-label="Description"
-                  placeholder="Write a comment or drag your files here…"
+                  placeholder="Write a comment or drag your files here..."
                   @keydown.up="editCurrentUserLastNote()"
                   @keydown.meta.enter="handleSave()"
                   @keydown.ctrl.enter="handleSave()">
