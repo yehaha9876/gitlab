@@ -8,13 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2018-06-12 10:39+0200\n"
-"PO-Revision-Date: 2018-06-12 10:39+0200\n"
-=======
-"POT-Creation-Date: 2018-06-11 09:18+0200\n"
-"PO-Revision-Date: 2018-06-11 09:18+0200\n"
->>>>>>> master
+"POT-Creation-Date: 2018-06-13 20:41+0200\n"
+"PO-Revision-Date: 2018-06-13 20:41+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -2839,10 +2834,10 @@ msgstr ""
 msgid "Gitaly"
 msgstr ""
 
-msgid "Gitaly|Address"
+msgid "Gitaly Servers"
 msgstr ""
 
-msgid "Gitaly Servers"
+msgid "Gitaly|Address"
 msgstr ""
 
 msgid "Go Back"
@@ -3412,7 +3407,13 @@ msgstr ""
 msgid "MergeRequests|Resolve this discussion in a new issue"
 msgstr ""
 
+msgid "MergeRequests|Saving the comment failed"
+msgstr ""
+
 msgid "MergeRequests|Toggle comments for this file"
+msgstr ""
+
+msgid "MergeRequests|Updating discussions failed"
 msgstr ""
 
 msgid "MergeRequests|View file @ %{commitId}"
@@ -6258,6 +6259,9 @@ msgstr ""
 msgid "ciReport|Confidence"
 msgstr ""
 
+msgid "ciReport|Container scanning detected"
+msgstr ""
+
 msgid "ciReport|Container scanning detects known vulnerabilities in your docker images."
 msgstr ""
 
@@ -6265,6 +6269,9 @@ msgid "ciReport|Container scanning is loading"
 msgstr ""
 
 msgid "ciReport|Container scanning resulted in error while loading results"
+msgstr ""
+
+msgid "ciReport|DAST detected"
 msgstr ""
 
 msgid "ciReport|DAST is loading"
@@ -6381,7 +6388,13 @@ msgstr ""
 msgid "ciReport|There was an error dismissing the vulnerability. Please try again."
 msgstr ""
 
+msgid "ciReport|There was an error loading DAST report"
+msgstr ""
+
 msgid "ciReport|There was an error loading SAST report"
+msgstr ""
+
+msgid "ciReport|There was an error loading container scanning report"
 msgstr ""
 
 msgid "ciReport|There was an error loading dependency scanning report"
