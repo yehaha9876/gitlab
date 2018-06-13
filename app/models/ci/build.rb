@@ -31,7 +31,7 @@ module Ci
     has_one :job_artifacts_trace, -> { where(file_type: Ci::JobArtifact.file_types[:trace]) }, class_name: 'Ci::JobArtifact', inverse_of: :job, foreign_key: :job_id
 
     has_one :metadata, class_name: 'Ci::BuildMetadata'
-    delegate :timeout, to: :metadata, prefix: true, allow_nil: true
+    delegate :timeout, :runner_session_url, :runner_session_certificate, to: :metadata, prefix: true, allow_nil: true
     delegate :gitlab_deploy_token, to: :project
 
     ##
@@ -586,6 +586,19 @@ module Ci
 
     def serializable_hash(options = {})
       super(options).merge(when: read_attribute(:when))
+    end
+
+    def has_terminal?
+      running? && metadata_runner_session_url.present?
+    end
+
+    def terminal_specification
+      {
+        subprotocols: ['terminal.gitlab.com'].freeze,
+        url: "#{metadata_runner_session_url}?build=#{id}",
+        header: {},
+        ca_pem: metadata_runner_session_certificate
+      }
     end
 
     private

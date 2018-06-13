@@ -2621,4 +2621,40 @@ describe Ci::Build do
       end
     end
   end
+
+  describe '#has_terminal?' do
+    let(:states) { Ci::Build.state_machines[:status].states.map(&:name) - [:running] }
+
+    subject { build.has_terminal? }
+
+    it 'returns true if the build is running and it has a runner_session_url' do
+      build.metadata.runner_session_url = 'whatever'
+      build.status = :running
+
+      expect(subject).to be_truthy
+    end
+
+    context 'returns false' do
+      it 'when runner_session_url is empty' do
+        build.metadata.runner_session_url = nil
+        build.status = :running
+
+        expect(subject).to be_falsey
+      end
+
+      context 'unless the build is running' do
+        before do
+          build.metadata.runner_session_url = 'whatever'
+        end
+
+        it do
+          states.each do |state|
+            build.status = state
+
+            is_expected.to be_falsey
+          end
+        end
+      end
+    end
+  end
 end

@@ -81,19 +81,23 @@ module API
         requires :token, type: String, desc: %q(Runner's authentication token)
         optional :last_update, type: String, desc: %q(Runner's queue last_update token)
         optional :info, type: Hash, desc: %q(Runner's metadata)
+        optional :session_url, type: String
+        optional :session_cert, type: String
       end
       post '/request' do
         authenticate_runner!
         no_content! unless current_runner.active?
 
-        if current_runner.runner_queue_value_latest?(params[:last_update])
-          header 'X-GitLab-Last-Update', params[:last_update]
+        runner_params = declared_params(include_missing: false)
+
+        if current_runner.runner_queue_value_latest?(runner_params[:last_update])
+          header 'X-GitLab-Last-Update', runner_params[:last_update]
           Gitlab::Metrics.add_event(:build_not_found_cached)
           break no_content!
         end
 
         new_update = current_runner.ensure_runner_queue_value
-        result = ::Ci::RegisterJobService.new(current_runner).execute
+        result = ::Ci::RegisterJobService.new(current_runner).execute(runner_params)
 
         if result.valid?
           if result.build
