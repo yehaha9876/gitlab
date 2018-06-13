@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Geo::GeoTasks do
+describe Gitlab::Geo::GeoTasks, :geo do
   include ::EE::GeoHelpers
 
   describe '.clean_orphaned_project_registry!' do
