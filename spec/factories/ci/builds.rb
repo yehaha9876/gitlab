@@ -251,7 +251,7 @@ FactoryBot.define do
 
     trait :with_runner_session_url do
       after(:create) do |build|
-        build.metadata.update(runner_session_url: 'ws://localhost')
+        build.create_runner_session(url: 'ws://localhost')
       end
     end
   end

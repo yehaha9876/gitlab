@@ -1222,7 +1222,7 @@ module API
 
       class RunnerInfo < Grape::Entity
         expose :metadata_timeout, as: :timeout
-        expose :metadata_runner_session_url, as: :runner_session_url
+        expose :runner_session_url
       end
 
       class Step < Grape::Entity
