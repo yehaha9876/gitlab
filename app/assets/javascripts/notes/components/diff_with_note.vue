@@ -83,8 +83,8 @@ export default {
 <template>
   <div
     ref="fileHolder"
-    class="diff-file file-holder"
     :class="diffFileClass"
+    class="diff-file file-holder"
   >
     <diff-file-header
       :diff-file="diffFile"
@@ -98,6 +98,7 @@ export default {
       class="diff-content code"
     >
       <table>
+<<<<<<< HEAD
         <tr
           v-for="line in discussion.truncatedDiffLines"
           :key="line.lineCode"
@@ -139,6 +140,15 @@ export default {
             <span></span>
           </td>
         </tr>
+=======
+        <component
+          v-for="(html, index) in diffRows"
+          :is="rowTag(html)"
+          :class="html.className"
+          :key="index"
+          v-html="html.outerHTML"
+        />
+>>>>>>> master
         <tr class="notes_holder">
           <td
             class="notes_line"
