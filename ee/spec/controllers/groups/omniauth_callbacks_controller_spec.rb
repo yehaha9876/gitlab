@@ -48,6 +48,12 @@ describe Groups::OmniauthCallbacksController do
           expect(response).to redirect_to('/explore')
         end
 
+        it "sanitizes RelayState and redirects sensibly" do
+          post provider, group_id: group, RelayState: 'https://evil.com/explore'
+
+          expect(response).to redirect_to(group_path(group))
+        end
+
         it "displays a flash message verifying group sign in" do
           post provider, group_id: group
 

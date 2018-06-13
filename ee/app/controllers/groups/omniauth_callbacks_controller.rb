@@ -1,4 +1,5 @@
 class Groups::OmniauthCallbacksController < OmniauthCallbacksController
+  include InternalRedirect
   extend ::Gitlab::Utils::Override
 
   skip_before_filter :verify_authenticity_token, only: :group_saml
@@ -44,6 +45,12 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
   end
 
   def saml_redirect_path
-    params['RelayState'].presence if current_user
+    return unless current_user
+
+    sanitize_redirect(relay_state) || group_path(@unauthenticated_group)
+  end
+
+  def relay_state
+    params['RelayState'].presence
   end
 end
