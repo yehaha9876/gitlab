@@ -18,7 +18,7 @@ export default {
     },
     getGraphLabel(graphData) {
       if (!graphData.queries || !graphData.queries[0]) return undefined;
-      return graphData.queries[0].label;
+      return graphData.queries[0].label || graphData.y_label || 'Average';
     },
     getQueryAlerts(graphData) {
       if (!graphData.queries) return [];
