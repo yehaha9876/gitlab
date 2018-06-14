@@ -1,0 +1,8 @@
+- project = local_assigns.fetch(:project)
+- protected_refs_for_users_feature_available = project.feature_available?(:protected_refs_for_users, current_user)
+
+-# The following class is only used in ee/app/assets/javascripts/pages/projects/settings/repository/show/index.js
+- if protected_refs_for_users_feature_available
+  .js-protected-refs-for-users-feature-available
+
+= render_ce 'projects/settings/repository/protected_refs', project: project

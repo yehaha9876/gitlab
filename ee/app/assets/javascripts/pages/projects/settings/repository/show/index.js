@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDeployKeys();
   initSettingsPanels();
 
-  if (document.querySelector('.js-protected-refs-for-users')) {
+  if (document.querySelector('.js-protected-refs-for-users-feature-available')) {
     new ProtectedBranchCreate();
     new ProtectedBranchEditList();
 

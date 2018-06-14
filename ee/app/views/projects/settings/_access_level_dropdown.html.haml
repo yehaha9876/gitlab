@@ -1,0 +1,11 @@
+- access_levels = local_assigns.fetch(:access_levels)
+- input_basic_name = local_assigns.fetch(:input_basic_name)
+- disabled = local_assigns.fetch(:disabled, false)
+- toggle_class = local_assigns.fetch(:toggle_class)
+- default_label = s_('RepositorySettingsAccessLevel|Select')
+
+%div{ class: "#{input_basic_name}-container" }
+  = dropdown_tag(default_label,
+                 options: { toggle_class: "#{toggle_class} js-multiselect", disabled: disabled, dropdown_class: 'dropdown-menu-user dropdown-menu-selectable',
+                 filter: true,
+                 data: { default_label: default_label, preselected_items: access_levels_data(access_levels) } })
