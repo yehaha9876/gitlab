@@ -69,7 +69,7 @@ export default {
       return this.hasAlerts ? this.alertData[this.alerts[0]] : undefined;
     },
     formDisabled() {
-      return this.errorMessage || this.isLoading;
+      return !!(this.errorMessage || this.isLoading);
     },
   },
   watch: {
