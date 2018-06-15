@@ -1,0 +1,570 @@
+{
+	"image": "registry.gitlab.com/gitlab-org/gl-sast/dz-whitelist-clair:f228bfb73dc368e38e9cfa3396b65ac9ec38c103",
+	"unaproved": [
+		"CVE-2017-15412",
+		"CVE-2017-1000410",
+		"CVE-2017-17450",
+		"CVE-2017-17458"
+	],
+	"vulnerabilities": [{
+			"vulnerability": "CVE-2017-11671",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2017-15277",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-12433",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-13144",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-12669",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-15015",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2017-11446",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-14531",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-14528",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-13769",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-17504",
+			"namespace": "debian:8",
+			"severity": "Unknown"
+		},
+		{
+			"vulnerability": "CVE-2017-11534",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-14173",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-15017",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-12430",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-11754",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-11531",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-11166",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-12665",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-14400",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-12671",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-12565",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-12675",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-12676",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-14324",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-14532",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-12983",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-13131",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-14505",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-13143",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-13134",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-12432",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-13145",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-14224",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-14533",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-11533",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-11523",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-11536",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-13059",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2016-8678",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-12435",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-14607",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-15016",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-17499",
+			"namespace": "debian:8",
+			"severity": "Unknown"
+		},
+		{
+			"vulnerability": "CVE-2017-12654",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-11539",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-12429",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-11640",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-12564",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-13139",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-14343",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-12692",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-14341",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-12693",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-12667",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-12674",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-9500",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-2626",
+			"namespace": "debian:8",
+			"severity": "Unknown"
+		},
+		{
+			"vulnerability": "CVE-2017-14988",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-9116",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-9110",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-9113",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-9112",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-12596",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-9111",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-9114",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-9115",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2011-3389",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-9937",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2016-7943",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2016-7942",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-7960",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-8834",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2017-7961",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-8871",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2016-7098",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2017-2520",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-10989",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-2519",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-13685",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-2518",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-9814",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2017-7475",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2010-4052",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2014-9761",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-15671",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2017-15804",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2010-4756",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2015-8985",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2015-5180",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2016-10228",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-1000408",
+			"namespace": "debian:8",
+			"severity": "Unknown"
+		},
+		{
+			"vulnerability": "CVE-2017-8804",
+			"namespace": "debian:8",
+			"severity": "High"
+		},
+		{
+			"vulnerability": "CVE-2017-12133",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2017-12132",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2010-4051",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2017-1000409",
+			"namespace": "debian:8",
+			"severity": "Unknown"
+		},
+		{
+			"vulnerability": "CVE-2017-15670",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2007-3996",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2007-3477",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2009-3546",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2007-3476",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2016-9401",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2017-2625",
+			"namespace": "debian:8",
+			"severity": "Unknown"
+		},
+		{
+			"vulnerability": "CVE-2017-17512",
+			"namespace": "debian:8",
+			"severity": "Unknown"
+		},
+		{
+			"vulnerability": "CVE-2017-12618",
+			"namespace": "debian:8",
+			"severity": "Low"
+		},
+		{
+			"vulnerability": "CVE-2012-5627",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2012-5613",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2016-6328",
+			"namespace": "debian:8",
+			"severity": "Unknown"
+		},
+		{
+			"vulnerability": "CVE-2017-7544",
+			"namespace": "debian:8",
+			"severity": "Medium"
+		},
+		{
+			"vulnerability": "CVE-2005-2541",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		},
+		{
+			"vulnerability": "CVE-2013-4235",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		}
+	]
+}

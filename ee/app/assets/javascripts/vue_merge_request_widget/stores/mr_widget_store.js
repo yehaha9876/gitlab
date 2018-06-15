@@ -8,10 +8,10 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     const blobPath = data.blob_path || {};
     this.headBlobPath = blobPath.head_path || '';
     this.baseBlobPath = blobPath.base_path || '';
-    this.sast = data.sast || {};
-    this.sastContainer = data.sast_container || {};
-    this.dast = data.dast || {};
-    this.dependencyScanning = data.dependency_scanning || {};
+    this.sast = data.sast || { head_path: 'foo', base_path: 'bar' };
+    this.sastContainer = data.sast_container || { head_path: 'foo', base_path: 'bar' };
+    this.dast = data.dast || { head_path: 'foo', base_path: 'bar' };
+    this.dependencyScanning = data.dependency_scanning || { head_path: 'foo', base_path: 'bar' };
     this.sastHelp = data.sast_help_path;
     this.sastContainerHelp = data.sast_container_help_path;
     this.dastHelp = data.dast_help_path;

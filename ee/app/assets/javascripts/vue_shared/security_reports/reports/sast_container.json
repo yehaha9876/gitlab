@@ -1,0 +1,29 @@
+{
+	"image": "registry.gitlab.com/gitlab-org/gl-sast/dz-whitelist-clair:f228bfb73dc368e38e9cfa3396b65ac9ec38c103",
+	"unaproved": [
+		"CVE-2017-15412",
+		"CVE-2017-1000410",
+		"CVE-2017-17450",
+		"CVE-2017-17448",
+		"CVE-2017-0861",
+		"CVE-2017-17449",
+		"CVE-2017-15868",
+		"CVE-2017-17504",
+		"CVE-2017-17499",
+		"CVE-2017-1000408",
+		"CVE-2017-1000409",
+		"CVE-2017-3737",
+		"CVE-2017-12944",
+		"CVE-2017-15422",
+		"CVE-2017-17484",
+		"CVE-2017-17512",
+		"CVE-2017-17458"
+	],
+	"vulnerabilities": [
+		{
+			"vulnerability": "CVE-2017-15098",
+			"namespace": "debian:8",
+			"severity": "Negligible"
+		}
+	]
+}

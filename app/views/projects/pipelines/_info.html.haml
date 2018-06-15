@@ -1,8 +1,8 @@
 #js-pipeline-header-vue.pipeline-header-container
-- sast_artifact = @pipeline.sast_artifact
-- dependency_artifact = @pipeline.dependency_scanning_artifact
-- dast_artifact = @pipeline.dast_artifact
-- sast_container_artifact = @pipeline.sast_container_artifact
+- sast_artifact = true # @pipeline.sast_artifact
+- dependency_artifact = true #@pipeline.dependency_scanning_artifact
+- dast_artifact = true #@pipeline.dast_artifact
+- sast_container_artifact = true #@pipeline.sast_container_artifact
 
 - if @commit.present?
   .commit-box

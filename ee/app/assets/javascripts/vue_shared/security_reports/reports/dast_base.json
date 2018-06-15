@@ -1,0 +1,107 @@
+{
+	"@version": "2.7.0",
+	"@generated": "Tue, 26 Dec 2017 16:46:11",
+	"site": {
+		"@name": "http://192.168.32.236:3001",
+		"@host": "192.168.32.236",
+		"@port": "3001",
+		"@ssl": "false",
+		"alerts": [{
+			"pluginid": "10202",
+			"alert": "Absence of Anti-CSRF Tokens",
+			"name": "Absence of Anti-CSRF Tokens",
+			"riskcode": "1",
+			"confidence": "2",
+			"riskdesc": "Low (Medium)",
+			"desc": "<p>No Anti-CSRF tokens were found in a HTML submission form.<\/p><p>A cross-site request forgery is an attack that involves forcing a victim to send an HTTP request to a target destination without their knowledge or intent in order to perform an action as the victim. The underlying cause is application functionality using predictable URL/form actions in a repeatable way. The nature of the attack is that CSRF exploits the trust that a web site has for a user. By contrast, cross-site scripting (XSS) exploits the trust that a user has for a web site. Like XSS, CSRF attacks are not necessarily cross-site, but they can be. Cross-site request forgery is also known as CSRF, XSRF, one-click attack, session riding, confused deputy, and sea surf.<\/p><p><\/p><p>CSRF attacks are effective in a number of situations, including:<\/p><p>    * The victim has an active session on the target site.<\/p><p>    * The victim is authenticated via HTTP auth on the target site.<\/p><p>    * The victim is on the same local network as the target site.<\/p><p><\/p><p>CSRF has primarily been used to perform an action against a target site using the victim's privileges, but recent techniques have been discovered to disclose information by gaining access to the response. The risk of information disclosure is dramatically increased when the target site is vulnerable to XSS, because XSS can be used as a platform for CSRF, allowing the attack to operate within the bounds of the same-origin policy.<\/p>",
+			"instances": [{
+				"uri": "http://192.168.32.236:3001/explore?sort=latest_activity_desc",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/user/group/subgroups/index.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/user/search/advanced_global_search.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/h5bp/html5-boilerplate/blob/master/modernizr-config.json",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/user/project/issues/index.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore/projects/trending?sort=created_asc",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/ci/README.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore/projects/trending?lineprofiler=app",
+				"method": "GET",
+				"evidence": "<form class=\"project-filter-form\" id=\"project-filter-form\" action=\"/explore/projects/trending?\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/h5bp/html5-boilerplate/blob/master/CHANGELOG.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/user/project/settings/index.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/twitter/typeahead-js/-/jobs",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/development/writing_documentation.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/integration/trello_power_up.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore?name&sort=created_asc&utf8=%E2%9C%93",
+				"method": "GET",
+				"evidence": "<form class=\"project-filter-form\" id=\"project-filter-form\" action=\"/explore?sort=created_asc\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/twitter/typeahead-js?lineprofiler=views",
+				"method": "GET",
+				"evidence": "<form class=\"project-refs-form\" action=\"/twitter/typeahead-js/refs/switch\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore/projects?sort=created_asc",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/twitter/typeahead-js/labels",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore?archived=true&name&sort=latest_activity_desc&utf8=%E2%9C%93",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore/projects/trending?name&utf8=%E2%9C%93",
+				"method": "GET",
+				"evidence": "<form class=\"project-filter-form\" id=\"project-filter-form\" action=\"/explore/projects/trending?\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help?lineprofiler=true",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}],
+			"count": "408",
+			"solution": "<p>Phase: Architecture and Design<\/p><p>Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.<\/p><p>For example, use anti-CSRF packages such as the OWASP CSRFGuard.<\/p><p><\/p><p>Phase: Implementation<\/p><p>Ensure that your application is free of cross-site scripting issues, because most CSRF defenses can be bypassed using attacker-controlled script.<\/p><p><\/p><p>Phase: Architecture and Design<\/p><p>Generate a unique nonce for each form, place the nonce into the form, and verify the nonce upon receipt of the form. Be sure that the nonce is not predictable (CWE-330).<\/p><p>Note that this can be bypassed using XSS.<\/p><p><\/p><p>Identify especially dangerous operations. When the user performs a dangerous operation, send a separate confirmation request to ensure that the user intended to perform that operation.<\/p><p>Note that this can be bypassed using XSS.<\/p><p><\/p><p>Use the ESAPI Session Management control.<\/p><p>This control includes a component for CSRF.<\/p><p><\/p><p>Do not use the GET method for any request that triggers a state change.<\/p><p><\/p><p>Phase: Implementation<\/p><p>Check the HTTP Referer header to see if the request originated from an expected page. This could break legitimate functionality, because users or proxies may have disabled sending the Referer for privacy reasons.<\/p>",
+			"otherinfo": "<p>No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf] was found in the following HTML form: [Form 1: \"utf8\" \"search\" \"group_id\" \"search_project_id\" \"repository_ref\" ].<\/p>",
+			"reference": "<p>http://projects.webappsec.org/Cross-Site-Request-Forgery<\/p><p>http://cwe.mitre.org/data/definitions/352.html<\/p>",
+			"cweid": "352",
+			"wascid": "9",
+			"sourceid": "3"
+		}]
+	}
+}

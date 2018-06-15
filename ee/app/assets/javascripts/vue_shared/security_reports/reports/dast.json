@@ -1,0 +1,336 @@
+{
+	"@version": "2.7.0",
+	"@generated": "Tue, 26 Dec 2017 16:46:11",
+	"site": {
+		"@name": "http://192.168.32.236:3001",
+		"@host": "192.168.32.236",
+		"@port": "3001",
+		"@ssl": "false",
+		"alerts": [{
+			"pluginid": "10202",
+			"alert": "Absence of Anti-CSRF Tokens",
+			"name": "Absence of Anti-CSRF Tokens",
+			"riskcode": "1",
+			"confidence": "2",
+			"riskdesc": "Low (Medium)",
+			"desc": "<p>No Anti-CSRF tokens were found in a HTML submission form.<\/p><p>A cross-site request forgery is an attack that involves forcing a victim to send an HTTP request to a target destination without their knowledge or intent in order to perform an action as the victim. The underlying cause is application functionality using predictable URL/form actions in a repeatable way. The nature of the attack is that CSRF exploits the trust that a web site has for a user. By contrast, cross-site scripting (XSS) exploits the trust that a user has for a web site. Like XSS, CSRF attacks are not necessarily cross-site, but they can be. Cross-site request forgery is also known as CSRF, XSRF, one-click attack, session riding, confused deputy, and sea surf.<\/p><p><\/p><p>CSRF attacks are effective in a number of situations, including:<\/p><p>    * The victim has an active session on the target site.<\/p><p>    * The victim is authenticated via HTTP auth on the target site.<\/p><p>    * The victim is on the same local network as the target site.<\/p><p><\/p><p>CSRF has primarily been used to perform an action against a target site using the victim's privileges, but recent techniques have been discovered to disclose information by gaining access to the response. The risk of information disclosure is dramatically increased when the target site is vulnerable to XSS, because XSS can be used as a platform for CSRF, allowing the attack to operate within the bounds of the same-origin policy.<\/p>",
+			"instances": [{
+				"uri": "http://192.168.32.236:3001/explore?sort=latest_activity_desc",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/user/group/subgroups/index.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/user/search/advanced_global_search.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/h5bp/html5-boilerplate/blob/master/modernizr-config.json",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/user/project/issues/index.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore/projects/trending?sort=created_asc",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/ci/README.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore/projects/trending?lineprofiler=app",
+				"method": "GET",
+				"evidence": "<form class=\"project-filter-form\" id=\"project-filter-form\" action=\"/explore/projects/trending?\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/h5bp/html5-boilerplate/blob/master/CHANGELOG.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/user/project/settings/index.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/twitter/typeahead-js/-/jobs",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/development/writing_documentation.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help/integration/trello_power_up.md",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore?name&sort=created_asc&utf8=%E2%9C%93",
+				"method": "GET",
+				"evidence": "<form class=\"project-filter-form\" id=\"project-filter-form\" action=\"/explore?sort=created_asc\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/twitter/typeahead-js?lineprofiler=views",
+				"method": "GET",
+				"evidence": "<form class=\"project-refs-form\" action=\"/twitter/typeahead-js/refs/switch\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore/projects?sort=created_asc",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/twitter/typeahead-js/labels",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore?archived=true&name&sort=latest_activity_desc&utf8=%E2%9C%93",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/explore/projects/trending?name&utf8=%E2%9C%93",
+				"method": "GET",
+				"evidence": "<form class=\"project-filter-form\" id=\"project-filter-form\" action=\"/explore/projects/trending?\" accept-charset=\"UTF-8\" method=\"get\">"
+			}, {
+				"uri": "http://192.168.32.236:3001/help?lineprofiler=true",
+				"method": "GET",
+				"evidence": "<form class=\"navbar-form\" action=\"/search\" accept-charset=\"UTF-8\" method=\"get\">"
+			}],
+			"count": "408",
+			"solution": "<p>Phase: Architecture and Design<\/p><p>Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.<\/p><p>For example, use anti-CSRF packages such as the OWASP CSRFGuard.<\/p><p><\/p><p>Phase: Implementation<\/p><p>Ensure that your application is free of cross-site scripting issues, because most CSRF defenses can be bypassed using attacker-controlled script.<\/p><p><\/p><p>Phase: Architecture and Design<\/p><p>Generate a unique nonce for each form, place the nonce into the form, and verify the nonce upon receipt of the form. Be sure that the nonce is not predictable (CWE-330).<\/p><p>Note that this can be bypassed using XSS.<\/p><p><\/p><p>Identify especially dangerous operations. When the user performs a dangerous operation, send a separate confirmation request to ensure that the user intended to perform that operation.<\/p><p>Note that this can be bypassed using XSS.<\/p><p><\/p><p>Use the ESAPI Session Management control.<\/p><p>This control includes a component for CSRF.<\/p><p><\/p><p>Do not use the GET method for any request that triggers a state change.<\/p><p><\/p><p>Phase: Implementation<\/p><p>Check the HTTP Referer header to see if the request originated from an expected page. This could break legitimate functionality, because users or proxies may have disabled sending the Referer for privacy reasons.<\/p>",
+			"otherinfo": "<p>No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf] was found in the following HTML form: [Form 1: \"utf8\" \"search\" \"group_id\" \"search_project_id\" \"repository_ref\" ].<\/p>",
+			"reference": "<p>http://projects.webappsec.org/Cross-Site-Request-Forgery<\/p><p>http://cwe.mitre.org/data/definitions/352.html<\/p>",
+			"cweid": "352",
+			"wascid": "9",
+			"sourceid": "3"
+		}, {
+			"pluginid": "10021",
+			"alert": "X-Content-Type-Options Header Missing",
+			"name": "X-Content-Type-Options Header Missing",
+			"riskcode": "1",
+			"confidence": "2",
+			"riskdesc": "Low (Medium)",
+			"desc": "<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.<\/p>",
+			"instances": [{
+				"uri": "http://192.168.32.236:3001/assets/webpack/main.bundle.js",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/touch-icon-iphone-5a9cee0e8a51212e70b90c87c12f382c428870c0ff67d1eb034d884b78d2dae7.png",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/robots.txt",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/logo-d36b5212042cebc89b96df4bf6ac24e43db316143e89926c0db839ff694d2de4.svg",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/webpack/webpack_runtime.bundle.js",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/webpack/docs.bundle.js",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/application-5cc93d0574d6dd2d07bf17f1f2569c7823f01f798e7df83649b684cdaaaa2ee8.css",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/print-c8a801c5b9e43a1b04c1291cbca55844d2c495c9f9dbf2f4946dbf942196bc9d.css",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/touch-icon-ipad-retina-8ebe416f5313483d9c1bc772b5bbe03ecad52a54eba443e5215a22caed2a16a2.png",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/favicon-green-ea7665f0f4e046a34ec899de0e82d7cb95555f65dee3f3b77e5c642580ed9b41.ico",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/performance_bar-0559f65e4cd4ac1101cfb6ef48df524be3088e552169130b895e97fb18f8f76c.css",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/webpack/groups.bundle.js",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/webpack/performance_bar.bundle.js",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/webpack/common_vue.bundle.js",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/webpack/common.bundle.js",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/touch-icon-iphone-retina-72e2aadf86513a56e050e7f0f2355deaa19cc17ed97bbe5147847f2748e5a3e3.png",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/touch-icon-ipad-a6eec6aeb9da138e507593b464fdac213047e49d3093fc30e90d9a995df83ba3.png",
+				"method": "GET",
+				"param": "X-Content-Type-Options"
+			}],
+			"count": "17",
+			"solution": "<p>Ensure that the application/web server sets the Content-Type header appropriately, and that it sets the X-Content-Type-Options header to 'nosniff' for all web pages.<\/p><p>If possible, ensure that the end user uses a standards-compliant and modern web browser that does not perform MIME-sniffing at all, or that can be directed by the web application/web server to not perform MIME-sniffing.<\/p>",
+			"otherinfo": "<p>This issue still applies to error type pages (401, 403, 500, etc) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.<\/p><p>At \"High\" threshold this scanner will not alert on client or server error responses.<\/p>",
+			"reference": "<p>http://msdn.microsoft.com/en-us/library/ie/gg622941%28v=vs.85%29.aspx<\/p><p>https://www.owasp.org/index.php/List_of_useful_HTTP_headers<\/p>",
+			"cweid": "16",
+			"wascid": "15",
+			"sourceid": "3"
+		}, {
+			"pluginid": "10012",
+			"alert": "Password Autocomplete in Browser",
+			"name": "Password Autocomplete in Browser",
+			"riskcode": "1",
+			"confidence": "2",
+			"riskdesc": "Low (Medium)",
+			"desc": "<p>The AUTOCOMPLETE attribute is not disabled on an HTML FORM/INPUT element containing password type input.  Passwords may be stored in browsers and retrieved.<\/p>",
+			"instances": [{
+				"uri": "http://192.168.32.236:3001/users/sign_in?redirect_to_referer=yes",
+				"method": "GET",
+				"param": "user_password",
+				"evidence": "<input class=\"form-control bottom\" required=\"required\" title=\"This field is required.\" type=\"password\" name=\"user[password]\" id=\"user_password\" />"
+			}, {
+				"uri": "http://192.168.32.236:3001/users/sign_in",
+				"method": "GET",
+				"param": "user_password",
+				"evidence": "<input class=\"form-control bottom\" required=\"required\" title=\"This field is required.\" type=\"password\" name=\"user[password]\" id=\"user_password\" />"
+			}, {
+				"uri": "http://192.168.32.236:3001/users/sign_in?redirect_to_referer=yes",
+				"method": "GET",
+				"param": "new_user_password",
+				"evidence": "<input class=\"form-control bottom\" required=\"required\" pattern=\".{8,}\" title=\"Minimum length is 8 characters.\" type=\"password\" name=\"new_user[password]\" id=\"new_user_password\" />"
+			}, {
+				"uri": "http://192.168.32.236:3001/users",
+				"method": "POST",
+				"param": "new_user_password",
+				"evidence": "<input class=\"form-control bottom\" required=\"required\" pattern=\".{8,}\" title=\"Minimum length is 8 characters.\" type=\"password\" name=\"new_user[password]\" id=\"new_user_password\" />"
+			}, {
+				"uri": "http://192.168.32.236:3001/users/sign_in",
+				"method": "POST",
+				"param": "user_password",
+				"evidence": "<input class=\"form-control bottom\" required=\"required\" title=\"This field is required.\" type=\"password\" name=\"user[password]\" id=\"user_password\" />"
+			}, {
+				"uri": "http://192.168.32.236:3001/users/sign_in",
+				"method": "POST",
+				"param": "new_user_password",
+				"evidence": "<input class=\"form-control bottom\" required=\"required\" pattern=\".{8,}\" title=\"Minimum length is 8 characters.\" type=\"password\" name=\"new_user[password]\" id=\"new_user_password\" />"
+			}, {
+				"uri": "http://192.168.32.236:3001/users/sign_in",
+				"method": "GET",
+				"param": "new_user_password",
+				"evidence": "<input class=\"form-control bottom\" required=\"required\" pattern=\".{8,}\" title=\"Minimum length is 8 characters.\" type=\"password\" name=\"new_user[password]\" id=\"new_user_password\" />"
+			}],
+			"count": "7",
+			"solution": "<p>Turn off the AUTOCOMPLETE attribute in forms or individual input elements containing password inputs by using AUTOCOMPLETE='OFF'.<\/p>",
+			"reference": "<p>http://www.w3schools.com/tags/att_input_autocomplete.asp<\/p><p>https://msdn.microsoft.com/en-us/library/ms533486%28v=vs.85%29.aspx<\/p>",
+			"cweid": "525",
+			"wascid": "15",
+			"sourceid": "3"
+		}, {
+			"pluginid": "2",
+			"alert": "Private IP Disclosure",
+			"name": "Private IP Disclosure",
+			"riskcode": "1",
+			"confidence": "2",
+			"riskdesc": "Low (Medium)",
+			"desc": "<p>A private IP (such as 10.x.x.x, 172.x.x.x, 192.168.x.x) or an Amazon EC2 private hostname (for example, ip-10-0-56-78) has been found in the HTTP response body. This information might be helpful for further attacks targeting internal systems.<\/p>",
+			"instances": [{
+				"uri": "http://192.168.32.236:3001/help/user/project/integrations/webhooks.md",
+				"method": "GET",
+				"evidence": "192.168.64.1:3005"
+			}],
+			"count": "1",
+			"solution": "<p>Remove the private IP address from the HTTP response body.  For comments, use JSP/ASP/PHP comment instead of HTML/JavaScript comment which can be seen by client browsers.<\/p>",
+			"otherinfo": "<p>192.168.64.1:3005<\/p><p>192.168.64.1<\/p><p>192.168.64.1:3005<\/p><p>192.168.64.1<\/p><p>192.168.64.1:3005<\/p><p>192.168.64.1<\/p><p>192.168.64.1:3005<\/p><p><\/p>",
+			"reference": "<p>https://tools.ietf.org/html/rfc1918<\/p>",
+			"cweid": "200",
+			"wascid": "13",
+			"sourceid": "3"
+		}, {
+			"pluginid": "10027",
+			"alert": "Information Disclosure - Suspicious Comments",
+			"name": "Information Disclosure - Suspicious Comments",
+			"riskcode": "0",
+			"confidence": "2",
+			"riskdesc": "Informational (Medium)",
+			"desc": "<p>The response appears to contain suspicious comments which may help an attacker.<\/p>",
+			"instances": [{
+				"uri": "http://192.168.32.236:3001/h5bp/html5-boilerplate/boards",
+				"method": "GET"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/webpack/main.bundle.js",
+				"method": "GET"
+			}, {
+				"uri": "http://192.168.32.236:3001/twitter/typeahead-js/boards",
+				"method": "GET"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/webpack/webpack_runtime.bundle.js",
+				"method": "GET"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/webpack/common_vue.bundle.js",
+				"method": "GET"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/webpack/groups.bundle.js",
+				"method": "GET"
+			}, {
+				"uri": "http://192.168.32.236:3001/assets/webpack/common.bundle.js",
+				"method": "GET"
+			}],
+			"count": "7",
+			"solution": "<p>Remove all comments that return information that may help an attacker and fix any underlying problems they refer to.<\/p>",
+			"otherinfo": "<p><script id=\"js-board-template\" type=\"text/x-template\"><div :class=\"{ &quot;is-draggable&quot;: !list.preset, &quot;is-expandable&quot;: list.isExpandable, &quot;is-collapsed&quot;: !list.isExpanded }\" :data-id=\"list.id\" class=\"board\"><\/p><p><div class=\"board-inner\"><\/p><p><header :class=\"{ &quot;has-border&quot;: list.label &amp;&amp; list.label.color }\" :style=\"{ borderTopColor: (list.label &amp;&amp; list.label.color ? list.label.color : null) }\" @click=\"toggleExpanded($event)\" class=\"board-header\"><\/p><p><h3 :class=\"{ &quot;user-can-drag&quot;: (!disabled &amp;&amp; !list.preset) }\" class=\"board-title js-board-handle\"><\/p><p><i :class=\"{ &quot;fa-caret-down&quot;: list.isExpanded, &quot;fa-caret-right&quot;: !list.isExpanded &amp;&amp; list.position === -1, &quot;fa-caret-left&quot;: !list.isExpanded &amp;&amp; list.position !== -1 }\" aria-hidden=\"true\" class=\"fa fa-fw board-title-expandable-toggle\" v-if=\"list.isExpandable\"><\/i><\/p><p><span :title=\"(list.label ? list.label.description : &quot;&quot;)\" class=\"board-title-text has-tooltip\" data-container=\"body\" v-if=\"list.type !== &quot;label&quot;\"><\/p><p>{{ list.title }}<\/p><p><\/span><\/p><p><span :style=\"{ backgroundColor: (list.label &amp;&amp; list.label.color ? list.label.color : null), color: (list.label &amp;&amp; list.label.color ? list.label.text_color : &quot;#2e2e2e&quot;) }\" :title=\"(list.label ? list.label.description : &quot;&quot;)\" class=\"board-title-text color-label has-tooltip label title\" data-container=\"body\" data-placement=\"bottom\" v-if=\"list.type === &quot;label&quot;\"><\/p><p>{{ list.title }}<\/p><p><\/span><\/p><p><div class=\"issue-count-badge clearfix\" v-if=\"list.type !== &quot;blank&quot; &amp;&amp; list.type !== &quot;promotion&quot;\"><\/p><p><span :class=\"{ &quot;has-btn&quot;: list.type !== &quot;closed&quot; &amp;&amp; !disabled }\" class=\"issue-count-badge-count pull-left\"><\/p><p>{{ list.issuesSize }}<\/p><p><\/span><\/p><p><\/div><\/p><p><\/h3><\/p><p><\/header><\/p><p><board-list :disabled=\"disabled\" :groupId=\"null\" :issue-link-base=\"issueLinkBase\" :issues=\"list.issues\" :list=\"list\" :loading=\"list.loading\" :root-path=\"rootPath\" ref=\"board-list\" v-if=\"list.type !== &quot;blank&quot; &amp;&amp; list.type !== &quot;promotion&quot;\"><\/board-list><\/p><p><board-promotion-state v-if=\"list.id == &quot;promotion&quot;\"><\/board-promotion-state><\/p><p><\/div><\/p><p><\/div><\/p><p><\/script><\/p><p><script id=\"js-board-modal-filter\" type=\"text/x-template\"><div class=\"issues-filters\"><\/p><p><div class=\"filtered-search-block issues-details-filters\" v-pre=\"true\"><\/p><p><form class=\"filter-form js-filter-form\" action=\"/h5bp/html5-boilerplate/boards?\" accept-charset=\"UTF-8\" method=\"get\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" /><div class=\"issues-other-filters filtered-search-wrapper\"><\/p><p><div class=\"filtered-search-box\"><\/p><p><div class=\"filtered-search-box-input-container droplab-dropdown\"><\/p><p><div class=\"scroll-container\"><\/p><p><ul class=\"tokens-container list-unstyled\"><\/p><p><li class=\"input-token\"><\/p><p><input autocomplete=\"off\" class=\"form-control filtered-search\" data-base-endpoint=\"/h5bp/html5-boilerplate\" data-project-id=\"8\" id=\"filtered-search-boards_modal\" placeholder=\"Search or filter results...\"><\/p><p><\/li><\/p><p><\/ul><\/p><p><\/div><\/p><p><div class=\"filtered-search-input-dropdown-menu dropdown-menu hint-dropdown\" id=\"js-dropdown-hint\"><\/p><p><ul data-dropdown><\/p><p><li class=\"filter-dropdown-item\" data-action=\"submit\"><\/p><p><button class=\"btn btn-link\"><\/p><p><i aria-hidden=\"true\" data-hidden=\"true\" class=\"fa fa-search\"><\/i><\/p><p><span><\/p><p>Press Enter or click to search<\/p><p><\/span><\/p><p><\/button><\/p><p><\/li><\/p><p><\/ul><\/p><p><ul class=\"filter-dropdown\" data-dropdown data-dynamic><\/p><p><li class=\"filter-dropdown-item\"><\/p><p><button class=\"btn btn-link\"><\/p><p><i class=\"fa {{icon}}\"><\/i><\/p><p><span class=\"js-filter-hint\"><\/p><p>{{hint}}<\/p><p><\/span><\/p><p><span class=\"js-filter-tag dropdown-light-content\"><\/p><p>{{tag}}<\/p><p><\/span><\/p><p><\/button><\/p><p><\/li><\/p><p><\/ul><\/p><p><\/div><\/p><p><div class=\"filtered-search-input-dropdown-menu dropdown-menu\" id=\"js-dropdown-author\"><\/p><p><ul class=\"filter-dropdown\" data-dropdown data-dynamic><\/p><p><li class=\"filter-dropdown-item\"><\/p><p><button class=\"btn btn-link dropdown-user\" type=\"button\"><\/p><p><div class=\"avatar-container s40\"><\/p><p><img alt=\"{{name}}&#39;s avatar\" src=\"data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\" data-src=\"{{avatar_url}}\" class=\"avatar s40 lazy\" title=\"{{name}}\" /><\/p><p><\/div><\/p><p><div class=\"dropdown-user-details\"><\/p><p><span><\/p><p>{{name}}<\/p><p><\/span><\/p><p><span class=\"dropdown-light-content\"><\/p><p>@{{username}}<\/p><p><\/span><\/p><p><\/div><\/p><p><\/button><\/p><p><\/li><\/p><p><\/p><p><\/ul><\/p><p><\/div><\/p><p><div class=\"filtered-search-input-dropdown-menu dropdown-menu\" id=\"js-dropdown-assignee\"><\/p><p><ul data-dropdown><\/p><p><li class=\"filter-dropdown-item\" data-value=\"none\"><\/p><p><button class=\"btn btn-link\"><\/p><p>No Assignee<\/p><p><\/button><\/p><p><\/li><\/p><p><li class=\"divider droplab-item-ignore\"><\/li><\/p><p><\/ul><\/p><p><ul class=\"filter-dropdown\" data-dropdown data-dynamic><\/p><p><li class=\"filter-dropdown-item\"><\/p><p><button class=\"btn btn-link dropdown-user\" type=\"button\"><\/p><p><div class=\"avatar-container s40\"><\/p><p><img alt=\"{{name}}&#39;s avatar\" src=\"data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\" data-src=\"{{avatar_url}}\" class=\"avatar s40 lazy\" title=\"{{name}}\" /><\/p><p><\/div><\/p><p><div class=\"dropdown-user-details\"><\/p><p><span><\/p><p>{{name}}<\/p><p><\/span><\/p><p><span class=\"dropdown-light-content\"><\/p><p>@{{username}}<\/p><p><\/span><\/p><p><\/div><\/p><p><\/button><\/p><p><\/li><\/p><p><\/p><p><\/ul><\/p><p><\/div><\/p><p><div class=\"filtered-search-input-dropdown-menu dropdown-menu\" id=\"js-dropdown-milestone\"><\/p><p><ul data-dropdown><\/p><p><li class=\"filter-dropdown-item\" data-value=\"none\"><\/p><p><button class=\"btn btn-link\"><\/p><p>No Milestone<\/p><p><\/button><\/p><p><\/li><\/p><p><li class=\"filter-dropdown-item\" data-value=\"upcoming\"><\/p><p><button class=\"btn btn-link\"><\/p><p>Upcoming<\/p><p><\/button><\/p><p><\/li><\/p><p><li class=\"filter-dropdown-item\" data-value=\"started\"><\/p><p><button class=\"btn btn-link\"><\/p><p>Started<\/p><p><\/button><\/p><p><\/li><\/p><p><li class=\"divider droplab-item-ignore\"><\/li><\/p><p><\/ul><\/p><p><ul class=\"filter-dropdown\" data-dropdown data-dynamic><\/p><p><li class=\"filter-dropdown-item\"><\/p><p><button class=\"btn btn-link js-data-value\"><\/p><p>{{title}}<\/p><p><\/button><\/p><p><\/li><\/p><p><\/ul><\/p><p><\/div><\/p><p><div class=\"filtered-search-input-dropdown-menu dropdown-menu\" id=\"js-dropdown-label\"><\/p><p><ul data-dropdown><\/p><p><li class=\"filter-dropdown-item\" data-value=\"none\"><\/p><p><button class=\"btn btn-link\"><\/p><p>No Label<\/p><p><\/button><\/p><p><\/li><\/p><p><li class=\"divider droplab-item-ignore\"><\/li><\/p><p><\/ul><\/p><p><ul class=\"filter-dropdown\" data-dropdown data-dynamic><\/p><p><li class=\"filter-dropdown-item\"><\/p><p><button class=\"btn btn-link\"><\/p><p><span class=\"dropdown-label-box\" style=\"background: {{color}}\"><\/span><\/p><p><span class=\"label-title js-data-value\"><\/p><p>{{title}}<\/p><p><\/span><\/p><p><\/button><\/p><p><\/li><\/p><p><\/ul><\/p><p><\/div><\/p><p><div class=\"filtered-search-input-dropdown-menu dropdown-menu\" id=\"js-dropdown-my-reaction\"><\/p><p><ul class=\"filter-dropdown\" data-dropdown data-dynamic><\/p><p><li class=\"filter-dropdown-item\"><\/p><p><button class=\"btn btn-link\"><\/p><p><gl-emoji><\/gl-emoji><\/p><p><span class=\"js-data-value prepend-left-10\"><\/p><p>{{name}}<\/p><p><\/span><\/p><p><\/button><\/p><p><\/li><\/p><p><\/ul><\/p><p><\/div><\/p><p><div class=\"filtered-search-input-dropdown-menu dropdown-menu\" id=\"js-dropdown-weight\"><\/p><p><ul data-dropdown><\/p><p><li class=\"filter-dropdown-item\" data-value=\"none\"><\/p><p><button class=\"btn btn-link\"><\/p><p>No Weight<\/p><p><\/button><\/p><p><\/li><\/p><p><li class=\"filter-dropdown-item\" data-value=\"any\"><\/p><p><button class=\"btn btn-link\"><\/p><p>Any Weight<\/p><p><\/button><\/p><p><\/li><\/p><p><li class=\"divider droplab-item-ignore\"><\/li><\/p><p><\/ul><\/p><p><ul class=\"filter-dropdown\" data-dropdown><\/p><p><li class=\"filter-dropdown-item\" data-value=\"1\"><\/p><p><button class=\"btn btn-link\">1<\/button><\/p><p><\/li><\/p><p><li class=\"filter-dropdown-item\" data-value=\"2\"><\/p><p><button class=\"btn btn-link\">2<\/button><\/p><p><\/li><\/p><p><li class=\"filter-dropdown-item\" data-value=\"3\"><\/p><p><button class=\"btn btn-link\">3<\/button><\/p><p><\/li><\/p><p><li class=\"filter-dropdown-item\" data-value=\"4\"><\/p><p><button class=\"btn btn-link\">4<\/button><\/p><p><\/li><\/p><p><li class=\"filter-dropdown-item\" data-value=\"5\"><\/p><p><button class=\"btn btn-link\">5<\/button><\/p><p><\/li><\/p><p><li class=\"filter-dropdown-item\" data-value=\"6\"><\/p><p><button class=\"btn btn-link\">6<\/button><\/p><p><\/li><\/p><p><li class=\"filter-dropdown-item\" data-value=\"7\"><\/p><p><button class=\"btn btn-link\">7<\/button><\/p><p><\/li><\/p><p><li class=\"filter-dropdown-item\" data-value=\"8\"><\/p><p><button class=\"btn btn-link\">8<\/button><\/p><p><\/li><\/p><p><li class=\"filter-dropdown-item\" data-value=\"9\"><\/p><p><button class=\"btn btn-link\">9<\/button><\/p><p><\/li><\/p><p><\/ul><\/p><p><\/div><\/p><p><\/div><\/p><p><button class=\"clear-search hidden\" type=\"button\"><\/p><p><i aria-hidden=\"true\" data-hidden=\"true\" class=\"fa fa-times\"><\/i><\/p><p><\/button><\/p><p><\/div><\/p><p><div class=\"filter-dropdown-container\"><\/p><p><\/div><\/p><p><\/div><\/p><p><\/form><\/div><\/p><p><\/div><\/p><p><\/script><\/p><p><script id=\"js-board-promotion\" type=\"text/x-template\"><div class=\"board-promotion-state\"><\/p><p><div class=\"svg-container center\"><\/p><p><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"78\" height=\"82\" viewBox=\"0 0 78 82\"><g fill=\"none\" fill-rule=\"evenodd\"><path fill=\"#F9F9F9\" d=\"M2.12 42c-.08.99-.12 1.99-.12 3 0 20.435 16.565 37 37 37s37-16.565 37-37c0-1.01-.04-2.01-.12-3C74.353 61.032 58.425 76 39 76 19.575 76 3.647 61.032 2.12 42z\"/><path fill=\"#EEE\" fill-rule=\"nonzero\" d=\"M39 78C17.46 78 0 60.54 0 39S17.46 0 39 0s39 17.46 39 39-17.46 39-39 39zm0-4c19.33 0 35-15.67 35-35S58.33 4 39 4 4 19.67 4 39s15.67 35 35 35z\"/><g transform=\"translate(12 25)\"><path fill=\"#E1DBF2\" d=\"M3 0h10a3 3 0 0 1 3 3v22a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3V3a3 3 0 0 1 3-3zm1 4v20h8V4H4zm2 2h4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z\"/><rect width=\"6\" height=\"4\" x=\"5\" y=\"12\" fill=\"#6B4FBB\" rx=\"1\"/><\/g><g transform=\"translate(50 25)\"><rect width=\"6\" height=\"4\" x=\"5\" y=\"6\" fill=\"#6B4FBB\" rx=\"1\"/><path fill=\"#E1DBF2\" fill-rule=\"nonzero\" d=\"M3 0h10a3 3 0 0 1 3 3v22a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3V3a3 3 0 0 1 3-3zm1 4v20h8V4H4zm2 8h4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z\"/><\/g><path fill=\"#E1DBF2\" d=\"M34 25h10a3 3 0 0 1 3 3v28a3 3 0 0 1-3 3H34a3 3 0 0 1-3-3V28a3 3 0 0 1 3-3zm1 4v26h8V29h-8zm2 8h4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z\"/><path fill=\"#6B4FBB\" d=\"M37 43h4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1zm0-12h4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z\"/><\/g><\/svg><\/p><p><\/div><\/p><p><p><\/p><p>Improve Issue boards with GitLab Enterprise Edition.<\/p><p><\/p><\/p><p><ul><\/p><p><\/ul><\/p><p><p><\/p><p>Contact your Administrator to upgrade your license.<\/p><p><\/p><\/p><p><\/p><p><div class=\"top-space\"><\/p><p><button @click.stop=\"clearPromotionState\" class=\"btn btn-default btn-block\" href=\"#\" id=\"hide-btn\"><\/p><p>Thanks! Don&#39;t show me this again<\/p><p><\/button><\/p><p><\/div><\/p><p><\/div><\/p><p><\/script><\/p><p><\/p>",
+			"reference": "<p><\/p>",
+			"cweid": "200",
+			"wascid": "13",
+			"sourceid": "3"
+		}, {
+			"pluginid": "90022",
+			"alert": "Application Error Disclosure",
+			"name": "Application Error Disclosure",
+			"riskcode": "2",
+			"confidence": "2",
+			"riskdesc": "Medium (Medium)",
+			"desc": "<p>This page contains an error/warning message that may disclose sensitive information like the location of the file that produced the unhandled exception. This information can be used to launch further attacks against the web application. The alert could be a false positive if the error message is found inside a documentation page.<\/p>",
+			"instances": [{
+				"uri": "http://192.168.32.236:3001/help/user/project/integrations/webhooks.md",
+				"method": "GET",
+				"evidence": "internal error"
+			}],
+			"count": "1",
+			"solution": "<p>Review the source code of this page. Implement custom error pages. Consider implementing a mechanism to provide a unique error reference/identifier to the client (browser) while logging the details on the server side and not exposing them to the user.<\/p>",
+			"reference": "<p><\/p>",
+			"cweid": "200",
+			"wascid": "13",
+			"sourceid": "3"
+		}, {
+			"pluginid": "10026",
+			"alert": "HTTP Parameter Override",
+			"name": "HTTP Parameter Override",
+			"riskcode": "2",
+			"confidence": "1",
+			"riskdesc": "Medium (Low)",
+			"desc": "<p>Unspecified form action: HTTP parameter override attack potentially possible. This is a known problem with Java Servlets but other platforms may also be vulnerable.<\/p>",
+			"instances": [{
+				"uri": "http://192.168.32.236:3001/assets/webpack/main.bundle.js",
+				"method": "GET",
+				"evidence": "<form class=\\\"js-requires-input\\\">"
+			}],
+			"count": "1",
+			"solution": "<p>All forms must specify the action URL.<\/p>",
+			"reference": "<p>http://download.oracle.com/javaee-archive/servlet-spec.java.net/jsr340-experts/att-0317/OnParameterPollutionAttacks.pdf<\/p>",
+			"cweid": "20",
+			"wascid": "20",
+			"sourceid": "3"
+		}]
+	}
+}

@@ -3,6 +3,12 @@ import axios from '~/lib/utils/axios_utils';
 import { s__ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
+import sastContainerHead from '../reports/sast_container.json';
+import sastContainerBase from '../reports/sast_container_base.json';
+import sastHead from '../reports/sast.json';
+import sastBase from '../reports/sast_base.json';
+import dastHead from '../reports/dast.json';
+import dastBase from '../reports/dast_base.json';
 
 export const setHeadBlobPath = ({ commit }, blobPath) => commit(types.SET_HEAD_BLOB_PATH, blobPath);
 
@@ -35,7 +41,16 @@ export const fetchSastReports = ({ state, dispatch }) => {
   const base = state.sast.paths.base;
   const head = state.sast.paths.head;
 
-  dispatch('requestSastReports');
+  //dispatch('requestSastReports');
+
+  return Promise.resolve().then(() => {
+    dispatch('receiveSastReports', {
+      head: sastHead,
+      base: sastBase,
+      enrichData: [],
+    });
+  });
+
 
   return Promise.all([
     head ? axios.get(head) : Promise.resolve(),
@@ -84,6 +99,15 @@ export const fetchSastContainerReports = ({ state, dispatch }) => {
 
   dispatch('requestSastContainerReports');
 
+  return Promise.resolve()
+    .then(() => {
+      dispatch('receiveSastContainerReports', {
+        head: sastContainerHead,
+        base: sastContainerBase,
+        enrichData: [],
+      });
+    });
+
   return Promise.all([
     head ? axios.get(head) : Promise.resolve(),
     base ? axios.get(base) : Promise.resolve(),
@@ -127,6 +151,15 @@ export const fetchDastReports = ({ state, dispatch }) => {
   const head = state.dast.paths.head;
 
   dispatch('requestDastReports');
+
+  return Promise.resolve()
+    .then(() => {
+      dispatch('receiveDastReports', {
+        head: dastHead,
+        base: dastBase,
+        enrichData: [],
+      });
+    });
 
   return Promise.all([
     head ? axios.get(head) : Promise.resolve(),
@@ -174,6 +207,15 @@ export const fetchDependencyScanningReports = ({ state, dispatch }) => {
   const head = state.dependencyScanning.paths.head;
 
   dispatch('requestDependencyScanningReports');
+
+  return Promise.resolve()
+    .then(() => {
+      dispatch('receiveDependencyScanningReports', {
+        head: sastHead,
+        base: sastBase,
+        enrichData: [],
+      });
+    });
 
   return Promise.all([
     head ? axios.get(head) : Promise.resolve(),
