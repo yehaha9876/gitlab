@@ -1,0 +1,101 @@
+[
+  {
+    "tool": "retire",
+    "tools": ["retire"],
+    "message": "Command Injection for macaddress",
+    "url": "https://hackerone.com/reports/319467",
+    "cve": "Command Injection for macaddress",
+    "priority": "Critical"
+  },
+  {
+    "tool": "retire",
+    "message": "Denial of Service for sshpk",
+    "url": "https://hackerone.com/reports/319593",
+    "cve": "Denial of Service for sshpk",
+    "priority": "High"
+  },
+  {
+    "tool": "retire",
+    "tools": ["retire"],
+    "message": "Selector interpreted as HTML for jquery",
+    "url": "http://bugs.jquery.com/ticket/11290",
+    "cve": "CVE-2012-6708",
+    "file": "node_modules/jed/test/jquery.min.js",
+    "priority": "Medium"
+  },
+  {
+    "tool": "retire",
+    "tools": ["retire"],
+    "message": "3rd party CORS request may execute for jquery",
+    "url": "https://github.com/jquery/jquery/issues/2432",
+    "cve": "CVE-2015-9251",
+    "file": "node_modules/jed/test/jquery.min.js",
+    "priority": "Medium"
+  },
+  {
+    "tool": "retire",
+    "tools": ["retire"],
+    "message": "Out-of-bounds Read for stringstream",
+    "url": "https://hackerone.com/reports/321670",
+    "cve": "Out-of-bounds Read for stringstream",
+    "priority": "Medium"
+  },
+  {
+    "tool": "retire",
+    "tools": ["retire"],
+    "message": "Out-of-bounds Read for atob",
+    "url": "https://hackerone.com/reports/321686",
+    "cve": "CVE-2018-3745",
+    "priority": "Medium"
+  },
+  {
+    "tool": "retire",
+    "tools": ["retire"],
+    "message": "Prototype pollution attack for deep-extend",
+    "url": "https://hackerone.com/reports/311333",
+    "cve": "CVE-2018-3750",
+    "priority": "Low"
+  },
+  {
+    "tool": "retire",
+    "tools": ["retire"],
+    "message": "Prototype pollution attack for hoek",
+    "url": "https://hackerone.com/reports/310439",
+    "cve": "Prototype pollution attack for hoek",
+    "priority": "Low"
+  },
+  {
+    "tool": "retire",
+    "message": "Prototype pollution attack for deep-extend",
+    "url": "https://hackerone.com/reports/311333",
+    "cve": "CVE-2018-3750",
+    "priority": "Low"
+  },
+  {
+    "tool": "gemnasium",
+    "tools": ["gemnasium"],
+    "message": "Regular Expression Denial of Service for timespan",
+    "url": "https://nodesecurity.io/advisories/533",
+    "cve": "Regular Expression Denial of Service for timespan",
+    "file": "yarn.lock",
+    "priority": "Unknown"
+  },
+  {
+    "tool": "gemnasium",
+    "tools": ["gemnasium"],
+    "message": "Regular Expression Denial of Service for debug",
+    "url": "https://github.com/visionmedia/debug/pull/504",
+    "cve": "Regular Expression Denial of Service for debug",
+    "file": "yarn.lock",
+    "priority": "Unknown"
+  },
+  {
+    "tool": "gemnasium",
+    "tools": ["gemnasium"],
+    "message": "Prototype pollution attack for hoek",
+    "url": "https://nodesecurity.io/advisories/566",
+    "cve": "CVE-2018-3728",
+    "file": "yarn.lock",
+    "priority": "Unknown"
+  }
+]
