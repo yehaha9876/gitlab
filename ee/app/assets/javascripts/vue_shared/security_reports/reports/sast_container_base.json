@@ -1,6 +1,6 @@
 {
 	"image": "registry.gitlab.com/gitlab-org/gl-sast/dz-whitelist-clair:f228bfb73dc368e38e9cfa3396b65ac9ec38c103",
-	"unaproved": [
+	"unapproved": [
 		"CVE-2017-15412",
 		"CVE-2017-1000410",
 		"CVE-2017-17450",
