@@ -23,6 +23,7 @@ class RepositoryRemoveRemoteWorker
         logger.error("Could not remove remote #{remote_name} from project #{project.id}")
       end
     end
+  rescue LeaseNotObtained
   end
 
   def lease_timeout
