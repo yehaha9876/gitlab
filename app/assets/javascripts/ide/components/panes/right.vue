@@ -4,6 +4,7 @@ import tooltip from '../../../vue_shared/directives/tooltip';
 import Icon from '../../../vue_shared/components/icon.vue';
 import { rightSidebarViews } from '../../constants';
 import PipelinesList from '../pipelines/list.vue';
+import terminalDetail from '../terminal/detail.vue';
 import JobsDetail from '../jobs/detail.vue';
 import ResizablePanel from '../resizable_panel.vue';
 
@@ -23,6 +24,11 @@ export default {
       return (
         this.rightPane === rightSidebarViews.pipelines ||
         this.rightPane === rightSidebarViews.jobsDetail
+      );
+    },
+    terminalActive() {
+      return (
+        this.rightPane === rightSidebarViews.terminalDetail
       );
     },
   },
@@ -70,6 +76,25 @@ export default {
             <icon
               :size="16"
               name="pipeline"
+            />
+          </button>
+        </li>
+        <li>
+          <button
+            v-tooltip
+            :title="__('Terminal')"
+            :class="{
+              active: terminalActive
+            }"
+            data-container="body"
+            data-placement="left"
+            class="ide-sidebar-link is-right"
+            type="button"
+            @click="clickTab($event, $options.rightSidebarViews.terminalDetail)"
+          >
+            <icon
+              :size="16"
+              name="terminal"
             />
           </button>
         </li>

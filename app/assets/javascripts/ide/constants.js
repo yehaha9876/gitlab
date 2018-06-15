@@ -31,6 +31,7 @@ export const diffModes = {
 export const rightSidebarViews = {
   pipelines: 'pipelines-list',
   jobsDetail: 'jobs-detail',
+  terminalDetail: 'terminal-detail',
 };
 
 export const stageKeys = {
