@@ -24,8 +24,12 @@ module Clusters
       end
 
       # TODO: Make this CE compat
+      def ready_status
+        [:installed]
+      end
+
       def ready?
-        status_name == :installed
+        ready_status.include?(status_name)
       end
 
       def chart

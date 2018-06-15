@@ -9,7 +9,7 @@ describe Clusters::Applications::Prometheus do
 
     it 'sets last_update_started_at to now' do
       Timecop.freeze do
-        expect { subject.make_updating }.to change { subject.reload.last_update_started_at }.to(Time.now)
+        expect { subject.make_updating }.to change { subject.reload.last_update_started_at }.to be_within(1.second).of(Time.now)
       end
     end
   end

@@ -36,6 +36,8 @@ module Clusters
         config = set_alert_manager_enabled(config, false)
         config.delete("alertmanagerFiles")
         config["serverFiles"]["alerts"] = {}
+
+        config
       end
 
       def generate_alert_manager(config)

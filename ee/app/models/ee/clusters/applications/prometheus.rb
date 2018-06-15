@@ -3,7 +3,6 @@ module EE
     module Applications
       module Prometheus
         extend ActiveSupport::Concern
-        extend ::Gitlab::Utils::Override
 
         prepended do
           state_machine :status do
@@ -13,9 +12,8 @@ module EE
           end
         end
 
-        override :ready?
-        def ready?
-          [:installed, :updating, :updated, :update_errored].include?(status_name)
+        def ready_status
+          super + [:updating, :updated, :update_errored]
         end
 
         def updated_since?(timestamp)

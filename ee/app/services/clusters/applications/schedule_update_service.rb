@@ -1,7 +1,7 @@
 module Clusters
   module Applications
     class ScheduleUpdateService
-      BACKOFF_DELAY = 5.minutes
+      BACKOFF_DELAY = 2.minutes
 
       attr_accessor :application, :project
 
