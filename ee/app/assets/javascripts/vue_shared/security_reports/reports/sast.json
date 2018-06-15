@@ -1,1 +1,1506 @@
-[{"tool":"bundler_audit","message":"Test Information Leak Vulnerability in Action View","url":"https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00","cve":"CVE-2016-9999","file":"Gemfile.lock","solution":"upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1"},{"tool":"bundler_audit","message":"Possible Information Leak Vulnerability in Action View","url":"https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00","cve":"CVE-2016-0752","file":"Gemfile.lock","solution":"upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1"},{"tool":"bundler_audit","message":"Possible Object Leak and Denial of Service attack in Action Pack","url":"https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc","cve":"CVE-2016-0751","file":"Gemfile.lock","solution":"upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1"},{"tool":"bundler_audit","message":"Possible Information Leak Vulnerability in Action View","url":"https://groups.google.com/forum/#!topic/rubyonrails-security/ddY6HgqB2z4","cve":"CVE-2016-2097","file":"Gemfile.lock","solution":"upgrade to ~> 3.2.22.2, >= 4.1.14.2, ~> 4.1.14"},{"tool":"bundler_audit","message":"Possible remote code execution vulnerability in Action Pack","url":"https://groups.google.com/forum/#!topic/rubyonrails-security/ly-IH-fxr_Q","cve":"CVE-2016-2098","file":"Gemfile.lock","solution":"upgrade to ~> 3.2.22.2, >= 4.2.5.2, ~> 4.2.5, >= 4.1.14.2, ~> 4.1.14"},{"tool":"bundler_audit","message":"Object leak vulnerability for wildcard controller routes in Action Pack","url":"https://groups.google.com/forum/#!topic/rubyonrails-security/dthJ5wL69JE","cve":"CVE-2015-7581","file":"Gemfile.lock","solution":"upgrade to >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14"},{"tool":"bundler_audit","message":"Possible XSS Vulnerability in Action View","url":"https://groups.google.com/forum/#!topic/rubyonrails-security/I-VWr034ouk","cve":"CVE-2016-6316","file":"Gemfile.lock","solution":"upgrade to ~> 3.2.22.3, ~> 4.2.7.1, >= 5.0.0.1"},{"tool":"bundler_audit","message":"Timing attack vulnerability in basic authentication in Action Controller.","url":"https://groups.google.com/forum/#!topic/rubyonrails-security/ANv0HDHEC3k","cve":"CVE-2015-7576","file":"Gemfile.lock","solution":"upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1"},{"tool":"bundler_audit","message":"Nested attributes rejection proc bypass in Active Record","url":"https://groups.google.com/forum/#!topic/rubyonrails-security/cawsWcQ6c8g","cve":"CVE-2015-7577","file":"Gemfile.lock","solution":"upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1"},{"tool":"bundler_audit","message":"Possible Denial of Service attack in Active Support","url":"https://groups.google.com/forum/#!topic/rubyonrails-security/bahr2JLnxvk","cve":"CVE-2015-3227","file":"Gemfile.lock","solution":"upgrade to >= 4.2.2, ~> 4.1.11, ~> 3.2.22"},{"tool":"bundler_audit","message":"Devise Gem for Ruby Unauthorized Access Using Remember Me Cookie","url":"http://blog.plataformatec.com.br/2016/01/improve-remember-me-cookie-expiration-in-devise/","cve":"CVE-2015-8314","file":"Gemfile.lock","solution":"upgrade to >= 3.5.4"},{"tool":"bundler_audit","message":"CSRF Vulnerability in jquery-rails","url":"https://groups.google.com/forum/#!topic/ruby-security-ann/XIZPbobuwaY","cve":"CVE-2015-1840","file":"Gemfile.lock","solution":"upgrade to >= 4.0.4, ~> 3.1.3"},{"tool":"bundler_audit","message":"Nokogiri gem contains several vulnerabilities in libxml2 and libxslt","url":"https://github.com/sparklemotion/nokogiri/issues/1374","cve":"CVE-2015-1819","file":"Gemfile.lock","solution":"upgrade to ~> 1.6.6.4, >= 1.6.7.rc4"},{"tool":"bundler_audit","message":"Nokogiri Gem for JRuby Crafted XML Document Handling Infinite Loop Remote DoS","url":"http://osvdb.org/show/osvdb/101179","cve":"CVE-2013-6460","file":"Gemfile.lock","solution":"upgrade to ~> 1.5.11, >= 1.6.1"},{"tool":"bundler_audit","message":"Nokogiri gem contains two upstream vulnerabilities in libxslt 1.1.29","url":"https://github.com/sparklemotion/nokogiri/issues/1634","cve":"CVE-2017-5029","file":"Gemfile.lock","solution":"upgrade to >= 1.7.2"},{"tool":"bundler_audit","message":"Nokogiri gem contains several vulnerabilities in libxml2 and libxslt","url":"https://github.com/sparklemotion/nokogiri/issues/1615","cve":"CVE-2016-4658","file":"Gemfile.lock","solution":"upgrade to >= 1.7.1"},{"tool":"bundler_audit","message":"Nokogiri Gem for Ruby External Entity (XXE) Expansion Remote DoS","url":"http://www.osvdb.org/show/osvdb/101458","cve":"CVE-2013-6461","file":"Gemfile.lock","solution":"upgrade to ~> 1.5.11, >= 1.6.1"},{"tool":"bundler_audit","message":"Nokogiri Gem for JRuby XML Document Root Element Handling Memory Consumption","url":"https://github.com/sparklemotion/nokogiri/pull/1087","cve":"118481","file":"Gemfile.lock","solution":"upgrade to >= 1.6.3"},{"tool":"bundler_audit","message":"Potential Denial of Service Vulnerability in Rack","url":"https://groups.google.com/forum/#!topic/ruby-security-ann/gcUbICUmKMc","cve":"CVE-2015-3225","file":"Gemfile.lock","solution":"upgrade to >= 1.6.2, ~> 1.5.4, ~> 1.4.6"},{"tool":"bundler_audit","message":"rubygem-rest-client: session fixation vulnerability via Set-Cookie headers in 30x redirection responses","url":"https://github.com/rest-client/rest-client/issues/369","cve":"CVE-2015-1820","file":"Gemfile.lock","solution":"upgrade to >= 1.8.0"},{"tool":"bundler_audit","message":"Rest-Client Gem for Ruby logs password information in plaintext","url":"http://www.osvdb.org/show/osvdb/117461","cve":"CVE-2015-3448","file":"Gemfile.lock","solution":"upgrade to >= 1.7.3"},{"tool":"bundler_audit","message":"uglifier incorrectly handles non-boolean comparisons during minification","url":"https://github.com/mishoo/UglifyJS2/issues/751","cve":"126747","file":"Gemfile.lock","solution":"upgrade to >= 2.7.2"},{"tool":"brakeman","message":"Session secret should not be included in version control","url":"http://brakemanscanner.org/docs/warning_types/session_setting/","file":"config/initializers/secret_token.rb","fingerprint":"715ad9c0d76f57a6a657192574d528b620176a80fec969e2f63c88eacab0b984","line":12,"priority":"High"}]
+[
+  {
+    "tool": "find_sec_bugs",
+    "category": "sast",
+    "name": "Predictable pseudorandom number generator",
+    "message": "Predictable pseudorandom number generator",
+    "description": "The use of java.util.Random is predictable",
+    "cve": "e8ff1d01f74cd372f78da8f5247d3e73:PREDICTABLE_RANDOM",
+    "severity": "Medium",
+    "confidence": "Medium",
+    "location": {
+      "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+      "start_line": 41,
+      "end_line": 41,
+      "class": "com.gitlab.security_products.tests.App",
+      "method": "generateSecretToken1"
+    },
+    "identifiers": [
+      {
+        "type": "find_sec_bugs_type",
+        "name": "Find Security Bugs-PREDICTABLE_RANDOM",
+        "value": "PREDICTABLE_RANDOM",
+        "url": "https://find-sec-bugs.github.io/bugs.htm#PREDICTABLE_RANDOM"
+      },
+      {
+        "type": "cwe",
+        "name": "CWE-330",
+        "value": "330",
+        "url": "https://cwe.mitre.org/data/definitions/330.html"
+      }
+    ],
+    "priority": "Medium",
+    "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+    "line": 41,
+    "url": "https://find-sec-bugs.github.io/bugs.htm#PREDICTABLE_RANDOM"
+  },
+  {
+    "tool": "find_sec_bugs",
+    "category": "sast",
+    "name": "Cipher with no integrity",
+    "message": "Cipher with no integrity",
+    "cve": "gradle/src/main/java/com/gitlab/security_products/tests/App.java:29:CIPHER_INTEGRITY",
+    "severity": "Medium",
+    "confidence": "High",
+    "location": {
+      "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+      "start_line": 29,
+      "end_line": 29,
+      "class": "com.gitlab.security_products.tests.App",
+      "method": "insecureCypher"
+    },
+    "identifiers": [
+      {
+        "type": "find_sec_bugs_type",
+        "name": "Find Security Bugs-CIPHER_INTEGRITY",
+        "value": "CIPHER_INTEGRITY",
+        "url": "https://find-sec-bugs.github.io/bugs.htm#CIPHER_INTEGRITY"
+      }
+    ],
+    "priority": "Medium",
+    "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+    "line": 29,
+    "url": "https://find-sec-bugs.github.io/bugs.htm#CIPHER_INTEGRITY"
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Use of insecure MD2, MD4, or MD5 hash function.",
+    "cve": "python/imports/imports-aliases.py:a7173c43ae66bd07466632d819d450e0071e02dbf782763640d1092981f9631b:B303",
+    "severity": "Medium",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-aliases.py",
+      "start_line": 12,
+      "end_line": 12
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B303",
+        "value": "B303"
+      }
+    ],
+    "priority": "Medium",
+    "file": "python/imports/imports-aliases.py",
+    "line": 12
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Use of insecure MD2, MD4, or MD5 hash function.",
+    "cve": "python/imports/imports-aliases.py:017017b77deb0b8369b6065947833eeea752a92ec8a700db590fece3e934cf0d:B303",
+    "severity": "Medium",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-aliases.py",
+      "start_line": 13,
+      "end_line": 13
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B303",
+        "value": "B303"
+      }
+    ],
+    "priority": "Medium",
+    "file": "python/imports/imports-aliases.py",
+    "line": 13
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Use of insecure MD2, MD4, or MD5 hash function.",
+    "cve": "python/imports/imports-aliases.py:45fc8c53aea7b84f06bc4e590cc667678d6073c4c8a1d471177ca2146fb22db2:B303",
+    "severity": "Medium",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-aliases.py",
+      "start_line": 14,
+      "end_line": 14
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B303",
+        "value": "B303"
+      }
+    ],
+    "priority": "Medium",
+    "file": "python/imports/imports-aliases.py",
+    "line": 14
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Pickle library appears to be in use, possible security issue.",
+    "cve": "python/imports/imports-aliases.py:5f200d47291e7bbd8352db23019b85453ca048dd98ea0c291260fa7d009963a4:B301",
+    "severity": "Medium",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-aliases.py",
+      "start_line": 15,
+      "end_line": 15
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B301",
+        "value": "B301"
+      }
+    ],
+    "priority": "Medium",
+    "file": "python/imports/imports-aliases.py",
+    "line": 15
+  },
+  {
+    "tool": "find_sec_bugs",
+    "category": "sast",
+    "name": "ECB mode is insecure",
+    "message": "ECB mode is insecure",
+    "cve": "gradle/src/main/java/com/gitlab/security_products/tests/App.java:29:ECB_MODE",
+    "severity": "Medium",
+    "confidence": "High",
+    "location": {
+      "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+      "start_line": 29,
+      "end_line": 29,
+      "class": "com.gitlab.security_products.tests.App",
+      "method": "insecureCypher"
+    },
+    "identifiers": [
+      {
+        "type": "find_sec_bugs_type",
+        "name": "Find Security Bugs-ECB_MODE",
+        "value": "ECB_MODE",
+        "url": "https://find-sec-bugs.github.io/bugs.htm#ECB_MODE"
+      }
+    ],
+    "priority": "Medium",
+    "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+    "line": 29,
+    "url": "https://find-sec-bugs.github.io/bugs.htm#ECB_MODE"
+  },
+  {
+    "tool": "find_sec_bugs",
+    "category": "sast",
+    "name": "Predictable pseudorandom number generator",
+    "message": "Predictable pseudorandom number generator",
+    "cve": "gradle/src/main/java/com/gitlab/security_products/tests/App.java:41:PREDICTABLE_RANDOM",
+    "severity": "Medium",
+    "confidence": "Medium",
+    "location": {
+      "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+      "start_line": 41,
+      "end_line": 41,
+      "class": "com.gitlab.security_products.tests.App",
+      "method": "generateSecretToken1"
+    },
+    "identifiers": [
+      {
+        "type": "find_sec_bugs_type",
+        "name": "Find Security Bugs-PREDICTABLE_RANDOM",
+        "value": "PREDICTABLE_RANDOM",
+        "url": "https://find-sec-bugs.github.io/bugs.htm#PREDICTABLE_RANDOM"
+      }
+    ],
+    "priority": "Medium",
+    "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+    "line": 41,
+    "url": "https://find-sec-bugs.github.io/bugs.htm#PREDICTABLE_RANDOM"
+  },
+  {
+    "tool": "find_sec_bugs",
+    "category": "sast",
+    "name": "Predictable pseudorandom number generator",
+    "message": "Predictable pseudorandom number generator",
+    "cve": "gradle/src/main/java/com/gitlab/security_products/tests/App.java:47:PREDICTABLE_RANDOM",
+    "severity": "Medium",
+    "confidence": "Medium",
+    "location": {
+      "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+      "start_line": 47,
+      "end_line": 47,
+      "class": "com.gitlab.security_products.tests.App",
+      "method": "generateSecretToken2"
+    },
+    "identifiers": [
+      {
+        "type": "find_sec_bugs_type",
+        "name": "Find Security Bugs-PREDICTABLE_RANDOM",
+        "value": "PREDICTABLE_RANDOM",
+        "url": "https://find-sec-bugs.github.io/bugs.htm#PREDICTABLE_RANDOM"
+      }
+    ],
+    "priority": "Medium",
+    "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+    "line": 47,
+    "url": "https://find-sec-bugs.github.io/bugs.htm#PREDICTABLE_RANDOM"
+  },
+  {
+    "tool": "find_sec_bugs",
+    "category": "sast",
+    "name": "Cipher with no integrity",
+    "message": "Cipher with no integrity",
+    "description": "The cipher does not provide data integrity",
+    "cve": "22638f20786f979911c3f22f9b30f24f:CIPHER_INTEGRITY",
+    "severity": "Medium",
+    "confidence": "High",
+    "location": {
+      "file": "sbt/src/main/scala/example/Main.scala",
+      "start_line": 13,
+      "end_line": 13,
+      "class": "example.Main$",
+      "method": "main"
+    },
+    "identifiers": [
+      {
+        "type": "find_sec_bugs_type",
+        "name": "Find Security Bugs-CIPHER_INTEGRITY",
+        "value": "CIPHER_INTEGRITY",
+        "url": "https://find-sec-bugs.github.io/bugs.htm#CIPHER_INTEGRITY"
+      },
+      {
+        "type": "cwe",
+        "name": "CWE-353",
+        "value": "353",
+        "url": "https://cwe.mitre.org/data/definitions/353.html"
+      }
+    ],
+    "priority": "Medium",
+    "file": "sbt/src/main/scala/example/Main.scala",
+    "line": 13,
+    "url": "https://find-sec-bugs.github.io/bugs.htm#CIPHER_INTEGRITY"
+  },
+  {
+    "tool": "find_sec_bugs",
+    "category": "sast",
+    "name": "Hard Coded Key",
+    "message": "Hard Coded Key",
+    "description": "Hard coded cryptographic key found",
+    "cve": "102ac67e0975ecec02a056008e0faad8:HARD_CODE_KEY",
+    "severity": "Medium",
+    "confidence": "High",
+    "location": {
+      "file": "sbt/src/main/scala/example/Main.scala",
+      "start_line": 12,
+      "end_line": 12,
+      "class": "example.Main$",
+      "method": "getBytes"
+    },
+    "identifiers": [
+      {
+        "type": "find_sec_bugs_type",
+        "name": "Find Security Bugs-HARD_CODE_KEY",
+        "value": "HARD_CODE_KEY",
+        "url": "https://find-sec-bugs.github.io/bugs.htm#HARD_CODE_KEY"
+      },
+      {
+        "type": "cwe",
+        "name": "CWE-321",
+        "value": "321",
+        "url": "https://cwe.mitre.org/data/definitions/321.html"
+      }
+    ],
+    "priority": "Medium",
+    "file": "sbt/src/main/scala/example/Main.scala",
+    "line": 12,
+    "url": "https://find-sec-bugs.github.io/bugs.htm#HARD_CODE_KEY"
+  },
+  {
+    "tool": "find_sec_bugs",
+    "category": "sast",
+    "name": "Predictable pseudorandom number generator",
+    "message": "Predictable pseudorandom number generator",
+    "description": "The use of java.util.Random is predictable",
+    "cve": "818bf5dacb291e15d9e6dc3c5ac32178:PREDICTABLE_RANDOM",
+    "severity": "Medium",
+    "confidence": "Medium",
+    "location": {
+      "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+      "start_line": 47,
+      "end_line": 47,
+      "class": "com.gitlab.security_products.tests.App",
+      "method": "generateSecretToken2"
+    },
+    "identifiers": [
+      {
+        "type": "find_sec_bugs_type",
+        "name": "Find Security Bugs-PREDICTABLE_RANDOM",
+        "value": "PREDICTABLE_RANDOM",
+        "url": "https://find-sec-bugs.github.io/bugs.htm#PREDICTABLE_RANDOM"
+      },
+      {
+        "type": "cwe",
+        "name": "CWE-330",
+        "value": "330",
+        "url": "https://cwe.mitre.org/data/definitions/330.html"
+      }
+    ],
+    "priority": "Medium",
+    "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+    "line": 47,
+    "url": "https://find-sec-bugs.github.io/bugs.htm#PREDICTABLE_RANDOM"
+  },
+  {
+    "tool": "go_ast_scanner",
+    "category": "sast",
+    "message": "this method will not auto-escape HTML. Verify data is well formed.",
+    "cve": "go/main.go:template.HTML(a):G203",
+    "severity": "Medium",
+    "confidence": "Low",
+    "location": {
+      "file": "go/main.go",
+      "start_line": 16
+    },
+    "identifiers": [
+      {
+        "type": "gas_rule_id",
+        "name": "Go AST Scanner Rule ID G203",
+        "value": "G203"
+      }
+    ],
+    "priority": "Medium",
+    "file": "go/main.go",
+    "line": 16
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Probable insecure usage of temp file/directory.",
+    "cve": "python/hardcoded/hardcoded-tmp.py:63dd4d626855555b816985d82c4614a790462a0a3ada89dc58eb97f9c50f3077:B108",
+    "severity": "Medium",
+    "confidence": "Medium",
+    "location": {
+      "file": "python/hardcoded/hardcoded-tmp.py",
+      "start_line": 14,
+      "end_line": 14
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B108",
+        "value": "B108",
+        "url": "https://docs.openstack.org/bandit/latest/plugins/b108_hardcoded_tmp_directory.html"
+      }
+    ],
+    "priority": "Medium",
+    "file": "python/hardcoded/hardcoded-tmp.py",
+    "line": 14,
+    "url": "https://docs.openstack.org/bandit/latest/plugins/b108_hardcoded_tmp_directory.html"
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Probable insecure usage of temp file/directory.",
+    "cve": "python/hardcoded/hardcoded-tmp.py:4ad6d4c40a8c263fc265f3384724014e0a4f8dd6200af83e51ff120420038031:B108",
+    "severity": "Medium",
+    "confidence": "Medium",
+    "location": {
+      "file": "python/hardcoded/hardcoded-tmp.py",
+      "start_line": 10,
+      "end_line": 10
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B108",
+        "value": "B108",
+        "url": "https://docs.openstack.org/bandit/latest/plugins/b108_hardcoded_tmp_directory.html"
+      }
+    ],
+    "priority": "Medium",
+    "file": "python/hardcoded/hardcoded-tmp.py",
+    "line": 10,
+    "url": "https://docs.openstack.org/bandit/latest/plugins/b108_hardcoded_tmp_directory.html"
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Probable insecure usage of temp file/directory.",
+    "cve": "python/hardcoded/hardcoded-tmp.py:52865813c884a507be1f152d654245af34aba8a391626d01f1ab6d3f52ec8779:B108",
+    "severity": "Medium",
+    "confidence": "Medium",
+    "location": {
+      "file": "python/hardcoded/hardcoded-tmp.py",
+      "start_line": 1,
+      "end_line": 1
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B108",
+        "value": "B108",
+        "url": "https://docs.openstack.org/bandit/latest/plugins/b108_hardcoded_tmp_directory.html"
+      }
+    ],
+    "priority": "Medium",
+    "file": "python/hardcoded/hardcoded-tmp.py",
+    "line": 1,
+    "url": "https://docs.openstack.org/bandit/latest/plugins/b108_hardcoded_tmp_directory.html"
+  },
+  {
+    "tool": "find_sec_bugs",
+    "category": "sast",
+    "name": "ECB mode is insecure",
+    "message": "ECB mode is insecure",
+    "description": "The cipher uses ECB mode, which provides poor confidentiality for encrypted data",
+    "cve": "ea0f905fc76f2739d5f10a1fd1e37a10:ECB_MODE",
+    "severity": "Medium",
+    "confidence": "High",
+    "location": {
+      "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+      "start_line": 29,
+      "end_line": 29,
+      "class": "com.gitlab.security_products.tests.App",
+      "method": "insecureCypher"
+    },
+    "identifiers": [
+      {
+        "type": "find_sec_bugs_type",
+        "name": "Find Security Bugs-ECB_MODE",
+        "value": "ECB_MODE",
+        "url": "https://find-sec-bugs.github.io/bugs.htm#ECB_MODE"
+      },
+      {
+        "type": "cwe",
+        "name": "CWE-327",
+        "value": "327",
+        "url": "https://cwe.mitre.org/data/definitions/327.html"
+      }
+    ],
+    "priority": "Medium",
+    "file": "gradle/src/main/java/com/gitlab/security_products/tests/App.java",
+    "line": 29,
+    "url": "https://find-sec-bugs.github.io/bugs.htm#ECB_MODE"
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Possible hardcoded password: 'blerg'",
+    "cve": "python/hardcoded/hardcoded-passwords.py:63c62a8b7e1e5224439bd26b28030585ac48741e28ca64561a6071080c560a5f:B105",
+    "severity": "Low",
+    "confidence": "Medium",
+    "location": {
+      "file": "python/hardcoded/hardcoded-passwords.py",
+      "start_line": 23,
+      "end_line": 23
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B105",
+        "value": "B105",
+        "url": "https://docs.openstack.org/bandit/latest/plugins/b105_hardcoded_password_string.html"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/hardcoded/hardcoded-passwords.py",
+    "line": 23,
+    "url": "https://docs.openstack.org/bandit/latest/plugins/b105_hardcoded_password_string.html"
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Possible hardcoded password: 'ajklawejrkl42348swfgkg'",
+    "cve": "python/hardcoded/hardcoded-passwords.py:fb3866215a61393a5c9c32a3b60e2058171a23219c353f722cbd3567acab21d2:B105",
+    "severity": "Low",
+    "confidence": "Medium",
+    "location": {
+      "file": "python/hardcoded/hardcoded-passwords.py",
+      "start_line": 13,
+      "end_line": 13
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B105",
+        "value": "B105",
+        "url": "https://docs.openstack.org/bandit/latest/plugins/b105_hardcoded_password_string.html"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/hardcoded/hardcoded-passwords.py",
+    "line": 13,
+    "url": "https://docs.openstack.org/bandit/latest/plugins/b105_hardcoded_password_string.html"
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Possible hardcoded password: ''",
+    "cve": "python/hardcoded/hardcoded-passwords.py:d2d1857c27caedd49c57bfbcdc23afcc92bd66a22701fcdc632869aab4ca73ee:B105",
+    "severity": "Low",
+    "confidence": "Medium",
+    "location": {
+      "file": "python/hardcoded/hardcoded-passwords.py",
+      "start_line": 9,
+      "end_line": 9
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B105",
+        "value": "B105",
+        "url": "https://docs.openstack.org/bandit/latest/plugins/b105_hardcoded_password_string.html"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/hardcoded/hardcoded-passwords.py",
+    "line": 9,
+    "url": "https://docs.openstack.org/bandit/latest/plugins/b105_hardcoded_password_string.html"
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "subprocess call with shell=True seems safe, but may be changed in the future, consider rewriting without shell",
+    "cve": "python/imports/imports-aliases.py:f99f9721e27537fbcb6699a4cf39c6740d6234d2c6f06cfc2d9ea977313c483d:B602",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-aliases.py",
+      "start_line": 9,
+      "end_line": 9
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B602",
+        "value": "B602",
+        "url": "https://docs.openstack.org/bandit/latest/plugins/b602_subprocess_popen_with_shell_equals_true.html"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/imports/imports-aliases.py",
+    "line": 9,
+    "url": "https://docs.openstack.org/bandit/latest/plugins/b602_subprocess_popen_with_shell_equals_true.html"
+  },
+  {
+    "tool": "phpcs_security_audit",
+    "category": "sast",
+    "name": "phpinfo() function detected",
+    "message": "phpinfo() function detected",
+    "cve": "php/vuln.php:PHPCS_SecurityAudit.BadFunctions.Phpinfos.WarnPhpinfo",
+    "severity": "Low",
+    "location": {
+      "file": "php/vuln.php",
+      "start_line": 7
+    },
+    "identifiers": [
+      {
+        "type": "phpcs_security_audit_source",
+        "name": "PHPCS_SecurityAudit.BadFunctions.Phpinfos.WarnPhpinfo",
+        "value": "PHPCS_SecurityAudit.BadFunctions.Phpinfos.WarnPhpinfo"
+      }
+    ],
+    "priority": "Low",
+    "file": "php/vuln.php",
+    "line": 7
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Possible hardcoded password: 'blerg'",
+    "cve": "python/hardcoded/hardcoded-passwords.py:97c30f1d76d2a88913e3ce9ae74087874d740f87de8af697a9c455f01119f633:B106",
+    "severity": "Low",
+    "confidence": "Medium",
+    "location": {
+      "file": "python/hardcoded/hardcoded-passwords.py",
+      "start_line": 22,
+      "end_line": 22
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B106",
+        "value": "B106",
+        "url": "https://docs.openstack.org/bandit/latest/plugins/b106_hardcoded_password_funcarg.html"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/hardcoded/hardcoded-passwords.py",
+    "line": 22,
+    "url": "https://docs.openstack.org/bandit/latest/plugins/b106_hardcoded_password_funcarg.html"
+  },
+  {
+    "tool": "go_ast_scanner",
+    "category": "sast",
+    "message": "Use of math/big.Int.Exp function should be audited for modulus == 0",
+    "cve": "go/main.go:z.Exp(x, y, m):G105",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "go/main.go",
+      "start_line": 26
+    },
+    "identifiers": [
+      {
+        "type": "gas_rule_id",
+        "name": "Go AST Scanner Rule ID G105",
+        "value": "G105"
+      }
+    ],
+    "priority": "Low",
+    "file": "go/main.go",
+    "line": 26
+  },
+  {
+    "tool": "go_ast_scanner",
+    "category": "sast",
+    "message": "Errors unhandled.",
+    "cve": "go/main.go:t.Execute(os.Stdout, v):G104",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "go/main.go",
+      "start_line": 18
+    },
+    "identifiers": [
+      {
+        "type": "gas_rule_id",
+        "name": "Go AST Scanner Rule ID G104",
+        "value": "G104"
+      }
+    ],
+    "priority": "Low",
+    "file": "go/main.go",
+    "line": 18
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Consider possible security implications associated with subprocess module.",
+    "cve": "python/imports/imports.py:8de9bc98029d212db530785a5f6780cfa663548746ff228ab8fa96c5bb82f089:B404",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports.py",
+      "start_line": 4,
+      "end_line": 4
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B404",
+        "value": "B404"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/imports/imports.py",
+    "line": 4
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Consider possible security implications associated with pickle module.",
+    "cve": "python/imports/imports.py:af58d07f6ad519ef5287fcae65bf1a6999448a1a3a8bc1ac2a11daa80d0b96bf:B403",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports.py",
+      "start_line": 2,
+      "end_line": 2
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B403",
+        "value": "B403"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/imports/imports.py",
+    "line": 2
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Consider possible security implications associated with subprocess module.",
+    "cve": "python/imports/imports-function.py:5858400c2f39047787702de44d03361ef8d954c9d14bd54ee1c2bef9e6a7df93:B404",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-function.py",
+      "start_line": 4,
+      "end_line": 4
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B404",
+        "value": "B404"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/imports/imports-function.py",
+    "line": 4
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Consider possible security implications associated with Popen module.",
+    "cve": "python/imports/imports-aliases.py:2c3e1fa1e54c3c6646e8bcfaee2518153c6799b77587ff8d9a7b0631f6d34785:B404",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-aliases.py",
+      "start_line": 1,
+      "end_line": 1
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B404",
+        "value": "B404"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/imports/imports-aliases.py",
+    "line": 1
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Consider possible security implications associated with pickle module.",
+    "cve": "python/imports/imports-function.py:dbda3cf4190279d30e0aad7dd137eca11272b0b225e8af4e8bf39682da67d956:B403",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-function.py",
+      "start_line": 2,
+      "end_line": 2
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B403",
+        "value": "B403"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/imports/imports-function.py",
+    "line": 2
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Consider possible security implications associated with Popen module.",
+    "cve": "python/imports/imports-from.py:eb8a0db9cd1a8c1ab39a77e6025021b1261cc2a0b026b2f4a11fca4e0636d8dd:B404",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-from.py",
+      "start_line": 7,
+      "end_line": 7
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B404",
+        "value": "B404"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/imports/imports-from.py",
+    "line": 7
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Consider possible security implications associated with subprocess module.",
+    "cve": "python/imports/imports-from.py:332a12ab1146698f614a905ce6a6a5401497a12281aef200e80522711c69dcf4:B404",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-from.py",
+      "start_line": 6,
+      "end_line": 6
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B404",
+        "value": "B404"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/imports/imports-from.py",
+    "line": 6
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Consider possible security implications associated with Popen module.",
+    "cve": "python/imports/imports-from.py:0a48de4a3d5348853a03666cb574697e3982998355e7a095a798bd02a5947276:B404",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-from.py",
+      "start_line": 1,
+      "end_line": 2
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B404",
+        "value": "B404"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/imports/imports-from.py",
+    "line": 1
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Consider possible security implications associated with pickle module.",
+    "cve": "python/imports/imports-aliases.py:51b71661dff994bde3529639a727a678c8f5c4c96f00d300913f6d5be1bbdf26:B403",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-aliases.py",
+      "start_line": 7,
+      "end_line": 8
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B403",
+        "value": "B403"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/imports/imports-aliases.py",
+    "line": 7
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Consider possible security implications associated with loads module.",
+    "cve": "python/imports/imports-aliases.py:6ff02aeb3149c01ab68484d794a94f58d5d3e3bb0d58557ef4153644ea68ea54:B403",
+    "severity": "Low",
+    "confidence": "High",
+    "location": {
+      "file": "python/imports/imports-aliases.py",
+      "start_line": 6,
+      "end_line": 6
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B403",
+        "value": "B403"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/imports/imports-aliases.py",
+    "line": 6
+  },
+  {
+    "tool": "bandit",
+    "category": "sast",
+    "message": "Possible hardcoded password: 'blerg'",
+    "cve": "python/hardcoded/hardcoded-passwords.py:4311b06d08df8fa58229b341c531da8e1a31ec4520597bdff920cd5c098d86f9:B105",
+    "severity": "Low",
+    "confidence": "Medium",
+    "location": {
+      "file": "python/hardcoded/hardcoded-passwords.py",
+      "start_line": 24,
+      "end_line": 24
+    },
+    "identifiers": [
+      {
+        "type": "bandit_test_id",
+        "name": "Bandit Test ID B105",
+        "value": "B105",
+        "url": "https://docs.openstack.org/bandit/latest/plugins/b105_hardcoded_password_string.html"
+      }
+    ],
+    "priority": "Low",
+    "file": "python/hardcoded/hardcoded-passwords.py",
+    "line": 24,
+    "url": "https://docs.openstack.org/bandit/latest/plugins/b105_hardcoded_password_string.html"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Possible SQL injection",
+    "message": "Possible SQL injection",
+    "cve": "672fb59ead203af7b429e4efa722101b9246e60334470daa7c07a62078974350",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/controllers/users_controller.rb",
+      "start_line": 97,
+      "class": "UsersController",
+      "method": "arel_sql"
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 0",
+        "value": "0",
+        "url": "https://brakemanscanner.org/docs/warning_types/sql_injection/"
+      }
+    ],
+    "file": "rails5/app/controllers/users_controller.rb",
+    "line": 97,
+    "url": "https://brakemanscanner.org/docs/warning_types/sql_injection/"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "User input in eval",
+    "message": "User input in eval",
+    "cve": "e90f8e364e35ed2f6a56b4597e7de8945c836c75ef673006d960a380ecdf47e8",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/helpers/users_helper.rb",
+      "start_line": 3,
+      "class": "UsersHelper",
+      "method": "bad_helper"
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 13",
+        "value": "13",
+        "url": "https://brakemanscanner.org/docs/warning_types/dangerous_eval/"
+      }
+    ],
+    "file": "rails5/app/helpers/users_helper.rb",
+    "line": 3,
+    "url": "https://brakemanscanner.org/docs/warning_types/dangerous_eval/"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Unsafe reflection method constantize called with parameter value",
+    "message": "Unsafe reflection method constantize called with parameter value",
+    "cve": "ed9f1dea97ba2929a0107fce64c3b4aa66010961ebbef36e1d11428067095cb6",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/controllers/widget_controller.rb",
+      "start_line": 7,
+      "class": "WidgetController",
+      "method": "dynamic_constant"
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 24",
+        "value": "24",
+        "url": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/"
+      }
+    ],
+    "file": "rails5/app/controllers/widget_controller.rb",
+    "line": 7,
+    "url": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Possible SQL injection",
+    "message": "Possible SQL injection",
+    "cve": "fe0098fc5ab1051854573b487855f348bd9320c8eb5ae55302b4649d0147d7dd",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/lib/a_lib.rb",
+      "start_line": 3,
+      "class": "JustAClass",
+      "method": "do_sql_stuff"
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 0",
+        "value": "0",
+        "url": "https://brakemanscanner.org/docs/warning_types/sql_injection/"
+      }
+    ],
+    "file": "rails5/lib/a_lib.rb",
+    "line": 3,
+    "url": "https://brakemanscanner.org/docs/warning_types/sql_injection/"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Unescaped parameter value",
+    "message": "Unescaped parameter value",
+    "cve": "e203c837d65aad6ab63e09c2487beabf478534f77f0c20e946a28a38826ca657",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/views/users/sanitizing.html.erb",
+      "start_line": 1
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 2",
+        "value": "2",
+        "url": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting"
+      }
+    ],
+    "file": "rails5/app/views/users/sanitizing.html.erb",
+    "line": 1,
+    "url": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Unescaped parameter value",
+    "message": "Unescaped parameter value",
+    "cve": "dbec030dda82f21c5ea860e38746de64a6f3b9c49508ae2db947759a753a386c",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/views/widget/no_html.haml",
+      "start_line": 1
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 2",
+        "value": "2",
+        "url": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/"
+      }
+    ],
+    "file": "rails5/app/views/widget/no_html.haml",
+    "line": 1,
+    "url": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Unescaped parameter value in content_tag",
+    "message": "Unescaped parameter value in content_tag",
+    "cve": "a1ca8c0e91d159ddc920d3c9efc6942f6aa697c519b299b756810ac1ca977763",
+    "confidence": "Medium",
+    "location": {
+      "file": "rails5/app/views/widget/content_tag.html.erb",
+      "start_line": 3
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 53",
+        "value": "53",
+        "url": "https://brakemanscanner.org/docs/warning_types/content_tag"
+      }
+    ],
+    "file": "rails5/app/views/widget/content_tag.html.erb",
+    "line": 3,
+    "url": "https://brakemanscanner.org/docs/warning_types/content_tag"
+  },
+  {
+    "tool": "security_code_scan",
+    "category": "sast",
+    "name": "Weak random generator",
+    "message": "Weak random generator",
+    "cve": "dotnet/app/WeakRandom.cs:7:SCS0005",
+    "location": {
+      "file": "dotnet/app/WeakRandom.cs",
+      "start_line": 7
+    },
+    "identifiers": [
+      {
+        "type": "security_code_scan_rule_id",
+        "name": "SCS0005",
+        "value": "SCS0005",
+        "url": "https://security-code-scan.github.io/#SCS0005"
+      }
+    ],
+    "file": "dotnet/app/WeakRandom.cs",
+    "line": 7,
+    "url": "https://security-code-scan.github.io/#SCS0005"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Unescaped parameter value in content_tag",
+    "message": "Unescaped parameter value in content_tag",
+    "cve": "956e3e4f494316c5f30cde009086fd7be0bddf80d85901cdb8e3d7b7d76d219b",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/views/widget/content_tag.html.erb",
+      "start_line": 1
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 53",
+        "value": "53",
+        "url": "https://brakemanscanner.org/docs/warning_types/content_tag"
+      }
+    ],
+    "file": "rails5/app/views/widget/content_tag.html.erb",
+    "line": 1,
+    "url": "https://brakemanscanner.org/docs/warning_types/content_tag"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Possible unprotected redirect",
+    "message": "Possible unprotected redirect",
+    "cve": "9187972b879413888afcc0f94c02d9e5c47d56ecb15add404d6706f95efc08ee",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/controllers/mixed_controller.rb",
+      "start_line": 26,
+      "class": "BaseController",
+      "method": "redirect_to_strong_params"
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 18",
+        "value": "18",
+        "url": "https://brakemanscanner.org/docs/warning_types/redirect/"
+      }
+    ],
+    "file": "rails5/app/controllers/mixed_controller.rb",
+    "line": 26,
+    "url": "https://brakemanscanner.org/docs/warning_types/redirect/"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Unescaped cookie value rendered inline",
+    "message": "Unescaped cookie value rendered inline",
+    "cve": "8badd2e174576484eca32fb6015d903700d6694e9b3486be64d737aa215a36ea",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/controllers/widget_controller.rb",
+      "start_line": 86,
+      "class": "WidgetController",
+      "method": "render_cookies"
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 84",
+        "value": "84",
+        "url": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/"
+      }
+    ],
+    "file": "rails5/app/controllers/widget_controller.rb",
+    "line": 86,
+    "url": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "User input in eval",
+    "message": "User input in eval",
+    "cve": "7fe3142d1d11b7118463e45a82b4b7a2b5b5bac95cf8904050c101fae16b8168",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/models/user.rb",
+      "start_line": 3,
+      "class": "User",
+      "method": "User.evaluate_user_input"
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 13",
+        "value": "13",
+        "url": "https://brakemanscanner.org/docs/warning_types/dangerous_eval/"
+      }
+    ],
+    "file": "rails5/app/models/user.rb",
+    "line": 3,
+    "url": "https://brakemanscanner.org/docs/warning_types/dangerous_eval/"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Unescaped model attribute",
+    "message": "Unescaped model attribute",
+    "cve": "7aec2bbe8fa40f49f08b70dfc8c0b6afdc9be252eb0459a3d5313bc904d9ec77",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/views/layouts/users.html.erb",
+      "start_line": 2
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 2",
+        "value": "2",
+        "url": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting"
+      }
+    ],
+    "file": "rails5/app/views/layouts/users.html.erb",
+    "line": 2,
+    "url": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Potentially dangerous key allowed for mass assignment",
+    "message": "Potentially dangerous key allowed for mass assignment",
+    "cve": "615627822842388859734b6124bf99e0db057a2572f35c92ff42b5ad46f4415f",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/controllers/widget_controller.rb",
+      "start_line": 90,
+      "class": "WidgetController",
+      "method": "dangerous_permits"
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 105",
+        "value": "105",
+        "url": "https://brakemanscanner.org/docs/warning_types/mass_assignment/"
+      }
+    ],
+    "file": "rails5/app/controllers/widget_controller.rb",
+    "line": 90,
+    "url": "https://brakemanscanner.org/docs/warning_types/mass_assignment/"
+  },
+  {
+    "tool": "flawfinder",
+    "category": "sast",
+    "message": "Statically-sized arrays can be improperly restricted, leading to potential overflows or other issues (CWE-119!/CWE-120)",
+    "cve": "c/subdir/utils.c:b466873101951fe96e1332f6728eb7010acbbd5dfc3b65d7d53571d091a06d9e:CWE-119!/CWE-120",
+    "confidence": "Low",
+    "solution": "Perform bounds checking, use functions that limit length, or ensure that the size is larger than the maximum possible length",
+    "location": {
+      "file": "c/subdir/utils.c",
+      "start_line": 4
+    },
+    "identifiers": [
+      {
+        "type": "cwe",
+        "name": "CWE-119",
+        "value": "119",
+        "url": "https://cwe.mitre.org/data/definitions/119.html"
+      },
+      {
+        "type": "cwe",
+        "name": "CWE-120",
+        "value": "120",
+        "url": "https://cwe.mitre.org/data/definitions/120.html"
+      }
+    ],
+    "file": "c/subdir/utils.c",
+    "line": 4,
+    "url": "https://cwe.mitre.org/data/definitions/119.html"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Unescaped parameter value",
+    "message": "Unescaped parameter value",
+    "cve": "26b8b0ad586712d41ac6877e2292c6da7aa4760078add7fd23edf5b7a1bcb699",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/views/widget/show.html.erb",
+      "start_line": 1
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 2",
+        "value": "2",
+        "url": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/"
+      }
+    ],
+    "file": "rails5/app/views/widget/show.html.erb",
+    "line": 1,
+    "url": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/"
+  },
+  {
+    "tool": "flawfinder",
+    "category": "sast",
+    "message": "Statically-sized arrays can be improperly restricted, leading to potential overflows or other issues (CWE-119!/CWE-120)",
+    "cve": "cplusplus/src/hello.cpp:c8c6dd0afdae6814194cf0930b719f757ab7b379cf8f261e7f4f9f2f323a818a:CWE-119!/CWE-120",
+    "confidence": "Low",
+    "solution": "Perform bounds checking, use functions that limit length, or ensure that the size is larger than the maximum possible length",
+    "location": {
+      "file": "cplusplus/src/hello.cpp",
+      "start_line": 6
+    },
+    "identifiers": [
+      {
+        "type": "cwe",
+        "name": "CWE-119",
+        "value": "119",
+        "url": "https://cwe.mitre.org/data/definitions/119.html"
+      },
+      {
+        "type": "cwe",
+        "name": "CWE-120",
+        "value": "120",
+        "url": "https://cwe.mitre.org/data/definitions/120.html"
+      }
+    ],
+    "file": "cplusplus/src/hello.cpp",
+    "line": 6,
+    "url": "https://cwe.mitre.org/data/definitions/119.html"
+  },
+  {
+    "tool": "flawfinder",
+    "category": "sast",
+    "message": "Does not check for buffer overflows when copying to destination [MS-banned] (CWE-120)",
+    "cve": "cplusplus/src/hello.cpp:331c04062c4fe0c7c486f66f59e82ad146ab33cdd76ae757ca41f392d568cbd0:CWE-120",
+    "confidence": "Low",
+    "solution": "Consider using snprintf, strcpy_s, or strlcpy (warning: strncpy easily misused)",
+    "location": {
+      "file": "cplusplus/src/hello.cpp",
+      "start_line": 7
+    },
+    "identifiers": [
+      {
+        "type": "cwe",
+        "name": "CWE-120",
+        "value": "120",
+        "url": "https://cwe.mitre.org/data/definitions/120.html"
+      }
+    ],
+    "file": "cplusplus/src/hello.cpp",
+    "line": 7,
+    "url": "https://cwe.mitre.org/data/definitions/120.html"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Unescaped parameter value",
+    "message": "Unescaped parameter value",
+    "cve": "26948b197b886c81ed6e3cc668b811e6e2407bcd6d2df3cf1ae79e33dccc4bb0",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/controllers/widget_controller.rb",
+      "start_line": 15
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 2",
+        "value": "2",
+        "url": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/"
+      }
+    ],
+    "file": "rails5/app/controllers/widget_controller.rb",
+    "line": 15,
+    "url": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "User controlled method execution",
+    "message": "User controlled method execution",
+    "cve": "21c9eef1c001e48a0bfedfa11ff0f9d96b0c106f1016218712dabc088b2e69b6",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/controllers/users_controller.rb",
+      "start_line": 76,
+      "class": "UsersController",
+      "method": "ruby_230"
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 23",
+        "value": "23",
+        "url": "https://brakemanscanner.org/docs/warning_types/dangerous_send/"
+      }
+    ],
+    "file": "rails5/app/controllers/users_controller.rb",
+    "line": 76,
+    "url": "https://brakemanscanner.org/docs/warning_types/dangerous_send/"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Unescaped parameter value",
+    "message": "Unescaped parameter value",
+    "cve": "0d980d69bd0158cfa6a92c12bc49294fe32e9862a758e11fe3cf9e03b6c50489",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/views/users/sanitizing.html.erb",
+      "start_line": 3
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 2",
+        "value": "2",
+        "url": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting"
+      }
+    ],
+    "file": "rails5/app/views/users/sanitizing.html.erb",
+    "line": 3,
+    "url": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Parameters should be whitelisted for mass assignment",
+    "message": "Parameters should be whitelisted for mass assignment",
+    "cve": "046f3c6cc9a55464d21837b583c672c26532cd46c1f719853a1a15b790baf8ea",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/controllers/users_controller.rb",
+      "start_line": 78,
+      "class": "UsersController",
+      "method": "ruby_230"
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 70",
+        "value": "70",
+        "url": "https://brakemanscanner.org/docs/warning_types/mass_assignment/"
+      }
+    ],
+    "file": "rails5/app/controllers/users_controller.rb",
+    "line": 78,
+    "url": "https://brakemanscanner.org/docs/warning_types/mass_assignment/"
+  },
+  {
+    "tool": "brakeman",
+    "category": "sast",
+    "name": "Unsafe parameter value in link_to href",
+    "message": "Unsafe parameter value in link_to href",
+    "cve": "03fcddff701f15c976a229c2a814c817f81463b733c6d4925253488879d907e3",
+    "confidence": "High",
+    "location": {
+      "file": "rails5/app/views/users/show.html.erb",
+      "start_line": 7
+    },
+    "identifiers": [
+      {
+        "type": "brakeman_warning_code",
+        "name": "Brakeman Warning Code 4",
+        "value": "4",
+        "url": "https://brakemanscanner.org/docs/warning_types/link_to_href"
+      }
+    ],
+    "file": "rails5/app/views/users/show.html.erb",
+    "line": 7,
+    "url": "https://brakemanscanner.org/docs/warning_types/link_to_href"
+  },
+  {
+    "tool": "flawfinder",
+    "category": "sast",
+    "message": "Check when opening files - can an attacker redirect it (via symlinks), force the opening of special file type (e.g., device files), move things around to create a race condition, control its ancestors, or change its contents? (CWE-362)",
+    "cve": "c/subdir/utils.c:bab681140fcc8fc3085b6bba74081b44ea145c1c98b5e70cf19ace2417d30770:CWE-362",
+    "confidence": "Low",
+    "location": {
+      "file": "c/subdir/utils.c",
+      "start_line": 8
+    },
+    "identifiers": [
+      {
+        "type": "cwe",
+        "name": "CWE-362",
+        "value": "362",
+        "url": "https://cwe.mitre.org/data/definitions/362.html"
+      }
+    ],
+    "file": "c/subdir/utils.c",
+    "line": 8,
+    "url": "https://cwe.mitre.org/data/definitions/362.html"
+  }
+]
