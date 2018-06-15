@@ -2,6 +2,7 @@
 - add_to_breadcrumbs "Jobs", project_jobs_path(@project)
 - breadcrumb_title "##{@build.id}"
 - page_title "#{@build.name} (##{@build.id})", "Jobs"
+- active_tab = active_tab = local_assigns.fetch(:active_tab, 'raw')
 
 %div{ class: container_class }
   .build-page.js-build-page
@@ -58,37 +59,56 @@
             Job has been erased #{time_ago_with_tooltip(@build.erased_at)}
 
     - if @build.running? || @build.has_trace?
-      .build-trace-container.prepend-top-default
-        .top-bar.js-top-bar
-          .js-truncated-info.truncated-info.d-none.d-sm-block.float-left.hidden<
-            Showing last
-            %span.js-truncated-info-size.truncated-info-size><
-            of log -
-            %a.js-raw-link.raw-link{ href: raw_project_job_path(@project, @build) }>< Complete Raw
+      - if @build.expose_selenium_data?
+        .tabs-holder
+          %ul.nav.nav-tabs.nav-links
+            %li
+              = link_to '#0', class: active_when(active_tab == 'raw'), data: { target: '#js-tab-raw', action: 'raw', toggle: 'tab' } do
+                = _("Raw")
+            %li
+              = link_to '#0', class: active_when(active_tab == 'selenium'), data: { target: '#js-tab-selenium', action: 'selenium', toggle: 'tab' } do
+                = _("Selenium")
 
-          .controllers.float-right
-            - if @build.has_trace?
-              = link_to raw_project_job_path(@project, @build),
-                      title: 'Show complete raw',
-                      data: { placement: 'top', container: 'body' },
-                      class: 'js-raw-link-controller has-tooltip controllers-buttons' do
-                = icon('file-text-o')
+      .tab-content
+        #js-tab-raw.tab-pane{ class: active_when(active_tab == 'raw') }
+          .build-trace-container.prepend-top-default
+            .top-bar.js-top-bar
+              .js-truncated-info.truncated-info.d-none.d-sm-block.float-left.hidden<
+                Showing last
+                %span.js-truncated-info-size.truncated-info-size><
+                of log -
+                %a.js-raw-link.raw-link{ href: raw_project_job_path(@project, @build) }>< Complete Raw
 
-            - if @build.erasable? && can?(current_user, :erase_build, @build)
-              = link_to erase_project_job_path(@project, @build),
-                        method: :post,
-                        data: { confirm: 'Are you sure you want to erase this build?', placement: 'top', container: 'body' },
-                        title: 'Erase job log',
-                        class: 'has-tooltip js-erase-link controllers-buttons' do
-                = icon('trash')
-            .has-tooltip.controllers-buttons{ title: 'Scroll to top', data: { placement: 'top', container: 'body'} }
-              %button.js-scroll-up.btn-scroll.btn-transparent.btn-blank{ type: 'button', disabled: true }
-                = custom_icon('scroll_up')
-            .has-tooltip.controllers-buttons{ title: 'Scroll to bottom', data: { placement: 'top', container: 'body'} }
-              %button.js-scroll-down.btn-scroll.btn-transparent.btn-blank{ type: 'button', disabled: true }
-                = custom_icon('scroll_down')
+              .controllers.float-right
+                - if @build.has_trace?
+                  = link_to raw_project_job_path(@project, @build),
+                          title: 'Show complete raw',
+                          data: { placement: 'top', container: 'body' },
+                          class: 'js-raw-link-controller has-tooltip controllers-buttons' do
+                    = icon('file-text-o')
 
-        = render 'shared/builds/build_output'
+                - if @build.erasable? && can?(current_user, :erase_build, @build)
+                  = link_to erase_project_job_path(@project, @build),
+                            method: :post,
+                            data: { confirm: 'Are you sure you want to erase this build?', placement: 'top', container: 'body' },
+                            title: 'Erase job log',
+                            class: 'has-tooltip js-erase-link controllers-buttons' do
+                    = icon('trash')
+                .has-tooltip.controllers-buttons{ title: 'Scroll to top', data: { placement: 'top', container: 'body'} }
+                  %button.js-scroll-up.btn-scroll.btn-transparent.btn-blank{ type: 'button', disabled: true }
+                    = custom_icon('scroll_up')
+                .has-tooltip.controllers-buttons{ title: 'Scroll to bottom', data: { placement: 'top', container: 'body'} }
+                  %button.js-scroll-down.btn-scroll.btn-transparent.btn-blank{ type: 'button', disabled: true }
+                    = custom_icon('scroll_down')
+            = render 'shared/builds/build_output'
+
+        - if @build.expose_selenium_data?
+          #js-tab-selenium.tab-pane{ class: active_when(active_tab == 'selenium') }
+            #js-selenium-view-app{ data: { base_artifact_endpoint: selenium_artifact_base_url(@build),
+              session_ids: @build.selenium_session_ids.join(',') } }
+              = _('Selenium CI view unitialized')
+
+
     - else
       = render "empty_states"
 

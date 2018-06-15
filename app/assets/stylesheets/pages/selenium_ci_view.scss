@@ -1,0 +1,21 @@
+.selenium-ci-view-cell {
+  padding-left: $gl-padding-8;
+  padding-right: $gl-padding-8;
+}
+
+.selenium-ci-view-duration-cell {
+  align-self: flex-start;
+  font-size: 12px;
+}
+
+.selenium-ci-view-screenshot-container {
+  overflow: hidden;
+  width: 60%;
+  max-height: 300px;
+}
+
+.selenium-ci-view-screenshot {
+  width: 100%;
+  // Ensure tall images stay within the container
+  object-fit: contain;
+}

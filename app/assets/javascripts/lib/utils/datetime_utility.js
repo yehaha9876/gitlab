@@ -198,6 +198,16 @@ export function timeIntervalInWords(intervalInSeconds) {
   return text;
 }
 
+export function timeDurationShort(intervalInSeconds) {
+  const secondsInteger = parseFloat(intervalInSeconds);
+
+  const hours = Math.floor(secondsInteger / (60 * 60));
+  const minutes = Math.floor((secondsInteger / 60) % 60);
+  const seconds = (secondsInteger % 60).toFixed(2);
+
+  return `${hours > 0 ? `${hours} hrs ` : ''}${minutes} mins ${seconds} s`;
+}
+
 export function dateInWords(date, abbreviated = false, hideYear = false) {
   if (!date) return date;
 

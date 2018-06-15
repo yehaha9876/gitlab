@@ -66,6 +66,7 @@ class License < ActiveRecord::Base
     system_header_footer
     custom_project_templates
     packages
+    selenium
   ].freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[

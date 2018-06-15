@@ -35,6 +35,12 @@ module EE
                                       path: Ci::Build::SAST_FILE)
     end
 
+    def selenium_artifact_base_url(build)
+      raw_project_build_artifacts_url(build.project,
+                                      build,
+                                      path: Ci::Build::SELENIUM_DIR)
+    end
+
     def dependency_scanning_artifact_url(pipeline)
       raw_project_build_artifacts_url(pipeline.project,
                                       pipeline.dependency_scanning_artifact,

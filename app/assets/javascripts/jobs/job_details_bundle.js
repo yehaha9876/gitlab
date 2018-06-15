@@ -1,7 +1,10 @@
 import Vue from 'vue';
+import { mapActions, mapState, mapGetters } from 'vuex';
 import JobMediator from './job_details_mediator';
 import jobHeader from './components/header.vue';
 import detailsBlock from './components/sidebar_details_block.vue';
+import seleniumCiView from '../selenium_ci_view/components/selenium_ci_view.vue';
+import seleniumCiViewStore from '../selenium_ci_view/store';
 
 export default () => {
   const { dataset } = document.getElementById('js-job-details-vue');
@@ -59,4 +62,47 @@ export default () => {
       });
     },
   });
+
+  const seleniumViewElement = document.getElementById('js-selenium-view-app');
+  if (seleniumViewElement) {
+    // eslint-disable-next-line
+    new Vue({
+      el: seleniumViewElement,
+      store: seleniumCiViewStore,
+      components: {
+        seleniumCiView,
+      },
+      computed: {
+        ...mapState([
+          //'todo',
+        ]),
+        ...mapGetters([
+          'firstSessionId',
+        ]),
+      },
+      created() {
+        const seleniumViewDataset = seleniumViewElement.dataset;
+        console.log('seleniumViewDataset', seleniumViewDataset);
+
+        this.setBaseArtifactEndpoint(seleniumViewDataset.baseArtifactEndpoint);
+        this.setSessionIds((seleniumViewDataset.sessionIds || '').split(','));
+
+        this.fetchSessionLog(this.firstSessionId);
+      },
+      methods: {
+        ...mapActions([
+          'setBaseArtifactEndpoint',
+          'setSessionIds',
+          'fetchSessionLog',
+        ]),
+      },
+      render(createElement) {
+        return createElement('selenium-ci-view', {
+          props: {
+            // ...
+          },
+        });
+      },
+    });
+  }
 };

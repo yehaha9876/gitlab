@@ -18,6 +18,7 @@ module EE
       SAST_CONTAINER_FILE = 'gl-sast-container-report.json'.freeze
       CONTAINER_SCANNING_FILE = 'gl-container-scanning-report.json'.freeze
       DAST_FILE = 'gl-dast-report.json'.freeze
+      SELENIUM_DIR = 'selenium/'.freeze
 
       prepended do
         after_save :stick_build_if_status_changed
@@ -55,6 +56,10 @@ module EE
           has_artifact?(SAST_FILE)
       end
 
+      def has_selenium_dir?
+        has_artifact?(SELENIUM_DIR)
+      end
+
       def has_dependency_scanning_json?
         name_in?('dependency_scanning') &&
           has_artifact?(DEPENDENCY_SCANNING_FILE)
@@ -79,6 +84,15 @@ module EE
       def has_dast_json?
         name_in?('dast') &&
           has_artifact?(DAST_FILE)
+      end
+
+      def expose_selenium_data?
+        project.feature_available?(:selenium) &&
+          has_selenium_dir?
+      end
+
+      def selenium_session_ids
+        has_selenium_dir? ? artifacts_metadata_entry(SELENIUM_DIR).children.select(&:directory?).map { |dir| dir.name } : []
       end
 
       private

@@ -54,7 +54,7 @@ class Projects::JobsController < Projects::ApplicationController
       .present(current_user: current_user)
 
     respond_to do |format|
-      format.html
+      format.html { render :show, locals: { active_tab: params[:active_tab] || "raw" } }
       format.json do
         Gitlab::PollingInterval.set_header(response, interval: 10_000)
 
