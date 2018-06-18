@@ -20,7 +20,9 @@ module Projects
       end
 
       def notify
-        NotificationService.new.prometheus_alert_fired(project, params["alerts"].first)
+        params["alerts"].each do |alert|
+          NotificationService.new.prometheus_alert_fired(project, alert)
+        end
 
         head :ok
       end

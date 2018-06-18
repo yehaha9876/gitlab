@@ -18,16 +18,22 @@ module EE
             proc do |group|
               group[:metrics]&.map! do |metric|
                 metric[:queries]&.map! do |item|
-                  query = item&.[](:query) || item&.[](:query_range)
+                  item_hash = Hash.new(item)
+                  query = item_hash[:query] || item_hash[:query_range]
 
                   if query && alerts_map[query]
-                    item[:alert_path] = ::Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alerts_map[query], environment_id: environment.id, format: :json)
+                    item[:alert_path] = ::Gitlab::Routing.url_helpers
+                      .project_prometheus_alert_path(
+                        project, alerts_map[query],
+                        environment_id: environment.id, format: :json)
                   end
 
                   item
                 end
+
                 metric
               end
+
               group
             end
           end

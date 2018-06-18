@@ -75,7 +75,6 @@ module ReactiveCaching
       end
     end
 
-    # TODO: Remove change since https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/19311 will get merged
     def clear_reactive_cache!(*args)
       Rails.cache.delete(full_reactive_cache_key(*args))
       Rails.cache.delete(alive_reactive_cache_key(*args))

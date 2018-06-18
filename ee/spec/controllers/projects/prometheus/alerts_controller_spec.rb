@@ -26,6 +26,14 @@ describe Projects::Prometheus::AlertsController do
         create_list(:prometheus_alert, 3, project: project, environment: environment)
       end
 
+      it 'renders forbidden when unlicensed' do
+        stub_licensed_features(prometheus_alerts: false)
+
+        get :index, project_params
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
       it 'returns an empty response' do
         get :index, project_params
 
@@ -36,16 +44,6 @@ describe Projects::Prometheus::AlertsController do
   end
 
   describe 'GET #show' do
-    context 'when unlicensed' do
-      it 'renders forbidden' do
-        stub_licensed_features(prometheus_alerts: false)
-
-        get :show, project_params(id: PrometheusAlert.all.maximum(:iid) || 0)
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
-
     context 'when alert does not exist' do
       it 'renders 404' do
         get :show, project_params(id: PrometheusAlert.all.maximum(:iid) || 0)
@@ -55,8 +53,17 @@ describe Projects::Prometheus::AlertsController do
     end
 
     context 'when alert exists' do
+      let(:alert) { create(:prometheus_alert, project: project, environment: environment) }
+
+      it 'renders forbidden when unlicensed' do
+        stub_licensed_features(prometheus_alerts: false)
+
+        get :show, project_params(id: alert.iid)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
       it 'renders the alert' do
-        alert = create(:prometheus_alert, project: project, environment: environment)
         alert_params = {
           "id" => alert.id,
           "iid" => alert.iid,
@@ -101,14 +108,12 @@ describe Projects::Prometheus::AlertsController do
   end
 
   describe 'POST #create' do
-    context 'when unlicensed' do
-      it 'renders forbidden' do
-        stub_licensed_features(prometheus_alerts: false)
+    it 'renders forbidden when unlicensed' do
+      stub_licensed_features(prometheus_alerts: false)
 
-        post :create, project_params(query: "foo", operator: ">", threshold: "1", name: "bar", environment_id: environment.id)
+      post :create, project_params(query: "foo", operator: ">", threshold: "1", name: "bar", environment_id: environment.id)
 
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
+      expect(response).to have_gitlab_http_status(:not_found)
     end
 
     it 'creates a new prometheus alert' do
@@ -149,14 +154,12 @@ describe Projects::Prometheus::AlertsController do
       allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
     end
 
-    context 'when unlicensed' do
-      it 'renders forbidden' do
-        stub_licensed_features(prometheus_alerts: false)
+    it 'renders forbidden when unlicensed' do
+      stub_licensed_features(prometheus_alerts: false)
 
-        put :update, project_params(id: alert.iid, name: "bar")
+      put :update, project_params(id: alert.iid, name: "bar")
 
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
+      expect(response).to have_gitlab_http_status(:not_found)
     end
 
     it 'updates an already existing prometheus alert' do
@@ -179,14 +182,12 @@ describe Projects::Prometheus::AlertsController do
       allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
     end
 
-    context 'when unlicensed' do
-      it 'renders forbidden' do
-        stub_licensed_features(prometheus_alerts: false)
+    it 'renders forbidden when unlicensed' do
+      stub_licensed_features(prometheus_alerts: false)
 
-        delete :destroy, project_params(id: alert.iid)
+      delete :destroy, project_params(id: alert.iid)
 
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
+      expect(response).to have_gitlab_http_status(:not_found)
     end
 
     it 'destroys the specified prometheus alert' do
