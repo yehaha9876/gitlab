@@ -413,10 +413,10 @@ ActiveRecord::Schema.define(version: 20180613081317) do
     t.integer "auto_canceled_by_id"
     t.boolean "retried"
     t.integer "stage_id"
-    t.boolean "protected"
-    t.integer "failure_reason"
     t.integer "artifacts_file_store"
     t.integer "artifacts_metadata_store"
+    t.boolean "protected"
+    t.integer "failure_reason"
   end
 
   add_index "ci_builds", ["artifacts_expire_at"], name: "index_ci_builds_on_artifacts_expire_at", where: "(artifacts_file <> ''::text)", using: :btree
@@ -2010,8 +2010,6 @@ ActiveRecord::Schema.define(version: 20180613081317) do
     t.text "encrypted_credentials"
     t.string "encrypted_credentials_iv"
     t.string "encrypted_credentials_salt"
-    t.string "original_name"
-    t.string "original_path"
   end
 
   add_index "project_import_data", ["project_id"], name: "index_project_import_data_on_project_id", using: :btree
