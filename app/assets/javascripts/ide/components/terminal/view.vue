@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, dispatch } from 'vuex';
 import TerminalDetail from './detail.vue';
 import axios from 'axios';
 
@@ -9,23 +9,39 @@ export default {
   },
   data: function() {
      return {
-         runnerState: true,
+         runnerState: false
      };
   },
   mounted() {
     this.initWebIDEPolling();
+  },
+  beforeDestroy() {
+    this.stopWebIDEPolling();
   },
   computed: {
     ...mapGetters(['currentProject']),
   },
   methods: {
     initWebIDEPolling() {
-      debugger;
-      // http://localhost:3001/api/v4/projects/34/pipelines?source=webide&scope=running
-      this.runnerState = false;
+      this.intervalId = setInterval(() => {
+        this.fetchRunninWebIDEPipeline();
+      }, 1000);
     },
     startWebIDERunner() {
       this.runnerState = true;
+    },
+    runningWebIDEPipeline(pipelines) {
+      this.runnerState = (pipelines.count.running != "0")
+    },
+    fetchRunninWebIDEPipeline() {
+      axios
+        .get(`/${this.currentProject.path_with_namespace}/pipelines`, { params: { format: 'json', source: 'webide', scope: 'running' } })
+        .then(response => (this.runningWebIDEPipeline(response.data)))
+    },
+    stopWebIDEPolling() {
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+      }
     },
   },
 };
