@@ -75,7 +75,8 @@ module Ci
       api: 5,
       external: 6,
       pipeline: 7,
-      chat: 8
+      chat: 8,
+      webide: 9
     }
 
     enum_with_nil config_source: {

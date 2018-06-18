@@ -27,6 +27,7 @@ module API
                             desc: 'Order pipelines'
         optional :sort,     type: String, values: %w[asc desc], default: 'desc',
                             desc: 'Sort pipelines'
+        optional :source,   type: String
       end
       get ':id/pipelines' do
         authorize! :read_pipeline, user_project

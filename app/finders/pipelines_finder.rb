@@ -18,6 +18,7 @@ class PipelinesFinder
     items = by_name(items)
     items = by_username(items)
     items = by_yaml_errors(items)
+    items = by_source(items)
     sort_items(items)
   end
 
@@ -92,6 +93,12 @@ class PipelinesFinder
     else
       items
     end
+  end
+
+  def by_source(items)
+    return items unless source = Ci::Pipeline.sources.include?(params[:source])
+
+    items.where(source: source)
   end
 
   def by_yaml_errors(items)

@@ -4,7 +4,7 @@ import tooltip from '../../../vue_shared/directives/tooltip';
 import Icon from '../../../vue_shared/components/icon.vue';
 import { rightSidebarViews } from '../../constants';
 import PipelinesList from '../pipelines/list.vue';
-import terminalDetail from '../terminal/detail.vue';
+import terminalView from '../terminal/view.vue';
 import JobsDetail from '../jobs/detail.vue';
 import ResizablePanel from '../resizable_panel.vue';
 
@@ -17,6 +17,7 @@ export default {
     PipelinesList,
     JobsDetail,
     ResizablePanel,
+    terminalView,
   },
   computed: {
     ...mapState(['rightPane']),
@@ -28,7 +29,7 @@ export default {
     },
     terminalActive() {
       return (
-        this.rightPane === rightSidebarViews.terminalDetail
+        this.rightPane === rightSidebarViews.terminalView
       );
     },
   },
@@ -90,7 +91,7 @@ export default {
             data-placement="left"
             class="ide-sidebar-link is-right"
             type="button"
-            @click="clickTab($event, $options.rightSidebarViews.terminalDetail)"
+            @click="clickTab($event, $options.rightSidebarViews.terminalView)"
           >
             <icon
               :size="16"
