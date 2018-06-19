@@ -1,6 +1,5 @@
 <script>
 
-// import '~/terminal/index';
 import initTerminal from '~/terminal/';
 
 export default {
@@ -25,13 +24,18 @@ export default {
       }
     },
   },
-  watch: {
-    terminalRunning: function (val) {
-      if (val) {
-        initTerminal();
-      }
-    },
+  updated: function () {
+    if (this.terminalRunning) {
+      initTerminal();
+    }
   },
+  // watch: {
+  //   terminalRunning: function (val) {
+  //     // if (val) {
+  //     //   initTerminal();
+  //     // }
+  //   },
+  // },
 };
 </script>
 

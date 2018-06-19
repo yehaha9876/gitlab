@@ -10,7 +10,7 @@ export default {
   data: function() {
      return {
          terminalRunning: false,
-         terminalBuildPath: 'fran',
+         terminalBuildPath: '',
      };
   },
   mounted() {
