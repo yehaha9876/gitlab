@@ -191,7 +191,7 @@ module Gitlab
         ActiveRecord::Tasks::DatabaseTasks.migrations_paths = settings[:migrations_paths]
         ActiveRecord::Tasks::DatabaseTasks.seed_loader = settings[:seed_loader]
 
-        ApplicationRecord.configurations       = ActiveRecord::Tasks::DatabaseTasks.database_configuration || {}
+        ApplicationRecord.configurations = ActiveRecord::Tasks::DatabaseTasks.database_configuration || {}
         ActiveRecord::Migrator.migrations_paths = ActiveRecord::Tasks::DatabaseTasks.migrations_paths
 
         ApplicationRecord.establish_connection(ApplicationRecord.configurations[ActiveRecord::Tasks::DatabaseTasks.env])
