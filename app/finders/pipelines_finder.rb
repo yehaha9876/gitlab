@@ -96,7 +96,7 @@ class PipelinesFinder
   end
 
   def by_source(items)
-    return items unless source = Ci::Pipeline.sources.include?(params[:source])
+    return items unless source = Ci::Pipeline.sources[params[:source]]
 
     items.where(source: source)
   end

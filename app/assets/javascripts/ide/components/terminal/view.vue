@@ -9,7 +9,8 @@ export default {
   },
   data: function() {
      return {
-         runnerState: false
+         terminalRunning: false,
+         terminalBuildPath: 'fran',
      };
   },
   mounted() {
@@ -24,16 +25,21 @@ export default {
   methods: {
     initWebIDEPolling() {
       this.intervalId = setInterval(() => {
-        this.fetchRunninWebIDEPipeline();
+        this.fetchRunningWebIDEPipeline();
       }, 1000);
     },
     startWebIDERunner() {
-      this.runnerState = true;
+      if (!this.terminalRunning) {
+        axios
+          .post(`/${this.currentProject.path_with_namespace}/-/jobs/create_web_ide_terminal`, { params: { format: 'json' } })
+          .then(response => (this.setTerminalBuildPath(response.data.details_path)))
+      }
     },
     runningWebIDEPipeline(pipelines) {
-      this.runnerState = (pipelines.count.running != "0")
+      // TODO: Fix this check
+      this.terminalRunning = (pipelines.count.running != "0")
     },
-    fetchRunninWebIDEPipeline() {
+    fetchRunningWebIDEPipeline() {
       axios
         .get(`/${this.currentProject.path_with_namespace}/pipelines`, { params: { format: 'json', source: 'webide', scope: 'running' } })
         .then(response => (this.runningWebIDEPipeline(response.data)))
@@ -43,6 +49,9 @@ export default {
         clearInterval(this.intervalId);
       }
     },
+    setTerminalBuildPath(val) {
+      this.terminalBuildPath = val;
+    }
   },
 };
 </script>
@@ -59,7 +68,7 @@ export default {
       </span>
       <div class="ml-auto align-self-center">
         <button
-          v-if="!runnerState"
+          v-if="!terminalRunning"
           type="button"
           class="btn btn-default btn-sm"
           @click="startWebIDERunner"
@@ -69,7 +78,8 @@ export default {
       </div>
     </header>
     <terminal-detail
-      :loading="!runnerState"
+      :terminalRunning="terminalRunning"
+      :terminalBuildPath="terminalBuildPath"
     />
   </div>
 </template>

@@ -1,14 +1,35 @@
 <script>
-import LoadingIcon from '../../../vue_shared/components/loading_icon.vue';
+
+// import '~/terminal/index';
+import initTerminal from '~/terminal/';
 
 export default {
   components: {
-    LoadingIcon,
   },
   props: {
-    loading: {
+    terminalRunning: {
       type: Boolean,
       required: true,
+    },
+    terminalBuildPath: {
+      type: String,
+      required: true,
+    }
+  },
+  computed: {
+    wsTerminalPath: function () {
+      if (this.terminalBuildPath == '') {
+        return '';
+      } else {
+        return `${this.terminalBuildPath}/terminal.ws`
+      }
+    },
+  },
+  watch: {
+    terminalRunning: function (val) {
+      if (val) {
+        initTerminal();
+      }
     },
   },
 };
@@ -16,24 +37,16 @@ export default {
 
 <template>
   <div class="ide-terminal build-page d-flex flex-column flex-fill">
-    <loading-icon
-      v-if="loading"
-      class="prepend-top-default"
-      size="2"
-    />
-    <template v-else>
+    <template v-if="terminalRunning">
       <pre
         ref="buildTrace"
         class="build-trace mb-0 h-100"
       >
-        <code
-          class="bash"
-        >
-        blablalaa
-        </code>
-        <div
-          class="build-loader-animation"
-        >
+        <div class="container-fluid container-limited terminal-container">
+          <div
+            :data-project-path="wsTerminalPath"
+            id="terminal">
+          </div>
         </div>
       </pre>
     </template>

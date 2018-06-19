@@ -302,6 +302,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :jobs, only: [:index, :show], constraints: { id: /\d+/ } do
           collection do
             post :cancel_all
+            post :create_web_ide_terminal, defaults: { format: 'json' }
 
             resources :artifacts, only: [] do
               collection do
