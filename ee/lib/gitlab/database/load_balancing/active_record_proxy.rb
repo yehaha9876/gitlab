@@ -5,6 +5,8 @@ module Gitlab
       # "connection" method.
       module ActiveRecordProxy
         def connection
+          return super if self.singleton_class.included_modules.include?(Gitlab::Database::LoadBalancing::IgnoreLoadBalancing)
+
           LoadBalancing.proxy
         end
       end

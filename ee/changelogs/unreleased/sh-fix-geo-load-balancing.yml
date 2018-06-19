@@ -1,0 +1,5 @@
+---
+title: Fix load balancing configuration not working with Geo tracking database
+merge_request:
+author:
+type: fixed

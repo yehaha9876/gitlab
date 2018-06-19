@@ -2,6 +2,8 @@
 # tracking database for Geo.
 module Geo
   class TrackingBase < ActiveRecord::Base
+    extend Gitlab::Database::LoadBalancing::IgnoreLoadBalancing
+
     self.abstract_class = true
 
     SecondaryNotConfigured = Class.new(StandardError)

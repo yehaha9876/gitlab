@@ -14,5 +14,20 @@ describe Gitlab::Database::LoadBalancing::ActiveRecordProxy do
 
       expect(dummy.new.connection).to eq(proxy)
     end
+
+    it 'does not return a load balancing proxy' do
+      dummy = Class.new do
+        extend Gitlab::Database::LoadBalancing::IgnoreLoadBalancing
+        include Gitlab::Database::LoadBalancing::ActiveRecordProxy
+
+        def connection
+          true
+        end
+      end
+
+      expect(Gitlab::Database::LoadBalancing).not_to receive(:proxy)
+
+      expect(dummy.new.connection).to be_truthy
+    end
   end
 end

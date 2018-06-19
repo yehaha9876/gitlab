@@ -252,6 +252,7 @@ stages:
   script:
     - export NO_KNAPSACK=1
     - export CACHE_CLASSES=true
+    - source scripts/prepare_load_balancing.sh
     - source scripts/prepare_postgres_fdw.sh
     - scripts/gitaly-test-spawn
     - bundle exec rspec --color --format documentation --tag geo ee/spec/
@@ -263,6 +264,7 @@ stages:
   script:
     - export NO_KNAPSACK=1
     - export CACHE_CLASSES=true
+    - source scripts/prepare_load_balancing.sh
     - source scripts/prepare_postgres_fdw.sh
     - scripts/gitaly-test-spawn
     - bundle exec rspec --color --format documentation --tag geo ee/spec/
