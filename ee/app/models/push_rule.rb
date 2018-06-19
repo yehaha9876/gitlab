@@ -1,4 +1,4 @@
-class PushRule < ActiveRecord::Base
+class PushRule < ApplicationRecord
   extend Gitlab::Cache::RequestCache
 
   request_cache_key do

@@ -1,5 +1,5 @@
 module Geo
-  class JobArtifactDeletedEvent < ActiveRecord::Base
+  class JobArtifactDeletedEvent < ApplicationRecord
     include Geo::Model
 
     belongs_to :job_artifact, class_name: 'Ci::JobArtifact'

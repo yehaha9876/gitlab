@@ -4,7 +4,7 @@
 class UpdateAuthorizedKeysFile < ActiveRecord::Migration
   include Gitlab::Database::MigrationHelpers
 
-  class ApplicationSetting < ActiveRecord::Base
+  class ApplicationSetting < ApplicationRecord
     self.table_name = 'application_settings'
   end
 

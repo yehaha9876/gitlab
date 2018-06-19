@@ -23,7 +23,7 @@ class MigrateOldElasticsearchSettings < ActiveRecord::Migration
       end
 
       updater =
-        Arel::UpdateManager.new(ActiveRecord::Base)
+        Arel::UpdateManager.new(ApplicationRecord)
           .table(settings)
           .set(settings[:elasticsearch_url] => urls.join(','))
           .where(settings[:id].eq(id))

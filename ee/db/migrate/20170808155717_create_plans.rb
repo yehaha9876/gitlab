@@ -4,7 +4,7 @@
 class CreatePlans < ActiveRecord::Migration
   DOWNTIME = false
 
-  class Plan < ActiveRecord::Base
+  class Plan < ApplicationRecord
     self.table_name = 'plans'
   end
 

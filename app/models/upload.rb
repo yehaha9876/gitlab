@@ -1,4 +1,4 @@
-class Upload < ActiveRecord::Base
+class Upload < ApplicationRecord
   prepend EE::Upload
 
   # Upper limit for foreground checksum processing

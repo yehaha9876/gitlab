@@ -1,4 +1,4 @@
-class AuditEvent < ActiveRecord::Base
+class AuditEvent < ApplicationRecord
   prepend EE::AuditEvent
   include Gitlab::Utils::StrongMemoize
 

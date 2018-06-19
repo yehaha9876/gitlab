@@ -5,7 +5,7 @@ class MigrateMirrorAttributesDataFromProjectsToImportState < ActiveRecord::Migra
 
   disable_ddl_transaction!
 
-  class Project < ActiveRecord::Base
+  class Project < ApplicationRecord
     include EachBatch
 
     self.table_name = 'projects'
@@ -98,7 +98,7 @@ class MigrateMirrorAttributesDataFromProjectsToImportState < ActiveRecord::Migra
         execute <<~SQL
           UPDATE project_mirror_data
           SET status = 'none'
-          FROM projects 
+          FROM projects
           WHERE projects.id = project_id
           AND projects.mirror = TRUE
           AND projects.id BETWEEN #{start} AND #{stop}

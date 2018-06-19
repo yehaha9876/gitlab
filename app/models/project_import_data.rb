@@ -1,6 +1,6 @@
 require 'carrierwave/orm/activerecord'
 
-class ProjectImportData < ActiveRecord::Base
+class ProjectImportData < ApplicationRecord
   prepend ::EE::ProjectImportData
 
   belongs_to :project, inverse_of: :import_data

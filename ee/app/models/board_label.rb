@@ -1,4 +1,4 @@
-class BoardLabel < ActiveRecord::Base
+class BoardLabel < ApplicationRecord
   belongs_to :board
   belongs_to :label
 

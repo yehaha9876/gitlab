@@ -4,7 +4,7 @@ describe Gitlab::Database::LoadBalancing::HostList do
   before do
     allow(Gitlab::Database)
       .to receive(:create_connection_pool)
-      .and_return(ActiveRecord::Base.connection_pool)
+      .and_return(ApplicationRecord.connection_pool)
   end
 
   let(:load_balancer) { double(:load_balancer) }

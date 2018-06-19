@@ -15,7 +15,7 @@ describe Geo::TruncateEventLogWorker, :geo do
       it 'deletes everything from the Geo event log' do
         create_list(:geo_event_log, 2)
 
-        expect(ActiveRecord::Base.connection).to receive(:truncate).with('geo_event_log').and_call_original
+        expect(ApplicationRecord.connection).to receive(:truncate).with('geo_event_log').and_call_original
 
         expect { worker.perform }.to change { Geo::EventLog.count }.by(-2)
       end

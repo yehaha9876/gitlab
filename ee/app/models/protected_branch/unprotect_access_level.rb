@@ -1,3 +1,3 @@
-class ProtectedBranch::UnprotectAccessLevel < ActiveRecord::Base
+class ProtectedBranch::UnprotectAccessLevel < ApplicationRecord
   include ProtectedBranchAccess
 end

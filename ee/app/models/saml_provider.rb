@@ -1,4 +1,4 @@
-class SamlProvider < ActiveRecord::Base
+class SamlProvider < ApplicationRecord
   belongs_to :group
   has_many :identities
 

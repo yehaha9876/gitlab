@@ -88,7 +88,7 @@ module Gitlab
       end
 
       def self.gitlab_schema
-        retrieve_schema_tables(ActiveRecord::Base, ActiveRecord::Base.connection_config[:database], DEFAULT_SCHEMA).to_a
+        retrieve_schema_tables(ApplicationRecord, ApplicationRecord.connection_config[:database], DEFAULT_SCHEMA).to_a
       end
 
       def self.fdw_schema

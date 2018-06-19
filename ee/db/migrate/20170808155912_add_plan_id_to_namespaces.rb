@@ -8,11 +8,11 @@ class AddPlanIdToNamespaces < ActiveRecord::Migration
 
   disable_ddl_transaction!
 
-  class Namespace < ActiveRecord::Base
+  class Namespace < ApplicationRecord
     self.table_name = 'namespaces'
   end
 
-  class Plan < ActiveRecord::Base
+  class Plan < ApplicationRecord
     self.table_name = 'plans'
   end
 

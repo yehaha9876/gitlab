@@ -13,18 +13,18 @@ describe PgReplicationSlot, :postgresql do
           skip('max_replication_slots too small') if skip_examples
 
           @current_slot_count =
-            ActiveRecord::Base.connection.execute("SELECT COUNT(*) FROM pg_replication_slots;")
+            ApplicationRecord.connection.execute("SELECT COUNT(*) FROM pg_replication_slots;")
             .first.fetch('count').to_i
           @current_unused_count =
-            ActiveRecord::Base.connection.execute("SELECT COUNT(*) FROM pg_replication_slots WHERE active = 'f';")
+            ApplicationRecord.connection.execute("SELECT COUNT(*) FROM pg_replication_slots WHERE active = 'f';")
             .first.fetch('count').to_i
 
-          ActiveRecord::Base.connection.execute("SELECT * FROM pg_create_physical_replication_slot('test_slot');")
+          ApplicationRecord.connection.execute("SELECT * FROM pg_create_physical_replication_slot('test_slot');")
         end
 
         after(:all) do
           unless skip_examples
-            ActiveRecord::Base.connection.execute("SELECT pg_drop_replication_slot('test_slot');")
+            ApplicationRecord.connection.execute("SELECT pg_drop_replication_slot('test_slot');")
           end
         end
 

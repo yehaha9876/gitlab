@@ -1,5 +1,5 @@
 module Geo
-  class RepositoriesChangedEvent < ActiveRecord::Base
+  class RepositoriesChangedEvent < ApplicationRecord
     include Geo::Model
 
     belongs_to :geo_node

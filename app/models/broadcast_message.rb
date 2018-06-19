@@ -1,4 +1,4 @@
-class BroadcastMessage < ActiveRecord::Base
+class BroadcastMessage < ApplicationRecord
   prepend EE::BroadcastMessage
   include CacheMarkdownField
   include Sortable

@@ -3,8 +3,8 @@ class RemoveGeoSshRepoSync < ActiveRecord::Migration
 
   DOWNTIME = false
 
-  GeoNode = Class.new(ActiveRecord::Base)
-  Key = Class.new(ActiveRecord::Base)
+  GeoNode = Class.new(ApplicationRecord)
+  Key = Class.new(ApplicationRecord)
 
   disable_ddl_transaction!
 
