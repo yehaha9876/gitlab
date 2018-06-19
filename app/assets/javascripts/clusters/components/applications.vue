@@ -31,43 +31,10 @@ export default {
       required: false,
       default: () => ({}),
     },
-<<<<<<< HEAD
     helpPath: {
       type: String,
       required: false,
       default: '',
-=======
-    props: {
-      applications: {
-        type: Object,
-        required: false,
-        default: () => ({}),
-      },
-      helpPath: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      ingressHelpPath: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      ingressDnsHelpPath: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      managePrometheusPath: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      jaegerEnabled: {
-        type: Boolean,
-        required: true,
-      },
->>>>>>> added license check
     },
     ingressHelpPath: {
       type: String,
@@ -83,6 +50,10 @@ export default {
       type: String,
       required: false,
       default: '',
+    },
+    jaegerEnabled: {
+      type: Boolean,
+      required: true,
     },
   },
   data: () => ({
@@ -491,11 +462,11 @@ export default {
           v-if="jaegerEnabled"
           id="jaeger"
           :title="applications.jaeger.title"
-          title-link="http://jaeger.readthedocs.io/en/latest/"
           :status="applications.jaeger.status"
           :status-reason="applications.jaeger.statusReason"
           :request-status="applications.jaeger.requestStatus"
           :request-reason="applications.jaeger.requestReason"
+          title-link="http://jaeger.readthedocs.io/en/latest/"
         >
           <div slot="description">
             {{ s__(`ClusterIntegration|Jaeger is a distributed tracing system,

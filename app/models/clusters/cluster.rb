@@ -13,7 +13,7 @@ module Clusters
       Applications::Prometheus.application_name => Applications::Prometheus,
       Applications::Runner.application_name => Applications::Runner,
       Applications::Jupyter.application_name => Applications::Jupyter,
-      Applications::Knative.application_name => Applications::Knative
+      Applications::Knative.application_name => Applications::Knative,
       Applications::Jaeger.application_name => Applications::Jaeger
     }.freeze
     DEFAULT_ENVIRONMENT = '*'.freeze
@@ -105,7 +105,7 @@ module Clusters
         application_prometheus || build_application_prometheus,
         application_runner || build_application_runner,
         application_jupyter || build_application_jupyter,
-        application_knative || build_application_knative
+        application_knative || build_application_knative,
         application_jaeger || build_application_jaeger
       ]
     end

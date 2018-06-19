@@ -782,6 +782,15 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["cluster_id"], name: "index_clusters_applications_ingress_on_cluster_id", unique: true, using: :btree
   end
 
+  create_table "clusters_applications_jaeger", force: :cascade do |t|
+    t.integer "cluster_id", null: false
+    t.integer "status", null: false
+    t.string "version", null: false
+    t.text "status_reason"
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+  end
+
   create_table "clusters_applications_jupyter", force: :cascade do |t|
     t.integer "cluster_id", null: false
     t.integer "oauth_application_id"
@@ -804,15 +813,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.string "hostname"
     t.text "status_reason"
     t.index ["cluster_id"], name: "index_clusters_applications_knative_on_cluster_id", unique: true, using: :btree
-  end
-
-  create_table "clusters_applications_jaeger", force: :cascade do |t|
-    t.integer "cluster_id", null: false
-    t.integer "status", null: false
-    t.string "version", null: false
-    t.text "status_reason"
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
   end
 
   create_table "clusters_applications_prometheus", force: :cascade do |t|
@@ -1107,8 +1107,8 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.bigint "hashed_storage_migrated_event_id"
     t.bigint "lfs_object_deleted_event_id"
     t.bigint "hashed_storage_attachments_event_id"
-    t.bigint "upload_deleted_event_id"
     t.bigint "job_artifact_deleted_event_id"
+    t.bigint "upload_deleted_event_id"
     t.bigint "reset_checksum_event_id"
     t.bigint "cache_invalidation_event_id"
     t.index ["cache_invalidation_event_id"], name: "index_geo_event_log_on_cache_invalidation_event_id", where: "(cache_invalidation_event_id IS NOT NULL)", using: :btree
@@ -2442,6 +2442,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["path"], name: "index_redirect_routes_on_path", unique: true, using: :btree
+    t.index ["path"], name: "index_redirect_routes_on_path_text_pattern_ops", using: :btree, opclasses: {"path"=>"varchar_pattern_ops"}
     t.index ["source_type", "source_id"], name: "index_redirect_routes_on_source_type_and_source_id", using: :btree
   end
 
@@ -3136,10 +3137,11 @@ ActiveRecord::Schema.define(version: 20181107054254) do
   add_foreign_key "clusters", "users", on_delete: :nullify
   add_foreign_key "clusters_applications_helm", "clusters", on_delete: :cascade
   add_foreign_key "clusters_applications_ingress", "clusters", on_delete: :cascade
+  add_foreign_key "clusters_applications_jaeger", "clusters", on_delete: :cascade
   add_foreign_key "clusters_applications_jupyter", "clusters", on_delete: :cascade
   add_foreign_key "clusters_applications_jupyter", "oauth_applications", on_delete: :nullify
   add_foreign_key "clusters_applications_knative", "clusters", on_delete: :cascade
-  add_foreign_key "clusters_applications_prometheus", "clusters", name: "fk_557e773639", on_delete: :cascade
+  add_foreign_key "clusters_applications_prometheus", "clusters", on_delete: :cascade
   add_foreign_key "clusters_applications_runners", "ci_runners", column: "runner_id", name: "fk_02de2ded36", on_delete: :nullify
   add_foreign_key "clusters_applications_runners", "clusters", on_delete: :cascade
   add_foreign_key "clusters_kubernetes_namespaces", "cluster_projects", on_delete: :nullify
@@ -3167,6 +3169,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
   add_foreign_key "fork_networks", "projects", column: "root_project_id", name: "fk_e7b436b2b5", on_delete: :nullify
   add_foreign_key "forked_project_links", "projects", column: "forked_to_project_id", name: "fk_434510edb0", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_cache_invalidation_events", column: "cache_invalidation_event_id", name: "fk_42c3b54bed", on_delete: :cascade
+  add_foreign_key "geo_event_log", "geo_hashed_storage_attachments_events", column: "hashed_storage_attachments_event_id", name: "fk_304067fc30", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_hashed_storage_migrated_events", column: "hashed_storage_migrated_event_id", name: "fk_27548c6db3", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_job_artifact_deleted_events", column: "job_artifact_deleted_event_id", name: "fk_176d3fbb5d", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_lfs_object_deleted_events", column: "lfs_object_deleted_event_id", name: "fk_d5af95fcd9", on_delete: :cascade
