@@ -1,10 +1,11 @@
 class Projects::JobsController < Projects::ApplicationController
   include SendFileUpload
 
-  before_action :build, except: [:index, :cancel_all, :create_web_ide_terminal]
+  before_action :build, except: [:index, :cancel_all, :web_ide_terminal, :create_web_ide_terminal]
+  before_action :find_web_ide_terminal, only: [:web_ide_terminal, :create_web_ide_terminal]
   before_action :authorize_read_build!
   before_action :authorize_update_build!,
-    except: [:index, :show, :status, :raw, :trace, :cancel_all, :erase, :create_web_ide_terminal]
+    except: [:index, :show, :status, :raw, :trace, :cancel_all, :erase, :web_ide_terminal, :create_web_ide_terminal]
   before_action :authorize_erase_build!, only: [:erase]
   before_action :authorize_use_build_terminal!, only: [:terminal, :terminal_workhorse_authorize]
   before_action :verify_api_request!, only: :terminal_websocket_authorize
@@ -146,14 +147,15 @@ class Projects::JobsController < Projects::ApplicationController
     render json: Gitlab::Workhorse.terminal_websocket(@build.terminal_specification)
   end
 
+  def web_ide_terminal
+    render json: BuildSerializer
+      .new(project: @project, current_user: @current_user)
+      .represent_status(@build)
+  end
+
   def create_web_ide_terminal
     respond_to do |format|
       format.json do
-        @build = Ci::Build.includes(:pipeline)
-                          .find_by(project: @project,
-                                   status: 'running',
-                                   ci_pipelines: { source: Ci::Pipeline.sources['webide'] })
-
         unless @build
           @pipeline = ::Ci::CreatePipelineService.new(@project, @current_user, ref: @project.default_branch, sha: @project.commit('master').id).execute(:webide)
           @build = @pipeline.builds.last
@@ -203,5 +205,12 @@ class Projects::JobsController < Projects::ApplicationController
 
   def build_path(build)
     project_job_path(build.project, build)
+  end
+
+  def find_web_ide_terminal
+    @build ||= Ci::Build.includes(:pipeline)
+                        .find_by(project: @project,
+                                 status: 'running',
+                                 ci_pipelines: { source: Ci::Pipeline.sources['webide'] })
   end
 end

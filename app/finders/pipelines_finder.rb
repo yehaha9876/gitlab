@@ -9,7 +9,7 @@ class PipelinesFinder
     @params = params
   end
 
-  def execute
+  def execute(with_web_ide_pipelines: false)
     items = pipelines
     items = by_scope(items)
     items = by_status(items)
@@ -19,6 +19,7 @@ class PipelinesFinder
     items = by_username(items)
     items = by_yaml_errors(items)
     items = by_source(items)
+    items = without_web_ide_pipelines(items) unless with_web_ide_pipelines
     sort_items(items)
   end
 
@@ -99,6 +100,10 @@ class PipelinesFinder
     return items unless source = Ci::Pipeline.sources[params[:source]]
 
     items.where(source: source)
+  end
+
+  def without_web_ide_pipelines(items)
+    items.where.not(source: Ci::Pipeline.sources['webide'])
   end
 
   def by_yaml_errors(items)

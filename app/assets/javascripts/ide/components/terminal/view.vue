@@ -35,13 +35,16 @@ export default {
           .then(response => (this.setTerminalBuildPath(response.data.details_path)))
       }
     },
-    runningWebIDEPipeline(pipelines) {
-      // TODO: Fix this check
-      this.terminalRunning = (pipelines.count.running != "0")
+    runningWebIDEPipeline(job) {
+      this.terminalRunning = job !== null
+
+      if (this.terminalRunning) {
+        this.setTerminalBuildPath(job.details_path);
+      }
     },
     fetchRunningWebIDEPipeline() {
       axios
-        .get(`/${this.currentProject.path_with_namespace}/pipelines`, { params: { format: 'json', source: 'webide', scope: 'running' } })
+        .get(`/${this.currentProject.path_with_namespace}/-/jobs/web_ide_terminal`, { params: { format: 'json' } })
         .then(response => (this.runningWebIDEPipeline(response.data)))
     },
     stopWebIDEPolling() {

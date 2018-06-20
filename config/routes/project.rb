@@ -303,6 +303,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           collection do
             post :cancel_all
             post :create_web_ide_terminal, defaults: { format: 'json' }
+            get :web_ide_terminal, defaults: { format: 'json' }
 
             resources :artifacts, only: [] do
               collection do

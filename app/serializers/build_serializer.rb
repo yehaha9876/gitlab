@@ -3,6 +3,6 @@ class BuildSerializer < BaseSerializer
 
   def represent_status(resource)
     data = represent(resource, { only: [:status] })
-    data.fetch(:status, {})
+    data.fetch(:status, {}) if data
   end
 end

@@ -15,7 +15,7 @@ class Projects::PipelinesController < Projects::ApplicationController
   def index
     @scope = params[:scope]
     @pipelines = PipelinesFinder
-      .new(project, scope: @scope, source: params[:source])
+      .new(project, scope: @scope)
       .execute
       .page(params[:page])
       .per(30)
