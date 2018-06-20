@@ -11,11 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(version: 20180612175636) do
-=======
 ActiveRecord::Schema.define(version: 20180613081317) do
->>>>>>> d8b5bc5ed88... Add Web Terminal for CI builds
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
