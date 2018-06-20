@@ -15,7 +15,7 @@ module Ci
       @runner = runner
     end
 
-    def execute(runner_session_params = {})
+    def execute(params = {})
       builds =
         if runner.shared?
           builds_for_shared_runner
@@ -27,14 +27,12 @@ module Ci
 
       valid = true
 
-      if Feature.enabled?('ci_job_request_with_tags_matcher')
-        # pick builds that does not have other tags than runner's one
-        builds = builds.matches_tag_ids(runner.tags.ids)
+      # pick builds that does not have other tags than runner's one
+      builds = builds.matches_tag_ids(runner.tags.ids)
 
-        # pick builds that have at least one tag
-        unless runner.run_untagged?
-          builds = builds.with_any_tags
-        end
+      # pick builds that have at least one tag
+      unless runner.run_untagged?
+        builds = builds.with_any_tags
       end
 
       builds.find do |build|
@@ -46,8 +44,8 @@ module Ci
           begin
             build.runner_id = runner.id
 
-            if runner_session_params[:url].present?
-              build.build_runner_session.assign_attributes(runner_session_params)
+            if params.dig(:session, :url).present?
+              build.build_runner_session(params[:session])
             end
 
             build.run!
