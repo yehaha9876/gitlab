@@ -238,7 +238,7 @@ describe EE::NotificationService, :mailer do
     end
   end
 
-  describe '#prometheus_alert_fired' do
+  describe '#prometheus_alerts_fired' do
     it 'sends the email to owners and masters' do
       project = create(:project)
       prometheus_alert = create(:prometheus_alert, project: project)
@@ -251,7 +251,7 @@ describe EE::NotificationService, :mailer do
       expect(Notify).to receive(:prometheus_alert_fired_email).with(project.id, project.owner.id, prometheus_alert).and_call_original
       expect(Notify).not_to receive(:prometheus_alert_fired_email).with(project.id, developer.id, prometheus_alert)
 
-      subject.prometheus_alert_fired(prometheus_alert.project, prometheus_alert)
+      subject.prometheus_alerts_fired(prometheus_alert.project, [prometheus_alert])
     end
   end
 

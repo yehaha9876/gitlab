@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe PrometheusAlert do
-  let(:alert) { create(:prometheus_alert) }
-
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:environment) }
@@ -14,13 +12,32 @@ describe PrometheusAlert do
 
   describe '#full_query' do
     it 'returns the concatenated query' do
-      expect(alert.full_query).to eq("#{alert.query} #{alert.operator} #{alert.threshold}")
+      subject.name = "bar"
+      subject.iid = 1
+      subject.query = "foo"
+      subject.operator = ">"
+      subject.threshold = 1
+
+      expect(subject.full_query).to eq("foo > 1.0")
     end
   end
 
   describe '#to_param' do
     it 'returns the params of the prometheus alert' do
-      expect(alert.to_param.keys).to include("alert", "expr", "for", "labels", "annotations")
+      subject.name = "bar"
+      subject.iid = 1
+      subject.query = "foo"
+      subject.operator = ">"
+      subject.threshold = 1
+
+      alert_params = {
+        "alert" => "bar_1",
+        "expr" => "foo > 1.0",
+        "for" => "5m",
+        "labels" => { "gitlab"=>"hook" }
+      }
+
+      expect(subject.to_param).to eq(alert_params)
     end
   end
 end

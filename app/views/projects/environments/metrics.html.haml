@@ -9,4 +9,4 @@
           Environment:
           = link_to @environment.name, environment_path(@environment)
 
-  #prometheus-graphs{ data: metrics_data }
+  #prometheus-graphs{ data: metrics_data(project, environment) }

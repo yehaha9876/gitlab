@@ -23,7 +23,6 @@ describe Gitlab::Kubernetes::Helm::Api do
 
     it 'ensures the namespace exists before retrieving the config_map' do
       expect(namespace).to receive(:ensure_exists!).once.ordered
-      expect(client).to receive(:get_config_map).once.ordered
 
       subject.get_config_map(command)
     end

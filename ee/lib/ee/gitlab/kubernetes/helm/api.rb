@@ -6,9 +6,9 @@ module EE
           def get_config_map(command)
             namespace.ensure_exists!
 
-            if command.config_map?
-              kubeclient.get_config_map(command.config_map_name, namespace.name)
-            end
+            return unless command.config_map?
+
+            kubeclient.get_config_map(command.config_map_name, namespace.name)
           end
 
           def update(command)

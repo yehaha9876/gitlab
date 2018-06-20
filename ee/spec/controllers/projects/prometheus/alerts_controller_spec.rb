@@ -91,15 +91,11 @@ describe Projects::Prometheus::AlertsController do
         "alert" => "#{alert.name}_#{alert.iid}",
         "expr" => "#{alert.query} #{alert.operator} #{alert.threshold}",
         "for" => "5m",
-        "labels" => { "gitlab" => "hook" },
-        "annotations" => {
-          "summary" => "Instance {{ $labels.instance }} raised an alert",
-          "description" => "{{ $labels.instance }} of job {{ $labels.job }} has been raising an alert for more than 5 minutes."
-        }
+        "labels" => { "gitlab" => "hook" }
       }
 
       allow(NotificationService).to receive(:new).and_return(notification_service)
-      expect(notification_service).to receive(:prometheus_alert_fired).with(project, alert_params)
+      expect(notification_service).to receive(:prometheus_alerts_fired).with(project, [alert_params])
 
       post :notify, project_params(alerts: [alert])
 
