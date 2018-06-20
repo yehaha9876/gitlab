@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180613081317) do
+ActiveRecord::Schema.define(version: 20180612175636) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -441,8 +441,6 @@ ActiveRecord::Schema.define(version: 20180613081317) do
     t.integer "project_id", null: false
     t.integer "timeout"
     t.integer "timeout_source", default: 1, null: false
-    t.string "runner_session_url"
-    t.string "runner_session_certificate"
   end
 
   add_index "ci_builds_metadata", ["build_id"], name: "index_ci_builds_metadata_on_build_id", unique: true, using: :btree
