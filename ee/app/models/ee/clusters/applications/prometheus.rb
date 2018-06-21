@@ -38,6 +38,7 @@ module EE
           ::Gitlab::Kubernetes::Helm::UpgradeCommand.new(
             name,
             chart: chart,
+            version: version,
             values: values
           )
         end

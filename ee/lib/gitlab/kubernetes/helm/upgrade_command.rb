@@ -4,11 +4,12 @@ module Gitlab
   module Kubernetes
     module Helm
       class UpgradeCommand < BaseCommand
-        attr_reader :chart, :repository, :values
+        attr_reader :chart, :version, :repository, :values
 
-        def initialize(name, chart:, values:, repository: nil)
+        def initialize(name, chart:, values:, version: nil, repository: nil)
           super(name)
           @chart = chart
+          @version = version
           @values = values
           @repository = repository
         end
@@ -45,8 +46,12 @@ module Gitlab
 
         def script_command
           <<~HEREDOC
-          helm upgrade #{name} #{chart} --reset-values --install --namespace #{::Gitlab::Kubernetes::Helm::NAMESPACE} -f /data/helm/#{name}/config/values.yaml >/dev/null
+          helm upgrade #{name}#{optional_version_flag} #{chart} --reset-values --install --namespace #{::Gitlab::Kubernetes::Helm::NAMESPACE} -f /data/helm/#{name}/config/values.yaml >/dev/null
           HEREDOC
+        end
+
+        def optional_version_flag
+          " --version #{version}" if version
         end
       end
     end

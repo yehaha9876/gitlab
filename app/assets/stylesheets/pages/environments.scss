@@ -437,21 +437,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-<<<<<<< HEAD
-<<<<<<< HEAD
   margin-bottom: $gl-padding-8;
 
   h5 {
-=======
-  margin-bottom: 8px;
-
-  h3 {
->>>>>>> add slot for monitoring graph widgets within prometheus graphs
-=======
-  margin-bottom: $gl-padding-8;
-
-  h5 {
->>>>>>> fix scss values and harmonize with upstream changes
     margin: 0;
   }
 }

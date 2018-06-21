@@ -230,15 +230,7 @@ export default {
         :show-legend="showLegend"
         :small-graph="forceSmallGraph"
       >
-<<<<<<< HEAD
-<<<<<<< HEAD
         <!-- EE content -->
-        {{ null }}
-=======
-        <!-- EE Content Placeholder -->
->>>>>>> add placeholder comment and closing tag to reduce conflicts with EE
-=======
-        <!-- EE-only -->
         <alert-widget
           v-if="alertsEndpoint"
           :alerts-endpoint="alertsEndpoint"
@@ -246,7 +238,6 @@ export default {
           :name="getGraphLabel(graphData)"
           :current-alerts="getQueryAlerts(graphData)"
         />
->>>>>>> create AlertWidget component and pass it the alert endpoint
       </graph>
     </graph-group>
   </div>
