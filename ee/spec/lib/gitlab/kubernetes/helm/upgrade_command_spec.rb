@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe Gitlab::Kubernetes::Helm::UpgradeCommand do
-  let(:application) { create(:clusters_applications_prometheus) }
+  let(:application) { build(:clusters_applications_prometheus) }
   let(:namespace) { ::Gitlab::Kubernetes::Helm::NAMESPACE }
 
   subject do
@@ -23,7 +23,7 @@ describe Gitlab::Kubernetes::Helm::UpgradeCommand do
 
   context 'with an application with a repository' do
     let(:ci_runner) { create(:ci_runner) }
-    let(:application) { create(:clusters_applications_runner, runner: ci_runner) }
+    let(:application) { build(:clusters_applications_runner, runner: ci_runner) }
 
     subject do
       described_class.new(

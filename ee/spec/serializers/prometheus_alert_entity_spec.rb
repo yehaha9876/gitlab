@@ -4,10 +4,7 @@ describe PrometheusAlertEntity do
   let(:user) { create(:user) }
   let(:prometheus_alert) { create(:prometheus_alert) }
   let(:request) { double('prometheus_alert', current_user: user) }
-
-  let(:entity) do
-    described_class.new(prometheus_alert, request: request)
-  end
+  let(:entity) { described_class.new(prometheus_alert, request: request) }
 
   subject { entity.as_json }
 

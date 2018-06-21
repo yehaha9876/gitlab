@@ -34,7 +34,7 @@ describe PrometheusAlert do
         "alert" => "bar_1",
         "expr" => "foo > 1.0",
         "for" => "5m",
-        "labels" => { "gitlab"=>"hook" }
+        "labels" => { "gitlab" => "hook" }
       }
 
       expect(subject.to_param).to eq(alert_params)

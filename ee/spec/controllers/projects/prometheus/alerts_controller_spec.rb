@@ -134,17 +134,6 @@ describe Projects::Prometheus::AlertsController do
   describe 'POST #update' do
     let(:schedule_update_service) { spy }
     let(:alert) { create(:prometheus_alert, project: project, environment: environment) }
-    let(:alert_params) do
-      {
-        "id" => alert.id,
-        "iid" => alert.iid,
-        "name" => "bar",
-        "query" => alert.query,
-        "operator" => alert.operator,
-        "threshold" => alert.threshold,
-        "alert_path" => Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alert.iid, environment_id: alert.environment.id, format: :json)
-      }
-    end
 
     before do
       allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
@@ -159,6 +148,16 @@ describe Projects::Prometheus::AlertsController do
     end
 
     it 'updates an already existing prometheus alert' do
+      alert_params = {
+        "id" => alert.id,
+        "iid" => alert.iid,
+        "name" => "bar",
+        "query" => alert.query,
+        "operator" => alert.operator,
+        "threshold" => alert.threshold,
+        "alert_path" => Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alert.iid, environment_id: alert.environment.id, format: :json)
+      }
+
       expect(schedule_update_service).to receive(:execute)
 
       expect do

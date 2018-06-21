@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe Gitlab::Kubernetes::Helm::GetCommand do
-  let(:application) { create(:clusters_applications_prometheus) }
+  let(:application) { build(:clusters_applications_prometheus) }
 
   subject(:get_command) { described_class.new(application.name) }
 

@@ -19,19 +19,19 @@ describe Clusters::Applications::Prometheus do
     let(:cluster) { create(:cluster, projects: [project]) }
 
     it 'returns true when updating' do
-      application = create(:clusters_applications_prometheus, :updating, cluster: cluster)
+      application = build(:clusters_applications_prometheus, :updating, cluster: cluster)
 
       expect(application.ready?).to be true
     end
 
     it 'returns true when updated' do
-      application = create(:clusters_applications_prometheus, :updated, cluster: cluster)
+      application = build(:clusters_applications_prometheus, :updated, cluster: cluster)
 
       expect(application.ready?).to be true
     end
 
     it 'returns true when errored' do
-      application = create(:clusters_applications_prometheus, :update_errored, cluster: cluster)
+      application = build(:clusters_applications_prometheus, :update_errored, cluster: cluster)
 
       expect(application.ready?).to be true
     end
@@ -39,7 +39,7 @@ describe Clusters::Applications::Prometheus do
 
   context '#updated_since?' do
     let(:cluster) { create(:cluster) }
-    let(:prometheus_app) { create(:clusters_applications_prometheus, cluster: cluster) }
+    let(:prometheus_app) { build(:clusters_applications_prometheus, cluster: cluster) }
     let(:timestamp) { Time.now - 5.minutes }
 
     around do |example|
@@ -47,7 +47,7 @@ describe Clusters::Applications::Prometheus do
     end
 
     before do
-      prometheus_app.update_attributes(last_update_started_at: Time.now)
+      prometheus_app.last_update_started_at = Time.now
     end
 
     context 'when app does not have status failed' do
@@ -62,7 +62,7 @@ describe Clusters::Applications::Prometheus do
 
     context 'when app has status failed' do
       it 'returns false when last update started after the timestamp' do
-        prometheus_app.update_attributes(status: 6)
+        prometheus_app.status = 6
 
         expect(prometheus_app.updated_since?(timestamp)).to be false
       end
@@ -73,7 +73,7 @@ describe Clusters::Applications::Prometheus do
     context 'when app is updating' do
       it 'returns true' do
         cluster = create(:cluster)
-        prometheus_app = create(:clusters_applications_prometheus, :updating, cluster: cluster)
+        prometheus_app = build(:clusters_applications_prometheus, :updating, cluster: cluster)
 
         expect(prometheus_app.update_in_progress?).to be true
       end
@@ -84,7 +84,7 @@ describe Clusters::Applications::Prometheus do
     context 'when app errored' do
       it 'returns true' do
         cluster = create(:cluster)
-        prometheus_app = create(:clusters_applications_prometheus, :update_errored, cluster: cluster)
+        prometheus_app = build(:clusters_applications_prometheus, :update_errored, cluster: cluster)
 
         expect(prometheus_app.update_errored?).to be true
       end
@@ -92,7 +92,7 @@ describe Clusters::Applications::Prometheus do
   end
 
   describe '#get_command' do
-    let(:prometheus) { create(:clusters_applications_prometheus) }
+    let(:prometheus) { build(:clusters_applications_prometheus) }
 
     it 'returns an instance of Gitlab::Kubernetes::Helm::GetCommand' do
       expect(prometheus.get_command).to be_an_instance_of(::Gitlab::Kubernetes::Helm::GetCommand)
@@ -106,7 +106,7 @@ describe Clusters::Applications::Prometheus do
   end
 
   describe '#upgrade_command' do
-    let(:prometheus) { create(:clusters_applications_prometheus) }
+    let(:prometheus) { build(:clusters_applications_prometheus) }
     let(:values) { { foo: 'bar' } }
 
     it 'returns an instance of Gitlab::Kubernetes::Helm::GetCommand' do

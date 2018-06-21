@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Clusters::Applications::ScheduleUpdateService do
   describe '#execute' do
     let(:project) { create(:project) }
-    let(:service) { described_class.new(application, project) }
+
+    subject(:service) { described_class.new(application, project) }
 
     around do |example|
       Timecop.freeze { example.run }

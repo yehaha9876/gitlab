@@ -39,37 +39,37 @@ describe Clusters::Applications::Prometheus do
     let(:cluster) { create(:cluster, projects: [project]) }
 
     it 'returns true when installed' do
-      application = create(:clusters_applications_prometheus, :installed, cluster: cluster)
+      application = build(:clusters_applications_prometheus, :installed, cluster: cluster)
 
       expect(application.ready?).to be true
     end
 
     it 'returns false when not_installable' do
-      application = create(:clusters_applications_prometheus, :not_installable, cluster: cluster)
+      application = build(:clusters_applications_prometheus, :not_installable, cluster: cluster)
 
       expect(application.ready?).to be false
     end
 
     it 'returns false when installable' do
-      application = create(:clusters_applications_prometheus, :installable, cluster: cluster)
+      application = build(:clusters_applications_prometheus, :installable, cluster: cluster)
 
       expect(application.ready?).to be false
     end
 
     it 'returns false when scheduled' do
-      application = create(:clusters_applications_prometheus, :scheduled, cluster: cluster)
+      application = build(:clusters_applications_prometheus, :scheduled, cluster: cluster)
 
       expect(application.ready?).to be false
     end
 
     it 'returns false when installing' do
-      application = create(:clusters_applications_prometheus, :installing, cluster: cluster)
+      application = build(:clusters_applications_prometheus, :installing, cluster: cluster)
 
       expect(application.ready?).to be false
     end
 
     it 'returns false when errored' do
-      application = create(:clusters_applications_prometheus, :errored, cluster: cluster)
+      application = build(:clusters_applications_prometheus, :errored, cluster: cluster)
 
       expect(application.ready?).to be false
     end

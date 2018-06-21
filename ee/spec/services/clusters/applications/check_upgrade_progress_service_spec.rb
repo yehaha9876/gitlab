@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe Clusters::Applications::CheckUpgradeProgressService do
-  RESCHEDULE_PHASES = ::Gitlab::Kubernetes::Pod::PHASES - [::Gitlab::Kubernetes::Pod::SUCCEEDED, ::Gitlab::Kubernetes::Pod::FAILED].freeze
+  RESCHEDULE_PHASES = ::Gitlab::Kubernetes::Pod::PHASES -
+    [::Gitlab::Kubernetes::Pod::SUCCEEDED, ::Gitlab::Kubernetes::Pod::FAILED, ::Gitlab].freeze
 
   let(:application) { create(:clusters_applications_prometheus, :updating) }
   let(:service) { described_class.new(application) }
