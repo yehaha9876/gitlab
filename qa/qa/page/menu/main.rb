@@ -55,8 +55,7 @@ module QA
         end
 
         def has_personal_area?
-          # No need to wait, either we're logged-in, or not.
-          using_wait_time(0) { page.has_selector?('.qa-user-avatar') }
+          page.has_selector?('.qa-user-avatar')
         end
 
         private
