@@ -1379,6 +1379,42 @@ module API
       expose :reset_approvals_on_push
       expose :disable_overriding_approvers_per_merge_request
     end
+
+    class UnleashIssue < Grape::Entity
+      expose :name
+      expose :title, as: :description
+      expose :enabled
+      expose :strategies
+
+      private
+
+      def name
+        "\##{object.iid}"
+      end
+
+      def enabled
+        true
+      end
+
+      def strategies
+        [{ name: 'default' }]
+      end
+    end
+
+    class UnleashFeatureResponse < Grape::Entity
+      expose :version
+      expose :features, with: UnleashIssue
+
+      private
+
+      def version
+        1
+      end
+
+      def features
+        object.execute
+      end
+    end
   end
 end
 
