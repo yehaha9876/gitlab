@@ -36,6 +36,8 @@ module Ci
     delegate :url, :certificate, :authorization, to: :runner_session, prefix: true, allow_nil: true
     delegate :gitlab_deploy_token, to: :project
 
+    scope :webide, -> { includes(:pipeline).where(ci_pipelines: { source: Ci::Pipeline.sources[:webide] }) }
+
     ##
     # The "environment" field for builds is a String, and is the unexpanded name!
     #

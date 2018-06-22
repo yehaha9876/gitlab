@@ -394,6 +394,10 @@ Settings.cron_jobs['issue_due_scheduler_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['issue_due_scheduler_worker']['cron'] ||= '50 00 * * *'
 Settings.cron_jobs['issue_due_scheduler_worker']['job_class'] = 'IssueDueSchedulerWorker'
 
+Settings.cron_jobs['pipeline_web_ide_cleaner_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['pipeline_web_ide_cleaner_worker']['cron'] ||= '*/5 * * * *'
+Settings.cron_jobs['pipeline_web_ide_cleaner_worker']['job_class'] = 'PipelineWebIdeCleanerWorker'
+
 #
 # Sidekiq
 #

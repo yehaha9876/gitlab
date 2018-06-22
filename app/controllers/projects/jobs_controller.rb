@@ -32,7 +32,9 @@ class Projects::JobsController < Projects::ApplicationController
       :project,
       :tags
     ])
-    @builds = @builds.page(params[:page]).per(30).without_count
+    @builds = @builds.page(params[:page])
+                     .per(30)
+                     .without_count
   end
 
   def cancel_all
@@ -157,7 +159,11 @@ class Projects::JobsController < Projects::ApplicationController
     respond_to do |format|
       format.json do
         unless @build
-          @pipeline = ::Ci::CreatePipelineService.new(@project, @current_user, ref: @project.default_branch, sha: @project.commit('master').id).execute(:webide)
+          @pipeline = ::Ci::CreatePipelineService.new(@project,
+                                                      @current_user,
+                                                      ref: @project.default_branch,
+                                                      sha: @project.commit('master').id)
+                                                 .execute(:webide)
           @build = @pipeline.builds.last
         end
 
@@ -208,9 +214,6 @@ class Projects::JobsController < Projects::ApplicationController
   end
 
   def find_web_ide_terminal
-    @build ||= Ci::Build.includes(:pipeline)
-                        .find_by(project: @project,
-                                 status: 'running',
-                                 ci_pipelines: { source: Ci::Pipeline.sources['webide'] })
+    @build ||= Ci::Build.webide.with_status(:running).find_by(project: @project)
   end
 end

@@ -103,7 +103,7 @@ class PipelinesFinder
   end
 
   def without_web_ide_pipelines(items)
-    items.where.not(source: Ci::Pipeline.sources['webide'])
+    items.where.not(source: Ci::Pipeline.sources[:webide])
   end
 
   def by_yaml_errors(items)
