@@ -51,7 +51,7 @@ describe Clusters::Applications::CheckUpgradeProgressService do
   end
 
   before do
-    expect(service).to receive(:phase).once.and_return(phase)
+    allow(service).to receive(:phase).once.and_return(phase)
 
     allow(service).to receive(:errors).and_return(errors)
     allow(service).to receive(:remove_pod).and_return(nil)

@@ -50,9 +50,7 @@ module PrometheusAdapter
     end
 
     def build_query_args(*args)
-      args.map do |arg|
-        arg.respond_to?(:id) ? arg.id : arg
-      end
+      args.map(&:id)
     end
   end
 end

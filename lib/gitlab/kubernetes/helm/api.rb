@@ -24,17 +24,14 @@ module Gitlab
         #
         # values: "Pending", "Running", "Succeeded", "Failed", "Unknown"
         #
-        # TODO: Make this CE compat
         def status(pod_name)
           kubeclient.get_pod(pod_name, namespace.name).status.phase
         end
 
-        # TODO: Make this CE compat
         def log(pod_name)
           kubeclient.get_pod_log(pod_name, namespace.name).body
         end
 
-        # TODO: Make this CE compat
         def delete_pod!(pod_name)
           kubeclient.delete_pod(pod_name, namespace.name)
         end

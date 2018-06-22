@@ -11,4 +11,4 @@
     = @alert.full_query
 
 %p
-  = link_to("View #{@environment.name} performance dashboard.", metrics_project_environment_path(@environment.project, @environment))
+  = link_to("View #{@environment.name} performance dashboard.", metrics_project_environment_url(@environment.project, @environment))

@@ -5,7 +5,6 @@ module Gitlab
         include QueryAdditionalMetrics
 
         def query(deployment_id)
-          # TODO: Make this CE compat
           Deployment.find_by(id: deployment_id).try do |deployment|
             query_metrics(
               deployment.project,

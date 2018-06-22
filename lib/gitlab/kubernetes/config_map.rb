@@ -1,7 +1,6 @@
 module Gitlab
   module Kubernetes
     class ConfigMap
-      # TODO: Make this CE compat
       def initialize(name, values = "")
         @name = name
         @values = values
@@ -14,7 +13,6 @@ module Gitlab
         resource
       end
 
-      # TODO: Make this CE compat
       def config_map_name
         "values-content-configuration-#{name}"
       end

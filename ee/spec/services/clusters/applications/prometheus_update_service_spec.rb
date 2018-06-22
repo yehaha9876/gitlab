@@ -8,8 +8,9 @@ describe Clusters::Applications::PrometheusUpdateService do
     let(:application) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
     let!(:get_command_values) { OpenStruct.new(data: OpenStruct.new(values: application.values)) }
     let!(:upgrade_command) { application.upgrade_command("") }
-    let(:service) { described_class.new(application, project) }
     let(:helm_client) { instance_double(::Gitlab::Kubernetes::Helm::Api) }
+
+    subject(:service) { described_class.new(application, project) }
 
     before do
       allow(service).to receive(:upgrade_command).and_return(upgrade_command)
@@ -24,11 +25,9 @@ describe Clusters::Applications::PrometheusUpdateService do
       end
 
       context 'when prometheus alerts exist' do
-        before do
-          create(:prometheus_alert, project: project, environment: environment)
-        end
-
         it 'generates the alert manager values' do
+          create(:prometheus_alert, project: project, environment: environment)
+
           expect(service).to receive(:generate_alert_manager).once
 
           service.execute
@@ -61,7 +60,7 @@ describe Clusters::Applications::PrometheusUpdateService do
     context 'when k8s cluster communication fails' do
       it 'make the application update errored' do
         error = ::Kubeclient::HttpError.new(500, 'system failure', nil)
-        expect(helm_client).to receive(:get_config_map).and_raise(error)
+        allow(helm_client).to receive(:get_config_map).and_raise(error)
 
         service.execute
 
@@ -74,7 +73,8 @@ describe Clusters::Applications::PrometheusUpdateService do
       let(:application) { build(:clusters_applications_prometheus, :installed) }
 
       it 'make the application update errored' do
-        expect(application).to receive(:make_updating!).once.and_raise(ActiveRecord::RecordInvalid)
+        allow(application).to receive(:make_updating!).once.and_raise(ActiveRecord::RecordInvalid)
+
         expect(helm_client).not_to receive(:get_config_map)
         expect(helm_client).not_to receive(:update)
 

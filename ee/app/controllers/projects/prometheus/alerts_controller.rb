@@ -67,8 +67,8 @@ module Projects
         ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
       end
 
-      def serialize_as_json(alert)
-        serializer.represent(alert)
+      def serialize_as_json(alert_obj)
+        serializer.represent(alert_obj)
       end
 
       def serializer

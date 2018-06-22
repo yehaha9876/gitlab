@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe ClusterUpdateAppWorker do
   let(:project) { create(:project) }
-  let(:scheduled_time) { Time.now - 5.minutes }
   let(:prometheus_update_service) { spy }
 
   subject { described_class.new }
@@ -22,7 +21,7 @@ describe ClusterUpdateAppWorker do
 
         expect(prometheus_update_service).not_to receive(:execute)
 
-        expect(subject.perform(application.name, application.id, project.id, scheduled_time)).to be_nil
+        expect(subject.perform(application.name, application.id, project.id, Time.now - 5.minutes)).to be_nil
       end
     end
 

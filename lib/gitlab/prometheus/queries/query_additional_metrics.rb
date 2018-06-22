@@ -4,7 +4,6 @@ module Gitlab
       module QueryAdditionalMetrics
         prepend EE::Gitlab::Prometheus::Queries::QueryAdditionalMetrics
 
-        # TODO: Make this CE compat
         def query_metrics(project, environment, query_context)
           matched_metrics(project).map(&query_group(query_context))
             .select(&method(:group_with_any_metrics))

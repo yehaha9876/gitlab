@@ -49,10 +49,8 @@ module EE
         recipients = project.group.members.active_without_invites_and_requests.owners_and_masters
       end
 
-      alerts.each do |alert|
-        recipients.each do |recipient|
-          mailer.prometheus_alert_fired_email(project.id, recipient.user.id, alert).deliver_later
-        end
+      recipients.product(alerts).each do |recipient, alert|
+        mailer.prometheus_alert_fired_email(project.id, recipient.user.id, alert).deliver_later
       end
     end
 

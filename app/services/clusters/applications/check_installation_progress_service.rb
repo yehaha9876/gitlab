@@ -48,19 +48,16 @@ module Clusters
       end
 
       def remove_installation_pod
-        # TODO: Port to CE
         helm_api.delete_pod!(install_command.pod_name)
       rescue
         # no-op
       end
 
       def installation_phase
-        # TODO: Port to CE
         helm_api.status(install_command.pod_name)
       end
 
       def installation_errors
-        # TODO: Port to CE
         helm_api.log(install_command.pod_name)
       end
     end

@@ -23,7 +23,6 @@ module Clusters
         end
       end
 
-      # TODO: Make this CE compat
       def ready_status
         [:installed]
       end

@@ -139,7 +139,6 @@ describe Clusters::Applications::Prometheus do
     end
   end
 
-  # TODO: Make this CE compat
   describe '#install_command' do
     let(:kubeclient) { double('kubernetes client') }
     let(:prometheus) { create(:clusters_applications_prometheus) }
