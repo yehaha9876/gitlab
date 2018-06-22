@@ -13,18 +13,18 @@ export default {
     terminalBuildPath: {
       type: String,
       required: true,
-    }
-  },
-  computed: {
-    wsTerminalPath: function () {
-      if (this.terminalBuildPath == '') {
-        return '';
-      } else {
-        return `${this.terminalBuildPath}/terminal.ws`
-      }
     },
   },
-  updated: function () {
+  computed: {
+    wsTerminalPath() {
+      if (this.terminalBuildPath === '') {
+        return '';
+      }
+
+      return `${this.terminalBuildPath}/terminal.ws`;
+    },
+  },
+  updated() {
     if (this.terminalRunning) {
       initTerminal();
     }
@@ -40,8 +40,8 @@ export default {
       >
         <div class="terminal-container">
           <div
-            :data-project-path="wsTerminalPath"
-            id="terminal">
+            id="terminal"
+            :data-project-path="wsTerminalPath">
           </div>
         </div>
       </pre>

@@ -1,26 +1,26 @@
 <script>
-import { mapActions, mapGetters, dispatch } from 'vuex';
-import TerminalDetail from './detail.vue';
+import { mapGetters } from 'vuex';
 import axios from 'axios';
+import TerminalDetail from './detail.vue';
 
 export default {
   components: {
-    TerminalDetail
+    TerminalDetail,
   },
-  data: function() {
-     return {
-         terminalRunning: false,
-         terminalBuildPath: '',
-     };
+  data() {
+    return {
+      terminalRunning: false,
+      terminalBuildPath: '',
+    };
+  },
+  computed: {
+    ...mapGetters(['currentProject']),
   },
   mounted() {
     this.initWebIDEPolling();
   },
   beforeDestroy() {
     this.stopWebIDEPolling();
-  },
-  computed: {
-    ...mapGetters(['currentProject']),
   },
   methods: {
     initWebIDEPolling() {
@@ -32,11 +32,11 @@ export default {
       if (!this.terminalRunning) {
         axios
           .post(`/${this.currentProject.path_with_namespace}/-/jobs/create_web_ide_terminal`, { params: { format: 'json' } })
-          .then(response => (this.setTerminalBuildPath(response.data.details_path)))
+          .then(response => (this.setTerminalBuildPath(response.data.details_path)));
       }
     },
     runningWebIDEPipeline(job) {
-      this.terminalRunning = job !== null
+      this.terminalRunning = job !== null;
 
       if (this.terminalRunning) {
         this.setTerminalBuildPath(job.details_path);
@@ -45,7 +45,7 @@ export default {
     fetchRunningWebIDEPipeline() {
       axios
         .get(`/${this.currentProject.path_with_namespace}/-/jobs/web_ide_terminal`, { params: { format: 'json' } })
-        .then(response => (this.runningWebIDEPipeline(response.data)))
+        .then(response => (this.runningWebIDEPipeline(response.data)));
     },
     stopWebIDEPolling() {
       if (this.intervalId) {
@@ -54,7 +54,7 @@ export default {
     },
     setTerminalBuildPath(val) {
       this.terminalBuildPath = val;
-    }
+    },
   },
 };
 </script>
@@ -81,8 +81,8 @@ export default {
       </div>
     </header>
     <terminal-detail
-      :terminalRunning="terminalRunning"
-      :terminalBuildPath="terminalBuildPath"
+      :terminal-running="terminalRunning"
+      :terminal-build-path="terminalBuildPath"
     />
   </div>
 </template>
