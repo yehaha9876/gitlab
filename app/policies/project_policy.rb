@@ -60,6 +60,9 @@ class ProjectPolicy < BasePolicy
   desc "User is a member of the group"
   condition(:group_member, scope: :subject) { project_group_member? }
 
+  desc "Access to resource restricted by token"
+  condition(:token_prevents_access) { token_prevents_access? }
+
   desc "Project is archived"
   condition(:archived, scope: :subject, score: 0) { project.archived? }
 
@@ -315,6 +318,9 @@ class ProjectPolicy < BasePolicy
 
   rule { anonymous & ~public_project }.prevent_all
 
+  #TODO: check order
+  rule { token_prevents_access }.prevent_all
+
   rule { public_project }.policy do
     enable :public_access
     enable :read_project_for_iids
@@ -406,6 +412,10 @@ class ProjectPolicy < BasePolicy
 
     # NOTE: max_member_access has its own cache
     project.team.max_member_access(@user.id)
+  end
+
+  def token_prevents_access?
+    !TokenChecker.from_user(@user).allows?(project)
   end
 
   def feature_available?(feature)

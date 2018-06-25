@@ -50,6 +50,8 @@ module API
           forbidden!(api_access_denied_message(user))
         end
 
+        user.set_current_personal_access_token!(access_token) if access_token
+
         user
       end
 

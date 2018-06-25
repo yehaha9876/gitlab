@@ -1192,6 +1192,11 @@ class User < ActiveRecord::Base
     save
   end
 
+  attr_reader :current_personal_access_token
+  def set_current_personal_access_token!(token) #TODO: avoid using @user as god object by not passing it everywhere
+    @current_personal_access_token = token
+  end
+
   # each existing user needs to have an `feed_token`.
   # we do this on read since migrating all existing users is not a feasible
   # solution.
