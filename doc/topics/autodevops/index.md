@@ -323,7 +323,7 @@ report is created, it's uploaded as an artifact which you can later download and
 check out.
 
 Any security warnings are also
-[shown in the merge request widget](../../user/project/merge_requests/dependency_scanning.md).
+[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/dependency_scanning.html).
 
 ### Auto License Management **[ULTIMATE]**
 
@@ -336,7 +336,7 @@ report is created, it's uploaded as an artifact which you can later download and
 check out.
 
 Any licenses are also
-[shown in the merge request widget](../../user/project/merge_requests/license_management.md).
+[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/license_management.html).
 
 ### Auto Container Scanning
 
