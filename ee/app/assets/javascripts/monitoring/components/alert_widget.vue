@@ -171,8 +171,8 @@ export default {
 
 <template>
   <div
-    class="prometheus-alert-widget dropdown"
     :class="{ show: isOpen }"
+    class="prometheus-alert-widget dropdown"
   >
     <span
       v-if="errorMessage"
@@ -191,10 +191,10 @@ export default {
       {{ alertSummary }}
     </span>
     <button
+      :aria-label="alertStatus"
       class="btn btn-sm alert-dropdown-button"
       type="button"
       @click="handleDropdownToggle"
-      :aria-label="alertStatus"
     >
       <icon
         :name="alertIcon"
@@ -202,8 +202,8 @@ export default {
         aria-hidden="true"
       />
       <icon
-        name="arrow-down"
         :size="16"
+        name="arrow-down"
         aria-hidden="true"
         class="chevron"
       />
@@ -221,8 +221,8 @@ export default {
           @click="handleDropdownClose"
         >
           <icon
-            name="close"
             :size="12"
+            name="close"
             aria-hidden="true"
           />
         </button>

@@ -109,34 +109,34 @@ export default {
 <template>
   <div class="alert-form">
     <div
+      :aria-label="s__('PrometheusAlerts|Operator')"
       class="form-group btn-group"
       role="group"
-      :aria-label="s__('PrometheusAlerts|Operator')"
     >
       <button
+        :class="{ active: operator === operators.greaterThan }"
+        :disabled="disabled"
         type="button"
         class="btn btn-default"
-        :class="{ active: operator === operators.greaterThan }"
         @click="operator = operators.greaterThan"
-        :disabled="disabled"
       >
         {{ operators.greaterThan }}
       </button>
       <button
+        :class="{ active: operator === operators.equalTo }"
+        :disabled="disabled"
         type="button"
         class="btn btn-default"
-        :class="{ active: operator === operators.equalTo }"
         @click="operator = operators.equalTo"
-        :disabled="disabled"
       >
         {{ operators.equalTo }}
       </button>
       <button
+        :class="{ active: operator === operators.lessThan }"
+        :disabled="disabled"
         type="button"
         class="btn btn-default"
-        :class="{ active: operator === operators.lessThan }"
         @click="operator = operators.lessThan"
-        :disabled="disabled"
       >
         {{ operators.lessThan }}
       </button>
@@ -144,27 +144,27 @@ export default {
     <div class="form-group">
       <label>{{ s__('PrometheusAlerts|Threshold') }}</label>
       <input
-        type="number"
-        class="form-control"
         v-model.number="threshold"
         :disabled="disabled"
+        type="number"
+        class="form-control"
       />
     </div>
     <div class="action-group">
       <button
+        :disabled="disabled"
         type="button"
         class="btn btn-default"
         @click="handleCancel"
-        :disabled="disabled"
       >
         {{ __('Cancel') }}
       </button>
       <button
         ref="submitButton"
-        type="button"
-        class="btn btn-inverted"
         :class="submitButtonClass"
         :disabled="isSubmitDisabled"
+        type="button"
+        class="btn btn-inverted"
         @click="handleSubmit"
       >
         {{ submitActionText }}
