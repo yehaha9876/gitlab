@@ -1,10 +1,10 @@
 <script>
 
+import { mapState } from 'vuex';
 import initTerminal from '~/terminal/';
 
 export default {
-  components: {
-  },
+  components: {},
   props: {
     terminalRunning: {
       type: Boolean,
@@ -16,6 +16,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(['panelResizing']),
     wsTerminalPath() {
       if (this.terminalBuildPath === '') {
         return '';
@@ -28,6 +29,13 @@ export default {
     if (this.terminalRunning) {
       initTerminal();
     }
+  },
+  watch: {
+    panelResizing() {
+      if (!this.panelResizing) {
+        $(window).trigger('resize.terminal');
+      }
+    },
   },
 };
 </script>
