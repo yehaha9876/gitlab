@@ -64,7 +64,7 @@ module Projects
       end
 
       def schedule_prometheus_update!
-        ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
+        Clusters::Applications::ScheduleUpdateService.new(application, project).execute
       end
 
       def serialize_as_json(alert_obj)

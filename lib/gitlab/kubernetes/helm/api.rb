@@ -2,8 +2,6 @@ module Gitlab
   module Kubernetes
     module Helm
       class Api
-        attr_reader :kubeclient, :namespace
-
         prepend EE::Gitlab::Kubernetes::Helm::Api
 
         def initialize(kubeclient)
@@ -37,6 +35,8 @@ module Gitlab
         end
 
         private
+
+        attr_reader :kubeclient, :namespace
 
         def create_config_map(command)
           command.config_map_resource.tap do |config_map_resource|
