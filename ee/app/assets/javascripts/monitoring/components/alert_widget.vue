@@ -229,6 +229,7 @@ export default {
       </div>
       <div class="dropdown-content">
         <alert-widget-form
+          ref="widgetForm"
           :disabled="formDisabled"
           :alert="firstAlert"
           :alert-data="firstAlertData"
