@@ -46,7 +46,7 @@ describe Projects::Prometheus::AlertsController do
   describe 'GET #show' do
     context 'when alert does not exist' do
       it 'renders 404' do
-        get :show, project_params(id: PrometheusAlert.all.maximum(:iid) || 0)
+        get :show, project_params(id: PrometheusAlert.all.maximum(:iid).to_i)
 
         expect(response).to have_gitlab_http_status(404)
       end
