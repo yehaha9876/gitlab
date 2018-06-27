@@ -43,7 +43,10 @@ module Gitlab
 
         validate_access_token!
 
-        access_token.user || raise(UnauthorizedError)
+        user = access_token.user
+        user.set_current_personal_access_token!(access_token) if user
+
+        user || raise(UnauthorizedError)
       end
 
       def validate_access_token!(scopes: [])
