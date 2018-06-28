@@ -11,18 +11,34 @@ export default {
     return {
       terminalRunning: false,
       terminalBuildPath: '',
+      availableWebIdeRunners: false,
     };
   },
   computed: {
     ...mapGetters(['currentProject']),
+    runnersAvailable() {
+      if (!this.terminalRunning) {
+        axios
+        .get(`/api/v4/projects/${this.currentProject.id}/runners`, { params: { scope: 'active', tag_list: 'webide' } })
+        .then(response => (this.checkAvailableWebIdeRunners(response.data)))
+      }
+    },
   },
   mounted() {
     this.initWebIDEPolling();
+    this.checkAvailableWebIdeRunners();
   },
   beforeDestroy() {
     this.stopWebIDEPolling();
   },
   methods: {
+    checkAvailableWebIdeRunners() {
+      if (!this.terminalRunning) {
+        axios
+        .get(`/api/v4/projects/${this.currentProject.id}/runners`, { params: { scope: 'active', tag_list: 'webide' } })
+        .then(response => (this.availableWebIdeRunners = response.data.length !== 0))
+      }
+    },
     initWebIDEPolling() {
       this.intervalId = setInterval(() => {
         this.fetchRunningWebIDEPipeline();
@@ -69,7 +85,7 @@ export default {
           {{ __('Terminal') }}
         </strong>
       </span>
-      <div class="ml-auto align-self-center">
+      <div v-if="availableWebIdeRunners" class="ml-auto align-self-center">
         <button
           v-if="!terminalRunning"
           type="button"
@@ -81,8 +97,12 @@ export default {
       </div>
     </header>
     <terminal-detail
+      v-if="availableWebIdeRunners"
       :terminal-running="terminalRunning"
       :terminal-build-path="terminalBuildPath"
     />
+    <div v-else>
+      No avilable web ide runners
+    </div>
   </div>
 </template>

@@ -116,10 +116,11 @@ module API
       params do
         optional :scope, type: String, values: %w[active paused online specific shared],
                          desc: 'The scope of specific runners to show'
+        optional :tag_list, type: Array[String]
         use :pagination
       end
       get ':id/runners' do
-        runners = filter_runners(Ci::Runner.owned_or_shared(user_project.id), params[:scope])
+        runners = filter_runners(Ci::Runner.owned_or_shared(user_project.id), params[:scope], tag_list: params[:tag_list])
         present paginate(runners), with: Entities::Runner
       end
 
@@ -168,6 +169,10 @@ module API
 
         if (available_scopes & [scope]).empty?
           render_api_error!('Scope contains invalid value', 400)
+        end
+
+        if options[:tag_list]
+          runners = runners.tagged_with(options[:tag_list])
         end
 
         runners.public_send(scope) # rubocop:disable GitlabSecurity/PublicSend
