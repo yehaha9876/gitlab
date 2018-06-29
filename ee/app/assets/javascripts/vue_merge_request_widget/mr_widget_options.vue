@@ -123,18 +123,6 @@ export default {
       return text.join('');
     },
 
-    licenseReportText() {
-      const { licenseReport } = this.mr;
-
-      if (licenseReport.length > 0) {
-        return sprintf(s__('ciReport|License management detected %{licenseInfo}'), {
-          licenseInfo: n__('%d new license', '%d new licenses', licenseReport.length),
-        });
-      }
-
-      return s__('ciReport|License management detected no new licenses');
-    },
-
     codequalityStatus() {
       return this.checkReportStatus(this.isLoadingCodequality, this.loadingCodequalityFailed);
     },
@@ -312,7 +300,7 @@ export default {
       :head-path="mr.licenseManagement.head_path"
       :base-path="mr.licenseManagement.base_path"
       :mock-license-report="mr.licenseReport"
-    />
+  />
     <div class="mr-widget-section">
       <component
         :is="componentName"

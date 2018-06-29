@@ -1,5 +1,5 @@
 <script>
-import { s__ } from '~/locale';
+import { sprintf, s__, n__ } from '~/locale';
 import ReportSection from './report_section.vue';
 import reportsMixin from '../mixins/reports_mixin';
 
@@ -38,6 +38,27 @@ export default {
       // TODO: stop faking it
       return this.$props.mockLicenseReport
     },
+    licenseReportText() {
+      if (this.licenseReport.length > 0) {
+        return sprintf(s__('ciReport|License management detected %{licenseInfo}'), {
+          licenseInfo: n__('%d new license', '%d new licenses', this.licenseReport.length),
+        });
+      }
+
+      return s__('ciReport|License management detected no new licenses');
+    },
+  },
+  created() {
+    const { headPath, basePath } = this.$props;
+
+    // TODO: Work out the best way to fetch these reports
+    return;
+
+    if (headPath && basePath) {
+      this.fetchLicenseReport();
+    } else if (headPath) {
+      this.fetchNewLicenses();
+    }
   }
 }
 </script>
@@ -47,7 +68,7 @@ export default {
     :has-issues="hasLicenseReportIssues"
     :loading-text="s__('ciReport|Loading license management report')"
     :status="licenseReportStatus"
-    :success-text="s__('ciReport|License management detected [x] new licenses')"
+    :success-text="licenseReportText"
     :unresolved-issues="licenseReport"
     class="js-license-report-widget mr-widget-border-top"
     type="license"
