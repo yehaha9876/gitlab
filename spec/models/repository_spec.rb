@@ -46,7 +46,7 @@ describe Repository do
       it { is_expected.not_to include('feature') }
       it { is_expected.not_to include('fix') }
 
-      describe 'when storage is broken', :broken_storage  do
+      describe 'when storage is broken', :broken_storage do
         it 'should raise a storage error' do
           expect_to_raise_storage_error do
             broken_repository.branch_names_contains(sample_commit.id)
@@ -192,7 +192,7 @@ describe Repository do
 
       it { is_expected.to eq('c1acaa58bbcbc3eafe538cb8274ba387047b69f8') }
 
-      describe 'when storage is broken', :broken_storage  do
+      describe 'when storage is broken', :broken_storage do
         it 'should raise a storage error' do
           expect_to_raise_storage_error do
             broken_repository.last_commit_id_for_path(sample_commit.id, '.gitignore')
@@ -226,7 +226,7 @@ describe Repository do
         is_expected.to eq('c1acaa5')
       end
 
-      describe 'when storage is broken', :broken_storage  do
+      describe 'when storage is broken', :broken_storage do
         it 'should raise a storage error' do
           expect_to_raise_storage_error do
             broken_repository.last_commit_for_path(sample_commit.id, '.gitignore').id
@@ -664,7 +664,7 @@ describe Repository do
     end
   end
 
-  shared_examples "search_files_by_content" do
+  describe "search_files_by_content" do
     let(:results) { repository.search_files_by_content('feature', 'master') }
     subject { results }
 
@@ -695,7 +695,7 @@ describe Repository do
       expect(results).to match_array([])
     end
 
-    describe 'when storage is broken', :broken_storage  do
+    describe 'when storage is broken', :broken_storage do
       it 'should raise a storage error' do
         expect_to_raise_storage_error do
           broken_repository.search_files_by_content('feature', 'master')
@@ -711,7 +711,7 @@ describe Repository do
     end
   end
 
-  shared_examples "search_files_by_name" do
+  describe "search_files_by_name" do
     let(:results) { repository.search_files_by_name('files', 'master') }
 
     it 'returns result' do
@@ -744,21 +744,11 @@ describe Repository do
       expect(results).to match_array([])
     end
 
-    describe 'when storage is broken', :broken_storage  do
+    describe 'when storage is broken', :broken_storage do
       it 'should raise a storage error' do
         expect_to_raise_storage_error { broken_repository.search_files_by_name('files', 'master') }
       end
     end
-  end
-
-  describe 'with gitaly enabled' do
-    it_behaves_like 'search_files_by_content'
-    it_behaves_like 'search_files_by_name'
-  end
-
-  describe 'with gitaly disabled', :disable_gitaly do
-    it_behaves_like 'search_files_by_content'
-    it_behaves_like 'search_files_by_name'
   end
 
   describe '#async_remove_remote' do
@@ -796,7 +786,7 @@ describe Repository do
   describe '#fetch_ref' do
     let(:broken_repository) { create(:project, :broken_storage).repository }
 
-    describe 'when storage is broken', :broken_storage  do
+    describe 'when storage is broken', :broken_storage do
       it 'should raise a storage error' do
         expect_to_raise_storage_error do
           broken_repository.fetch_ref(broken_repository, source_ref: '1', target_ref: '2')
@@ -2316,17 +2306,6 @@ describe Repository do
     end
   end
 
-  describe '#upstream_branches' do
-    it 'returns branches from the upstream remote' do
-      masterrev = repository.find_branch('master').dereferenced_target
-      create_remote_branch('upstream', 'upstream_branch', masterrev)
-
-      expect(repository.upstream_branches.size).to eq(1)
-      expect(repository.upstream_branches.first).to be_an_instance_of(Gitlab::Git::Branch)
-      expect(repository.upstream_branches.first.name).to eq('upstream_branch')
-    end
-  end
-
   describe '#commit_count' do
     context 'with a non-existing repository' do
       it 'returns 0' do
@@ -2422,16 +2401,6 @@ describe Repository do
       it 'returns nil' do
         expect(repository.route_map_for(repository.commit.parent.sha)).to be_nil
       end
-    end
-  end
-
-  describe '#after_sync' do
-    it 'expires repository cache' do
-      expect(repository).to receive(:expire_all_method_caches)
-      expect(repository).to receive(:expire_branch_cache)
-      expect(repository).to receive(:expire_content_cache)
-
-      repository.after_sync
     end
   end
 

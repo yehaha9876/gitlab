@@ -24,7 +24,7 @@
     methods: {
       removeIssue() {
         const board = Store.state.currentBoard;
-        const issue = this.issue;
+        const { issue } = this;
         const lists = issue.getLists();
         const boardLabelIds = board.labels.map(label => label.id);
         const listLabelIds = lists.map(list => list.label.id);
@@ -33,6 +33,7 @@
           .map(label => label.id)
           .filter(id => !listLabelIds.includes(id))
           .filter(id => !boardLabelIds.includes(id));
+
         if (labelIds.length === 0) {
           labelIds = [''];
         }
