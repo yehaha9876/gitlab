@@ -38,6 +38,10 @@ export default {
       const { licenseManagement } = this.mr;
       return licenseManagement && licenseManagement.head_path && licenseManagement.base_path;
     },
+    shouldRenderNewLicenses() {
+      const { licenseManagement } = this.mr;
+      return licenseManagement && licenseManagement.head_path && !licenseManagement.basePath;
+    },
     hasCodequalityIssues() {
       return (
         this.mr.codeclimateMetrics &&
@@ -156,6 +160,8 @@ export default {
 
     if (this.shouldRenderLicenseReport) {
       this.fetchLicenseReport();
+    } else if (this.shouldRenderNewLicenses) {
+      this.fetchNewLicenses();
     }
   },
   methods: {
@@ -210,6 +216,22 @@ export default {
           this.isLoadingLicenseReport = false;
           this.loadingLicenseReportFailed = true;
         });
+    },
+
+    fetchNewLicenses() {
+      const { head_path } = this.mr.licenseManagement;
+
+      this.isLoadingLicenseReport = true;
+
+      this.service.fetchReport(head_path)
+        .then(values => {
+          this.mr.parseLicenseReportMetrics(values);
+          this.isLoadingLicenseReport = false;
+        })
+        .catch(() => {
+          this.isLoadingLicenseReport = false;
+          this.loadingLicenseReportFailed = true;
+        })
     },
 
     translateText(type) {
@@ -292,7 +314,7 @@ export default {
       :can-create-feedback="mr.canCreateFeedback"
     />
     <report-section
-      v-if="shouldRenderLicenseReport"
+      v-if="shouldRenderLicenseReport || shouldRenderNewLicenses"
       :status="licenseReportStatus"
       :loading-text="translateText('license management').loading"
       :error-text="translateText('license management').error"

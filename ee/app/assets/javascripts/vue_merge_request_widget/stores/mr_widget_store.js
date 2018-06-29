@@ -135,16 +135,16 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.performanceMetrics = { improved, degraded, neutral };
   }
 
-  parseLicenseReportMetrics(headMetrics, baseMetrics) {
+  parseLicenseReportMetrics(headMetrics, baseMetrics = {}) {
     const headLicenses = headMetrics.licenses;
     const headDependencies = headMetrics.dependencies;
-    const baseLicenses = baseMetrics.licenses;
-
+    const baseLicenses = baseMetrics.licenses || [];
+    
     if (headLicenses.length > 0 && headDependencies.length > 0) {
       const report = {};
       const knownLicenses = baseLicenses.map(license => license.name);
       const newLicenses = [];
-
+      
       headLicenses.forEach(license => {
         if (knownLicenses.indexOf(license.name) === -1) {
           report[license.name] = {
