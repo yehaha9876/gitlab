@@ -75,7 +75,7 @@
         .info-well
           .well-segment.admin-well.admin-well-features
             %h4 Features
-            - sign_up = "Sign up"
+            - sign_up = link_to 'Sign up', admin_application_settings_path
             %p{ "aria-label" => "#{sign_up}: status " + (allow_signup? ? "on" : "off") }
               = sign_up
               %span.light.float-right
@@ -85,12 +85,12 @@
               = ldap
               %span.light.float-right
                 = boolean_to_icon Gitlab.config.ldap.enabled
-            - gravatar = "Gravatar"
+            - gravatar = link_to 'Gravatar', admin_application_settings_path
             %p{ "aria-label" => "#{gravatar}: status " + (gravatar_enabled? ? "on" : "off") }
               = gravatar
               %span.light.float-right
                 = boolean_to_icon gravatar_enabled?
-            - omniauth = "OmniAuth"
+            - omniauth = link_to 'OmniAuth', admin_application_settings_path
             %p{ "aria-label" => "#{omniauth}: status " + (Gitlab.config.omniauth.enabled ? "on" : "off") }
               = omniauth
               %span.light.float-right
@@ -103,18 +103,18 @@
 
             = render_if_exists 'elastic_and_geo'
 
-            - container_reg = "Container Registry"
+            - container_reg = link_to 'Container Registry', admin_application_settings_path
             %p{ "aria-label" => "#{container_reg}: status " + (Gitlab.config.registry.enabled ? "on" : "off") }
               = container_reg
               %span.light.float-right
                 = boolean_to_icon Gitlab.config.registry.enabled
-            - gitlab_pages = 'GitLab Pages'
+            - gitlab_pages = link_to 'GitLab Pages', help_instance_configuration_url
             - gitlab_pages_enabled = Gitlab.config.pages.enabled
             %p{ "aria-label" => "#{gitlab_pages}: status " + (gitlab_pages_enabled ? "on" : "off") }
               = gitlab_pages
               %span.light.float-right
                 = boolean_to_icon gitlab_pages_enabled
-            - gitlab_shared_runners = 'Shared Runners'
+            - gitlab_shared_runners = link_to 'Shared Runners', admin_runners_path
             - gitlab_shared_runners_enabled = Gitlab.config.gitlab_ci.shared_runners_enabled
             %p{ "aria-label" => "#{gitlab_shared_runners}: status " + (gitlab_shared_runners_enabled ? "on" : "off") }
               = gitlab_shared_runners
@@ -129,7 +129,7 @@
                 .float-right
                   = version_status_badge
             %p
-              GitLab
+              = link_to 'GitLab', admin_application_settings_path
               %span.float-right
                 = Gitlab::VERSION
                 = "(#{Gitlab.revision})"
@@ -166,7 +166,7 @@
               %span.float-right
                 = Gitlab::Database.version
             %p
-              = link_to "Gitaly Servers", admin_gitaly_servers_path
+              = link_to 'Gitaly Servers', admin_gitaly_servers_path
     .row
       .col-md-4
         .info-well
