@@ -4,6 +4,7 @@ import CEWidgetOptions from '~/vue_merge_request_widget/mr_widget_options.vue';
 import WidgetApprovals from './components/approvals/mr_widget_approvals.vue';
 import GeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
 import ReportSection from '../vue_shared/security_reports/components/report_section.vue';
+import LicenseReport from '../vue_shared/security_reports/components/license_report.vue';
 import GroupedSecurityReportsApp from '../vue_shared/security_reports/grouped_security_reports_app.vue';
 import reportsMixin from '../vue_shared/security_reports/mixins/reports_mixin';
 
@@ -13,6 +14,7 @@ export default {
     'mr-widget-geo-secondary-node': GeoSecondaryNode,
     GroupedSecurityReportsApp,
     ReportSection,
+    LicenseReport,
   },
   extends: CEWidgetOptions,
   mixins: [reportsMixin],
@@ -58,10 +60,6 @@ export default {
           (this.mr.performanceMetrics.improved && this.mr.performanceMetrics.improved.length > 0) ||
           (this.mr.performanceMetrics.neutral && this.mr.performanceMetrics.neutral.length > 0))
       );
-    },
-    hasLicenseReportIssues() {
-      const { licenseReport } = this.mr;
-      return licenseReport && licenseReport.length > 0;
     },
     shouldRenderPerformance() {
       const { performance } = this.mr;
@@ -144,11 +142,7 @@ export default {
     performanceStatus() {
       return this.checkReportStatus(this.isLoadingPerformance, this.loadingPerformanceFailed);
     },
-
-    licenseReportStatus() {
-      return this.checkReportStatus(this.isLoadingLicenseReport, this.loadingLicenseReportFailed);
-    },
-  },
+ },
   created() {
     if (this.shouldRenderCodeQuality) {
       this.fetchCodeQuality();
@@ -313,16 +307,11 @@ export default {
       :can-create-issue="mr.canCreateIssue"
       :can-create-feedback="mr.canCreateFeedback"
     />
-    <report-section
+    <license-report
       v-if="shouldRenderLicenseReport || shouldRenderNewLicenses"
-      :status="licenseReportStatus"
-      :loading-text="translateText('license management').loading"
-      :error-text="translateText('license management').error"
-      :success-text="licenseReportText"
-      :unresolved-issues="mr.licenseReport"
-      :has-issues="hasLicenseReportIssues"
-      class="js-license-report-widget mr-widget-border-top"
-      type="license"
+      :head-path="mr.licenseManagement.head_path"
+      :base-path="mr.licenseManagement.base_path"
+      :mock-license-report="mr.licenseReport"
     />
     <div class="mr-widget-section">
       <component
