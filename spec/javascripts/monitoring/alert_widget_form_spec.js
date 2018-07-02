@@ -28,7 +28,7 @@ describe('AlertWidgetForm', () => {
   it('emits a "create" event when form submitted without existing alert', done => {
     vm = mountComponent(AlertWidgetFormComponent, props);
     expect(vm.$refs.submitButton.innerText).toContain('Add');
-    vm.$on('create', alert => {
+    vm.$once('create', alert => {
       expect(alert).toEqual({
         alert: null,
         name: props.name,
@@ -55,7 +55,7 @@ describe('AlertWidgetForm', () => {
       alertData: { operator: '<', threshold: 5 },
     });
 
-    vm.$on('delete', alert => {
+    vm.$once('delete', alert => {
       expect(alert).toEqual({
         alert: 'alert',
         name: props.name,
@@ -77,7 +77,7 @@ describe('AlertWidgetForm', () => {
       alertData: { operator: '<', threshold: 5 },
     });
     expect(vm.$refs.submitButton.innerText).toContain('Delete');
-    vm.$on('update', alert => {
+    vm.$once('update', alert => {
       expect(alert).toEqual({
         alert: 'alert',
         name: props.name,
