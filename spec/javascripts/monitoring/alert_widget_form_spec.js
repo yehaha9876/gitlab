@@ -15,27 +15,19 @@ describe('AlertWidgetForm', () => {
     AlertWidgetFormComponent = Vue.extend(AlertWidgetForm);
   });
 
-  beforeEach(() => {
-    setFixtures('<div id="alert-widget-form"></div>');
-  });
-
   afterEach(() => {
     if (vm) vm.$destroy();
   });
 
   it('disables the input when disabled prop is set', () => {
-    vm = mountComponent(
-      AlertWidgetFormComponent,
-      { ...props, disabled: true },
-      '#alert-widget-form',
-    );
+    vm = mountComponent(AlertWidgetFormComponent, { ...props, disabled: true });
     expect(vm.$refs.cancelButton).toBeDisabled();
     expect(vm.$refs.submitButton).toBeDisabled();
   });
 
   it('emits a "create" event when form submitted without existing alert', done => {
-    vm = mountComponent(AlertWidgetFormComponent, props, '#alert-widget-form');
-    expect(vm.$refs.submitButton.innerText).toBe('Add');
+    vm = mountComponent(AlertWidgetFormComponent, props);
+    expect(vm.$refs.submitButton.innerText).toContain('Add');
     vm.$on('create', alert => {
       expect(alert).toEqual({
         alert: null,
@@ -57,15 +49,11 @@ describe('AlertWidgetForm', () => {
   });
 
   it('emits a "delete" event when form submitted with existing alert and no changes are made', done => {
-    vm = mountComponent(
-      AlertWidgetFormComponent,
-      {
-        ...props,
-        alert: 'alert',
-        alertData: { operator: '<', threshold: 5 },
-      },
-      '#alert-widget-form',
-    );
+    vm = mountComponent(AlertWidgetFormComponent, {
+      ...props,
+      alert: 'alert',
+      alertData: { operator: '<', threshold: 5 },
+    });
 
     vm.$on('delete', alert => {
       expect(alert).toEqual({
@@ -78,21 +66,17 @@ describe('AlertWidgetForm', () => {
       done();
     });
 
-    expect(vm.$refs.submitButton.innerText).toBe('Delete');
+    expect(vm.$refs.submitButton.innerText).toContain('Delete');
     vm.$refs.submitButton.click();
   });
 
   it('emits a "update" event when form submitted with existing alert', done => {
-    vm = mountComponent(
-      AlertWidgetFormComponent,
-      {
-        ...props,
-        alert: 'alert',
-        alertData: { operator: '<', threshold: 5 },
-      },
-      '#alert-widget-form',
-    );
-    expect(vm.$refs.submitButton.innerText).toBe('Delete');
+    vm = mountComponent(AlertWidgetFormComponent, {
+      ...props,
+      alert: 'alert',
+      alertData: { operator: '<', threshold: 5 },
+    });
+    expect(vm.$refs.submitButton.innerText).toContain('Delete');
     vm.$on('update', alert => {
       expect(alert).toEqual({
         alert: 'alert',
@@ -107,7 +91,7 @@ describe('AlertWidgetForm', () => {
     // change operator to allow update
     vm.operator = '=';
     Vue.nextTick(() => {
-      expect(vm.$refs.submitButton.innerText).toBe('Save');
+      expect(vm.$refs.submitButton.innerText).toContain('Save');
       vm.$refs.submitButton.click();
     });
   });
