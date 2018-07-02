@@ -152,6 +152,7 @@ export default {
     </div>
     <div class="action-group">
       <button
+        ref="cancelButton"
         :disabled="disabled"
         type="button"
         class="btn btn-default"
