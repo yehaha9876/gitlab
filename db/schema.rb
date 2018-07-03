@@ -778,7 +778,7 @@ ActiveRecord::Schema.define(version: 20180704204006) do
     t.text "status_reason"
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
-    t.datetime "last_update_started_at"
+    t.datetime_with_timezone "last_update_started_at"
   end
 
   create_table "clusters_applications_runners", force: :cascade do |t|
@@ -2181,20 +2181,19 @@ ActiveRecord::Schema.define(version: 20180704204006) do
   add_index "projects", ["visibility_level"], name: "index_projects_on_visibility_level", using: :btree
 
   create_table "prometheus_alerts", force: :cascade do |t|
-    t.integer "iid", null: false
-    t.string "name", null: false
-    t.string "query", null: false
-    t.string "operator", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
     t.float "threshold", null: false
+    t.integer "iid", null: false
+    t.integer "operator", null: false
     t.integer "environment_id", null: false
     t.integer "project_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.text "name", null: false
+    t.string "query", null: false
   end
 
   add_index "prometheus_alerts", ["environment_id"], name: "index_prometheus_alerts_on_environment_id", using: :btree
   add_index "prometheus_alerts", ["project_id", "iid"], name: "index_prometheus_alerts_on_project_id_and_iid", unique: true, using: :btree
-  add_index "prometheus_alerts", ["project_id"], name: "index_prometheus_alerts_on_project_id", using: :btree
 
   create_table "prometheus_metrics", force: :cascade do |t|
     t.integer "project_id"

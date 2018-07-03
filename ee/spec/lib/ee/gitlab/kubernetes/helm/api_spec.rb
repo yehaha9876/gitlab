@@ -41,7 +41,7 @@ describe Gitlab::Kubernetes::Helm::Api do
       )
     end
 
-    it 'ensures the namespace exists before creating the POD' do
+    it 'ensures the namespace exists before creating the pod' do
       expect(namespace).to receive(:ensure_exists!).once.ordered
       expect(kubeclient).to receive(:create_pod).once.ordered
 

@@ -19,16 +19,16 @@ describe Clusters::Applications::ScheduleUpdateService do
           service.execute
         end
       end
-    end
 
-    context 'when the application has not been recently updated' do
-      it 'schedules worker' do
-        application = create(:clusters_applications_prometheus, :installed)
-        service = described_class.new(application, project)
+      context 'when the application has not been recently updated' do
+        it 'schedules worker' do
+          application = create(:clusters_applications_prometheus, :installed)
+          service = described_class.new(application, project)
 
-        expect(::ClusterUpdateAppWorker).to receive(:perform_async).with(application.name, application.id, project.id, Time.now).once
+          expect(::ClusterUpdateAppWorker).to receive(:perform_async).with(application.name, application.id, project.id, Time.now).once
 
-        service.execute
+          service.execute
+        end
       end
     end
   end

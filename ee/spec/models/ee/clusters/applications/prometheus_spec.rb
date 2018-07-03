@@ -21,19 +21,19 @@ describe Clusters::Applications::Prometheus do
     it 'returns true when updating' do
       application = build(:clusters_applications_prometheus, :updating, cluster: cluster)
 
-      expect(application.ready?).to be true
+      expect(application).to be_ready
     end
 
     it 'returns true when updated' do
       application = build(:clusters_applications_prometheus, :updated, cluster: cluster)
 
-      expect(application.ready?).to be true
+      expect(application).to be_ready
     end
 
     it 'returns true when errored' do
       application = build(:clusters_applications_prometheus, :update_errored, cluster: cluster)
 
-      expect(application.ready?).to be true
+      expect(application).to be_ready
     end
   end
 

@@ -6,10 +6,12 @@ class PrometheusAlert < ActiveRecord::Base
 
   validates :name, presence: true
 
-  has_internal_id :iid, scope: :project, init: ->(s) { s.project&.prometheus_alerts&.maximum(:iid) }
+  has_internal_id :iid, scope: :project
 
   after_save :clear_prometheus_adapter_cache!
   after_destroy :clear_prometheus_adapter_cache!
+
+  #enum operator: ["<", "=", ">"]
 
   def full_query
     "#{query} #{operator} #{threshold}"

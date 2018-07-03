@@ -121,7 +121,7 @@ module Clusters
       end
 
       def has_alerts?
-        !environments_with_alerts.values.flatten.empty?
+        environments_with_alerts.values.flatten.any?
       end
 
       def environments_with_alerts

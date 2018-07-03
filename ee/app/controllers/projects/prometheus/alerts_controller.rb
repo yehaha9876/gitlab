@@ -10,7 +10,7 @@ module Projects
       before_action :alert, only: [:update, :show, :destroy]
 
       def index
-        alerts = project.prometheus_alerts.order(created_at: :asc)
+        alerts = project.prometheus_alerts.reorder(id: :asc)
 
         render json: serialize_as_json(alerts)
       end
@@ -20,18 +20,18 @@ module Projects
       end
 
       def notify
-        NotificationService.new.prometheus_alerts_fired(project, params["alerts"])
+        NotificationService.new.async.prometheus_alerts_fired(project, params["alerts"])
 
         head :ok
       end
 
       def create
-        @alert = project.prometheus_alerts.create(alerts_params)
+        alert = project.prometheus_alerts.create(alerts_params)
 
-        if @alert
+        if alert
           schedule_prometheus_update!
 
-          render json: serialize_as_json(@alert)
+          render json: serialize_as_json(alert)
         else
           head :no_content
         end

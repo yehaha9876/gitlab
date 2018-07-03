@@ -34,7 +34,7 @@ describe Projects::Prometheus::AlertsController do
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
-      it 'returns an empty response' do
+      it 'contains prometheus alerts' do
         get :index, project_params
 
         expect(response).to have_gitlab_http_status(200)

@@ -21,10 +21,16 @@ module Emails
       def prometheus_alert_fired_email(project_id, user_id, alert_params)
         alert_iid = alert_params["labels"]["alertname"].split("_").last
 
-        @project = Project.find(project_id)
+        @project = Project.find_by(id: project_id)
+        return unless @project
+
         @alert = @project.prometheus_alerts.find_by_iid(alert_iid)
+        return unless @alert
+
         @environment = @alert.environment
-        user = User.find(user_id)
+
+        user = User.find_by(id: user_id)
+        return unless user
 
         subject_text = "Alert: #{@environment.name} - #{@alert.name} #{@alert.operator} #{@alert.threshold} for 5 minutes"
 

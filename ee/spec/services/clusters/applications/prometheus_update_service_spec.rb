@@ -50,7 +50,7 @@ describe Clusters::Applications::PrometheusUpdateService do
         expect(application).to be_updating
       end
 
-      it 'schedule async update status check' do
+      it 'schedules async update status check' do
         expect(::ClusterWaitForAppUpdateWorker).to receive(:perform_in).once
 
         service.execute

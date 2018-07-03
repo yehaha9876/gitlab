@@ -4,6 +4,8 @@ module Clusters
       extend ActiveSupport::Concern
 
       included do
+        prepend ::EE::Clusters::ApplicationStatus
+
         scope :installed, -> { where(status: self.state_machines[:status].states[:installed].value) }
 
         state_machine :status, initial: :not_installable do
@@ -39,8 +41,6 @@ module Clusters
             app_status.status_reason = status_reason if status_reason
           end
         end
-
-        prepend ::EE::Clusters::ApplicationStatus
       end
     end
   end

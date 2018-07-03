@@ -21,7 +21,7 @@ describe Clusters::Applications::CheckUpgradeProgressService do
     let(:phase) { a_phase }
 
     context "when phase is #{a_phase}" do
-      context 'when not timeouted' do
+      context 'when not timed out' do
         it 'reschedule a new check' do
           expect(::ClusterWaitForAppUpdateWorker).to receive(:perform_in).once
           expect(service).not_to receive(:remove_pod)
@@ -33,7 +33,7 @@ describe Clusters::Applications::CheckUpgradeProgressService do
         end
       end
 
-      context 'when timeouted' do
+      context 'when timed out' do
         let(:application) { create(:clusters_applications_prometheus, :timeouted, :updating) }
 
         it_behaves_like 'a terminated upgrade'
@@ -58,7 +58,7 @@ describe Clusters::Applications::CheckUpgradeProgressService do
   end
 
   describe '#execute' do
-    context 'when upgrade POD succeeded' do
+    context 'when upgrade pod succeeded' do
       let(:phase) { ::Gitlab::Kubernetes::Pod::SUCCEEDED }
 
       it_behaves_like 'a terminated upgrade'
@@ -73,7 +73,7 @@ describe Clusters::Applications::CheckUpgradeProgressService do
       end
     end
 
-    context 'when upgrade POD failed' do
+    context 'when upgrade pod failed' do
       let(:phase) { ::Gitlab::Kubernetes::Pod::FAILED }
       let(:errors) { 'test installation failed' }
 

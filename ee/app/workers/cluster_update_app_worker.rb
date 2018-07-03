@@ -7,14 +7,9 @@ class ClusterUpdateAppWorker
 
   sidekiq_options retry: 3, dead: false
 
-  sidekiq_retry_in { |count| 30 * count }
-
-  sidekiq_retries_exhausted do |msg, _|
-    Sidekiq.logger.warn "Failed #{msg['class']} with #{msg['args']}: #{msg['error_message']}"
-  end
-
   def perform(app_name, app_id, project_id, scheduled_time)
-    project = Project.find(project_id)
+    project = Project.find_by(id: project_id)
+    return unless project
 
     find_application(app_name, app_id) do |app|
       break if app.updated_since?(scheduled_time)

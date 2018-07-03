@@ -17,7 +17,7 @@ module EE
 
             proc do |group|
               group[:metrics]&.map! do |metric|
-                metric[:queries]&.map! do |item|
+                metric[:queries]&.map do |item|
                   query = item&.[](:query) || item&.[](:query_range)
 
                   if query && alerts_map[query]
