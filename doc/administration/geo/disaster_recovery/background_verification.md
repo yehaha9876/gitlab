@@ -1,8 +1,9 @@
 # Automatic background verification **[PREMIUM ONLY]**
 
 NOTE: **Note:**
-Automatic background verification of repositories and wikis was added in GitLab
-EE 10.6, but is disabled by default. To enable it, run
+Automatic background verification of repositories and wikis was added in
+GitLab EE 10.6 but is enabled by default only on Gitlab EE 11.1. If you
+are running a previous version to enable it run
 `sudo gitlab-rails runner 'Feature.enable(:geo_repository_verification)'` on
 the **primary**. Until [issue #5699][ee-5699] is completed, we need to reset
 the cache for this feature flag on each **secondary**, to do this run

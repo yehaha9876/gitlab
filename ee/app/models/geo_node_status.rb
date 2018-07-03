@@ -3,11 +3,7 @@ class GeoNodeStatus < ActiveRecord::Base
 
   delegate :selective_sync_type, to: :geo_node
 
-  after_initialize :initialize_feature_flags
-
   attr_accessor :storage_shards
-
-  attr_accessor :repository_verification_enabled
 
   # Prometheus metrics, no need to store them in the database
   attr_accessor :event_log_count, :event_log_max_id,
@@ -129,10 +125,6 @@ class GeoNodeStatus < ActiveRecord::Base
     self.column_names - EXCLUDED_PARAMS + EXTRA_PARAMS
   end
 
-  def initialize_feature_flags
-    self.repository_verification_enabled = Feature.enabled?('geo_repository_verification')
-  end
-
   def update_cache!
     Rails.cache.write(self.class.cache_key, attributes)
   end
@@ -183,14 +175,10 @@ class GeoNodeStatus < ActiveRecord::Base
       self.replication_slots_count = geo_node.replication_slots_count
       self.replication_slots_used_count = geo_node.replication_slots_used_count
       self.replication_slots_max_retained_wal_bytes = geo_node.replication_slots_max_retained_wal_bytes
-
-      if repository_verification_enabled
-        self.repositories_checksummed_count = repository_verification_finder.count_verified_repositories
-        self.repositories_checksum_failed_count = repository_verification_finder.count_verification_failed_repositories
-        self.wikis_checksummed_count = repository_verification_finder.count_verified_wikis
-        self.wikis_checksum_failed_count = repository_verification_finder.count_verification_failed_wikis
-      end
-
+      self.repositories_checksummed_count = repository_verification_finder.count_verified_repositories
+      self.repositories_checksum_failed_count = repository_verification_finder.count_verification_failed_repositories
+      self.wikis_checksummed_count = repository_verification_finder.count_verified_wikis
+      self.wikis_checksum_failed_count = repository_verification_finder.count_verification_failed_wikis
       self.repositories_checked_count = Project.where.not(last_repository_check_at: nil).count
       self.repositories_checked_failed_count = Project.where(last_repository_check_failed: true).count
     end
@@ -226,14 +214,12 @@ class GeoNodeStatus < ActiveRecord::Base
   end
 
   def load_verification_data
-    if repository_verification_enabled
-      self.repositories_verified_count = projects_finder.count_verified_repositories
-      self.repositories_verification_failed_count = projects_finder.count_verification_failed_repositories
-      self.repositories_checksum_mismatch_count = projects_finder.count_repositories_checksum_mismatch
-      self.wikis_verified_count = projects_finder.count_verified_wikis
-      self.wikis_verification_failed_count = projects_finder.count_verification_failed_wikis
-      self.wikis_checksum_mismatch_count = projects_finder.count_wikis_checksum_mismatch
-    end
+    self.repositories_verified_count = projects_finder.count_verified_repositories
+    self.repositories_verification_failed_count = projects_finder.count_verification_failed_repositories
+    self.repositories_checksum_mismatch_count = projects_finder.count_repositories_checksum_mismatch
+    self.wikis_verified_count = projects_finder.count_verified_wikis
+    self.wikis_verification_failed_count = projects_finder.count_verification_failed_wikis
+    self.wikis_checksum_mismatch_count = projects_finder.count_wikis_checksum_mismatch
   end
 
   def healthy?

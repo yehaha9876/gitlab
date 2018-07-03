@@ -389,6 +389,10 @@ module EE
         def missing_oauth_application
           object.geo_node.missing_oauth_application?
         end
+
+        def repository_verification_enabled
+          true
+        end
       end
     end
   end

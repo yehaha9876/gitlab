@@ -73,7 +73,6 @@ export default class GeoNodesStore {
       missingOAuthApplication: rawNodeDetails.missing_oauth_application || false,
       syncStatusUnavailable: rawNodeDetails.sync_status_unavailable || false,
       storageShardsMatch: rawNodeDetails.storage_shards_match,
-      repositoryVerificationEnabled: rawNodeDetails.repository_verification_enabled,
       replicationSlots: {
         totalCount: rawNodeDetails.replication_slots_count || 0,
         successCount: rawNodeDetails.replication_slots_used_count || 0,
