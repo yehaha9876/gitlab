@@ -1,7 +1,7 @@
 class CreatePrometheusAlerts < ActiveRecord::Migration
   DOWNTIME = false
 
-  def change
+  def up
     create_table :prometheus_alerts do |t|
       t.datetime_with_timezone :created_at, null: false
       t.datetime_with_timezone :updated_at, null: false
@@ -15,5 +15,10 @@ class CreatePrometheusAlerts < ActiveRecord::Migration
     end
 
     add_index :prometheus_alerts, [:project_id, :iid], unique: true
+  end
+
+  def down
+    remove_foreign_key :prometheus_alerts, column: :project_id
+    drop_table :prometheus_alerts
   end
 end

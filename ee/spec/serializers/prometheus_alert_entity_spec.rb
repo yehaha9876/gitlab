@@ -22,19 +22,4 @@ describe PrometheusAlertEntity do
       expect(subject).to include(:alert_path)
     end
   end
-
-  context 'when user cannot read prometheus alerts' do
-    it 'does not expose alert_path when user is master' do
-      prometheus_alert.project.add_master(user)
-      stub_licensed_features(prometheus_alerts: false)
-
-      expect(subject).not_to include(:alert_path)
-    end
-
-    it 'does not expose alert_path when user is not master' do
-      stub_licensed_features(prometheus_alerts: true)
-
-      expect(subject).not_to include(:alert_path)
-    end
-  end
 end

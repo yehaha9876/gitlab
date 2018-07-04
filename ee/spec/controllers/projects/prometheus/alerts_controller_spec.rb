@@ -88,10 +88,13 @@ describe Projects::Prometheus::AlertsController do
       notification_service = spy
 
       alert_params = {
-        "alert" => "#{alert.name}_#{alert.iid}",
+        "alert" => alert.name,
         "expr" => "#{alert.query} #{alert.computed_operator} #{alert.threshold}",
         "for" => "5m",
-        "labels" => { "gitlab" => "hook" }
+        "labels" => {
+          "gitlab" => "hook",
+          "gitlab_alert_id" => 1
+        }
       }
 
       allow(NotificationService).to receive(:new).and_return(notification_service)

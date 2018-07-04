@@ -33,10 +33,13 @@ class PrometheusAlert < ActiveRecord::Base
 
   def to_param
     {
-      "alert" => "#{name}_#{iid}",
+      "alert" => name,
       "expr" => full_query,
       "for" => "5m",
-      "labels" => { "gitlab" => "hook" }
+      "labels" => {
+        "gitlab" => "hook",
+        "gitlab_alert_id" => iid
+      }
     }
   end
 
