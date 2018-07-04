@@ -4,7 +4,7 @@ FactoryBot.define do
     environment
     name { generate(:title) }
     query "foo"
-    operator ">"
+    operator :gt
     threshold 1
   end
 end

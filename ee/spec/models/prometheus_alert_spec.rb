@@ -15,7 +15,7 @@ describe PrometheusAlert do
       subject.name = "bar"
       subject.iid = 1
       subject.query = "foo"
-      subject.operator = ">"
+      subject.operator = "gt"
       subject.threshold = 1
 
       expect(subject.full_query).to eq("foo > 1.0")
@@ -27,7 +27,7 @@ describe PrometheusAlert do
       subject.name = "bar"
       subject.iid = 1
       subject.query = "foo"
-      subject.operator = ">"
+      subject.operator = "gt"
       subject.threshold = 1
 
       alert_params = {

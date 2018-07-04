@@ -69,7 +69,7 @@ describe Projects::Prometheus::AlertsController do
           "iid" => alert.iid,
           "name" => alert.name,
           "query" => alert.query,
-          "operator" => alert.operator,
+          "operator" => alert.computed_operator,
           "threshold" => alert.threshold,
           "alert_path" => Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alert.iid, environment_id: alert.environment.id, format: :json)
         }
@@ -89,16 +89,16 @@ describe Projects::Prometheus::AlertsController do
 
       alert_params = {
         "alert" => "#{alert.name}_#{alert.iid}",
-        "expr" => "#{alert.query} #{alert.operator} #{alert.threshold}",
+        "expr" => "#{alert.query} #{alert.computed_operator} #{alert.threshold}",
         "for" => "5m",
         "labels" => { "gitlab" => "hook" }
       }
 
       allow(NotificationService).to receive(:new).and_return(notification_service)
-      expect(notification_service).to receive(:prometheus_alerts_fired).with(project, [alert_params])
 
       post :notify, project_params(alerts: [alert])
 
+      expect(notification_service).to have_received(:prometheus_alerts_fired).with(project, [alert_params])
       expect(response).to have_gitlab_http_status(200)
     end
   end
@@ -118,14 +118,14 @@ describe Projects::Prometheus::AlertsController do
         "name" => "bar",
         "query" => "foo",
         "operator" => ">",
-        "threshold" => 1
+        "threshold" => 1.0
       }
 
       allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
-      expect(schedule_update_service).to receive(:execute)
 
       post :create, project_params(query: "foo", operator: ">", threshold: "1", name: "bar", environment_id: environment.id)
 
+      expect(schedule_update_service).to have_received(:execute)
       expect(response).to have_gitlab_http_status(200)
       expect(JSON.parse(response.body)).to include(alert_params)
     end
@@ -153,17 +153,16 @@ describe Projects::Prometheus::AlertsController do
         "iid" => alert.iid,
         "name" => "bar",
         "query" => alert.query,
-        "operator" => alert.operator,
+        "operator" => alert.computed_operator,
         "threshold" => alert.threshold,
         "alert_path" => Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alert.iid, environment_id: alert.environment.id, format: :json)
       }
-
-      expect(schedule_update_service).to receive(:execute)
 
       expect do
         put :update, project_params(id: alert.iid, name: "bar")
       end.to change { alert.reload.name }.to("bar")
 
+      expect(schedule_update_service).to have_received(:execute)
       expect(response).to have_gitlab_http_status(200)
       expect(JSON.parse(response.body)).to include(alert_params)
     end
@@ -186,11 +185,11 @@ describe Projects::Prometheus::AlertsController do
     end
 
     it 'destroys the specified prometheus alert' do
-      expect(schedule_update_service).to receive(:execute)
-
       expect do
         delete :destroy, project_params(id: alert.iid)
       end.to change { PrometheusAlert.count }.from(1).to(0)
+
+      expect(schedule_update_service).to have_received(:execute)
     end
   end
 

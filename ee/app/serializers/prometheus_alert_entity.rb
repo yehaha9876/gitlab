@@ -5,10 +5,13 @@ class PrometheusAlertEntity < Grape::Entity
   expose :iid
   expose :name
   expose :query
-  expose :operator
   expose :threshold
 
-  expose :alert_path, if: -> (*) { can_read_prometheus_alerts? } do |prometheus_alert|
+  expose :operator do |prometheus_alert|
+    prometheus_alert.computed_operator
+  end
+
+  expose :alert_path do |prometheus_alert|
     project_prometheus_alert_path(prometheus_alert.project, prometheus_alert.iid, environment_id: prometheus_alert.environment.id, format: :json)
   end
 

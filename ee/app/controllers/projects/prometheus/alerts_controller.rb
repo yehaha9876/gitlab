@@ -26,12 +26,12 @@ module Projects
       end
 
       def create
-        alert = project.prometheus_alerts.create(alerts_params)
+        @alert = project.prometheus_alerts.create(alerts_params)
 
-        if alert
+        if @alert
           schedule_prometheus_update!
 
-          render json: serialize_as_json(alert)
+          render json: serialize_as_json(@alert)
         else
           head :no_content
         end
@@ -60,7 +60,13 @@ module Projects
       private
 
       def alerts_params
-        params.permit(:query, :operator, :threshold, :name, :environment_id)
+        alerts_params = params.permit(:query, :operator, :threshold, :name, :environment_id)
+
+        if alerts_params[:operator].present?
+          alerts_params[:operator] = PrometheusAlert.operator_to_enum(alerts_params[:operator])
+        end
+
+        alerts_params
       end
 
       def schedule_prometheus_update!
