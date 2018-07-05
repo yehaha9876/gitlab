@@ -1,0 +1,5 @@
+---
+title: "[Geo] Fix performance of SQL queries in RepositoryVerificationFinder"
+merge_request: 6388
+author:
+type: fixed
