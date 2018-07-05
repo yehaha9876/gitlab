@@ -31,10 +31,13 @@ describe PrometheusAlert do
       subject.threshold = 1
 
       alert_params = {
-        "alert" => "bar_1",
+        "alert" => "bar",
         "expr" => "foo > 1.0",
         "for" => "5m",
-        "labels" => { "gitlab" => "hook" }
+        "labels" => {
+          "gitlab" => "hook",
+          "gitlab_alert_id" => 1
+        }
       }
 
       expect(subject.to_param).to eq(alert_params)
