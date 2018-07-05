@@ -2,13 +2,18 @@ require 'spec_helper'
 
 describe Geo::PruneEventLogWorker, :geo do
   include ::EE::GeoHelpers
+  include ExclusiveLeaseHelpers
 
   subject(:worker) { described_class.new }
+
   set(:primary) { create(:geo_node, :primary) }
   set(:secondary) { create(:geo_node) }
 
+  let(:lease_key) { 'geo/prune_event_log_worker' }
+  let(:lease_timeout) { Geo::PruneEventLogWorker::LEASE_TIMEOUT }
+
   before do
-    allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:try_obtain).and_return(true)
+    stub_exclusive_lease(lease_key, timeout: lease_timeout)
   end
 
   describe '#perform' do
@@ -30,9 +35,9 @@ describe Geo::PruneEventLogWorker, :geo do
       end
 
       it 'logs error when it cannot obtain lease' do
-        allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:try_obtain) { nil }
+        stub_exclusive_lease_taken(lease_key, timeout: lease_timeout)
 
-        expect(worker).to receive(:log_error).with('Cannot obtain an exclusive lease. There must be another instance already in execution.')
+        expect(worker).to receive(:log_error).with(/^Cannot obtain an exclusive lease/)
 
         worker.perform
       end
@@ -45,10 +50,9 @@ describe Geo::PruneEventLogWorker, :geo do
         it 'deletes everything from the Geo event log' do
           create_list(:geo_event_log, 2)
 
-          expect(worker).to receive(:log_info).with('No secondary nodes, truncate the Geo Event Log table')
-          expect(ActiveRecord::Base.connection).to receive(:truncate).with('geo_event_log').and_call_original
+          expect(Geo::TruncateEventLogWorker).to receive(:perform_in).with(described_class::TRUNCATE_DELAY)
 
-          expect { worker.perform }.to change { Geo::EventLog.count }.by(-2)
+          worker.perform
         end
       end
 
@@ -58,12 +62,11 @@ describe Geo::PruneEventLogWorker, :geo do
         let(:unhealthy_status) { build(:geo_node_status, :unhealthy) }
 
         it 'contacts all secondary nodes for their status' do
-          events = create_list(:geo_event_log, 5)
+          status = spy(:status)
 
-          create(:geo_node_status, :healthy, cursor_last_event_id: events.last.id, geo_node_id: secondary.id)
-          create(:geo_node_status, :healthy, cursor_last_event_id: events[3].id, geo_node_id: secondary2.id)
+          allow_any_instance_of(GeoNode).to receive(:status).and_return(status)
 
-          expect(worker).to receive(:log_info).with('Delete Geo Event Log entries up to id', anything)
+          expect(status).to receive(:cursor_last_event_id).twice.and_return(0)
 
           worker.perform
         end
@@ -74,7 +77,7 @@ describe Geo::PruneEventLogWorker, :geo do
           create(:geo_node_status, :healthy, cursor_last_event_id: events.last.id, geo_node_id: secondary.id)
           create(:geo_node_status, :unhealthy, geo_node_id: secondary2.id)
 
-          expect(worker).to receive(:log_info).with('Could not get status of all nodes, not deleting any entries from Geo Event Log', unhealthy_node_count: 1)
+          expect(worker).to receive(:log_info).with(/^Could not get status of all nodes/, unhealthy_node_count: 1)
 
           expect { worker.perform }.not_to change { Geo::EventLog.count }
         end
@@ -84,7 +87,7 @@ describe Geo::PruneEventLogWorker, :geo do
 
           create(:geo_node_status, :healthy, cursor_last_event_id: events[3].id, geo_node_id: secondary.id)
           create(:geo_node_status, :healthy, cursor_last_event_id: events.last.id, geo_node_id: secondary2.id)
-          expect(worker).to receive(:log_info).with('Delete Geo Event Log entries up to id', geo_event_log_id: events[3].id)
+          expect(worker).to receive(:log_info).with(/^Delete Geo Event Log/, geo_event_log_id: events[3].id)
 
           expect { worker.perform }.to change { Geo::EventLog.count }.by(-4)
         end

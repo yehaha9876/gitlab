@@ -12,6 +12,11 @@ export default {
       type: Boolean,
       required: true,
     },
+    cssClasses: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     tooltipLabel() {
@@ -28,22 +33,23 @@ export default {
 
 <template>
   <button
+    v-tooltip
+    :title="tooltipLabel"
+    :class="cssClasses"
     type="button"
     class="btn btn-blank gutter-toggle btn-sidebar-action"
-    @click="toggle"
-    v-tooltip
     data-container="body"
     data-placement="left"
     data-boundary="viewport"
-    :title="tooltipLabel"
+    @click="toggle"
   >
     <i
-      aria-label="toggle collapse"
-      class="fa"
       :class="{
         'fa-angle-double-right': !collapsed,
         'fa-angle-double-left': collapsed
       }"
+      aria-label="toggle collapse"
+      class="fa"
     >
     </i>
   </button>

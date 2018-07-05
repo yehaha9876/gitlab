@@ -133,6 +133,19 @@ module IssuablesHelper
     end
   end
 
+  def group_dropdown_label(group_id, default_label)
+    return default_label if group_id.nil?
+    return "Any group" if group_id == "0"
+
+    group = ::Group.find_by(id: group_id)
+
+    if group
+      group.full_name
+    else
+      default_label
+    end
+  end
+
   def milestone_dropdown_label(milestone_title, default_label = "Milestone")
     title =
       case milestone_title
@@ -159,7 +172,7 @@ module IssuablesHelper
     output = ""
     output << "Opened #{time_ago_with_tooltip(issuable.created_at)} by ".html_safe
     output << content_tag(:strong) do
-      author_output = link_to_member(project, issuable.author, size: 24, mobile_classes: "d-none d-sm-inline-block", tooltip: true)
+      author_output = link_to_member(project, issuable.author, size: 24, mobile_classes: "d-none d-sm-inline", tooltip: true)
       author_output << link_to_member(project, issuable.author, size: 24, by_username: true, avatar: false, mobile_classes: "d-block d-sm-none")
     end
 
@@ -167,7 +180,7 @@ module IssuablesHelper
     output << content_tag(:span, (issuable_first_contribution_icon if issuable.first_contribution?), class: 'has-tooltip', title: _('1st contribution!'))
 
     output << content_tag(:span, (issuable.task_status if issuable.tasks?), id: "task_status", class: "d-none d-sm-none d-md-inline-block")
-    output << content_tag(:span, (issuable.task_status_short if issuable.tasks?), id: "task_status_short", class: "d-md-none d-lg-none d-xl-inline-block")
+    output << content_tag(:span, (issuable.task_status_short if issuable.tasks?), id: "task_status_short", class: "d-md-none")
 
     output.html_safe
   end

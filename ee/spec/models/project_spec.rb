@@ -592,8 +592,8 @@ describe Project do
 
   describe '#any_runners_limit' do
     let(:project) { create(:project, shared_runners_enabled: shared_runners_enabled) }
-    let(:specific_runner) { create(:ci_runner) }
-    let(:shared_runner) { create(:ci_runner, :shared) }
+    let(:specific_runner) { create(:ci_runner, :project) }
+    let(:shared_runner) { create(:ci_runner, :instance) }
 
     context 'for shared runners enabled' do
       let(:shared_runners_enabled) { true }
@@ -1388,6 +1388,36 @@ describe Project do
       end
 
       it { is_expected.to be_empty }
+    end
+  end
+
+  describe '#find_path_lock' do
+    let(:project) { create :project }
+    let(:path_lock) { create :path_lock, project: project }
+    let(:path) { path_lock.path }
+
+    it 'returns path_lock' do
+      expect(project.find_path_lock(path)).to eq(path_lock)
+    end
+
+    it 'returns nil' do
+      expect(project.find_path_lock('app/controllers')).to be_falsey
+    end
+  end
+
+  describe '#any_path_locks?', :request_store do
+    let(:project) { create :project }
+
+    it 'returns false when there are no path locks' do
+      expect(project.any_path_locks?).to be_falsey
+    end
+
+    it 'returns a cached true when there are path locks' do
+      create(:path_lock, project: project)
+
+      expect(project.path_locks).to receive(:any?).once.and_call_original
+
+      2.times { expect(project.any_path_locks?).to be_truthy }
     end
   end
 end

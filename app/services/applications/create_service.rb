@@ -4,10 +4,10 @@ module Applications
 
     def initialize(current_user, params)
       @current_user = current_user
-      @params = params
+      @params = params.except(:ip_address)
     end
 
-    def execute(request = nil)
+    def execute(request)
       Doorkeeper::Application.create(@params)
     end
   end

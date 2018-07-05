@@ -308,6 +308,10 @@ module API
       expose :additions, :deletions, :total
     end
 
+    class CommitWithStats < Commit
+      expose :stats, using: Entities::CommitStats
+    end
+
     class CommitDetail < Commit
       expose :stats, using: Entities::CommitStats, if: :stats
       expose :status
@@ -345,6 +349,10 @@ module API
       expose :developers_can_merge do |repo_branch, options|
         options[:project].protected_branches.developers_can?(:merge, repo_branch.name)
       end
+
+      expose :can_push do |repo_branch, options|
+        Gitlab::UserAccess.new(options[:current_user], project: options[:project]).can_push_to_branch?(repo_branch.name)
+      end
     end
 
     class TreeObject < Grape::Entity
@@ -358,7 +366,7 @@ module API
     end
 
     class Snippet < Grape::Entity
-      expose :id, :title, :file_name, :description
+      expose :id, :title, :file_name, :description, :visibility
       expose :author, using: Entities::UserBasic
       expose :updated_at, :created_at
       expose :project_id
@@ -414,6 +422,10 @@ module API
       expose :state, :created_at, :updated_at
       expose :due_date
       expose :start_date
+
+      expose :web_url do |milestone, _options|
+        Gitlab::UrlBuilder.build(milestone)
+      end
     end
 
     class IssueBasic < ProjectEntity
@@ -561,7 +573,9 @@ module API
       expose :discussion_locked
       expose :should_remove_source_branch?, as: :should_remove_source_branch
       expose :force_remove_source_branch?, as: :force_remove_source_branch
-      expose :allow_maintainer_to_push, if: -> (merge_request, _) { merge_request.for_fork? }
+      expose :allow_collaboration, if: -> (merge_request, _) { merge_request.for_fork? }
+      # Deprecated
+      expose :allow_collaboration, as: :allow_maintainer_to_push, if: -> (merge_request, _) { merge_request.for_fork? }
 
       expose :web_url do |merge_request, options|
         Gitlab::UrlBuilder.build(merge_request)
@@ -720,6 +734,12 @@ module API
       expose :notes, using: Entities::Note
     end
 
+    class Avatar < Grape::Entity
+      expose :avatar_url do |avatarable, options|
+        avatarable.avatar_url(only_path: false, size: options[:size])
+      end
+    end
+
     class AwardEmoji < Grape::Entity
       expose :id
       expose :name
@@ -777,28 +797,33 @@ module API
 
     class Todo < Grape::Entity
       expose :id
-      expose :project, using: Entities::BasicProjectDetails
+      expose :project, using: Entities::ProjectIdentity, if: -> (todo, _) { todo.project_id }
+      expose :group, using: 'API::Entities::NamespaceBasic', if: -> (todo, _) { todo.group_id }
       expose :author, using: Entities::UserBasic
       expose :action_name
       expose :target_type
 
       expose :target do |todo, options|
-        Entities.const_get(todo.target_type).represent(todo.target, options)
+        todo_target_class(todo.target_type).represent(todo.target, options)
       end
 
       expose :target_url do |todo, options|
         target_type   = todo.target_type.underscore
-        target_url    = "namespace_project_#{target_type}_url"
+        target_url    = "#{todo.parent.class.to_s.underscore}_#{target_type}_url"
         target_anchor = "note_#{todo.note_id}" if todo.note_id?
 
         Gitlab::Routing
           .url_helpers
-          .public_send(target_url, todo.project.namespace, todo.project, todo.target, anchor: target_anchor) # rubocop:disable GitlabSecurity/PublicSend
+          .public_send(target_url, todo.parent, todo.target, anchor: target_anchor) # rubocop:disable GitlabSecurity/PublicSend
       end
 
       expose :body
       expose :state
       expose :created_at
+
+      def todo_target_class(target_type)
+        ::API::Entities.const_get(target_type)
+      end
     end
 
     class NamespaceBasic < Grape::Entity
@@ -1018,7 +1043,7 @@ module API
       expose :description
       expose :ip_address
       expose :active
-      expose :is_shared
+      expose :instance_type?, as: :is_shared
       expose :name
       expose :online?, as: :online
       expose :status
@@ -1032,7 +1057,7 @@ module API
       expose :access_level
       expose :version, :revision, :platform, :architecture
       expose :contacted_at
-      expose :token, if: lambda { |runner, options| options[:current_user].admin? || !runner.is_shared? }
+      expose :token, if: lambda { |runner, options| options[:current_user].admin? || !runner.instance_type? }
       expose :projects, with: Entities::BasicProjectDetails do |runner, options|
         if options[:current_user].admin?
           runner.projects
@@ -1393,3 +1418,4 @@ API::Entities.prepend_entity(::API::Entities::Project, with: EE::API::Entities::
 API::Entities.prepend_entity(::API::Entities::ProtectedRefAccess, with: EE::API::Entities::ProtectedRefAccess)
 API::Entities.prepend_entity(::API::Entities::UserPublic, with: EE::API::Entities::UserPublic)
 API::Entities.prepend_entity(::API::Entities::Variable, with: EE::API::Entities::Variable)
+API::Entities.prepend_entity(::API::Entities::Todo, with: EE::API::Entities::Todo)

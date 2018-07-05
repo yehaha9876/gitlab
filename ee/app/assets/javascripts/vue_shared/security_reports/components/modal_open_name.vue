@@ -7,11 +7,17 @@ export default {
       type: Object,
       required: true,
     },
+    // failed || success
+    status: {
+      type: String,
+      required: true,
+    },
   },
   methods: {
     ...mapActions(['openModal']),
     handleIssueClick() {
-      this.openModal(this.issue);
+      const { issue, status, openModal } = this;
+      openModal({ issue, status });
     },
   },
 };
@@ -19,9 +25,9 @@ export default {
 <template>
   <button
     type="button"
+    class="btn-link btn-blank text-left break-link vulnerability-name-button"
     @click="handleIssueClick()"
-    class="btn-link btn-blank text-left break-link"
   >
-    {{ issue.name }}
+    {{ issue.title }}
   </button>
 </template>

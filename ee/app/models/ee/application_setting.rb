@@ -70,13 +70,13 @@ module EE
 
       attr_encrypted :external_auth_client_key,
                      mode: :per_attribute_iv,
-                     key: ::Gitlab::Application.secrets.db_key_base,
+                     key: Settings.attr_encrypted_db_key_base_truncated,
                      algorithm: 'aes-256-gcm',
                      encode: true
 
       attr_encrypted :external_auth_client_key_pass,
                      mode: :per_attribute_iv,
-                     key: ::Gitlab::Application.secrets.db_key_base,
+                     key: Settings.attr_encrypted_db_key_base_truncated,
                      algorithm: 'aes-256-gcm',
                      encode: true
     end
@@ -100,9 +100,18 @@ module EE
           slack_app_enabled: false,
           slack_app_id: nil,
           slack_app_secret: nil,
-          slack_app_verification_token: nil
+          slack_app_verification_token: nil,
+          pseudonymizer_enabled: false
         )
       end
+    end
+
+    def pseudonymizer_available?
+      License.feature_available?(:pseudonymizer)
+    end
+
+    def pseudonymizer_enabled?
+      pseudonymizer_available? && super
     end
 
     def should_check_namespace_plan?

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Issue Sidebar' do
+describe 'Issue Sidebar' do
   include MobileHelpers
 
   let(:group) { create(:group, :nested) }
@@ -222,35 +222,6 @@ feature 'Issue Sidebar' do
 
     it 'does not have a option to edit labels' do
       expect(page).not_to have_selector('.block.labels .edit-link')
-    end
-  end
-
-  context 'updating weight', :js do
-    before do
-      project.add_master(user)
-      visit_issue(project, issue)
-    end
-
-    it 'updates weight in sidebar to 1' do
-      page.within '.weight' do
-        click_link 'Edit'
-        click_link '1'
-
-        page.within '.value' do
-          expect(page).to have_content '1'
-        end
-      end
-    end
-
-    it 'updates weight in sidebar to no weight' do
-      page.within '.weight' do
-        click_link 'Edit'
-        click_link 'No Weight'
-
-        page.within '.value' do
-          expect(page).to have_content 'None'
-        end
-      end
     end
   end
 

@@ -6,7 +6,7 @@ PostgreSQL. This is the database that will be installed if you use the
 Omnibus package to manage your database.
 
 > Important notes:
-- This document will focus only on configuration supported with [GitLab Premium](https://about.gitlab.com/products/), using the Omnibus GitLab package.
+- This document will focus only on configuration supported with [GitLab Premium](https://about.gitlab.com/pricing/), using the Omnibus GitLab package.
 - If you are a Community Edition or Starter user, consider using a cloud hosted solution.
 - This document will not cover installations from source.
 
@@ -262,11 +262,9 @@ check the [Troubleshooting section](#troubleshooting) before proceeding.
 
 ### Configuring the Database nodes
 
-On each database node perform the following:
-
 1. Make sure you collect [`CONSUL_SERVER_NODES`](#consul_information), [`PGBOUNCER_PASSWORD_HASH`](#pgbouncer_information), [`POSTGRESQL_PASSWORD_HASH`](#postgresql_information), [`Number of db nodes`](#postgresql_information), and [`Network Address`](#network_address) before executing the next step.
 
-1. Edit `/etc/gitlab/gitlab.rb` replacing values noted in the `# START user configuration` section:
+1. On the master database node, edit `/etc/gitlab/gitlab.rb` replacing values noted in the `# START user configuration` section:
 
     ```ruby
     # Disable all components except PostgreSQL and Repmgr and Consul
@@ -310,6 +308,15 @@ On each database node perform the following:
     ```
 
     > `postgres_role` was introduced with GitLab 10.3
+
+1. On secondary nodes, add all the configuration specified above for primary node
+   to `/etc/gitlab/gitlab.rb`. In addition, append the following configuration
+   to inform gitlab-ctl that they are standby nodes initially and it need not
+   attempt to register them as primary node
+   ```
+   # HA setting to specify if a node should attempt to be master on initialization
+   repmgr['master_on_initialization'] = false
+   ```
 
 1. [Reconfigure GitLab] for the changes to take effect.
 
@@ -424,6 +431,18 @@ Role      | Name         | Upstream     | Connection String
 
 If the 'Role' column for any node says "FAILED", check the
 [Troubleshooting section](#troubleshooting) before proceeding.
+
+Also, check that the check master command works successfully on each node:
+
+```
+su - gitlab-consul
+gitlab-ctl repmgr-check-master
+```
+
+This command relies on exit codes to tell Consul whether a particular node is a master
+or secondary. The most important thing here is that this command does not produce errors.
+If there are errors it's most likely due to incorrect `gitlab-consul` database user permissions.
+Check the [Troubleshooting section](#troubleshooting) before proceeding.
 
 ### Configuring the Pgbouncer node
 
@@ -594,7 +613,9 @@ consul['configuration'] = {
 
 ##### Example recommended setup for PostgreSQL servers
 
-On each server edit `/etc/gitlab/gitlab.rb`:
+###### Primary node
+
+On primary node edit `/etc/gitlab/gitlab.rb`:
 
 ```ruby
 # Disable all components except PostgreSQL and Repmgr and Consul
@@ -622,6 +643,19 @@ repmgr['trust_auth_cidr_addresses'] = %w(10.6.0.0/16)
 consul['configuration'] = {
   retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13)
 }
+```
+
+[Reconfigure Omnibus GitLab][reconfigure Gitlab] for the changes to take effect.
+
+###### Secondary nodes
+
+On secondary nodes, edit `/etc/gitlab/gitlab.rb` and add all the configuration
+added to primary node, noted above. In addition, append the following
+configuration
+
+```
+# HA setting to specify if a node should attempt to be master on initialization
+repmgr['master_on_initialization'] = false
 ```
 
 [Reconfigure Omnibus GitLab][reconfigure Gitlab] for the changes to take effect.
@@ -734,7 +768,8 @@ Please note that after the initial configuration, if a failover occurs, the Post
 
 ##### Example minimal configuration for database servers
 
-On each server edit `/etc/gitlab/gitlab.rb`:
+##### Primary node
+On primary database node edit `/etc/gitlab/gitlab.rb`:
 
 ```ruby
 # Disable all components except PostgreSQL, Repmgr, and Consul
@@ -766,6 +801,16 @@ consul['configuration'] = {
 ```
 
 [Reconfigure Omnibus GitLab][reconfigure Gitlab] for the changes to take effect.
+
+###### Secondary nodes
+
+On secondary nodes, edit `/etc/gitlab/gitlab.rb` and add all the information added
+to primary node, noted above. In addition, append the following configuration
+
+```
+# HA setting to specify if a node should attempt to be master on initialization
+repmgr['master_on_initialization'] = false
+```
 
 ##### Example minimal configuration for application server
 
@@ -971,6 +1016,21 @@ To restart either service, run `gitlab-ctl restart SERVICE`
 For PostgreSQL, it is usually safe to restart the master node by default. Automatic failover defaults to a 1 minute timeout. Provided the database returns before then, nothing else needs to be done. To be safe, you can stop `repmgrd` on the standby nodes first with `gitlab-ctl stop repmgrd`, then start afterwards with `gitlab-ctl start repmgrd`.
 
 On the consul server nodes, it is important to restart the consul service in a controlled fashion. Read our [consul documentation](consul.md#restarting-the-server-cluster) for instructions on how to restart the service.
+
+#### `gitlab-ctl repmgr-check-master` command produces errors
+
+If this command displays errors about database permissions it is likely that something failed during
+install, resulting in the `gitlab-consul` database user getting incorrect permissions. Follow these
+steps to fix the problem:
+
+1. On the master database node, connect to the database prompt - `gitlab-psql -d template1`
+1. Delete the `gitlab-consul` user - `DROP USER "gitlab-consul";`
+1. Exit the database prompt - `\q`
+1. [Reconfigure GitLab] and the user will be re-added with the proper permissions.
+1. Change to the `gitlab-consul` user - `su - gitlab-consul`
+1. Try the check command again - `gitlab-ctl repmgr-check-master`.
+
+Now there should not be errors. If errors still occur then there is another problem. 
 
 #### PGBouncer error `ERROR:  pgbouncer cannot connect to server`
 

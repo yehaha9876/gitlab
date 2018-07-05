@@ -17,15 +17,23 @@ export default {
       type: Object,
       required: true,
     },
+    // failed || success
+    status: {
+      type: String,
+      required: true,
+    },
   },
 };
 </script>
 <template>
   <div class="report-block-list-issue-description prepend-top-5 append-bottom-5">
-    <div class="report-block-list-issue-description-text append-right-5">
-      <template v-if="issue.priority">{{ issue.priority }}:</template>
+    <div class="report-block-list-issue-description-text">
+      <template v-if="issue.severity">{{ issue.severity }}:</template>
 
-      <modal-open-name :issue="issue" />
+      <modal-open-name
+        :issue="issue"
+        :status="status"
+      />
     </div>
 
     <report-link

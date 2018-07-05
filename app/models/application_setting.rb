@@ -213,14 +213,6 @@ class ApplicationSetting < ActiveRecord::Base
     end
   end
 
-  validates_each :disabled_oauth_sign_in_sources do |record, attr, value|
-    value&.each do |source|
-      unless Devise.omniauth_providers.include?(source.to_sym)
-        record.errors.add(attr, "'#{source}' is not an OAuth sign-in source")
-      end
-    end
-  end
-
   validate :terms_exist, if: :enforce_terms?
 
   before_validation :ensure_uuid!
@@ -331,6 +323,11 @@ class ApplicationSetting < ActiveRecord::Base
     ::Gitlab::Database.cached_column_exists?(:application_settings, :sidekiq_throttling_enabled)
   end
 
+  def disabled_oauth_sign_in_sources=(sources)
+    sources = (sources || []).map(&:to_s) & Devise.omniauth_providers.map(&:to_s)
+    super(sources)
+  end
+
   def domain_whitelist_raw
     self.domain_whitelist&.join("\n")
   end
@@ -359,17 +356,6 @@ class ApplicationSetting < ActiveRecord::Base
 
   def repository_storages
     Array(read_attribute(:repository_storages))
-  end
-
-  # DEPRECATED
-  # repository_storage is still required in the API. Remove in 9.0
-  # Still used in API v3
-  def repository_storage
-    repository_storages.first
-  end
-
-  def repository_storage=(value)
-    self.repository_storages = [value]
   end
 
   def default_project_visibility=(level)

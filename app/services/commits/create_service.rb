@@ -1,5 +1,7 @@
 module Commits
   class CreateService < ::BaseService
+    prepend EE::Commits::CreateService
+
     ValidationError = Class.new(StandardError)
     ChangeError = Class.new(StandardError)
 
@@ -17,7 +19,7 @@ module Commits
       new_commit = create_commit!
 
       success(result: new_commit)
-    rescue ValidationError, ChangeError, Gitlab::Git::Index::IndexError, Gitlab::Git::CommitError, Gitlab::Git::HooksService::PreReceiveError => ex
+    rescue ValidationError, ChangeError, Gitlab::Git::Index::IndexError, Gitlab::Git::CommitError, Gitlab::Git::PreReceiveError => ex
       error(ex.message)
     end
 
@@ -37,7 +39,6 @@ module Commits
 
     def validate!
       validate_permissions!
-      validate_repository_size!
       validate_on_branch!
       validate_branch_existance!
 
@@ -49,12 +50,6 @@ module Commits
 
       unless allowed
         raise_error("You are not allowed to push into this branch")
-      end
-    end
-
-    def validate_repository_size!
-      if project.above_size_limit?
-        raise_error(Gitlab::RepositorySizeError.new(project).commit_error)
       end
     end
 

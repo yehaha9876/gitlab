@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'Dashboard Projects' do
+describe 'Dashboard Projects' do
   let(:user) { create(:user) }
   let(:project) { create(:project, :repository, name: 'awesome stuff') }
   let(:project2) { create(:project, :public, name: 'Community project') }
@@ -10,7 +10,7 @@ feature 'Dashboard Projects' do
     sign_in(user)
   end
 
-  it_behaves_like "an autodiscoverable RSS feed with current_user's RSS token" do
+  it_behaves_like "an autodiscoverable RSS feed with current_user's feed token" do
     before do
       visit dashboard_projects_path
     end
@@ -121,7 +121,7 @@ feature 'Dashboard Projects' do
       visit dashboard_projects_path
     end
 
-    scenario 'shows "Create merge request" button' do
+    it 'shows "Create merge request" button' do
       expect(page).to have_content 'You pushed to feature'
 
       within('#content-body') do

@@ -100,8 +100,6 @@ module Issuable
 
     strip_attributes :title
 
-    after_save :ensure_metrics, unless: :imported?
-
     # We want to use optimistic lock for cases when only title or description are involved
     # http://api.rubyonrails.org/classes/ActiveRecord/Locking/Optimistic.html
     def locking_enabled?
@@ -109,6 +107,10 @@ module Issuable
     end
 
     def allows_multiple_assignees?
+      false
+    end
+
+    def etag_caching_enabled?
       false
     end
   end
@@ -249,6 +251,12 @@ module Issuable
 
   def open?
     opened?
+  end
+
+  def overdue?
+    return false unless respond_to?(:due_date)
+
+    due_date.try(:past?) || false
   end
 
   def user_notes_count

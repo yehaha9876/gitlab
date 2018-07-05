@@ -11,7 +11,7 @@ module EE
       CODECLIMATE_FILE = 'codeclimate.json'.freeze
       CODE_QUALITY_FILE = 'gl-code-quality-report.json'.freeze
       DEPENDENCY_SCANNING_FILE = 'gl-dependency-scanning-report.json'.freeze
-      LICENSE_MANAGEMENT_FILE = 'gl-license-report.json'.freeze
+      LICENSE_MANAGEMENT_FILE = 'gl-license-management-report.json'.freeze
       SAST_FILE = 'gl-sast-report.json'.freeze
       PERFORMANCE_FILE = 'performance.json'.freeze
       # SAST_CONTAINER_FILE is deprecated and replaced with CONTAINER_SCANNING_FILE (#5778)
@@ -38,7 +38,7 @@ module EE
       end
 
       def shared_runners_minutes_limit_enabled?
-        runner && runner.shared? && project.shared_runners_minutes_limit_enabled?
+        runner && runner.instance_type? && project.shared_runners_minutes_limit_enabled?
       end
 
       def stick_build_if_status_changed

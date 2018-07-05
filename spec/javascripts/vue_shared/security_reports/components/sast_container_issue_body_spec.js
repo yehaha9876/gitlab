@@ -8,54 +8,58 @@ describe('sast container issue body', () => {
   const Component = Vue.extend(component);
 
   const sastContainerIssue = {
-    name: 'CVE-2017-11671',
-    nameLink: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-11671',
+    title: 'CVE-2017-11671',
     namespace: 'debian:8',
     path: 'debian:8',
-    priority: 'Low',
     severity: 'Low',
     vulnerability: 'CVE-2017-11671',
   };
+
+  const status = 'failed';
 
   afterEach(() => {
     vm.$destroy();
   });
 
-  describe('with priority', () => {
-    it('renders priority key', () => {
+  describe('with severity', () => {
+    it('renders severity key', () => {
       vm = mountComponent(Component, {
         issue: sastContainerIssue,
+        status,
       });
 
-      expect(vm.$el.textContent.trim()).toContain(sastContainerIssue.priority);
+      expect(vm.$el.textContent.trim()).toContain(sastContainerIssue.severity);
     });
   });
 
-  describe('without priority', () => {
-    it('does not rendere priority key', () => {
+  describe('without severity', () => {
+    it('does not render severity key', () => {
       const issueCopy = Object.assign({}, sastContainerIssue);
-      delete issueCopy.priority;
+      delete issueCopy.severity;
 
       vm = mountComponent(Component, {
         issue: issueCopy,
+        status,
       });
 
-      expect(vm.$el.textContent.trim()).not.toContain(sastContainerIssue.priority);
+      expect(vm.$el.textContent.trim()).not.toContain(sastContainerIssue.severity);
     });
   });
 
   it('renders name', () => {
     vm = mountComponent(Component, {
       issue: sastContainerIssue,
+      status,
     });
 
-    expect(vm.$el.querySelector('button').textContent.trim()).toEqual(sastContainerIssue.name);
+    expect(vm.$el.querySelector('button').textContent.trim()).toEqual(sastContainerIssue.title);
   });
 
   describe('path', () => {
     it('renders path', () => {
       vm = mountComponent(Component, {
         issue: sastContainerIssue,
+        status,
       });
 
       expect(vm.$el.textContent.trim()).toContain(sastContainerIssue.path);

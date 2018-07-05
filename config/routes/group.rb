@@ -5,9 +5,10 @@ end
 constraints(::Constraints::GroupUrlConstrainer.new) do
   scope(path: 'groups/*id',
         controller: :groups,
-        constraints: { id: Gitlab::PathRegex.full_namespace_route_regex, format: /(html|json|atom)/ }) do
+        constraints: { id: Gitlab::PathRegex.full_namespace_route_regex, format: /(html|json|atom|ics)/ }) do
     scope(path: '-') do
       get :edit, as: :edit_group
+      get :issues, as: :issues_group_calendar, action: :issues_calendar, constraints: lambda { |req| req.format == :ics }
       get :issues, as: :issues_group
       get :merge_requests, as: :merge_requests_group
       get :projects, as: :projects_group
@@ -56,6 +57,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resources :uploads, only: [:create] do
       collection do
         get ":secret/:filename", action: :show, as: :show, constraints: { filename: %r{[^/]+} }
+        post :authorize
       end
     end
 
@@ -105,6 +107,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         resources :notes, only: [:index, :create, :destroy, :update], concerns: :awardable, constraints: { id: /\d+/ }
       end
     end
+
+    resources :todos, only: [:create]
 
     # On CE only index and show are needed
     resources :boards, only: [:index, :show, :create, :update, :destroy]

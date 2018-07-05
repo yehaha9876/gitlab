@@ -31,12 +31,11 @@ export default {
   computed: {
     ...mapState(['currentBranchId', 'currentProjectId']),
     ...mapGetters(['currentProject', 'lastCommit']),
+    ...mapState('pipelines', ['latestPipeline']),
   },
   watch: {
     lastCommit() {
-      if (!this.isPollingInitialized) {
-        this.initPipelinePolling();
-      }
+      this.initPipelinePolling();
     },
   },
   mounted() {
@@ -46,20 +45,20 @@ export default {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
-    if (this.isPollingInitialized) {
-      this.stopPipelinePolling();
-    }
+
+    this.stopPipelinePolling();
   },
   methods: {
-    ...mapActions(['pipelinePoll', 'stopPipelinePolling']),
+    ...mapActions('pipelines', ['fetchLatestPipeline', 'stopPipelinePolling']),
     startTimer() {
       this.intervalId = setInterval(() => {
         this.commitAgeUpdate();
       }, 1000);
     },
     initPipelinePolling() {
-      this.pipelinePoll();
-      this.isPollingInitialized = true;
+      if (this.lastCommit) {
+        this.fetchLatestPipeline();
+      }
     },
     commitAgeUpdate() {
       if (this.lastCommit) {
@@ -76,23 +75,23 @@ export default {
 <template>
   <footer class="ide-status-bar">
     <div
-      class="ide-status-branch"
       v-if="lastCommit && lastCommitFormatedAge"
+      class="ide-status-branch"
     >
       <span
+        v-if="latestPipeline && latestPipeline.details"
         class="ide-status-pipeline"
-        v-if="lastCommit.pipeline && lastCommit.pipeline.details"
       >
         <ci-icon
-          :status="lastCommit.pipeline.details.status"
           v-tooltip
-          :title="lastCommit.pipeline.details.status.text"
+          :status="latestPipeline.details.status"
+          :title="latestPipeline.details.status.text"
         />
         Pipeline
         <a
-          class="monospace"
-          :href="lastCommit.pipeline.details.status.details_path">#{{ lastCommit.pipeline.id }}</a>
-        {{ lastCommit.pipeline.details.status.text }}
+          :href="latestPipeline.details.status.details_path"
+          class="monospace">#{{ latestPipeline.id }}</a>
+        {{ latestPipeline.details.status.text }}
         for
       </span>
 
@@ -101,18 +100,18 @@ export default {
       />
       <a
         v-tooltip
-        class="commit-sha"
         :title="lastCommit.message"
         :href="getCommitPath(lastCommit.short_id)"
+        class="commit-sha"
       >{{ lastCommit.short_id }}</a>
       by
       {{ lastCommit.author_name }}
       <time
         v-tooltip
-        data-placement="top"
-        data-container="body"
         :datetime="lastCommit.committed_date"
         :title="tooltipTitle(lastCommit.committed_date)"
+        data-placement="top"
+        data-container="body"
       >
         {{ lastCommitFormatedAge }}
       </time>
@@ -130,8 +129,8 @@ export default {
       {{ file.eol }}
     </div>
     <div
-      class="ide-status-file"
-      v-if="file && !file.binary">
+      v-if="file && !file.binary"
+      class="ide-status-file">
       {{ file.editorRow }}:{{ file.editorColumn }}
     </div>
     <div

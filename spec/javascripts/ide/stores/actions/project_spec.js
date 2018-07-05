@@ -1,36 +1,32 @@
-import Visibility from 'visibilityjs';
 import MockAdapter from 'axios-mock-adapter';
-import { refreshLastCommitData, pollSuccessCallBack } from '~/ide/stores/actions';
+import axios from '~/lib/utils/axios_utils';
+import {
+  refreshLastCommitData,
+  showBranchNotFoundError,
+  createNewBranchFromDefault,
+  getBranchData,
+} from '~/ide/stores/actions';
 import store from '~/ide/stores';
 import service from '~/ide/services';
-import axios from '~/lib/utils/axios_utils';
-import { fullPipelinesResponse } from '../../mock_data';
+import api from '~/api';
+import router from '~/ide/ide_router';
 import { resetStore } from '../../helpers';
 import testAction from '../../../helpers/vuex_action_helper';
 
 describe('IDE store project actions', () => {
-  const setProjectState = () => {
-    store.state.currentProjectId = 'abc/def';
-    store.state.currentBranchId = 'master';
-    store.state.projects['abc/def'] = {
-      id: 4,
-      path_with_namespace: 'abc/def',
-      branches: {
-        master: {
-          commit: {
-            id: 'abc123def456ghi789jkl',
-            title: 'example',
-          },
-        },
-      },
-    };
-  };
+  let mock;
 
   beforeEach(() => {
-    store.state.projects['abc/def'] = {};
+    mock = new MockAdapter(axios);
+
+    store.state.projects['abc/def'] = {
+      branches: {},
+    };
   });
 
   afterEach(() => {
+    mock.restore();
+
     resetStore(store);
   });
 
@@ -102,91 +98,137 @@ describe('IDE store project actions', () => {
     });
   });
 
-  describe('pipelinePoll', () => {
-    let mock;
+  describe('showBranchNotFoundError', () => {
+    it('dispatches setErrorMessage', done => {
+      testAction(
+        showBranchNotFoundError,
+        'master',
+        null,
+        [],
+        [
+          {
+            type: 'setErrorMessage',
+            payload: {
+              text: "Branch <strong>master</strong> was not found in this project's repository.",
+              action: jasmine.any(Function),
+              actionText: 'Create branch',
+              actionPayload: 'master',
+            },
+          },
+        ],
+        done,
+      );
+    });
+  });
 
-    beforeEach(() => {
-      setProjectState();
-      jasmine.clock().install();
-      mock = new MockAdapter(axios);
-      mock
-        .onGet('/abc/def/commit/abc123def456ghi789jkl/pipelines')
-        .reply(200, { data: { foo: 'bar' } }, { 'poll-interval': '10000' });
+  describe('createNewBranchFromDefault', () => {
+    it('calls API', done => {
+      spyOn(api, 'createBranch').and.returnValue(Promise.resolve());
+      spyOn(router, 'push');
+
+      createNewBranchFromDefault(
+        {
+          state: {
+            currentProjectId: 'project-path',
+          },
+          getters: {
+            currentProject: {
+              default_branch: 'master',
+            },
+          },
+          dispatch() {},
+        },
+        'new-branch-name',
+      )
+        .then(() => {
+          expect(api.createBranch).toHaveBeenCalledWith('project-path', {
+            ref: 'master',
+            branch: 'new-branch-name',
+          });
+        })
+        .then(done)
+        .catch(done.fail);
     });
 
-    afterEach(() => {
-      jasmine.clock().uninstall();
-      mock.restore();
-      store.dispatch('stopPipelinePolling');
+    it('clears error message', done => {
+      const dispatchSpy = jasmine.createSpy('dispatch');
+      spyOn(api, 'createBranch').and.returnValue(Promise.resolve());
+      spyOn(router, 'push');
+
+      createNewBranchFromDefault(
+        {
+          state: {
+            currentProjectId: 'project-path',
+          },
+          getters: {
+            currentProject: {
+              default_branch: 'master',
+            },
+          },
+          dispatch: dispatchSpy,
+        },
+        'new-branch-name',
+      )
+        .then(() => {
+          expect(dispatchSpy).toHaveBeenCalledWith('setErrorMessage', null);
+        })
+        .then(done)
+        .catch(done.fail);
     });
 
-    it('calls service periodically', done => {
-      spyOn(axios, 'get').and.callThrough();
-      spyOn(Visibility, 'hidden').and.returnValue(false);
+    it('reloads window', done => {
+      spyOn(api, 'createBranch').and.returnValue(Promise.resolve());
+      spyOn(router, 'push');
 
-      store
-        .dispatch('pipelinePoll')
+      createNewBranchFromDefault(
+        {
+          state: {
+            currentProjectId: 'project-path',
+          },
+          getters: {
+            currentProject: {
+              default_branch: 'master',
+            },
+          },
+          dispatch() {},
+        },
+        'new-branch-name',
+      )
         .then(() => {
-          jasmine.clock().tick(1000);
-
-          expect(axios.get).toHaveBeenCalled();
-          expect(axios.get.calls.count()).toBe(1);
+          expect(router.push).toHaveBeenCalled();
         })
-        .then(() => new Promise(resolve => requestAnimationFrame(resolve)))
-        .then(() => {
-          jasmine.clock().tick(10000);
-          expect(axios.get.calls.count()).toBe(2);
-        })
-        .then(() => new Promise(resolve => requestAnimationFrame(resolve)))
-        .then(() => {
-          jasmine.clock().tick(10000);
-          expect(axios.get.calls.count()).toBe(3);
-        })
-        .then(() => new Promise(resolve => requestAnimationFrame(resolve)))
-        .then(() => {
-          jasmine.clock().tick(10000);
-          expect(axios.get.calls.count()).toBe(4);
-        })
-
         .then(done)
         .catch(done.fail);
     });
   });
 
-  describe('pollSuccessCallBack', () => {
-    beforeEach(() => {
-      setProjectState();
-    });
+  describe('getBranchData', () => {
+    describe('error', () => {
+      it('dispatches branch not found action when response is 404', done => {
+        const dispatch = jasmine.createSpy('dispatchSpy');
 
-    it('commits correct pipeline', done => {
-      testAction(
-        pollSuccessCallBack,
-        fullPipelinesResponse,
-        store.state,
-        [
+        mock.onGet(/(.*)/).replyOnce(404);
+
+        getBranchData(
           {
-            type: 'SET_LAST_COMMIT_PIPELINE',
-            payload: {
-              projectId: 'abc/def',
-              branchId: 'master',
-              pipeline: {
-                id: '50',
-                commit: {
-                  id: 'abc123def456ghi789jkl',
-                },
-                details: {
-                  status: {
-                    icon: 'status_passed',
-                    text: 'passed',
-                  },
-                },
-              },
-            },
+            commit() {},
+            dispatch,
+            state: store.state,
           },
-        ], // mutations
-        [], // action
-        done,
-      );
+          {
+            projectId: 'abc/def',
+            branchId: 'master-testing',
+          },
+        )
+          .then(done.fail)
+          .catch(() => {
+            expect(dispatch.calls.argsFor(0)).toEqual([
+              'showBranchNotFoundError',
+              'master-testing',
+            ]);
+            done();
+          });
+      });
     });
   });
 });

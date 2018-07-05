@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'Update Epic', :js do
+describe 'Update Epic', :js do
   include DropzoneHelper
 
   let(:user) { create(:user) }
@@ -46,13 +46,41 @@ feature 'Update Epic', :js do
         fill_in 'issuable-title', with: 'New epic title'
         fill_in 'issue-description', with: 'New epic description'
 
-        page.within('.detail-page-description') { click_link('Preview') }
-        expect(find('.md-preview')).to have_content('New epic description')
+        page.within('.detail-page-description') do
+          click_link('Preview')
+          expect(find('.md-preview')).to have_content('New epic description')
+        end
 
         click_button 'Save changes'
 
         expect(find('.issuable-details h2.title')).to have_content('New epic title')
         expect(find('.issuable-details .description')).to have_content('New epic description')
+      end
+
+      it 'creates a todo only for mentioned users' do
+        mentioned = create(:user)
+
+        fill_in 'issue-description', with: "FYI #{mentioned.to_reference}"
+
+        click_button 'Save changes'
+
+        expect(find('.issuable-details h2.title')).to have_content('title')
+
+        visit dashboard_todos_path
+
+        expect(page).to have_selector('.todos-list .todo', count: 0)
+
+        sign_in(mentioned)
+
+        visit dashboard_todos_path
+
+        page.within '.header-content .todos-count' do
+          expect(page).to have_content '1'
+        end
+        expect(page).to have_selector('.todos-list .todo', count: 1)
+        within first('.todo') do
+          expect(page).to have_content "epic #{epic.to_reference(full: true)}"
+        end
       end
 
       it 'edits full screen' do
@@ -68,12 +96,14 @@ feature 'Update Epic', :js do
 
         expect(page.find_field("issue-description").value).to have_content('banana_sample')
 
-        page.within('.detail-page-description') { click_link('Preview') }
-        wait_for_requests
+        page.within('.detail-page-description') do
+          click_link('Preview')
+          wait_for_requests
 
-        within('.md-preview') do
-          link = find(link_css)['src']
-          expect(link).to match(link_match)
+          within('.md-preview') do
+            link = find(link_css)['src']
+            expect(link).to match(link_match)
+          end
         end
 
         click_button 'Save changes'

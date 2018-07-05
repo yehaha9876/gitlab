@@ -1,8 +1,8 @@
 module QA
-  feature 'GitLab Geo attachment replication', :geo do
+  describe 'GitLab Geo attachment replication', :geo do
     let(:file_to_attach) { File.absolute_path(File.join('spec', 'fixtures', 'banana_sample.gif')) }
 
-    scenario 'user uploads attachment to the primary node' do
+    it 'user uploads attachment to the primary node' do
       Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
         Page::Main::Login.act { sign_in_using_credentials }
 
@@ -25,20 +25,26 @@ module QA
             authorize! if needs_authorization?
           end
 
-          expect(page).to have_content 'You are on a secondary (read-only) Geo node'
+          EE::Page::Main::Banner.perform do |banner|
+            expect(banner).to have_secondary_read_only_banner
+          end
+
+          expect(page).to have_content 'You are on a secondary, read-only Geo node'
 
           Page::Menu::Main.perform do |menu|
             menu.go_to_projects
           end
 
           Page::Dashboard::Projects.perform do |dashboard|
+            dashboard.wait_for_project_replication(project.name)
+
             dashboard.go_to_project(project.name)
           end
 
           Page::Menu::Side.act { click_issues }
 
           Page::Project::Issue::Index.perform do |index|
-            index.go_to_issue(issue.title)
+            index.wait_for_issue_replication(issue)
           end
 
           image_url = find('a[href$="banana_sample.gif"]')[:href]

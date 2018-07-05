@@ -29,6 +29,10 @@ class GeoNode < ActiveRecord::Base
     allow_nil: true
   }
 
+  validates :repos_max_capacity, numericality: { greater_than_or_equal_to: 0 }
+  validates :files_max_capacity, numericality: { greater_than_or_equal_to: 0 }
+  validates :verification_max_capacity, numericality: { greater_than_or_equal_to: 0 }
+
   validate :check_not_adding_primary_as_secondary, if: :secondary?
 
   after_save :expire_cache!
@@ -42,7 +46,7 @@ class GeoNode < ActiveRecord::Base
   scope :with_url_prefix, ->(prefix) { where('url LIKE ?', "#{prefix}%") }
 
   attr_encrypted :secret_access_key,
-                 key: Gitlab::Application.secrets.db_key_base,
+                 key: Settings.attr_encrypted_db_key_base_truncated,
                  algorithm: 'aes-256-gcm',
                  mode: :per_attribute_iv,
                  encode: true

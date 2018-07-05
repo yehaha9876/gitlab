@@ -1,6 +1,6 @@
 # Repository mirroring
 
-Repository Mirroring is a way to mirror repositories from external sources.
+Repository mirroring is a way to mirror repositories from external sources.
 It can be used to mirror all branches, tags, and commits that you have
 in your repository.
 
@@ -34,7 +34,7 @@ A few things/limitations to consider:
 - The Git LFS objects will not be synced. You'll need to push/pull them
   manually.
 
-## Use-cases
+## Use cases
 
 - You migrated to GitLab but still need to keep your project in another source.
   In that case, you can simply set it up to mirror to GitLab (pull) and all the
@@ -228,7 +228,7 @@ backoff period.
 If the mirror fails (eg: branch diverged from upstream), the project's backoff
 period will be penalized each time it fails up to a maximum amount of time.
 
-## Pushing to a remote repository **[STARTER]**
+## Pushing to a remote repository
 
 >[Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/249) in
 GitLab Enterprise Edition 8.7. [Moved to GitLab Community Edition][ce-18715] in 10.8.
@@ -294,11 +294,12 @@ by using the **Update now** button which is exposed in various places:
 
 ## Bidirectional mirroring
 
-> **Warning:** There is no bidirectional support without conflicts. If you
-> configure a repository to pull and push to a second remote, there is no
-> guarantee that it will update correctly on both remotes. If you configure
-> a repository for bidirectional mirroring, you should consider when conflicts
-> occur who and how they will be resolved.
+CAUTION: **Warning:**
+There is no bidirectional support without conflicts. If you
+configure a repository to pull and push to a second remote, there is no
+guarantee that it will update correctly on both remotes. If you configure
+a repository for bidirectional mirroring, you should consider when conflicts
+occur who and how they will be resolved.
 
 Rewriting any mirrored commit on either remote will cause conflicts and
 mirroring to fail. This can be prevented by [only pulling protected branches](
@@ -312,16 +313,85 @@ mitigated by reducing the mirroring delay by using a Push event webhook to
 trigger an immediate pull to GitLab. Push mirroring from GitLab is rate limited
 to once per minute when only push mirroring protected branches.
 
-It may be possible to implement a locking mechanism using the server-side
-`pre-receive` hook to prevent the race condition. Read about [configuring
-custom Git hooks][hooks] on the GitLab server.
+### Preventing conflicts using a `pre-receive` hook
+
+> **Warning:** The solution proposed will negatively impact the performance of
+> Git push operations because they will be proxied to the upstream Git
+> repository.
+
+A server-side `pre-receive` hook can be used to prevent the race condition
+described above by only accepting the push after first pushing the commit to
+the upstream Git repository. In this configuration one Git repository acts as
+the authoritative upstream, and the other as downstream. The `pre-recieve` hook
+will be installed on the downstream repository.
+
+Read about [configuring custom Git hooks][hooks] on the GitLab server.
+
+A sample `pre-recieve` hook is provided below.
+
+```bash
+#!/usr/bin/env bash
+
+# --- Assume only one push mirror target
+# Push mirroring remotes are named `remote_mirror_<id>`, this finds the first remote and uses that.
+TARGET_REPO=$(git remote | grep -m 1 remote_mirror)
+
+proxy_push()
+{
+  # --- Arguments
+  OLDREV=$(git rev-parse $1)
+  NEWREV=$(git rev-parse $2)
+  REFNAME="$3"
+
+  # --- Pattern of branches to proxy pushes
+  whitelisted=$(expr "$branch" : "\(master\)")
+
+  case "$refname" in
+    refs/heads/*)
+      branch=$(expr "$refname" : "refs/heads/\(.*\)")
+
+      if [ "$whitelisted" = "$branch" ]; then
+        error="$(git push --quiet $TARGET_REPO $NEWREV:$REFNAME 2>&1)"
+        fail=$?
+
+        if [ "$fail" != "0" ]; then
+          echo >&2 ""
+          echo >&2 " Error: updates were rejected by upstream server"
+          echo >&2 "   This is usually caused by another repository pushing changes"
+          echo >&2 "   to the same ref. You may want to first integrate remote changes"
+          echo >&2 ""
+          return
+        fi
+      fi
+      ;;
+  esac
+}
+
+# Allow dual mode: run from the command line just like the update hook, or
+# if no arguments are given then run as a hook script
+if [ -n "$1" -a -n "$2" -a -n "$3" ]; then
+  # Output to the terminal in command line mode - if someone wanted to
+  # resend an email; they could redirect the output to sendmail
+  # themselves
+  PAGER= proxy_push $2 $3 $1
+else
+  # Push is proxied upstream one ref at a time. Because of this it is possible
+  # for some refs to succeed, and others to fail. This will result in a failed
+  # push.
+  while read oldrev newrev refname
+  do
+    proxy_push $oldrev $newrev $refname
+  done
+fi
+```
 
 ### Mirroring with Perforce via GitFusion
 
-> **Warning:** Bidirectional mirroring should not be used as a permanent
-> configuration. There is no bidirectional mirroring without conflicts.
-> Refer to [Migrating from Perforce Helix][perforce] for alternative migration
-> approaches.
+CAUTION: **Warning:**
+Bidirectional mirroring should not be used as a permanent
+configuration. There is no bidirectional mirroring without conflicts.
+Refer to [Migrating from Perforce Helix][perforce] for alternative migration
+approaches.
 
 GitFusion provides a Git interface to Perforce which can be used by GitLab to
 bidirectionally mirror projects with GitLab. This may be useful in some
@@ -333,16 +403,29 @@ Perforce will reject any pushes that rewrite history. It is recommended that
 only the fewest number of branches are mirrored due to the performance
 limitations of GitFusion.
 
+When configuring mirroring with Perforce via GitFusion, the following GitFusion
+settings are recommended:
+
+- `change-pusher` should be disabled, otherwise every commit will be rewritten
+as being committed by the mirroring account, rather than being mapped to
+existing Perforce users or the `unknown_git` user.
+- `unknown_git` user will be used as the commit author if the GitLab user does
+not exist in Perforce.
+
+Read about [GitFusion settings on Perforce.com][gitfusion-settings].
+
 [ee-51]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/51
 [ee-2551]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/2551
 [ee-3117]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3117
 [ee-3326]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3326
 [ee-3350]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3350
 [ee-3453]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3453
+[ee-4559]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/4559
 [ce-18715]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/18715
 [perms]: ../user/permissions.md
-[hooks]: ../administration/custom_hooks.html
+[hooks]: ../administration/custom_hooks.md
 [deploy-key]: ../ssh/README.md#deploy-keys
-[webhook]: ../user/project/integrations/webhooks.html#push-events
-[pull-api]: ../api/projects.html#start-the-pull-mirroring-process-for-a-project
-[perforce]: ../user/project/import/perforce.html
+[webhook]: ../user/project/integrations/webhooks.md#push-events
+[pull-api]: ../api/projects.md#start-the-pull-mirroring-process-for-a-project
+[perforce]: ../user/project/import/perforce.md
+[gitfusion-settings]: https://www.perforce.com/perforce/doc.current/manuals/git-fusion/Content/Git-Fusion/section_zdp_zz1_3l.html

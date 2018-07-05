@@ -1,4 +1,4 @@
-/* eslint-disable one-var, quote-props, comma-dangle, space-before-function-paren */
+/* eslint-disable quote-props, comma-dangle */
 
 import $ from 'jquery';
 import _ from 'underscore';
@@ -7,28 +7,30 @@ import Vue from 'vue';
 import Flash from '~/flash';
 import { __ } from '~/locale';
 import '~/vue_shared/models/label';
+import '~/vue_shared/models/assignee';
 
 import FilteredSearchBoards from './filtered_search_boards';
 import eventHub from './eventhub';
 import sidebarEventHub from '~/sidebar/event_hub'; // eslint-disable-line import/first
-import './models/issue';
-import './models/list';
 import './models/milestone';
 import './models/project';
-import './models/assignee';
 import './stores/boards_store';
 import ModalStore from './stores/modal_store';
-import BoardService from './services/board_service';
 import modalMixin from './mixins/modal_mixins';
 import './mixins/sortable_default_options';
 import './filters/due_date_filters';
 import './components/board';
 import './components/board_sidebar';
 import './components/new_list_dropdown';
-import './components/modal/index';
+import BoardAddIssuesModal from './components/modal/index.vue';
 import '~/vue_shared/vue_resource_interceptor'; // eslint-disable-line import/first
 
+import 'ee/boards/models/list'; // eslint-disable-line import/first
+import 'ee/boards/models/issue'; // eslint-disable-line import/first
 import 'ee/boards/models/project'; // eslint-disable-line import/first
+import BoardService from 'ee/boards/services/board_service'; // eslint-disable-line import/first
+import 'ee/boards/components/board_sidebar'; // eslint-disable-line import/first
+import 'ee/boards/components/modal/index'; // eslint-disable-line import/first
 import 'ee/boards/components/boards_selector'; // eslint-disable-line import/first
 import collapseIcon from 'ee/boards/icons/fullscreen_collapse.svg'; // eslint-disable-line import/first
 import expandIcon from 'ee/boards/icons/fullscreen_expand.svg'; // eslint-disable-line import/first
@@ -56,7 +58,7 @@ export default () => {
     components: {
       'board': gl.issueBoards.Board,
       'board-sidebar': gl.issueBoards.BoardSidebar,
-      'board-add-issues-modal': gl.issueBoards.IssuesModal,
+      BoardAddIssuesModal,
     },
     data: {
       state: Store.state,
@@ -131,7 +133,7 @@ export default () => {
         this.filterManager.updateTokens();
       },
       updateDetailIssue(newIssue) {
-        const sidebarInfoEndpoint = newIssue.sidebarInfoEndpoint;
+        const { sidebarInfoEndpoint } = newIssue;
         if (sidebarInfoEndpoint && newIssue.subscribed === undefined) {
           newIssue.setFetchingState('subscriptions', true);
           newIssue.setFetchingState('weight', true);
@@ -161,7 +163,7 @@ export default () => {
         Store.detail.issue = {};
       },
       toggleSubscription(id) {
-        const issue = Store.detail.issue;
+        const { issue } = Store.detail;
         if (issue.id === id && issue.toggleSubscriptionEndpoint) {
           issue.setFetchingState('subscriptions', true);
           BoardService.toggleIssueSubscription(issue.toggleSubscriptionEndpoint)
@@ -178,7 +180,7 @@ export default () => {
         }
       },
       updateWeight(newWeight, id) {
-        const issue = Store.detail.issue;
+        const { issue } = Store.detail;
         if (issue.id === id && issue.sidebarInfoEndpoint) {
           issue.setLoadingState('weight', true);
           BoardService.updateWeight(issue.sidebarInfoEndpoint, newWeight)

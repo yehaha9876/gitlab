@@ -4,6 +4,7 @@ class Projects::IssuesController < Projects::ApplicationController
   include IssuableActions
   include ToggleAwardEmoji
   include IssuableCollections
+  include IssuesCalendar
   include SpammableActions
 
   prepend_before_action :authenticate_user!, only: [:new, :export_csv]
@@ -11,9 +12,9 @@ class Projects::IssuesController < Projects::ApplicationController
   before_action :whitelist_query_limiting_ee, only: [:update]
   before_action :whitelist_query_limiting, only: [:create, :create_merge_request, :move, :bulk_update]
   before_action :check_issues_available!
-  before_action :issue, except: [:index, :new, :create, :bulk_update, :export_csv]
+  before_action :issue, except: [:index, :calendar, :new, :create, :bulk_update, :export_csv]
 
-  before_action :set_issuables_index, only: [:index]
+  before_action :set_issuables_index, only: [:index, :calendar]
 
   # Allow write(create) issue
   before_action :authorize_create_issue!, only: [:new, :create]
@@ -41,6 +42,10 @@ class Projects::IssuesController < Projects::ApplicationController
         }
       end
     end
+  end
+
+  def calendar
+    render_issues_calendar(@issuables)
   end
 
   def new

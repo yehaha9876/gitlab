@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'Protected Branches', :js do
+describe 'Protected Branches', :js do
   include EE::ProtectedBranchHelpers
 
   let(:user) { create(:user) }
@@ -60,33 +60,6 @@ feature 'Protected Branches', :js do
         find('#branch-search').native.send_keys(:enter)
 
         expect(page).to have_content('No branches to show')
-      end
-    end
-
-    describe "Saved defaults" do
-      it "keeps the allowed to merge and push dropdowns defaults based on the previous selection" do
-        visit project_protected_branches_path(project)
-        form = '.js-new-protected-branch'
-
-        within form do
-          find(".js-allowed-to-merge").click
-          wait_for_requests
-          click_link 'No one'
-          find(".js-allowed-to-push").click
-          wait_for_requests
-          click_link 'Developers + Masters'
-        end
-
-        visit project_protected_branches_path(project)
-
-        within form do
-          page.within(".js-allowed-to-merge") do
-            expect(page.find(".dropdown-toggle-text")).to have_content("No one")
-          end
-          page.within(".js-allowed-to-push") do
-            expect(page.find(".dropdown-toggle-text")).to have_content("Developers + Masters")
-          end
-        end
       end
     end
   end

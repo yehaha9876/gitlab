@@ -11,6 +11,7 @@ import {
   statusIcon,
 } from 'ee/vue_shared/security_reports/store/utils';
 import {
+  oldSastIssues,
   sastIssues,
   sastFeedbacks,
   dependencyScanningIssues,
@@ -52,11 +53,29 @@ describe('security reports utils', () => {
   });
 
   describe('parseSastIssues', () => {
-    it('should parse the received issues', () => {
-      const parsed = parseSastIssues(sastIssues, [], 'path')[0];
-      expect(parsed.name).toEqual(sastIssues[0].message);
-      expect(parsed.path).toEqual(sastIssues[0].file);
+    it('should parse the received issues with old JSON format', () => {
+      const parsed = parseSastIssues(oldSastIssues, [], 'path')[0];
+      expect(parsed.title).toEqual(sastIssues[0].message);
+      expect(parsed.path).toEqual(sastIssues[0].location.file);
+      expect(parsed.location.start_line).toEqual(sastIssues[0].location.start_line);
+      expect(parsed.location.end_line).toBeUndefined();
+      expect(parsed.urlPath).toEqual('path/Gemfile.lock#L5');
       expect(parsed.project_fingerprint).toEqual(sha1(sastIssues[0].cve));
+    });
+
+    it('should parse the received issues with new JSON format', () => {
+      const parsed = parseSastIssues(sastIssues, [], 'path')[0];
+      expect(parsed.title).toEqual(sastIssues[0].message);
+      expect(parsed.path).toEqual(sastIssues[0].location.file);
+      expect(parsed.location.start_line).toEqual(sastIssues[0].location.start_line);
+      expect(parsed.location.end_line).toEqual(sastIssues[0].location.end_line);
+      expect(parsed.urlPath).toEqual('path/Gemfile.lock#L5-10');
+      expect(parsed.project_fingerprint).toEqual(sha1(sastIssues[0].cve));
+    });
+
+    it('generate correct path to file when there is no line', () => {
+      const parsed = parseSastIssues(sastIssues, [], 'path')[1];
+      expect(parsed.urlPath).toEqual('path/Gemfile.lock');
     });
 
     it('includes vulnerability feedbacks', () => {
@@ -75,9 +94,17 @@ describe('security reports utils', () => {
   describe('parseDependencyScanningIssues', () => {
     it('should parse the received issues', () => {
       const parsed = parseDependencyScanningIssues(dependencyScanningIssues, [], 'path')[0];
-      expect(parsed.name).toEqual(dependencyScanningIssues[0].message);
+      expect(parsed.title).toEqual(dependencyScanningIssues[0].message);
       expect(parsed.path).toEqual(dependencyScanningIssues[0].file);
+      expect(parsed.location.start_line).toEqual(sastIssues[0].location.start_line);
+      expect(parsed.location.end_line).toBeUndefined();
+      expect(parsed.urlPath).toEqual('path/Gemfile.lock#L5');
       expect(parsed.project_fingerprint).toEqual(sha1(dependencyScanningIssues[0].cve));
+    });
+
+    it('generate correct path to file when there is no line', () => {
+      const parsed = parseDependencyScanningIssues(dependencyScanningIssues, [], 'path')[1];
+      expect(parsed.urlPath).toEqual('path/Gemfile.lock');
     });
 
     it('uses message to generate sha1 when cve is undefined', () => {
@@ -107,14 +134,14 @@ describe('security reports utils', () => {
       const parsed = parseSastContainer(dockerReport.vulnerabilities)[0];
       const issue = dockerReport.vulnerabilities[0];
 
-      expect(parsed.name).toEqual(dockerReport.vulnerabilities[0].vulnerability);
-      expect(parsed.priority).toEqual(dockerReport.vulnerabilities[0].severity);
-      expect(parsed.path).toEqual(dockerReport.vulnerabilities[0].namespace);
-      expect(parsed.nameLink).toEqual(
-        `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${
-          dockerReport.vulnerabilities[0].vulnerability
-        }`,
-      );
+      expect(parsed.title).toEqual(issue.vulnerability);
+      expect(parsed.path).toEqual(issue.namespace);
+      expect(parsed.identifiers).toEqual([{
+        type: 'CVE',
+        name: issue.vulnerability,
+        value: issue.vulnerability,
+        url: `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${issue.vulnerability}`,
+      }]);
       expect(parsed.project_fingerprint).toEqual(
         sha1(`${issue.namespace}:${issue.vulnerability}:${issue.featurename}:${issue.featureversion}`));
     });
@@ -205,6 +232,9 @@ describe('security reports utils', () => {
           expect(textBuilder('', { head: 'foo', base: 'foo' }, 1, 0, 0)).toEqual(
             ' detected 1 new vulnerability',
           );
+          expect(textBuilder('', { head: 'foo', base: 'foo' }, 2, 0, 0)).toEqual(
+            ' detected 2 new vulnerabilities',
+          );
         });
       });
 
@@ -213,6 +243,9 @@ describe('security reports utils', () => {
           expect(
             textBuilder('', { head: 'foo', base: 'foo' }, 1, 1, 0).replace(/\n+\s+/m, ' '),
           ).toEqual(' detected 1 new vulnerability and 1 fixed vulnerability');
+          expect(
+            textBuilder('', { head: 'foo', base: 'foo' }, 2, 2, 0).replace(/\n+\s+/m, ' '),
+          ).toEqual(' detected 2 new vulnerabilities and 2 fixed vulnerabilities');
         });
       });
 
@@ -220,6 +253,9 @@ describe('security reports utils', () => {
         it('should return fixed issues text', () => {
           expect(textBuilder('', { head: 'foo', base: 'foo' }, 0, 1, 0)).toEqual(
             ' detected 1 fixed vulnerability',
+          );
+          expect(textBuilder('', { head: 'foo', base: 'foo' }, 0, 2, 0)).toEqual(
+            ' detected 2 fixed vulnerabilities',
           );
         });
       });

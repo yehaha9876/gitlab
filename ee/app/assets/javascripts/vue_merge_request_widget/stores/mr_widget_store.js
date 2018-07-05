@@ -18,10 +18,13 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.dependencyScanningHelp = data.dependency_scanning_help_path;
     this.vulnerabilityFeedbackPath = data.vulnerability_feedback_path;
     this.vulnerabilityFeedbackHelpPath = data.vulnerability_feedback_help_path;
+    this.approvalsHelpPath = data.approvals_help_path;
     this.securityReportsPipelineId = data.pipeline_id;
+    this.canCreateFeedback = data.can_create_feedback || false;
 
     this.initCodeclimate(data);
     this.initPerformanceReport(data);
+    this.initLicenseReport(data);
   }
 
   setData(data) {
@@ -65,6 +68,11 @@ export default class MergeRequestStore extends CEMergeRequestStore {
       degraded: [],
       neutral: [],
     };
+  }
+
+  initLicenseReport(data) {
+    this.licenseManagement = data.license_management;
+    this.licenseReport = [];
   }
 
   compareCodeclimateMetrics(headIssues, baseIssues, headBlobPath, baseBlobPath) {
@@ -125,6 +133,44 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     });
 
     this.performanceMetrics = { improved, degraded, neutral };
+  }
+
+  parseLicenseReportMetrics(headMetrics, baseMetrics) {
+    const headLicenses = headMetrics.licenses;
+    const headDependencies = headMetrics.dependencies;
+    const baseLicenses = baseMetrics.licenses;
+
+    if (headLicenses.length > 0 && headDependencies.length > 0) {
+      const report = {};
+      const knownLicenses = baseLicenses.map(license => license.name);
+      const newLicenses = [];
+
+      headLicenses.forEach(license => {
+        if (knownLicenses.indexOf(license.name) === -1) {
+          report[license.name] = {
+            name: license.name,
+            count: license.count,
+            url: '',
+            packages: [],
+          };
+          newLicenses.push(license.name);
+        }
+      });
+
+      headDependencies.forEach(dependencyItem => {
+        const licenseName = dependencyItem.license.name;
+
+        if (newLicenses.indexOf(licenseName) > -1) {
+          if (!report[licenseName].url) {
+            report[licenseName].url = dependencyItem.license.url;
+          }
+
+          report[licenseName].packages.push(dependencyItem.dependency);
+        }
+      });
+
+      this.licenseReport = newLicenses.map(licenseName => report[licenseName]);
+    }
   }
 
   // normalize performance metrics by indexing on performance subject and metric name

@@ -1,4 +1,5 @@
 module IssuableCollections
+  prepend EE::IssuableCollections
   extend ActiveSupport::Concern
   include SortingHelper
   include Gitlab::IssuableMetadata
@@ -95,12 +96,7 @@ module IssuableCollections
     elsif @group
       @filter_params[:group_id] = @group.id
       @filter_params[:include_subgroups] = true
-    else
-      # TODO: this filter ignore issues/mr created in public or
-      # internal repos where you are not a member. Enable this filter
-      # or improve current implementation to filter only issues you
-      # created or assigned or mentioned
-      # @filter_params[:authorized_only] = true
+      @filter_params[:use_cte_for_search] = true
     end
 
     @filter_params.permit(finder_type.valid_params)
@@ -140,8 +136,6 @@ module IssuableCollections
     when 'milestone_due_desc' then sort_value_milestone
     when 'downvotes_asc'      then sort_value_popularity
     when 'downvotes_desc'     then sort_value_popularity
-    when 'weight_asc'         then sort_value_weight
-    when 'weight_desc'        then sort_value_weight
     else value
     end
   end

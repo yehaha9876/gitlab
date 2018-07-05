@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'Projects > Audit Events', :js do
+describe 'Projects > Audit Events', :js do
   let(:user) { create(:user) }
   let(:pete) { create(:user, name: 'Pete') }
   let(:project) { create(:project, :repository, namespace: user.namespace) }
@@ -98,7 +98,7 @@ feature 'Projects > Audit Events', :js do
 
       page.within "#project_member_#{project_member.id}" do
         click_button 'Developer'
-        click_link 'Master'
+        click_link 'Maintainer'
       end
 
       find(:link, text: 'Settings').click
@@ -106,7 +106,7 @@ feature 'Projects > Audit Events', :js do
       click_link 'Audit Events'
 
       page.within('table#audits') do
-        expect(page).to have_content 'Change access level from developer to master'
+        expect(page).to have_content 'Change access level from developer to maintainer'
         expect(page).to have_content(project.owner.name)
         expect(page).to have_content('Pete')
       end

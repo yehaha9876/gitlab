@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'SAML provider settings' do
+describe 'SAML provider settings' do
   include CookieHelper
 
   let(:user) { create(:user) }
@@ -8,14 +8,9 @@ feature 'SAML provider settings' do
   let(:callback_path) { "/groups/#{group.path}/-/saml/callback" }
 
   before do
-    set_beta_cookie
     stub_config_setting(url: 'https://localhost')
     stub_saml_config
     group.add_owner(user)
-  end
-
-  def set_beta_cookie
-    set_cookie('enable_group_saml', 'true')
   end
 
   def submit

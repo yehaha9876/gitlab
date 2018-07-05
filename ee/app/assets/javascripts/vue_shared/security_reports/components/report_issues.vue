@@ -2,6 +2,7 @@
 import Icon from '~/vue_shared/components/icon.vue';
 import PerformanceIssue from 'ee/vue_merge_request_widget/components/performance_issue_body.vue';
 import CodequalityIssue from 'ee/vue_merge_request_widget/components/codequality_issue_body.vue';
+import LicenseIssue from 'ee/vue_merge_request_widget/components/license_issue_body.vue';
 import SastIssue from './sast_issue_body.vue';
 import SastContainerIssue from './sast_container_issue_body.vue';
 import DastIssue from './dast_issue_body.vue';
@@ -17,13 +18,14 @@ export default {
     DastIssue,
     PerformanceIssue,
     CodequalityIssue,
+    LicenseIssue,
   },
   props: {
     issues: {
       type: Array,
       required: true,
     },
-    // security || codequality || performance || docker || dast
+    // security || codequality || performance || docker || dast || license
     type: {
       type: String,
       required: true,
@@ -59,6 +61,9 @@ export default {
     isTypePerformance() {
       return this.type === 'performance';
     },
+    isTypeLicense() {
+      return this.type === 'license';
+    },
     isTypeSast() {
       return this.type === SAST;
     },
@@ -75,20 +80,27 @@ export default {
   <div>
     <ul class="report-block-list">
       <li
-        class="report-block-list-issue"
-        :class="{ 'is-dismissed': issue.isDismissed }"
         v-for="(issue, index) in issues"
+        :class="{ 'is-dismissed': issue.isDismissed }"
         :key="index"
+        class="report-block-list-issue"
       >
         <div
-          class="report-block-list-icon append-right-5"
           :class="{
             failed: isStatusFailed,
             success: isStatusSuccess,
             neutral: isStatusNeutral,
           }"
+          class="report-block-list-icon append-right-5"
         >
           <icon
+            v-if="isTypeLicense"
+            :size="24"
+            name="status_created_borderless"
+            css-classes="prepend-left-4"
+          />
+          <icon
+            v-else
             :name="iconName"
             :size="32"
           />
@@ -97,17 +109,20 @@ export default {
         <sast-issue
           v-if="isTypeSast"
           :issue="issue"
+          :status="status"
         />
 
         <dast-issue
           v-else-if="isTypeDast"
           :issue="issue"
           :issue-index="index"
+          :status="status"
         />
 
         <sast-container-issue
           v-else-if="isTypeSastContainer"
           :issue="issue"
+          :status="status"
         />
 
         <codequality-issue
@@ -118,6 +133,11 @@ export default {
 
         <performance-issue
           v-else-if="isTypePerformance"
+          :issue="issue"
+        />
+
+        <license-issue
+          v-else-if="isTypeLicense"
           :issue="issue"
         />
       </li>

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'GEO Nodes' do
+describe 'GEO Nodes' do
   let(:user) { create(:user) }
   let(:project) { create(:project) }
   let(:geo_url) { 'http://geo.example.com' }
@@ -17,12 +17,12 @@ feature 'GEO Nodes' do
     describe "showing Flash Info Message" do
       it 'on dashboard' do
         visit root_dashboard_path
-        expect(page).to have_content 'You are on a secondary (read-only) Geo node.'
+        expect(page).to have_content 'You are on a secondary, read-only Geo node. If you want to make changes, you must visit this page on the primary node.'
       end
 
       it 'on project overview' do
         visit project_path(project)
-        expect(page).to have_content 'You are on a secondary (read-only) Geo node.'
+        expect(page).to have_content 'You are on a secondary, read-only Geo node. If you want to make changes, you must visit this page on the primary node.'
       end
     end
   end

@@ -238,14 +238,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resources :clusters, except: [:edit, :create] do
         collection do
-          scope :providers do
-            get '/user/new', to: 'clusters/user#new'
-            post '/user', to: 'clusters/user#create'
-
-            get '/gcp/new', to: 'clusters/gcp#new'
-            get '/gcp/login', to: 'clusters/gcp#login'
-            post '/gcp', to: 'clusters/gcp#create'
-          end
+          post :create_gcp
+          post :create_user
         end
 
         member do
@@ -265,6 +259,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :metrics
           get :additional_metrics
           get '/terminal.ws/authorize', to: 'environments#terminal_websocket_authorize', constraints: { format: nil }
+
+          # EE
+          get :logs
         end
 
         collection do
@@ -389,6 +386,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       ## EE-specific
       resources :vulnerability_feedback, only: [:index, :create, :destroy], constraints: { id: /\d+/ }
 
+      get :issues, to: 'issues#calendar', constraints: lambda { |req| req.format == :ics }
       resources :issues, concerns: :awardable, constraints: { id: /\d+/ } do
         member do
           post :toggle_subscription
@@ -446,6 +444,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       resources :uploads, only: [:create] do
         collection do
           get ":secret/:filename", action: :show, as: :show, constraints: { filename: %r{[^/]+} }
+          post :authorize
         end
       end
 

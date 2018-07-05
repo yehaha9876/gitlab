@@ -11,13 +11,26 @@ module EE
       noteable.is_a?(Epic)
     end
 
-    override :for_project_noteable?
-    def for_project_noteable?
-      !for_epic? && super
+    # Remove with https://gitlab.com/gitlab-org/gitlab-ee/issues/6793
+    def note
+      raw_note = super
+
+      return raw_note unless system? && system_note_metadata&.action == 'weight'
+
+      raw_note.delete(',')
     end
 
-    override :can_create_todo?
-    def can_create_todo?
+    # Remove with https://gitlab.com/gitlab-org/gitlab-ee/issues/6783
+    def note_html
+      raw_note_html = super
+
+      return raw_note_html unless system? && system_note_metadata&.action == 'weight'
+
+      raw_note_html.delete(',')
+    end
+
+    override :for_project_noteable?
+    def for_project_noteable?
       !for_epic? && super
     end
 
@@ -42,6 +55,11 @@ module EE
       return super unless for_epic?
 
       super.merge(banzai_context_params)
+    end
+
+    override :for_issuable?
+    def for_issuable?
+      for_epic? || super
     end
 
     private
