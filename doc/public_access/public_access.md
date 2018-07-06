@@ -30,6 +30,13 @@ in users.
 Any logged in user will have [Guest](../user/permissions.md) permissions
 on the repository.
 
+### Private projects
+
+Private projects can only be cloned and viewed by project members.
+
+They will only appear to project members on the public access directory (`/public`).
+
+
 ### How to change project visibility
 
 1. Go to your project's **Settings**
