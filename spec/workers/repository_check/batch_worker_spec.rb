@@ -62,4 +62,26 @@ describe RepositoryCheck::BatchWorker do
 
     expect(subject.perform(shard_name)).to eq([])
   end
+
+  context 'multiple shards' do
+    let(:second_shard) { 'test-1' }
+
+    before do
+      Gitlab::ShardHealthCache.update([shard_name, second_shard])
+      projects = create_list(:project, 2, created_at: 1.week.ago)
+      stub_const("#{described_class}::BATCH_SIZE", 2)
+    end
+
+    it 'limits batch size to 1 per shard' do
+      allow(subject).to receive(:batch_size).and_call_original
+
+      expect(subject.perform(shard_name).count).to eq(1)
+    end
+
+    it 'schedules no checks if shards are all unhealthy' do
+      Gitlab::ShardHealthCache.update([])
+
+      expect(subject.perform(shard_name)).to be_nil
+    end
+  end
 end

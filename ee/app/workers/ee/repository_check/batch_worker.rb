@@ -7,7 +7,7 @@ module EE
       private
 
       override :never_checked_project_ids
-      def never_checked_project_ids(batch_size)
+      def never_checked_project_ids
         return super unless ::Gitlab::Geo.secondary?
 
         Geo::ProjectRegistry.synced_repos.synced_wikis
@@ -18,7 +18,7 @@ module EE
       end
 
       override :old_checked_project_ids
-      def old_checked_project_ids(batch_size)
+      def old_checked_project_ids
         return super unless ::Gitlab::Geo.secondary?
 
         Geo::ProjectRegistry.synced_repos.synced_wikis

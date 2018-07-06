@@ -42,16 +42,24 @@ module RepositoryCheck
     # getting ID's from Postgres is not terribly slow, and because no user
     # has to sit and wait for this query to finish.
     def project_ids
-      never_checked_project_ids(BATCH_SIZE) + old_checked_project_ids(BATCH_SIZE)
+      never_checked_project_ids + old_checked_project_ids
     end
 
-    def never_checked_project_ids(batch_size)
+    def batch_size
+      healthy_count = Gitlab::ShardHealthCache.healthy_shard_count
+
+      return 0 if healthy_count == 0
+
+      BATCH_SIZE / healthy_count
+    end
+
+    def never_checked_project_ids
       projects_on_shard.where(last_repository_check_at: nil)
         .where('created_at < ?', 24.hours.ago)
         .limit(batch_size).pluck(:id)
     end
 
-    def old_checked_project_ids(batch_size)
+    def old_checked_project_ids
       projects_on_shard.where.not(last_repository_check_at: nil)
         .where('last_repository_check_at < ?', 1.month.ago)
         .reorder(last_repository_check_at: :asc)
