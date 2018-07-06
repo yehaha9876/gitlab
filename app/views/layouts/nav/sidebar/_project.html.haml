@@ -215,6 +215,11 @@
                   %span
                     = _('Metrics')
 
+              = nav_link(controller: :environments, action: [:metrics, :metrics_redirect]) do
+                = link_to metrics_project_environments_path(@project), title: _('Pod logs'), class: 'shortcuts-pod-logs' do
+                  %span
+                    = _('Pod logs')
+
               = nav_link(controller: :environments, action: [:index, :folder, :show, :new, :edit, :create, :update, :stop, :terminal]) do
                 = link_to project_environments_path(@project), title: _('Environments'), class: 'shortcuts-environments' do
                   %span
