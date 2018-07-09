@@ -21,6 +21,10 @@ export default {
   },
   computed: {
     ...mapGetters('diffs', ['commitId']),
+    ...mapGetters(['discussionsByLineCode']),
+    ...mapState({
+      diffLineCommentForms: state => state.diffs.diffLineCommentForms,
+    }),
     normalizedDiffLines() {
       return this.diffLines.map(line => (line.richText ? trimFirstCharOfLineContent(line) : line));
     },

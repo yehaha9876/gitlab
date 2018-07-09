@@ -22,6 +22,10 @@ export default {
   },
   computed: {
     ...mapGetters('diffs', ['commitId']),
+    ...mapGetters(['discussionsByLineCode']),
+    ...mapState({
+      diffLineCommentForms: state => state.diffs.diffLineCommentForms,
+    }),
     parallelDiffLines() {
       return this.diffLines.map(line => {
         const parallelLine = Object.assign({}, line);
