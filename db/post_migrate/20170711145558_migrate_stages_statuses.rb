@@ -26,8 +26,8 @@ class MigrateStagesStatuses < ActiveRecord::Migration
   end
 
   def down
-    disable_statement_timeout
-
-    update_column_in_batches(:ci_stages, :status, nil)
+    disable_statement_timeout(transaction: false) do
+      update_column_in_batches(:ci_stages, :status, nil)
+    end
   end
 end
