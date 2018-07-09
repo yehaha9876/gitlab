@@ -266,8 +266,11 @@ EOT
 
   describe '#submodule?' do
     before do
-      commit = repository.lookup('5937ac0a7beb003549fc5fd26fc247adbce4a52e')
-      @diffs = commit.parents[0].diff(commit).patches
+      rugged_commit = Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+        repository.lookup('5937ac0a7beb003549fc5fd26fc247adbce4a52e')
+      end
+
+      @diffs = rugged_commit.parents[0].diff(rugged_commit).patches
     end
 
     it { expect(described_class.new(@diffs[0]).submodule?).to eq(false) }
