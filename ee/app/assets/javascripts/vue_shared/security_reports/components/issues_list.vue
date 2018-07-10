@@ -29,11 +29,6 @@ export default {
       required: false,
       default: () => [],
     },
-    allIssues: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
     type: {
       type: String,
       required: true,
@@ -74,11 +69,11 @@ export default {
       status="success"
     />
 
-    <!-- TODO: link to the pipeline page -->
+    <!-- TODO: dynamically link to the pipeline page -->
     <a
-      v-if="allIssues.length"
       class="prepend-left-10"
-      href="#"
+      href="/root/security-reports/pipelines/14/security"
+      :title="s__('ciReport|Show complete code vulnerabilities report')"
     >
       {{ s__("ciReport|Show complete code vulnerabilities report") }}
     </a>
