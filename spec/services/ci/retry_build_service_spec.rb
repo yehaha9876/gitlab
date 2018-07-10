@@ -32,7 +32,7 @@ describe Ci::RetryBuildService do
        runner_id tag_taggings taggings tags trigger_request_id
        user_id auto_canceled_by_id retried failure_reason
        sourced_pipelines artifacts_file_store artifacts_metadata_store
-       metadata trace_chunks].freeze # EE
+       metadata runner_session trace_chunks].freeze # EE
 
   shared_examples 'build duplication' do
     let(:another_pipeline) { create(:ci_empty_pipeline, project: project) }
@@ -49,7 +49,7 @@ describe Ci::RetryBuildService do
       # Make sure that build has both `stage_id` and `stage` because FactoryBot
       # can reset one of the fields when assigning another. We plan to deprecate
       # and remove legacy `stage` column in the future.
-      build.update_attributes(stage: 'test', stage_id: stage.id)
+      build.update(stage: 'test', stage_id: stage.id)
     end
 
     describe 'clone accessors' do
