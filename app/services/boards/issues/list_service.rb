@@ -2,14 +2,34 @@ module Boards
   module Issues
     class ListService < Boards::BaseService
       prepend EE::Boards::Issues::ListService
+      include Gitlab::Utils::StrongMemoize
 
       def execute
-        issues = IssuesFinder.new(current_user, filter_params).execute
-        issues = filter(issues)
-        issues.order_by_position_and_priority
+        fetch_issues.order_by_position_and_priority
+      end
+
+      def metadata
+        issues_count = issues_to_array.size
+
+        { size: issues_count }
       end
 
       private
+
+      def fetch_issues
+        strong_memoize(:fetch_issues) do
+          issues = IssuesFinder.new(current_user, filter_params).execute
+          filter(issues)
+        end
+      end
+
+      # We have to convert relation to array because when issues are filtered by label
+      # ActiveRecord::Relation#count will return { 10 => 4 } or {} when collection is nil
+      def issues_to_array
+        strong_memoize(:issues_to_array) do
+          fetch_issues.to_a
+        end
+      end
 
       def filter(issues)
         issues = without_board_labels(issues) unless list&.movable? || list&.closed?
