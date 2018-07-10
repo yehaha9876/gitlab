@@ -39,19 +39,9 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      isFullReportVisible: false,
-    };
-  },
   computed: {
     unresolvedIssuesStatus() {
       return this.type === 'license' ? 'neutral' : 'failed';
-    },
-  },
-  methods: {
-    openFullReport() {
-      this.isFullReportVisible = true;
     },
   },
 };
@@ -66,14 +56,6 @@ export default {
       :status="unresolvedIssuesStatus"
       :issues="unresolvedIssues"
       class="js-mr-code-new-issues"
-    />
-
-    <issues-block
-      v-if="isFullReportVisible"
-      :type="type"
-      :issues="allIssues"
-      class="js-mr-code-all-issues"
-      status="failed"
     />
 
     <issues-block
@@ -92,13 +74,13 @@ export default {
       status="success"
     />
 
-    <button
-      v-if="allIssues.length && !isFullReportVisible"
-      type="button"
-      class="btn-link btn-blank prepend-left-10 js-expand-full-list break-link"
-      @click="openFullReport"
+    <!-- TODO: link to the pipeline page -->
+    <a
+      v-if="allIssues.length"
+      class="prepend-left-10"
+      href="#"
     >
       {{ s__("ciReport|Show complete code vulnerabilities report") }}
-    </button>
+    </a>
   </div>
 </template>

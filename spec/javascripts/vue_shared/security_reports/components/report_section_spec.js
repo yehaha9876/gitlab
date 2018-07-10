@@ -217,6 +217,7 @@ describe('Report section', () => {
       });
     });
 
+    // TODO: Remove and/or refactor
     it('should render full report section', done => {
       vm.$el.querySelector('button').click();
 
@@ -229,6 +230,7 @@ describe('Report section', () => {
       });
     });
 
+    // TODO: Remove and/or refactor
     it('should expand full list when clicked and hide the show all button', done => {
       vm.$el.querySelector('button').click();
 
