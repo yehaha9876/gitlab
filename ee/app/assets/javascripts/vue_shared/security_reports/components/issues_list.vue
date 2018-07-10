@@ -2,6 +2,7 @@
 import IssuesBlock from './report_issues.vue';
 import SastContainerInfo from './sast_container_info.vue';
 import { SAST_CONTAINER } from '../store/constants';
+import { mapState } from 'vuex';
 
 /**
  * Renders block of issues
@@ -35,9 +36,14 @@ export default {
     },
   },
   computed: {
+    ...mapState(['pipelineId']),
     unresolvedIssuesStatus() {
       return this.type === 'license' ? 'neutral' : 'failed';
     },
+    fullReportLink() {
+      // TODO: Make this a bit more dynamic/reliable
+      return `../pipelines/${this.pipelineId}/security`;
+    }
   },
 };
 </script>
@@ -69,10 +75,9 @@ export default {
       status="success"
     />
 
-    <!-- TODO: dynamically link to the pipeline page -->
     <a
       class="prepend-left-10"
-      href="/root/security-reports/pipelines/14/security"
+      :href="fullReportLink"
       :title="s__('ciReport|Show complete code vulnerabilities report')"
     >
       {{ s__("ciReport|Show complete code vulnerabilities report") }}
