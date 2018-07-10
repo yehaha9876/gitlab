@@ -97,6 +97,7 @@ export default {
     currentEnvironmentName: {
       type: String,
       required: true,
+    },
   },
   data() {
     return {

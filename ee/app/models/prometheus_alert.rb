@@ -9,6 +9,7 @@ class PrometheusAlert < ActiveRecord::Base
 
   belongs_to :environment, required: true, validate: true, inverse_of: :prometheus_alerts
   belongs_to :project, required: true, validate: true, inverse_of: :prometheus_alerts
+  belongs_to :prometheus_metric, validate: true
 
   validates :name, presence: true
 
