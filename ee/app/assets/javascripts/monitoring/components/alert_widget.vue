@@ -29,6 +29,11 @@ export default {
       require: false,
       default: () => [],
     },
+    customMetricId: {
+      type: Number,
+      require: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -120,6 +125,10 @@ export default {
     },
     handleCreate({ name, query, operator, threshold }) {
       const newAlert = { name, query, operator, threshold };
+
+      // pass custom metric ID only if it exists
+      if (this.customMetricId) newAlert.prometheus_metric_id = this.customMetricId;
+
       this.isLoading = true;
       this.service
         .createAlert(newAlert)

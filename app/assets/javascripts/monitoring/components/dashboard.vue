@@ -238,6 +238,7 @@ export default {
           :query="getGraphQuery(graphData)"
           :name="getGraphLabel(graphData)"
           :current-alerts="getQueryAlerts(graphData)"
+          :custom-metric-id="graphData.id"
         />
       </graph>
     </graph-group>

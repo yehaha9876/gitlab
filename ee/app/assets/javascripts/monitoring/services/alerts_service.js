@@ -9,9 +9,9 @@ export default class AlertsService {
     return axios.get(this.alertsEndpoint).then(resp => resp.data);
   }
 
-  createAlert({ name, query, operator, threshold }) {
+  createAlert({ name, query, operator, threshold, prometheus_metric_id }) {
     return axios
-      .post(this.alertsEndpoint, { name, query, operator, threshold })
+      .post(this.alertsEndpoint, { name, query, operator, threshold, prometheus_metric_id })
       .then(resp => resp.data);
   }
 
