@@ -85,6 +85,8 @@ module API
         use :with_custom_attributes
       end
       get ":user_id/projects" do
+        authenticate!
+
         user = find_user(params[:user_id])
         not_found!('User') unless user
 
