@@ -433,7 +433,7 @@ cloud-native-image:
   cache: {}
   script:
     - gem install gitlab --no-ri --no-rdoc
-    - ./trigger-build cng
+    - ./scripts/trigger-build cng
   only:
     - tags@gitlab-org/gitlab-ce
     - tags@gitlab-org/gitlab-ee
@@ -480,6 +480,24 @@ ee-specific-lines-check:
   <<: *ee-specific-check
   script:
     - scripts/ee-specific-lines-check
+
+danger-review:
+  image: registry.gitlab.com/gitlab-org/gitaly/dangercontainer:latest
+  stage: prepare
+  before_script:
+    - source scripts/utils.sh
+    - retry gem install danger --no-ri --no-rdoc
+  cache: {}
+  only:
+    refs:
+      - branches@gitlab-org/gitlab-ce
+      - branches@gitlab-org/gitlab-ee
+  except:
+    variables:
+      - $CI_COMMIT_REF_NAME =~ /^ce-to-ee-.*/
+  script:
+    - git version
+    - danger --fail-on-errors=true
 
 update-tests-metadata:
   <<: *tests-metadata-state

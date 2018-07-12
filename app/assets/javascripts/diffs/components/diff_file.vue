@@ -31,9 +31,6 @@ export default {
     };
   },
   computed: {
-    isDiscussionsExpanded() {
-      return true; // TODO: @fatihacet - Fix this.
-    },
     isCollapsed() {
       return this.file.collapsed || false;
     },
@@ -58,7 +55,7 @@ export default {
     document.removeEventListener('scroll', this.handleScroll);
   },
   methods: {
-    ...mapActions(['loadCollapsedDiff']),
+    ...mapActions('diffs', ['loadCollapsedDiff']),
     handleToggle() {
       const { collapsed, highlightedDiffLines, parallelDiffLines } = this.file;
 
@@ -131,7 +128,6 @@ export default {
       :diff-file="file"
       :collapsible="true"
       :expanded="!isCollapsed"
-      :discussions-expanded="isDiscussionsExpanded"
       :add-merge-request-buttons="true"
       class="js-file-title file-title"
       @toggleFile="handleToggle"

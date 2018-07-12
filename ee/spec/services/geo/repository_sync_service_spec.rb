@@ -286,7 +286,10 @@ describe Geo::RepositorySyncService do
 
         subject.execute
 
-        repo_path = Gitlab::GitalyClient::StorageSettings.allow_disk_access { project.repository.path }
+        repo_path = Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+          project.repository.path
+        end
+
         expect(File.directory?(repo_path)).to be true
       end
 
