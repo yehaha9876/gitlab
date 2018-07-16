@@ -272,7 +272,7 @@ module Gitlab
         check_single_change_access(change, skip_lfs_integrity_check: !first_change)
 
         if project.size_limit_enabled?
-          push_size_in_bytes += repository.push_size(change[:newrev])
+          push_size_in_bytes += repository.push_changes(change[:newrev]).size
         end
       end
 

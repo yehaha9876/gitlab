@@ -59,7 +59,7 @@ module Gitlab
 
           next if require_path && path.to_s.empty?
 
-          include_path ? [path.chomp, sha] : sha
+          include_path ? [sha, path.chomp] : sha
         end.reject(&:nil?)
       end
     end

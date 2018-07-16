@@ -34,7 +34,7 @@ module EE
           return if push_rule.nil? || push_rule.max_file_size.zero?
 
           max_file_size = push_rule.max_file_size
-          changes = project.repository.push_file_sizes(newrev)
+          changes = project.repository.push_changes(newrev)
 
           large_file = changes.find do |_object_id, (path, size)|
             ::Gitlab::Utils.bytes_to_megabytes(size) > max_file_size

@@ -28,7 +28,6 @@ module Gitlab
       GITALY_INTERNAL_URL = 'ssh://gitaly/internal.git'.freeze
       GITLAB_PROJECTS_TIMEOUT = Gitlab.config.gitlab_shell.git_timeout
       EMPTY_REPOSITORY_CHECKSUM = '0000000000000000000000000000000000000000'.freeze
-      REV_LIST_CHECK_LIMIT = 2000
 
       NoRepository = Class.new(StandardError)
       InvalidRepository = Class.new(StandardError)
@@ -353,33 +352,10 @@ module Gitlab
         (size.to_f / 1024).round(2)
       end
 
-      # Return push size in bytes
-      def push_size(new_rev)
-        total_size = 0
-
-        return total_size unless new_rev
-
-        push_file_sizes(new_rev).each do |_object_id, (path, size)|
-          total_size += size
+      def push_changes(new_rev)
+        strong_memoize(:push_changes) do
+          ::Gitlab::Git::PushChanges.new(self, new_rev)
         end
-
-        total_size
-      end
-
-      # Returns a Hash of file paths and sizes
-      def push_file_sizes(new_rev)
-        changes = {}
-        rev_list = ::Gitlab::Git::RevList.new(self, newrev: new_rev)
-
-        rev_list.new_objects(require_path: true, include_path: true) do |lazy_output|
-          lazy_output.take(REV_LIST_CHECK_LIMIT).each do |path, object_id|
-            type, size = rugged.read_header(object_id).values_at(:type, :len)
-
-            changes[object_id] = [path, size] if type == :blob
-          end
-        end
-
-        changes
       end
 
       # Use the Rugged Walker API to build an array of commits.
