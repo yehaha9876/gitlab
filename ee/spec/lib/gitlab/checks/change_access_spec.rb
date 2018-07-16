@@ -264,13 +264,14 @@ describe Gitlab::Checks::ChangeAccess do
         let(:push_rule) { create(:push_rule, max_file_size: 1) }
 
         before do
-          allow_any_instance_of(::Gitlab::Git::RawDiffChange).to receive(:blob_size).and_return(2.megabytes)
+          allow_any_instance_of(::Gitlab::Git::RevList).to receive(:new_objects)
+            .and_yield([['723c2c3f4c8a2a1e957f878c8813acfc08cda2b6', 'files/images/emoji.png']])
         end
 
         it_behaves_like 'check ignored when push rule unlicensed'
 
         it 'returns an error if file exceeds the maximum file size' do
-          expect { subject.exec }.to raise_error(Gitlab::GitAccess::UnauthorizedError, "File \"README\" is larger than the allowed size of 1 MB")
+          expect { subject.exec }.to raise_error(Gitlab::GitAccess::UnauthorizedError, "File \"files/images/emoji.png\" is larger than the allowed size of 1 MB")
         end
       end
 

@@ -21,7 +21,7 @@ module Gitlab
         strong_memoize(:size) do
           total_size = 0
 
-          return total_size unless new_rev
+          break total_size unless new_rev
 
           changes.each do |_object_id, (path, size)|
             total_size += size

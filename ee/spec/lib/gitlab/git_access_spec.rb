@@ -157,14 +157,12 @@ For more information: #{EE::Gitlab::GeoGitAccess::GEO_SERVER_DOCS_URL}"
       let(:start_sha) { 'cfe32cf61b73a0d5e9f13e774abde7ff789b1660' }
       let(:sha_with_2_mb_file) { 'c84ff944ff4529a70788a5e9003c2b7feae29047' }
       let(:changes) { "#{start_sha} #{sha_with_2_mb_file} refs/heads/master" }
-      # files/images/emoji.png
-      let(:large_blob_id) { '723c2c3f4c8a2a1e957f878c8813acfc08cda2b6' }
 
       before do
         project.add_developer(user)
 
         expect_any_instance_of(::Gitlab::Git::RevList).to receive(:new_objects)
-          .and_yield(["#{large_blob_id} files/images/emoji.png\n"])
+          .and_yield([['723c2c3f4c8a2a1e957f878c8813acfc08cda2b6', 'files/images/emoji.png']])
       end
 
       it "returns false when size is too large" do
@@ -245,7 +243,7 @@ For more information: #{EE::Gitlab::GeoGitAccess::GEO_SERVER_DOCS_URL}"
 
         before do
           expect_any_instance_of(::Gitlab::Git::RevList).to receive(:new_objects)
-            .and_yield(["#{large_blob_id} files/images/emoji.png\n"])
+            .and_yield([['723c2c3f4c8a2a1e957f878c8813acfc08cda2b6', 'files/images/emoji.png']])
         end
 
         it 'rejects the push' do
@@ -256,12 +254,9 @@ For more information: #{EE::Gitlab::GeoGitAccess::GEO_SERVER_DOCS_URL}"
       end
 
       context 'when new change does not exceeds the limit' do
-        # README.md file
-        let(:small_blob_id) { 'c60514b6d3d6bf4bec1030f70026e34dfbd69ad5' }
-
         before do
           expect_any_instance_of(::Gitlab::Git::RevList).to receive(:new_objects)
-            .and_yield(["#{small_blob_id} README.md\n"])
+            .and_yield([['c60514b6d3d6bf4bec1030f70026e34dfbd69ad5', 'README.md ']])
         end
 
         it 'accepts the push' do
