@@ -17,12 +17,23 @@ module Members
         notification_service.decline_access_request(member)
       end
 
+      enqeue_delete_todos(member)
+
       after_execute(member: member)
 
       member
     end
 
     private
+
+    def enqeue_delete_todos(member)
+      key = member.is_a?(GroupMember) ? :private_group_id : :private_project_id
+
+      params = { removed_user_id: member.user_id }
+      params[key] = member.source_id
+
+      DeleteTodosWorker.perform_async(params)
+    end
 
     def can_destroy_member?(member)
       can?(current_user, destroy_member_permission(member), member)

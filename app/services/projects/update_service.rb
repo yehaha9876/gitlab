@@ -27,13 +27,7 @@ module Projects
       return validation_failed! if project.errors.any?
 
       if project.update(params.except(:default_branch))
-        if project.previous_changes.include?('path')
-          project.rename_repo
-        else
-          system_hook_service.execute_hooks_for(project, :update)
-        end
-
-        update_pages_config if changing_pages_https_only?
+        after_update
 
         success
       else
@@ -48,6 +42,20 @@ module Projects
     end
 
     private
+
+    def after_update
+      if project.previous_changes.include?(:visibility_level) && project.private?
+        DeleteTodosWorker.perform_async(private_project_id: project.id)
+      end
+
+      if project.previous_changes.include?('path')
+        project.rename_repo
+      else
+        system_hook_service.execute_hooks_for(project, :update)
+      end
+
+      update_pages_config if changing_pages_https_only?
+    end
 
     def validation_failed!
       model_errors = project.errors.full_messages.to_sentence

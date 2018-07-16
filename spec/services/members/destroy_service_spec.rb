@@ -20,6 +20,15 @@ describe Members::DestroyService do
   end
 
   shared_examples 'a service destroying a member' do
+    before do
+      key = member.is_a?(GroupMember) ? :private_group_id : :private_project_id
+
+      worker_params = { removed_user_id: member.user_id }
+      worker_params[key] = member.source_id
+
+      expect(DeleteTodosWorker).to receive(:perform_async).with(worker_params)
+    end
+
     it 'destroys the member' do
       expect { described_class.new(current_user).execute(member, opts) }.to change { member.source.members_and_requesters.count }.by(-1)
     end

@@ -81,6 +81,7 @@
 - create_gpg_signature
 - delete_merged_branches
 - delete_user
+- delete_todos
 - email_receiver
 - emails_on_push
 - expire_build_instance_artifacts

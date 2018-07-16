@@ -37,6 +37,7 @@ module Issues
       end
 
       if issue.previous_changes.include?('confidential')
+        DeleteTodosWorker.perform_async(confidential_issue_id: issue.id) if issue.confidential?
         create_confidentiality_note(issue)
       end
 

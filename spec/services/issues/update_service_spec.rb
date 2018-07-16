@@ -74,6 +74,21 @@ describe Issues::UpdateService, :mailer do
           .to change { project.open_issues_count }.from(1).to(0)
       end
 
+      it 'enqueue TodosDeleteWorker when an issue is made confidential' do
+        expect(DeleteTodosWorker).to receive(:perform_async).with(confidential_issue_id: issue.id)
+
+        update_issue(confidential: true)
+      end
+
+      it 'does not enqueue TodosDeleteWorker when an issue is made non confidential' do
+        # set confidentiality to true before the acutal update
+        issue.update!(confidential: true)
+
+        expect(DeleteTodosWorker).not_to receive(:perform_async)
+
+        update_issue(confidential: false)
+      end
+
       it 'updates open issue counter for assignees when issue is reassigned' do
         update_issue(assignee_ids: [user2.id])
 

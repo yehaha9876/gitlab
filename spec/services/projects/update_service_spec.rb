@@ -16,6 +16,8 @@ describe Projects::UpdateService, '#execute' do
     context 'when changing visibility level' do
       context 'when visibility_level is INTERNAL' do
         it 'updates the project to internal' do
+          expect(DeleteTodosWorker).not_to receive(:perform_async)
+
           result = update_project(project, user, visibility_level: Gitlab::VisibilityLevel::INTERNAL)
 
           expect(result).to eq({ status: :success })
@@ -25,9 +27,26 @@ describe Projects::UpdateService, '#execute' do
 
       context 'when visibility_level is PUBLIC' do
         it 'updates the project to public' do
+          expect(DeleteTodosWorker).not_to receive(:perform_async)
+
           result = update_project(project, user, visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+
           expect(result).to eq({ status: :success })
           expect(project).to be_public
+        end
+      end
+
+      context 'when visibility_level is PRIVATE' do
+        before do
+          project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+        end
+        it 'updates the project to private' do
+          expect(DeleteTodosWorker).to receive(:perform_async).with(private_project_id: project.id)
+
+          result = update_project(project, user, visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+
+          expect(result).to eq({ status: :success })
+          expect(project).to be_private
         end
       end
 
@@ -39,6 +58,7 @@ describe Projects::UpdateService, '#execute' do
         context 'when visibility_level is INTERNAL' do
           it 'updates the project to internal' do
             result = update_project(project, user, visibility_level: Gitlab::VisibilityLevel::INTERNAL)
+
             expect(result).to eq({ status: :success })
             expect(project).to be_internal
           end
@@ -55,6 +75,7 @@ describe Projects::UpdateService, '#execute' do
           context 'when updated by an admin' do
             it 'updates the project to public' do
               result = update_project(project, admin, visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+
               expect(result).to eq({ status: :success })
               expect(project).to be_public
             end
