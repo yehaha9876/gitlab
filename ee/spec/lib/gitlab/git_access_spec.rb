@@ -155,11 +155,15 @@ For more information: #{EE::Gitlab::GeoGitAccess::GEO_SERVER_DOCS_URL}"
 
     describe "max file size check" do
       let(:start_sha) { 'cfe32cf61b73a0d5e9f13e774abde7ff789b1660' }
-      let(:end_sha)   { 'c84ff944ff4529a70788a5e9003c2b7feae29047' }
-      let(:changes) { "#{start_sha} #{end_sha} refs/heads/master" }
+      let(:sha_with_2_mb_file) { 'c84ff944ff4529a70788a5e9003c2b7feae29047' }
+      let(:changes) { "#{start_sha} #{sha_with_2_mb_file} refs/heads/master" }
 
       before do
         project.add_developer(user)
+
+        allow_any_instance_of(::Gitlab::Git::Repository).to receive(:push_file_sizes) do
+          { 'any_blob_id' => ['/path/to/file', 2.megabytes] }
+        end
       end
 
       it "returns false when size is too large" do
@@ -169,13 +173,6 @@ For more information: #{EE::Gitlab::GeoGitAccess::GEO_SERVER_DOCS_URL}"
       end
 
       it "returns true when size is allowed" do
-        project.create_push_rule(max_file_size: 2)
-
-        expect { push_changes(changes) }.not_to raise_error
-      end
-
-      it "returns true when size is nil" do
-        allow_any_instance_of(Gitlab::Git::Blob).to receive(:size).and_return(nil)
         project.create_push_rule(max_file_size: 2)
 
         expect { push_changes(changes) }.not_to raise_error
