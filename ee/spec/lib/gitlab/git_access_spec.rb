@@ -223,6 +223,14 @@ For more information: #{EE::Gitlab::GeoGitAccess::GEO_SERVER_DOCS_URL}"
         project.update_attribute(:repository_size_limit, 2.megabytes)
       end
 
+      context 'when pushing a new branch without new changes' do
+        it 'accepts the push' do
+          expect do
+            push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_2_mb_file} refs/heads/custom_branch")
+          end.not_to raise_error
+        end
+      end
+
       context 'when new change exceeds the limit' do
         it 'rejects the push' do
           expect do
