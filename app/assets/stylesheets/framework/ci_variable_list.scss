@@ -4,6 +4,7 @@
   padding-left: 0;
   list-style: none;
   clear: both;
+  overflow: unset;
 
   .table-section {
     font-size: $gl-font-size;
@@ -127,9 +128,9 @@
   color: $gl-text-color-secondary;
   cursor: default;
   display: block;
-  margin: ($gl-padding-8 * -1) ($gl-padding * -1);
-  padding: $gl-padding-8 $gl-padding;
-  background: $white-light;
+  // margin: ($gl-padding-8 * -1) ($gl-padding * -1);
+  // padding: $gl-padding-8 $gl-padding;
+  // background: $white-light;
 }
 
 .ci-variable-environment-dropdown-wrapper + .ci-variable-row-remove-button {

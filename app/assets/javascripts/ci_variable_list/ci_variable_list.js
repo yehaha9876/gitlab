@@ -1,4 +1,6 @@
 import $ from 'jquery';
+import 'autocomplete.js/index_jquery';
+import fuzzaldrinPlus from 'fuzzaldrin-plus';
 import { convertPermissionToBoolean } from '../lib/utils/common_utils';
 import { s__ } from '../locale';
 import setupToggleButtons from '../toggle_buttons';
@@ -107,49 +109,42 @@ export default class VariableList {
     const $environmentSelect = $row.find('.js-variable-environment-trigger');
     if ($environmentSelect.length) {
       const dropdownTrigger = $row.find(this.inputMap.environment_scope.selector);
+      let searchTerm = '';
 
-      $(dropdownTrigger).select2({
-        data: () => ({
-          results: [
-            {
-              id: 0,
-              locked: true,
-              disabled: true,
-              text: '',
-            },
-            ...this.getEnvironmentValues(),
-          ],
-        }),
-        allowClear: true,
-        formatResult: result => {
-          if (result.id === 0) {
-            return `<span class="ci-variable-environment-help-text">
-            Enter scope (wildcards allowed) or select a past value. <a target="_blank" rel="noopener noreferrer" href="${SCOPE_DOC_LINK}">Learn more</a></span>`;
-          }
-
-          return result.text;
+      $(dropdownTrigger).autocomplete({
+        openOnFocus: true,
+        templates: {
+          header: `<span class="dropdown-header ci-variable-environment-help-text">
+                Enter scope (wildcards allowed) or select a past value. <a target="_blank" rel="noopener noreferrer" href="${SCOPE_DOC_LINK}">Learn more</a></span>`,
         },
-        createSearchChoice: value => {
-          const result = createEnvironmentItem(value);
-          result.text = `"${result.text}"`;
-          return result;
+        cssClasses: {
+          root: 'dropdown',
+          noPrefix: true,
+          dropdownMenu: 'dropdown-menu',
+          suggestions: 'dropdown-content',
+          suggestion: 'dropdown-item',
         },
-        createSearchChoicePosition: 'bottom',
-      });
-
-      $(dropdownTrigger).on('select2-selecting', e => {
-        e.choice.text = e.choice.text.replace(/"/g, '');
-        $(dropdownTrigger).select2('val', e.choice.text);
-        $(dropdownTrigger).val(e.choice.id);
-      });
-
-      // Remove select2 mouse trap
-      $(dropdownTrigger).on('select2-open', () => {
-        $('#select2-drop').off('click');
-      });
+      }, [{
+        source: (q, cb) => {
+          searchTerm = q;
+          if (!q || q === '*') return cb(this.getEnvironmentValues());
+          return cb(fuzzaldrinPlus.filter(this.getEnvironmentValues(), q, { key: 'text' }));
+        },
+        templates: {
+          suggestion: item => `<span>${VariableList.highlightTextMatches(item.text, searchTerm)}</span>`,
+        },
+        minLength: 0,
+        displayKey: suggestion => ((suggestion.title === ALL_ENVIRONMENTS_STRING) ? '*' : suggestion.text),
+      }]);
 
       this.environmentDropdownMap.set($row[0], $(dropdownTrigger));
     }
+  }
+
+  static highlightTextMatches(text, term) {
+    const occurrences = fuzzaldrinPlus.match(text, term);
+    const { indexOf } = [];
+    return [...text].map((character, i) => ((indexOf.call(occurrences, i) !== -1) ? `<b>${character}</b>` : character)).join('');
   }
 
   insertRow($row) {
@@ -163,9 +158,7 @@ export default class VariableList {
     });
 
     // Remove any dropdowns
-    $rowClone.find('.select2-container').each((index, $el) => {
-      $el.remove();
-    });
+    $rowClone.find(this.inputMap.environment_scope.selector).autocomplete('destroy');
 
     $rowClone.find(this.inputMap.environment_scope.selector).show();
 
