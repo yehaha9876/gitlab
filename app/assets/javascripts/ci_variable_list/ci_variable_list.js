@@ -89,12 +89,19 @@ export default class VariableList {
     });
 
     // Always make sure there is an empty last row
-    this.$container.on('input trigger-change change select2-selecting', inputSelector, () => {
+    this.$container.on('input trigger-change change', inputSelector, () => {
       const $lastRow = this.$container.find('.js-row').last();
 
       if (this.checkIfRowTouched($lastRow)) {
         this.insertRow($lastRow);
       }
+    });
+
+    // Always ensure only one dropdown is open
+    this.$container.on('autocomplete:opened autocomplete:updated', inputSelector, (e) => {
+      $(this.inputMap.environment_scope.selector).not($(e.target)).each((index, $el) => {
+        $($el).autocomplete('close');
+      });
     });
   }
 
@@ -112,7 +119,6 @@ export default class VariableList {
       let searchTerm = '';
 
       $(dropdownTrigger).autocomplete({
-        debug: true,
         openOnFocus: true,
         templates: {
           header: `<span class="dropdown-header ci-variable-environment-help-text">
