@@ -278,6 +278,10 @@
     list-style: none;
     padding: 0 1px;
 
+    &.active {
+      @include dropdown-item-hover;
+    }
+
     a,
     button,
     .menu-item {

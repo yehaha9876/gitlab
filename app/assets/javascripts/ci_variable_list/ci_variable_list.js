@@ -112,6 +112,7 @@ export default class VariableList {
       let searchTerm = '';
 
       $(dropdownTrigger).autocomplete({
+        debug: true,
         openOnFocus: true,
         templates: {
           header: `<span class="dropdown-header ci-variable-environment-help-text">
@@ -119,6 +120,7 @@ export default class VariableList {
         },
         cssClasses: {
           root: 'dropdown',
+          cursor: 'active',
           noPrefix: true,
           dropdownMenu: 'dropdown-menu',
           suggestions: 'dropdown-content',
