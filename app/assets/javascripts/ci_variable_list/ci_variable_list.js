@@ -236,7 +236,7 @@ export default class VariableList {
       .reduce(
         (prevValueMap, envInput) => ({
           ...prevValueMap,
-          [envInput.value]: envInput.value,
+          [(document.activeElement === envInput) ? `"${envInput.value}"` : envInput.value]: envInput.value,
         }),
         {},
       );
