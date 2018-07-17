@@ -265,12 +265,14 @@
     margin-right: 5px;
   }
 
-  ul {
+  ul,
+  .dropdown-content {
     margin: 0;
     padding: 0;
   }
 
-  li {
+  li,
+  .dropdown-item {
     display: block;
     text-align: left;
     list-style: none;

@@ -19,6 +19,11 @@
       @include media-breakpoint-down(xs) {
         padding-right: $gl-btn-padding;
       }
+
+      .dropdown {
+        width: 100%;
+        display: block !important; // using important to overide js styles
+      }
     }
   }
 }
@@ -113,24 +118,11 @@
   }
 }
 
-.ci-variable-environment-trigger {
-  .select2-choices .select2-search-choice {
-    border: 0;
-    background: transparent;
-  }
-
-  .select2-search-choice-close {
-    display: none;
-  }
-}
-
 .ci-variable-environment-help-text {
   color: $gl-text-color-secondary;
   cursor: default;
   display: block;
-  // margin: ($gl-padding-8 * -1) ($gl-padding * -1);
-  // padding: $gl-padding-8 $gl-padding;
-  // background: $white-light;
+  white-space: normal;
 }
 
 .ci-variable-environment-dropdown-wrapper + .ci-variable-row-remove-button {

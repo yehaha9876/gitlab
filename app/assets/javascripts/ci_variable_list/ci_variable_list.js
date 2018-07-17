@@ -131,7 +131,7 @@ export default class VariableList {
           return cb(fuzzaldrinPlus.filter(this.getEnvironmentValues(), q, { key: 'text' }));
         },
         templates: {
-          suggestion: item => `<span>${VariableList.highlightTextMatches(item.text, searchTerm)}</span>`,
+          suggestion: item => `<span class="menu-item" role="button">${VariableList.highlightTextMatches(item.text, searchTerm)}</span>`,
         },
         minLength: 0,
         displayKey: suggestion => ((suggestion.title === ALL_ENVIRONMENTS_STRING) ? '*' : suggestion.text),
