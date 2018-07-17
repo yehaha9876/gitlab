@@ -21,7 +21,7 @@ module TestEnv
     'merged-target'                      => '21751bf',
     'markdown'                           => '0ed8c6c',
     'lfs'                                => '55bc176',
-    'master'                             => '7975be0',
+    'master'                             => 'b83d6e3',
     'merge-test'                         => '5937ac0',
     "'test'"                             => 'e56497b',
     'orphaned-branch'                    => '45127a9',

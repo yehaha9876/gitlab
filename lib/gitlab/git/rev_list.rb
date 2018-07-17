@@ -18,7 +18,7 @@ module Gitlab
         Gitlab::GitalyClient::StorageSettings.allow_disk_access do
           repository.rev_list(including: newrev, excluding: :all).split("\n")
         end
-
+      end
       # Can skip objects which do not have a path using required_path: true
       # This skips commit objects and root trees, which might not be needed when
       # looking for blobs
