@@ -276,7 +276,8 @@ class Project < ActiveRecord::Base
   delegate :name, to: :owner, allow_nil: true, prefix: true
   delegate :members, to: :team, prefix: true
   delegate :add_user, :add_users, to: :team
-  delegate :add_guest, :add_reporter, :add_developer, :add_master, :add_role, to: :team
+  delegate :add_guest, :add_reporter, :add_developer, :add_maintainer, :add_role, to: :team
+  delegate :add_master, to: :team # @deprecated
   delegate :group_runners_enabled, :group_runners_enabled=, :group_runners_enabled?, to: :ci_cd_settings
 
   # Validations
@@ -374,8 +375,10 @@ class Project < ActiveRecord::Base
   chronic_duration_attr :build_timeout_human_readable, :build_timeout, default: 3600
 
   validates :build_timeout, allow_nil: true,
-                            numericality: { greater_than_or_equal_to: 600,
-                                            message: 'needs to be at least 10 minutes' }
+                            numericality: { greater_than_or_equal_to: 10.minutes,
+                                            less_than: 1.month,
+                                            only_integer: true,
+                                            message: 'needs to be beetween 10 minutes and 1 month' }
 
   # Returns a collection of projects that is either public or visible to the
   # logged in user.
@@ -1665,10 +1668,10 @@ class Project < ActiveRecord::Base
       params = {
         name: default_branch,
         push_access_levels_attributes: [{
-          access_level: Gitlab::CurrentSettings.default_branch_protection == Gitlab::Access::PROTECTION_DEV_CAN_PUSH ? Gitlab::Access::DEVELOPER : Gitlab::Access::MASTER
+          access_level: Gitlab::CurrentSettings.default_branch_protection == Gitlab::Access::PROTECTION_DEV_CAN_PUSH ? Gitlab::Access::DEVELOPER : Gitlab::Access::MAINTAINER
         }],
         merge_access_levels_attributes: [{
-          access_level: Gitlab::CurrentSettings.default_branch_protection == Gitlab::Access::PROTECTION_DEV_CAN_MERGE ? Gitlab::Access::DEVELOPER : Gitlab::Access::MASTER
+          access_level: Gitlab::CurrentSettings.default_branch_protection == Gitlab::Access::PROTECTION_DEV_CAN_MERGE ? Gitlab::Access::DEVELOPER : Gitlab::Access::MAINTAINER
         }]
       }
 
@@ -2182,10 +2185,13 @@ class Project < ActiveRecord::Base
       merge_requests = source_of_merge_requests.opened
                          .where(allow_collaboration: true)
 
-      if branch_name
-        merge_requests.find_by(source_branch: branch_name)&.can_be_merged_by?(user)
-      else
-        merge_requests.any? { |merge_request| merge_request.can_be_merged_by?(user) }
+      # Issue for N+1: https://gitlab.com/gitlab-org/gitlab-ce/issues/49322
+      Gitlab::GitalyClient.allow_n_plus_1_calls do
+        if branch_name
+          merge_requests.find_by(source_branch: branch_name)&.can_be_merged_by?(user)
+        else
+          merge_requests.any? { |merge_request| merge_request.can_be_merged_by?(user) }
+        end
       end
     end
 

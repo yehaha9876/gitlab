@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProjectWiki
   include Gitlab::ShellAdapter
   include Storage::LegacyProjectWiki
@@ -12,6 +14,7 @@ class ProjectWiki
   }.freeze unless defined?(MARKUPS)
 
   CouldNotCreateWikiError = Class.new(StandardError)
+  SIDEBAR = '_sidebar'
 
   # Returns a string describing what went wrong after
   # an operation fails.
@@ -23,7 +26,6 @@ class ProjectWiki
     @user = user
   end
 
-  delegate :empty?, to: :pages
   delegate :repository_storage, :hashed_storage?, to: :project
 
   def path
@@ -82,6 +84,10 @@ class ProjectWiki
     !!find_page('home')
   end
 
+  def empty?
+    pages(limit: 1).empty?
+  end
+
   # Returns an Array of Gitlab WikiPage instances or an
   # empty Array if this Wiki has no pages.
   def pages(limit: nil)
@@ -101,6 +107,10 @@ class ProjectWiki
     if page = wiki.page(title: page_title, version: version, dir: page_dir)
       WikiPage.new(self, page, true)
     end
+  end
+
+  def find_sidebar(version = nil)
+    find_page(SIDEBAR, version)
   end
 
   def find_file(name, version = nil)

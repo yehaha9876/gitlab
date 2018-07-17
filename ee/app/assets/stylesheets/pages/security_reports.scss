@@ -34,10 +34,12 @@
 
   .code-text {
     width: 100%;
+    flex: 1;
   }
 }
 
 .mr-widget-grouped-section {
+
   .report-block-container {
     max-height: 170px;
     overflow: auto;

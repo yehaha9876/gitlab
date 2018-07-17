@@ -40,7 +40,7 @@ describe API::Projects do
     create(:project_member,
     user: user4,
     project: project3,
-    access_level: ProjectMember::MASTER)
+    access_level: ProjectMember::MAINTAINER)
   end
   let(:project4) do
     create(:project,
@@ -237,6 +237,39 @@ describe API::Projects do
         end
       end
 
+      context 'and using archived' do
+        let!(:archived_project) { create(:project, creator_id: user.id, namespace: user.namespace, archived: true) }
+
+        it 'returns archived projects' do
+          get api('/projects?archived=true', user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to include_pagination_headers
+          expect(json_response).to be_an Array
+          expect(json_response.length).to eq(Project.public_or_visible_to_user(user).where(archived: true).size)
+          expect(json_response.map { |project| project['id'] }).to include(archived_project.id)
+        end
+
+        it 'returns non-archived projects' do
+          get api('/projects?archived=false', user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to include_pagination_headers
+          expect(json_response).to be_an Array
+          expect(json_response.length).to eq(Project.public_or_visible_to_user(user).where(archived: false).size)
+          expect(json_response.map { |project| project['id'] }).not_to include(archived_project.id)
+        end
+
+        it 'returns every project' do
+          get api('/projects', user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to include_pagination_headers
+          expect(json_response).to be_an Array
+          expect(json_response.map { |project| project['id'] }).to contain_exactly(*Project.public_or_visible_to_user(user).pluck(:id))
+        end
+      end
+
       context 'and using search' do
         it_behaves_like 'projects response' do
           let(:filter) { { search: project.name } }
@@ -353,7 +386,7 @@ describe API::Projects do
             create(:project_member,
                    user: user,
                    project: project5,
-                   access_level: ProjectMember::MASTER)
+                   access_level: ProjectMember::MAINTAINER)
           end
 
           it 'returns only projects that satisfy all query parameters' do
@@ -1011,7 +1044,7 @@ describe API::Projects do
       describe 'permissions' do
         context 'all projects' do
           before do
-            project.add_master(user)
+            project.add_maintainer(user)
           end
 
           it 'contains permission information' do
@@ -1019,19 +1052,19 @@ describe API::Projects do
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response.first['permissions']['project_access']['access_level'])
-            .to eq(Gitlab::Access::MASTER)
+            .to eq(Gitlab::Access::MAINTAINER)
             expect(json_response.first['permissions']['group_access']).to be_nil
           end
         end
 
         context 'personal project' do
           it 'sets project access and returns 200' do
-            project.add_master(user)
+            project.add_maintainer(user)
             get api("/projects/#{project.id}", user)
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response['permissions']['project_access']['access_level'])
-            .to eq(Gitlab::Access::MASTER)
+            .to eq(Gitlab::Access::MAINTAINER)
             expect(json_response['permissions']['group_access']).to be_nil
           end
         end
@@ -1592,9 +1625,23 @@ describe API::Projects do
 
         expect(response).to have_gitlab_http_status(400)
       end
+
+      it 'updates avatar' do
+        project_param = {
+          avatar: fixture_file_upload('spec/fixtures/banana_sample.gif',
+                                      'image/gif')
+        }
+
+        put api("/projects/#{project3.id}", user), project_param
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['avatar_url']).to eq('http://localhost/uploads/'\
+                                                  '-/system/project/avatar/'\
+                                                  "#{project3.id}/banana_sample.gif")
+      end
     end
 
-    context 'when authenticated as project master' do
+    context 'when authenticated as project maintainer' do
       it 'updates path' do
         project_param = { path: 'bar' }
         put api("/projects/#{project3.id}", user4), project_param

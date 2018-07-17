@@ -275,24 +275,6 @@ describe Ci::Build do
     end
   end
 
-  describe '#browsable_artifacts?' do
-    subject { build.browsable_artifacts? }
-
-    context 'artifacts metadata does not exist' do
-      before do
-        build.update(legacy_artifacts_metadata: nil)
-      end
-
-      it { is_expected.to be_falsy }
-    end
-
-    context 'artifacts metadata does exists' do
-      let(:build) { create(:ci_build, :artifacts) }
-
-      it { is_expected.to be_truthy }
-    end
-  end
-
   describe '#artifacts_expired?' do
     subject { build.artifacts_expired? }
 
@@ -1633,6 +1615,7 @@ describe Ci::Build do
         { key: 'CI_JOB_NAME', value: 'test', public: true },
         { key: 'CI_JOB_STAGE', value: 'test', public: true },
         { key: 'CI_COMMIT_SHA', value: build.sha, public: true },
+        { key: 'CI_COMMIT_BEFORE_SHA', value: build.before_sha, public: true },
         { key: 'CI_COMMIT_REF_NAME', value: build.ref, public: true },
         { key: 'CI_COMMIT_REF_SLUG', value: build.ref_slug, public: true },
         { key: 'CI_BUILD_REF', value: build.sha, public: true },
@@ -2703,6 +2686,60 @@ describe Ci::Build do
 
             is_expected.to be_falsey
           end
+        end
+      end
+    end
+  end
+
+  describe '#artifacts_metadata_entry' do
+    set(:build) { create(:ci_build, project: project) }
+    let(:path) { 'other_artifacts_0.1.2/another-subdirectory/banana_sample.gif' }
+
+    before do
+      stub_artifacts_object_storage
+    end
+
+    subject { build.artifacts_metadata_entry(path) }
+
+    context 'when using local storage' do
+      let!(:metadata) { create(:ci_job_artifact, :metadata, job: build) }
+
+      context 'for existing file' do
+        it 'does exist' do
+          is_expected.to be_exists
+        end
+      end
+
+      context 'for non-existing file' do
+        let(:path) { 'invalid-file' }
+
+        it 'does not exist' do
+          is_expected.not_to be_exists
+        end
+      end
+    end
+
+    context 'when using remote storage' do
+      include HttpIOHelpers
+
+      let!(:metadata) { create(:ci_job_artifact, :remote_store, :metadata, job: build) }
+      let(:file_path) { expand_fixture_path('ci_build_artifacts_metadata.gz') }
+
+      before do
+        stub_remote_url_206(metadata.file.url, file_path)
+      end
+
+      context 'for existing file' do
+        it 'does exist' do
+          is_expected.to be_exists
+        end
+      end
+
+      context 'for non-existing file' do
+        let(:path) { 'invalid-file' }
+
+        it 'does not exist' do
+          is_expected.not_to be_exists
         end
       end
     end

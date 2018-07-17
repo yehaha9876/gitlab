@@ -6,6 +6,7 @@ import '~/commons';
 import Vue from 'vue';
 import VueResource from 'vue-resource';
 import Translate from '~/vue_shared/translate';
+import jasmineDiff from 'jasmine-diff';
 
 import { getDefaultAdapter } from '~/lib/utils/axios_utils';
 import { FIXTURES_PATH, TEST_HOST } from './test_constants';
@@ -35,7 +36,15 @@ Vue.use(Translate);
 jasmine.getFixtures().fixturesPath = FIXTURES_PATH;
 jasmine.getJSONFixtures().fixturesPath = FIXTURES_PATH;
 
-beforeAll(() => jasmine.addMatchers(customMatchers));
+beforeAll(() => {
+  jasmine.addMatchers(
+    jasmineDiff(jasmine, {
+      colors: true,
+      inline: true,
+    }),
+  );
+  jasmine.addMatchers(customMatchers);
+});
 
 // globalize common libraries
 window.$ = $;
@@ -173,8 +182,8 @@ if (process.env.BABEL_ENV === 'coverage') {
 
   describe('Uncovered files', function() {
     const sourceFilesContexts = [
-      require.context('~', true, /\.js$/),
-      require.context('ee', true, /\.js$/),
+      require.context('~', true, /\.(js|vue)$/),
+      require.context('ee', true, /\.(js|vue)$/),
     ];
     const allTestFiles = testContexts.reduce((accumulator, context) =>
       accumulator.concat(context.keys()), []);
@@ -184,7 +193,7 @@ if (process.env.BABEL_ENV === 'coverage') {
     sourceFilesContexts.forEach(context => {
       context.keys().forEach(path => {
         // ignore if there is a matching spec file
-        if (allTestFiles.indexOf(`${path.replace(/\.js$/, '')}_spec`) > -1) {
+        if (allTestFiles.indexOf(`${path.replace(/\.(js|vue)$/, '')}_spec`) > -1) {
           return;
         }
 
