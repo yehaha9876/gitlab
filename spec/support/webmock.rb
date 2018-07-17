@@ -2,7 +2,7 @@ require 'webmock'
 require 'webmock/rspec'
 
 def webmock_setup_defaults
-  allowed = %w[elasticsearch registry.gitlab.com-gitlab-org-test-elastic-image]
+  allowed = %w[elasticsearch registry.gitlab.com-gitlab-org-test-elastic-image https://a8963ea1.ngrok.io]
 
   if ENV.key?('ELASTIC_URL')
     url = URI.parse(ENV['ELASTIC_URL'])
