@@ -31,6 +31,7 @@ export default class VariableList {
     this.$container = $(container);
     this.formField = formField;
     this.environmentDropdownMap = new WeakMap();
+    this.$rowClone = null;
 
     this.inputMap = {
       id: {
@@ -70,6 +71,7 @@ export default class VariableList {
   }
 
   init() {
+    this.$rowClone = this.$container.find('.js-row').last().clone();
     this.bindEvents();
     this.secretValues.init();
   }
@@ -88,17 +90,8 @@ export default class VariableList {
       .map(name => this.inputMap[name].selector)
       .join(',');
 
-    // Remove any empty rows except the last row
-    this.$container.on('blur', inputSelector, e => {
-      const $row = $(e.currentTarget).closest('.js-row');
-
-      if ($row.is(':not(:last-child)') && !this.checkIfRowTouched($row)) {
-        this.removeRow($row);
-      }
-    });
-
     // Always make sure there is an empty last row
-    this.$container.on('input trigger-change change', inputSelector, () => {
+    this.$container.on('input trigger-change change autocomplete:selected', inputSelector, () => {
       const $lastRow = this.$container.find('.js-row').last();
 
       if (this.checkIfRowTouched($lastRow)) {
@@ -128,6 +121,8 @@ export default class VariableList {
       let searchTerm = '';
 
       $(dropdownTrigger).autocomplete({
+        hint: false,
+        minLength: 0,
         openOnFocus: true,
         templates: {
           header: `<span class="dropdown-header ci-variable-environment-help-text">
@@ -144,7 +139,12 @@ export default class VariableList {
       }, [{
         source: (q, cb) => {
           searchTerm = q;
-          if (!q || q === '*') return cb(this.getEnvironmentValues());
+          if (!q || q === '*') {
+            const results = this.getEnvironmentValues();
+            if (!results.some((item) => item.id === '*')) results.push(createEnvironmentItem('*'));
+            return cb(results);
+          }
+
           return cb(fuzzaldrinPlus.filter(this.getEnvironmentValues(), q, { key: 'text' }));
         },
         templates: {
@@ -165,7 +165,7 @@ export default class VariableList {
   }
 
   insertRow($row) {
-    const $rowClone = $row.clone();
+    const $rowClone = this.$rowClone.clone();
     $rowClone.removeAttr('data-is-persisted');
 
     // Reset the inputs to their defaults
@@ -173,11 +173,6 @@ export default class VariableList {
       const entry = this.inputMap[name];
       $rowClone.find(entry.selector).val(entry.default);
     });
-
-    // Remove any dropdowns
-    $rowClone.find(this.inputMap.environment_scope.selector).autocomplete('destroy');
-
-    $rowClone.find(this.inputMap.environment_scope.selector).show();
 
     $row.after($rowClone);
 
@@ -242,10 +237,11 @@ export default class VariableList {
     const valueMap = this.$container
       .find(this.inputMap.environment_scope.selector)
       .toArray()
+      .filter(input => input.value)
       .reduce(
         (prevValueMap, envInput) => ({
           ...prevValueMap,
-          [envInput.value]: (document.activeElement === envInput && envInput.value !== '*') ? `"${envInput.value}"` : envInput.value,
+          [envInput.value]: (envInput.value !== '*' && document.activeElement === envInput) ? `"${envInput.value}"` : envInput.value,
         }),
         {},
       );
