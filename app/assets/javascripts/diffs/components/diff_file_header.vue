@@ -50,7 +50,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('diffs', ['diffHasExpandedDiscussions']),
+    ...mapGetters('diffs', ['diffHasExpandedDiscussions', 'diffHasDiscussions']),
     hasExpandedDiscussions() {
       return this.diffHasExpandedDiscussions(this.diffFile);
     },
@@ -217,6 +217,7 @@ export default {
         v-if="diffFile.blob && diffFile.blob.readableText"
       >
         <button
+          :disabled="!diffHasDiscussions(diffFile)"
           :class="{ active: hasExpandedDiscussions }"
           :title="s__('MergeRequests|Toggle comments for this file')"
           class="js-btn-vue-toggle-comments btn"

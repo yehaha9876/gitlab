@@ -1,0 +1,5 @@
+---
+title: Disables toggle comments button if diff has no discussions and fixes alignment
+merge_request:
+author:
+type: other
