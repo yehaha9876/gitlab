@@ -8,8 +8,6 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-17 07:12+0000\n"
-"PO-Revision-Date: 2018-07-17 07:12+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -1365,25 +1363,28 @@ msgstr ""
 msgid "CiVariable|All environments"
 msgstr ""
 
-msgid "CiVariable|Create wildcard"
+msgid "CiVariable|Enviroment Scope"
 msgstr ""
 
 msgid "CiVariable|Error occured while saving variables"
 msgstr ""
 
-msgid "CiVariable|New environment"
-msgstr ""
-
 msgid "CiVariable|Protected"
-msgstr ""
-
-msgid "CiVariable|Search environments"
 msgstr ""
 
 msgid "CiVariable|Toggle protected"
 msgstr ""
 
 msgid "CiVariable|Validation failed"
+msgstr ""
+
+msgid "CiVariable|Variable environment"
+msgstr ""
+
+msgid "CiVariable|Variable key"
+msgstr ""
+
+msgid "CiVariable|Variable value"
 msgstr ""
 
 msgid "CircuitBreakerApiLink|circuitbreaker api"
