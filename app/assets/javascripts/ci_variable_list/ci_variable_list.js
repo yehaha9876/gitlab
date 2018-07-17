@@ -10,11 +10,20 @@ const ALL_ENVIRONMENTS_STRING = s__('CiVariable|All environments');
 const SCOPE_DOC_LINK = $('.js-ci-variable-list-section').data('scopeDocsLink');
 
 function createEnvironmentItem(value) {
+  const hint = value.match(/("([^"]|"")*")/);
+  const item = hint ? value.replace(/"/g, '') : value;
+
   return {
-    title: value === '*' ? ALL_ENVIRONMENTS_STRING : value,
-    id: value,
-    text: value === '*' ? s__('CiVariable|* (All environments)') : value,
+    title: item === '*' ? ALL_ENVIRONMENTS_STRING : item,
+    id: item,
+    text: item === '*' ? s__('CiVariable|* (All environments)') : item,
+    hint,
   };
+}
+
+function wrapHint(suggestion, text) {
+  if (suggestion.hint) return `"${text}"`;
+  return text;
 }
 
 export default class VariableList {
@@ -139,7 +148,7 @@ export default class VariableList {
           return cb(fuzzaldrinPlus.filter(this.getEnvironmentValues(), q, { key: 'text' }));
         },
         templates: {
-          suggestion: item => `<span class="menu-item" role="button">${VariableList.highlightTextMatches(item.text, searchTerm)}</span>`,
+          suggestion: item => `<span class="menu-item" role="button">${wrapHint(item, VariableList.highlightTextMatches(item.text, searchTerm))}</span>`,
         },
         minLength: 0,
         displayKey: suggestion => ((suggestion.title === ALL_ENVIRONMENTS_STRING) ? '*' : suggestion.text),
@@ -236,11 +245,11 @@ export default class VariableList {
       .reduce(
         (prevValueMap, envInput) => ({
           ...prevValueMap,
-          [(document.activeElement === envInput) ? `"${envInput.value}"` : envInput.value]: envInput.value,
+          [envInput.value]: (document.activeElement === envInput && envInput.value !== '*') ? `"${envInput.value}"` : envInput.value,
         }),
         {},
       );
 
-    return Object.keys(valueMap).map(createEnvironmentItem);
+    return Object.values(valueMap).map(createEnvironmentItem).reverse();
   }
 }
