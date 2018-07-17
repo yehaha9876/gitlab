@@ -623,7 +623,7 @@ describe Gitlab::Elastic::SearchResults do
       commits = results.objects('commits')
 
       expect(commits.first.message).to include("Add")
-      expect(results.commits_count).to eq 24
+      expect(results.commits_count).to eq 27
     end
 
     it 'finds commits from public projects only' do
@@ -632,7 +632,7 @@ describe Gitlab::Elastic::SearchResults do
       Gitlab::Elastic::Helper.refresh_index
 
       results = described_class.new(user, 'add', [project_1.id])
-      expect(results.commits_count).to eq 24
+      expect(results.commits_count).to eq 27
 
       results = described_class.new(user, 'add', [project_1.id, project_2.id])
       expect(results.commits_count).to eq 48

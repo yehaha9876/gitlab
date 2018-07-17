@@ -18,16 +18,12 @@ module Gitlab
       end
 
       def size
-        strong_memoize(:size) do
-          total_size = 0
+        return 0 unless new_rev
 
-          break total_size unless new_rev
-
-          changes.each do |_object_id, (path, size)|
-            total_size += size
+        strong_memoize(:push_size) do
+          changes.inject(0) do |total_size, (_object_id, (_blob_path, blob_size))|
+            total_size + blob_size
           end
-
-          total_size
         end
       end
 
