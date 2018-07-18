@@ -3791,7 +3791,7 @@ describe Project do
       end
     end
 
-    context 'when explicitely enabled' do
+    context 'when explicitly enabled' do
       context 'when domain is empty' do
         before do
           create(:project_auto_devops, project: project, domain: nil)
