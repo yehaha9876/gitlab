@@ -1,5 +1,5 @@
-- merge_access_level = protected_branch.merge_access_levels.for_role.first
-- push_access_level = protected_branch.push_access_levels.for_role.first
+- protected_branch = local_assigns.fetch(:protected_branch)
+- can_unprotect = can?(current_user, :update_protected_branch, protected_branch)
 
 - user_merge_access_levels = protected_branch.merge_access_levels.for_user
 - user_push_access_levels = protected_branch.push_access_levels.for_user
@@ -7,11 +7,13 @@
 - group_merge_access_levels = protected_branch.merge_access_levels.for_group
 - group_push_access_levels = protected_branch.push_access_levels.for_group
 
+
 %td
-  = hidden_field_tag "allowed_to_merge_#{protected_branch.id}", merge_access_level&.access_level
-  = dropdown_tag( (merge_access_level&.humanize || 'Select') ,
-                 options: { toggle_class: 'js-allowed-to-merge', dropdown_class: 'dropdown-menu-selectable js-allowed-to-merge-container capitalize-header',
-                 data: { field_name: "allowed_to_merge_#{protected_branch.id}", access_level_id: merge_access_level&.id }})
+  = render 'projects/settings/access_level_dropdown',
+    access_levels: protected_branch.merge_access_levels,
+    input_basic_name: 'merge_access_levels',
+    disabled: !can_unprotect,
+    toggle_class: 'js-allowed-to-merge qa-allowed-to-merge'
   - if user_merge_access_levels.any?
     %p.small
       The following
@@ -26,10 +28,11 @@
       #{ group_merge_access_levels.map(&:humanize).to_sentence }
 
 %td
-  = hidden_field_tag "allowed_to_push_#{protected_branch.id}", push_access_level&.access_level
-  = dropdown_tag( (push_access_level&.humanize || 'Select') ,
-                 options: { toggle_class: 'js-allowed-to-push', dropdown_class: 'dropdown-menu-selectable js-allowed-to-push-container capitalize-header',
-                 data: { field_name: "allowed_to_push_#{protected_branch.id}", access_level_id: push_access_level&.id }})
+  = render 'projects/settings/access_level_dropdown',
+    access_levels: protected_branch.push_access_levels,
+    input_basic_name: 'push_access_levels',
+    disabled: !can_unprotect,
+    toggle_class: 'js-allowed-to-push'
   - if user_push_access_levels.any?
     %p.small
       The following
