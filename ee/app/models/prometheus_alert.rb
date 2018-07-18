@@ -9,10 +9,11 @@ class PrometheusAlert < ActiveRecord::Base
 
   belongs_to :environment, required: true, validate: true, inverse_of: :prometheus_alerts
   belongs_to :project, required: true, validate: true, inverse_of: :prometheus_alerts
-  belongs_to :prometheus_metric, validate: true
+  belongs_to :prometheus_metric, required: true, validate: true
 
   validates :name, presence: true
 
+  # TODO: Update this column since it won't be needed anymore
   has_internal_id :iid, scope: :project, init: ->(s) { 0 }
 
   after_save :clear_prometheus_adapter_cache!
@@ -39,7 +40,7 @@ class PrometheusAlert < ActiveRecord::Base
       "for" => "5m",
       "labels" => {
         "gitlab" => "hook",
-        "gitlab_alert_id" => iid
+        "gitlab_alert_id" => prometheus_metric_id
       }
     }
   end

@@ -81,8 +81,10 @@ module Projects
         PrometheusAlertSerializer.new(project: project, current_user: current_user)
       end
 
+      # TODO: Update this code to only use prometheus metric
       def alert
-        @alert ||= project.prometheus_alerts.find_by_iid(params[:id]) || render_404
+        @alert ||= project.prometheus_alerts.find_by(prometheus_metric: params[:id]) ||
+          project.prometheus_alerts.find_by(iid: params[:id]) || render_404
       end
 
       def application

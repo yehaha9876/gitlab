@@ -12,23 +12,19 @@ module EE
           def query_with_alert(project, environment)
             alerts_map =
               project.prometheus_alerts.each_with_object({}) do |alert, hsh|
-                if alert.prometheus_metric
-                  hsh[alert[:prometheus_metric_id]] = alert.iid
-                else
-                  hsh[alert[:query]] = alert.iid
-                end
+                hsh[alert[:prometheus_metric_id]] = alert.prometheus_metric_id
               end
 
             proc do |group|
               group[:metrics]&.map! do |metric|
-                metric[:queries]&.map! do |item|
-                  key = metric[:id] || item&.[](:query) || item&.[](:query_range)
+                key = metric[:id]
 
-                  if key && alerts_map[key]
-                    item[:alert_path] = ::Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alerts_map[key], environment_id: environment.id, format: :json)
+                if key && alerts_map[key]
+                  metric[:queries]&.map! do |item|
+                    item[:alert_path] = alert_path(alerts_map, key, project, environment)
+
+                    item
                   end
-
-                  item
                 end
 
                 metric
@@ -36,6 +32,12 @@ module EE
 
               group
             end
+          end
+
+          private
+
+          def alert_path(alerts_map, key, project, environment)
+            ::Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alerts_map[key], environment_id: environment.id, format: :json)
           end
         end
       end

@@ -14,6 +14,7 @@ class InternalId < ActiveRecord::Base
   belongs_to :project
   belongs_to :namespace
 
+  # TODO: Remove prometheus_alerts from the hash
   enum usage: { issues: 0, merge_requests: 1, deployments: 2, milestones: 3, epics: 4, ci_pipelines: 5, prometheus_alerts: 6 }
 
   validates :usage, presence: true

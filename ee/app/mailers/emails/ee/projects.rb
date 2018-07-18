@@ -24,7 +24,9 @@ module Emails
         @project = Project.find_by(id: project_id)
         return unless @project
 
-        @alert = @project.prometheus_alerts.find_by_iid(alert_iid)
+        # TODO: Update this code to only use prometheus_metric
+        @alert = @project.prometheus_alerts.find_by(prometheus_metric: alert_iid) ||
+          @project.prometheus_alerts.find_by(iid: alert_iid)
         return unless @alert
 
         @environment = @alert.environment

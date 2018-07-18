@@ -2188,7 +2188,7 @@ ActiveRecord::Schema.define(version: 20180704204006) do
     t.integer "operator", null: false
     t.integer "environment_id", null: false
     t.integer "project_id", null: false
-    t.integer "prometheus_metric_id"
+    t.integer "prometheus_metric_id", null: false
     t.text "name", null: false
     t.string "query", null: false
   end

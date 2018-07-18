@@ -2,6 +2,7 @@ class PrometheusAlertEntity < Grape::Entity
   include RequestAwareEntity
 
   expose :id
+  # TODO: Remove iid from entity
   expose :iid
   expose :name
   expose :query
@@ -12,7 +13,7 @@ class PrometheusAlertEntity < Grape::Entity
   end
 
   expose :alert_path do |prometheus_alert|
-    project_prometheus_alert_path(prometheus_alert.project, prometheus_alert.iid, environment_id: prometheus_alert.environment.id, format: :json)
+    project_prometheus_alert_path(prometheus_alert.project, prometheus_alert.prometheus_metric_id, environment_id: prometheus_alert.environment.id, format: :json)
   end
 
   private
