@@ -105,6 +105,10 @@ export default class VariableList {
         $($el).autocomplete('close');
       });
     });
+
+    this.$container.on('autocomplete:cursorchanged', inputSelector, (e) => {
+      $(e.target).val($(e.target).autocomplete('val'));
+    });
   }
 
   initRow(rowEl) {
@@ -123,6 +127,8 @@ export default class VariableList {
       $(dropdownTrigger).autocomplete({
         hint: false,
         minLength: 0,
+        autoselect: false,
+        autoselectOnBlur: false,
         openOnFocus: true,
         templates: {
           header: `<span class="dropdown-header ci-variable-environment-help-text">
