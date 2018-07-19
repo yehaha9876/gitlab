@@ -13,10 +13,10 @@ describe PrometheusAlert do
   describe '#full_query' do
     it 'returns the concatenated query' do
       subject.name = "bar"
-      subject.iid = 1
       subject.query = "foo"
       subject.operator = "gt"
       subject.threshold = 1
+      subject.prometheus_metric_id = 1
 
       expect(subject.full_query).to eq("foo > 1.0")
     end
@@ -25,10 +25,10 @@ describe PrometheusAlert do
   describe '#to_param' do
     it 'returns the params of the prometheus alert' do
       subject.name = "bar"
-      subject.iid = 1
       subject.query = "foo"
       subject.operator = "gt"
       subject.threshold = 1
+      subject.prometheus_metric_id = 1
 
       alert_params = {
         "alert" => "bar",

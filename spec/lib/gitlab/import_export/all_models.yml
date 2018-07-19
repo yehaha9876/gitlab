@@ -340,6 +340,7 @@ priorities:
 - label
 prometheus_metrics:
 - project
+- prometheus_alerts
 timelogs:
 - issue
 - merge_request

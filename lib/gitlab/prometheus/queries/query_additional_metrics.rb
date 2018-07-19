@@ -23,7 +23,7 @@ module Gitlab
                 queries: metric.queries.map(&query_processor).select(&method(:query_with_result))
               }
 
-              metric_hsh.merge!(id: metric.id) if metric.id
+              metric_hsh[:id] = metric.id if metric.id
 
               metric_hsh
             end

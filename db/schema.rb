@@ -2184,7 +2184,6 @@ ActiveRecord::Schema.define(version: 20180704204006) do
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
     t.float "threshold", null: false
-    t.integer "iid", null: false
     t.integer "operator", null: false
     t.integer "environment_id", null: false
     t.integer "project_id", null: false
@@ -2194,7 +2193,6 @@ ActiveRecord::Schema.define(version: 20180704204006) do
   end
 
   add_index "prometheus_alerts", ["environment_id"], name: "index_prometheus_alerts_on_environment_id", using: :btree
-  add_index "prometheus_alerts", ["project_id", "iid"], name: "index_prometheus_alerts_on_project_id_and_iid", unique: true, using: :btree
   add_index "prometheus_alerts", ["prometheus_metric_id"], name: "index_prometheus_alerts_on_prometheus_metric_id", unique: true, using: :btree
 
   create_table "prometheus_metrics", force: :cascade do |t|

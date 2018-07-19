@@ -2,8 +2,6 @@ class PrometheusAlertEntity < Grape::Entity
   include RequestAwareEntity
 
   expose :id
-  # TODO: Remove iid from entity
-  expose :iid
   expose :name
   expose :query
   expose :threshold

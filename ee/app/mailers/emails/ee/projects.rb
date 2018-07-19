@@ -19,14 +19,12 @@ module Emails
       end
 
       def prometheus_alert_fired_email(project_id, user_id, alert_params)
-        alert_iid = alert_params["labels"]["gitlab_alert_id"]
+        alert_metric_id = alert_params["labels"]["gitlab_alert_id"]
 
         @project = Project.find_by(id: project_id)
         return unless @project
 
-        # TODO: Update this code to only use prometheus_metric
-        @alert = @project.prometheus_alerts.find_by(prometheus_metric: alert_iid) ||
-          @project.prometheus_alerts.find_by(iid: alert_iid)
+        @alert = @project.prometheus_alerts.find_by(prometheus_metric: alert_metric_id)
         return unless @alert
 
         @environment = @alert.environment

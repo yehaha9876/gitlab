@@ -4,6 +4,7 @@ describe Projects::Prometheus::AlertsController do
   let(:user) { create(:user) }
   let(:project) { create(:project) }
   let(:environment) { create(:environment, project: project) }
+  let(:metric) { create(:prometheus_metric, project: project) }
 
   before do
     stub_licensed_features(prometheus_alerts: true)
@@ -46,19 +47,19 @@ describe Projects::Prometheus::AlertsController do
   describe 'GET #show' do
     context 'when alert does not exist' do
       it 'renders 404' do
-        get :show, project_params(id: PrometheusAlert.all.maximum(:iid).to_i)
+        get :show, project_params(id: PrometheusAlert.all.maximum(:prometheus_metric_id).to_i)
 
         expect(response).to have_gitlab_http_status(404)
       end
     end
 
     context 'when alert exists' do
-      let(:alert) { create(:prometheus_alert, project: project, environment: environment) }
+      let(:alert) { create(:prometheus_alert, project: project, environment: environment, prometheus_metric: metric) }
 
       it 'renders forbidden when unlicensed' do
         stub_licensed_features(prometheus_alerts: false)
 
-        get :show, project_params(id: alert.iid)
+        get :show, project_params(id: alert.prometheus_metric_id)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -66,15 +67,14 @@ describe Projects::Prometheus::AlertsController do
       it 'renders the alert' do
         alert_params = {
           "id" => alert.id,
-          "iid" => alert.iid,
           "name" => alert.name,
           "query" => alert.query,
           "operator" => alert.computed_operator,
           "threshold" => alert.threshold,
-          "alert_path" => Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alert.iid, environment_id: alert.environment.id, format: :json)
+          "alert_path" => Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alert.prometheus_metric_id, environment_id: alert.environment.id, format: :json)
         }
 
-        get :show, project_params(id: alert.iid)
+        get :show, project_params(id: alert.prometheus_metric_id)
 
         expect(response).to have_gitlab_http_status(200)
         expect(JSON.parse(response.body)).to include(alert_params)
@@ -84,7 +84,7 @@ describe Projects::Prometheus::AlertsController do
 
   describe 'POST #notify' do
     it 'sends a notification' do
-      alert = create(:prometheus_alert, project: project, environment: environment)
+      alert = create(:prometheus_alert, project: project, environment: environment, prometheus_metric: metric)
       notification_service = spy
 
       alert_params = {
@@ -93,7 +93,7 @@ describe Projects::Prometheus::AlertsController do
         "for" => "5m",
         "labels" => {
           "gitlab" => "hook",
-          "gitlab_alert_id" => 1
+          "gitlab_alert_id" => alert.prometheus_metric_id
         }
       }
 
@@ -110,7 +110,14 @@ describe Projects::Prometheus::AlertsController do
     it 'renders forbidden when unlicensed' do
       stub_licensed_features(prometheus_alerts: false)
 
-      post :create, project_params(query: "foo", operator: ">", threshold: "1", name: "bar", environment_id: environment.id)
+      post :create, project_params(
+        query: "foo",
+        operator: ">",
+        threshold: "1",
+        name: "bar",
+        environment_id: environment.id,
+        prometheus_metric_id: metric.id
+      )
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
@@ -126,7 +133,14 @@ describe Projects::Prometheus::AlertsController do
 
       allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
 
-      post :create, project_params(query: "foo", operator: ">", threshold: "1", name: "bar", environment_id: environment.id)
+      post :create, project_params(
+        query: "foo",
+        operator: ">",
+        threshold: "1",
+        name: "bar",
+        environment_id: environment.id,
+        prometheus_metric_id: metric.id
+      )
 
       expect(schedule_update_service).to have_received(:execute)
       expect(response).to have_gitlab_http_status(200)
@@ -136,7 +150,7 @@ describe Projects::Prometheus::AlertsController do
 
   describe 'POST #update' do
     let(:schedule_update_service) { spy }
-    let(:alert) { create(:prometheus_alert, project: project, environment: environment) }
+    let(:alert) { create(:prometheus_alert, project: project, environment: environment, prometheus_metric: metric) }
 
     before do
       allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
@@ -145,7 +159,7 @@ describe Projects::Prometheus::AlertsController do
     it 'renders forbidden when unlicensed' do
       stub_licensed_features(prometheus_alerts: false)
 
-      put :update, project_params(id: alert.iid, name: "bar")
+      put :update, project_params(id: alert.prometheus_metric_id, name: "bar")
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
@@ -153,16 +167,15 @@ describe Projects::Prometheus::AlertsController do
     it 'updates an already existing prometheus alert' do
       alert_params = {
         "id" => alert.id,
-        "iid" => alert.iid,
         "name" => "bar",
         "query" => alert.query,
         "operator" => alert.computed_operator,
         "threshold" => alert.threshold,
-        "alert_path" => Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alert.iid, environment_id: alert.environment.id, format: :json)
+        "alert_path" => Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alert.prometheus_metric_id, environment_id: alert.environment.id, format: :json)
       }
 
       expect do
-        put :update, project_params(id: alert.iid, name: "bar")
+        put :update, project_params(id: alert.prometheus_metric_id, name: "bar")
       end.to change { alert.reload.name }.to("bar")
 
       expect(schedule_update_service).to have_received(:execute)
@@ -173,7 +186,7 @@ describe Projects::Prometheus::AlertsController do
 
   describe 'DELETE #destroy' do
     let(:schedule_update_service) { spy }
-    let!(:alert) { create(:prometheus_alert, project: project) }
+    let!(:alert) { create(:prometheus_alert, project: project, prometheus_metric: metric) }
 
     before do
       allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
@@ -182,14 +195,14 @@ describe Projects::Prometheus::AlertsController do
     it 'renders forbidden when unlicensed' do
       stub_licensed_features(prometheus_alerts: false)
 
-      delete :destroy, project_params(id: alert.iid)
+      delete :destroy, project_params(id: alert.prometheus_metric_id)
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
 
     it 'destroys the specified prometheus alert' do
       expect do
-        delete :destroy, project_params(id: alert.iid)
+        delete :destroy, project_params(id: alert.prometheus_metric_id)
       end.to change { PrometheusAlert.count }.from(1).to(0)
 
       expect(schedule_update_service).to have_received(:execute)

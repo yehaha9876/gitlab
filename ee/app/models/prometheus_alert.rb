@@ -13,9 +13,6 @@ class PrometheusAlert < ActiveRecord::Base
 
   validates :name, presence: true
 
-  # TODO: Update this column since it won't be needed anymore
-  has_internal_id :iid, scope: :project, init: ->(s) { 0 }
-
   after_save :clear_prometheus_adapter_cache!
   after_destroy :clear_prometheus_adapter_cache!
 
