@@ -1,47 +1,65 @@
 - protected_branch = local_assigns.fetch(:protected_branch)
 - can_unprotect = can?(current_user, :update_protected_branch, protected_branch)
 
+- merge_access_level = protected_branch.merge_access_levels.for_role.first
+- push_access_level = protected_branch.push_access_levels.for_role.first
+
 - user_merge_access_levels = protected_branch.merge_access_levels.for_user
 - user_push_access_levels = protected_branch.push_access_levels.for_user
 
 - group_merge_access_levels = protected_branch.merge_access_levels.for_group
 - group_push_access_levels = protected_branch.push_access_levels.for_group
 
+- protected_refs_for_users_feature_available = project.feature_available?(:protected_refs_for_users, current_user)
 
 %td
   = render 'projects/settings/access_level_dropdown',
-    access_levels: protected_branch.merge_access_levels,
-    input_basic_name: 'merge_access_levels',
+    verb: 'merge',
+    protected_ref: protected_branch,
+    access_level: merge_access_level,
     disabled: !can_unprotect,
-    toggle_class: 'js-allowed-to-merge qa-allowed-to-merge'
-  - if user_merge_access_levels.any?
-    %p.small
-      The following
-      #{ 'user'.pluralize(user_merge_access_levels.size) }
-      can also merge into this branch:
-      #{ user_merge_access_levels.map(&:humanize).to_sentence }
-  - if group_merge_access_levels.any?
-    %p.small
-      Members of
-      #{ group_merge_access_levels.size > 1 ? 'these groups' : 'this group' }
-      can also merge into this branch:
-      #{ group_merge_access_levels.map(&:humanize).to_sentence }
+    filter: true,
+    extra_toggle_classes: %w[js-multiselect qa-allowed-to-merge],
+    extra_dropdown_classes: %w[dropdown-menu-user],
+    preselected_items: access_levels_data(protected_branch.merge_access_levels)
+
+  - unless protected_refs_for_users_feature_available
+    - if user_merge_access_levels.any?
+      %p.small
+        The following
+        #{ 'user'.pluralize(user_merge_access_levels.size) }
+        can also merge into this branch:
+        #{ user_merge_access_levels.map(&:humanize).to_sentence }
+
+    - if group_merge_access_levels.any?
+      %p.small
+        Members of
+        #{ group_merge_access_levels.size > 1 ? 'these groups' : 'this group' }
+        can also merge into this branch:
+        #{ group_merge_access_levels.map(&:humanize).to_sentence }
 
 %td
   = render 'projects/settings/access_level_dropdown',
-    access_levels: protected_branch.push_access_levels,
-    input_basic_name: 'push_access_levels',
+    verb: 'push',
+    protected_ref: protected_branch,
+    access_level: push_access_level,
     disabled: !can_unprotect,
-    toggle_class: 'js-allowed-to-push'
-  - if user_push_access_levels.any?
-    %p.small
-      The following
-      #{ 'user'.pluralize(user_push_access_levels.size) }
-      can also push to this branch:
-      #{ user_push_access_levels.map(&:humanize).to_sentence }
-  - if group_push_access_levels.any?
-    %p.small
-      Members of
-      #{ group_push_access_levels.size > 1 ? 'these groups' : 'this group' }
-      can also push to this branch:
-      #{ group_push_access_levels.map(&:humanize).to_sentence }
+    filter: true,
+    extra_toggle_classes: %w[js-multiselect],
+    extra_dropdown_classes: %w[dropdown-menu-user],
+    preselected_items: access_levels_data(protected_branch.push_access_levels)
+
+  - unless protected_refs_for_users_feature_available
+    - if user_push_access_levels.any?
+      %p.small
+        The following
+        #{ 'user'.pluralize(user_push_access_levels.size) }
+        can also push to this branch:
+        #{ user_push_access_levels.map(&:humanize).to_sentence }
+
+    - if group_push_access_levels.any?
+      %p.small
+        Members of
+        #{ group_push_access_levels.size > 1 ? 'these groups' : 'this group' }
+        can also push to this branch:
+        #{ group_push_access_levels.map(&:humanize).to_sentence }

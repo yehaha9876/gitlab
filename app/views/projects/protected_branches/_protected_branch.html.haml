@@ -1,4 +1,5 @@
 - can_admin_project = can?(current_user, :admin_project, @project)
+- can_unprotect = can?(current_user, :update_protected_branch, protected_branch)
 
 %tr.js-protected-branch-edit-form{ data: { url: namespace_project_protected_branch_path(@project.namespace, @project, protected_branch) } }
   %td
@@ -17,8 +18,8 @@
       - else
         (branch was removed from repository)
 
-  = render partial: 'projects/protected_branches/update_protected_branch', locals: { protected_branch: protected_branch }
+  = render 'projects/protected_branches/update_protected_branch', protected_branch: protected_branch
 
   - if can_admin_project
     %td
-      = link_to 'Unprotect', [@project.namespace.becomes(Namespace), @project, protected_branch], disabled: local_assigns[:disabled], data: { confirm: 'Branch will be writable for developers. Are you sure?' }, method: :delete, class: "btn btn-warning"
+      = link_to 'Unprotect', [@project.namespace.becomes(Namespace), @project, protected_branch], disabled: !can_unprotect, data: { confirm: 'Branch will be writable for developers. Are you sure?' }, method: :delete, class: "btn btn-warning"
