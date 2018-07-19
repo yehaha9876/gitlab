@@ -11,7 +11,9 @@ const discussionFixture = 'merge_requests/diff_discussion.json';
 describe('diff_file_header', () => {
   let vm;
   let props;
+  const diffDiscussionMock = getJSONFixture(discussionFixture)[0];
   const Component = Vue.extend(DiffFileHeader);
+
   const store = new Vuex.Store({
     modules: {
       diffs: diffsModule,
@@ -20,7 +22,6 @@ describe('diff_file_header', () => {
   });
 
   beforeEach(() => {
-    const diffDiscussionMock = getJSONFixture(discussionFixture)[0];
     const diffFile = convertObjectPropsToCamelCase(diffDiscussionMock.diff_file, { deep: true });
     props = {
       diffFile,
@@ -408,7 +409,7 @@ describe('diff_file_header', () => {
       });
     });
 
-    fdescribe('handles toggle discussions', () => {
+    describe('handles toggle discussions', () => {
       it('renders a disabled button when diff has no discussions', () => {
         const propsCopy = Object.assign({}, props);
         propsCopy.diffFile.submodule = false;
@@ -428,33 +429,44 @@ describe('diff_file_header', () => {
           store,
         });
 
-        expect(vm.$el.querySelector('.js-btn-vue-toggle-comments').getAttribute('disabled')).toEqual('disabled');
+        expect(
+          vm.$el.querySelector('.js-btn-vue-toggle-comments').getAttribute('disabled'),
+        ).toEqual('disabled');
       });
 
-      it('dispatches toggleFileDiscussions when user clicks on toggle discussions button', () => {
-        const propsCopy = Object.assign({}, props);
-        propsCopy.diffFile.submodule = false;
-        propsCopy.diffFile.blob = {
-          id: '848ed9407c6730ff16edb3dd24485a0eea24292a',
-          path: 'lib/base.js',
-          name: 'base.js',
-          mode: '100644',
-          readableText: true,
-          icon: 'file-text-o',
-        };
-        propsCopy.addMergeRequestButtons = true;
-        propsCopy.diffFile.deletedFile = true;
+      describe('with discussions', () => {
+        it('dispatches toggleFileDiscussions when user clicks on toggle discussions button', () => {
+          const propsCopy = Object.assign({}, props);
+          propsCopy.diffFile.submodule = false;
+          propsCopy.diffFile.blob = {
+            id: '848ed9407c6730ff16edb3dd24485a0eea24292a',
+            path: 'lib/base.js',
+            name: 'base.js',
+            mode: '100644',
+            readableText: true,
+            icon: 'file-text-o',
+          };
+          propsCopy.addMergeRequestButtons = true;
+          propsCopy.diffFile.deletedFile = true;
 
-        vm = mountComponentWithStore(Component, {
-          props: propsCopy,
-          store,
+          const discussionGetter = () => [diffDiscussionMock];
+          notesModule.getters.discussions = discussionGetter;
+          vm = mountComponentWithStore(Component, {
+            props: propsCopy,
+            store: new Vuex.Store({
+              modules: {
+                diffs: diffsModule,
+                notes: notesModule,
+              },
+            }),
+          });
+
+          spyOn(vm, 'toggleFileDiscussions');
+
+          vm.$el.querySelector('.js-btn-vue-toggle-comments').click();
+
+          expect(vm.toggleFileDiscussions).toHaveBeenCalled();
         });
-
-        spyOn(vm, 'toggleFileDiscussions');
-
-        vm.$el.querySelector('.js-btn-vue-toggle-comments').click();
-
-        expect(vm.toggleFileDiscussions).toHaveBeenCalled();
       });
     });
   });
