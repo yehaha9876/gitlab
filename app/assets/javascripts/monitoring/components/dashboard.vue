@@ -233,7 +233,7 @@ export default {
       >
         <!-- EE content -->
         <alert-widget
-          v-if="alertsEndpoint"
+          v-if="alertsEndpoint && graphData.id"
           :alerts-endpoint="alertsEndpoint"
           :query="getGraphQuery(graphData)"
           :name="getGraphLabel(graphData)"
