@@ -9,9 +9,9 @@ export default class AlertsService {
     return axios.get(this.alertsEndpoint).then(resp => resp.data);
   }
 
-  createAlert({ name, query, operator, threshold, prometheus_metric_id }) {
+  createAlert({ prometheus_metric_id, operator, threshold }) {
     return axios
-      .post(this.alertsEndpoint, { name, query, operator, threshold, prometheus_metric_id })
+      .post(this.alertsEndpoint, { prometheus_metric_id, operator, threshold })
       .then(resp => resp.data);
   }
 
@@ -21,8 +21,8 @@ export default class AlertsService {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  updateAlert(alertPath, { name, query, operator, threshold }) {
-    return axios.put(alertPath, { name, query, operator, threshold }).then(resp => resp.data);
+  updateAlert(alertPath, { operator, threshold }) {
+    return axios.put(alertPath, { operator, threshold }).then(resp => resp.data);
   }
 
   // eslint-disable-next-line class-methods-use-this

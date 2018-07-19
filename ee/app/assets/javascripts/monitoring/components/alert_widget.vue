@@ -16,11 +16,7 @@ export default {
       type: String,
       required: true,
     },
-    name: {
-      type: String,
-      required: true,
-    },
-    query: {
+    label: {
       type: String,
       required: true,
     },
@@ -49,7 +45,7 @@ export default {
     alertSummary() {
       const data = this.firstAlertData;
       if (!data) return null;
-      return `${this.name} ${data.operator} ${data.threshold}`;
+      return `${this.label} ${data.operator} ${data.threshold}`;
     },
     alertIcon() {
       return this.hasAlerts ? 'notifications' : 'notifications-off';
@@ -123,12 +119,8 @@ export default {
         this.isOpen = false;
       }
     },
-    handleCreate({ name, query, operator, threshold }) {
-      const newAlert = { name, query, operator, threshold };
-
-      // pass custom metric ID only if it exists
-      if (this.customMetricId) newAlert.prometheus_metric_id = this.customMetricId;
-
+    handleCreate({ operator, threshold }) {
+      const newAlert = { operator, threshold, prometheus_metric_id: this.customMetricId };
       this.isLoading = true;
       this.service
         .createAlert(newAlert)
@@ -144,8 +136,8 @@ export default {
           this.isLoading = false;
         });
     },
-    handleUpdate({ alert, name, query, operator, threshold }) {
-      const updatedAlert = { name, query, operator, threshold };
+    handleUpdate({ alert, operator, threshold }) {
+      const updatedAlert = { operator, threshold };
       this.isLoading = true;
       this.service
         .updateAlert(alert, updatedAlert)
@@ -242,8 +234,6 @@ export default {
           :disabled="formDisabled"
           :alert="firstAlert"
           :alert-data="firstAlertData"
-          :name="name"
-          :query="query"
           @create="handleCreate"
           @update="handleUpdate"
           @delete="handleDelete"

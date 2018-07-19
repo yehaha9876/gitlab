@@ -12,10 +12,6 @@ export default {
     },
   },
   methods: {
-    getGraphQuery(graphData) {
-      if (!graphData.queries || !graphData.queries[0]) return undefined;
-      return graphData.queries[0].query || graphData.queries[0].query_range;
-    },
     getGraphLabel(graphData) {
       if (!graphData.queries || !graphData.queries[0]) return undefined;
       return graphData.queries[0].label || graphData.y_label || 'Average';

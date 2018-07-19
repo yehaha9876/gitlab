@@ -29,14 +29,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    name: {
-      type: String,
-      required: true,
-    },
-    query: {
-      type: String,
-      required: true,
-    },
     alert: {
       type: String,
       required: false,
@@ -92,8 +84,6 @@ export default {
       this.$refs.submitButton.blur();
       this.$emit(this.submitAction, {
         alert: this.alert,
-        name: this.name,
-        query: this.query,
         operator: this.operator,
         threshold: this.threshold,
       });

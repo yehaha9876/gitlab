@@ -8,8 +8,8 @@ describe('AlertWidget', () => {
   let vm;
   const props = {
     alertsEndpoint: '',
-    name: 'alert-name',
-    query: 'e=mc2',
+    customMetricId: 5,
+    label: 'alert-label',
     currentAlerts: ['my/alert.json'],
   };
 
@@ -74,7 +74,7 @@ describe('AlertWidget', () => {
     setTimeout(() =>
       vm.$nextTick(() => {
         expect(vm.isLoading).toEqual(false);
-        expect(vm.alertSummary).toBe('alert-name > 42');
+        expect(vm.alertSummary).toBe('alert-label > 42');
         expect(vm.$el.querySelector('.alert-current-setting')).toBeVisible();
         done();
       }),
@@ -127,10 +127,9 @@ describe('AlertWidget', () => {
 
   it('creates an alert with an appropriate handler', done => {
     const alertParams = {
-      name: 'test',
-      query: 'e=mc2',
       operator: '<',
       threshold: 4,
+      prometheus_metric_id: 5,
     };
 
     spyOn(AlertsService.prototype, 'createAlert').and.returnValue(
@@ -146,7 +145,7 @@ describe('AlertWidget', () => {
     expect(AlertsService.prototype.createAlert).toHaveBeenCalledWith(alertParams);
     Vue.nextTick(() => {
       expect(vm.isLoading).toEqual(false);
-      expect(vm.alertSummary).toBe('alert-name < 4');
+      expect(vm.alertSummary).toBe('alert-label < 4');
       done();
     });
   });
@@ -154,8 +153,6 @@ describe('AlertWidget', () => {
   it('updates an alert with an appropriate handler', done => {
     const alertPath = 'my/test/alert.json';
     const alertParams = {
-      name: 'alert-name',
-      query: 'e=mc2',
       operator: '<',
       threshold: 4,
     };
@@ -178,7 +175,7 @@ describe('AlertWidget', () => {
     });
     Vue.nextTick(() => {
       expect(vm.isLoading).toEqual(false);
-      expect(vm.alertSummary).toBe('alert-name = 12');
+      expect(vm.alertSummary).toBe('alert-label = 12');
       done();
     });
   });
@@ -186,8 +183,6 @@ describe('AlertWidget', () => {
   it('deletes an alert with an appropriate handler', done => {
     const alertPath = 'my/test/alert.json';
     const alertParams = {
-      name: 'alert-name',
-      query: 'e=mc2',
       operator: '<',
       threshold: 4,
     };

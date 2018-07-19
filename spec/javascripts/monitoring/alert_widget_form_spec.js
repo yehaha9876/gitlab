@@ -7,8 +7,6 @@ describe('AlertWidgetForm', () => {
   let vm;
   const props = {
     disabled: false,
-    name: 'alert-name',
-    query: 'e=mc2',
   };
 
   beforeAll(() => {
@@ -31,8 +29,6 @@ describe('AlertWidgetForm', () => {
     vm.$once('create', alert => {
       expect(alert).toEqual({
         alert: null,
-        name: props.name,
-        query: props.query,
         operator: '<',
         threshold: 5,
       });
@@ -58,8 +54,6 @@ describe('AlertWidgetForm', () => {
     vm.$once('delete', alert => {
       expect(alert).toEqual({
         alert: 'alert',
-        name: props.name,
-        query: props.query,
         operator: '<',
         threshold: 5,
       });
@@ -80,8 +74,6 @@ describe('AlertWidgetForm', () => {
     vm.$once('update', alert => {
       expect(alert).toEqual({
         alert: 'alert',
-        name: props.name,
-        query: props.query,
         operator: '=',
         threshold: 5,
       });

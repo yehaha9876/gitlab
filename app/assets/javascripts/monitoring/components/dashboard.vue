@@ -144,7 +144,7 @@ export default {
           .catch(() => Flash(s__('Metrics|There was an error getting deployment information.'))),
         this.service
           .getEnvironmentsData()
-          .then((data) => this.store.storeEnvironmentsData(data))
+          .then(data => this.store.storeEnvironmentsData(data))
           .catch(() => Flash(s__('Metrics|There was an error getting environments information.'))),
       ])
         .then(() => {
@@ -235,8 +235,7 @@ export default {
         <alert-widget
           v-if="alertsEndpoint && graphData.id"
           :alerts-endpoint="alertsEndpoint"
-          :query="getGraphQuery(graphData)"
-          :name="getGraphLabel(graphData)"
+          :label="getGraphLabel(graphData)"
           :current-alerts="getQueryAlerts(graphData)"
           :custom-metric-id="graphData.id"
         />
