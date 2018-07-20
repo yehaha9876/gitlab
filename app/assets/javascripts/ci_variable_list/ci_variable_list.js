@@ -114,8 +114,7 @@ export default class VariableList {
     // Refresh dropdown when opened
     this.$container.on('autocomplete:opened', inputSelector, (e) => {
       const val = $(e.target).autocomplete('val');
-      $(e.target).autocomplete('val', '');
-      $(e.target).autocomplete('val', val);
+      $(e.target).autocomplete('val', '').autocomplete('val', val);
     });
   }
 

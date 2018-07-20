@@ -24,11 +24,11 @@ describe('VariableList (EE features)', () => {
       function addRowByNewEnvironment(newEnv) {
         const $row = $wrapper.find('.js-row:last-child');
 
-        // // Open the dropdown
-        $($row.find('.select2-container.js-variable-environment-trigger')).select2('val', newEnv).trigger('change.select2');
-        $row.find('input.js-variable-environment-trigger')
-          .val(newEnv)
-          .trigger('input');
+        // Open the dropdown
+        // $row.find('input.js-variable-environment-trigger')
+        //   .val(newEnv)
+        //   .trigger('input');
+        $row.find('.js-variable-environment-trigger').autocomplete('val', newEnv).trigger('autocomplete:selected');
 
       }
 
@@ -51,21 +51,28 @@ describe('VariableList (EE features)', () => {
         addRowByNewEnvironment('someenv');
 
         const $row = $wrapper.find('.js-row:last-child');
-        $row.find('.select2-container.js-variable-environment-trigger').select2('open');
+        $row.find('.js-variable-environment-trigger').autocomplete('open');
 
         getSetTimeoutPromise()
           .then(() => {
-            const $dropdownItemsBeforeRemove = $('#select2-drop .select2-result-selectable');
+            const $dropdownItemsBeforeRemove = $row.find('.dropdown-menu .menu-item');
             expect($dropdownItemsBeforeRemove.length).toBe(2);
-            expect($dropdownItemsBeforeRemove[0].textContent.trim()).toBe('someenv');
-            expect($dropdownItemsBeforeRemove[1].textContent.trim()).toBe('* (All environments)');
+            expect($dropdownItemsBeforeRemove[0].textContent.trim()).toBe('* (All environments)');
+            expect($dropdownItemsBeforeRemove[1].textContent.trim()).toBe('someenv');
 
-            $row.find('.select2-container.js-variable-environment-trigger').select2('close');
+            $row.find('.js-variable-environment-trigger').autocomplete('close');
             $row.prev().find('.js-row-remove-button').trigger('click');
           })
           .then(() => {
-            $row.find('.select2-container.js-variable-environment-trigger').select2('open');
-            const $dropdownItemsAfterRemove = $('#select2-drop .select2-result-selectable');
+            const $dropdownTrigger = $row.find('.js-variable-environment-trigger');
+            $dropdownTrigger.autocomplete('open');
+            $dropdownTrigger
+              .val('')
+              .trigger('input')
+              .val('*')
+              .trigger('input');
+
+            const $dropdownItemsAfterRemove = $('.dropdown-menu .menu-item');
             expect($dropdownItemsAfterRemove.length).toBe(1);
             expect($dropdownItemsAfterRemove[0].textContent.trim()).toBe('* (All environments)');
           })
