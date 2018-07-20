@@ -106,8 +106,16 @@ export default class VariableList {
       });
     });
 
+    // Ensure content stays the same when cycling through options
     this.$container.on('autocomplete:cursorchanged', inputSelector, (e) => {
       $(e.target).val($(e.target).autocomplete('val'));
+    });
+
+    // Refresh dropdown when opened
+    this.$container.on('autocomplete:opened', inputSelector, (e) => {
+      const val = $(e.target).autocomplete('val');
+      $(e.target).autocomplete('val', '');
+      $(e.target).autocomplete('val', val);
     });
   }
 
@@ -188,6 +196,8 @@ export default class VariableList {
   removeRow(row) {
     const $row = $(row);
     const isPersisted = convertPermissionToBoolean($row.attr('data-is-persisted'));
+
+    $row.find(this.inputMap.environment_scope.selector).autocomplete('destroy');
 
     if (isPersisted) {
       $row.hide();
