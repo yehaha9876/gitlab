@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180704204006) do
+ActiveRecord::Schema.define(version: 20180718100455) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -2174,6 +2174,7 @@ ActiveRecord::Schema.define(version: 20180704204006) do
   add_index "projects", ["path"], name: "index_projects_on_path", using: :btree
   add_index "projects", ["path"], name: "index_projects_on_path_trigram", using: :gin, opclasses: {"path"=>"gin_trgm_ops"}
   add_index "projects", ["pending_delete"], name: "index_projects_on_pending_delete", using: :btree
+  add_index "projects", ["repository_storage", "created_at"], name: "idx_project_repository_check_partial", where: "(last_repository_check_at IS NULL)", using: :btree
   add_index "projects", ["repository_storage"], name: "index_projects_on_repository_storage", using: :btree
   add_index "projects", ["runners_token"], name: "index_projects_on_runners_token", using: :btree
   add_index "projects", ["star_count"], name: "index_projects_on_star_count", using: :btree

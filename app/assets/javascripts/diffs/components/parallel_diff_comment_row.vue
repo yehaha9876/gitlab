@@ -13,12 +13,8 @@ export default {
       type: Object,
       required: true,
     },
-    diffFile: {
-      type: Object,
-      required: true,
-    },
-    diffLines: {
-      type: Array,
+    diffFileHash: {
+      type: String,
       required: true,
     },
     lineIndex: {
@@ -30,7 +26,7 @@ export default {
     ...mapState({
       diffLineCommentForms: state => state.diffs.diffLineCommentForms,
     }),
-    ...mapGetters(['discussionsByLineCode']),
+    ...mapGetters('diffs', ['discussionsByLineCode']),
     leftLineCode() {
       return this.line.left.lineCode;
     },
@@ -91,10 +87,9 @@ export default {
       <diff-line-note-form
         v-if="diffLineCommentForms[leftLineCode] &&
         diffLineCommentForms[leftLineCode]"
-        :diff-file="diffFile"
-        :diff-lines="diffLines"
+        :diff-file-hash="diffFileHash"
         :line="line.left"
-        :note-target-line="diffLines[lineIndex].left"
+        :note-target-line="line.left"
         position="left"
       />
     </td>
@@ -112,10 +107,9 @@ export default {
       <diff-line-note-form
         v-if="diffLineCommentForms[rightLineCode] &&
         diffLineCommentForms[rightLineCode] && line.right.type"
-        :diff-file="diffFile"
-        :diff-lines="diffLines"
+        :diff-file-hash="diffFileHash"
         :line="line.right"
-        :note-target-line="diffLines[lineIndex].right"
+        :note-target-line="line.right"
         position="right"
       />
     </td>

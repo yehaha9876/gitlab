@@ -147,6 +147,7 @@ Settings.gitlab['default_projects_features'] ||= {}
 Settings.gitlab['webhook_timeout'] ||= 10
 Settings.gitlab['max_attachment_size'] ||= 10
 Settings.gitlab['session_expire_delay'] ||= 10080
+Settings.gitlab['unauthenticated_session_expire_delay'] ||= 1.hour.to_i
 Settings.gitlab['mirror_max_delay'] ||= 300
 Settings.gitlab['mirror_max_capacity'] ||= 30
 Settings.gitlab['mirror_capacity_threshold'] ||= 15
@@ -373,10 +374,6 @@ Settings.cron_jobs['gitlab_usage_ping_worker']['job_class'] = 'GitlabUsagePingWo
 Settings.cron_jobs['pseudonymizer_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['pseudonymizer_worker']['cron'] ||= '0 23 * * *'
 Settings.cron_jobs['pseudonymizer_worker']['job_class'] ||= 'PseudonymizerWorker'
-
-Settings.cron_jobs['schedule_update_user_activity_worker'] ||= Settingslogic.new({})
-Settings.cron_jobs['schedule_update_user_activity_worker']['cron'] ||= '30 0 * * *'
-Settings.cron_jobs['schedule_update_user_activity_worker']['job_class'] = 'ScheduleUpdateUserActivityWorker'
 
 Settings.cron_jobs['clear_shared_runners_minutes_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['clear_shared_runners_minutes_worker']['cron'] ||= '0 0 1 * *'

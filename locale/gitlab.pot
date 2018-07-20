@@ -160,9 +160,6 @@ msgstr[1] ""
 msgid "%{unstaged} unstaged and %{staged} staged changes"
 msgstr ""
 
-msgid "(check out the %{link} for information on how to install it)."
-msgstr ""
-
 msgid "+ %{moreCount} more"
 msgstr ""
 
@@ -1498,6 +1495,9 @@ msgstr ""
 msgid "ClusterIntegration|Create Kubernetes cluster"
 msgstr ""
 
+msgid "ClusterIntegration|Did you know?"
+msgstr ""
+
 msgid "ClusterIntegration|Enter the details for your Kubernetes cluster"
 msgstr ""
 
@@ -1532,6 +1532,9 @@ msgid "ClusterIntegration|Google Kubernetes Engine project"
 msgstr ""
 
 msgid "ClusterIntegration|Helm Tiller"
+msgstr ""
+
+msgid "ClusterIntegration|Hide"
 msgstr ""
 
 msgid "ClusterIntegration|If you are setting up multiple clusters and are using Auto DevOps, %{help_link_start}read this first%{help_link_end}."
@@ -1673,9 +1676,6 @@ msgid "ClusterIntegration|Prometheus"
 msgstr ""
 
 msgid "ClusterIntegration|Read our %{link_to_help_page} on Kubernetes cluster integration."
-msgstr ""
-
-msgid "ClusterIntegration|Redeem up to $500 in free credit for Google Cloud Platform"
 msgstr ""
 
 msgid "ClusterIntegration|Remove Kubernetes cluster integration"
@@ -2061,6 +2061,9 @@ msgid "Copy reference to clipboard"
 msgstr ""
 
 msgid "Copy to clipboard"
+msgstr ""
+
+msgid "Copy token to clipboard"
 msgstr ""
 
 msgid "Create"
@@ -3189,9 +3192,6 @@ msgstr ""
 msgid "GitLab Import"
 msgstr ""
 
-msgid "GitLab Runner section"
-msgstr ""
-
 msgid "GitLab User"
 msgstr ""
 
@@ -3581,10 +3581,10 @@ msgstr ""
 msgid "Inline"
 msgstr ""
 
-msgid "Install Runner on Kubernetes"
+msgid "Install GitLab Runner"
 msgstr ""
 
-msgid "Install a Runner compatible with GitLab CI"
+msgid "Install Runner on Kubernetes"
 msgstr ""
 
 msgid "Instance"
@@ -4337,6 +4337,9 @@ msgstr ""
 msgid "Note: Consider asking your GitLab administrator to configure %{github_integration_link}, which will allow login via GitHub and allow importing repositories without generating a Personal Access Token."
 msgstr ""
 
+msgid "Notes|Are you sure you want to cancel creating this comment?"
+msgstr ""
+
 msgid "Notification events"
 msgstr ""
 
@@ -4920,6 +4923,9 @@ msgid "ProjectLastActivity|Never"
 msgstr ""
 
 msgid "ProjectLifecycle|Stage"
+msgstr ""
+
+msgid "ProjectPage|Project ID: %{project_id}"
 msgstr ""
 
 msgid "ProjectSettings|Contact an admin to change this setting."

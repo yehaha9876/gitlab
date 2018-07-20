@@ -13,12 +13,8 @@ export default {
       type: Object,
       required: true,
     },
-    diffFile: {
-      type: Object,
-      required: true,
-    },
-    diffLines: {
-      type: Array,
+    diffFileHash: {
+      type: String,
       required: true,
     },
     lineIndex: {
@@ -30,12 +26,15 @@ export default {
     ...mapState({
       diffLineCommentForms: state => state.diffs.diffLineCommentForms,
     }),
-    ...mapGetters(['discussionsByLineCode']),
+    ...mapGetters('diffs', ['discussionsByLineCode']),
     discussions() {
       return this.discussionsByLineCode[this.line.lineCode] || [];
     },
     className() {
       return this.discussions.length ? '' : 'js-temp-notes-holder';
+    },
+    hasCommentForm() {
+      return this.diffLineCommentForms[this.line.lineCode];
     },
   },
 };
@@ -57,11 +56,10 @@ export default {
           :discussions="discussions"
         />
         <diff-line-note-form
-          v-if="diffLineCommentForms[line.lineCode]"
-          :diff-file="diffFile"
-          :diff-lines="diffLines"
+          v-if="hasCommentForm"
+          :diff-file-hash="diffFileHash"
           :line="line"
-          :note-target-line="diffLines[lineIndex]"
+          :note-target-line="line"
         />
       </div>
     </td>

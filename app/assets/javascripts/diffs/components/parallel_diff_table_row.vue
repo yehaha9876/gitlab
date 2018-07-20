@@ -19,8 +19,12 @@ export default {
     DiffTableCell,
   },
   props: {
-    diffFile: {
-      type: Object,
+    fileHash: {
+      type: String,
+      required: true,
+    },
+    contextLinesPath: {
+      type: String,
       required: true,
     },
     line: {
@@ -103,7 +107,8 @@ export default {
     @mouseout="handleMouseMove"
   >
     <diff-table-cell
-      :diff-file="diffFile"
+      :file-hash="fileHash"
+      :context-lines-path="contextLinesPath"
       :line="line"
       :line-type="oldLineType"
       :line-position="linePositionLeft"
@@ -114,7 +119,6 @@ export default {
       class="diff-line-num old_line"
     />
     <td
-      v-once
       :id="line.left.lineCode"
       :class="parallelViewLeftLineType"
       class="line_content parallel left-side"
@@ -123,7 +127,8 @@ export default {
     >
     </td>
     <diff-table-cell
-      :diff-file="diffFile"
+      :file-hash="fileHash"
+      :context-lines-path="contextLinesPath"
       :line="line"
       :line-type="newLineType"
       :line-position="linePositionRight"
@@ -134,7 +139,6 @@ export default {
       class="diff-line-num new_line"
     />
     <td
-      v-once
       :id="line.right.lineCode"
       :class="line.right.type"
       class="line_content parallel right-side"
