@@ -90,6 +90,15 @@ export default class VariableList {
       .map(name => this.inputMap[name].selector)
       .join(',');
 
+    // Remove any empty rows except the last row
+    this.$container.on('blur', inputSelector, (e) => {
+      const $row = $(e.currentTarget).closest('.js-row');
+
+      if ($row.is(':not(:last-child)') && !this.checkIfRowTouched($row)) {
+        this.removeRow($row);
+      }
+    });
+
     // Always make sure there is an empty last row
     this.$container.on('input trigger-change change autocomplete:selected', inputSelector, () => {
       const $lastRow = this.$container.find('.js-row').last();
