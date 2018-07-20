@@ -32,7 +32,7 @@ describe 'Project variables EE', :js do
 
       click_button('Save variables')
       wait_for_requests
-      
+
       visit page_path
 
       page.within('.js-ci-variable-list-section .js-row:nth-child(2)') do

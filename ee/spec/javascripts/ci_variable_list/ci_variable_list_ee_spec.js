@@ -25,9 +25,6 @@ describe('VariableList (EE features)', () => {
         const $row = $wrapper.find('.js-row:last-child');
 
         // Open the dropdown
-        // $row.find('input.js-variable-environment-trigger')
-        //   .val(newEnv)
-        //   .trigger('input');
         $row.find('.js-variable-environment-trigger').autocomplete('val', newEnv).trigger('autocomplete:selected');
 
       }
