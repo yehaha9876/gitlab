@@ -71,11 +71,17 @@ module API
           success Entities::List
         end
         params do
-          requires :label_id, type: Integer, desc: 'The ID of an existing label'
+          optional :label_id, type: Integer, desc: 'The ID of an existing label'
+          optional :assignee_id, type: Integer, desc: 'The ID of an assignee'
         end
         post '/lists' do
-          unless available_labels_for(user_project).exists?(params[:label_id])
-            render_api_error!({ error: 'Label not found!' }, 400)
+
+          unless params[:assignee_id]
+
+            unless available_labels_for(user_project).exists?(params[:label_id])
+              render_api_error!({ error: 'Label not found!' }, 400)
+            end
+
           end
 
           authorize!(:admin_list, user_project)

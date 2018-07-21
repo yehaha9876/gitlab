@@ -966,6 +966,7 @@ module API
     class List < Grape::Entity
       expose :id
       expose :label, using: Entities::LabelBasic
+      expose :user, using: Entities::UserSafe
       expose :position
     end
 

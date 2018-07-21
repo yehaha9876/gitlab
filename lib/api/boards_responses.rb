@@ -13,8 +13,9 @@ module API
         end
 
         def create_list
+          updated_params = { label_id: params[:label_id], "assignee_id" => params[:assignee_id] }
           create_list_service =
-            ::Boards::Lists::CreateService.new(board_parent, current_user, { label_id: params[:label_id] })
+            ::Boards::Lists::CreateService.new(board_parent, current_user, updated_params)
 
           list = create_list_service.execute(board)
 
