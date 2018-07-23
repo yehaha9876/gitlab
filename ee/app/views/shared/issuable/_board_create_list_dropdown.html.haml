@@ -7,10 +7,13 @@
       %ul.nav.nav-tabs.dropdown-tabs-list.js-new-board-list-tabs{ role: 'tablist' }
         %li.nav-item.dropdown-tab-item.js-tab-button-labels
           %a.active{ href: '#', role: 'tab', data: { is_link: 'true', toggle: 'tab', action: 'tab-labels', target: '#tab-labels' } }
-            Label list
+            Label
         %li.nav-item.dropdown-tab-item.js-tab-button-assignees
           %a{ href: '#', role: 'tab', data: { is_link: 'true', toggle: 'tab', action: 'tab-assignees', target: '#tab-assignees' } }
-            Assignee list
+            Assignee
+        %li.nav-item.dropdown-tab-item.js-tab-button-milestones
+          %a{ href: '#', role: 'tab', data: { is_link: 'true', toggle: 'tab', action: 'tab-milestones', target: '#tab-milestones' } }
+            Milestone
       .tab-content
         #tab-labels.tab-pane.tab-pane-labels.active.js-tab-container-labels{ role: 'tabpanel' }
           = render partial: "shared/issuable/label_page_default", locals: { show_title: false, show_footer: true, show_create: true, show_boards_content: true, content_title: _('Label lists show all issues with the selected label.') }
@@ -18,6 +21,8 @@
             = render partial: "shared/issuable/label_page_create", locals: { show_close: false }
         #tab-assignees.tab-pane.tab-pane-assignees.js-tab-container-assignees{ role: 'tabpanel' }
           = render partial: "shared/issuable/assignee_page_default"
+        #tab-milestones.tab-pane.tab-pane-milestones.js-tab-container-milestones{ role: 'tabpanel' }
+          = render partial: "shared/issuable/milestone_page_default"
       = dropdown_loading
 - else
   = render_ce 'shared/issuable/board_create_list_dropdown', board: board
