@@ -1,7 +1,7 @@
 import _ from 'underscore';
+import $ from 'jquery';
 import BoardsListSelector from './boards_list_selector/index';
 import AssigneesListItem from './boards_list_selector/assignees_list_item.vue';
-import $ from "jquery";
 
 window.gl = window.gl || {};
 window.gl.issueBoards = window.gl.issueBoards || {};
