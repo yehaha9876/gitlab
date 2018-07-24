@@ -22,8 +22,7 @@ function createEnvironmentItem(value) {
 }
 
 function wrapHint(suggestion, text) {
-  if (suggestion.hint) return `"${text}"`;
-  return text;
+  return (suggestion.hint) ? `"${text}"` : text;
 }
 
 export default class VariableList {
