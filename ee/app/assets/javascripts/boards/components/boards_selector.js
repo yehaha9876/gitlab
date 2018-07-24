@@ -153,7 +153,7 @@ import MilestoneListItem from './assignees_list/milestones_list_item.vue';
           this.assigneeList = new AssigneesList({
             propsData: {
               listPath: $addListEl.find('.js-new-board-list').data('listAssigneesPath'),
-              listType: 'assignees',
+              listType: 'assignees',o
               listItemComponent: AssigneesListItem,
             },
           }).$mount('.js-assignees-list');

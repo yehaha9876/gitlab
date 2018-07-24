@@ -14,13 +14,22 @@ module Boards
     def finder_service
       parent = @board.parent
 
-      @finder_service ||=
-        if parent.is_a?(Group)
-          # TODO: Consider descendants projects
-          ::MilestonesFinder.new(project_ids: [], group_ids: parent.self_and_descendants_ids)
-        else
-          ::MilestonesFinder.new(project_ids: [parent.id], group_ids: [parent.namespace.id])
-        end
+      finder_params =
+          if parent.is_a?(Group)
+            groups = parent.self_and_descendants
+
+            {
+                project_ids: @current_user.authorized_projects.where(namespace_id: groups.select(:id)),
+                group_ids: @current_user.authorized_groups.where(id: groups.select(:id))
+            }
+          else
+            {
+                project_ids: [parent.id],
+                group_ids: [parent.namespace_id]
+            }
+          end
+
+      ::MilestonesFinder.new(finder_params)
     end
   end
 end
