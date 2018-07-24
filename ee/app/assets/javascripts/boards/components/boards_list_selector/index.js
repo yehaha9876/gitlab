@@ -4,11 +4,11 @@ import { __ } from '~/locale';
 import Flash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 
-import AssigneesListContainer from './assignees_list_container.vue';
+import ListContainer from './list_container.vue';
 
 export default Vue.extend({
   components: {
-    AssigneesListContainer,
+    ListContainer,
   },
   props: {
     listPath: {
@@ -23,6 +23,14 @@ export default Vue.extend({
       type: Object,
       required: true,
     },
+    filterItems: {
+      type: Function,
+      required: true,
+    },
+    onItemSelect: {
+      type: Function,
+      required: true,
+    },
   },
   data() {
     return {
@@ -31,10 +39,10 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.loadAssignees();
+    this.loadList();
   },
   methods: {
-    loadAssignees() {
+    loadList() {
       if (this.store.state[this.listType].length) {
         return Promise.resolve();
       }
@@ -50,13 +58,13 @@ export default Vue.extend({
           Flash(__(`Something went wrong while fetching ${this.listType} list`));
         });
     },
-    handleItemClick(assignee) {
-      if (!this.store.findList('title', assignee.name)) {
+    handleItemClick(item) {
+      if (!this.store.findList('title', item.name)) {
         this.store.new({
-          title: assignee.name,
+          title: item.name,
           position: this.store.state.lists.length - 2,
-          list_type: 'assignee',
-          user: assignee,
+          list_type: this.listType,
+          user: item,
         });
 
         this.store.state.lists = _.sortBy(this.store.state.lists, 'position');
@@ -64,14 +72,15 @@ export default Vue.extend({
     },
   },
   render(createElement) {
-    return createElement('assignees-list-container', {
+    return createElement('list-container', {
       props: {
         loading: this.loading,
-        assignees: this.store.state[this.listType],
+        items: this.store.state[this.listType],
+        filterItems: this.filterItems,
         listItemComponent: this.listItemComponent,
       },
       on: {
-        onItemSelect: this.handleItemClick,
+        onItemSelect: this.onItemSelect,
       },
     });
   },

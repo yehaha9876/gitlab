@@ -2,7 +2,7 @@ import '~/boards/stores/boards_store';
 
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
-import AssigneesListComponent from 'ee/boards/components/assignees_list/';
+import AssigneesListComponent from 'ee/boards/components/boards_list_selector/';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 

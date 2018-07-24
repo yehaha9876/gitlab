@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import AssigneesListItemComponent from 'ee/boards/components/assignees_list/assignees_list_item.vue';
+import AssigneesListItemComponent from 'ee/boards/components/boards_list_selector/assignees_list_item.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 import { mockAssigneesList } from 'spec/boards/mock_data';

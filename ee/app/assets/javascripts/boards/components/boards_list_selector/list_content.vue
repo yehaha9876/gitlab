@@ -6,7 +6,7 @@ export default {
     AssigneesListItem,
   },
   props: {
-    assignees: {
+    items: {
       type: Array,
       required: true,
     },
@@ -16,8 +16,8 @@ export default {
     },
   },
   methods: {
-    handleItemClick(assignee) {
-      this.$emit('onItemSelect', assignee);
+    handleItemClick(item) {
+      this.$emit('onItemSelect', item);
     },
   },
 };
@@ -27,9 +27,9 @@ export default {
   <div class="dropdown-content">
     <ul>
       <component
-        v-for="assignee in assignees"
-        :key="assignee.id"
-        :list="assignee"
+        v-for="item in items"
+        :key="item.id"
+        :list="item"
         :is="listItemComponent"
         @onItemSelect="handleItemClick"
       />

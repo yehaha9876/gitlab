@@ -3,9 +3,8 @@ import $ from 'jquery';
 import { throttle } from 'underscore';
 import '~/boards/stores/boards_store';
 import BoardForm from './board_form.vue';
-import AssigneesList from './assignees_list';
-import AssigneesListItem from './assignees_list/assignees_list_item.vue';
-import MilestoneListItem from './assignees_list/milestones_list_item.vue';
+import AssigneeList from './assignees_list_slector';
+import MilestoneList from './milestone_list_selector';
 
 (() => {
   window.gl = window.gl || {};
@@ -47,6 +46,7 @@ import MilestoneListItem from './assignees_list/milestones_list_item.vue';
         throttledSetScrollFade: throttle(this.setScrollFade, this.throttleDuration),
         contentClientHeight: 0,
         maxPosition: 0,
+        store: gl.issueBoards.BoardsStore,
       };
     },
     computed: {
@@ -150,24 +150,12 @@ import MilestoneListItem from './assignees_list/milestones_list_item.vue';
         $addListEl.data('preventClose', true);
         if (e.target.dataset.action === 'tab-assignees' &&
             !this.hasAssigneesListMounted) {
-          this.assigneeList = new AssigneesList({
-            propsData: {
-              listPath: $addListEl.find('.js-new-board-list').data('listAssigneesPath'),
-              listType: 'assignees',
-              listItemComponent: AssigneesListItem,
-            },
-          }).$mount('.js-assignees-list');
+          this.assigneeList = AssigneeList();
           this.hasAssigneesListMounted = true;
         }
 
         if (e.target.dataset.action === 'tab-milestones' && !this.hasMilstoneListMounted) {
-          this.milstoneList = new AssigneesList({
-            propsData: {
-              listPath: $addListEl.find('.js-new-board-list').data('listMilestonePath'),
-              listType: 'milestones',
-              listItemComponent: MilestoneListItem,
-            },
-          }).$mount('.js-milestone-list');
+          this.milstoneList = MilestoneList();
           this.hasMilstoneListMounted = true;
         }
       },

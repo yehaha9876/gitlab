@@ -1,6 +1,4 @@
 <script>
-import { sprintf, __ } from '~/locale';
-
 export default {
   props: {
     list: {
@@ -10,7 +8,7 @@ export default {
   },
   methods: {
     handleItemClick() {
-      this.$emit('onItemSelect', this.milestone);
+      this.$emit('onItemSelect', this.list);
     },
   },
 };
