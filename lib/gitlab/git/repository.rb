@@ -1,4 +1,3 @@
-# Gitlab::Git::Repository is a wrapper around native Rugged::Repository object
 require 'tempfile'
 require 'forwardable'
 require "rubygems/package"
@@ -1252,14 +1251,6 @@ module Gitlab
         args = %W(fetch --no-tags -f #{GITALY_INTERNAL_URL} #{source_ref}:#{target_ref})
 
         run_git(args, env: source_repository.fetch_env)
-      end
-
-      def rugged_add_remote(remote_name, url, mirror_refmap)
-        rugged.remotes.create(remote_name, url)
-
-        set_remote_as_mirror(remote_name, refmap: mirror_refmap) if mirror_refmap
-      rescue Rugged::ConfigError
-        remote_update(remote_name, url: url)
       end
 
       def gitaly_delete_refs(*ref_names)

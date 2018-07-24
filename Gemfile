@@ -230,6 +230,9 @@ gem 'gemnasium-gitlab-service', '~> 0.2'
 # Slack integration
 gem 'slack-notifier', '~> 1.5.1'
 
+# Hangouts Chat integration
+gem 'hangouts-chat', '~> 0.0.5'
+
 # Asana integration
 gem 'asana', '~> 0.6.0'
 
@@ -335,6 +338,7 @@ group :development do
 end
 
 group :development, :test do
+  gem 'bootsnap', '~> 1.3'
   gem 'bullet', '~> 5.5.0', require: !!ENV['ENABLE_BULLET']
   gem 'pry-byebug', '~> 3.4.1', platform: :mri
   gem 'pry-rails', '~> 0.3.4'
