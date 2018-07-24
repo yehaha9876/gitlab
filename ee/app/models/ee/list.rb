@@ -10,8 +10,10 @@ module EE
       end
 
       base.belongs_to :user
+      base.belongs_to :milestone
 
       base.validates :user, presence: true, if: :assignee?
+      base.validates :milestone, presence: true, if: :milestone?
       base.validates :user_id, uniqueness: { scope: :board_id }, if: :assignee?
       base.validates :list_type,
         exclusion: { in: %w[assignee], message: _('Assignee boards not available with your current license') },
@@ -24,17 +26,24 @@ module EE
 
     override :destroyable?
     def destroyable?
-      assignee? || super
+      self.class.destroyable_types.include?(list_type&.to_sym) || super
     end
 
     override :movable?
     def movable?
-      assignee? || super
+      self.class.movable_types.include?(list_type&.to_sym) || super
     end
 
     override :title
     def title
-      assignee? ? user.to_reference : super
+      case list_type
+      when 'assignee'
+        user.to_reference
+      when 'milestone'
+        milestone.title
+      else
+        super
+      end
     end
 
     override :as_json
@@ -48,11 +57,11 @@ module EE
 
     module ClassMethods
       def destroyable_types
-        super + [:assignee]
+        super + [:assignee, :milestone]
       end
 
       def movable_types
-        super + [:assignee]
+        super + [:assignee, :milestone]
       end
     end
   end
