@@ -3,7 +3,7 @@ import { sprintf, __ } from '~/locale';
 
 export default {
   props: {
-    assignee: {
+    list: {
       type: Object,
       required: true,
     },
@@ -11,13 +11,13 @@ export default {
   computed: {
     avatarAltText() {
       return sprintf(__("%{name}'s avatar"), {
-        name: this.assignee.name,
+        name: this.list.name,
       });
     },
   },
   methods: {
     handleItemClick() {
-      this.$emit('onItemSelect', this.assignee);
+      this.$emit('onItemSelect', this.list);
     },
   },
 };
@@ -35,16 +35,16 @@ export default {
       <div class="avatar-container s32">
         <img
           :alt="avatarAltText"
-          :src="assignee.avatar_url"
+          :src="list.avatar_url"
           class="avatar s32 lazy"
         />
       </div>
       <div class="dropdown-user-details">
-        <div :title="assignee.name">{{ assignee.name }}</div>
+        <div :title="list.name">{{ list.name }}</div>
         <div
-          :title="assignee.username"
+          :title="list.username"
           class="dropdown-light-content"
-        >@{{ assignee.username }}</div>
+        >@{{ list.username }}</div>
       </div>
     </button>
   </li>

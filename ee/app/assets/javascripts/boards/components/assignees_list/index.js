@@ -11,8 +11,16 @@ export default Vue.extend({
     AssigneesListContainer,
   },
   props: {
-    listAssigneesPath: {
+    listPath: {
       type: String,
+      required: true,
+    },
+    listType: {
+      type: String,
+      required: true,
+    },
+    listItemComponent: {
+      type: Object,
       required: true,
     },
   },
@@ -27,12 +35,12 @@ export default Vue.extend({
   },
   methods: {
     loadAssignees() {
-      if (!this.store.state.assignees.length) {
+      if (!this.store.state[this.listType].length) {
         axios
-          .get(this.listAssigneesPath)
+          .get(this.listPath)
           .then(({ data }) => {
             this.loading = false;
-            this.store.state.assignees = data;
+            this.store.state[this.listType] = data;
           })
           .catch(() => {
             this.loading = false;
@@ -59,7 +67,8 @@ export default Vue.extend({
     return createElement('assignees-list-container', {
       props: {
         loading: this.loading,
-        assignees: this.store.state.assignees,
+        assignees: this.store.state[this.listType],
+        listItemComponent: this.listItemComponent,
       },
       on: {
         onItemSelect: this.handleItemClick,

@@ -19,6 +19,10 @@ export default {
       type: Array,
       required: true,
     },
+    listItemComponent: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -67,6 +71,7 @@ export default {
     <assignees-list-content
       v-if="!loading"
       :assignees="filteredAssignees"
+      :list-item-component="listItemComponent"
       @onItemSelect="handleItemClick"
     />
   </div>

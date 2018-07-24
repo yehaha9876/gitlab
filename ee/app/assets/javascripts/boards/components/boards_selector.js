@@ -4,6 +4,8 @@ import { throttle } from 'underscore';
 import '~/boards/stores/boards_store';
 import BoardForm from './board_form.vue';
 import AssigneesList from './assignees_list';
+import AssigneesListItem from './assignees_list/assignees_list_item.vue';
+import MilestoneListItem from './assignees_list/milestones_list_item.vue';
 
 (() => {
   window.gl = window.gl || {};
@@ -38,6 +40,7 @@ import AssigneesList from './assignees_list';
         loading: true,
         hasScrollFade: false,
         hasAssigneesListMounted: false,
+        hasMilstoneListMounted: false,
         scrollFadeInitialized: false,
         boards: [],
         state: Store.state,
@@ -84,6 +87,7 @@ import AssigneesList from './assignees_list';
     created() {
       this.state.currentBoard = this.currentBoard;
       Store.state.assignees = [];
+      Store.state.milestones = [];
       $('#js-add-list').on('hide.bs.dropdown', this.handleDropdownHide);
       $('.js-new-board-list-tabs').on('click', this.handleDropdownTabClick);
     },
@@ -148,10 +152,23 @@ import AssigneesList from './assignees_list';
             !this.hasAssigneesListMounted) {
           this.assigneeList = new AssigneesList({
             propsData: {
-              listAssigneesPath: $addListEl.find('.js-new-board-list').data('listAssigneesPath'),
+              listPath: $addListEl.find('.js-new-board-list').data('listAssigneesPath'),
+              listType: 'assignees',
+              listItemComponent: AssigneesListItem,
             },
           }).$mount('.js-assignees-list');
           this.hasAssigneesListMounted = true;
+        }
+
+        if (e.target.dataset.action === 'tab-milestones' && !this.hasMilstoneListMounted) {
+          this.milstoneList = new AssigneesList({
+            propsData: {
+              listPath: $addListEl.find('.js-new-board-list').data('listMilestonePath'),
+              listType: 'milestones',
+              listItemComponent: MilestoneListItem,
+            },
+          }).$mount('.js-milestone-list');
+          this.hasMilstoneListMounted = true;
         }
       },
     },

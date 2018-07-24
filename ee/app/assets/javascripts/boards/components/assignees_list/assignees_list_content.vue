@@ -10,6 +10,10 @@ export default {
       type: Array,
       required: true,
     },
+    listItemComponent: {
+      type: Object,
+      required: true,
+    },
   },
   methods: {
     handleItemClick(assignee) {
@@ -22,10 +26,11 @@ export default {
 <template>
   <div class="dropdown-content">
     <ul>
-      <assignees-list-item
+      <component
         v-for="assignee in assignees"
         :key="assignee.id"
-        :assignee="assignee"
+        :list="assignee"
+        :is="listItemComponent"
         @onItemSelect="handleItemClick"
       />
     </ul>
