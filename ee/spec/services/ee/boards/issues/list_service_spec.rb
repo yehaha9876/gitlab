@@ -24,10 +24,12 @@ describe Boards::Issues::ListService, services: true do
     let(:list1)     { create(:list, board: board, label: development, position: 0) }
     let(:list2)     { create(:list, board: board, label: testing, position: 1) }
     let(:closed)    { create(:closed_list, board: board) }
+    let(:milestone_list) { create(:milestone_list, board: board, position: 3) }
 
     let(:opened_issue1) { create(:labeled_issue, project: project, milestone: m1, title: 'Issue 1', labels: [bug]) }
     let(:opened_issue2) { create(:labeled_issue, project: project, milestone: m2, title: 'Issue 2', labels: [p2]) }
     let(:opened_issue3) { create(:labeled_issue, project: project, milestone: m2, title: 'Assigned Issue', labels: [p3]) }
+    let(:milestone_issue) { create(:labeled_issue, project: project, milestone: milestone_list.milestone, labels: [p3]) }
     let(:reopened_issue1) { create(:issue, state: 'opened', project: project, title: 'Issue 3', closed_at: Time.now ) }
 
     let(:list1_issue1) { create(:labeled_issue, project: project, milestone: m1, labels: [p2, development]) }
@@ -47,6 +49,16 @@ describe Boards::Issues::ListService, services: true do
       stub_licensed_features(board_assignee_lists: true)
       parent.add_developer(user)
       opened_issue3.assignees.push(user_list.user)
+    end
+
+    context 'milestone lists' do
+      it 'returns issues from milestone persisted in the list' do
+        params = { board_id: board.id, id: milestone_list.id }
+
+        issues = described_class.new(parent, user, params).execute
+
+        expect(issues).to match_array([milestone_issue])
+      end
     end
 
     context 'when list_id is missing' do

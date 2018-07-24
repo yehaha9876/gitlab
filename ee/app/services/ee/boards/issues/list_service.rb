@@ -6,11 +6,19 @@ module EE
 
         override :filter
         def filter(issues)
-          issues = without_board_assignees(issues) unless list&.movable? || list&.closed?
+          unless list&.movable? || list&.closed?
+            issues = without_assignees_from_lists(issues)
+            issues = without_milestones_from_lists(issues)
+          end
 
-          return super unless list&.assignee?
-
-          with_assignee(super)
+          case list&.list_type
+          when 'assignee'
+            with_assignee(super)
+          when 'milestone'
+            with_milestone(super)
+          else
+            super
+          end
         end
 
         override :issues_label_links
@@ -24,7 +32,7 @@ module EE
 
         private
 
-        def board_assignee_ids
+        def all_lists_assignee_ids
           @board_assignee_ids ||=
             if parent.feature_available?(:board_assignee_lists)
               board.lists.movable.pluck(:user_id).compact
@@ -33,14 +41,30 @@ module EE
             end
         end
 
-        def without_board_assignees(issues)
-          return issues unless board_assignee_ids.any?
+        def all_lists_milestone_ids
+          # TODO: add feature check
+          @board_milestone_ids ||=
+            board.lists.movable.pluck(:milestone_id).compact
+        end
 
-          issues.where.not(id: issues.joins(:assignees).where(users: { id: board_assignee_ids }))
+        def without_assignees_from_lists(issues)
+          return issues if all_lists_assignee_ids.empty?
+
+          issues.where.not(id: issues.joins(:assignees).where(users: { id: all_lists_assignee_ids }))
+        end
+
+        def without_milestones_from_lists(issues)
+          return issues if all_lists_milestone_ids.empty?
+
+          issues.where.not(milestone_id: all_lists_milestone_ids)
         end
 
         def with_assignee(issues)
           issues.assigned_to(list.user)
+        end
+
+        def with_milestone(issues)
+          issues.where(milestone_id: list.milestone_id)
         end
 
         # Prevent filtering by milestone stubs
