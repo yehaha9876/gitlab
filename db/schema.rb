@@ -1534,6 +1534,7 @@ ActiveRecord::Schema.define(version: 20180724161450) do
 
   add_index "lists", ["board_id", "label_id"], name: "index_lists_on_board_id_and_label_id", unique: true, using: :btree
   add_index "lists", ["label_id"], name: "index_lists_on_label_id", using: :btree
+  add_index "lists", ["milestone_id", "board_id"], name: "index_lists_on_milestone_id_and_board_id", unique: true, using: :btree
   add_index "lists", ["user_id"], name: "index_lists_on_user_id", using: :btree
 
   create_table "members", force: :cascade do |t|
@@ -2931,6 +2932,7 @@ ActiveRecord::Schema.define(version: 20180724161450) do
   add_foreign_key "lfs_file_locks", "users", on_delete: :cascade
   add_foreign_key "lists", "boards", name: "fk_0d3f677137", on_delete: :cascade
   add_foreign_key "lists", "labels", name: "fk_7a5553d60f", on_delete: :cascade
+  add_foreign_key "lists", "milestones", on_delete: :cascade
   add_foreign_key "lists", "users", name: "fk_d6cf4279f7", on_delete: :cascade
   add_foreign_key "members", "users", name: "fk_2e88fb7ce9", on_delete: :cascade
   add_foreign_key "merge_request_diff_commits", "merge_request_diffs", on_delete: :cascade
