@@ -19,6 +19,7 @@ class DeleteInconsistentInternalIdRecords < ActiveRecord::Migration
     delete_internal_id_records('deployments', 'project_id')
     delete_internal_id_records('milestones', 'project_id')
     delete_internal_id_records('milestones', 'namespace_id', 'group_id')
+    delete_internal_id_records('epics', 'namespace_id', 'group_id')
     delete_internal_id_records('ci_pipelines', 'project_id')
   end
 

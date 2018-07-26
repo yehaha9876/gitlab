@@ -89,7 +89,7 @@ describe DeleteInconsistentInternalIdRecords, :migration do
   end
 
   context 'for milestones (by group)' do
-    # milestones (by group) is a little different than all of the other models
+    # milestones (by group) is a little different than most of the other models
     let!(:group1) { create(:group) }
     let!(:group2) { create(:group) }
     let!(:group3) { create(:group) }
@@ -119,6 +119,45 @@ describe DeleteInconsistentInternalIdRecords, :migration do
     end
 
     it "retains consistent issues" do
+      expect { migrate! }.not_to change { internal_id_query.call(group2).size }
+    end
+
+    it "retains consistent records, especially those with a greater last_value" do
+      expect { migrate! }.not_to change { internal_id_query.call(group3).size }
+    end
+  end
+
+  context 'for milestones (by group)' do
+    # epics (by group) is a little different than most of the other models
+    let!(:group1) { create(:group) }
+    let!(:group2) { create(:group) }
+    let!(:group3) { create(:group) }
+
+    let(:internal_id_query) { ->(group) { InternalId.where(usage: InternalId.usages['epics'], namespace: group) } }
+
+    before do
+      at_least_times(3) { create(:epic, group: group1) }
+      at_least_times(3) { create(:epic, group: group2) }
+      at_least_times(3) { create(:epic, group: group3) }
+
+      internal_id_query.call(group1).first.tap do |iid|
+        iid.last_value = iid.last_value - 2
+        # This is an inconsistent record
+        iid.save!
+      end
+
+      internal_id_query.call(group3).first.tap do |iid|
+        iid.last_value = iid.last_value + 2
+        # This is a consistent record
+        iid.save!
+      end
+    end
+
+    it "deletes inconsistent records" do
+      expect { migrate! }.to change { internal_id_query.call(group1).size }.from(1).to(0)
+    end
+
+    it "retains consistent records" do
       expect { migrate! }.not_to change { internal_id_query.call(group2).size }
     end
 
