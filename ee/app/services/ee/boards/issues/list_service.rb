@@ -42,9 +42,12 @@ module EE
         end
 
         def all_lists_milestone_ids
-          # TODO: add feature check
           @board_milestone_ids ||=
-            board.lists.movable.pluck(:milestone_id).compact
+            if parent.feature_available?(:board_milestone_lists)
+              board.lists.movable.pluck(:milestone_id).compact
+            else
+              []
+            end
         end
 
         def without_assignees_from_lists(issues)

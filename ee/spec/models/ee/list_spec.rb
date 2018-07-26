@@ -36,6 +36,14 @@ describe List do
 
     describe 'validations' do
       it { is_expected.to validate_presence_of(:milestone) }
+
+      it 'is invalid when feature is not available' do
+        stub_licensed_features(board_milestone_lists: false)
+
+        expect(subject).to be_invalid
+        expect(subject.errors[:list_type])
+          .to contain_exactly('Milestone lists not available with your current license')
+      end
     end
 
     describe '#title' do

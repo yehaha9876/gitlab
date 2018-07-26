@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Boards::Issues::ListService, services: true do
+  # TODO: refactor tests
   describe '#execute' do
     let(:user)    { create(:user) }
     let(:group) { create(:group) }
@@ -20,11 +21,11 @@ describe Boards::Issues::ListService, services: true do
     let(:p3) { create(:group_label, title: 'P3', group: group) }
 
     let(:user_list) { create(:user_list, board: board, position: 2) }
+    let(:milestone_list) { create(:milestone_list, board: board, position: 3) }
     let(:backlog)   { create(:backlog_list, board: board) }
     let(:list1)     { create(:list, board: board, label: development, position: 0) }
     let(:list2)     { create(:list, board: board, label: testing, position: 1) }
     let(:closed)    { create(:closed_list, board: board) }
-    let(:milestone_list) { create(:milestone_list, board: board, position: 3) }
 
     let(:opened_issue1) { create(:labeled_issue, project: project, milestone: m1, title: 'Issue 1', labels: [bug]) }
     let(:opened_issue2) { create(:labeled_issue, project: project, milestone: m2, title: 'Issue 2', labels: [p2]) }
@@ -46,7 +47,8 @@ describe Boards::Issues::ListService, services: true do
     let(:parent) { group }
 
     before do
-      stub_licensed_features(board_assignee_lists: true)
+      stub_licensed_features(board_assignee_lists: true, board_milestone_lists: true)
+
       parent.add_developer(user)
       opened_issue3.assignees.push(user_list.user)
     end

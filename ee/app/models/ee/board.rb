@@ -45,6 +45,14 @@ module EE
       end
     end
 
+    def assignee_lists_available?
+      parent&.feature_available?(:board_assignee_lists)
+    end
+
+    def milestone_lists_available?
+      parent&.feature_available?(:board_milestone_lists)
+    end
+
     def as_json(options = {})
       milestone_attrs = options.fetch(:include, {})
                           .extract!(:milestone)
