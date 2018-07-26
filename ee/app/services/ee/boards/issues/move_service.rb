@@ -38,8 +38,11 @@ module EE
         end
 
         def milestone_id(issue)
+          # We want to nullify the issue milestone.
           return if moving_to_list.backlog?
 
+          # Moving to a list which is not a 'milestone list' will keep
+          # the already existent milestone.
           [issue.milestone_id, moving_to_list.milestone_id].compact.last
         end
 

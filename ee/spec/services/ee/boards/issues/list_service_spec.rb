@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Boards::Issues::ListService, services: true do
-  # TODO: refactor tests
   describe '#execute' do
     let(:user)    { create(:user) }
     let(:group) { create(:group) }
@@ -64,7 +63,7 @@ describe Boards::Issues::ListService, services: true do
     end
 
     context 'when list_id is missing' do
-      context 'when board does not have a milestone' do
+      context 'when board is not scoped by milestone' do
         it 'returns opened issues without board labels and assignees applied' do
           params = { board_id: board.id }
 
@@ -74,14 +73,15 @@ describe Boards::Issues::ListService, services: true do
         end
       end
 
-      context 'when board have a milestone' do
+      context 'when board is scoped by milestone' do
         it 'returns opened issues without board labels, assignees, or milestone applied' do
           params = { board_id: board.id }
           board.update_attribute(:milestone, m1)
 
           issues = described_class.new(parent, user, params).execute
 
-          expect(issues).to match_array([opened_issue2, list1_issue2, reopened_issue1, opened_issue1])
+          expect(issues)
+            .to match_array([opened_issue2, list1_issue2, reopened_issue1, opened_issue1])
         end
 
         context 'when milestone is predefined' do

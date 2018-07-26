@@ -7,19 +7,23 @@ module EE
         override :execute
         def execute(board)
           not_available_lists =
-            list_type_features_availability(board).select { |type, available| !available }
+            list_type_features_availability(board).select { |_, available| !available }
 
-          return super if not_available_lists.empty?
-
-          super.where.not(list_type: not_available_lists.keys)
+          if not_available_lists.any?
+            super.where.not(list_type: not_available_lists.keys)
+          else
+            super
+          end
         end
 
         private
 
         def list_type_features_availability(board)
+          parent = board.parent
+
           {
-            ::List.list_types[:assignee] => board.assignee_lists_available?,
-            ::List.list_types[:milestone] => board.milestone_lists_available?
+            ::List.list_types[:assignee] => parent&.feature_available?(:board_assignee_lists),
+            ::List.list_types[:milestone] => parent&.feature_available?(:board_milestone_lists)
           }
         end
       end

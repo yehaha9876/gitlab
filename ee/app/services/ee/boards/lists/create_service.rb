@@ -6,10 +6,15 @@ module EE
 
         override :type
         def type
-          return :assignee if params.keys.include?('assignee_id')
-          return :milestone if params.keys.include?('milestone_id')
-
-          super
+          # We don't ever expect to have more than one list
+          # type param at once.
+          if params.key?('assignee_id')
+            :assignee
+          elsif params.key?('milestone_id')
+            :milestone
+          else
+            super
+          end
         end
 
         override :target
@@ -27,7 +32,8 @@ module EE
         end
 
         def find_milestone(board)
-          milestone_finder(board).execute.find(params['milestone_id'])
+          milestones = milestone_finder(board).execute
+          milestones.find(params['milestone_id'])
         end
 
         def find_user(board)

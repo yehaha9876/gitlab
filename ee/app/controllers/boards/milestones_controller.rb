@@ -1,13 +1,9 @@
 module Boards
   class MilestonesController < Boards::ApplicationController
     def index
-      render json: MilestoneSerializer.new.represent(finder.execute)
-    end
+      milestones_finder = Boards::MilestonesFinder.new(board, current_user)
 
-    private
-
-    def finder
-      Boards::MilestonesFinder.new(board, current_user)
+      render json: MilestoneSerializer.new.represent(milestones_finder.execute)
     end
   end
 end

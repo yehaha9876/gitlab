@@ -29,12 +29,12 @@ module EE
 
     override :destroyable?
     def destroyable?
-      self.class.destroyable_types.include?(list_type&.to_sym) || super
+      self.class.destroyable_types.include?(list_type.to_sym) || super
     end
 
     override :movable?
     def movable?
-      self.class.movable_types.include?(list_type&.to_sym) || super
+      self.class.movable_types.include?(list_type.to_sym) || super
     end
 
     override :title
