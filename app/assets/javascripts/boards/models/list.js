@@ -3,6 +3,7 @@
 
 import ListLabel from '~/vue_shared/models/label';
 import ListAssignee from '~/vue_shared/models/assignee';
+import ListMilestone from '~/vue_shared/models/milestone'
 import queryData from '../utils/query_data';
 
 const PER_PAGE = 20;
@@ -49,6 +50,9 @@ class List {
     } else if (obj.user) {
       this.assignee = new ListAssignee(obj.user);
       this.title = this.assignee.name;
+    } else if (obj.milestone) {
+      this.milestone = new ListMilestone(obj.milestone);
+      this.title = this.milestone.title;
     }
 
     if (!typeInfo.isBlank && this.id) {
@@ -67,12 +71,14 @@ class List {
   }
 
   save() {
-    const entity = this.label || this.assignee;
+    const entity = this.label || this.assignee || this.milestone;
     let entityType = '';
     if (this.label) {
       entityType = 'label_id';
-    } else {
+    } else if (this.label) {
       entityType = 'assignee_id';
+    } else if (this.milestone) {
+      entityType = 'milestone_id';
     }
 
     return gl.boardService
