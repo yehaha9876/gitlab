@@ -15,6 +15,7 @@ module EE
       base.validates :user, presence: true, if: :assignee?
       base.validates :milestone, presence: true, if: :milestone?
       base.validates :user_id, uniqueness: { scope: :board_id }, if: :assignee?
+      base.validates :milestone_id, uniqueness: { scope: :board_id }, if: :milestone?
       base.validates :list_type,
         exclusion: { in: %w[assignee], message: _('Assignee lists not available with your current license') },
         unless: -> { board&.parent&.feature_available?(:board_assignee_lists) }
@@ -29,12 +30,12 @@ module EE
 
     override :destroyable?
     def destroyable?
-      self.class.destroyable_types.include?(list_type.to_sym) || super
+      self.class.destroyable_types.include?(list_type&.to_sym) || super
     end
 
     override :movable?
     def movable?
-      self.class.movable_types.include?(list_type.to_sym) || super
+      self.class.movable_types.include?(list_type&.to_sym) || super
     end
 
     override :title
