@@ -1,5 +1,20 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.1.2 (2018-07-26)
+
+### Security (1 change)
+
+- Don't expose project names in EE counters.
+
+
+## 11.1.1 (2018-07-23)
+
+### Fixed (2 changes)
+
+- Fix geo download service ImportExportDownloader unitialized constant. !6567
+- Geo - Allow repository verification to be disabled on a secondary node. !6599
+
+
 ## 11.1.0 (2018-07-22)
 
 ### Removed (1 change)
@@ -65,6 +80,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 - Enable Geo snapshot synchronization for everyone. !6286
 - Geo - Make Geo repository verification flag opt-out by default. !6369
+
+
+## 11.0.5 (2018-07-26)
+
+### Security (1 change)
+
+- Don't expose project names in EE counters.
 
 
 ## 11.0.4 (2018-07-17)
