@@ -189,7 +189,7 @@ export default class VariableList {
             },
             minLength: 0,
             displayKey: suggestion =>
-              suggestion.title === ALL_ENVIRONMENTS_STRING ? '*' : _.escape(suggestion.text),
+              (suggestion.title === ALL_ENVIRONMENTS_STRING ? '*' : _.escape(suggestion.text)),
           },
         ],
       );
@@ -283,7 +283,28 @@ export default class VariableList {
     const valueMap = this.$container
       .find(this.inputMap.environment_scope.selector)
       .toArray()
-      .filter(input => input.value)
+      .filter(input => input.value) // Removing inputs with no value
+      .reduce( // Removing inputs with duplicate values
+        (inputList, input) => {
+          const currentList = [...inputList];
+          const currentValue = input.value;
+          const valueIsPresent = testInput => testInput.value === currentValue;
+
+          if (document.activeElement === input) {
+            const index = currentList.findIndex(valueIsPresent);
+            if (index !== -1) {
+              currentList[index] = input;
+            } else {
+              currentList.push(input);
+            }
+          } else if (!currentList.some(valueIsPresent)) {
+            currentList.push(input);
+          }
+
+          return currentList;
+        },
+        [],
+      )
       .reduce(
         (prevValueMap, envInput) => ({
           ...prevValueMap,
