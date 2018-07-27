@@ -17,6 +17,7 @@ class ListIssue {
     this.subscribed = obj.subscribed;
     this.labels = [];
     this.assignees = [];
+    this.milestones = [];
     this.selected = false;
     this.position = obj.relative_position || Infinity;
     this.isFetching = {
@@ -83,6 +84,22 @@ class ListIssue {
 
   removeAllAssignees () {
     this.assignees = [];
+  }
+
+  addMilestone (milestone) {
+    if (!this.findMilestone(milestone)) {
+      this.milestones.push(new ListMilestone(milestone));
+    }
+  }
+
+  findMilestone (findMilestone) {
+    return this.milestones.filter(milestone => milestone.id === findMilestone.id)[0];
+  }
+
+  removeMilestone (removeMilestone) {
+    if (removeMilestone) {
+      this.milestones = this.milestones.filter(milestone => milestone.id !== removeMilestone.id);
+    }
   }
 
   getLists () {

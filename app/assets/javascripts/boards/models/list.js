@@ -3,7 +3,7 @@
 
 import ListLabel from '~/vue_shared/models/label';
 import ListAssignee from '~/vue_shared/models/assignee';
-import ListMilestone from '~/vue_shared/models/milestone'
+import ListMilestone from '~/vue_shared/models/milestone';
 import queryData from '../utils/query_data';
 
 const PER_PAGE = 20;
@@ -189,6 +189,13 @@ class List {
           issue.removeAssignee(listFrom.assignee);
         }
         issue.addAssignee(this.assignee);
+      }
+
+      if (this.milestone) {
+        if (listFrom && listFrom.type === 'milestone') {
+          issue.removeMilestone(listFrom.milestone);
+        }
+        issue.addMilestone(this.milestone);
       }
 
       if (listFrom) {
