@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import _ from 'underscore';
 import 'autocomplete.js/index_jquery';
 import fuzzaldrinPlus from 'fuzzaldrin-plus';
 import { convertPermissionToBoolean } from '../lib/utils/common_utils';
@@ -22,7 +23,7 @@ function createEnvironmentItem(value) {
 }
 
 function wrapHint(suggestion, text) {
-  return (suggestion.hint) ? `"${text}"` : text;
+  return suggestion.hint ? `"${text}"` : text;
 }
 
 export default class VariableList {
@@ -70,7 +71,10 @@ export default class VariableList {
   }
 
   init() {
-    this.$rowClone = this.$container.find('.js-row').last().clone();
+    this.$rowClone = this.$container
+      .find('.js-row')
+      .last()
+      .clone();
     this.bindEvents();
     this.secretValues.init();
   }
@@ -90,7 +94,7 @@ export default class VariableList {
       .join(',');
 
     // Remove any empty rows except the last row
-    this.$container.on('blur', inputSelector, (e) => {
+    this.$container.on('blur', inputSelector, e => {
       const $row = $(e.currentTarget).closest('.js-row');
 
       if ($row.is(':not(:last-child)') && !this.checkIfRowTouched($row)) {
@@ -108,21 +112,25 @@ export default class VariableList {
     });
 
     // Always ensure only one dropdown is open
-    this.$container.on('autocomplete:opened autocomplete:updated', inputSelector, (e) => {
-      $(this.inputMap.environment_scope.selector).not($(e.target)).each((index, $el) => {
-        $($el).autocomplete('close');
-      });
+    this.$container.on('autocomplete:opened autocomplete:updated', inputSelector, e => {
+      $(this.inputMap.environment_scope.selector)
+        .not($(e.target))
+        .each((index, $el) => {
+          $($el).autocomplete('close');
+        });
     });
 
     // Ensure content stays the same when cycling through options
-    this.$container.on('autocomplete:cursorchanged', inputSelector, (e) => {
+    this.$container.on('autocomplete:cursorchanged', inputSelector, e => {
       $(e.target).val($(e.target).autocomplete('val'));
     });
 
     // Refresh dropdown when opened
-    this.$container.on('autocomplete:opened', inputSelector, (e) => {
+    this.$container.on('autocomplete:opened', inputSelector, e => {
       const val = $(e.target).autocomplete('val');
-      $(e.target).autocomplete('val', '').autocomplete('val', val);
+      $(e.target)
+        .autocomplete('val', '')
+        .autocomplete('val', val);
     });
   }
 
@@ -139,41 +147,52 @@ export default class VariableList {
       const dropdownTrigger = $row.find(this.inputMap.environment_scope.selector);
       let searchTerm = '';
 
-      $(dropdownTrigger).autocomplete({
-        hint: false,
-        minLength: 0,
-        autoselect: false,
-        autoselectOnBlur: false,
-        openOnFocus: true,
-        templates: {
-          header: `<span class="dropdown-header ci-variable-environment-help-text">
+      $(dropdownTrigger).autocomplete(
+        {
+          hint: false,
+          minLength: 0,
+          autoselect: false,
+          autoselectOnBlur: false,
+          openOnFocus: true,
+          templates: {
+            header: `<span class="dropdown-header ci-variable-environment-help-text">
                 Enter scope (wildcards allowed) or select a past value. <a target="_blank" rel="noopener noreferrer" href="${SCOPE_DOC_LINK}">Learn more</a></span>`,
+          },
+          cssClasses: {
+            root: 'dropdown',
+            cursor: 'active',
+            noPrefix: true,
+            dropdownMenu: 'dropdown-menu',
+            suggestions: 'dropdown-content',
+            suggestion: 'dropdown-item',
+          },
         },
-        cssClasses: {
-          root: 'dropdown',
-          cursor: 'active',
-          noPrefix: true,
-          dropdownMenu: 'dropdown-menu',
-          suggestions: 'dropdown-content',
-          suggestion: 'dropdown-item',
-        },
-      }, [{
-        source: (q, cb) => {
-          searchTerm = q;
-          if (!q || q === '*') {
-            const results = this.getEnvironmentValues();
-            if (!results.some((item) => item.id === '*')) results.push(createEnvironmentItem('*'));
-            return cb(results);
-          }
+        [
+          {
+            source: (q, cb) => {
+              searchTerm = q;
+              if (!q || q === '*') {
+                const results = this.getEnvironmentValues();
+                if (!results.some(item => item.id === '*'))
+                  results.push(createEnvironmentItem('*'));
+                return cb(results);
+              }
 
-          return cb(fuzzaldrinPlus.filter(this.getEnvironmentValues(), q, { key: 'text' }));
-        },
-        templates: {
-          suggestion: item => `<span class="menu-item" role="button">${wrapHint(item, VariableList.highlightTextMatches(item.text, searchTerm))}</span>`,
-        },
-        minLength: 0,
-        displayKey: suggestion => ((suggestion.title === ALL_ENVIRONMENTS_STRING) ? '*' : suggestion.text),
-      }]);
+              return cb(fuzzaldrinPlus.filter(this.getEnvironmentValues(), q, { key: 'text' }));
+            },
+            templates: {
+              suggestion: item =>
+                `<span class="menu-item" role="button">${wrapHint(
+                  item,
+                  VariableList.highlightTextMatches(_.escape(item.text), searchTerm),
+                )}</span>`,
+            },
+            minLength: 0,
+            displayKey: suggestion =>
+              suggestion.title === ALL_ENVIRONMENTS_STRING ? '*' : _.escape(suggestion.text),
+          },
+        ],
+      );
 
       this.environmentDropdownMap.set($row[0], $(dropdownTrigger));
     }
@@ -182,7 +201,11 @@ export default class VariableList {
   static highlightTextMatches(text, term) {
     const occurrences = fuzzaldrinPlus.match(text, term);
     const { indexOf } = [];
-    return [...text].map((character, i) => ((indexOf.call(occurrences, i) !== -1) ? `<b>${character}</b>` : character)).join('');
+    return [...text]
+      .map(
+        (character, i) => (indexOf.call(occurrences, i) !== -1 ? `<b>${character}</b>` : character),
+      )
+      .join('');
   }
 
   insertRow($row) {
@@ -264,11 +287,16 @@ export default class VariableList {
       .reduce(
         (prevValueMap, envInput) => ({
           ...prevValueMap,
-          [envInput.value]: (envInput.value !== '*' && document.activeElement === envInput) ? `"${envInput.value}"` : envInput.value,
+          [envInput.value]:
+            envInput.value !== '*' && document.activeElement === envInput
+              ? `"${envInput.value}"`
+              : envInput.value,
         }),
         {},
       );
 
-    return Object.values(valueMap).map(createEnvironmentItem).reverse();
+    return Object.values(valueMap)
+      .map(createEnvironmentItem)
+      .reverse();
   }
 }
