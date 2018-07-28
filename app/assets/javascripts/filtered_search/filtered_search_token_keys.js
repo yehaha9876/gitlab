@@ -13,6 +13,13 @@ const tokenKeys = [{
   icon: 'user',
   tag: '@assignee',
 }, {
+  key: 'approver',
+  type: 'string',
+  param: 'username',
+  symbol: '@',
+  icon: 'check',
+  tag: '@approver',
+}, {
   key: 'milestone',
   type: 'string',
   param: 'title',
@@ -52,6 +59,10 @@ const tokenKeysWithAlternative = tokenKeys.concat(alternativeTokenKeys);
 const conditions = [{
   url: 'assignee_id=0',
   tokenKey: 'assignee',
+  value: 'none',
+}, {
+  url: 'approver_id=0',
+  tokenKey: 'approver',
   value: 'none',
 }, {
   url: 'milestone_title=No+Milestone',

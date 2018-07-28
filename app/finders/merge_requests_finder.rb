@@ -12,6 +12,7 @@
 #     milestone_title: string
 #     author_id: integer
 #     assignee_id: integer
+#     approver_id: integer
 #     search: string
 #     label_name: string
 #     sort: string
@@ -31,6 +32,7 @@ class MergeRequestsFinder < IssuableFinder
 
   def filter_items(_items)
     items = by_source_branch(super)
+    items = by_approver(items)
 
     by_target_branch(items)
   end
@@ -47,6 +49,47 @@ class MergeRequestsFinder < IssuableFinder
     end
 
     items
+  end
+
+  def by_approver(items)
+    if approvers.any?
+      approvers.each do |approver|
+        items = items.can_approve(approver)
+      end
+
+      items
+    elsif no_approver?
+      items.without_approvers
+    elsif approver_id? || approver_username? # approver not found
+      items.none
+    else
+      items
+    end
+  end
+
+  def approvers
+    return @approvers if defined?(@approvers)
+    @approvers =
+      if params[:approver_ids]
+        User.where(id: params[:approver_ids])
+      elsif params[:approver_username]
+        User.where(username: params[:approver_username])
+      else
+        []
+      end
+  end
+
+  def approver_id?
+    params[:approver_id].present? && params[:approver_id] != NONE
+  end
+
+  def approver_username?
+    params[:approver_username].present? && params[:approver_username] != NONE
+  end
+
+  def no_approver?
+    # Approver_id takes precedence over approver_username
+    params[:approver_id] == NONE || params[:approver_username] == NONE
   end
 
   def source_branch

@@ -5,6 +5,7 @@ class DashboardController < Dashboard::ApplicationController
   FILTER_PARAMS = [
     :author_id,
     :assignee_id,
+    :approver_id,
     :milestone_title,
     :weight,
     :label_name

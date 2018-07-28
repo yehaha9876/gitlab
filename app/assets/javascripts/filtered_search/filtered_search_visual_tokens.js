@@ -171,7 +171,7 @@ export default class FilteredSearchVisualTokens {
     const tokenType = tokenName.toLowerCase();
     if (tokenType === 'label') {
       FilteredSearchVisualTokens.updateLabelTokenColor(tokenValueContainer, tokenValue);
-    } else if ((tokenType === 'author') || (tokenType === 'assignee')) {
+    } else if ((tokenType === 'author') || (tokenType === 'assignee') || (tokenType === 'approver')) {
       FilteredSearchVisualTokens.updateUserTokenAppearance(
         tokenValueContainer, tokenValueElement, tokenValue,
       );

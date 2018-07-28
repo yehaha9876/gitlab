@@ -40,6 +40,8 @@ class IssuableFinder
     @scalar_params ||= %i[
       assignee_id
       assignee_username
+      approver_id
+      approver_username
       author_id
       author_username
       authorized_only
