@@ -135,8 +135,8 @@ gem 'unf', '~> 0.1.4'
 gem 'seed-fu', '~> 2.3.7'
 
 # Search
-gem 'elasticsearch-model', '~> 0.1.9'
-gem 'elasticsearch-rails', '~> 0.1.9'
+gem 'elasticsearch-model', '~> 5.0.2'
+gem 'elasticsearch-rails', '~> 5.0.2'
 gem 'elasticsearch-api',   '5.0.3'
 gem 'aws-sdk'
 gem 'faraday_middleware-aws-signers-v4'
