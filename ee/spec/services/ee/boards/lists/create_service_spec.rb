@@ -42,9 +42,6 @@ describe Boards::Lists::CreateService do
         expect(list.list_type).to eq('milestone')
         expect(list).to be_valid
       end
-
-      xit 'does not create a milestone list when feature is disabled' do
-      end
     end
   end
 end

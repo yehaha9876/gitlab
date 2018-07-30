@@ -32,31 +32,34 @@ module EE
 
         private
 
-        def all_lists_assignee_ids
-          @board_assignee_ids ||=
-            if parent.feature_available?(:board_assignee_lists)
-              board.lists.movable.pluck(:user_id).compact
-            else
-              []
-            end
+        def all_assignee_lists
+          if parent.feature_available?(:board_assignee_lists)
+            board.lists.assignee.where.not(user_id: nil)
+          else
+            ::List.none
+          end
         end
 
-        def all_lists_milestone_ids
-          # TODO: add feature check
-          @board_milestone_ids ||=
-            board.lists.movable.pluck(:milestone_id).compact
+        def all_milestone_lists
+          if parent.feature_available?(:board_milestone_lists)
+            board.lists.milestone.where.not(milestone_id: nil)
+          else
+            ::List.none
+          end
         end
 
         def without_assignees_from_lists(issues)
-          return issues if all_lists_assignee_ids.empty?
+          return issues if all_assignee_lists.empty?
 
-          issues.where.not(id: issues.joins(:assignees).where(users: { id: all_lists_assignee_ids }))
+          issues
+            .where.not(id: issues.joins(:assignees)
+            .where(users: { id: all_assignee_lists.select(:user_id) }))
         end
 
         def without_milestones_from_lists(issues)
-          return issues if all_lists_milestone_ids.empty?
+          return issues if all_milestone_lists.empty?
 
-          issues.where.not(milestone_id: all_lists_milestone_ids)
+          issues.where.not(milestone_id: all_milestone_lists.select(:milestone_id))
         end
 
         def with_assignee(issues)

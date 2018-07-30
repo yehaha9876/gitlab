@@ -44,8 +44,8 @@ describe Boards::Issues::MoveService, services: true do
     context 'from milestone to label list' do
       let!(:issue) do
         create(:labeled_issue, project: project,
-               milestone: milestone_list1.milestone,
-               labels: [bug, development])
+                               milestone: milestone_list1.milestone,
+                               labels: [bug, development])
       end
 
       it 'adds labels and keep milestone' do
@@ -202,7 +202,7 @@ describe Boards::Issues::MoveService, services: true do
       let(:regression) { create(:label, project: project, name: 'Regression') }
 
       before do
-        stub_licensed_features(board_assignee_lists: true)
+        stub_licensed_features(board_assignee_lists: true, board_milestone_lists: true)
         parent.add_developer(user)
         parent.add_developer(user_list1.user)
       end
@@ -225,7 +225,7 @@ describe Boards::Issues::MoveService, services: true do
       let(:regression) { create(:group_label, group: group, name: 'Regression') }
 
       before do
-        stub_licensed_features(board_assignee_lists: true)
+        stub_licensed_features(board_assignee_lists: true, board_milestone_lists: true)
         parent.add_developer(user)
         parent.add_developer(user_list1.user)
       end
