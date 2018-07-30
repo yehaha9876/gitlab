@@ -69,6 +69,7 @@ class MergeRequestsFinder < IssuableFinder
 
   def approvers
     return @approvers if defined?(@approvers)
+
     @approvers =
       if params[:approver_ids]
         User.where(id: params[:approver_ids])

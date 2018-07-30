@@ -171,8 +171,8 @@ class MergeRequest < ActiveRecord::Base
   scope :unassigned, -> { where("assignee_id IS NULL") }
   scope :assigned_to, ->(u) { where(assignee_id: u.id)}
 
-  scope :without_approvers, -> { includes(:approvers).where({ approvers: { user_id: nil }}) }
-  scope :can_approve, ->(u) { includes(:approvers).where({ approvers: { user_id: u.id }}) }
+  scope :without_approvers, -> { includes(:approvers).where({ approvers: { user_id: nil } }) }
+  scope :can_approve, ->(u) { includes(:approvers).where({ approvers: { user_id: u.id } }) }
 
   participant :assignee
 
