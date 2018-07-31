@@ -17,7 +17,9 @@ module Gitlab
         end
 
         def config_map_name
-          ::Gitlab::Kubernetes::ConfigMap.new(name).config_map_name
+          # TODO we are only interested in ConfigMap#config_map_name which does
+          # not need files, so pass in an empty list for now.
+          ::Gitlab::Kubernetes::ConfigMap.new(name, {}).config_map_name
         end
       end
     end
