@@ -1535,6 +1535,7 @@ ActiveRecord::Schema.define(version: 20180724161450) do
 
   add_index "lists", ["board_id", "label_id"], name: "index_lists_on_board_id_and_label_id", unique: true, using: :btree
   add_index "lists", ["label_id"], name: "index_lists_on_label_id", using: :btree
+  add_index "lists", ["milestone_id"], name: "index_lists_on_milestone_id", using: :btree
   add_index "lists", ["user_id"], name: "index_lists_on_user_id", using: :btree
 
   create_table "members", force: :cascade do |t|
