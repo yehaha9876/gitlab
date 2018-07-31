@@ -971,6 +971,7 @@ module API
     class List < Grape::Entity
       expose :id
       expose :label, using: Entities::LabelBasic
+      expose :milestone, using: Entities::Milestone, if: -> (entity, _) { entity.milestone? }
       expose :position
     end
 

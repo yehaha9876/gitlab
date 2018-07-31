@@ -34,6 +34,32 @@ module EE
             end
           end
 
+          def create_list_params
+            params.slice(:label_id, :milestone_id)
+          end
+
+          # Overrides API::BoardsResponses authorize_list_type_resource!
+          def authorize_list_type_resource!
+            if params[:label_id] && !available_labels_for(board_parent).exists?(params[:label_id])
+              render_api_error!({ error: 'Label not found!' }, 400)
+            end
+
+            if milestone_id = params[:milestone_id]
+              finder = ::Boards::MilestonesFinder.new(board, current_user)
+
+              unless finder.execute.find_by(id: milestone_id)
+                render_api_error!({ error: 'Milestone not found!' }, 400)
+              end
+            end
+          end
+
+          # Overrides API::BoardsResponses list_creation_params
+          params :list_creation_params do
+            optional :label_id, type: Integer, desc: 'The ID of an existing label'
+            optional :milestone_id, type: Integer, desc: 'The ID of an existing milestone'
+            at_least_one_of :label_id, :milestone_id
+          end
+
           params :update_params do
             optional :name, type: String, desc: 'The board name'
             optional :assignee_id, type: Integer, desc: 'The ID of a user to associate with board'
