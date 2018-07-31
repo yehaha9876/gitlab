@@ -32,6 +32,7 @@ describe MergeRequestWidgetEntity do
 
     allow(merge_request).to receive_messages(
       expose_codeclimate_data?: true,
+      expose_security_dashboard?: false,
       base_codeclimate_artifact: build,
       head_codeclimate_artifact: build
     )
@@ -44,6 +45,7 @@ describe MergeRequestWidgetEntity do
 
     allow(merge_request).to receive_messages(
       expose_code_quality_data?: true,
+      expose_security_dashboard?: false,
       base_code_quality_artifact: build,
       head_code_quality_artifact: build
     )
@@ -60,6 +62,7 @@ describe MergeRequestWidgetEntity do
 
     allow(merge_request).to receive_messages(
       expose_performance_data?: true,
+      expose_security_dashboard?: false,
       base_performance_artifact: build,
       head_performance_artifact: build
     )
@@ -72,6 +75,7 @@ describe MergeRequestWidgetEntity do
 
     allow(merge_request).to receive_messages(
       expose_sast_data?: true,
+      expose_security_dashboard?: true,
       base_has_sast_data?: true,
       base_sast_artifact: build,
       head_sast_artifact: build
@@ -87,6 +91,7 @@ describe MergeRequestWidgetEntity do
 
     allow(merge_request).to receive_messages(
       expose_dependency_scanning_data?: true,
+      expose_security_dashboard?: true,
       base_has_dependency_scanning_data?: true,
       base_dependency_scanning_artifact: build,
       head_dependency_scanning_artifact: build
@@ -102,6 +107,7 @@ describe MergeRequestWidgetEntity do
 
     allow(merge_request).to receive_messages(
       expose_license_management_data?: true,
+      expose_security_dashboard?: false,
       base_has_license_management_data?: true,
       base_license_management_artifact: build,
       head_license_management_artifact: build
@@ -110,6 +116,8 @@ describe MergeRequestWidgetEntity do
     expect(subject.as_json).to include(:license_management)
     expect(subject.as_json[:license_management]).to include(:head_path)
     expect(subject.as_json[:license_management]).to include(:base_path)
+    expect(subject.as_json[:license_management]).to include(:managed_licenses_path)
+    expect(subject.as_json[:license_management]).to include(:can_manage_licenses)
   end
 
   # methods for old artifact are deprecated and replaced with ones for the new name (#5779)
@@ -118,6 +126,7 @@ describe MergeRequestWidgetEntity do
 
     allow(merge_request).to receive_messages(
       expose_sast_container_data?: true,
+      expose_security_dashboard?: true,
       base_has_sast_container_data?: true,
       base_sast_container_artifact: build,
       head_sast_container_artifact: build
@@ -133,6 +142,7 @@ describe MergeRequestWidgetEntity do
 
     allow(merge_request).to receive_messages(
       expose_container_scanning_data?: true,
+      expose_security_dashboard?: true,
       base_has_container_scanning_data?: true,
       base_container_scanning_artifact: build,
       head_container_scanning_artifact: build
@@ -148,6 +158,7 @@ describe MergeRequestWidgetEntity do
 
     allow(merge_request).to receive_messages(
       expose_dast_data?: true,
+      expose_security_dashboard?: true,
       base_has_dast_data?: true,
       base_dast_artifact: build,
       head_dast_artifact: build
