@@ -4,7 +4,7 @@ describe Clusters::Applications::PrometheusUpdateService do
   describe '#execute' do
     let(:project) { create(:project) }
     let(:environment) { create(:environment, project: project) }
-    let(:cluster) { create(:cluster, projects: [project]) }
+    let(:cluster) { create(:cluster, :with_installed_helm, projects: [project]) }
     let(:application) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
     let!(:get_command_values) { OpenStruct.new(data: OpenStruct.new(values: application.values)) }
     let!(:upgrade_command) { application.upgrade_command("") }

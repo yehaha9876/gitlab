@@ -35,11 +35,13 @@ module EE
         end
 
         def upgrade_command(values)
+          files_with_updated_values = { 'values.yaml': values }
+
           ::Gitlab::Kubernetes::Helm::UpgradeCommand.new(
             name,
             chart: chart,
             version: version,
-            values: values
+            files: files_with_updated_values
           )
         end
       end

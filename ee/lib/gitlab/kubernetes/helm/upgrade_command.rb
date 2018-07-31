@@ -6,13 +6,13 @@ module Gitlab
       class UpgradeCommand
         include BaseCommand
 
-        attr_reader :name, :chart, :version, :repository, :values
+        attr_reader :name, :chart, :version, :repository, :files
 
-        def initialize(name, chart:, values:, version: nil, repository: nil)
+        def initialize(name, chart:, files:, version: nil, repository: nil)
           @name = name
           @chart = chart
           @version = version
-          @values = values
+          @files = files
           @repository = repository
         end
 
@@ -26,10 +26,6 @@ module Gitlab
 
         def config_map?
           true
-        end
-
-        def config_map_resource
-          ::Gitlab::Kubernetes::ConfigMap.new(name, values).generate
         end
 
         def pod_name

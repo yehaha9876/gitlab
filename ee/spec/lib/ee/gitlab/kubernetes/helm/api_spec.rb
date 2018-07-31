@@ -37,7 +37,7 @@ describe Gitlab::Kubernetes::Helm::Api do
       Gitlab::Kubernetes::Helm::UpgradeCommand.new(
         application.name,
         chart: application.chart,
-        values: application.values
+        files: application.files
       )
     end
 
@@ -50,7 +50,7 @@ describe Gitlab::Kubernetes::Helm::Api do
 
     it 'updates the config map on kubeclient when one exists' do
       resource = Gitlab::Kubernetes::ConfigMap.new(
-        application.name, application.values
+        application.name, application.files
       ).generate
 
       expect(kubeclient).to receive(:update_config_map).with(resource).once

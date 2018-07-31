@@ -2,13 +2,14 @@ require 'rails_helper'
 
 describe Gitlab::Kubernetes::Helm::UpgradeCommand do
   let(:application) { build(:clusters_applications_prometheus) }
+  let(:files) { { 'ca.pem': 'some file content' } }
   let(:namespace) { ::Gitlab::Kubernetes::Helm::NAMESPACE }
 
   subject do
     described_class.new(
       application.name,
       chart: application.chart,
-      values: application.values
+      files: files
     )
   end
 
@@ -29,7 +30,7 @@ describe Gitlab::Kubernetes::Helm::UpgradeCommand do
       described_class.new(
         application.name,
         chart: application.chart,
-        values: application.values,
+        files: files,
         repository: application.repository
       )
     end
@@ -52,14 +53,16 @@ describe Gitlab::Kubernetes::Helm::UpgradeCommand do
   end
 
   describe '#config_map_resource' do
-    it 'returns a KubeClient resource with config map content for the application' do
-      metadata = {
+    let(:metadata) do
+      {
         name: "values-content-configuration-#{application.name}",
         namespace: namespace,
         labels: { name: "values-content-configuration-#{application.name}" }
       }
-      resource = ::Kubeclient::Resource.new(metadata: metadata, data: { values: application.values })
+    end
+    let(:resource) { ::Kubeclient::Resource.new(metadata: metadata, data: files) }
 
+    it 'returns a KubeClient resource with config map content for the application' do
       expect(subject.config_map_resource).to eq(resource)
     end
   end
