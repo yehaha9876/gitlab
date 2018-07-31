@@ -81,7 +81,7 @@ class GitPushService < BaseService
       else
         paths = Set.new
 
-        @push_commits.last(PROCESS_COMMIT_LIMIT).each do |commit|
+        last_pushed_commits.each do |commit|
           commit.raw_deltas.each do |diff|
             paths << diff.new_path
           end
@@ -97,7 +97,7 @@ class GitPushService < BaseService
   end
 
   def update_signatures
-    commit_shas = @push_commits.last(PROCESS_COMMIT_LIMIT).map(&:sha)
+    commit_shas = last_pushed_commits.map(&:sha)
 
     return if commit_shas.empty?
 
@@ -117,7 +117,7 @@ class GitPushService < BaseService
   def process_commit_messages
     default = default_branch?
 
-    @push_commits.last(PROCESS_COMMIT_LIMIT).each do |commit|
+    last_pushed_commits.each do |commit|
       if commit.matches_cross_reference_regex?
         ProcessCommitWorker
           .perform_async(project.id, current_user.id, commit.to_hash, default)
@@ -224,5 +224,9 @@ class GitPushService < BaseService
     strong_memoize(:push_commits_count) do
       project.repository.commit_count_for_ref(params[:ref])
     end
+  end
+
+  def last_pushed_commits
+    @last_pushed_commits ||= @push_commits.last(PROCESS_COMMIT_LIMIT)
   end
 end
