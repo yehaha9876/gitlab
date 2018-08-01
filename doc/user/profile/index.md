@@ -15,7 +15,7 @@ or from `https://example.gitlab.com/username`.
 
 On your profile page, you will see the following information:
 
-- Personal status: your current [status message](#setting-your-status)
+- Personal status: set your current [status message](#setting-your-status)
 - Personal information
 - Activity stream: see your activity streamline and the history of your contributions
 - Groups: [groups](../group/index.md) you're a member of
