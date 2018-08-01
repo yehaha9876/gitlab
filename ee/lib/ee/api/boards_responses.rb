@@ -35,7 +35,7 @@ module EE
           end
 
           def create_list_params
-            params.slice(:label_id, :milestone_id)
+            params.slice(:label_id, :milestone_id, :assignee_id)
           end
 
           # Overrides API::BoardsResponses authorize_list_type_resource!
@@ -51,13 +51,15 @@ module EE
                 render_api_error!({ error: 'Milestone not found!' }, 400)
               end
             end
+            # TODO add assignee_id validation
           end
 
           # Overrides API::BoardsResponses list_creation_params
           params :list_creation_params do
             optional :label_id, type: Integer, desc: 'The ID of an existing label'
             optional :milestone_id, type: Integer, desc: 'The ID of an existing milestone'
-            at_least_one_of :label_id, :milestone_id
+            optional :assignee_id, type: Integer, desc: 'The ID of an assignee'
+            at_least_one_of :label_id, :milestone_id, :assignee_id
           end
 
           params :update_params do
