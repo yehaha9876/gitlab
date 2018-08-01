@@ -15,6 +15,7 @@ or from `https://example.gitlab.com/username`.
 
 On your profile page, you will see the following information:
 
+- Personal status: your current [status message](#setting-your-status)
 - Personal information
 - Activity stream: see your activity streamline and the history of your contributions
 - Groups: [groups](../group/index.md) you're a member of
@@ -42,6 +43,10 @@ to customize your own GitLab experience
 - [View your active sessions](active_sessions.md) and revoke any of them if necessary
 - Access your audit log, a security log of important events involving your account
 
+## Setting your status
+
+*To add*
+
 ## Changing your username
 
 Your `username` is a unique [`namespace`](../group/index.md#namespaces)
@@ -52,8 +57,8 @@ before proceeding.
 To change your `username`:
 
 1. Navigate to your [profile's](#profile-settings) **Settings > Account**.
-1. Enter a new username under "Change username".
-1. Hit **Update username**.
+2. Enter a new username under "Change username".
+3. Hit **Update username**.
 
 CAUTION: **Caution:**
 It is currently not possible to change your username if it contains a
