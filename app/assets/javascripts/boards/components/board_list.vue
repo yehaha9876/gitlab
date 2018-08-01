@@ -112,6 +112,32 @@ export default {
           if (e.target) {
             const containerEl = e.target.closest('.js-board-list') || e.target.querySelector('.js-board-list');
             const toBoardType = containerEl.dataset.boardType;
+            const cloneActions = [
+              {
+                from: 'assignee',
+                to: 'label',
+              },
+              {
+                from: 'label',
+                to: 'assignee',
+              },
+              {
+                from: 'assignee',
+                to: 'milestone',
+              },
+              {
+                from: 'milestone',
+                to: 'assignee',
+              },
+              {
+                from: 'label',
+                to: 'milestone',
+              },
+              {
+                from: 'milestone',
+                to: 'label',
+              },
+            ];
 
             if (toBoardType) {
               const fromBoardType = this.list.type;
@@ -120,6 +146,10 @@ export default {
                   (fromBoardType === 'label' && toBoardType === 'assignee')) {
                 return 'clone';
               }
+
+              // if (cloneActions.some(({ fromType, toType }) => (fromBoardType === fromType && toBoardType === toType))) {
+              //   return 'clone';
+              // }
             }
           }
 

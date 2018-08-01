@@ -1,9 +1,8 @@
 /* eslint-disable no-underscore-dangle, class-methods-use-this, consistent-return, no-shadow, no-param-reassign, max-len */
-/* global ListIssue */
+/* global ListIssue ListMilestone */
 
 import ListLabel from '~/vue_shared/models/label';
 import ListAssignee from '~/vue_shared/models/assignee';
-import ListMilestone from '~/vue_shared/models/milestone';
 import queryData from '../utils/query_data';
 
 const PER_PAGE = 20;

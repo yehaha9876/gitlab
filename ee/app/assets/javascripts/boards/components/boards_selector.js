@@ -39,7 +39,7 @@ import MilestoneList from './milestone_list_selector';
         loading: true,
         hasScrollFade: false,
         hasAssigneesListMounted: false,
-        hasMilstoneListMounted: false,
+        hasMilestoneListMounted: false,
         scrollFadeInitialized: false,
         boards: [],
         state: Store.state,
@@ -154,9 +154,9 @@ import MilestoneList from './milestone_list_selector';
           this.hasAssigneesListMounted = true;
         }
 
-        if (e.target.dataset.action === 'tab-milestones' && !this.hasMilstoneListMounted) {
+        if (e.target.dataset.action === 'tab-milestones' && !this.hasMilestoneListMounted) {
           this.milstoneList = MilestoneList();
-          this.hasMilstoneListMounted = true;
+          this.hasMilestoneListMounted = true;
         }
       },
     },
