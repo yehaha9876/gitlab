@@ -45,9 +45,9 @@ module EE
             end
 
             if milestone_id = params[:milestone_id]
-              finder = ::Boards::MilestonesFinder.new(board, current_user)
+              milestones = ::Boards::MilestonesFinder.new(board, current_user).execute
 
-              unless finder.execute.find_by(id: milestone_id)
+              unless milestones.find_by(id: milestone_id)
                 render_api_error!({ error: 'Milestone not found!' }, 400)
               end
             end
