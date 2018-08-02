@@ -32,7 +32,6 @@ module EE
 
         private
 
-<<<<<<< HEAD
         def all_assignee_lists
           if parent.feature_available?(:board_assignee_lists)
             board.lists.assignee.where.not(user_id: nil)
@@ -55,20 +54,11 @@ module EE
           issues
             .where.not(id: issues.joins(:assignees)
             .where(users: { id: all_assignee_lists.select(:user_id) }))
-=======
+        end
+
         override :metadata_fields
         def metadata_fields
           super.merge(total_weight: 'COALESCE(SUM(weight), 0)')
-        end
-
-        def board_assignee_ids
-          @board_assignee_ids ||=
-            if parent.feature_available?(:board_assignee_lists)
-              board.lists.movable.pluck(:user_id).compact
-            else
-              []
-            end
->>>>>>> dccbf60c89cc335aa4e54c5ae41778da9ea760ef
         end
 
         def without_milestones_from_lists(issues)
