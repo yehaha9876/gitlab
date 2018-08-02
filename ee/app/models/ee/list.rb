@@ -46,6 +46,10 @@ module EE
         if options.key?(:user)
           json[:user] = UserSerializer.new.represent(user).as_json
         end
+
+        if options.key?(:milestone)
+          json[:milestone] = MilestoneSerializer.new.represent(milestone).as_json
+        end
       end
     end
 

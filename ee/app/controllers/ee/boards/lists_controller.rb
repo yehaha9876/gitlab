@@ -10,7 +10,7 @@ module EE
 
       override :serialization_attrs
       def serialization_attrs
-        super.merge(user: true)
+        super.merge(user: true, milestone: true)
       end
     end
   end
