@@ -96,6 +96,11 @@ export default class FilteredSearchDropdownManager {
         gl: DropdownWeight,
         element: this.container.querySelector('#js-dropdown-weight'),
       },
+      wip: {
+        reference: null,
+        gl: DropdownNonUser,
+        element: this.container.querySelector('#js-dropdown-wip'),
+      },
     };
 
     supportedTokens.forEach(type => {

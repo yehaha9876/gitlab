@@ -18,6 +18,10 @@ export default class FilteredSearchTokenizer {
         tokenValue = '';
       }
 
+      if (tokenValue === 'Yes' || tokenValue === 'No') {
+        tokenValue = tokenValue.toLowerCase();
+      }
+
       tokenIndex = `${key}:${tokenValue}`;
 
       // Prevent adding duplicates

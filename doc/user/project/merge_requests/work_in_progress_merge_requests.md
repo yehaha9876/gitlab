@@ -15,4 +15,10 @@ with its title starting with `wip` or `WIP` to the merge request's source branch
 To allow a Work In Progress merge request to be accepted again when it's ready,
 simply remove the `WIP` prefix.
 
-![Unark as WIP](img/wip_unmark_as_wip.png)
+![Unmark as WIP](img/wip_unmark_as_wip.png)
+
+
+##Searching merge requests
+To search exclusively for `WIP` merge requests, add "wip=yes" to the end of the search url.
+
+To search exclusively for **non** `WIP` merge requests, add "wip=no" to the end of the search url.

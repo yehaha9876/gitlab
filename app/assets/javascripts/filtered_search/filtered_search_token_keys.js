@@ -1,3 +1,5 @@
+import { isInMergeRequestListingPage } from '~/lib/utils/common_utils';
+
 const tokenKeys = [{
   key: 'author',
   type: 'string',
@@ -27,6 +29,17 @@ const tokenKeys = [{
   icon: 'tag',
   tag: '~label',
 }];
+
+if (isInMergeRequestListingPage()) {
+  tokenKeys.push({
+    key: 'wip',
+    type: 'string',
+    param: '',
+    symbol: '',
+    icon: 'wrench',
+    tag: 'Yes or No',
+  });
+}
 
 if (gon.current_user_id) {
   // Appending tokenkeys only logged-in
