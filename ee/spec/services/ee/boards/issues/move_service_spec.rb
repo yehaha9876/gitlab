@@ -29,7 +29,7 @@ describe Boards::Issues::MoveService, services: true do
     context 'from label to milestone list' do
       let(:issue)  { create(:labeled_issue, project: project, labels: [bug, development]) }
 
-      it 'assigns the milestone and keep labels' do
+      it 'assigns the milestone and keeps labels' do
         params = { board_id: board1.id, from_list_id: label_list1.id, to_list_id: milestone_list1.id }
 
         expect { described_class.new(parent, user, params).execute(issue) }
@@ -48,7 +48,7 @@ describe Boards::Issues::MoveService, services: true do
                                labels: [bug, development])
       end
 
-      it 'adds labels and keep milestone' do
+      it 'adds labels and keeps milestone' do
         params = { board_id: board1.id, from_list_id: milestone_list1.id, to_list_id: label_list2.id }
 
         described_class.new(parent, user, params).execute(issue)
@@ -61,7 +61,7 @@ describe Boards::Issues::MoveService, services: true do
     context 'from assignee to milestone list' do
       let!(:issue) { create(:labeled_issue, project: project, assignees: [user], milestone: nil) }
 
-      it 'assigns the milestone and keep assignees' do
+      it 'assigns the milestone and keeps assignees' do
         params = { board_id: board1.id, from_list_id: user_list1.id, to_list_id: milestone_list1.id }
 
         expect { described_class.new(parent, user, params).execute(issue) }
@@ -76,7 +76,7 @@ describe Boards::Issues::MoveService, services: true do
     context 'from milestone to assignee list' do
       let!(:issue) { create(:labeled_issue, project: project, milestone: milestone_list1.milestone) }
 
-      it 'assigns the user and keep milestone' do
+      it 'assigns the user and keeps milestone' do
         params = { board_id: board1.id, from_list_id: milestone_list1.id, to_list_id: user_list1.id }
 
         described_class.new(parent, user, params).execute(issue)

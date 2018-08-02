@@ -3,62 +3,61 @@ require 'spec_helper'
 describe Boards::MilestonesFinder do
   describe '#execute' do
     let(:group) { create(:group) }
-    let(:project) { create(:project, group: group) }
-    let(:user) { create(:user) }
+    let(:nested_group) { create(:group, parent: group) }
+    let(:deep_nested_group) { create(:group, parent: group) }
 
+    let(:group_project) { create(:project, group: group) }
+    let(:nested_group_project) { create(:project, group: nested_group) }
+
+    let!(:group_milestone) { create(:milestone, group: group, project: nil) }
+    let!(:group_project_milestone) { create(:milestone, project: group_project, group: nil) }
+    let!(:nested_group_project_milestone) { create(:milestone, project: nested_group_project, group: nil) }
+    let!(:nested_group_milestone) { create(:milestone, group: nested_group, project: nil) }
+    let!(:deep_nested_group_milestone) { create(:milestone, group: deep_nested_group, project: nil) }
+
+    let(:user) { create(:user) }
     let(:finder) { described_class.new(board, user) }
 
-    context 'when project board' do
-      let(:board) { create(:board, project: project) }
-      let!(:group_milestone) { create(:milestone, group: group, project: nil) }
-      let!(:milestone) { create(:milestone, group: nil, project: project) }
+    context 'when project board', :nested_groups do
+      let(:board) { create(:board, project: nested_group_project, group: nil) }
 
-      it 'returns milestones from project and its namespace' do
+      it 'returns milestones from board project and ancestors groups' do
+        group.add_developer(user)
+
         results = finder.execute
 
-        expect(results).to contain_exactly(group_milestone, milestone)
+        expect(results).to contain_exactly(nested_group_project_milestone,
+                                           nested_group_milestone,
+                                           group_milestone)
+      end
+
+      it 'does not returns unauthorized ancestors group milestones' do
+        nested_group.add_developer(user)
+
+        results = finder.execute
+
+        expect(results).to contain_exactly(nested_group_project_milestone,
+                                           nested_group_milestone)
       end
     end
 
     context 'when group board', :nested_groups do
-      let(:nested_group) { create(:group, parent: group) }
+      let(:board) { create(:board, project: nil, group: nested_group) }
 
-      let(:group_project) { create(:project, group: group) }
-      let(:nested_group_project) { create(:project, group: nested_group) }
+      it 'returns milestones from board group and its ancestors' do
+        group.add_developer(user)
 
-      let!(:group_milestone) { create(:milestone, group: group, project: nil) }
-      let!(:nested_group_milestone) { create(:milestone, group: nested_group, project: nil) }
-      let!(:group_project_milestone) { create(:milestone, group: nil, project: group_project) }
-      let!(:nested_group_project_milestone) { create(:milestone, group: nil, project: nested_group_project) }
+        results = finder.execute
 
-      let(:board) { create(:board, project: nil, group: group) }
-
-      context 'when user has access to top level group' do
-        before do
-          group.add_developer(user)
-        end
-
-        it 'returns milestones from ancestor groups and its projects' do
-          results = finder.execute
-
-          expect(results).to contain_exactly(group_milestone,
-                                             nested_group_milestone,
-                                             group_project_milestone,
-                                             nested_group_project_milestone)
-        end
+        expect(results).to contain_exactly(group_milestone, nested_group_milestone)
       end
 
-      context 'when user has access only to nested level group' do
-        before do
-          nested_group.add_developer(user)
-        end
+      it 'does not returns unauthorized ancestors group milestones' do
+        nested_group.add_developer(user)
 
-        it 'returns milestones from ancestor groups and its projects' do
-          results = finder.execute
+        results = finder.execute
 
-          expect(results).to contain_exactly(nested_group_milestone,
-                                             nested_group_project_milestone)
-        end
+        expect(results).to contain_exactly(nested_group_milestone)
       end
     end
   end

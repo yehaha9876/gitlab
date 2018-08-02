@@ -17,27 +17,20 @@ module Boards
       finder_params =
         if parent.is_a?(Group)
           {
-            project_ids: authorized_nested_projects(parent),
-            group_ids: authorized_nested_groups(parent)
+            group_ids: authorized_groups(parent.self_and_ancestors)
           }
         else
           {
             project_ids: [parent.id],
-            group_ids: [parent.namespace_id]
+            group_ids: authorized_groups(parent.group&.self_and_ancestors)
           }
         end
 
       ::MilestonesFinder.new(finder_params)
     end
 
-    def authorized_nested_projects(parent)
-      @current_user.authorized_projects
-        .where(namespace_id: parent.self_and_descendants.select(:id))
-    end
-
-    def authorized_nested_groups(parent)
-      @current_user.authorized_groups
-        .where(id: parent.self_and_descendants.select(:id))
+    def authorized_groups(groups)
+      @current_user.authorized_groups.where(id: groups&.select(:id))
     end
   end
 end

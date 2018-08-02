@@ -27,11 +27,11 @@ class List < ActiveRecord::Base
   end
 
   def destroyable?
-    label?
+    self.class.destroyable_types.include?(list_type&.to_sym)
   end
 
   def movable?
-    label?
+    self.class.movable_types.include?(list_type&.to_sym)
   end
 
   def title

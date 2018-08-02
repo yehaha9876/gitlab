@@ -28,16 +28,6 @@ module EE
       self.user = user
     end
 
-    override :destroyable?
-    def destroyable?
-      self.class.destroyable_types.include?(list_type&.to_sym) || super
-    end
-
-    override :movable?
-    def movable?
-      self.class.movable_types.include?(list_type&.to_sym) || super
-    end
-
     override :title
     def title
       case list_type
