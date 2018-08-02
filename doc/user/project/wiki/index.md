@@ -110,9 +110,9 @@ instructions.
 
 ## Customizing sidebar
 
-On the project's Wiki page, there is a right side navigation that renders the full Wiki pages list by default.
+On the project's Wiki page, there is a right side navigation that renders the full Wiki pages list by default, with hierarchy.
 
-If the Wiki repository contains a `_sidebar` page, the file of this page replaces the default side
-navigation. This custom file serves to render it's custom content, replacing the standard sidebar.
+If the Wiki repository contains a `_sidebar` page, the file of this page replaces the default side navigation.
+This custom file serves to render it's custom content, fully replacing the standard sidebar as of now.
 
-Support for a generated TOC and a custom side navigation is planned.
+Support for displaying a generated TOC with a custom side navigation is planned.
