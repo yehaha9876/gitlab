@@ -74,7 +74,7 @@ class List {
     let entityType = '';
     if (this.label) {
       entityType = 'label_id';
-    } else if (this.label) {
+    } else if (this.assignee) {
       entityType = 'assignee_id';
     } else if (this.milestone) {
       entityType = 'milestone_id';
