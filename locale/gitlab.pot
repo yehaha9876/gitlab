@@ -69,11 +69,6 @@ msgid_plural "%d metrics"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "%d new license"
-msgid_plural "%d new licenses"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "%d staged change"
 msgid_plural "%d staged changes"
 msgstr[0] ""
@@ -143,6 +138,11 @@ msgstr ""
 
 msgid "%{storage_name}: failed storage access attempt on host:"
 msgid_plural "%{storage_name}: %{failed_attempts} failed storage access attempts:"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%{text} %{files}"
+msgid_plural "%{text} %{files} files"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -452,6 +452,9 @@ msgstr ""
 msgid "All features are enabled for blank projects, from templates, or when importing, but you can disable them afterward in the project settings."
 msgstr ""
 
+msgid "All users"
+msgstr ""
+
 msgid "Allow commits from members who can merge to the target branch."
 msgstr ""
 
@@ -645,6 +648,9 @@ msgid "Archived project! Repository and other project resources are read-only"
 msgstr ""
 
 msgid "Are you sure you want to delete this pipeline schedule?"
+msgstr ""
+
+msgid "Are you sure you want to lose unsaved changes?"
 msgstr ""
 
 msgid "Are you sure you want to remove %{group_name}?"
@@ -2297,6 +2303,9 @@ msgstr ""
 msgid "Delete list"
 msgstr ""
 
+msgid "Deleted"
+msgstr ""
+
 msgid "Deny"
 msgstr ""
 
@@ -2903,6 +2912,9 @@ msgid "Files (%{human_size})"
 msgstr ""
 
 msgid "Fill in the fields below, turn on <strong>%{enable_label}</strong>, and press <strong>%{save_changes}</strong>"
+msgstr ""
+
+msgid "Filter"
 msgstr ""
 
 msgid "Filter by commit message"
@@ -3646,6 +3658,12 @@ msgid_plural "Instances"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Instance Statistics"
+msgstr ""
+
+msgid "Instance Statistics visibility"
+msgstr ""
+
 msgid "Instance does not support multiple Kubernetes clusters"
 msgstr ""
 
@@ -3856,6 +3874,54 @@ msgid "Leave the \"File type\" and \"Delivery method\" options on their default 
 msgstr ""
 
 msgid "License"
+msgstr ""
+
+msgid "LicenseManagement|Approve license"
+msgstr ""
+
+msgid "LicenseManagement|Approve license?"
+msgstr ""
+
+msgid "LicenseManagement|Approved"
+msgstr ""
+
+msgid "LicenseManagement|Blacklist license"
+msgstr ""
+
+msgid "LicenseManagement|Blacklist license?"
+msgstr ""
+
+msgid "LicenseManagement|Blacklisted"
+msgstr ""
+
+msgid "LicenseManagement|License"
+msgstr ""
+
+msgid "LicenseManagement|License Management"
+msgstr ""
+
+msgid "LicenseManagement|License details"
+msgstr ""
+
+msgid "LicenseManagement|Manage approved and blacklisted licenses for this project."
+msgstr ""
+
+msgid "LicenseManagement|Packages"
+msgstr ""
+
+msgid "LicenseManagement|Remove license"
+msgstr ""
+
+msgid "LicenseManagement|Remove license?"
+msgstr ""
+
+msgid "LicenseManagement|URL"
+msgstr ""
+
+msgid "LicenseManagement|Unapproved"
+msgstr ""
+
+msgid "LicenseManagement|You are about to remove the license, %{name}, from this project."
 msgstr ""
 
 msgid "LinkedIn"
@@ -4107,6 +4173,9 @@ msgstr ""
 msgid "Metrics|There was an error getting environments information."
 msgstr ""
 
+msgid "Metrics|There was an error while retrieving metrics"
+msgstr ""
+
 msgid "Metrics|Type"
 msgstr ""
 
@@ -4352,6 +4421,9 @@ msgstr ""
 msgid "No issues for the selected time period."
 msgstr ""
 
+msgid "No labels with such name or description"
+msgstr ""
+
 msgid "No merge requests for the selected time period."
 msgstr ""
 
@@ -4359,6 +4431,12 @@ msgid "No merge requests found"
 msgstr ""
 
 msgid "No messages were logged"
+msgstr ""
+
+msgid "No other labels with such name or description"
+msgstr ""
+
+msgid "No prioritised labels with such name or description"
 msgstr ""
 
 msgid "No public groups"
@@ -4410,9 +4488,6 @@ msgid "Note: Consider asking your GitLab administrator to configure %{github_int
 msgstr ""
 
 msgid "Note: Consider asking your GitLab administrator to configure %{github_integration_link}, which will allow login via GitHub and allow importing repositories without generating a Personal Access Token."
-msgstr ""
-
-msgid "Notes|Are you sure you want to cancel creating this comment?"
 msgstr ""
 
 msgid "Notification events"
@@ -4509,6 +4584,9 @@ msgid "One or more of your Google Code projects cannot be imported into GitLab d
 msgstr ""
 
 msgid "Online IDE integration settings."
+msgstr ""
+
+msgid "Only admins"
 msgstr ""
 
 msgid "Only comments from the following commit are shown below"
@@ -4896,6 +4974,9 @@ msgid "Profiles|Path"
 msgstr ""
 
 msgid "Profiles|This doesn't look like a public SSH key, are you sure you want to add it?"
+msgstr ""
+
+msgid "Profiles|This emoji and message will appear on your profile and throughout the interface. The message can contain emoji codes, too."
 msgstr ""
 
 msgid "Profiles|Type your %{confirmationValue} to confirm:"
@@ -5973,6 +6054,9 @@ msgstr ""
 msgid "Submit as spam"
 msgstr ""
 
+msgid "Submit search"
+msgstr ""
+
 msgid "Subscribe"
 msgstr ""
 
@@ -6137,7 +6221,7 @@ msgstr ""
 msgid "The number of attempts GitLab will make to access a storage."
 msgstr ""
 
-msgid "The number of failures of after which GitLab will completely prevent access to the storage. The number of failures can be reset in the admin interface: %{link_to_health_page} or using the %{api_documentation_link}."
+msgid "The number of failures after which GitLab will completely prevent access to the storage. The number of failures can be reset in the admin interface: %{link_to_health_page} or using the %{api_documentation_link}."
 msgstr ""
 
 msgid "The passphrase required to decrypt the private key. This is optional and the value is encrypted at rest."
@@ -6197,7 +6281,7 @@ msgstr ""
 msgid "The time in seconds GitLab will try to access storage. After this time a timeout error will be raised."
 msgstr ""
 
-msgid "The time in seconds between storage checks. When a previous check did complete yet, GitLab will skip a check."
+msgid "The time in seconds between storage checks. If a check did not complete yet, GitLab will skip the next check."
 msgstr ""
 
 msgid "The time taken by each data entry gathered by that stage."
@@ -6705,10 +6789,8 @@ msgstr ""
 msgid "Up to date"
 msgstr ""
 
-msgid "Update %{files}"
-msgid_plural "Update %{files} files"
-msgstr[0] ""
-msgstr[1] ""
+msgid "Update"
+msgstr ""
 
 msgid "Update your group name, description, avatar, and other general settings."
 msgstr ""
@@ -6780,6 +6862,9 @@ msgid "User map"
 msgstr ""
 
 msgid "Users"
+msgstr ""
+
+msgid "User|Current Status"
 msgstr ""
 
 msgid "Variables"
@@ -7255,12 +7340,6 @@ msgstr ""
 msgid "ciReport|%{namespace} is affected by %{vulnerability}."
 msgstr ""
 
-msgid "ciReport|%{packagesString} and "
-msgstr ""
-
-msgid "ciReport|%{packagesString} and %{lastPackage}"
-msgstr ""
-
 msgid "ciReport|%{remainingPackagesCount} more"
 msgstr ""
 
@@ -7352,9 +7431,6 @@ msgid "ciReport|Learn more about interacting with security reports (Alpha)."
 msgstr ""
 
 msgid "ciReport|Learn more about whitelisting"
-msgstr ""
-
-msgid "ciReport|License management detected %{licenseInfo}"
 msgstr ""
 
 msgid "ciReport|License management detected no new licenses"
@@ -7514,6 +7590,9 @@ msgid "is not a valid X509 certificate."
 msgstr ""
 
 msgid "latest version"
+msgstr ""
+
+msgid "license management"
 msgstr ""
 
 msgid "locked by %{path_lock_user_name} %{created_at}"

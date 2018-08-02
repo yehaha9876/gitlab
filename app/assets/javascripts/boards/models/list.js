@@ -141,6 +141,8 @@ class List {
         }
 
         this.createIssues(data.issues);
+
+        return data;
       });
   }
 

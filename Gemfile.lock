@@ -402,7 +402,8 @@ GEM
       googleauth (>= 0.5.1, < 0.7)
     gssapi (1.2.0)
       ffi (>= 1.0.1)
-    haml (4.0.7)
+    haml (5.0.4)
+      temple (>= 0.8.0)
       tilt
     haml_lint (0.26.0)
       haml (>= 4.0, < 5.1)
@@ -663,7 +664,7 @@ GEM
       parser
       unparser
     procto (0.0.3)
-    prometheus-client-mmap (0.9.3)
+    prometheus-client-mmap (0.9.4)
     pry (0.10.4)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -1162,7 +1163,7 @@ DEPENDENCIES
   peek-sidekiq (~> 1.0.3)
   pg (~> 0.18.2)
   premailer-rails (~> 1.9.7)
-  prometheus-client-mmap (~> 0.9.3)
+  prometheus-client-mmap (~> 0.9.4)
   pry-byebug (~> 3.4.1)
   pry-rails (~> 0.3.4)
   rack-attack (~> 4.4.1)

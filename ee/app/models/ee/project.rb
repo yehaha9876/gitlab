@@ -34,6 +34,8 @@ module EE
       has_many :audit_events, as: :entity
       has_many :path_locks
       has_many :vulnerability_feedback
+      has_many :software_license_policies, inverse_of: :project, class_name: 'SoftwareLicensePolicy'
+      accepts_nested_attributes_for :software_license_policies, allow_destroy: true
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
 
@@ -288,7 +290,10 @@ module EE
       UpdateAllMirrorsWorker.perform_async
     end
 
+    override :add_import_job
     def add_import_job
+      return if gitlab_custom_project_template_import?
+
       if import? && !repository_exists?
         super
       elsif mirror?
@@ -515,6 +520,16 @@ module EE
     def after_import
       super
       log_geo_events
+    end
+
+    override :import?
+    def import?
+      super || gitlab_custom_project_template_import?
+    end
+
+    def gitlab_custom_project_template_import?
+      import_type == 'gitlab_custom_project_template' &&
+        ::Gitlab::CurrentSettings.custom_project_templates_enabled?
     end
 
     private

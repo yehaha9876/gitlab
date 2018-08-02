@@ -62,6 +62,14 @@ module API
       expose :admin?, as: :is_admin
     end
 
+    class UserStatus < Grape::Entity
+      expose :emoji
+      expose :message
+      expose :message_html do |entity|
+        MarkupHelper.markdown_field(entity, :message)
+      end
+    end
+
     class Email < Grape::Entity
       expose :id, :email
     end
@@ -1265,7 +1273,13 @@ module API
       end
 
       class Artifacts < Grape::Entity
-        expose :name, :untracked, :paths, :when, :expire_in
+        expose :name
+        expose :untracked
+        expose :paths
+        expose :when
+        expose :expire_in
+        expose :artifact_type
+        expose :artifact_format
       end
 
       class Cache < Grape::Entity
@@ -1422,6 +1436,10 @@ module API
       expose :approvals_before_merge
       expose :reset_approvals_on_push
       expose :disable_overriding_approvers_per_merge_request
+    end
+
+    class ManagedLicense < Grape::Entity
+      expose :id, :name, :approval_status
     end
   end
 end

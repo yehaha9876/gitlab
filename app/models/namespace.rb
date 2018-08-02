@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Namespace < ActiveRecord::Base
   prepend EE::Namespace
   include CacheMarkdownField
@@ -123,6 +125,7 @@ class Namespace < ActiveRecord::Base
   def to_param
     full_path
   end
+  alias_method :flipper_id, :to_param
 
   def human_name
     owner_name
@@ -305,7 +308,6 @@ class Namespace < ActiveRecord::Base
 
   def write_projects_repository_config
     all_projects.find_each do |project|
-      project.expires_full_path_cache # we need to clear cache to validate renames correctly
       project.write_repository_config
     end
   end

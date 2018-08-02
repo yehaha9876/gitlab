@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20180724161450) do
+=======
+ActiveRecord::Schema.define(version: 20180726172057) do
+>>>>>>> dccbf60c89cc335aa4e54c5ae41778da9ea760ef
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -208,6 +212,8 @@ ActiveRecord::Schema.define(version: 20180724161450) do
     t.boolean "enforce_terms", default: false
     t.boolean "pseudonymizer_enabled", default: false, null: false
     t.boolean "hide_third_party_offers", default: false, null: false
+    t.boolean "instance_statistics_visibility_private", default: false, null: false
+    t.integer "custom_project_templates_group_id"
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -482,6 +488,7 @@ ActiveRecord::Schema.define(version: 20180724161450) do
     t.string "file"
     t.integer "file_store"
     t.binary "file_sha256"
+    t.integer "file_format", limit: 2
   end
 
   add_index "ci_job_artifacts", ["expire_at", "job_id"], name: "index_ci_job_artifacts_on_expire_at_and_job_id", using: :btree
@@ -1155,6 +1162,7 @@ ActiveRecord::Schema.define(version: 20180724161450) do
     t.integer "wikis_checksummed_count"
     t.integer "wikis_checksum_failed_count"
     t.integer "wikis_checksum_mismatch_count"
+    t.binary "storage_configuration_digest"
   end
 
   add_index "geo_node_statuses", ["geo_node_id"], name: "index_geo_node_statuses_on_geo_node_id", unique: true, using: :btree
@@ -1956,6 +1964,14 @@ ActiveRecord::Schema.define(version: 20180724161450) do
 
   add_index "plans", ["name"], name: "index_plans_on_name", using: :btree
 
+  create_table "programming_languages", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "color", null: false
+    t.datetime_with_timezone "created_at", null: false
+  end
+
+  add_index "programming_languages", ["name"], name: "index_programming_languages_on_name", unique: true, using: :btree
+
   create_table "project_authorizations", id: false, force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "project_id", null: false
@@ -2358,6 +2374,30 @@ ActiveRecord::Schema.define(version: 20180724161450) do
   add_index "remote_mirrors", ["last_successful_update_at"], name: "index_remote_mirrors_on_last_successful_update_at", using: :btree
   add_index "remote_mirrors", ["project_id"], name: "index_remote_mirrors_on_project_id", using: :btree
 
+  create_table "repository_languages", id: false, force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "programming_language_id", null: false
+    t.float "share", null: false
+  end
+
+  add_index "repository_languages", ["project_id", "programming_language_id"], name: "index_repository_languages_on_project_and_languages_id", unique: true, using: :btree
+
+  create_table "resource_label_events", id: :bigserial, force: :cascade do |t|
+    t.integer "action", null: false
+    t.integer "issue_id"
+    t.integer "merge_request_id"
+    t.integer "epic_id"
+    t.integer "label_id"
+    t.integer "user_id"
+    t.datetime_with_timezone "created_at", null: false
+  end
+
+  add_index "resource_label_events", ["epic_id"], name: "index_resource_label_events_on_epic_id", using: :btree
+  add_index "resource_label_events", ["issue_id"], name: "index_resource_label_events_on_issue_id", using: :btree
+  add_index "resource_label_events", ["label_id"], name: "index_resource_label_events_on_label_id", using: :btree
+  add_index "resource_label_events", ["merge_request_id"], name: "index_resource_label_events_on_merge_request_id", using: :btree
+  add_index "resource_label_events", ["user_id"], name: "index_resource_label_events_on_user_id", using: :btree
+
   create_table "routes", force: :cascade do |t|
     t.integer "source_id", null: false
     t.string "source_type", null: false
@@ -2463,6 +2503,20 @@ ActiveRecord::Schema.define(version: 20180724161450) do
   add_index "snippets", ["title"], name: "index_snippets_on_title_trigram", using: :gin, opclasses: {"title"=>"gin_trgm_ops"}
   add_index "snippets", ["updated_at"], name: "index_snippets_on_updated_at", using: :btree
   add_index "snippets", ["visibility_level"], name: "index_snippets_on_visibility_level", using: :btree
+
+  create_table "software_license_policies", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "software_license_id", null: false
+    t.integer "approval_status", default: 0, null: false
+  end
+
+  add_index "software_license_policies", ["project_id", "software_license_id"], name: "index_software_license_policies_unique_per_project", unique: true, using: :btree
+
+  create_table "software_licenses", force: :cascade do |t|
+    t.string "name", null: false
+  end
+
+  add_index "software_licenses", ["name"], name: "index_software_licenses_on_name", using: :btree
 
   create_table "spam_logs", force: :cascade do |t|
     t.integer "user_id"
@@ -2647,6 +2701,13 @@ ActiveRecord::Schema.define(version: 20180724161450) do
   add_index "user_interacted_projects", ["project_id", "user_id"], name: "index_user_interacted_projects_on_project_id_and_user_id", unique: true, using: :btree
   add_index "user_interacted_projects", ["user_id"], name: "index_user_interacted_projects_on_user_id", using: :btree
 
+  create_table "user_statuses", primary_key: "user_id", force: :cascade do |t|
+    t.integer "cached_markdown_version"
+    t.string "emoji", default: "speech_balloon", null: false
+    t.string "message", limit: 100
+    t.string "message_html"
+  end
+
   create_table "user_synced_attributes_metadata", force: :cascade do |t|
     t.boolean "name_synced", default: false
     t.boolean "email_synced", default: false
@@ -2822,6 +2883,7 @@ ActiveRecord::Schema.define(version: 20180724161450) do
   add_index "web_hooks", ["project_id"], name: "index_web_hooks_on_project_id", using: :btree
   add_index "web_hooks", ["type"], name: "index_web_hooks_on_type", using: :btree
 
+  add_foreign_key "application_settings", "namespaces", column: "custom_project_templates_group_id", on_delete: :nullify
   add_foreign_key "approvals", "merge_requests", name: "fk_310d714958", on_delete: :cascade
   add_foreign_key "approver_groups", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "badges", "namespaces", column: "group_id", on_delete: :cascade
@@ -3019,10 +3081,18 @@ ActiveRecord::Schema.define(version: 20180724161450) do
   add_foreign_key "push_rules", "projects", name: "fk_83b29894de", on_delete: :cascade
   add_foreign_key "releases", "projects", name: "fk_47fe2a0596", on_delete: :cascade
   add_foreign_key "remote_mirrors", "projects", name: "fk_43a9aa4ca8", on_delete: :cascade
+  add_foreign_key "repository_languages", "projects", on_delete: :cascade
+  add_foreign_key "resource_label_events", "epics", on_delete: :cascade
+  add_foreign_key "resource_label_events", "issues", on_delete: :cascade
+  add_foreign_key "resource_label_events", "labels", on_delete: :nullify
+  add_foreign_key "resource_label_events", "merge_requests", on_delete: :cascade
+  add_foreign_key "resource_label_events", "users", on_delete: :nullify
   add_foreign_key "saml_providers", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "services", "projects", name: "fk_71cce407f9", on_delete: :cascade
   add_foreign_key "slack_integrations", "services", on_delete: :cascade
   add_foreign_key "snippets", "projects", name: "fk_be41fd4bb7", on_delete: :cascade
+  add_foreign_key "software_license_policies", "projects", on_delete: :cascade
+  add_foreign_key "software_license_policies", "software_licenses", on_delete: :cascade
   add_foreign_key "subscriptions", "projects", on_delete: :cascade
   add_foreign_key "system_note_metadata", "notes", name: "fk_d83a918cb1", on_delete: :cascade
   add_foreign_key "term_agreements", "application_setting_terms", column: "term_id"
@@ -3039,6 +3109,7 @@ ActiveRecord::Schema.define(version: 20180724161450) do
   add_foreign_key "user_custom_attributes", "users", on_delete: :cascade
   add_foreign_key "user_interacted_projects", "projects", name: "fk_722ceba4f7", on_delete: :cascade
   add_foreign_key "user_interacted_projects", "users", name: "fk_0894651f08", on_delete: :cascade
+  add_foreign_key "user_statuses", "users", on_delete: :cascade
   add_foreign_key "user_synced_attributes_metadata", "users", on_delete: :cascade
   add_foreign_key "users", "application_setting_terms", column: "accepted_term_id", name: "fk_789cd90b35", on_delete: :cascade
   add_foreign_key "users_star_projects", "projects", name: "fk_22cd27ddfc", on_delete: :cascade

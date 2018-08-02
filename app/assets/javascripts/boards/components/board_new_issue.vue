@@ -122,6 +122,7 @@ export default {
           :id="list.id + '-title'"
           class="form-control"
           type="text"
+          name="issue_title"
           autocomplete="off"
         />
         <project-select

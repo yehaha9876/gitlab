@@ -26,11 +26,18 @@ describe Boards::Issues::ListService, services: true do
     let(:list2)     { create(:list, board: board, label: testing, position: 1) }
     let(:closed)    { create(:closed_list, board: board) }
 
+<<<<<<< HEAD
     let(:opened_issue1) { create(:labeled_issue, project: project, milestone: m1, title: 'Issue 1', labels: [bug]) }
     let(:opened_issue2) { create(:labeled_issue, project: project, milestone: m2, title: 'Issue 2', labels: [p2]) }
     let(:opened_issue3) { create(:labeled_issue, project: project, milestone: m2, title: 'Assigned Issue', labels: [p3]) }
     let(:milestone_issue) { create(:labeled_issue, project: project, milestone: milestone_list.milestone, labels: [p3]) }
     let(:reopened_issue1) { create(:issue, state: 'opened', project: project, title: 'Issue 3', closed_at: Time.now ) }
+=======
+    let!(:opened_issue1) { create(:labeled_issue, project: project, milestone: m1, weight: 9, title: 'Issue 1', labels: [bug]) }
+    let!(:opened_issue2) { create(:labeled_issue, project: project, milestone: m2, weight: 1, title: 'Issue 2', labels: [p2]) }
+    let!(:opened_issue3) { create(:labeled_issue, project: project, milestone: m2, title: 'Assigned Issue', labels: [p3]) }
+    let!(:reopened_issue1) { create(:issue, state: 'opened', project: project, title: 'Issue 3', closed_at: Time.now ) }
+>>>>>>> dccbf60c89cc335aa4e54c5ae41778da9ea760ef
 
     let(:list1_issue1) { create(:labeled_issue, project: project, milestone: m1, labels: [p2, development]) }
     let(:list1_issue2) { create(:labeled_issue, project: project, milestone: m2, labels: [development]) }
@@ -52,6 +59,7 @@ describe Boards::Issues::ListService, services: true do
       opened_issue3.assignees.push(user_list.user)
     end
 
+<<<<<<< HEAD
     context 'milestone lists' do
       it 'returns issues from milestone persisted in the list' do
         params = { board_id: board.id, id: milestone_list.id }
@@ -59,6 +67,27 @@ describe Boards::Issues::ListService, services: true do
         issues = described_class.new(parent, user, params).execute
 
         expect(issues).to match_array([milestone_issue])
+=======
+    context '#metadata' do
+      it 'returns issues count and weight for list' do
+        params = { board_id: board.id, id: backlog.id }
+
+        metadata = described_class.new(parent, user, params).metadata
+
+        expect(metadata[:size]).to eq(3)
+        expect(metadata[:total_weight]).to eq(10)
+      end
+
+      # When collection is filtered by labels the ActiveRecord::Relation returns '{}' on #count or #sum
+      # if no issues are found
+      it 'returns 0 when filtering by labels and issues are not present' do
+        params = { board_id: board.id, id: list1.id, label_name: [bug.title, p2.title] }
+
+        metadata = described_class.new(parent, user, params).metadata
+
+        expect(metadata[:size]).to eq(0)
+        expect(metadata[:total_weight]).to eq(0)
+>>>>>>> dccbf60c89cc335aa4e54c5ae41778da9ea760ef
       end
     end
 

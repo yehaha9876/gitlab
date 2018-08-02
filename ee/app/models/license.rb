@@ -62,6 +62,7 @@ class License < ActiveRecord::Base
     external_authorization_service
     ci_cd_projects
     system_header_footer
+    custom_project_templates
   ].freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
@@ -158,6 +159,7 @@ class License < ActiveRecord::Base
     repository_size_limit
     external_authorization_service
     system_header_footer
+    custom_project_templates
   ].freeze
 
   validate :valid_license
