@@ -114,42 +114,38 @@ export default {
             const toBoardType = containerEl.dataset.boardType;
             const cloneActions = [
               {
-                from: 'assignee',
-                to: 'label',
+                fromType: 'assignee',
+                toType: 'label',
               },
               {
-                from: 'label',
-                to: 'assignee',
+                fromType: 'label',
+                toType: 'assignee',
               },
               {
-                from: 'assignee',
-                to: 'milestone',
+                fromType: 'assignee',
+                toType: 'milestone',
               },
               {
-                from: 'milestone',
-                to: 'assignee',
+                fromType: 'milestone',
+                toType: 'assignee',
               },
               {
-                from: 'label',
-                to: 'milestone',
+                fromType: 'label',
+                toType: 'milestone',
               },
               {
-                from: 'milestone',
-                to: 'label',
+                fromType: 'milestone',
+                toType: 'label',
               },
             ];
 
             if (toBoardType) {
               const fromBoardType = this.list.type;
-
-              if ((fromBoardType === 'assignee' && toBoardType === 'label') ||
-                  (fromBoardType === 'label' && toBoardType === 'assignee')) {
+              const shouldClone = cloneActions.some(({ fromType, toType }) => (fromBoardType === fromType && toBoardType === toType))
+              
+              if (shouldClone) {
                 return 'clone';
               }
-
-              // if (cloneActions.some(({ fromType, toType }) => (fromBoardType === fromType && toBoardType === toType))) {
-              //   return 'clone';
-              // }
             }
           }
 

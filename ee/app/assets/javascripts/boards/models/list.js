@@ -16,6 +16,7 @@ class ListEE extends List {
   }
 
   onNewIssueResponse(issue, data) {
+    // Refactor milestone response
     issue.milestone = data.milestone;
     issue.assignees = Array.isArray(data.assignees)
       ? data.assignees.map(assignee => new ListAssignee(assignee))
