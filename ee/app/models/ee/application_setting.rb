@@ -204,7 +204,7 @@ module EE
         # 2.  ec2 instance profile
         static_credentials = Aws::Credentials.new(aws_access_key, aws_secret_access_key)
 
-        return static_credentials if static_credentials&.set?
+        next static_credentials if static_credentials&.set?
 
         # Instantiating this will perform an API call, so only do so if the
         # static credentials did not work
