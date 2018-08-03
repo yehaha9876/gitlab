@@ -51,7 +51,7 @@ export default {
       const labels = this.list.label ? [this.list.label] : [];
       const assignees = this.list.assignee ? [this.list.assignee] : [];
       const milestone = this.list.milestone ? this.list.milestone : null;
-      const milestone_id = milestone ? milestone.id : null;
+      const milestone_id = milestone ? milestone.id : null; // eslint-disable-line camelcase
 
       const issue = new ListIssue({
         title: this.title,

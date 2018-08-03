@@ -141,8 +141,9 @@ export default {
 
             if (toBoardType) {
               const fromBoardType = this.list.type;
-              const shouldClone = cloneActions.some(({ fromType, toType }) => (fromBoardType === fromType && toBoardType === toType))
-              
+              const shouldClone = cloneActions.some(({ fromType, toType }) =>
+                (fromBoardType === fromType && toBoardType === toType));
+
               if (shouldClone) {
                 return 'clone';
               }
