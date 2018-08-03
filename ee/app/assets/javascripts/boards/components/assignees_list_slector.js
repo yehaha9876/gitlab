@@ -1,5 +1,4 @@
 import _ from 'underscore';
-import $ from 'jquery';
 import BoardsListSelector from './boards_list_selector/index';
 import AssigneesListItem from './boards_list_selector/assignees_list_item.vue';
 
@@ -9,10 +8,10 @@ window.gl.issueBoards = window.gl.issueBoards || {};
 const Store = gl.issueBoards.BoardsStore;
 
 export default function () {
-  const $addListEl = $('#js-add-list');
+  const $addListEl = document.querySelector('#js-add-list');
   return new BoardsListSelector({
     propsData: {
-      listPath: $addListEl.find('.js-new-board-list').data('listAssigneesPath'),
+      listPath: $addListEl.querySelector('.js-new-board-list').dataset.listAssigneesPath,
       listType: 'assignees',
       listItemComponent: AssigneesListItem,
       filterItems: (term, items) => {
