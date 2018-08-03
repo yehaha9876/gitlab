@@ -52,8 +52,7 @@ module EE
           return issues if all_assignee_lists.empty?
 
           issues
-            .where.not(id: issues.joins(:assignees)
-            .where(users: { id: all_assignee_lists.select(:user_id) }))
+            .where.not(id: issues.joins(:assignees).where(users: { id: all_assignee_lists.select(:user_id) }))
         end
 
         override :metadata_fields
@@ -64,7 +63,8 @@ module EE
         def without_milestones_from_lists(issues)
           return issues if all_milestone_lists.empty?
 
-          issues.where.not(milestone_id: all_milestone_lists.select(:milestone_id))
+          issues.where("milestone_id NOT IN (?) OR milestone_id IS NULL",
+                       all_milestone_lists.select(:milestone_id))
         end
 
         def with_assignee(issues)

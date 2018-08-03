@@ -52,14 +52,26 @@ describe Boards::Issues::ListService, services: true do
     end
 
     context 'milestone lists' do
-      let(:milestone_issue) { create(:labeled_issue, project: project, milestone: milestone_list.milestone, labels: [p3]) }
+      let!(:milestone_issue) { create(:labeled_issue, project: project, milestone: milestone_list.milestone, labels: [p3]) }
 
       it 'returns issues from milestone persisted in the list' do
         params = { board_id: board.id, id: milestone_list.id }
 
         issues = described_class.new(parent, user, params).execute
 
-        expect(issues).to match_array([milestone_issue])
+        expect(issues).to contain_exactly(milestone_issue)
+      end
+
+      context 'backlog list context' do
+        it 'returns issues without milestones and without milestones from other lists' do
+          params = { board_id: board.id, id: backlog.id }
+
+          issues = described_class.new(parent, user, params).execute
+
+          expect(issues).to contain_exactly(opened_issue1, # milestone from this issue is not in a list
+                                            opened_issue2, # milestone from this issue is not in a list
+                                            reopened_issue1) # has no milestone
+        end
       end
     end
 
