@@ -46,4 +46,8 @@ describe API::GroupBoards do
 
   it_behaves_like 'group and project boards', "/groups/:id/boards", true
   it_behaves_like 'multiple and scoped issue boards', "/groups/:id/boards"
+
+  it_behaves_like 'milestone board list' do
+    let(:url) { "/groups/#{board_parent.id}/boards/#{board.id}/lists" }
+  end
 end

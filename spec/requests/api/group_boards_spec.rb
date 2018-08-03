@@ -50,7 +50,5 @@ describe API::GroupBoards do
 
       expect(response).to have_gitlab_http_status(400)
     end
-
-    it_behaves_like 'milestone board list'
   end
 end
