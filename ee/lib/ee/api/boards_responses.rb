@@ -51,7 +51,14 @@ module EE
                 render_api_error!({ error: 'Milestone not found!' }, 400)
               end
             end
-            # TODO add assignee_id validation
+
+            if assignee_id = params[:assignee_id]
+              users = ::Boards::UsersFinder.new(board, current_user).execute
+
+              unless users.find_by(id: assignee_id)
+                render_api_error!({ error: 'User not found!' }, 400)
+              end
+            end
           end
 
           # Overrides API::BoardsResponses list_creation_params
