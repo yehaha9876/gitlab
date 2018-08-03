@@ -77,7 +77,7 @@ export default {
       :neutral-issues="licenseReport"
       :has-issues="hasLicenseReportIssues"
       :component="$options.componentNames.LicenseIssueBody"
-      class="license-report-widget mr-widget-border-top"
+      class="license-report-widget mr-widget-border-top mr-report"
     />
   </div>
 </template>
