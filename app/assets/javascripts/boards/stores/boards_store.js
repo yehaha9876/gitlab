@@ -156,8 +156,6 @@ gl.issueBoards.BoardsStore = {
     } else if (listTo.type === 'backlog' && listFrom.type === 'milestone') {
       issue.removeMilestone(listFrom.milestone);
       listFrom.removeIssue(issue);
-    } else if ((listTo.type !== 'label' && listFrom.type === 'assignee') ||
-      (listTo.type !== 'assignee' && listFrom.type === 'label')) {
     } else if (this.shouldRemoveIssue(listFrom, listTo)) {
       listFrom.removeIssue(issue);
     }
