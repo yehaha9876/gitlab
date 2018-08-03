@@ -86,7 +86,7 @@ class ListIssue {
   }
 
   addMilestone (milestone) {
-    if (milestone && milestone.id !== this.milestone.id) {
+    if (!this.milestone || milestone && milestone.id !== this.milestone.id) {
       this.milestone = new ListMilestone(milestone);
     }
   }
