@@ -53,8 +53,6 @@ export default {
       const milestone = this.list.milestone ? this.list.milestone : null;
       const milestone_id = milestone ? milestone.id : null;
 
-      debugger;
-
       const issue = new ListIssue({
         title: this.title,
         labels,
