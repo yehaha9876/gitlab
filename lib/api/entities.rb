@@ -979,7 +979,6 @@ module API
     class List < Grape::Entity
       expose :id
       expose :label, using: Entities::LabelBasic
-      expose :milestone, using: Entities::Milestone, if: -> (entity, _) { entity.milestone? }
       expose :position
     end
 
@@ -1449,6 +1448,7 @@ API::Entities.prepend_entity(::API::Entities::Board, with: EE::API::Entities::Bo
 API::Entities.prepend_entity(::API::Entities::Group, with: EE::API::Entities::Group)
 API::Entities.prepend_entity(::API::Entities::GroupDetail, with: EE::API::Entities::GroupDetail)
 API::Entities.prepend_entity(::API::Entities::IssueBasic, with: EE::API::Entities::IssueBasic)
+API::Entities.prepend_entity(::API::Entities::List, with: EE::API::Entities::List)
 API::Entities.prepend_entity(::API::Entities::MergeRequestBasic, with: EE::API::Entities::MergeRequestBasic)
 API::Entities.prepend_entity(::API::Entities::Namespace, with: EE::API::Entities::Namespace)
 API::Entities.prepend_entity(::API::Entities::Project, with: EE::API::Entities::Project)

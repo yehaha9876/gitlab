@@ -100,6 +100,14 @@ module EE
         end
       end
 
+      module List
+        extend ActiveSupport::Concern
+
+        prepended do
+          expose :milestone, using: ::API::Entities::Milestone, if: -> (entity, _) { entity.milestone? }
+        end
+      end
+
       module ApplicationSetting
         extend ActiveSupport::Concern
 
