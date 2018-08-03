@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import _ from 'underscore';
-import { __ } from '~/locale';
+import { __, sprintf } from '~/locale';
 import Flash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 
@@ -55,7 +55,9 @@ export default Vue.extend({
         })
         .catch(() => {
           this.loading = false;
-          Flash(__(`Something went wrong while fetching ${this.listType} list`));
+          Flash(sprintf(__('Something went wrong while fetching %{listType} list'), {
+            listType: this.listType,
+          }));
         });
     },
     handleItemClick(item) {
