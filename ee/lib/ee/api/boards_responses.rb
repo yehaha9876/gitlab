@@ -55,7 +55,7 @@ module EE
             if assignee_id = params[:assignee_id]
               users = ::Boards::UsersFinder.new(board, current_user).execute
 
-              unless users.find_by(id: assignee_id)
+              unless users.find_by(user_id: assignee_id)
                 render_api_error!({ error: 'User not found!' }, 400)
               end
             end
