@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 shared_examples_for 'assignee board list' do
   context 'when assignee_id is sent' do
     it 'returns 400 if user is not found' do
