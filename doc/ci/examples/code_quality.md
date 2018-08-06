@@ -47,7 +47,19 @@ configuration to reflect that change.
 CAUTION: **Caution:**
 This job definition is supported on GitLab >= 10.4. For earlier versions please
 use the old job definition:
-```
+```yaml
+codequality:
+  image: docker:latest
+  variables:
+    DOCKER_DRIVER: overlay
+  services:
+    - docker:dind
+  script:
+    - docker pull codeclimate/codeclimate
+    - docker run --env CODECLIMATE_CODE="$PWD" --volume "$PWD":/code --volume /var/run/docker.sock:/var/run/docker.sock --volume /tmp/cc:/tmp/cc codeclimate/codeclimate:0.69.0 init
+    - docker run --env CODECLIMATE_CODE="$PWD" --volume "$PWD":/code --volume /var/run/docker.sock:/var/run/docker.sock --volume /tmp/cc:/tmp/cc codeclimate/codeclimate:0.69.0 analyze -f json > codeclimate.json || true
+  artifacts:
+    paths: [codeclimate.json]
 ```
 
 [cli]: https://github.com/codeclimate/codeclimate
