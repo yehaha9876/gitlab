@@ -44,6 +44,12 @@ are still maintained they have been deprecated with GitLab 11.0 and may be remov
 in next major release, GitLab 12.0. You are advised to update your current `.gitlab-ci.yml`
 configuration to reflect that change.
 
+CAUTION: **Caution:**
+This job definition is supported on GitLab >= 10.4. For earlier versions please
+use the old job definition:
+```
+```
+
 [cli]: https://github.com/codeclimate/codeclimate
 [dind]: ../docker/using_docker_build.md#use-docker-in-docker-executor
 [ee]: https://about.gitlab.com/pricing/
