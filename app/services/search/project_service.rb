@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Search
   class ProjectService
     attr_accessor :project, :current_user, :params

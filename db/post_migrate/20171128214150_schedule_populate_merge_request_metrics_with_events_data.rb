@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:disable GitlabSecurity/SqlInjection
 
 class SchedulePopulateMergeRequestMetricsWithEventsData < ActiveRecord::Migration
   DOWNTIME = false

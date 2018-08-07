@@ -16,12 +16,8 @@ export default {
     DiffTableCell,
   },
   props: {
-    fileHash: {
-      type: String,
-      required: true,
-    },
-    contextLinesPath: {
-      type: String,
+    diffFile: {
+      type: Object,
       required: true,
     },
     line: {
@@ -33,11 +29,6 @@ export default {
       required: false,
       default: false,
     },
-    discussions: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
   },
   data() {
     return {
@@ -45,7 +36,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('diffs', ['isInlineView']),
+    ...mapGetters(['isInlineView']),
     isContextLine() {
       return this.line.type === CONTEXT_LINE_TYPE;
     },
@@ -59,7 +50,7 @@ export default {
     inlineRowId() {
       const { lineCode, oldLine, newLine } = this.line;
 
-      return lineCode || `${this.fileHash}_${oldLine}_${newLine}`;
+      return lineCode || `${this.diffFile.fileHash}_${oldLine}_${newLine}`;
     },
   },
   created() {
@@ -87,27 +78,24 @@ export default {
     @mouseout="handleMouseMove"
   >
     <diff-table-cell
-      :file-hash="fileHash"
-      :context-lines-path="contextLinesPath"
+      :diff-file="diffFile"
       :line="line"
       :line-type="oldLineType"
       :is-bottom="isBottom"
       :is-hover="isHover"
       :show-comment-button="true"
-      :discussions="discussions"
       class="diff-line-num old_line"
     />
     <diff-table-cell
-      :file-hash="fileHash"
-      :context-lines-path="contextLinesPath"
+      :diff-file="diffFile"
       :line="line"
       :line-type="newLineType"
       :is-bottom="isBottom"
       :is-hover="isHover"
-      :discussions="discussions"
       class="diff-line-num new_line"
     />
     <td
+      v-once
       :class="line.type"
       class="line_content"
       v-html="line.richText"

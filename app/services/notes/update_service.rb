@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Notes
   class UpdateService < BaseService
     def execute(note)

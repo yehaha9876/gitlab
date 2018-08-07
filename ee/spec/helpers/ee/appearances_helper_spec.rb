@@ -14,19 +14,9 @@ describe AppearancesHelper do
     end
 
     context 'when header message is set' do
-      it 'returns nil when unlicensed' do
-        create(:appearance, header_message: "Foo bar")
-
-        stub_licensed_features(system_header_footer: false)
-
-        expect(helper.header_message).to be_nil
-      end
-
-      it 'includes current message when licensed' do
+      it 'includes current message' do
         message = "Foo bar"
         create(:appearance, header_message: message)
-
-        stub_licensed_features(system_header_footer: true)
 
         expect(helper.header_message).to include(message)
       end
@@ -41,19 +31,9 @@ describe AppearancesHelper do
     end
 
     context 'when footer message is set' do
-      it 'returns nil when unlicensed' do
-        create(:appearance, footer_message: "Foo bar")
-
-        stub_licensed_features(system_header_footer: false)
-
-        expect(helper.footer_message).to be_nil
-      end
-
-      it 'includes current message when licensed' do
+      it 'includes current message' do
         message = "Foo bar"
         create(:appearance, footer_message: message)
-
-        stub_licensed_features(system_header_footer: true)
 
         expect(helper.footer_message).to include(message)
       end

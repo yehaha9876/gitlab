@@ -11,7 +11,7 @@ describe Projects::MirrorsController do
 
   describe 'updates the mirror URL' do
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
       login_as(user)
     end
 

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class MergeRequestCreateEntity < Grape::Entity
   expose :iid
 

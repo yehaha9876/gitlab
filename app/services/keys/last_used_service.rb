@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Keys
   class LastUsedService
     TIMEOUT = 1.day.to_i

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class ApplicationSetting
   class TermPolicy < BasePolicy
     include Gitlab::Utils::StrongMemoize

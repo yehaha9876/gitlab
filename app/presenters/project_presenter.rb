@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class ProjectPresenter < Gitlab::View::Presenter::Delegated
   include ActionView::Helpers::NumberHelper
   include ActionView::Helpers::UrlHelper

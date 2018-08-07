@@ -26,7 +26,6 @@ class AddIndexConstraintsToInternalIdTable < ActiveRecord::Migration
   end
 
   private
-
   def replace_index(table, columns, name:)
     temporary_name = "#{name}_old"
 

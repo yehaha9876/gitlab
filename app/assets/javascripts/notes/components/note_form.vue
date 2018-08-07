@@ -7,7 +7,7 @@ import issuableStateMixin from '../mixins/issuable_state';
 import resolvable from '../mixins/resolvable';
 
 export default {
-  name: 'NoteForm',
+  name: 'IssueNoteForm',
   components: {
     issueWarning,
     markdownField,
@@ -200,7 +200,7 @@ js-autosize markdown-area js-vue-issue-note-form js-vue-textarea"
           class="btn btn-cancel note-edit-cancel js-close-discussion-note-form"
           type="button"
           @click="cancelHandler()">
-          Cancel
+          {{ __('Discard draft') }}
         </button>
       </div>
     </form>

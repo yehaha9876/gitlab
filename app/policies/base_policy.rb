@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_dependency 'declarative_policy'
 
 class BasePolicy < DeclarativePolicy::Base

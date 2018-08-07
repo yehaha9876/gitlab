@@ -255,7 +255,6 @@ class Service < ActiveRecord::Base
       emails_on_push
       external_wiki
       flowdock
-      hangouts_chat
       hipchat
       irker
       jira

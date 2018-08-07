@@ -13,7 +13,7 @@ describe 'Groups (JavaScript fixtures)', type: :controller do
   end
 
   before do
-    group.add_maintainer(admin)
+    group.add_master(admin)
     sign_in(admin)
   end
 

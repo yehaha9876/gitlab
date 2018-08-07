@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class JobEntity < Grape::Entity
   include RequestAwareEntity
 

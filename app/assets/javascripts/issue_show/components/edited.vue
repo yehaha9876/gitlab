@@ -46,7 +46,7 @@
       by
       <a
         :href="updatedByPath"
-        class="author-link"
+        class="author_link"
       >
         <span>{{ updatedByName }}</span>
       </a>

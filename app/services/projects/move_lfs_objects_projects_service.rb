@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Projects
   class MoveLfsObjectsProjectsService < BaseMoveRelationsService
     def execute(source_project, remove_remaining_elements: true)

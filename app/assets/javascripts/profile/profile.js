@@ -49,14 +49,12 @@ export default class Profile {
 
   saveForm() {
     const self = this;
-    const formData = new FormData(this.form.get(0));
+    const formData = new FormData(this.form[0]);
     const avatarBlob = this.avatarGlCrop.getBlob();
 
     if (avatarBlob != null) {
       formData.append('user[avatar]', avatarBlob, 'avatar.png');
     }
-
-    formData.delete('user[avatar]-trigger');
 
     axios({
       method: this.form.attr('method'),

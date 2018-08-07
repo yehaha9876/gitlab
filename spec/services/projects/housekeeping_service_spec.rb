@@ -35,7 +35,7 @@ describe Projects::HousekeepingService do
       allow(subject).to receive(:gc_period).and_return(1)
       project.increment_pushes_since_gc
 
-      perform_enqueued_jobs do
+      Sidekiq::Testing.inline! do
         expect { subject.execute }.to change { project.pushes_since_gc }.to(0)
       end
     end

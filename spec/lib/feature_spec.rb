@@ -39,36 +39,18 @@ describe Feature do
   end
 
   describe '.persisted?' do
-    context 'when the feature is persisted' do
-      it 'returns true when feature name is a string' do
-        Feature::FlipperFeature.create!(key: 'foo')
+    it 'returns true for a persisted feature' do
+      Feature::FlipperFeature.create!(key: 'foo')
 
-        feature = double(:feature, name: 'foo')
+      feature = double(:feature, name: 'foo')
 
-        expect(described_class.persisted?(feature)).to eq(true)
-      end
-
-      it 'returns true when feature name is a symbol' do
-        Feature::FlipperFeature.create!(key: 'foo')
-
-        feature = double(:feature, name: :foo)
-
-        expect(described_class.persisted?(feature)).to eq(true)
-      end
+      expect(described_class.persisted?(feature)).to eq(true)
     end
 
-    context 'when the feature is not persisted' do
-      it 'returns false when feature name is a string' do
-        feature = double(:feature, name: 'foo')
+    it 'returns false for a feature that is not persisted' do
+      feature = double(:feature, name: 'foo')
 
-        expect(described_class.persisted?(feature)).to eq(false)
-      end
-
-      it 'returns false when feature name is a symbol' do
-        feature = double(:feature, name: :bar)
-
-        expect(described_class.persisted?(feature)).to eq(false)
-      end
+      expect(described_class.persisted?(feature)).to eq(false)
     end
   end
 

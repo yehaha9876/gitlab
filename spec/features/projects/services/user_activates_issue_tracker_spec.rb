@@ -15,7 +15,7 @@ describe 'User activates issue tracker', :js do
   end
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
 
     visit project_settings_integrations_path(project)

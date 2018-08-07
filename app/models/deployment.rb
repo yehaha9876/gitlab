@@ -92,6 +92,10 @@ class Deployment < ActiveRecord::Base
     @stop_action ||= manual_actions.find_by(name: on_stop)
   end
 
+  def stop_action?
+    stop_action.present?
+  end
+
   def formatted_deployment_time
     created_at.to_time.in_time_zone.to_s(:medium)
   end

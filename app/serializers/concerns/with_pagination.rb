@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module WithPagination
   attr_accessor :paginator
 

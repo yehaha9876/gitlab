@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Ci
   class RunnerPolicy < BasePolicy
     with_options scope: :subject, score: 0

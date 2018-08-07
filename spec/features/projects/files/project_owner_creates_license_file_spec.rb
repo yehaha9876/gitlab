@@ -2,16 +2,16 @@ require 'spec_helper'
 
 describe 'Projects > Files > Project owner creates a license file', :js do
   let(:project) { create(:project, :repository) }
-  let(:project_maintainer) { project.owner }
+  let(:project_master) { project.owner }
 
   before do
-    project.repository.delete_file(project_maintainer, 'LICENSE',
+    project.repository.delete_file(project_master, 'LICENSE',
       message: 'Remove LICENSE', branch_name: 'master')
-    sign_in(project_maintainer)
+    sign_in(project_master)
     visit project_path(project)
   end
 
-  it 'project maintainer creates a license file manually from a template' do
+  it 'project master creates a license file manually from a template' do
     visit project_tree_path(project, project.repository.root_ref)
     find('.add-to-tree').click
     click_link 'New file'
@@ -35,7 +35,7 @@ describe 'Projects > Files > Project owner creates a license file', :js do
     expect(page).to have_content("Copyright (c) #{Time.now.year} #{project.namespace.human_name}")
   end
 
-  it 'project maintainer creates a license file from the "Add license" link' do
+  it 'project master creates a license file from the "Add license" link' do
     click_link 'Add License'
 
     expect(page).to have_content('New file')

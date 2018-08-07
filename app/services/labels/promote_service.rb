@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Labels
   class PromoteService < BaseService
     BATCH_SIZE = 1000

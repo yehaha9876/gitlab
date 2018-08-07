@@ -237,7 +237,7 @@ export default {
     <status-icon :status="iconClass" />
     <div class="media-body">
       <div class="mr-widget-body-controls media space-children">
-        <span class="btn-group">
+        <span class="btn-group append-bottom-5">
           <button
             :disabled="isMergeButtonDisabled"
             :class="mergeButtonClass"

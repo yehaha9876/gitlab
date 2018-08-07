@@ -121,8 +121,6 @@ describe ButtonHelper do
   end
 
   describe 'clipboard_button' do
-    include IconsHelper
-
     let(:user) { create(:user) }
     let(:project) { build_stubbed(:project) }
 
@@ -147,7 +145,7 @@ describe ButtonHelper do
           expect(element.attr('data-clipboard-text')).to eq(nil)
           expect(element.inner_text).to eq("")
 
-          expect(element.to_html).to include sprite_icon('duplicate')
+          expect(element).to have_selector('.fa.fa-clipboard')
         end
       end
 
@@ -180,7 +178,7 @@ describe ButtonHelper do
 
     context 'with `hide_button_icon` attribute provided' do
       it 'shows copy to clipboard button without tooltip support' do
-        expect(element(hide_button_icon: true).to_html).not_to include sprite_icon('duplicate')
+        expect(element(hide_button_icon: true)).not_to have_selector('.fa.fa-clipboard')
       end
     end
   end

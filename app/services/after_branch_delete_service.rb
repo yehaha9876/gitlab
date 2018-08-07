@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 ##
 # Branch can be deleted either by DeleteBranchService
 # or by GitPushService.

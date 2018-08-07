@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module TestHooks
   class SystemService < TestHooks::BaseService
     private

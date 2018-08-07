@@ -20,7 +20,7 @@ describe GroupChildEntity do
 
     before do
       enable_external_authorization_service_check
-      object.add_maintainer(user)
+      object.add_master(user)
     end
 
     it 'does not hit the external authorization service' do

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Boards
   class ListService < Boards::BaseService
     prepend EE::Boards::ListService

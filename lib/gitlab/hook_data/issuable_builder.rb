@@ -1,9 +1,13 @@
 module Gitlab
   module HookData
-    class IssuableBuilder < BaseBuilder
+    class IssuableBuilder
       CHANGES_KEYS = %i[previous current].freeze
 
-      alias_method :issuable, :object
+      attr_accessor :issuable
+
+      def initialize(issuable)
+        @issuable = issuable
+      end
 
       def build(user: nil, changes: {})
         hook_data = {

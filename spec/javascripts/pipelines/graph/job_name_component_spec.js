@@ -10,7 +10,7 @@ describe('job name component', () => {
       propsData: {
         name: 'foo',
         status: {
-          icon: 'status_success',
+          icon: 'icon_status_success',
         },
       },
     }).$mount();

@@ -1,16 +1,16 @@
 require 'spec_helper'
 
-describe 'Projects > Members > Maintainer adds member with expiration date', :js do
+describe 'Projects > Members > Master adds member with expiration date', :js do
   include Select2Helper
   include ActiveSupport::Testing::TimeHelpers
 
-  let(:maintainer) { create(:user) }
+  let(:master) { create(:user) }
   let(:project) { create(:project) }
   let!(:new_member) { create(:user) }
 
   before do
-    project.add_maintainer(maintainer)
-    sign_in(maintainer)
+    project.add_master(master)
+    sign_in(master)
   end
 
   it 'expiration date is displayed in the members list' do

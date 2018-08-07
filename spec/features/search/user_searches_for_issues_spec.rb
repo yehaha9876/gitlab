@@ -8,7 +8,7 @@ describe 'User searches for issues', :js do
 
   context 'when signed in' do
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
       sign_in(user)
 
       visit(search_path)

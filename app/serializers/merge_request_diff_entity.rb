@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class MergeRequestDiffEntity < Grape::Entity
   include Gitlab::Routing
   include GitHelper

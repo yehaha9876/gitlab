@@ -42,13 +42,7 @@ module UsersHelper
   private
 
   def get_profile_tabs
-    tabs = []
-
-    if can?(current_user, :read_user_profile, @user)
-      tabs += [:activity, :groups, :contributed, :projects, :snippets]
-    end
-
-    tabs
+    [:activity, :groups, :contributed, :projects, :snippets]
   end
 
   def get_current_user_menu_items

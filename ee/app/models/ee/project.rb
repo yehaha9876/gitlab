@@ -39,8 +39,6 @@ module EE
 
       has_many :source_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :project_id
 
-      has_many :prometheus_alerts, inverse_of: :project
-
       scope :with_shared_runners_limit_enabled, -> { with_shared_runners.non_public_only }
 
       scope :mirror, -> { where(mirror: true) }
@@ -99,12 +97,6 @@ module EE
 
     def latest_pipeline_with_security_reports
       pipelines.newest_first(default_branch).with_security_reports.first
-    end
-
-    def environments_for_scope(scope)
-      quoted_scope = ::Gitlab::SQL::Glob.q(scope)
-
-      environments.where("name LIKE (#{::Gitlab::SQL::Glob.to_like(quoted_scope)})") # rubocop:disable GitlabSecurity/SqlInjection
     end
 
     def ensure_external_webhook_token
@@ -292,7 +284,7 @@ module EE
       if import? && !repository_exists?
         super
       elsif mirror?
-        ::Gitlab::Metrics.add_event(:mirrors_scheduled)
+        ::Gitlab::Metrics.add_event(:mirrors_scheduled, path: full_path)
         job_id = RepositoryUpdateMirrorWorker.perform_async(self.id)
 
         log_import_activity(job_id, type: :mirror)
@@ -511,12 +503,6 @@ module EE
     end
     request_cache(:any_path_locks?) { self.id }
 
-    override :after_import
-    def after_import
-      super
-      log_geo_events
-    end
-
     private
 
     def set_override_pull_mirror_available
@@ -551,13 +537,6 @@ module EE
 
     def validate_board_limit(board)
       # Board limits are disabled in EE, so this method is just a no-op.
-    end
-
-    def log_geo_events
-      return unless ::Gitlab::Geo.primary?
-
-      ::Geo::RepositoryUpdatedService.new(self, source: ::Geo::RepositoryUpdatedEvent::REPOSITORY).execute
-      ::Geo::RepositoryUpdatedService.new(self, source: ::Geo::RepositoryUpdatedEvent::WIKI).execute
     end
   end
 end

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module MergeRequests
   class CreateFromIssueService < MergeRequests::CreateService
     def initialize(project, user, params)

@@ -6,7 +6,7 @@ describe 'Slack slash commands' do
   let(:service) { project.create_slack_slash_commands_service }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
     visit edit_project_service_path(project, service)
   end

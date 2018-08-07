@@ -2,19 +2,11 @@ require 'spec_helper'
 
 describe Gitlab::Ci::Build::Artifacts::Metadata do
   def metadata(path = '', **opts)
-    described_class.new(metadata_file_stream, path, **opts)
+    described_class.new(metadata_file_path, path, **opts)
   end
 
   let(:metadata_file_path) do
     Rails.root + 'spec/fixtures/ci_build_artifacts_metadata.gz'
-  end
-
-  let(:metadata_file_stream) do
-    File.open(metadata_file_path) if metadata_file_path
-  end
-
-  after do
-    metadata_file_stream&.close
   end
 
   context 'metadata file exists' do
@@ -94,21 +86,11 @@ describe Gitlab::Ci::Build::Artifacts::Metadata do
   end
 
   context 'metadata file does not exist' do
-    let(:metadata_file_path) { nil }
+    let(:metadata_file_path) { '' }
 
     describe '#find_entries!' do
       it 'raises error' do
-        expect { metadata.find_entries! }.to raise_error(described_class::InvalidStreamError, /Invalid stream/)
-      end
-    end
-  end
-
-  context 'metadata file is invalid' do
-    let(:metadata_file_path) { Rails.root + 'spec/fixtures/ci_build_artifacts.zip' }
-
-    describe '#find_entries!' do
-      it 'raises error' do
-        expect { metadata.find_entries! }.to raise_error(described_class::InvalidStreamError, /not in gzip format/)
+        expect { metadata.find_entries! }.to raise_error(Errno::ENOENT)
       end
     end
   end

@@ -65,7 +65,7 @@ describe Gitlab::HashedStorage::Migrator do
     end
 
     it 'migrate project' do
-      perform_enqueued_jobs do
+      Sidekiq::Testing.inline! do
         subject.migrate(project)
       end
 

@@ -7,7 +7,7 @@ describe 'Milestone' do
 
   before do
     create(:group_member, group: group, user: user)
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
   end
 

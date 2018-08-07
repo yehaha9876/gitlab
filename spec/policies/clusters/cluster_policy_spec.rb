@@ -16,9 +16,9 @@ describe Clusters::ClusterPolicy, :models do
       it { expect(policy).to be_disallowed :admin_cluster }
     end
 
-    context 'when maintainer' do
+    context 'when master' do
       before do
-        project.add_maintainer(user)
+        project.add_master(user)
       end
 
       it { expect(policy).to be_allowed :update_cluster }

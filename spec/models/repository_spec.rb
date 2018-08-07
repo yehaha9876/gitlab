@@ -151,9 +151,7 @@ describe Repository do
         it { is_expected.to eq(['v1.1.0', 'v1.0.0', annotated_tag_name]) }
 
         after do
-          Gitlab::GitalyClient::StorageSettings.allow_disk_access do
-            repository.rugged.tags.delete(annotated_tag_name)
-          end
+          repository.rugged.tags.delete(annotated_tag_name)
         end
       end
     end
@@ -296,40 +294,24 @@ describe Repository do
   end
 
   describe '#new_commits' do
-    shared_examples 'finding unreferenced commits' do
-      set(:project) { create(:project, :repository) }
-      let(:repository) { project.repository }
-
-      subject { repository.new_commits(rev) }
-
-      context 'when there are no new commits' do
-        let(:rev) { repository.commit.id }
-
-        it 'returns an empty array' do
-          expect(subject).to eq([])
-        end
-      end
-
-      context 'when new commits are found' do
-        let(:branch) { 'orphaned-branch' }
-        let!(:rev) { repository.commit(branch).id }
-
-        it 'returns the commits' do
-          repository.delete_branch(branch)
-
-          expect(subject).not_to be_empty
-          expect(subject).to all( be_a(::Commit) )
-          expect(subject.size).to eq(1)
-        end
-      end
+    let(:new_refs) do
+      double(:git_rev_list, new_refs: %w[
+        c1acaa58bbcbc3eafe538cb8274ba387047b69f8
+        5937ac0a7beb003549fc5fd26fc247adbce4a52e
+      ])
     end
 
-    context 'when Gitaly handles the request' do
-      it_behaves_like 'finding unreferenced commits'
-    end
+    it 'delegates to Gitlab::Git::RevList' do
+      expect(Gitlab::Git::RevList).to receive(:new).with(
+        repository.raw,
+        newrev: 'aaaabbbbccccddddeeeeffffgggghhhhiiiijjjj').and_return(new_refs)
 
-    context 'when Gitaly is disabled', :disable_gitaly do
-      it_behaves_like 'finding unreferenced commits'
+      commits = repository.new_commits('aaaabbbbccccddddeeeeffffgggghhhhiiiijjjj')
+
+      expect(commits).to eq([
+        repository.commit('c1acaa58bbcbc3eafe538cb8274ba387047b69f8'),
+        repository.commit('5937ac0a7beb003549fc5fd26fc247adbce4a52e')
+      ])
     end
   end
 
@@ -449,18 +431,6 @@ describe Repository do
 
       it { is_expected.to be_falsey }
     end
-
-    context 'non merged branch' do
-      subject { repository.merged_to_root_ref?('fix') }
-
-      it { is_expected.to be_falsey }
-    end
-
-    context 'non existent branch' do
-      subject { repository.merged_to_root_ref?('non_existent_branch') }
-
-      it { is_expected.to be_nil }
-    end
   end
 
   describe '#can_be_merged?' do
@@ -482,10 +452,16 @@ describe Repository do
       it { is_expected.to be_falsey }
     end
 
-    context 'submodule changes that confuse rugged' do
-      subject { repository.can_be_merged?('update-gitlab-shell-v-6-0-1', 'update-gitlab-shell-v-6-0-3') }
+    context 'non merged branch' do
+      subject { repository.merged_to_root_ref?('fix') }
 
       it { is_expected.to be_falsey }
+    end
+
+    context 'non existent branch' do
+      subject { repository.merged_to_root_ref?('non_existent_branch') }
+
+      it { is_expected.to be_nil }
     end
   end
 
@@ -1034,6 +1010,24 @@ describe Repository do
       it "returns false and doesn't create the branch" do
         expect(subject).to be(false)
         expect(repository.find_branch(branch_name)).to be_nil
+      end
+    end
+  end
+
+  describe '#find_branch' do
+    context 'fresh_repo is true' do
+      it 'delegates the call to raw_repository' do
+        expect(repository.raw_repository).to receive(:find_branch).with('master', true)
+
+        repository.find_branch('master', fresh_repo: true)
+      end
+    end
+
+    context 'fresh_repo is false' do
+      it 'delegates the call to raw_repository' do
+        expect(repository.raw_repository).to receive(:find_branch).with('master', false)
+
+        repository.find_branch('master', fresh_repo: false)
       end
     end
   end
@@ -2222,6 +2216,17 @@ describe Repository do
 
       expect(repository.local_branches.any? { |branch| branch.name == 'remote_branch' }).to eq(false)
       expect(repository.local_branches.any? { |branch| branch.name == 'local_branch' }).to eq(true)
+    end
+  end
+
+  describe '#remote_branches' do
+    it 'returns the remote branches' do
+      masterrev = repository.find_branch('master').dereferenced_target
+      create_remote_branch('joe', 'remote_branch', masterrev)
+      repository.add_branch(user, 'local_branch', masterrev.id)
+
+      expect(repository.remote_branches('joe').any? { |branch| branch.name == 'local_branch' }).to eq(false)
+      expect(repository.remote_branches('joe').any? { |branch| branch.name == 'remote_branch' }).to eq(true)
     end
   end
 

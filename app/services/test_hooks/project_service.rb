@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module TestHooks
   class ProjectService < TestHooks::BaseService
     attr_writer :project

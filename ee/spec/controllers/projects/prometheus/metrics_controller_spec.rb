@@ -10,7 +10,7 @@ describe Projects::Prometheus::MetricsController do
     allow(controller).to receive(:project).and_return(project)
     allow(controller).to receive(:prometheus_adapter).and_return(prometheus_adapter)
 
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
   end
 

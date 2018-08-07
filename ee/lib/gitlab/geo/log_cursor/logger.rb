@@ -25,10 +25,6 @@ module Gitlab
           geo_logger.error(base_log_data(message, params))
         end
 
-        def warn(message, params = {})
-          geo_logger.warn(base_log_data(message, params))
-        end
-
         def debug(message, params = {})
           geo_logger.debug(base_log_data(message, params))
         end

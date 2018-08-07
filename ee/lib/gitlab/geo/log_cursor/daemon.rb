@@ -37,47 +37,23 @@ module Gitlab
           # Wrap this with the connection to make it possible to reconnect if
           # PGbouncer dies: https://github.com/rails/rails/issues/29189
           ActiveRecord::Base.connection_pool.with_connection do
-            LogCursor::EventLogs.new.fetch_in_batches { |batch, last_id| handle_events(batch, last_id) }
+            LogCursor::EventLogs.new.fetch_in_batches { |batch| handle_events(batch) }
           end
         end
 
         private
 
-        def handle_events(batch, last_id)
-          logger.info("Handling events", first_id: batch.first.id, last_id: batch.last.id)
-
-          last_event_id = last_id
-
-          batch.each_with_index do |event_log, index|
-            event = event_log.event
-
-            # If a project is deleted, the event log and its associated event data
-            # could be purged from the log. We ignore this and move along.
-            unless event
-              logger.warn("Unknown event", event_log_id: event_log.id)
-              next
-            end
-
-            check_event_id(last_event_id, event_log.id) if last_event_id > 0
-            last_event_id = event_log.id
-
-            unless can_replay?(event_log)
-              logger.event_info(event_log.created_at, 'Skipped event', event_data(event_log))
-              next
-            end
+        def handle_events(batch)
+          batch.each do |event_log|
+            next unless can_replay?(event_log)
 
             begin
+              event = event_log.event
               event_klass_for(event).new(event, event_log.created_at, logger).process
             rescue NoMethodError => e
               logger.error(e.message)
               raise e
             end
-          end
-        end
-
-        def check_event_id(last_event_id, current_log_id)
-          if last_event_id + 1 != current_log_id
-            logger.info("Event log gap", previous_event_log_id: last_event_id, event_log_id: current_log_id)
           end
         end
 
@@ -128,15 +104,6 @@ module Gitlab
 
         def log_level
           options[:debug] ? :debug : Rails.logger.level
-        end
-
-        def event_data(event_log)
-          {
-            event_log_id: event_log.id,
-            event_id: event_log.event.id,
-            event_type: event_log.event.class.name,
-            project_id: event_log.project_id
-          }
         end
       end
     end

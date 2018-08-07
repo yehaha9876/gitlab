@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Ci
   class BuildPolicy < CommitStatusPolicy
     condition(:protected_ref) do

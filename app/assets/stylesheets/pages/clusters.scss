@@ -32,23 +32,49 @@
 }
 
 .gcp-signup-offer {
-  border-left-color: $blue-500;
+  background-color: $blue-50;
+  border: 1px solid $blue-300;
+  border-radius: $border-radius-default;
 
-  svg {
-    fill: $blue-500;
-    vertical-align: middle;
+  // TODO: To be superceded by cssLab
+  &.alert {
+    padding: 24px 16px;
+
+    &-dismissable {
+      padding-right: 32px;
+
+      .close {
+        top: -8px;
+        right: -16px;
+        color: $blue-500;
+        opacity: 1;
+      }
+    }
   }
 
-  .gcp-signup-offer--content {
-    display: flex;
+  .gcp-logo {
+    margin-bottom: $gl-padding;
+    text-align: center;
+  }
 
-    h4 {
-      font-size: 16px;
-      line-height: 24px;
+  img {
+    max-width: $gcp-signup-offer-icon-max-width;
+  }
+
+  a:not(.btn) {
+    color: $gl-link-color;
+    font-weight: normal;
+    text-decoration: none;
+  }
+
+  @include media-breakpoint-up(sm) {
+    > div {
+      display: flex;
+      align-items: center;
     }
 
-    .gcp-signup-offer--icon {
-      align-self: flex-start;
+    .gcp-logo {
+      margin: 0;
     }
   }
 }

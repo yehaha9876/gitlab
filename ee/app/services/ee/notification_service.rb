@@ -27,10 +27,10 @@ module EE
     end
 
     def mirror_was_hard_failed(project)
-      recipients = project.members.active_without_invites_and_requests.owners_and_maintainers
+      recipients = project.members.active_without_invites_and_requests.owners_and_masters
 
       if recipients.empty? && project.group
-        recipients = project.group.members.active_without_invites_and_requests.owners_and_maintainers
+        recipients = project.group.members.active_without_invites_and_requests.owners_and_masters
       end
 
       recipients.each do |recipient|
@@ -40,18 +40,6 @@ module EE
 
     def project_mirror_user_changed(new_mirror_user, deleted_user_name, project)
       mailer.project_mirror_user_changed_email(new_mirror_user.id, deleted_user_name, project.id).deliver_later
-    end
-
-    def prometheus_alerts_fired(project, alerts)
-      recipients = project.members.active_without_invites_and_requests.owners_and_masters
-
-      if recipients.empty? && project.group
-        recipients = project.group.members.active_without_invites_and_requests.owners_and_masters
-      end
-
-      recipients.product(alerts).each do |recipient, alert|
-        mailer.prometheus_alert_fired_email(project.id, recipient.user.id, alert).deliver_later
-      end
     end
 
     private

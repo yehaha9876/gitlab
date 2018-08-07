@@ -1,90 +1,94 @@
 <script>
-import { mapState, mapActions } from 'vuex';
-import imageDiffHelper from '~/image_diff/helpers/index';
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import DiffFileHeader from '~/diffs/components/diff_file_header.vue';
-import SkeletonLoadingContainer from '~/vue_shared/components/skeleton_loading_container.vue';
-import { trimFirstCharOfLineContent } from '~/diffs/store/utils';
+  import { mapState, mapActions } from 'vuex';
+  import imageDiffHelper from '~/image_diff/helpers/index';
+  import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+  import DiffFileHeader from '~/diffs/components/diff_file_header.vue';
+  import SkeletonLoadingContainer from '~/vue_shared/components/skeleton_loading_container.vue';
+  import { trimFirstCharOfLineContent } from '~/diffs/store/utils';
 
-export default {
-  components: {
-    DiffFileHeader,
-    SkeletonLoadingContainer,
-  },
-  props: {
-    discussion: {
-      type: Object,
-      required: true,
+  export default {
+    components: {
+      DiffFileHeader,
+      SkeletonLoadingContainer,
     },
-  },
-  data() {
-    return {
-      error: false,
-    };
-  },
-  computed: {
-    ...mapState({
-      noteableData: state => state.notes.noteableData,
-    }),
-    hasTruncatedDiffLines() {
-      return this.discussion.truncatedDiffLines && this.discussion.truncatedDiffLines.length !== 0;
+    props: {
+      discussion: {
+        type: Object,
+        required: true,
+      },
     },
-    isDiscussionsExpanded() {
-      return true; // TODO: @fatihacet - Fix this.
+    data() {
+      return {
+        error: false,
+      };
     },
-    isCollapsed() {
-      return this.diffFile.collapsed || false;
+    computed: {
+      ...mapState({
+        noteableData: state => state.notes.noteableData,
+      }),
+      hasTruncatedDiffLines() {
+        return this.discussion.truncatedDiffLines &&
+          this.discussion.truncatedDiffLines.length !== 0;
+      },
+      isDiscussionsExpanded() {
+        return true; // TODO: @fatihacet - Fix this.
+      },
+      isCollapsed() {
+        return this.diffFile.collapsed || false;
+      },
+      isImageDiff() {
+        return !this.diffFile.text;
+      },
+      diffFileClass() {
+        const { text } = this.diffFile;
+        return text ? 'text-file' : 'js-image-file';
+      },
+      diffFile() {
+        return convertObjectPropsToCamelCase(this.discussion.diffFile, { deep: true });
+      },
+      imageDiffHtml() {
+        return this.discussion.imageDiffHtml;
+      },
+      currentUser() {
+        return this.noteableData.current_user;
+      },
+      userColorScheme() {
+        return window.gon.user_color_scheme;
+      },
+      normalizedDiffLines() {
+        if (this.discussion.truncatedDiffLines) {
+          return this.discussion.truncatedDiffLines.map(line =>
+            trimFirstCharOfLineContent(convertObjectPropsToCamelCase(line)),
+          );
+        }
+
+        return [];
+      },
     },
-    isImageDiff() {
-      return !this.diffFile.text;
-    },
-    diffFileClass() {
-      const { text } = this.diffFile;
-      return text ? 'text-file' : 'js-image-file';
-    },
-    diffFile() {
-      return convertObjectPropsToCamelCase(this.discussion.diffFile, { deep: true });
-    },
-    imageDiffHtml() {
-      return this.discussion.imageDiffHtml;
-    },
-    userColorScheme() {
-      return window.gon.user_color_scheme;
-    },
-    normalizedDiffLines() {
-      if (this.discussion.truncatedDiffLines) {
-        return this.discussion.truncatedDiffLines.map(line =>
-          trimFirstCharOfLineContent(convertObjectPropsToCamelCase(line)),
-        );
+    mounted() {
+      if (this.isImageDiff) {
+        const canCreateNote = false;
+        const renderCommentBadge = true;
+        imageDiffHelper.initImageDiff(this.$refs.fileHolder, canCreateNote, renderCommentBadge);
+      } else if (!this.hasTruncatedDiffLines) {
+        this.fetchDiff();
       }
-
-      return [];
     },
-  },
-  mounted() {
-    if (this.isImageDiff) {
-      const canCreateNote = false;
-      const renderCommentBadge = true;
-      imageDiffHelper.initImageDiff(this.$refs.fileHolder, canCreateNote, renderCommentBadge);
-    } else if (!this.hasTruncatedDiffLines) {
-      this.fetchDiff();
-    }
-  },
-  methods: {
-    ...mapActions(['fetchDiscussionDiffLines']),
-    rowTag(html) {
-      return html.outerHTML ? 'tr' : 'template';
+    methods: {
+      ...mapActions(['fetchDiscussionDiffLines']),
+      rowTag(html) {
+        return html.outerHTML ? 'tr' : 'template';
+      },
+      fetchDiff() {
+        this.error = false;
+        this.fetchDiscussionDiffLines(this.discussion)
+          .then(this.highlight)
+          .catch(() => {
+            this.error = true;
+          });
+      },
     },
-    fetchDiff() {
-      this.error = false;
-      this.fetchDiscussionDiffLines(this.discussion)
-        .then(this.highlight)
-        .catch(() => {
-          this.error = true;
-        });
-    },
-  },
-};
+  };
 </script>
 
 <template>
@@ -95,7 +99,7 @@ export default {
   >
     <diff-file-header
       :diff-file="diffFile"
-      :can-current-user-fork="false"
+      :current-user="currentUser"
       :discussions-expanded="isDiscussionsExpanded"
       :expanded="!isCollapsed"
     />

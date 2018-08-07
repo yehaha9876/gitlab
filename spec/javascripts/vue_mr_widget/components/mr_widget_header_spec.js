@@ -119,7 +119,6 @@ describe('MRWidgetHeader', () => {
       beforeEach(() => {
         vm = mountComponent(Component, {
           mr: {
-            iid: 1,
             divergedCommitsCount: 12,
             sourceBranch: 'mr-widget-refactor',
             sourceBranchLink: '<a href="/foo/bar/mr-widget-refactor">mr-widget-refactor</a>',
@@ -131,8 +130,6 @@ describe('MRWidgetHeader', () => {
             emailPatchesPath: '/mr/email-patches',
             plainDiffPath: '/mr/plainDiffPath',
             statusPath: 'abc',
-            sourceProjectFullPath: 'root/gitlab-ce',
-            targetProjectFullPath: 'gitlab-org/gitlab-ce',
           },
         });
       });
@@ -149,40 +146,16 @@ describe('MRWidgetHeader', () => {
         const button = vm.$el.querySelector('.js-web-ide');
 
         expect(button.textContent.trim()).toEqual('Open in Web IDE');
-        expect(button.getAttribute('href')).toEqual(
-          '/-/ide/project/root/gitlab-ce/merge_requests/1?target_project=gitlab-org%2Fgitlab-ce',
-        );
+        expect(button.getAttribute('href')).toEqual('/-/ide/projectabc');
       });
 
-      it('renders web ide button with blank query string if target & source project branch', done => {
-        vm.mr.targetProjectFullPath = 'root/gitlab-ce';
-
-        vm.$nextTick(() => {
-          const button = vm.$el.querySelector('.js-web-ide');
-
-          expect(button.textContent.trim()).toEqual('Open in Web IDE');
-          expect(button.getAttribute('href')).toEqual(
-            '/-/ide/project/root/gitlab-ce/merge_requests/1?target_project=',
-          );
-
-          done();
-        });
-      });
-
-      it('renders web ide button with relative URL', done => {
+      it('renders web ide button with relative URL', () => {
         gon.relative_url_root = '/gitlab';
-        vm.mr.iid = 2;
 
-        vm.$nextTick(() => {
-          const button = vm.$el.querySelector('.js-web-ide');
+        const button = vm.$el.querySelector('.js-web-ide');
 
-          expect(button.textContent.trim()).toEqual('Open in Web IDE');
-          expect(button.getAttribute('href')).toEqual(
-            '/gitlab/-/ide/project/root/gitlab-ce/merge_requests/2?target_project=gitlab-org%2Fgitlab-ce',
-          );
-
-          done();
-        });
+        expect(button.textContent.trim()).toEqual('Open in Web IDE');
+        expect(button.getAttribute('href')).toEqual('/-/ide/projectabc');
       });
 
       it('renders download dropdown with links', () => {

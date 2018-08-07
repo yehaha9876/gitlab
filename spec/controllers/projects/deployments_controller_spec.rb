@@ -8,7 +8,7 @@ describe Projects::DeploymentsController do
   let(:environment) { create(:environment, name: 'production', project: project) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
 
     sign_in(user)
   end

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class ClusterApplicationEntity < Grape::Entity
   expose :name
   expose :status_name, as: :status

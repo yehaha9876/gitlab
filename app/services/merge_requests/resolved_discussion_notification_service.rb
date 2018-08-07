@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module MergeRequests
   class ResolvedDiscussionNotificationService < MergeRequests::BaseService
     def execute(merge_request)

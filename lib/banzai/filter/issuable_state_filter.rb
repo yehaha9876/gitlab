@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Banzai
   module Filter
     # HTML filter that appends state information to issuable links.

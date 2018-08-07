@@ -6,7 +6,7 @@ describe 'Projects > Members > Anonymous user sees members' do
   let(:project) { create(:project, :public) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     create(:project_group_link, project: project, group: group)
   end
 

@@ -9,7 +9,7 @@ describe 'User comments on a commit', :js do
   let(:user) { create(:user) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
 
     visit(project_commit_path(project, sample_commit.id))

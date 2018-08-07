@@ -3,7 +3,7 @@ require 'rails_helper'
 describe 'Projects > Settings > LFS settings' do
   let(:project) { create(:project) }
   let(:user) { create(:user) }
-  let(:role) { :maintainer }
+  let(:role) { :master }
 
   context 'LFS enabled setting' do
     before do
@@ -13,8 +13,8 @@ describe 'Projects > Settings > LFS settings' do
       project.add_role(user, role)
     end
 
-    context 'for maintainer' do
-      let(:role) { :maintainer }
+    context 'for master' do
+      let(:role) { :master }
 
       it 'displays the correct elements', :js do
         visit edit_project_path(project)

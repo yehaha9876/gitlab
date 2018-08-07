@@ -10,7 +10,7 @@ describe ProtectedBranchPolicy do
   subject { described_class.new(user, protected_branch) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
   end
 
   context 'when unprotection is limited by access levels' do

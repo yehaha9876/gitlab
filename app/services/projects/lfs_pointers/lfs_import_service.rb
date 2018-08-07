@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # This service manages the whole worflow of discovering the Lfs files in a
 # repository, linking them to the project and downloading (and linking) the non
 # existent ones.

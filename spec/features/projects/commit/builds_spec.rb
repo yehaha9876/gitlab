@@ -5,7 +5,7 @@ describe 'project commit pipelines', :js do
 
   before do
     user = create(:user)
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
   end
 

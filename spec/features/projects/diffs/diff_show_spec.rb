@@ -24,7 +24,7 @@ describe 'Diff file viewer', :js do
 
   context 'Ruby file (stored in LFS)' do
     before do
-      project.add_maintainer(project.creator)
+      project.add_master(project.creator)
 
       @commit_id = Files::CreateService.new(
         project,

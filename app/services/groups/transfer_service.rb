@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Groups
   class TransferService < Groups::BaseService
     ERROR_MESSAGES = {

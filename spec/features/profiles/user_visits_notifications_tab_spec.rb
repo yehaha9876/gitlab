@@ -5,7 +5,7 @@ describe 'User visits the notifications tab', :js do
   let(:user) { create(:user) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
     visit(profile_notifications_path)
   end

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # This service is an adapter used to for the GitLab Import feature, and
 # creating a project from a template.
 # The latter will under the hood just import an archive supplied by GitLab.

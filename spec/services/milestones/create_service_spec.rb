@@ -7,7 +7,7 @@ describe Milestones::CreateService do
   describe '#execute' do
     context "valid params" do
       before do
-        project.add_maintainer(user)
+        project.add_master(user)
 
         opts = {
           title: 'v2.1.9',

@@ -14,7 +14,7 @@ describe Groups::RunnersController do
 
   before do
     sign_in(user)
-    group.add_maintainer(user)
+    group.add_master(user)
   end
 
   describe '#update' do

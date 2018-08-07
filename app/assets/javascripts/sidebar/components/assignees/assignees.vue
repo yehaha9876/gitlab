@@ -187,7 +187,7 @@ export default {
       <template v-else-if="hasOneUser">
         <a
           :href="assigneeUrl(firstUser)"
-          class="author-link bold"
+          class="author_link bold"
         >
           <img
             :alt="assigneeAlt(firstUser)"

@@ -83,7 +83,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     resources :hooks, only: [:index, :create, :destroy], constraints: { id: /\d+/ } do
       member do
-        post :test
+        get :test
       end
     end
 
@@ -109,6 +109,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         resources :notes, only: [:index, :create, :destroy, :update], concerns: :awardable, constraints: { id: /\d+/ }
       end
     end
+
+    resources :todos, only: [:create]
 
     # On CE only index and show are needed
     resources :boards, only: [:index, :show, :create, :update, :destroy]

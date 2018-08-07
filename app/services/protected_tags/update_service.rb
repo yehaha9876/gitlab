@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module ProtectedTags
   class UpdateService < BaseService
     def execute(protected_tag)

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class RepositoryArchiveCleanUpService
   LAST_MODIFIED_TIME_IN_MINUTES = 120
 

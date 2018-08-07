@@ -21,14 +21,14 @@ class UploadedFile
     raise InvalidPathError, "#{path} file does not exist" unless ::File.exist?(path)
 
     @content_type = content_type
-    @original_filename = sanitize_filename(filename || path)
+    @original_filename = filename || ::File.basename(path)
     @content_type = content_type
     @sha256 = sha256
     @remote_id = remote_id
     @tempfile = File.new(path, 'rb')
   end
 
-  def self.from_params(params, field, upload_paths)
+  def self.from_params(params, field, upload_path)
     unless params["#{field}.path"]
       raise InvalidPathError, "file is invalid" if params["#{field}.remote_id"]
 
@@ -37,8 +37,7 @@ class UploadedFile
 
     file_path = File.realpath(params["#{field}.path"])
 
-    paths = Array(upload_paths) << Dir.tmpdir
-    unless self.allowed_path?(file_path, paths.compact)
+    unless self.allowed_path?(file_path, [upload_path, Dir.tmpdir].compact)
       raise InvalidPathError, "insecure path used '#{file_path}'"
     end
 
@@ -53,16 +52,6 @@ class UploadedFile
     paths.any? do |path|
       File.exist?(path) && file_path.start_with?(File.realpath(path))
     end
-  end
-
-  # copy-pasted from CarrierWave::SanitizedFile
-  def sanitize_filename(name)
-    name = name.tr("\\", "/") # work-around for IE
-    name = ::File.basename(name)
-    name = name.gsub(CarrierWave::SanitizedFile.sanitize_regexp, "_")
-    name = "_#{name}" if name =~ /\A\.+\z/
-    name = "unnamed" if name.empty?
-    name.mb_chars.to_s
   end
 
   def path

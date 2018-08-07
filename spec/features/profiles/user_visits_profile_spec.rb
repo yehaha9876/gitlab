@@ -29,7 +29,7 @@ describe 'User visits their profile' do
     let!(:project) do
       create(:project, :repository, namespace: group) do |project|
         create(:closed_issue_event, project: project)
-        project.add_maintainer(user)
+        project.add_master(user)
       end
     end
 

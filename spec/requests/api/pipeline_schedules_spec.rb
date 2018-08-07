@@ -270,38 +270,38 @@ describe API::PipelineSchedules do
   end
 
   describe 'DELETE /projects/:id/pipeline_schedules/:pipeline_schedule_id' do
-    let(:maintainer) { create(:user) }
+    let(:master) { create(:user) }
 
     let!(:pipeline_schedule) do
       create(:ci_pipeline_schedule, project: project, owner: developer)
     end
 
     before do
-      project.add_maintainer(maintainer)
+      project.add_master(master)
     end
 
     context 'authenticated user with valid permissions' do
       it 'deletes pipeline_schedule' do
         expect do
-          delete api("/projects/#{project.id}/pipeline_schedules/#{pipeline_schedule.id}", maintainer)
+          delete api("/projects/#{project.id}/pipeline_schedules/#{pipeline_schedule.id}", master)
         end.to change { project.pipeline_schedules.count }.by(-1)
 
         expect(response).to have_gitlab_http_status(204)
       end
 
       it 'responds with 404 Not Found if requesting non-existing pipeline_schedule' do
-        delete api("/projects/#{project.id}/pipeline_schedules/-5", maintainer)
+        delete api("/projects/#{project.id}/pipeline_schedules/-5", master)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it_behaves_like '412 response' do
-        let(:request) { api("/projects/#{project.id}/pipeline_schedules/#{pipeline_schedule.id}", maintainer) }
+        let(:request) { api("/projects/#{project.id}/pipeline_schedules/#{pipeline_schedule.id}", master) }
       end
     end
 
     context 'authenticated user with invalid permissions' do
-      let!(:pipeline_schedule) { create(:ci_pipeline_schedule, project: project, owner: maintainer) }
+      let!(:pipeline_schedule) { create(:ci_pipeline_schedule, project: project, owner: master) }
 
       it 'does not delete pipeline_schedule' do
         delete api("/projects/#{project.id}/pipeline_schedules/#{pipeline_schedule.id}", developer)
@@ -415,7 +415,7 @@ describe API::PipelineSchedules do
   end
 
   describe 'DELETE /projects/:id/pipeline_schedules/:pipeline_schedule_id/variables/:key' do
-    let(:maintainer) { create(:user) }
+    let(:master) { create(:user) }
 
     set(:pipeline_schedule) do
       create(:ci_pipeline_schedule, project: project, owner: developer)
@@ -426,13 +426,13 @@ describe API::PipelineSchedules do
     end
 
     before do
-      project.add_maintainer(maintainer)
+      project.add_master(master)
     end
 
     context 'authenticated user with valid permissions' do
       it 'deletes pipeline_schedule_variable' do
         expect do
-          delete api("/projects/#{project.id}/pipeline_schedules/#{pipeline_schedule.id}/variables/#{pipeline_schedule_variable.key}", maintainer)
+          delete api("/projects/#{project.id}/pipeline_schedules/#{pipeline_schedule.id}/variables/#{pipeline_schedule_variable.key}", master)
         end.to change { Ci::PipelineScheduleVariable.count }.by(-1)
 
         expect(response).to have_gitlab_http_status(:accepted)
@@ -440,14 +440,14 @@ describe API::PipelineSchedules do
       end
 
       it 'responds with 404 Not Found if requesting non-existing pipeline_schedule_variable' do
-        delete api("/projects/#{project.id}/pipeline_schedules/#{pipeline_schedule.id}/variables/____", maintainer)
+        delete api("/projects/#{project.id}/pipeline_schedules/#{pipeline_schedule.id}/variables/____", master)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
     context 'authenticated user with invalid permissions' do
-      let!(:pipeline_schedule) { create(:ci_pipeline_schedule, project: project, owner: maintainer) }
+      let!(:pipeline_schedule) { create(:ci_pipeline_schedule, project: project, owner: master) }
 
       it 'does not delete pipeline_schedule_variable' do
         delete api("/projects/#{project.id}/pipeline_schedules/#{pipeline_schedule.id}/variables/#{pipeline_schedule_variable.key}", developer)

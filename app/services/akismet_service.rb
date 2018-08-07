@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class AkismetService
   attr_accessor :owner, :text, :options
 

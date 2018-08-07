@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # This service list all existent Lfs objects in a repository
 module Projects
   module LfsPointers

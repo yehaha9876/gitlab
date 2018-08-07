@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Projects
   class UpdateRemoteMirrorService < BaseService
     attr_reader :errors

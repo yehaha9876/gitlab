@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class NoteSummary
   attr_reader :note
   attr_reader :metadata

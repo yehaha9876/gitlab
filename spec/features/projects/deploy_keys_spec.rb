@@ -5,7 +5,7 @@ describe 'Project deploy keys', :js do
   let(:project) { create(:project_empty_repo) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
   end
 

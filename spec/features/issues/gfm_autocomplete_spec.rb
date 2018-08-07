@@ -7,7 +7,7 @@ describe 'GFM autocomplete', :js do
   let(:issue)   { create(:issue, project: project) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
     visit project_issue_path(project, issue)
 

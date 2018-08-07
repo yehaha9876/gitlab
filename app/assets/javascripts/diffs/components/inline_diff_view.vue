@@ -20,11 +20,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('diffs', [
-      'commitId',
-      'shouldRenderInlineCommentRow',
-      'singleDiscussionByLineCode',
-    ]),
+    ...mapGetters(['commitId', 'discussionsByLineCode']),
     ...mapState({
       diffLineCommentForms: state => state.diffs.diffLineCommentForms,
     }),
@@ -38,7 +34,18 @@ export default {
       return window.gon.user_color_scheme;
     },
   },
-  methods: {},
+  methods: {
+    shouldRenderCommentRow(line) {
+      if (this.diffLineCommentForms[line.lineCode]) return true;
+
+      const lineDiscussions = this.discussionsByLineCode[line.lineCode];
+      if (lineDiscussions === undefined) {
+        return false;
+      }
+
+      return lineDiscussions.every(discussion => discussion.expanded);
+    },
+  },
 };
 </script>
 
@@ -52,20 +59,18 @@ export default {
         v-for="(line, index) in normalizedDiffLines"
       >
         <inline-diff-table-row
-          :file-hash="diffFile.fileHash"
-          :context-lines-path="diffFile.contextLinesPath"
+          :diff-file="diffFile"
           :line="line"
           :is-bottom="index + 1 === diffLinesLength"
           :key="line.lineCode"
-          :discussions="singleDiscussionByLineCode(line.lineCode)"
         />
         <inline-diff-comment-row
-          v-if="shouldRenderInlineCommentRow(line)"
-          :diff-file-hash="diffFile.fileHash"
+          v-if="shouldRenderCommentRow(line)"
+          :diff-file="diffFile"
+          :diff-lines="normalizedDiffLines"
           :line="line"
           :line-index="index"
           :key="index"
-          :discussions="singleDiscussionByLineCode(line.lineCode)"
         />
       </template>
     </tbody>

@@ -5,7 +5,7 @@ describe Projects::PushRulesController do
   let(:user) { create(:user) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
 
     sign_in(user)
   end
@@ -46,9 +46,9 @@ describe Projects::PushRulesController do
           end
         end
 
-        context 'as a maintainer user' do
+        context 'as a master user' do
           before do
-            project.add_maintainer(user)
+            project.add_master(user)
           end
 
           context 'when global setting is disabled' do

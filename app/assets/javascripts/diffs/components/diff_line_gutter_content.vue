@@ -71,18 +71,13 @@ export default {
       required: false,
       default: false,
     },
-    discussions: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
   },
   computed: {
     ...mapState({
       diffViewType: state => state.diffs.diffViewType,
       diffFiles: state => state.diffs.diffFiles,
     }),
-    ...mapGetters(['isLoggedIn']),
+    ...mapGetters(['isLoggedIn', 'discussionsByLineCode']),
     lineHref() {
       return this.lineCode ? `#${this.lineCode}` : '#';
     },
@@ -92,23 +87,28 @@ export default {
         this.showCommentButton &&
         !this.isMatchLine &&
         !this.isContextLine &&
-        !this.isMetaLine &&
-        !this.hasDiscussions
+        !this.hasDiscussions &&
+        !this.isMetaLine
       );
+    },
+    discussions() {
+      return this.discussionsByLineCode[this.lineCode] || [];
     },
     hasDiscussions() {
       return this.discussions.length > 0;
     },
     shouldShowAvatarsOnGutter() {
+      let render = this.hasDiscussions && this.showCommentButton;
+
       if (!this.lineType && this.linePosition === LINE_POSITION_RIGHT) {
-        return false;
+        render = false;
       }
 
-      return this.hasDiscussions && this.showCommentButton;
+      return render;
     },
   },
   methods: {
-    ...mapActions('diffs', ['loadMoreLines', 'showCommentForm']),
+    ...mapActions(['loadMoreLines', 'showCommentForm']),
     handleCommentButton() {
       this.showCommentForm({ lineCode: this.lineCode });
     },
@@ -189,6 +189,7 @@ export default {
       </button>
       <a
         v-if="lineNumber"
+        v-once
         :data-linenumber="lineNumber"
         :href="lineHref"
       >

@@ -7,7 +7,7 @@ describe 'Commit diff', :js do
   let(:project)       { create(:project, :public, :repository) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in user
   end
 

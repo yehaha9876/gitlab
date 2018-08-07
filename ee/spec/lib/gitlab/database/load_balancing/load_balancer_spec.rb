@@ -12,41 +12,6 @@ describe Gitlab::Database::LoadBalancing::LoadBalancer do
     RequestStore.delete(described_class::CACHE_KEY)
   end
 
-  def raise_and_wrap(wrapper, original)
-    raise original
-  rescue original.class
-    raise wrapper.new('boop')
-  end
-
-  def wrapped_exception(wrapper, original)
-    if Gitlab.rails5?
-      begin
-        raise_and_wrap(wrapper, original.new)
-      rescue wrapper => error
-        error
-      end
-    else
-      wrapper.new('boop', original.new)
-    end
-  end
-
-  def twice_wrapped_exception(top, middle, original)
-    if Gitlab.rails5?
-      begin
-        begin
-          raise_and_wrap(middle, original.new)
-        rescue middle => middle_error
-          raise_and_wrap(top, middle_error)
-        end
-      rescue top => top_error
-        top_error
-      end
-    else
-      middle_error = middle.new('boop', original.new)
-      top.new('boop', middle_error)
-    end
-  end
-
   describe '#read' do
     let(:conflict_error) { Class.new(RuntimeError) }
 
@@ -262,19 +227,23 @@ describe Gitlab::Database::LoadBalancing::LoadBalancer do
     end
 
     it 'returns true for a wrapped connection error' do
-      wrapped = wrapped_exception(ActiveRecord::StatementInvalid, NotImplementedError)
+      original = NotImplementedError.new
+      wrapped = ActiveRecord::StatementInvalid.new('boop', original)
 
       expect(lb.connection_error?(wrapped)).to eq(true)
     end
 
     it 'returns true for a wrapped connection error from a view' do
-      wrapped = wrapped_exception(ActionView::Template::Error, NotImplementedError)
+      original = NotImplementedError.new
+      wrapped = ActionView::Template::Error.new('boop', original)
 
       expect(lb.connection_error?(wrapped)).to eq(true)
     end
 
     it 'returns true for deeply wrapped/nested errors' do
-      top = twice_wrapped_exception(ActionView::Template::Error, ActiveRecord::StatementInvalid, NotImplementedError)
+      original = NotImplementedError.new
+      middle = ActiveRecord::StatementInvalid.new('boop', original)
+      top = ActionView::Template::Error.new('boop', middle)
 
       expect(lb.connection_error?(top)).to eq(true)
     end
@@ -307,7 +276,7 @@ describe Gitlab::Database::LoadBalancing::LoadBalancer do
     end
 
     it 'returns true for a wrapped error' do
-      wrapped = wrapped_exception(ActionView::Template::Error, conflict_error)
+      wrapped = ActionView::Template::Error.new('boop', conflict_error.new)
 
       expect(lb.serialization_failure?(wrapped)).to eq(true)
     end

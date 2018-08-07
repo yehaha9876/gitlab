@@ -216,19 +216,17 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
     end
 
     context 'when trace artifact is in ObjectStorage' do
-      let(:url) { 'http://object-storage/trace' }
-      let(:file_path) { expand_fixture_path('trace/sample_trace') }
       let!(:job) { create(:ci_build, :success, :trace_artifact, pipeline: pipeline) }
 
       before do
         allow_any_instance_of(JobArtifactUploader).to receive(:file_storage?) { false }
-        allow_any_instance_of(JobArtifactUploader).to receive(:url) { url }
-        allow_any_instance_of(JobArtifactUploader).to receive(:size) { File.size(file_path) }
+        allow_any_instance_of(JobArtifactUploader).to receive(:url) { remote_trace_url }
+        allow_any_instance_of(JobArtifactUploader).to receive(:size) { remote_trace_size }
       end
 
       context 'when there are no network issues' do
         before do
-          stub_remote_url_206(url, file_path)
+          stub_remote_trace_206
 
           get_trace
         end
@@ -243,11 +241,11 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
 
       context 'when there is a network issue' do
         before do
-          stub_remote_url_500(url)
+          stub_remote_trace_500
         end
 
         it 'returns a trace' do
-          expect { get_trace }.to raise_error(Gitlab::HttpIO::FailedToGetChunkError)
+          expect { get_trace }.to raise_error(Gitlab::Ci::Trace::HttpIO::FailedToGetChunkError)
         end
       end
     end
@@ -431,7 +429,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
   end
 
   describe 'POST erase' do
-    let(:role) { :maintainer }
+    let(:role) { :master }
 
     before do
       project.add_role(user, role)

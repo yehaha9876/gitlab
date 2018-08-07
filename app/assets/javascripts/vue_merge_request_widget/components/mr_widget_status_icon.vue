@@ -32,7 +32,7 @@
   };
 </script>
 <template>
-  <div class="space-children d-flex append-right-10 widget-status-icon">
+  <div class="space-children d-flex append-right-10">
     <div
       v-if="isLoading"
       class="mr-widget-icon"

@@ -33,7 +33,7 @@ describe ScheduleMergeRequestDiffMigrations, :migration, :sidekiq do
   end
 
   it 'schedules background migrations' do
-    perform_enqueued_jobs do
+    Sidekiq::Testing.inline! do
       non_empty = 'st_commits IS NOT NULL OR st_diffs IS NOT NULL'
 
       expect(merge_request_diffs.where(non_empty).count).to eq 3

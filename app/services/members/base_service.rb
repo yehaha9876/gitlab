@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Members
   class BaseService < ::BaseService
     # current_user - The user that performs the action

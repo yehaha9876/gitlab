@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'rouge/plugins/common_mark'
 require 'rouge/plugins/redcarpet'
 
@@ -17,7 +15,7 @@ module Banzai
       end
 
       def highlight_node(node)
-        css_classes = +'code highlight js-syntax-highlight'
+        css_classes = 'code highlight js-syntax-highlight'
         lang = node.attr('lang')
         retried = false
 

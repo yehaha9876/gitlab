@@ -234,7 +234,6 @@ project:
 - slack_service
 - microsoft_teams_service
 - mattermost_service
-- hangouts_chat_service
 - buildkite_service
 - bamboo_service
 - teamcity_service
@@ -333,7 +332,6 @@ project:
 - ci_cd_settings
 - import_export_upload
 - vulnerability_feedback
-- prometheus_alerts
 award_emoji:
 - awardable
 - user
@@ -341,7 +339,6 @@ priorities:
 - label
 prometheus_metrics:
 - project
-- prometheus_alert
 timelogs:
 - issue
 - merge_request

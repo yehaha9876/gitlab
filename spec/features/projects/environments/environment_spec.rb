@@ -102,8 +102,8 @@ describe 'Environment' do
 
           context 'with terminal' do
             shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
-              context 'for project maintainer' do
-                let(:role) { :maintainer }
+              context 'for project master' do
+                let(:role) { :master }
 
                 it 'it shows the terminal button' do
                   expect(page).to have_terminal_button

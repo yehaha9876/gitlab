@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module ApplicationSettings
   class BaseService < ::BaseService
     def initialize(application_setting, user, params = {})

@@ -4,7 +4,7 @@ describe 'list of badges' do
   before do
     user = create(:user)
     project = create(:project, :repository)
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
     visit project_settings_ci_cd_path(project)
   end

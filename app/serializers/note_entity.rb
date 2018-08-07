@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class NoteEntity < API::Entities::Note
   include RequestAwareEntity
   include NotesHelper

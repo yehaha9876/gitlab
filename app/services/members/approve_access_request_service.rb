@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Members
   class ApproveAccessRequestService < Members::BaseService
     prepend EE::Members::ApproveAccessRequestService

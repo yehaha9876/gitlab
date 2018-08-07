@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Emails
   class CreateService < ::Emails::BaseService
     prepend ::EE::Emails::CreateService

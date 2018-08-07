@@ -31,7 +31,7 @@ export const fetchMergeRequests = ({ dispatch, state: { state } }, { type, searc
   dispatch('requestMergeRequests', type);
   dispatch('resetMergeRequests', type);
 
-  return Api.mergeRequests({ scope, state, search })
+  Api.mergeRequests({ scope, state, search })
     .then(({ data }) => dispatch('receiveMergeRequestsSuccess', { type, data }))
     .catch(() => dispatch('receiveMergeRequestsError', { type, search }));
 };

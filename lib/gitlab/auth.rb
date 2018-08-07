@@ -16,8 +16,23 @@ module Gitlab
     class << self
       prepend EE::Gitlab::Auth
 
-      def omniauth_enabled?
-        Gitlab.config.omniauth.enabled
+      def omniauth_customized_providers
+        @omniauth_customized_providers ||= %w[bitbucket jwt]
+      end
+
+      def omniauth_setup_providers(provider_names)
+        provider_names.each do |provider|
+          omniauth_setup_a_provider(provider)
+        end
+      end
+
+      def omniauth_setup_a_provider(provider)
+        case provider
+        when 'kerberos'
+          require 'omniauth-kerberos'
+        when *omniauth_customized_providers
+          require_dependency "omni_auth/strategies/#{provider}"
+        end
       end
 
       def find_for_git_client(login, password, project:, ip:)

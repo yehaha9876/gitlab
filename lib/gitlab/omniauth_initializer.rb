@@ -1,6 +1,9 @@
 module Gitlab
   class OmniauthInitializer
-    prepend ::EE::Gitlab::OmniauthInitializer
+    def self.enabled?
+      Gitlab.config.omniauth.enabled ||
+        Gitlab.config.omniauth.auto_sign_in_with_provider.present?
+    end
 
     def initialize(devise_config)
       @devise_config = devise_config
@@ -8,16 +11,13 @@ module Gitlab
 
     def execute(providers)
       providers.each do |provider|
-        name = provider['name'].to_sym
-
-        add_provider_to_devise(name, *arguments_for(provider))
-        setup_provider(name)
+        add_provider(provider['name'].to_sym, *arguments_for(provider))
       end
     end
 
     private
 
-    def add_provider_to_devise(*args)
+    def add_provider(*args)
       @devise_config.omniauth(*args)
     end
 
@@ -74,24 +74,6 @@ module Gitlab
         else
           false
         end
-      end
-    end
-
-    def omniauth_customized_providers
-      @omniauth_customized_providers ||= build_omniauth_customized_providers
-    end
-
-    # We override this in EE
-    def build_omniauth_customized_providers
-      %i[bitbucket jwt]
-    end
-
-    def setup_provider(provider)
-      case provider
-      when :kerberos
-        require 'omniauth-kerberos'
-      when *omniauth_customized_providers
-        require_dependency "omni_auth/strategies/#{provider}"
       end
     end
   end

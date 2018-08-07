@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Commits
   class CreateService < ::BaseService
     prepend EE::Commits::CreateService

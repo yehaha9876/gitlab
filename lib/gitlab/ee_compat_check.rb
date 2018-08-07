@@ -138,23 +138,15 @@ module Gitlab
 
     def ee_branch_presence_check!
       ee_remotes.keys.each do |remote|
-        output, _ = step(
-          "Searching #{remote}",
-          %W[git ls-remote #{remote} *#{minimal_ee_branch_name}*])
+        [ce_branch, ee_branch_prefix, ee_branch_suffix].each do |branch|
+          _, status = step("Fetching #{remote}/#{branch}", %W[git fetch #{remote} #{branch}])
 
-        branches =
-          output.scan(%r{(?<=refs/heads/|refs/tags/).+}).sort_by(&:size)
-
-        next if branches.empty?
-
-        branch = branches.first
-
-        step("Fetching #{remote}/#{branch}", %W[git fetch #{remote} #{branch}])
-
-        @ee_remote_with_branch = remote
-        @ee_branch_found = branch
-
-        return true
+          if status.zero?
+            @ee_remote_with_branch = remote
+            @ee_branch_found = branch
+            return true
+          end
+        end
       end
 
       puts
@@ -277,10 +269,6 @@ module Gitlab
 
     def ee_patch_full_path
       @ee_patch_full_path ||= patches_dir.join(ee_patch_name)
-    end
-
-    def minimal_ee_branch_name
-      @minimal_ee_branch_name ||= ce_branch.sub(/(\Ace\-|\-ce\z)/, '')
     end
 
     def patch_name_from_branch(branch_name)

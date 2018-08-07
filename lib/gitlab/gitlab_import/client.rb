@@ -32,15 +32,15 @@ module Gitlab
         api.get("/api/v4/user").parsed
       end
 
-      def issues(project_identifier, **kwargs)
-        lazy_page_iterator(**kwargs) do |page, per_page|
-          api.get("/api/v4/projects/#{project_identifier}/issues?per_page=#{per_page}&page=#{page}").parsed
+      def issues(project_identifier)
+        lazy_page_iterator(PER_PAGE) do |page|
+          api.get("/api/v4/projects/#{project_identifier}/issues?per_page=#{PER_PAGE}&page=#{page}").parsed
         end
       end
 
-      def issue_comments(project_identifier, issue_id, **kwargs)
-        lazy_page_iterator(**kwargs) do |page, per_page|
-          api.get("/api/v4/projects/#{project_identifier}/issues/#{issue_id}/notes?per_page=#{per_page}&page=#{page}").parsed
+      def issue_comments(project_identifier, issue_id)
+        lazy_page_iterator(PER_PAGE) do |page|
+          api.get("/api/v4/projects/#{project_identifier}/issues/#{issue_id}/notes?per_page=#{PER_PAGE}&page=#{page}").parsed
         end
       end
 
@@ -48,27 +48,23 @@ module Gitlab
         api.get("/api/v4/projects/#{id}").parsed
       end
 
-      def projects(**kwargs)
-        lazy_page_iterator(**kwargs) do |page, per_page|
-          api.get("/api/v4/projects?per_page=#{per_page}&page=#{page}&simple=true&membership=true").parsed
+      def projects
+        lazy_page_iterator(PER_PAGE) do |page|
+          api.get("/api/v4/projects?per_page=#{PER_PAGE}&page=#{page}").parsed
         end
       end
 
       private
 
-      def lazy_page_iterator(starting_page: 1, page_limit: nil, per_page: PER_PAGE)
+      def lazy_page_iterator(per_page)
         Enumerator.new do |y|
-          page = starting_page
-          page_limit = (starting_page - 1) + page_limit if page_limit
-
+          page = 1
           loop do
-            items = yield(page, per_page)
-
+            items = yield(page)
             items.each do |item|
               y << item
             end
-
-            break if items.empty? || items.size < per_page || (page_limit && page >= page_limit)
+            break if items.empty? || items.size < per_page
 
             page += 1
           end

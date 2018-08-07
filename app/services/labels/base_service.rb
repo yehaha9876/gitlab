@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Labels
   class BaseService < ::BaseService
     COLOR_NAME_TO_HEX = {

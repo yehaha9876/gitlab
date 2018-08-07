@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class GroupEntity < Grape::Entity
   include ActionView::Helpers::NumberHelper
   include RequestAwareEntity

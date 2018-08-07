@@ -1,8 +1,6 @@
 module Banzai
   module Pipeline
     class GfmPipeline < BasePipeline
-      prepend EE::Banzai::Pipeline::GfmPipeline
-
       # These filters convert GitLab Flavored Markdown (GFM) to HTML.
       # The handlers defined in app/assets/javascripts/behaviors/markdown/copy_as_gfm.js
       # consequently convert that same HTML to GFM to be copied to the clipboard.
@@ -26,17 +24,7 @@ module Banzai
           Filter::AutolinkFilter,
           Filter::ExternalLinkFilter,
 
-          *reference_filters,
-
-          Filter::TaskListFilter,
-          Filter::InlineDiffFilter,
-
-          Filter::SetDirectionFilter
-        ]
-      end
-
-      def self.reference_filters
-        [
+          Filter::EpicReferenceFilter,
           Filter::UserReferenceFilter,
           Filter::IssueReferenceFilter,
           Filter::ExternalIssueReferenceFilter,
@@ -45,7 +33,12 @@ module Banzai
           Filter::CommitRangeReferenceFilter,
           Filter::CommitReferenceFilter,
           Filter::LabelReferenceFilter,
-          Filter::MilestoneReferenceFilter
+          Filter::MilestoneReferenceFilter,
+
+          Filter::TaskListFilter,
+          Filter::InlineDiffFilter,
+
+          Filter::SetDirectionFilter
         ]
       end
 

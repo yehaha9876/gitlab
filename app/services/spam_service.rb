@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class SpamService
   attr_accessor :spammable, :request, :options
   attr_reader :spam_log

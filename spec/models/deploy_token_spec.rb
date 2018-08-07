@@ -62,16 +62,9 @@ describe DeployToken do
       end
     end
 
-    context "when it hasn't been revoked and is not expired" do
+    context "when it hasn't been revoked" do
       it 'should return true' do
         expect(deploy_token.active?).to be_truthy
-      end
-    end
-
-    context "when it hasn't been revoked and is expired" do
-      it 'should return true' do
-        deploy_token.update_attribute(:expires_at, Date.today - 5.days)
-        expect(deploy_token.active?).to be_falsy
       end
     end
   end

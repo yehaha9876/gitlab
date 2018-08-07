@@ -1,14 +1,11 @@
-# frozen_string_literal: true
-
 module Groups
   class NestedCreateService < Groups::BaseService
-    attr_reader :group_path, :visibility_level
+    attr_reader :group_path
 
     def initialize(user, params)
       @current_user, @params = user, params.dup
+
       @group_path = @params.delete(:group_path)
-      @visibility_level = @params.delete(:visibility_level) ||
-        Gitlab::CurrentSettings.current_application_settings.default_group_visibility
     end
 
     def execute
@@ -39,12 +36,11 @@ module Groups
         new_params = params.reverse_merge(
           path: subgroup_name,
           name: subgroup_name,
-          parent: last_group,
-          visibility_level: visibility_level
+          parent: last_group
         )
+        new_params[:visibility_level] ||= Gitlab::CurrentSettings.current_application_settings.default_group_visibility
 
-        last_group = namespace_or_group(partial_path) ||
-          Groups::CreateService.new(current_user, new_params).execute
+        last_group = namespace_or_group(partial_path) || Groups::CreateService.new(current_user, new_params).execute
       end
 
       last_group

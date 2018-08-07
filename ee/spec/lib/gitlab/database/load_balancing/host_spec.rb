@@ -12,24 +12,6 @@ describe Gitlab::Database::LoadBalancing::Host, :postgresql do
       .and_return(ActiveRecord::Base.connection_pool)
   end
 
-  def raise_and_wrap(wrapper, original)
-    raise original
-  rescue original.class
-    raise wrapper.new('boom')
-  end
-
-  def wrapped_exception(wrapper, original)
-    if Gitlab.rails5?
-      begin
-        raise_and_wrap(wrapper, original.new)
-      rescue wrapper => error
-        error
-      end
-    else
-      wrapper.new('boom', original.new)
-    end
-  end
-
   describe '#connection' do
     it 'returns a connection from the pool' do
       expect(host.pool).to receive(:connection)
@@ -113,11 +95,11 @@ describe Gitlab::Database::LoadBalancing::Host, :postgresql do
 
     context 'when the replica is not online' do
       it 'returns false when ActionView::Template::Error is raised' do
-        wrapped_error = wrapped_exception(ActionView::Template::Error, StandardError)
+        error = StandardError.new
 
         allow(host)
           .to receive(:check_replica_status?)
-          .and_raise(wrapped_error)
+          .and_raise(ActionView::Template::Error.new('boom', error))
 
         expect(host).not_to be_online
       end
@@ -292,11 +274,9 @@ describe Gitlab::Database::LoadBalancing::Host, :postgresql do
     end
 
     it 'returns nil when the database connection fails' do
-      wrapped_error = wrapped_exception(ActionView::Template::Error, StandardError)
-
       allow(host)
         .to receive(:connection)
-        .and_raise(wrapped_error)
+        .and_raise(ActionView::Template::Error.new('boom', StandardError.new))
 
       expect(host.replication_lag_size).to be_nil
     end
@@ -331,11 +311,9 @@ describe Gitlab::Database::LoadBalancing::Host, :postgresql do
     end
 
     it 'returns false when the connection fails' do
-      wrapped_error = wrapped_exception(ActionView::Template::Error, StandardError)
-
       allow(host)
         .to receive(:connection)
-        .and_raise(wrapped_error)
+        .and_raise(ActionView::Template::Error.new('boom', StandardError.new))
 
       expect(host.caught_up?('foo')).to eq(false)
     end

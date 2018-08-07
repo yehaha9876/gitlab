@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Ci
   class RetryBuildService < ::BaseService
     CLONE_ACCESSORS = %i[pipeline project ref tag options commands name

@@ -4,14 +4,12 @@ import * as types from '../mutation_types';
 
 export const getMergeRequestData = (
   { commit, dispatch, state },
-  { projectId, mergeRequestId, targetProjectId = null, force = false } = {},
+  { projectId, mergeRequestId, force = false } = {},
 ) =>
   new Promise((resolve, reject) => {
     if (!state.projects[projectId].mergeRequests[mergeRequestId] || force) {
       service
-        .getProjectMergeRequestData(targetProjectId || projectId, mergeRequestId, {
-          render_html: true,
-        })
+        .getProjectMergeRequestData(projectId, mergeRequestId, { render_html: true })
         .then(({ data }) => {
           commit(types.SET_MERGE_REQUEST, {
             projectPath: projectId,
@@ -40,12 +38,12 @@ export const getMergeRequestData = (
 
 export const getMergeRequestChanges = (
   { commit, dispatch, state },
-  { projectId, mergeRequestId, targetProjectId = null, force = false } = {},
+  { projectId, mergeRequestId, force = false } = {},
 ) =>
   new Promise((resolve, reject) => {
     if (!state.projects[projectId].mergeRequests[mergeRequestId].changes.length || force) {
       service
-        .getProjectMergeRequestChanges(targetProjectId || projectId, mergeRequestId)
+        .getProjectMergeRequestChanges(projectId, mergeRequestId)
         .then(({ data }) => {
           commit(types.SET_MERGE_REQUEST_CHANGES, {
             projectPath: projectId,
@@ -73,12 +71,12 @@ export const getMergeRequestChanges = (
 
 export const getMergeRequestVersions = (
   { commit, dispatch, state },
-  { projectId, mergeRequestId, targetProjectId = null, force = false } = {},
+  { projectId, mergeRequestId, force = false } = {},
 ) =>
   new Promise((resolve, reject) => {
     if (!state.projects[projectId].mergeRequests[mergeRequestId].versions.length || force) {
       service
-        .getProjectMergeRequestVersions(targetProjectId || projectId, mergeRequestId)
+        .getProjectMergeRequestVersions(projectId, mergeRequestId)
         .then(res => res.data)
         .then(data => {
           commit(types.SET_MERGE_REQUEST_VERSIONS, {

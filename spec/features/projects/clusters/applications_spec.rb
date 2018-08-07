@@ -7,7 +7,7 @@ describe 'Clusters Applications', :js do
   let(:user) { create(:user) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
   end
 

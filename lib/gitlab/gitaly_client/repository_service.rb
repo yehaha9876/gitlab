@@ -202,7 +202,7 @@ module Gitlab
           save_path,
           :create_bundle,
           Gitaly::CreateBundleRequest,
-          GitalyClient.no_timeout
+          GitalyClient.default_timeout
         )
       end
 
@@ -220,7 +220,7 @@ module Gitlab
           bundle_path,
           :create_repository_from_bundle,
           Gitaly::CreateRepositoryFromBundleRequest,
-          GitalyClient.no_timeout
+          GitalyClient.default_timeout
         )
       end
 
@@ -245,7 +245,7 @@ module Gitlab
           :repository_service,
           :create_repository_from_snapshot,
           request,
-          timeout: GitalyClient.no_timeout
+          timeout: GitalyClient.default_timeout
         )
       end
 

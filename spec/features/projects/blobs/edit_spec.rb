@@ -134,11 +134,11 @@ describe 'Editing file blob', :js do
       end
     end
 
-    context 'as maintainer' do
+    context 'as master' do
       let(:user) { create(:user) }
 
       before do
-        project.add_maintainer(user)
+        project.add_master(user)
         sign_in(user)
         visit project_edit_blob_path(project, tree_join(branch, file_path))
       end

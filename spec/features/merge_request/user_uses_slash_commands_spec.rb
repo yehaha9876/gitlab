@@ -21,7 +21,7 @@ describe 'Merge request > User uses quick actions', :js do
     let!(:milestone) { create(:milestone, project: project, title: 'ASAP') }
 
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
     end
 
     describe 'time tracking' do
@@ -147,7 +147,7 @@ describe 'Merge request > User uses quick actions', :js do
       let(:new_url_opts) { { merge_request: { source_branch: 'feature' } } }
 
       before do
-        another_project.add_maintainer(user)
+        another_project.add_master(user)
         sign_in(user)
       end
 

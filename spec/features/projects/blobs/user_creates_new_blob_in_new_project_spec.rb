@@ -24,9 +24,9 @@ describe 'User creates blob in new project', :js do
     end
   end
 
-  describe 'as a maintainer' do
+  describe 'as a master' do
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
     end
 
     it_behaves_like 'creating a file'

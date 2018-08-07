@@ -224,10 +224,7 @@
   .form-control {
     position: relative;
     min-width: 200px;
-    padding-right: 25px;
-    padding-left: 0;
-    height: $input-height;
-    line-height: inherit;
+    padding: 5px 25px 6px 0;
     border-color: transparent;
 
     &:focus,

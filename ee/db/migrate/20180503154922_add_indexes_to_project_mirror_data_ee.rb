@@ -10,7 +10,6 @@ class AddIndexesToProjectMirrorDataEE < ActiveRecord::Migration
   end
 
   def down
-    # rubocop:disable Migration/RemoveIndex
     remove_index :project_mirror_data, :last_successful_update_at if index_exists? :project_mirror_data, :last_successful_update_at
   end
 end

@@ -8,7 +8,7 @@ describe 'Global elastic search' do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
     Gitlab::Elastic::Helper.create_empty_index
 
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
   end
 

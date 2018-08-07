@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module MergeRequests
   class MergeWhenPipelineSucceedsService < MergeRequests::BaseService
     # Marks the passed `merge_request` to be merged when the pipeline succeeds or

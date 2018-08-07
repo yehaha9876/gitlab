@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Groups
   class CreateService < Groups::BaseService
     prepend ::EE::Groups::CreateService

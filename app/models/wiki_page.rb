@@ -60,7 +60,7 @@ class WikiPage
   attr_accessor :attributes
 
   def hook_attrs
-    Gitlab::HookData::WikiPageBuilder.new(self).build
+    attributes
   end
 
   def initialize(wiki, page = nil, persisted = false)

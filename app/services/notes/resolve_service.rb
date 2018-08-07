@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Notes
   class ResolveService < ::BaseService
     def execute(note)

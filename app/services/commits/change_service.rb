@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Commits
   class ChangeService < Commits::CreateService
     def initialize(*args)

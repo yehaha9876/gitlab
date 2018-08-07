@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class CreateReleaseService < BaseService
   def execute(tag_name, release_description)
     repository = project.repository

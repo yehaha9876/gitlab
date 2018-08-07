@@ -1087,7 +1087,7 @@ describe API::Issues do
       let(:project) { merge_request.source_project }
 
       before do
-        project.add_maintainer(user)
+        project.add_master(user)
       end
 
       context 'resolving all discussions in a merge request' do

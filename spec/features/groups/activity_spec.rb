@@ -23,7 +23,7 @@ describe 'Group activity page' do
       let(:project) { create(:project, :public, namespace: group) }
 
       before do
-        project.add_maintainer(user)
+        project.add_master(user)
 
         visit path
       end

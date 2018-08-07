@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Ci
   class CreatePipelineService < BaseService
     attr_reader :pipeline

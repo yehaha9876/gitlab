@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Issues
   class BaseService < ::IssuableBaseService
     def hook_data(issue, action, old_associations: {})

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module EntityDateHelper
   include ActionView::Helpers::DateHelper
   include ActionView::Helpers::TagHelper
@@ -52,20 +50,15 @@ module EntityDateHelper
     elsif entity.due_date
       is_upcoming = (entity.due_date - Date.today).to_i > 0
       time_ago = time_ago_in_words(entity.due_date)
-
-      # https://gitlab.com/gitlab-org/gitlab-ce/issues/49440
-      #
-      # Need to improve the i18n here and do a full translation
-      # of the string instead of piecewise translations.
-      content = time_ago
-        .gsub(/\d+/) { |match| "<strong>#{match}</strong>" }
-        .remove("about ")
-      remaining_or_ago = is_upcoming ? _("remaining") : _("ago")
-
-      "#{content} #{remaining_or_ago}".html_safe
+      content = time_ago.gsub(/\d+/) { |match| "<strong>#{match}</strong>" }
+      content.slice!("about ")
+      content << " " + (is_upcoming ? _("remaining") : _("ago"))
+      content.html_safe
     elsif entity.start_date && entity.start_date.past?
-      days = entity.elapsed_days
-      "#{content_tag(:strong, days)} #{'day'.pluralize(days)} elapsed".html_safe
+      days    = entity.elapsed_days
+      content = content_tag(:strong, days)
+      content << " #{'day'.pluralize(days)} elapsed"
+      content.html_safe
     end
   end
 end

@@ -42,6 +42,7 @@ describe Gitlab::GithubImport::ImportPullRequestWorker do
 
       expect(worker.counter)
         .to receive(:increment)
+        .with(project: 'foo/bar')
         .and_call_original
 
       worker.import(project, client, hash)

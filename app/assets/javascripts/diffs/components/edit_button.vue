@@ -5,8 +5,8 @@ export default {
       type: String,
       required: true,
     },
-    canCurrentUserFork: {
-      type: Boolean,
+    currentUser: {
+      type: Object,
       required: true,
     },
     canModifyBlob: {
@@ -17,12 +17,12 @@ export default {
   },
   methods: {
     handleEditClick(evt) {
-      if (!this.canCurrentUserFork || this.canModifyBlob) {
+      if (!this.currentUser || this.canModifyBlob) {
         // if we can Edit, do default Edit button behavior
         return;
       }
 
-      if (this.canCurrentUserFork) {
+      if (this.currentUser.canFork && this.currentUser.canCreateMergeRequest) {
         evt.preventDefault();
         this.$emit('showForkMessage');
       }

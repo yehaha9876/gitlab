@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class NotePolicy < BasePolicy
   delegate { @subject.project }
   delegate { @subject.noteable if DeclarativePolicy.has_policy?(@subject.noteable) }

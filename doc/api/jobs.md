@@ -50,7 +50,6 @@ Example of response
     "started_at": "2015-12-24T17:54:24.729Z",
     "status": "failed",
     "tag": false,
-    "web_url": "https://example.com/foo/bar/-/jobs/6",
     "user": {
       "avatar_url": "http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80&d=identicon",
       "bio": null,
@@ -83,7 +82,7 @@ Example of response
       "size": 1000
     },
     "finished_at": "2015-12-24T17:54:27.895Z",
-    "artifacts_expire_at": "2016-01-23T17:54:27.895Z",
+    "artifacts_expire_at": "2016-01-23T17:54:27.895Z"
     "id": 7,
     "name": "teaspoon",
     "pipeline": {
@@ -98,7 +97,6 @@ Example of response
     "started_at": "2015-12-24T17:54:27.722Z",
     "status": "failed",
     "tag": false,
-    "web_url": "https://example.com/foo/bar/-/jobs/7",
     "user": {
       "avatar_url": "http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80&d=identicon",
       "bio": null,
@@ -153,7 +151,7 @@ Example of response
     "created_at": "2015-12-24T15:51:21.727Z",
     "artifacts_file": null,
     "finished_at": "2015-12-24T17:54:24.921Z",
-    "artifacts_expire_at": "2016-01-23T17:54:24.921Z",
+    "artifacts_expire_at": "2016-01-23T17:54:24.921Z"
     "id": 6,
     "name": "rspec:other",
     "pipeline": {
@@ -168,7 +166,6 @@ Example of response
     "started_at": "2015-12-24T17:54:24.729Z",
     "status": "failed",
     "tag": false,
-    "web_url": "https://example.com/foo/bar/-/jobs/6",
     "user": {
       "avatar_url": "http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80&d=identicon",
       "bio": null,
@@ -201,7 +198,7 @@ Example of response
       "size": 1000
     },
     "finished_at": "2015-12-24T17:54:27.895Z",
-    "artifacts_expire_at": "2016-01-23T17:54:27.895Z",
+    "artifacts_expire_at": "2016-01-23T17:54:27.895Z"
     "id": 7,
     "name": "teaspoon",
     "pipeline": {
@@ -216,7 +213,6 @@ Example of response
     "started_at": "2015-12-24T17:54:27.722Z",
     "status": "failed",
     "tag": false,
-    "web_url": "https://example.com/foo/bar/-/jobs/7",
     "user": {
       "avatar_url": "http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80&d=identicon",
       "bio": null,
@@ -284,7 +280,6 @@ Example of response
   "started_at": "2015-12-24T17:54:30.733Z",
   "status": "failed",
   "tag": false,
-  "web_url": "https://example.com/foo/bar/-/jobs/8",
   "user": {
     "avatar_url": "http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80&d=identicon",
     "bio": null,
@@ -494,7 +489,7 @@ Example of response
   "created_at": "2016-01-11T10:13:33.506Z",
   "artifacts_file": null,
   "finished_at": "2016-01-11T10:14:09.526Z",
-  "id": 42,
+  "id": 69,
   "name": "rubocop",
   "ref": "master",
   "runner": null,
@@ -502,7 +497,6 @@ Example of response
   "started_at": null,
   "status": "canceled",
   "tag": false,
-  "web_url": "https://example.com/foo/bar/-/jobs/42",
   "user": null
 }
 ```
@@ -541,7 +535,7 @@ Example of response
   "created_at": "2016-01-11T10:13:33.506Z",
   "artifacts_file": null,
   "finished_at": null,
-  "id": 42,
+  "id": 69,
   "name": "rubocop",
   "ref": "master",
   "runner": null,
@@ -549,7 +543,6 @@ Example of response
   "started_at": null,
   "status": "pending",
   "tag": false,
-  "web_url": "https://example.com/foo/bar/-/jobs/42",
   "user": null
 }
 ```
@@ -590,7 +583,7 @@ Example of response
   },
   "coverage": null,
   "download_url": null,
-  "id": 42,
+  "id": 69,
   "name": "rubocop",
   "ref": "master",
   "runner": null,
@@ -600,7 +593,6 @@ Example of response
   "finished_at": "2016-01-11T10:15:10.506Z",
   "status": "failed",
   "tag": false,
-  "web_url": "https://example.com/foo/bar/-/jobs/42",
   "user": null
 }
 ```
@@ -641,7 +633,7 @@ Example response:
   },
   "coverage": null,
   "download_url": null,
-  "id": 42,
+  "id": 69,
   "name": "rubocop",
   "ref": "master",
   "runner": null,
@@ -651,7 +643,6 @@ Example response:
   "finished_at": "2016-01-11T10:15:10.506Z",
   "status": "failed",
   "tag": false,
-  "web_url": "https://example.com/foo/bar/-/jobs/42",
   "user": null
 }
 ```
@@ -690,7 +681,7 @@ Example of response
   "created_at": "2016-01-11T10:13:33.506Z",
   "artifacts_file": null,
   "finished_at": null,
-  "id": 42,
+  "id": 69,
   "name": "rubocop",
   "ref": "master",
   "runner": null,
@@ -698,7 +689,6 @@ Example of response
   "started_at": null,
   "status": "started",
   "tag": false,
-  "web_url": "https://example.com/foo/bar/-/jobs/42",
   "user": null
 }
 ```

@@ -8,7 +8,7 @@ describe 'Invites' do
   let(:group_invite) { group.group_members.invite.last }
 
   before do
-    project.add_maintainer(owner)
+    project.add_master(owner)
     group.add_user(owner, Gitlab::Access::OWNER)
     group.add_developer('user@example.com', owner)
     group_invite.generate_invite_token!

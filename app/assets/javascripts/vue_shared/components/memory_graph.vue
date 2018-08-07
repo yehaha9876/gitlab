@@ -126,7 +126,7 @@ export default {
         :cx="dotX"
         :cy="dotY"
         r="1.5"
-        transform="translate(0 -1)"
+        tranform="translate(0 -1)"
       />
     </svg>
   </div>

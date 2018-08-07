@@ -99,9 +99,9 @@ describe Gitlab::Ci::Pipeline::Chain::Validate::Abilities do
       end
     end
 
-    context 'when user is a maintainer' do
+    context 'when user is a master' do
       before do
-        project.add_maintainer(user)
+        project.add_master(user)
       end
 
       it { is_expected.to be_truthy }

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Users
   # Service for refreshing the authorized projects of a user.
   #

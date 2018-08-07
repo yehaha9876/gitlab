@@ -40,9 +40,7 @@ Example response:
     "username": "raymond_smith",
     "name": "Raymond Smith",
     "state": "active",
-    "avatar_url": "https://www.gravatar.com/avatar/c2525a7f58ae3776070e44c106c48e15?s=80&d=identicon",
-    "web_url": "http://192.168.1.8:3000/root",
-    "expires_at": "2012-10-22T14:13:35Z",
+    "created_at": "2012-10-22T14:13:35Z",
     "access_level": 30
   },
   {
@@ -50,65 +48,7 @@ Example response:
     "username": "john_doe",
     "name": "John Doe",
     "state": "active",
-    "avatar_url": "https://www.gravatar.com/avatar/c2525a7f58ae3776070e44c106c48e15?s=80&d=identicon",
-    "web_url": "http://192.168.1.8:3000/root",
-    "expires_at": "2012-10-22T14:13:35Z",
-    "access_level": 30
-  }
-]
-```
-
-## List all members of a group or project including inherited members
-
-Gets a list of group or project members viewable by the authenticated user, including inherited members through ancestor groups.
-
-```
-GET /groups/:id/members/all
-GET /projects/:id/members/all
-```
-
-| Attribute | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `id`      | integer/string | yes | The ID or [URL-encoded path of the project or group](README.md#namespaced-path-encoding) owned by the authenticated user |
-| `query`   | string | no     | A query string to search for members |
-
-```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/groups/:id/members/all
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/:id/members/all
-```
-
-Example response:
-
-```json
-[
-  {
-    "id": 1,
-    "username": "raymond_smith",
-    "name": "Raymond Smith",
-    "state": "active",
-    "avatar_url": "https://www.gravatar.com/avatar/c2525a7f58ae3776070e44c106c48e15?s=80&d=identicon",
-    "web_url": "http://192.168.1.8:3000/root",
-    "expires_at": "2012-10-22T14:13:35Z",
-    "access_level": 30
-  },
-  {
-    "id": 2,
-    "username": "john_doe",
-    "name": "John Doe",
-    "state": "active",
-    "avatar_url": "https://www.gravatar.com/avatar/c2525a7f58ae3776070e44c106c48e15?s=80&d=identicon",
-    "web_url": "http://192.168.1.8:3000/root",
-    "expires_at": "2012-10-22T14:13:35Z",
-    "access_level": 30
-  },
-  {
-    "id": 3,
-    "username": "foo_bar",
-    "name": "Foo bar",
-    "state": "active",
-    "avatar_url": "https://www.gravatar.com/avatar/c2525a7f58ae3776070e44c106c48e15?s=80&d=identicon",
-    "web_url": "http://192.168.1.8:3000/root",
-    "expires_at": "2012-11-22T14:13:35Z",
+    "created_at": "2012-10-22T14:13:35Z",
     "access_level": 30
   }
 ]
@@ -141,8 +81,7 @@ Example response:
   "username": "raymond_smith",
   "name": "Raymond Smith",
   "state": "active",
-  "avatar_url": "https://www.gravatar.com/avatar/c2525a7f58ae3776070e44c106c48e15?s=80&d=identicon",
-  "web_url": "http://192.168.1.8:3000/root",
+  "created_at": "2012-10-22T14:13:35Z",
   "access_level": 30,
   "expires_at": null
 }
@@ -177,9 +116,7 @@ Example response:
   "username": "raymond_smith",
   "name": "Raymond Smith",
   "state": "active",
-  "avatar_url": "https://www.gravatar.com/avatar/c2525a7f58ae3776070e44c106c48e15?s=80&d=identicon",
-  "web_url": "http://192.168.1.8:3000/root",
-  "expires_at": "2012-10-22T14:13:35Z",
+  "created_at": "2012-10-22T14:13:35Z",
   "access_level": 30
 }
 ```
@@ -213,9 +150,7 @@ Example response:
   "username": "raymond_smith",
   "name": "Raymond Smith",
   "state": "active",
-  "avatar_url": "https://www.gravatar.com/avatar/c2525a7f58ae3776070e44c106c48e15?s=80&d=identicon",
-  "web_url": "http://192.168.1.8:3000/root",
-  "expires_at": "2012-10-22T14:13:35Z",
+  "created_at": "2012-10-22T14:13:35Z",
   "access_level": 40
 }
 ```

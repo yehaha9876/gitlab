@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Keys
   class DestroyService < ::Keys::BaseService
     prepend EE::Keys::DestroyService

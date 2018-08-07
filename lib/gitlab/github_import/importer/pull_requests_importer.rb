@@ -43,7 +43,7 @@ module Gitlab
           Rails.logger
             .info("GitHub importer finished updating repository for #{pname}")
 
-          repository_updates_counter.increment
+          repository_updates_counter.increment(project: pname)
         end
 
         def update_repository?(pr)

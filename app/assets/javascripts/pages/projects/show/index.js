@@ -7,7 +7,6 @@ import TreeView from '~/tree';
 import BlobViewer from '~/blob/viewer/index';
 import Activities from '~/activities';
 import { ajaxGet } from '~/lib/utils/common_utils';
-import GpgBadges from '~/gpg_badges';
 import Star from '../../../star';
 import notificationsDropdown from '../../../notifications_dropdown';
 
@@ -39,6 +38,4 @@ document.addEventListener('DOMContentLoaded', () => {
   $(treeSlider).waitForImages(() => {
     ajaxGet(document.querySelector('.js-tree-content').dataset.logsPath);
   });
-
-  GpgBadges.fetch();
 });

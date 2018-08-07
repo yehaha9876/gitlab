@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Banzai
   module Filter
     # HTML filter that renders `color` followed by a color "chip".

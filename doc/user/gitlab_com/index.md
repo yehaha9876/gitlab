@@ -64,8 +64,7 @@ Below are the current settings regarding [GitLab CI/CD](../../ci/README.md).
 
 ## Repository size limit
 
-The maximum size your Git repository is allowed to be, including LFS. If you are near
-or over the size limit, you can [reduce your repository size with Git](../project/repository/reducing_the_repo_size_using_git.md).
+The maximum size your Git repository is allowed to be including LFS.
 
 | Setting                 | GitLab.com        | Default       |
 | -----------             | ----------------- | ------------- |

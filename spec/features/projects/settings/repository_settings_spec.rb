@@ -20,8 +20,8 @@ describe 'Projects > Settings > Repository settings' do
     end
   end
 
-  context 'for maintainer' do
-    let(:role) { :maintainer }
+  context 'for master' do
+    let(:role) { :master }
 
     context 'Deploy Keys', :js do
       let(:private_deploy_key) { create(:deploy_key, title: 'private_deploy_key', public: false) }
@@ -124,7 +124,7 @@ describe 'Projects > Settings > Repository settings' do
       let(:user2) { create(:user) }
 
       before do
-        project.add_maintainer(user2)
+        project.add_master(user2)
 
         visit project_settings_repository_path(project)
       end

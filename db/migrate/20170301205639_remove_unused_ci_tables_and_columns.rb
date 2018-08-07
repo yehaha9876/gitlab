@@ -1,4 +1,5 @@
 # rubocop:disable Migration/RemoveColumn
+# rubocop:disable Migration/Datetime
 class RemoveUnusedCiTablesAndColumns < ActiveRecord::Migration
   include Gitlab::Database::MigrationHelpers
 

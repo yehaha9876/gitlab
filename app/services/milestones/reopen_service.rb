@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Milestones
   class ReopenService < Milestones::BaseService
     def execute(milestone)

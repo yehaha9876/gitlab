@@ -6,7 +6,7 @@ describe Groups::VariablesController do
 
   before do
     sign_in(user)
-    group.add_maintainer(user)
+    group.add_master(user)
   end
 
   describe 'GET #show' do

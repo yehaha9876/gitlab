@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module MergeRequests
   class AddTodoWhenBuildFailsService < MergeRequests::BaseService
     # Adds a todo to the parent merge_request when a CI build fails

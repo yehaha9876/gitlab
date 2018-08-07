@@ -125,7 +125,6 @@ export default {
       :class="flagOrientation"
       class="prometheus-graph-flag popover"
     >
-      <div class="arrow-shadow"></div>
       <div class="arrow"></div>
       <div class="popover-header">
         <h5 v-if="deploymentFlagData">

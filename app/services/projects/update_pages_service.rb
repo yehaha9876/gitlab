@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Projects
   class UpdatePagesService < BaseService
     InvalidStateError = Class.new(StandardError)

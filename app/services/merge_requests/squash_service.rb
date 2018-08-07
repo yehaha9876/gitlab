@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module MergeRequests
   class SquashService < MergeRequests::WorkingCopyBaseService
     def execute(merge_request)

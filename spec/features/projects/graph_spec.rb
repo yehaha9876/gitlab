@@ -6,7 +6,7 @@ describe 'Project Graph', :js do
   let(:branch_name) { 'master' }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
 
     sign_in(user)
   end

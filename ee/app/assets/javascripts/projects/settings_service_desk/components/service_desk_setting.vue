@@ -1,6 +1,5 @@
 <script>
   import tooltip from '~/vue_shared/directives/tooltip';
-  import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
   import eventHub from '../event_hub';
 
   export default {
@@ -8,11 +7,6 @@
     directives: {
       tooltip,
     },
-
-    components: {
-      ClipboardButton,
-    },
-
     props: {
       isEnabled: {
         type: Boolean,
@@ -65,11 +59,18 @@
           >
             {{ incomingEmail }}
           </span>
-          <clipboard-button
-            :title="__('Copy incoming email address to clipboard')"
-            :text="incomingEmail"
-            css-class="btn btn-clipboard btn-transparent"
-          />
+          <button
+            v-tooltip
+            :data-clipboard-text="incomingEmail"
+            type="button"
+            class="btn btn-clipboard btn-transparent"
+            title="Copy incoming email address to clipboard"
+          >
+            <i
+              class="fa fa-clipboard"
+              aria-hidden="true">
+            </i>
+          </button>
         </template>
         <template v-else>
           <i

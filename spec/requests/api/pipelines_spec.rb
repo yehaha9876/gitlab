@@ -11,7 +11,7 @@ describe API::Pipelines do
   end
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
   end
 
   describe 'GET /projects/:id/pipelines ' do
@@ -24,8 +24,7 @@ describe API::Pipelines do
         expect(json_response).to be_an Array
         expect(json_response.first['sha']).to match /\A\h{40}\z/
         expect(json_response.first['id']).to eq pipeline.id
-        expect(json_response.first['web_url']).to be_present
-        expect(json_response.first.keys).to contain_exactly(*%w[id sha ref status web_url])
+        expect(json_response.first.keys).to contain_exactly(*%w[id sha ref status])
       end
 
       context 'when parameter is passed' do

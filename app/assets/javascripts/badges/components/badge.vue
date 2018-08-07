@@ -93,7 +93,7 @@ export default {
         <icon
           :size="16"
           class="prepend-left-8 append-right-8"
-          name="doc-image"
+          name="doc_image"
           aria-hidden="true"
         />
       </div>

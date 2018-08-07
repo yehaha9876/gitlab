@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Tags
   class CreateService < BaseService
     def execute(tag_name, target, message, release_description = nil)

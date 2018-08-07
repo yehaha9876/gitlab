@@ -179,7 +179,7 @@ describe Ci::BuildTraceChunk, :clean_gitlab_redis_shared_state do
         end
 
         it 'migrates data to object storage' do
-          perform_enqueued_jobs do
+          Sidekiq::Testing.inline! do
             subject
 
             build_trace_chunk.reload
@@ -201,7 +201,7 @@ describe Ci::BuildTraceChunk, :clean_gitlab_redis_shared_state do
         end
 
         it 'does not migrate data to object storage' do
-          perform_enqueued_jobs do
+          Sidekiq::Testing.inline! do
             data_store = build_trace_chunk.data_store
 
             subject

@@ -13,8 +13,6 @@ class UsersController < ApplicationController
 
   skip_before_action :authenticate_user!
   before_action :user, except: [:exists]
-  before_action :authorize_read_user_profile!,
-                only: [:calendar, :calendar_activities, :groups, :projects, :contributed_projects, :snippets]
 
   def show
     respond_to do |format|
@@ -149,9 +147,5 @@ class UsersController < ApplicationController
 
   def build_canonical_path(user)
     url_for(safe_params.merge(username: user.to_param))
-  end
-
-  def authorize_read_user_profile!
-    access_denied! unless can?(current_user, :read_user_profile, user)
   end
 end

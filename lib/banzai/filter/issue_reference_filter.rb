@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Banzai
   module Filter
     # HTML filter that replaces issue references with links. References to

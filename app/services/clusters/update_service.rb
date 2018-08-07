@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Clusters
   class UpdateService < BaseService
     def execute(cluster)

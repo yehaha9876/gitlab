@@ -11,7 +11,7 @@ describe 'Issues > Labels bulk assignment' do
 
   context 'as an allowed user', :js do
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
 
       sign_in user
     end

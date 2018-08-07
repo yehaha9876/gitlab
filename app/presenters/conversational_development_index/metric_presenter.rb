@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module ConversationalDevelopmentIndex
   class MetricPresenter < Gitlab::View::Presenter::Simple
     def cards

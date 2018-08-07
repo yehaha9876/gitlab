@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Issues
   module ResolveDiscussions
     include Gitlab::Utils::StrongMemoize

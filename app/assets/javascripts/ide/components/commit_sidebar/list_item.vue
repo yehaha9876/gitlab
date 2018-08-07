@@ -5,7 +5,6 @@ import Icon from '~/vue_shared/components/icon.vue';
 import StageButton from './stage_button.vue';
 import UnstageButton from './unstage_button.vue';
 import { viewerTypes } from '../../constants';
-import { getCommitIconMap } from '../../utils';
 
 export default {
   components: {
@@ -43,12 +42,11 @@ export default {
   },
   computed: {
     iconName() {
-      const suffix = this.stagedList ? '-solid' : '';
-
-      return `${getCommitIconMap(this.file).icon}${suffix}`;
+      const prefix = this.stagedList ? '-solid' : '';
+      return this.file.tempFile ? `file-addition${prefix}` : `file-modified${prefix}`;
     },
     iconClass() {
-      return `${getCommitIconMap(this.file).class} append-right-8`;
+      return `multi-file-${this.file.tempFile ? 'addition' : 'modified'} append-right-8`;
     },
     fullKey() {
       return `${this.keyPrefix}-${this.file.key}`;
@@ -69,8 +67,6 @@ export default {
       'stageChange',
     ]),
     openFileInEditor() {
-      if (this.file.type === 'tree') return null;
-
       return this.openPendingTab({
         file: this.file,
         keyPrefix: this.keyPrefix,

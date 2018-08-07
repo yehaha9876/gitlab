@@ -49,13 +49,11 @@ describe('ee merge request widget options', () => {
     vm.$destroy();
     mock.restore();
 
-    if (Component.mr) {
-      // Clean security reports state
-      Component.mr.sast = state().sast;
-      Component.mr.sastContainer = state().sastContainer;
-      Component.mr.dast = state().dast;
-      Component.mr.dependencyScanning = state().dependencyScanning;
-    }
+    // Clean security reports state
+    Component.mr.sast = state().sast;
+    Component.mr.sastContainer = state().sastContainer;
+    Component.mr.dast = state().dast;
+    Component.mr.dependencyScanning = state().dependencyScanning;
   });
 
   describe('security widget', () => {
@@ -879,21 +877,6 @@ describe('ee merge request widget options', () => {
 
     it('renders multiple deployments', () => {
       expect(vm.$el.querySelectorAll('.deploy-heading').length).toBe(2);
-    });
-  });
-
-  describe('CI widget', () => {
-    it('renders the branch in the pipeline widget', () => {
-      const sourceBranchLink = '<a href="https://www.zelda.com/">Link</a>';
-      vm = mountComponent(Component, {
-        mrData: {
-          ...mockData,
-          source_branch_with_namespace_link: sourceBranchLink,
-        },
-      });
-
-      const ciWidget = vm.$el.querySelector('.mr-state-widget .label-branch');
-      expect(ciWidget).toContainHtml(sourceBranchLink);
     });
   });
 });

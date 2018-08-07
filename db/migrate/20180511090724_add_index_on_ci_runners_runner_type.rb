@@ -10,7 +10,6 @@ class AddIndexOnCiRunnersRunnerType < ActiveRecord::Migration
   end
 
   def down
-    # rubocop:disable Migration/RemoveIndex
     remove_index :ci_runners, :runner_type
   end
 end

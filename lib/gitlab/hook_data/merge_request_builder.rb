@@ -1,6 +1,6 @@
 module Gitlab
   module HookData
-    class MergeRequestBuilder < BaseBuilder
+    class MergeRequestBuilder
       SAFE_HOOK_ATTRIBUTES = %i[
         assignee_id
         author_id
@@ -35,11 +35,14 @@ module Gitlab
         total_time_spent
       ].freeze
 
-      alias_method :merge_request, :object
+      attr_accessor :merge_request
+
+      def initialize(merge_request)
+        @merge_request = merge_request
+      end
 
       def build
         attrs = {
-          description: absolute_image_urls(merge_request.description),
           url: Gitlab::UrlBuilder.build(merge_request),
           source: merge_request.source_project.try(:hook_attrs),
           target: merge_request.target_project.hook_attrs,

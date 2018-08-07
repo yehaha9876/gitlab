@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Issues
   class FetchReferencedMergeRequestsService < Issues::BaseService
     def execute(issue)

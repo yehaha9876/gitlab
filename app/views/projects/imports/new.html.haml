@@ -5,12 +5,12 @@
 %hr
 
 - if @project.import_failed?
-  .card.border-danger
-    .card-header.bg-danger.text-white The repository could not be imported.
+  .card.bg-danger
+    .card-header The repository could not be imported.
     .card-body
       %pre
         :preserve
-          #{h(@project.import_error)}
+          #{h(sanitize_repo_path(@project, @project.import_error))}
 
 = form_for @project, url: project_import_path(@project), method: :post do |f|
   = render "shared/import_form", f: f

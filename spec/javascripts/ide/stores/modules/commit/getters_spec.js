@@ -123,22 +123,6 @@ describe('IDE commit module getters', () => {
           'Update test-file, index.js files',
         );
       });
-
-      it('returns commitMessage with deleted files', () => {
-        rootState[key].push(
-          {
-            path: 'test-file',
-            deleted: true,
-          },
-          {
-            path: 'index.js',
-          },
-        );
-
-        expect(getters.preBuiltCommitMessage(state, null, rootState)).toBe(
-          'Update index.js\nDeleted test-file',
-        );
-      });
     });
   });
 });

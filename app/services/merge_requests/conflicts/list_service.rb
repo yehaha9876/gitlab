@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module MergeRequests
   module Conflicts
     class ListService < MergeRequests::Conflicts::BaseService

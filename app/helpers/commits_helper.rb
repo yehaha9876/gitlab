@@ -145,14 +145,15 @@ module CommitsHelper
         person_name
       end
 
-    link_options = {
-      class: "commit-#{options[:source]}-link"
+    options = {
+      class: "commit-#{options[:source]}-link has-tooltip",
+      title: source_email
     }
 
     if user.nil?
-      mail_to(source_email, text, link_options)
+      mail_to(source_email, text, options)
     else
-      link_to(text, user_path(user), link_options)
+      link_to(text, user_path(user), options)
     end
   end
 

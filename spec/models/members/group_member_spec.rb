@@ -21,7 +21,7 @@ describe GroupMember do
       described_class.add_users(
         group,
         [users.first.id, users.second],
-        described_class::MAINTAINER
+        described_class::MASTER
       )
 
       expect(group.users).to include(users.first, users.second)

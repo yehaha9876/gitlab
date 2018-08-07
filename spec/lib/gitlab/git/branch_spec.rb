@@ -2,11 +2,6 @@ require "spec_helper"
 
 describe Gitlab::Git::Branch, seed_helper: true do
   let(:repository) { Gitlab::Git::Repository.new('default', TEST_REPO_PATH, '') }
-  let(:rugged) do
-    Gitlab::GitalyClient::StorageSettings.allow_disk_access do
-      repository.rugged
-    end
-  end
 
   subject { repository.branches }
 
@@ -129,7 +124,6 @@ describe Gitlab::Git::Branch, seed_helper: true do
   it { expect(repository.branches.size).to eq(SeedRepo::Repo::BRANCHES.size) }
 
   def create_commit
-    params[:message].delete!("\r")
-    Rugged::Commit.create(rugged, params.merge(committer: committer.merge(time: Time.now)))
+    repository.create_commit(params.merge(committer: committer.merge(time: Time.now)))
   end
 end

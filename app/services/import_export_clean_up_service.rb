@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class ImportExportCleanUpService
   LAST_MODIFIED_TIME_IN_MINUTES = 1440
 

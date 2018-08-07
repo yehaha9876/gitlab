@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Labels
   class CreateService < Labels::BaseService
     def initialize(params = {})

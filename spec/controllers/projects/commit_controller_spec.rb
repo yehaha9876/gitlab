@@ -9,7 +9,7 @@ describe Projects::CommitController do
 
   before do
     sign_in(user)
-    project.add_maintainer(user)
+    project.add_master(user)
   end
 
   describe 'GET show' do

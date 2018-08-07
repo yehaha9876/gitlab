@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class VariableEntity < Grape::Entity
   prepend ::EE::VariableEntity
 

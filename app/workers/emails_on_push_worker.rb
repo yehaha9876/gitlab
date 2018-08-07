@@ -51,7 +51,7 @@ class EmailsOnPushWorker
       end
     end
 
-    valid_recipients(recipients).each do |recipient|
+    recipients.split.each do |recipient|
       begin
         send_email(
           recipient,
@@ -88,11 +88,5 @@ class EmailsOnPushWorker
     email.add_message_id
     email.header[:skip_premailer] = true if skip_premailer
     email.deliver_now
-  end
-
-  def valid_recipients(recipients)
-    recipients.split.select do |recipient|
-      recipient.include?('@')
-    end
   end
 end

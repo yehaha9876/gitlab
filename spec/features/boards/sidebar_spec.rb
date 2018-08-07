@@ -23,7 +23,7 @@ describe 'Issue Boards', :js do
 
   before do
     stub_licensed_features(multiple_issue_assignees: false)
-    project.add_maintainer(user)
+    project.add_master(user)
 
     sign_in(user)
 

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Banzai
   module Filter
     # HTML filter that adds an anchor child element to all Headers in a
@@ -21,7 +19,7 @@ module Banzai
       def call
         return doc if context[:no_header_anchors]
 
-        result[:toc] = +""
+        result[:toc] = ""
 
         headers = Hash.new(0)
         header_root = current_header = HeaderNode.new

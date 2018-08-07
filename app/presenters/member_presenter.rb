@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class MemberPresenter < Gitlab::View::Presenter::Delegated
   prepend EE::MemberPresenter
 

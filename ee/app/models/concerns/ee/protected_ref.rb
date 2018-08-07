@@ -19,7 +19,7 @@ module EE
           #
           # EE Needs to allow more access levels in the relation:
           # - 1 for each user/group
-          # - 1 with the `access_level` (Maintainer, Developer)
+          # - 1 with the `access_level` (Master, Developer)
           validates :"#{type}_access_levels", length: { is: 1 }, if: -> { false }
 
           # Returns access levels that grant the specified access type to the given user / group.

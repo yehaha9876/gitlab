@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180722103201) do
+ActiveRecord::Schema.define(version: 20180702181530) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -207,7 +207,6 @@ ActiveRecord::Schema.define(version: 20180722103201) do
     t.string "email_additional_text"
     t.boolean "enforce_terms", default: false
     t.boolean "pseudonymizer_enabled", default: false, null: false
-    t.boolean "hide_third_party_offers", default: false, null: false
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -778,7 +777,6 @@ ActiveRecord::Schema.define(version: 20180722103201) do
     t.text "status_reason"
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
-    t.datetime_with_timezone "last_update_started_at"
   end
 
   create_table "clusters_applications_runners", force: :cascade do |t|
@@ -2175,24 +2173,10 @@ ActiveRecord::Schema.define(version: 20180722103201) do
   add_index "projects", ["path"], name: "index_projects_on_path", using: :btree
   add_index "projects", ["path"], name: "index_projects_on_path_trigram", using: :gin, opclasses: {"path"=>"gin_trgm_ops"}
   add_index "projects", ["pending_delete"], name: "index_projects_on_pending_delete", using: :btree
-  add_index "projects", ["repository_storage", "created_at"], name: "idx_project_repository_check_partial", where: "(last_repository_check_at IS NULL)", using: :btree
   add_index "projects", ["repository_storage"], name: "index_projects_on_repository_storage", using: :btree
   add_index "projects", ["runners_token"], name: "index_projects_on_runners_token", using: :btree
   add_index "projects", ["star_count"], name: "index_projects_on_star_count", using: :btree
   add_index "projects", ["visibility_level"], name: "index_projects_on_visibility_level", using: :btree
-
-  create_table "prometheus_alerts", force: :cascade do |t|
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
-    t.float "threshold", null: false
-    t.integer "operator", null: false
-    t.integer "environment_id", null: false
-    t.integer "project_id", null: false
-    t.integer "prometheus_metric_id", null: false
-  end
-
-  add_index "prometheus_alerts", ["environment_id"], name: "index_prometheus_alerts_on_environment_id", using: :btree
-  add_index "prometheus_alerts", ["prometheus_metric_id"], name: "index_prometheus_alerts_on_prometheus_metric_id", unique: true, using: :btree
 
   create_table "prometheus_metrics", force: :cascade do |t|
     t.integer "project_id"
@@ -2420,11 +2404,6 @@ ActiveRecord::Schema.define(version: 20180722103201) do
   add_index "services", ["project_id"], name: "index_services_on_project_id", using: :btree
   add_index "services", ["template"], name: "index_services_on_template", using: :btree
 
-  create_table "site_statistics", force: :cascade do |t|
-    t.integer "repositories_count", default: 0, null: false
-    t.integer "wikis_count", default: 0, null: false
-  end
-
   create_table "slack_integrations", force: :cascade do |t|
     t.integer "service_id", null: false
     t.string "team_id", null: false
@@ -2548,7 +2527,7 @@ ActiveRecord::Schema.define(version: 20180722103201) do
 
   create_table "todos", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.integer "project_id", null: false
+    t.integer "project_id"
     t.integer "target_id"
     t.string "target_type", null: false
     t.integer "author_id", null: false
@@ -2558,10 +2537,12 @@ ActiveRecord::Schema.define(version: 20180722103201) do
     t.datetime "updated_at"
     t.integer "note_id"
     t.string "commit_id"
+    t.integer "group_id"
   end
 
   add_index "todos", ["author_id"], name: "index_todos_on_author_id", using: :btree
   add_index "todos", ["commit_id"], name: "index_todos_on_commit_id", using: :btree
+  add_index "todos", ["group_id"], name: "index_todos_on_group_id", using: :btree
   add_index "todos", ["note_id"], name: "index_todos_on_note_id", using: :btree
   add_index "todos", ["project_id"], name: "index_todos_on_project_id", using: :btree
   add_index "todos", ["target_type", "target_id"], name: "index_todos_on_target_type_and_target_id", using: :btree
@@ -2729,7 +2710,6 @@ ActiveRecord::Schema.define(version: 20180722103201) do
     t.integer "theme_id", limit: 2
     t.integer "accepted_term_id"
     t.string "feed_token"
-    t.boolean "private_profile"
   end
 
   add_index "users", ["admin"], name: "index_users_on_admin", using: :btree
@@ -2994,9 +2974,6 @@ ActiveRecord::Schema.define(version: 20180722103201) do
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
-  add_foreign_key "prometheus_alerts", "environments", on_delete: :cascade
-  add_foreign_key "prometheus_alerts", "projects", on_delete: :cascade
-  add_foreign_key "prometheus_alerts", "prometheus_metrics", on_delete: :cascade
   add_foreign_key "prometheus_metrics", "projects", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "namespaces", column: "group_id", name: "fk_98f3d044fe", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "protected_branches", name: "fk_8a3072ccb3", on_delete: :cascade
@@ -3026,6 +3003,7 @@ ActiveRecord::Schema.define(version: 20180722103201) do
   add_foreign_key "term_agreements", "users", on_delete: :cascade
   add_foreign_key "timelogs", "issues", name: "fk_timelogs_issues_issue_id", on_delete: :cascade
   add_foreign_key "timelogs", "merge_requests", name: "fk_timelogs_merge_requests_merge_request_id", on_delete: :cascade
+  add_foreign_key "todos", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "todos", "notes", name: "fk_91d1f47b13", on_delete: :cascade
   add_foreign_key "todos", "projects", name: "fk_45054f9c45", on_delete: :cascade
   add_foreign_key "todos", "users", column: "author_id", name: "fk_ccf0373936", on_delete: :cascade

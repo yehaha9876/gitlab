@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class GitPushService < BaseService
   attr_accessor :push_data, :push_commits
   include Gitlab::Access

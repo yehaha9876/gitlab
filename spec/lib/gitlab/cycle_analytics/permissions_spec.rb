@@ -36,9 +36,9 @@ describe Gitlab::CycleAnalytics::Permissions do
     end
   end
 
-  context 'user is maintainer' do
+  context 'user is master' do
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
     end
 
     it 'has permissions to issue stage' do

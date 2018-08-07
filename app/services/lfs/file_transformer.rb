@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Lfs
   # Usage: Calling `new_file` check to see if a file should be in LFS and
   #        return a transformed result with `content` and `encoding` to commit.

@@ -1,4 +1,5 @@
 class IncreaseMysqlTextLimitForGpgKeys < ActiveRecord::Migration
+
   # Set this constant to true if this migration requires downtime.
   DOWNTIME = false
 

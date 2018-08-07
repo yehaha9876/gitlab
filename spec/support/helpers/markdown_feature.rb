@@ -24,7 +24,7 @@ class MarkdownFeature
 
   def project
     @project ||= create(:project, :repository, group: group).tap do |project|
-      project.add_maintainer(user)
+      project.add_master(user)
     end
   end
 

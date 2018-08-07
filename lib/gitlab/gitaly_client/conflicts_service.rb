@@ -25,12 +25,10 @@ module Gitlab
 
       def conflicts?
         list_conflict_files.any?
-      rescue GRPC::FailedPrecondition, GRPC::Unknown
-        # The server raises FailedPrecondition when it encounters
-        # ConflictSideMissing, which means a conflict exists but its `theirs` or
-        # `ours` data is nil due to a non-existent file in one of the trees.
-        #
-        # GRPC::Unknown comes from Rugged::ReferenceError and Rugged::OdbError.
+      rescue GRPC::FailedPrecondition
+        # The server raises this exception when it encounters ConflictSideMissing, which
+        # means a conflict exists but its `theirs` or `ours` data is nil due to a non-existent
+        # file in one of the trees.
         true
       end
 

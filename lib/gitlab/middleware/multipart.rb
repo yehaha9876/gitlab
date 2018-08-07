@@ -84,7 +84,7 @@ module Gitlab
         def open_file(params, key)
           ::UploadedFile.from_params(
             params, key,
-            [FileUploader.root, Gitlab.config.uploads.storage_path])
+            Gitlab.config.uploads.storage_path)
         end
       end
 

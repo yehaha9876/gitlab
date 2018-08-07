@@ -10,7 +10,6 @@ class AddTimezoneToIssuesClosedAt < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def up
-    # rubocop:disable Migration/UpdateLargeTable
     change_column_type_concurrently(:issues, :closed_at, :datetime_with_timezone)
   end
 

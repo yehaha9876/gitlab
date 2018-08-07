@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Emails
   class BaseService
     def initialize(current_user, params = {})

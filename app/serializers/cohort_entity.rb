@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class CohortEntity < Grape::Entity
   include ActionView::Helpers::NumberHelper
 

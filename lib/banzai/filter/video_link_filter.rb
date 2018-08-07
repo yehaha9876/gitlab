@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Banzai
   module Filter
     # Find every image that isn't already wrapped in an `a` tag, and that has

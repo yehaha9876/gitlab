@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Issues
   class MoveService < Issues::BaseService
     prepend ::EE::Issues::MoveService

@@ -1,10 +1,28 @@
-# frozen_string_literal: true
-
 module Banzai
   module Filter
     class BlockquoteFenceFilter < HTML::Pipeline::TextFilter
       REGEX = %r{
-          #{::Gitlab::Regex.markdown_code_or_html_blocks}
+          (?<code>
+            # Code blocks:
+            # ```
+            # Anything, including `>>>` blocks which are ignored by this filter
+            # ```
+
+            ^```
+            .+?
+            \n```\ *$
+          )
+        |
+          (?<html>
+            # HTML block:
+            # <tag>
+            # Anything, including `>>>` blocks which are ignored by this filter
+            # </tag>
+
+            ^<[^>]+?>\ *\n
+            .+?
+            \n<\/[^>]+?>\ *$
+          )
         |
           (?:
             # Blockquote:

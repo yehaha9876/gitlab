@@ -18,7 +18,7 @@ export default {
 
     return axios
       .get(file.rawPath, {
-        transformResponse: [f => f],
+        params: { format: 'json' },
       })
       .then(({ data }) => data);
   },
@@ -33,7 +33,7 @@ export default {
 
     return axios
       .get(file.rawPath.replace(`/raw/${file.branchId}/${file.path}`, `/raw/${sha}/${file.path}`), {
-        transformResponse: [f => f],
+        params: { format: 'json' },
       })
       .then(({ data }) => data);
   },

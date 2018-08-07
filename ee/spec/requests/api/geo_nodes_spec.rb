@@ -215,186 +215,78 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
     end
   end
 
-  describe 'GET /geo_nodes/current/failures' do
-    context 'primary node' do
-      before do
-        stub_current_geo_node(primary)
-      end
+  describe 'GET /geo_nodes/current/failures/:type' do
+    it 'fetches the current node failures' do
+      create(:geo_project_registry, :sync_failed)
+      create(:geo_project_registry, :sync_failed)
 
-      it 'forbids requests' do
-        get api("/geo_nodes/current/failures", admin)
+      stub_current_geo_node(secondary)
+      expect(Gitlab::Geo).to receive(:current_node).and_return(secondary)
 
-        expect(response).to have_gitlab_http_status(403)
+      get api("/geo_nodes/current/failures", admin)
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(response).to match_response_schema('public_api/v4/geo_project_registry', dir: 'ee')
+    end
+
+    it 'does not show any registry when there is no failure' do
+      create(:geo_project_registry, :synced)
+
+      stub_current_geo_node(secondary)
+      expect(Gitlab::Geo).to receive(:current_node).and_return(secondary)
+
+      get api("/geo_nodes/current/failures", admin)
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(json_response.count).to be_zero
+    end
+
+    context 'wiki type' do
+      it 'only shows wiki failures' do
+        create(:geo_project_registry, :wiki_sync_failed)
+        create(:geo_project_registry, :repository_sync_failed)
+
+        stub_current_geo_node(secondary)
+        expect(Gitlab::Geo).to receive(:current_node).and_return(secondary)
+
+        get api("/geo_nodes/current/failures?type=wiki", admin)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response.count).to eq(1)
+        expect(json_response.first['wiki_retry_count']).to be > 0
       end
     end
 
-    context 'secondary node' do
-      before do
+    context 'repository type' do
+      it 'only shows repository failures' do
+        create(:geo_project_registry, :wiki_sync_failed)
+        create(:geo_project_registry, :repository_sync_failed)
+
         stub_current_geo_node(secondary)
-      end
+        expect(Gitlab::Geo).to receive(:current_node).and_return(secondary)
 
-      it 'fetches the current node failures' do
-        create(:geo_project_registry, :sync_failed)
-        create(:geo_project_registry, :sync_failed)
-
-        get api("/geo_nodes/current/failures", admin)
+        get api("/geo_nodes/current/failures?type=repository", admin)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response).to match_response_schema('public_api/v4/geo_project_registry', dir: 'ee')
+        expect(json_response.count).to eq(1)
+        expect(json_response.first['repository_retry_count']).to be > 0
       end
+    end
 
-      it 'does not show any registry when there is no failure' do
-        create(:geo_project_registry, :synced)
+    context 'nonexistent type' do
+      it 'returns a bad request' do
+        create(:geo_project_registry, :repository_sync_failed)
 
-        get api("/geo_nodes/current/failures", admin)
+        get api("/geo_nodes/current/failures?type=nonexistent", admin)
 
-        expect(response).to have_gitlab_http_status(200)
-        expect(json_response.count).to be_zero
+        expect(response).to have_gitlab_http_status(400)
       end
+    end
 
-      context 'wiki type' do
-        it 'only shows wiki failures' do
-          create(:geo_project_registry, :wiki_sync_failed)
-          create(:geo_project_registry, :repository_sync_failed)
+    it 'denies access if not admin' do
+      get api("/geo_nodes/current/failures", user)
 
-          get api("/geo_nodes/current/failures", admin), type: :wiki
-
-          expect(response).to have_gitlab_http_status(200)
-          expect(json_response.count).to eq(1)
-          expect(json_response.first['wiki_retry_count']).to be > 0
-        end
-      end
-
-      context 'repository type' do
-        it 'only shows repository failures' do
-          create(:geo_project_registry, :wiki_sync_failed)
-          create(:geo_project_registry, :repository_sync_failed)
-
-          get api("/geo_nodes/current/failures", admin), type: :repository
-
-          expect(response).to have_gitlab_http_status(200)
-          expect(json_response.count).to eq(1)
-          expect(json_response.first['repository_retry_count']).to be > 0
-        end
-      end
-
-      context 'nonexistent type' do
-        it 'returns a bad request' do
-          create(:geo_project_registry, :repository_sync_failed)
-
-          get api("/geo_nodes/current/failures", admin), type: :nonexistent
-
-          expect(response).to have_gitlab_http_status(400)
-        end
-      end
-
-      it 'denies access if not admin' do
-        get api("/geo_nodes/current/failures", user)
-
-        expect(response).to have_gitlab_http_status(403)
-      end
-
-      context 'verification failures' do
-        before do
-          stub_current_geo_node(secondary)
-        end
-
-        it 'fetches the current node checksum failures' do
-          create(:geo_project_registry, :repository_verification_failed)
-          create(:geo_project_registry, :wiki_verification_failed)
-
-          get api("/geo_nodes/current/failures", admin), failure_type: 'verification'
-
-          expect(response).to have_gitlab_http_status(200)
-          expect(response).to match_response_schema('public_api/v4/geo_project_registry', dir: 'ee')
-        end
-
-        it 'does not show any registry when there is no failure' do
-          create(:geo_project_registry, :repository_verified)
-
-          get api("/geo_nodes/current/failures", admin), failure_type: 'verification'
-
-          expect(response).to have_gitlab_http_status(200)
-          expect(json_response.count).to be_zero
-        end
-
-        context 'wiki type' do
-          it 'only shows wiki verification failures' do
-            create(:geo_project_registry, :repository_verification_failed)
-            create(:geo_project_registry, :wiki_verification_failed)
-
-            get api("/geo_nodes/current/failures", admin), failure_type: 'verification', type: :wiki
-
-            expect(response).to have_gitlab_http_status(200)
-            expect(json_response.count).to eq(1)
-            expect(json_response.first['last_wiki_verification_failure']).to be_present
-          end
-        end
-
-        context 'repository type' do
-          it 'only shows repository failures' do
-            create(:geo_project_registry, :repository_verification_failed)
-            create(:geo_project_registry, :wiki_verification_failed)
-
-            get api("/geo_nodes/current/failures", admin), failure_type: 'verification', type: :repository
-
-            expect(response).to have_gitlab_http_status(200)
-            expect(json_response.count).to eq(1)
-            expect(json_response.first['last_repository_verification_failure']).to be_present
-          end
-        end
-      end
-
-      context 'checksum mismatch failures' do
-        before do
-          stub_current_geo_node(secondary)
-        end
-
-        it 'fetches the checksum mismatch failures from current node' do
-          create(:geo_project_registry, :repository_checksum_mismatch)
-          create(:geo_project_registry, :wiki_checksum_mismatch)
-
-          get api("/geo_nodes/current/failures", admin), failure_type: 'checksum_mismatch'
-
-          expect(response).to have_gitlab_http_status(200)
-          expect(response).to match_response_schema('public_api/v4/geo_project_registry', dir: 'ee')
-        end
-
-        it 'does not show any registry when there is no failure' do
-          create(:geo_project_registry, :repository_verified)
-
-          get api("/geo_nodes/current/failures", admin), failure_type: 'checksum_mismatch'
-
-          expect(response).to have_gitlab_http_status(200)
-          expect(json_response.count).to be_zero
-        end
-
-        context 'wiki type' do
-          it 'only shows wiki checksum mismatch failures' do
-            create(:geo_project_registry, :repository_checksum_mismatch)
-            create(:geo_project_registry, :wiki_checksum_mismatch)
-
-            get api("/geo_nodes/current/failures", admin), failure_type: 'checksum_mismatch', type: :wiki
-
-            expect(response).to have_gitlab_http_status(200)
-            expect(json_response.count).to eq(1)
-            expect(json_response.first['wiki_checksum_mismatch']).to be_truthy
-          end
-        end
-
-        context 'repository type' do
-          it 'only shows repository checksum mismatch failures' do
-            create(:geo_project_registry, :repository_checksum_mismatch)
-            create(:geo_project_registry, :wiki_checksum_mismatch)
-
-            get api("/geo_nodes/current/failures", admin), failure_type: 'checksum_mismatch', type: :repository
-
-            expect(response).to have_gitlab_http_status(200)
-            expect(json_response.count).to eq(1)
-            expect(json_response.first['repository_checksum_mismatch']).to be_truthy
-          end
-        end
-      end
+      expect(response).to have_gitlab_http_status(403)
     end
   end
 end

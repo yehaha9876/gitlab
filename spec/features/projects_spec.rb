@@ -151,14 +151,8 @@ describe 'Project' do
 
     before do
       sign_in(user)
-      project.add_maintainer(user)
+      project.add_master(user)
       visit edit_project_path(project)
-    end
-
-    it 'focuses on the confirmation field' do
-      click_button 'Remove project'
-
-      expect(page).to have_selector '#confirm_name_input:focus'
     end
 
     it 'removes a project' do
@@ -175,7 +169,7 @@ describe 'Project' do
     let(:project) { create(:forked_project_with_submodules) }
 
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
       sign_in user
       visit project_path(project)
     end
@@ -204,7 +198,7 @@ describe 'Project' do
     let(:project) { create(:project, :repository) }
 
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
       sign_in user
       visit project_path(project)
     end

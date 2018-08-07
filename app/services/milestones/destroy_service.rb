@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Milestones
   class DestroyService < Milestones::BaseService
     def execute(milestone)

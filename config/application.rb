@@ -48,8 +48,7 @@ module Gitlab
                                      #{config.root}/app/services/concerns
                                      #{config.root}/app/serializers/concerns
                                      #{config.root}/app/finders/concerns
-                                     #{config.root}/app/graphql/resolvers/concerns
-                                     #{config.root}/app/graphql/mutations/concerns])
+                                     #{config.root}/app/graphql/resolvers/concerns])
 
     config.generators.templates.push("#{config.root}/generator_templates")
 
@@ -147,7 +146,6 @@ module Gitlab
     config.assets.precompile << "notify.css"
     config.assets.precompile << "mailers/*.css"
     config.assets.precompile << "xterm/xterm.css"
-    config.assets.precompile << "page_bundles/ide.css"
     config.assets.precompile << "performance_bar.css"
     config.assets.precompile << "lib/ace.js"
     config.assets.precompile << "test.css"

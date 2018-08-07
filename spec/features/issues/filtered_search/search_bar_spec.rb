@@ -8,7 +8,7 @@ describe 'Search bar', :js do
   let(:filtered_search) { find('.filtered-search') }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
     create(:issue, project: project)
 

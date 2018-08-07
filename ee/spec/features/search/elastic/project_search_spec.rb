@@ -7,7 +7,7 @@ describe 'Project elastic search', :js, :elastic do
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
 
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
   end
 

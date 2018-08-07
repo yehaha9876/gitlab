@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Projects
   module Settings
     class DeployKeysPresenter < Gitlab::View::Presenter::Simple

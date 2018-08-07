@@ -20,7 +20,7 @@ describe('Job details header', () => {
       job: {
         status: {
           group: 'failed',
-          icon: 'status_failed',
+          icon: 'ci-status-failed',
           label: 'failed',
           text: 'failed',
           details_path: 'path',

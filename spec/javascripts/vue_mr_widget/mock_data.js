@@ -29,10 +29,8 @@ export default {
   source_branch: 'daaaa',
   source_branch_link: 'daaaa',
   source_project_id: 19,
-  source_project_full_path: '/group1/project1',
   target_branch: 'master',
   target_project_id: 19,
-  target_project_full_path: '/group2/project2',
   metrics: {
     merged_by: {
       name: 'Administrator',
@@ -76,7 +74,7 @@ export default {
     path: '/root/acets-app/pipelines/172',
     details: {
       status: {
-        icon: 'status_success',
+        icon: 'icon_status_success',
         favicon: 'favicon_status_success',
         text: 'passed',
         label: 'passed',
@@ -91,7 +89,7 @@ export default {
           name: 'build',
           title: 'build: failed',
           status: {
-            icon: 'status_failed',
+            icon: 'icon_status_failed',
             favicon: 'favicon_status_failed',
             text: 'failed',
             label: 'failed',
@@ -106,7 +104,7 @@ export default {
           name: 'review',
           title: 'review: skipped',
           status: {
-            icon: 'status_skipped',
+            icon: 'icon_status_skipped',
             favicon: 'favicon_status_skipped',
             text: 'skipped',
             label: 'skipped',

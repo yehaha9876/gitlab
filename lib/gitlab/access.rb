@@ -9,15 +9,13 @@ module Gitlab
 
     AccessDeniedError = Class.new(StandardError)
 
-    NO_ACCESS  = 0
-    GUEST      = 10
-    REPORTER   = 20
-    DEVELOPER  = 30
-    MAINTAINER = 40
-    # @deprecated
-    MASTER     = MAINTAINER
-    OWNER      = 50
-    ADMIN      = 60
+    NO_ACCESS = 0
+    GUEST     = 10
+    REPORTER  = 20
+    DEVELOPER = 30
+    MASTER    = 40
+    OWNER     = 50
+    ADMIN     = 60
 
     # Branch protection settings
     PROTECTION_NONE          = 0
@@ -37,7 +35,7 @@ module Gitlab
           "Guest"      => GUEST,
           "Reporter"   => REPORTER,
           "Developer"  => DEVELOPER,
-          "Maintainer" => MAINTAINER
+          "Maintainer" => MASTER
         }
       end
 
@@ -49,10 +47,10 @@ module Gitlab
 
       def sym_options
         {
-          guest:      GUEST,
-          reporter:   REPORTER,
-          developer:  DEVELOPER,
-          maintainer: MAINTAINER
+          guest:     GUEST,
+          reporter:  REPORTER,
+          developer: DEVELOPER,
+          master:    MASTER
         }
       end
 

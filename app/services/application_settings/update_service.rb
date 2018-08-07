@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module ApplicationSettings
   class UpdateService < ApplicationSettings::BaseService
     prepend EE::ApplicationSettings::UpdateService

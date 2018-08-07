@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module QuickActions
   class InterpretService < BaseService
     include Gitlab::QuickActions::Dsl

@@ -21,17 +21,7 @@ module DeclarativePolicy
       cache = opts[:cache] || {}
       key = Cache.policy_key(user, subject)
 
-      cache[key] ||=
-        if Gitlab.rails5?
-          # to avoid deadlocks in multi-threaded environment when
-          # autoloading is enabled, we allow concurrent loads,
-          # https://gitlab.com/gitlab-org/gitlab-ce/issues/48263
-          ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
-            class_for(subject).new(user, subject, opts)
-          end
-        else
-          class_for(subject).new(user, subject, opts)
-        end
+      cache[key] ||= class_for(subject).new(user, subject, opts)
     end
 
     def class_for(subject)

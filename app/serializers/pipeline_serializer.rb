@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class PipelineSerializer < BaseSerializer
   include WithPagination
   entity PipelineDetailsEntity

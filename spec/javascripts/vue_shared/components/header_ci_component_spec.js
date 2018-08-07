@@ -12,7 +12,7 @@ describe('Header CI Component', () => {
     props = {
       status: {
         group: 'failed',
-        icon: 'status_failed',
+        icon: 'ci-status-failed',
         label: 'failed',
         text: 'failed',
         details_path: 'path',

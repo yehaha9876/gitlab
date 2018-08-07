@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class MergeRequestUserEntity < UserEntity
   include RequestAwareEntity
   include BlobHelper

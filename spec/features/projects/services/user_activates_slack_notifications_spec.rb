@@ -6,7 +6,7 @@ describe 'User activates Slack notifications' do
   let(:project) { create(:project, slack_service: service) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
   end
 

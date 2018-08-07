@@ -17,7 +17,7 @@ describe 'Filter issues weight', :js do
   end
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
 
     label = create(:label, project: project, title: 'urgent')

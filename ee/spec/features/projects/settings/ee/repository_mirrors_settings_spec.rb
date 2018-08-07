@@ -7,7 +7,7 @@ describe 'Project settings > [EE] repository' do
   let(:project) { create(:project_empty_repo) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     gitlab_sign_in(user)
   end
 

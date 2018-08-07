@@ -12,7 +12,7 @@ describe Groups::UpdateService do
         let!(:service) { described_class.new(public_group, user, visibility_level: Gitlab::VisibilityLevel::INTERNAL) }
 
         before do
-          public_group.add_user(user, Gitlab::Access::MAINTAINER)
+          public_group.add_user(user, Gitlab::Access::MASTER)
           create(:project, :public, group: public_group)
         end
 
@@ -26,7 +26,7 @@ describe Groups::UpdateService do
         let!(:service) { described_class.new(internal_group, user, visibility_level: Gitlab::VisibilityLevel::PRIVATE) }
 
         before do
-          internal_group.add_user(user, Gitlab::Access::MAINTAINER)
+          internal_group.add_user(user, Gitlab::Access::MASTER)
           create(:project, :internal, group: internal_group)
         end
 
@@ -80,7 +80,7 @@ describe Groups::UpdateService do
   context "unauthorized visibility_level validation" do
     let!(:service) { described_class.new(internal_group, user, visibility_level: 99) }
     before do
-      internal_group.add_user(user, Gitlab::Access::MAINTAINER)
+      internal_group.add_user(user, Gitlab::Access::MASTER)
     end
 
     it "does not change permission level" do
@@ -93,7 +93,7 @@ describe Groups::UpdateService do
     let!(:service) { described_class.new(internal_group, user, path: SecureRandom.hex) }
 
     before do
-      internal_group.add_user(user, Gitlab::Access::MAINTAINER)
+      internal_group.add_user(user, Gitlab::Access::MASTER)
       create(:project, :internal, group: internal_group)
     end
 

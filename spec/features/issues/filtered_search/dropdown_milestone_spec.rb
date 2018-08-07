@@ -29,7 +29,7 @@ describe 'Dropdown milestone', :js do
   end
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
     create(:issue, project: project)
 

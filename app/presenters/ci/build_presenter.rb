@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Ci
   class BuildPresenter < CommitStatusPresenter
     def erased_by_user?

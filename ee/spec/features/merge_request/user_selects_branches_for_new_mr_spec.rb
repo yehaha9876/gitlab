@@ -11,7 +11,7 @@ describe 'Merge request > User selects branches for new MR', :js do
   end
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
   end
 

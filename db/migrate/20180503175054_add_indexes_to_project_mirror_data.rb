@@ -11,7 +11,6 @@ class AddIndexesToProjectMirrorData < ActiveRecord::Migration
   end
 
   def down
-    # rubocop:disable Migration/RemoveIndex
     remove_index :project_mirror_data, :jid if index_exists? :project_mirror_data, :jid
     remove_index :project_mirror_data, :status if index_exists? :project_mirror_data, :status
   end

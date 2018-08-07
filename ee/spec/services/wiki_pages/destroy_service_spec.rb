@@ -8,7 +8,7 @@ describe WikiPages::DestroyService do
   subject(:service) { described_class.new(project, user) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
   end
 
   describe '#execute' do

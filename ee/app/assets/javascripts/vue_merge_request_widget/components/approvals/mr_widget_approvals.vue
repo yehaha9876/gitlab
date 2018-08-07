@@ -59,9 +59,9 @@ export default {
 };
 </script>
 <template>
-  <section
+  <div
     v-if="mr.approvalsRequired"
-    class="mr-widget-approvals-container mr-widget-section media media-section"
+    class="mr-widget-approvals-container mr-widget-section media"
   >
     <status-icon
       :class="approvalsOptional ? 'zero-approvals' : ''"
@@ -98,5 +98,5 @@ export default {
         :approvals-left="mr.approvals.approvals_left"
       />
     </div>
-  </section>
+  </div>
 </template>

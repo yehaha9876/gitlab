@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Banzai
   module Filter
     # Issues, Merge Requests, Snippets, Commits and Commit Ranges share

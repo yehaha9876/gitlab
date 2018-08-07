@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class RunnerEntity < Grape::Entity
   include RequestAwareEntity
 

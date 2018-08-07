@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class SubmoduleEntity < Grape::Entity
   include RequestAwareEntity
 

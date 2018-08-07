@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Projects
   class BaseMoveRelationsService < BaseService
     attr_reader :source_project

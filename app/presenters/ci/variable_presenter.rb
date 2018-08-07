@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Ci
   class VariablePresenter < Gitlab::View::Presenter::Delegated
     presents :variable

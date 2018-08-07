@@ -22,6 +22,11 @@ export default {
       required: false,
       default: null,
     },
+    disableActionDropdown: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     ...mapState(['currentBranchId']),
@@ -64,6 +69,7 @@ export default {
         :key="file.key"
         :file="file"
         :level="0"
+        :disable-action-dropdown="disableActionDropdown"
       />
     </template>
   </div>

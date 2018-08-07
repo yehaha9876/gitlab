@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Banzai
   module Filter
     # Base class for GitLab Flavored Markdown reference filters.

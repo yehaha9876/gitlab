@@ -3,7 +3,7 @@ module PipelineSchedulesHelper
     ActiveSupport::TimeZone.all.map do |timezone|
       {
         name: timezone.name,
-        offset: timezone.now.utc_offset,
+        offset: timezone.utc_offset,
         identifier: timezone.tzinfo.identifier
       }
     end

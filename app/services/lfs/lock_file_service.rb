@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Lfs
   class LockFileService < BaseService
     prepend EE::Lfs::LockFileService

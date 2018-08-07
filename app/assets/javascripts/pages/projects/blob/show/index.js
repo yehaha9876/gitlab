@@ -2,7 +2,6 @@ import Vue from 'vue';
 import commitPipelineStatus from '~/projects/tree/components/commit_pipeline_status_component.vue';
 import BlobViewer from '~/blob/viewer/index';
 import initBlob from '~/pages/projects/init_blob';
-import GpgBadges from '~/gpg_badges';
 
 document.addEventListener('DOMContentLoaded', () => {
   new BlobViewer(); // eslint-disable-line no-new
@@ -27,6 +26,4 @@ document.addEventListener('DOMContentLoaded', () => {
       },
     });
   }
-
-  GpgBadges.fetch();
 });

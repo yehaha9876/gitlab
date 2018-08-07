@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # Projects::HousekeepingService class
 #
 # Used for git housekeeping

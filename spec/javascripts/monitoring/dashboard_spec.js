@@ -126,23 +126,5 @@ describe('Dashboard', () => {
         done();
       });
     });
-
-    it('hides the dropdown', done => {
-      const component = new DashboardComponent({
-        el: document.querySelector('.prometheus-graphs'),
-        propsData: {
-          ...propsData,
-          hasMetrics: true,
-          showPanels: false,
-          showEnvironmentDropdown: false,
-        },
-      });
-
-      Vue.nextTick(() => {
-        const dropdownIsActiveElement = component.$el.querySelectorAll('.environments');
-        expect(dropdownIsActiveElement.length).toEqual(0);
-        done();
-      });
-    });
   });
 });

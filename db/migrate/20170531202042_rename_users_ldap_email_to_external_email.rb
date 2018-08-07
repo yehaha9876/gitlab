@@ -6,7 +6,6 @@ class RenameUsersLdapEmailToExternalEmail < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def up
-    # rubocop:disable Migration/UpdateLargeTable
     rename_column_concurrently :users, :ldap_email, :external_email
   end
 

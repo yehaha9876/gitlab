@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Milestones
   class PromoteService < Milestones::BaseService
     prepend EE::Milestones::PromoteService

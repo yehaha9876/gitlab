@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class BuildDetailsEntity < JobEntity
   expose :coverage, :erased_at, :duration
   expose :tag_list, as: :tags

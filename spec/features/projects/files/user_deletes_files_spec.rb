@@ -17,7 +17,7 @@ describe 'Projects > Files > User deletes files' do
 
   context 'when an user has write access' do
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
       visit(project_tree_path_root_ref)
     end
 

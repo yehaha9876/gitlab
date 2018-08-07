@@ -32,7 +32,7 @@
     },
     computed: {
       className() {
-        return `drag-${this.side}`;
+        return `drag${this.side}`;
       },
       cursorStyle() {
         if (this.enabled) {
@@ -44,15 +44,8 @@
     methods: {
       resetSize(e) {
         e.preventDefault();
-        this.$emit('resize-start', this.size);
-
         this.size = this.startSize;
         this.$emit('update:size', this.size);
-
-        // End resizing on next tick so that listeners can react to DOM changes
-        this.$nextTick(() => {
-          this.$emit('resize-end', this.size);
-        });
       },
       startDrag(e) {
         if (this.enabled) {
@@ -91,7 +84,7 @@
   <div
     :class="className"
     :style="cursorStyle"
-    class="drag-handle"
+    class="dragHandle"
     @mousedown="startDrag"
     @dblclick="resetSize"
   ></div>

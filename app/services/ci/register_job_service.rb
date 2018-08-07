@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Ci
   # This class responsible for assigning
   # proper pending build to runner on runner API request

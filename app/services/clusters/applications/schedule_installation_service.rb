@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Clusters
   module Applications
     class ScheduleInstallationService < ::BaseService

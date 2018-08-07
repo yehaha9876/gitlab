@@ -19,12 +19,8 @@ export default {
     DiffTableCell,
   },
   props: {
-    fileHash: {
-      type: String,
-      required: true,
-    },
-    contextLinesPath: {
-      type: String,
+    diffFile: {
+      type: Object,
       required: true,
     },
     line: {
@@ -36,16 +32,6 @@ export default {
       required: false,
       default: false,
     },
-    leftDiscussions: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-    rightDiscussions: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
   },
   data() {
     return {
@@ -54,7 +40,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('diffs', ['isParallelView']),
+    ...mapGetters(['isParallelView']),
     isContextLine() {
       return this.line.left.type === CONTEXT_LINE_TYPE;
     },
@@ -117,8 +103,7 @@ export default {
     @mouseout="handleMouseMove"
   >
     <diff-table-cell
-      :file-hash="fileHash"
-      :context-lines-path="contextLinesPath"
+      :diff-file="diffFile"
       :line="line"
       :line-type="oldLineType"
       :line-position="linePositionLeft"
@@ -126,10 +111,10 @@ export default {
       :is-hover="isLeftHover"
       :show-comment-button="true"
       :diff-view-type="parallelDiffViewType"
-      :discussions="leftDiscussions"
       class="diff-line-num old_line"
     />
     <td
+      v-once
       :id="line.left.lineCode"
       :class="parallelViewLeftLineType"
       class="line_content parallel left-side"
@@ -138,8 +123,7 @@ export default {
     >
     </td>
     <diff-table-cell
-      :file-hash="fileHash"
-      :context-lines-path="contextLinesPath"
+      :diff-file="diffFile"
       :line="line"
       :line-type="newLineType"
       :line-position="linePositionRight"
@@ -147,10 +131,10 @@ export default {
       :is-hover="isRightHover"
       :show-comment-button="true"
       :diff-view-type="parallelDiffViewType"
-      :discussions="rightDiscussions"
       class="diff-line-num new_line"
     />
     <td
+      v-once
       :id="line.right.lineCode"
       :class="line.right.type"
       class="line_content parallel right-side"

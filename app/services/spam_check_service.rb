@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # SpamCheckService
 #
 # Provide helper methods for checking if a given spammable object has

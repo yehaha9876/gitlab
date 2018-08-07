@@ -11,8 +11,6 @@ module QA
           factory.output
         end
 
-        product(:project) { |factory| factory.project }
-
         def initialize
           @file_name = 'file.txt'
           @file_content = '# This is test project'

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Projects
   # Base class for the various service classes that count project data (e.g.
   # issues or forks).

@@ -57,28 +57,11 @@ describe 'Display system header and footer bar' do
         create(:appearance, header_message: header_message)
 
         sign_in(create(:user))
+        visit root_path
       end
 
-      context 'when licensed' do
-        before do
-          stub_licensed_features(system_header_footer: true)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system header is configured'
-        it_behaves_like 'system footer is not configured'
-      end
-
-      context 'when unlicensed' do
-        before do
-          stub_licensed_features(system_header_footer: false)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system header is not configured'
-      end
+      it_behaves_like 'system header is configured'
+      it_behaves_like 'system footer is not configured'
     end
 
     context 'when only system footer is defined' do
@@ -86,28 +69,11 @@ describe 'Display system header and footer bar' do
         create(:appearance, footer_message: footer_message)
 
         sign_in(create(:user))
+        visit root_path
       end
 
-      context 'when licensed' do
-        before do
-          stub_licensed_features(system_header_footer: true)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system header is not configured'
-        it_behaves_like 'system footer is configured'
-      end
-
-      context 'when unlicensed' do
-        before do
-          stub_licensed_features(system_header_footer: false)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system footer is not configured'
-      end
+      it_behaves_like 'system header is not configured'
+      it_behaves_like 'system footer is configured'
     end
 
     context 'when system header and footer are defined' do
@@ -115,29 +81,11 @@ describe 'Display system header and footer bar' do
         create(:appearance, header_message: header_message, footer_message: footer_message)
 
         sign_in(create(:user))
+        visit root_path
       end
 
-      context 'when licensed' do
-        before do
-          stub_licensed_features(system_header_footer: true)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system header is configured'
-        it_behaves_like 'system footer is configured'
-      end
-
-      context 'when unlicensed' do
-        before do
-          stub_licensed_features(system_header_footer: false)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system header is not configured'
-        it_behaves_like 'system footer is not configured'
-      end
+      it_behaves_like 'system header is configured'
+      it_behaves_like 'system footer is configured'
     end
   end
 
@@ -154,83 +102,34 @@ describe 'Display system header and footer bar' do
     context 'when only system header is defined' do
       before do
         create(:appearance, header_message: header_message)
+
+        visit root_path
       end
 
-      context 'when licensed' do
-        before do
-          stub_licensed_features(system_header_footer: true)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system header is configured'
-        it_behaves_like 'system footer is not configured'
-      end
-
-      context 'when unlicensed' do
-        before do
-          stub_licensed_features(system_header_footer: false)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system header is not configured'
-      end
+      it_behaves_like 'system header is configured'
+      it_behaves_like 'system footer is not configured'
     end
 
     context 'when only system footer is defined' do
       before do
         create(:appearance, footer_message: footer_message)
+
+        visit root_path
       end
 
-      context 'when licensed' do
-        before do
-          stub_licensed_features(system_header_footer: true)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system header is not configured'
-        it_behaves_like 'system footer is configured'
-      end
-
-      context 'when unlicensed' do
-        before do
-          stub_licensed_features(system_header_footer: false)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system footer is not configured'
-      end
+      it_behaves_like 'system header is not configured'
+      it_behaves_like 'system footer is configured'
     end
 
     context 'when system header and footer are defined' do
       before do
         create(:appearance, header_message: header_message, footer_message: footer_message)
+
+        visit root_path
       end
 
-      context 'when licensed' do
-        before do
-          stub_licensed_features(system_header_footer: true)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system header is configured'
-        it_behaves_like 'system footer is configured'
-      end
-
-      context 'when unlicensed' do
-        before do
-          stub_licensed_features(system_header_footer: false)
-
-          visit root_path
-        end
-
-        it_behaves_like 'system header is not configured'
-        it_behaves_like 'system footer is not configured'
-      end
+      it_behaves_like 'system header is configured'
+      it_behaves_like 'system footer is configured'
     end
   end
 end

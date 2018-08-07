@@ -4,7 +4,6 @@ module Gitlab
       include Gitlab::ImportExport::CommandLineUtil
 
       MAX_RETRIES = 8
-      IGNORED_FILENAMES = %w(. ..).freeze
 
       def self.import(*args)
         new(*args).import
@@ -60,7 +59,7 @@ module Gitlab
       end
 
       def extracted_files
-        Dir.glob("#{@shared.export_path}/**/*", File::FNM_DOTMATCH).reject { |f| IGNORED_FILENAMES.include?(File.basename(f)) }
+        Dir.glob("#{@shared.export_path}/**/*", File::FNM_DOTMATCH).reject { |f| f =~ %r{.*/\.{1,2}$} }
       end
     end
   end

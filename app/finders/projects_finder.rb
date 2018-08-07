@@ -16,8 +16,6 @@
 #     personal: boolean
 #     search: string
 #     non_archived: boolean
-#     archived: 'only' or boolean
-#     min_access_level: integer
 #
 class ProjectsFinder < UnionFinder
   include CustomAttributesFilter
@@ -35,7 +33,7 @@ class ProjectsFinder < UnionFinder
     user = params.delete(:user)
     collection =
       if user
-        PersonalProjectsFinder.new(user, finder_params).execute(current_user)
+        PersonalProjectsFinder.new(user).execute(current_user)
       else
         init_collection
       end
@@ -66,8 +64,6 @@ class ProjectsFinder < UnionFinder
   def collection_with_user
     if owned_projects?
       current_user.owned_projects
-    elsif min_access_level?
-      current_user.authorized_projects.where('project_authorizations.access_level >= ?', params[:min_access_level])
     else
       if private_only?
         current_user.authorized_projects
@@ -79,7 +75,7 @@ class ProjectsFinder < UnionFinder
 
   # Builds a collection for an anonymous user.
   def collection_without_user
-    if private_only? || owned_projects? || min_access_level?
+    if private_only? || owned_projects?
       Project.none
     else
       Project.public_to_user
@@ -92,10 +88,6 @@ class ProjectsFinder < UnionFinder
 
   def private_only?
     params[:non_public].present?
-  end
-
-  def min_access_level?
-    params[:min_access_level].present?
   end
 
   def by_ids(items)
@@ -138,7 +130,7 @@ class ProjectsFinder < UnionFinder
   def by_archived(projects)
     if params[:non_archived]
       projects.non_archived
-    elsif params.key?(:archived)
+    elsif params.key?(:archived) # Back-compatibility with the places where `params[:archived]` can be set explicitly to `false`
       if params[:archived] == 'only'
         projects.archived
       elsif Gitlab::Utils.to_boolean(params[:archived])
@@ -149,11 +141,5 @@ class ProjectsFinder < UnionFinder
     else
       projects
     end
-  end
-
-  def finder_params
-    return {} unless min_access_level?
-
-    { min_access_level: params[:min_access_level] }
   end
 end

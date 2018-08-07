@@ -4,12 +4,10 @@ describe TimeHelper do
   describe "#time_interval_in_words" do
     it "returns minutes and seconds" do
       intervals_in_words = {
-        60 => "1 minute",
-        100 => "1 minute and 40 seconds",
-        100.32 => "1 minute and 40 seconds",
-        120 => "2 minutes",
-        121 => "2 minutes and 1 second",
-        3721 => "62 minutes and 1 second",
+        100 => "1 minute 40 seconds",
+        100.32 => "1 minute 40 seconds",
+        121 => "2 minutes 1 second",
+        3721 => "62 minutes 1 second",
         0 => "0 seconds"
       }
 

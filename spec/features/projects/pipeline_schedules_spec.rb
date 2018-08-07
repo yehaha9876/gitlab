@@ -9,9 +9,9 @@ describe 'Pipeline Schedules', :js do
   let(:scope) { nil }
   let!(:user) { create(:user) }
 
-  context 'logged in as maintainer' do
+  context 'logged in as master' do
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
       gitlab_sign_in(user)
     end
 

@@ -9,7 +9,7 @@ describe Projects::EnvironmentsController do
   end
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
 
     sign_in(user)
   end

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # SystemNoteService
 #
 # Used for creating system notes (e.g., when a user references a merge request
@@ -24,11 +22,9 @@ module SystemNoteService
     total_count  = new_commits.length + existing_commits.length
     commits_text = "#{total_count} commit".pluralize(total_count)
 
-    text_parts = ["added #{commits_text}"]
-    text_parts << commits_list(noteable, new_commits, existing_commits, oldrev)
-    text_parts << "[Compare with previous version](#{diff_comparison_url(noteable, project, oldrev)})"
-
-    body = text_parts.join("\n\n")
+    body = "added #{commits_text}\n\n"
+    body << commits_list(noteable, new_commits, existing_commits, oldrev)
+    body << "\n\n[Compare with previous version](#{diff_comparison_url(noteable, project, oldrev)})"
 
     create_note(NoteSummary.new(noteable, project, author, body, action: 'commit', commit_count: total_count))
   end
@@ -108,19 +104,18 @@ module SystemNoteService
     added_labels   = added_labels.map(&references).join(' ')
     removed_labels = removed_labels.map(&references).join(' ')
 
-    text_parts = []
+    body = ''
 
     if added_labels.present?
-      text_parts << "added #{added_labels}"
-      text_parts << 'and' if removed_labels.present?
+      body << "added #{added_labels}"
+      body << ' and ' if removed_labels.present?
     end
 
     if removed_labels.present?
-      text_parts << "removed #{removed_labels}"
+      body << "removed #{removed_labels}"
     end
 
-    text_parts << 'label'.pluralize(labels_count)
-    body = text_parts.join(' ')
+    body << ' ' << 'label'.pluralize(labels_count)
 
     create_note(NoteSummary.new(noteable, project, author, body, action: 'label'))
   end
@@ -194,10 +189,8 @@ module SystemNoteService
       spent_at = noteable.spent_at
       parsed_time = Gitlab::TimeTrackingFormatter.output(time_spent.abs)
       action = time_spent > 0 ? 'added' : 'subtracted'
-
-      text_parts = ["#{action} #{parsed_time} of time spent"]
-      text_parts << "at #{spent_at}" if spent_at
-      body = text_parts.join(' ')
+      body = "#{action} #{parsed_time} of time spent"
+      body << " at #{spent_at}" if spent_at
     end
 
     create_note(NoteSummary.new(noteable, project, author, body, action: 'time_tracking'))
@@ -276,19 +269,17 @@ module SystemNoteService
     diff_refs = change_position.diff_refs
     version_index = merge_request.merge_request_diffs.viewable.count
 
-    text_parts = ["changed this line in"]
+    body = "changed this line in"
     if version_params = merge_request.version_params_for(diff_refs)
       line_code = change_position.line_code(project.repository)
       url = url_helpers.diffs_project_merge_request_url(project, merge_request, version_params.merge(anchor: line_code))
 
-      text_parts << "[version #{version_index} of the diff](#{url})"
+      body << " [version #{version_index} of the diff](#{url})"
     else
-      text_parts << "version #{version_index} of the diff"
+      body << " version #{version_index} of the diff"
     end
 
-    body = text_parts.join(' ')
     note_attributes = discussion.reply_attributes.merge(project: project, author: author, note: body)
-
     note = Note.create(note_attributes.merge(system: true))
     note.system_note_metadata = SystemNoteMetadata.new(action: 'outdated')
 

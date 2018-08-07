@@ -7,7 +7,7 @@ describe 'Reportable note on issue', :js do
   let!(:note) { create(:note_on_issue, noteable: issue, project: project) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
 
     visit project_issue_path(project, issue)

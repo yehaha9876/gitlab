@@ -22,7 +22,7 @@ describe SpamLog do
       spam_log = build(:spam_log)
       user = spam_log.user
 
-      perform_enqueued_jobs do
+      Sidekiq::Testing.inline! do
         spam_log.remove_user(deleted_by: admin)
       end
 

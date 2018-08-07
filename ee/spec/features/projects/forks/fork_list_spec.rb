@@ -9,7 +9,7 @@ describe 'listing forks of a project' do
   let(:user) { create(:user) }
 
   before do
-    source.add_maintainer(user)
+    source.add_master(user)
     sign_in(user)
   end
 

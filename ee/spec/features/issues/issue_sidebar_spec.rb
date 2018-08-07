@@ -15,7 +15,7 @@ describe 'Issue Sidebar' do
 
   context 'updating weight', :js do
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
       visit_issue(project, issue)
     end
 

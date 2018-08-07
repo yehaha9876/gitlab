@@ -40,6 +40,10 @@ module Gitlab
           @project ||= Project.find_by_full_path(project_path)
         end
 
+        def metrics_params
+          super.merge(project: project&.full_path)
+        end
+
         private
 
         def create_merge_request

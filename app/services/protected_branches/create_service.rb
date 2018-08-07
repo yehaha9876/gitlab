@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module ProtectedBranches
   class CreateService < BaseService
     def execute(skip_authorization: false)

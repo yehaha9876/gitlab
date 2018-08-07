@@ -6,7 +6,7 @@ describe 'User searches for wiki pages', :js do
   let!(:wiki_page) { create(:wiki_page, wiki: project.wiki, attrs: { title: 'test_wiki', content: 'Some Wiki content' }) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
 
     visit(search_path)

@@ -1,72 +1,81 @@
 <script>
 import { __ } from '~/locale';
-import { mapActions, mapState } from 'vuex';
-import GlModal from '~/vue_shared/components/gl_modal.vue';
+import DeprecatedModal from '~/vue_shared/components/deprecated_modal.vue';
 
 export default {
   components: {
-    GlModal,
+    DeprecatedModal,
+  },
+  props: {
+    branchId: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+    path: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
-      name: '',
+      entryName: this.path !== '' ? `${this.path}/` : '',
     };
   },
   computed: {
-    ...mapState(['newEntryModal']),
-    entryName: {
-      get() {
-        return this.name || (this.newEntryModal.path !== '' ? `${this.newEntryModal.path}/` : '');
-      },
-      set(val) {
-        this.name = val;
-      },
-    },
     modalTitle() {
-      if (this.newEntryModal.type === 'tree') {
+      if (this.type === 'tree') {
         return __('Create new directory');
       }
 
       return __('Create new file');
     },
     buttonLabel() {
-      if (this.newEntryModal.type === 'tree') {
+      if (this.type === 'tree') {
         return __('Create directory');
       }
 
       return __('Create file');
     },
   },
+  mounted() {
+    this.$refs.fieldName.focus();
+  },
   methods: {
-    ...mapActions(['createTempEntry']),
     createEntryInStore() {
-      this.createTempEntry({
-        name: this.name,
-        type: this.newEntryModal.type,
+      this.$emit('create', {
+        branchId: this.branchId,
+        name: this.entryName,
+        type: this.type,
       });
+
+      this.hideModal();
     },
-    focusInput() {
-      setTimeout(() => {
-        this.$refs.fieldName.focus();
-      });
+    hideModal() {
+      this.$emit('hide');
     },
   },
 };
 </script>
 
 <template>
-  <gl-modal
-    id="ide-new-entry"
-    :header-title-text="modalTitle"
-    :footer-primary-button-text="buttonLabel"
-    footer-primary-button-variant="success"
+  <deprecated-modal
+    :title="modalTitle"
+    :primary-button-label="buttonLabel"
+    kind="success"
+    class="form-group row append-bottom-0"
+    @cancel="hideModal"
     @submit="createEntryInStore"
-    @open="focusInput"
   >
-    <div
+    <form
+      slot="body"
       class="form-group row"
+      @submit.prevent="createEntryInStore"
     >
-      <label class="label-bold col-form-label col-sm-3">
+      <label class="label-light col-form-label col-sm-3">
         {{ __('Name') }}
       </label>
       <div class="col-sm-9">
@@ -77,6 +86,6 @@ export default {
           class="form-control"
         />
       </div>
-    </div>
-  </gl-modal>
+    </form>
+  </deprecated-modal>
 </template>

@@ -13,7 +13,7 @@ describe('CI Icon component', () => {
   it('should render a span element with an svg', () => {
     vm = mountComponent(Component, {
       status: {
-        icon: 'status_success',
+        icon: 'icon_status_success',
       },
     });
 
@@ -24,7 +24,7 @@ describe('CI Icon component', () => {
   it('should render a success status', () => {
     vm = mountComponent(Component, {
       status: {
-        icon: 'status_success',
+        icon: 'icon_status_success',
         group: 'success',
       },
     });
@@ -35,7 +35,7 @@ describe('CI Icon component', () => {
   it('should render a failed status', () => {
     vm = mountComponent(Component, {
       status: {
-        icon: 'status_failed',
+        icon: 'icon_status_failed',
         group: 'failed',
       },
     });
@@ -46,7 +46,7 @@ describe('CI Icon component', () => {
   it('should render success with warnings status', () => {
     vm = mountComponent(Component, {
       status: {
-        icon: 'status_warning',
+        icon: 'icon_status_warning',
         group: 'warning',
       },
     });
@@ -57,7 +57,7 @@ describe('CI Icon component', () => {
   it('should render pending status', () => {
     vm = mountComponent(Component, {
       status: {
-        icon: 'status_pending',
+        icon: 'icon_status_pending',
         group: 'pending',
       },
     });
@@ -68,7 +68,7 @@ describe('CI Icon component', () => {
   it('should render running status', () => {
     vm = mountComponent(Component, {
       status: {
-        icon: 'status_running',
+        icon: 'icon_status_running',
         group: 'running',
       },
     });
@@ -79,7 +79,7 @@ describe('CI Icon component', () => {
   it('should render created status', () => {
     vm = mountComponent(Component, {
       status: {
-        icon: 'status_created',
+        icon: 'icon_status_created',
         group: 'created',
       },
     });
@@ -90,7 +90,7 @@ describe('CI Icon component', () => {
   it('should render skipped status', () => {
     vm = mountComponent(Component, {
       status: {
-        icon: 'status_skipped',
+        icon: 'icon_status_skipped',
         group: 'skipped',
       },
     });
@@ -101,7 +101,7 @@ describe('CI Icon component', () => {
   it('should render canceled status', () => {
     vm = mountComponent(Component, {
       status: {
-        icon: 'status_canceled',
+        icon: 'icon_status_canceled',
         group: 'canceled',
       },
     });
@@ -112,7 +112,7 @@ describe('CI Icon component', () => {
   it('should render status for manual action', () => {
     vm = mountComponent(Component, {
       status: {
-        icon: 'status_manual',
+        icon: 'icon_status_manual',
         group: 'manual',
       },
     });

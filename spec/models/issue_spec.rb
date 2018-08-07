@@ -706,7 +706,7 @@ describe Issue do
 
         context 'when the user is the project owner' do
           before do
-            project.add_maintainer(user)
+            project.add_master(user)
           end
 
           it 'returns true for a regular issue' do

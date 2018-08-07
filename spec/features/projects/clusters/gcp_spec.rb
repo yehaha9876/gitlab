@@ -7,7 +7,7 @@ describe 'Gcp Cluster', :js do
   let(:user) { create(:user) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     gitlab_sign_in(user)
     allow(Projects::ClustersController).to receive(:STATUS_POLLING_INTERVAL) { 100 }
   end

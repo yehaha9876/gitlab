@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module MergeRequests
   class UpdateService < MergeRequests::BaseService
     prepend ::EE::MergeRequests::UpdateService

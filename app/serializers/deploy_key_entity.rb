@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class DeployKeyEntity < Grape::Entity
   expose :id
   expose :user_id

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Events
   class RenderService < BaseRenderer
     def execute(events, atom_request: false)

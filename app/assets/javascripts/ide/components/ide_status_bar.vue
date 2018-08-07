@@ -5,7 +5,6 @@ import tooltip from '~/vue_shared/directives/tooltip';
 import timeAgoMixin from '~/vue_shared/mixins/timeago';
 import CiIcon from '../../vue_shared/components/ci_icon.vue';
 import userAvatarImage from '../../vue_shared/components/user_avatar/user_avatar_image.vue';
-import { rightSidebarViews } from '../constants';
 
 export default {
   components: {
@@ -50,7 +49,6 @@ export default {
     this.stopPipelinePolling();
   },
   methods: {
-    ...mapActions(['setRightPane']),
     ...mapActions('pipelines', ['fetchLatestPipeline', 'stopPipelinePolling']),
     startTimer() {
       this.intervalId = setInterval(() => {
@@ -71,31 +69,24 @@ export default {
       return `${this.currentProject.web_url}/commit/${shortSha}`;
     },
   },
-  rightSidebarViews,
 };
 </script>
 
 <template>
   <footer class="ide-status-bar">
     <div
-      v-if="lastCommit"
+      v-if="lastCommit && lastCommitFormatedAge"
       class="ide-status-branch"
     >
       <span
         v-if="latestPipeline && latestPipeline.details"
         class="ide-status-pipeline"
       >
-        <button
-          type="button"
-          class="p-0 border-0 h-50"
-          @click="setRightPane($options.rightSidebarViews.pipelines)"
-        >
-          <ci-icon
-            v-tooltip
-            :status="latestPipeline.details.status"
-            :title="latestPipeline.details.status.text"
-          />
-        </button>
+        <ci-icon
+          v-tooltip
+          :status="latestPipeline.details.status"
+          :title="latestPipeline.details.status.text"
+        />
         Pipeline
         <a
           :href="latestPipeline.details.status.details_path"

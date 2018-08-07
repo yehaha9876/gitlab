@@ -34,7 +34,7 @@ describe MigrateStagesStatuses, :sidekiq, :migration do
   end
 
   it 'correctly migrates stages statuses' do
-    perform_enqueued_jobs do
+    Sidekiq::Testing.inline! do
       expect(stages.where(status: nil).count).to eq 3
 
       migrate!

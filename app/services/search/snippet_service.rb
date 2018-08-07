@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Search
   class SnippetService
     attr_accessor :current_user, :params

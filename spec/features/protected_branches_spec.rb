@@ -30,9 +30,9 @@ describe 'Protected Branches', :js do
     end
   end
 
-  context 'logged in as maintainer' do
+  context 'logged in as master' do
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
       sign_in(user)
     end
 

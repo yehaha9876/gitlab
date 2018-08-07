@@ -18,6 +18,8 @@ describe GitlabSchema do
   end
 
   it 'has the base mutation' do
+    pending('Adding an empty mutation breaks the documentation explorer')
+
     expect(described_class.mutation).to eq(::Types::MutationType.to_graphql)
   end
 

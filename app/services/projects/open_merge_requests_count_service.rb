@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Projects
   # Service class for counting and caching the number of open merge requests of
   # a project.

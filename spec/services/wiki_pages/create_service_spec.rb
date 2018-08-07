@@ -15,7 +15,7 @@ describe WikiPages::CreateService do
   subject(:service) { described_class.new(project, user, opts) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
   end
 
   describe '#execute' do

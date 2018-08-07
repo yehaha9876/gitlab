@@ -9,7 +9,14 @@
   .arrow-icon {
     display: inline-block;
     vertical-align: middle;
-    fill: $border-color;
+    margin: -2px 2px 0 0;
+
+    svg {
+      fill: $border-color;
+      position: relative;
+      top: 4px;
+      left: -1px;
+    }
   }
 
   &:hover {

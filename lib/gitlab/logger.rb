@@ -12,10 +12,6 @@ module Gitlab
       build.error(message)
     end
 
-    def self.warn(message)
-      build.warn(message)
-    end
-
     def self.info(message)
       build.info(message)
     end

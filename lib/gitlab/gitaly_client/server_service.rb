@@ -9,7 +9,7 @@ module Gitlab
       end
 
       def info
-        GitalyClient.call(@storage, :server_service, :server_info, Gitaly::ServerInfoRequest.new, timeout: GitalyClient.fast_timeout)
+        GitalyClient.call(@storage, :server_service, :server_info, Gitaly::ServerInfoRequest.new)
       end
     end
   end

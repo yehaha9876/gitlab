@@ -30,6 +30,8 @@ class Repository
 
   CreateTreeError = Class.new(StandardError)
 
+  MIRROR_REMOTE = "upstream".freeze
+
   # Methods that cache data from the Git repository.
   #
   # Each entry in this Array should have a corresponding method with the exact
@@ -159,9 +161,12 @@ class Repository
 
   # Returns a list of commits that are not present in any reference
   def new_commits(newrev)
-    commits = raw.new_commits(newrev)
+    # Gitaly migration: https://gitlab.com/gitlab-org/gitaly/issues/1233
+    refs = Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+      ::Gitlab::Git::RevList.new(raw, newrev: newrev).new_refs
+    end
 
-    ::Commit.decorate(commits, project)
+    refs.map { |sha| commit(sha.strip) }
   end
 
   # Gitaly migration: https://gitlab.com/gitlab-org/gitaly/issues/384
@@ -176,8 +181,8 @@ class Repository
     CommitCollection.new(project, commits, ref)
   end
 
-  def find_branch(name)
-    raw_repository.find_branch(name)
+  def find_branch(name, fresh_repo: true)
+    raw_repository.find_branch(name, fresh_repo)
   end
 
   def find_tag(name)
@@ -852,6 +857,48 @@ class Repository
     end
   end
 
+  def fetch_upstream(url)
+    add_remote(Repository::MIRROR_REMOTE, url)
+    fetch_remote(Repository::MIRROR_REMOTE, ssh_auth: project&.import_data)
+  end
+
+  def upstream_branches
+    @upstream_branches ||= remote_branches(Repository::MIRROR_REMOTE)
+  end
+
+  def diverged_from_upstream?(branch_name)
+    branch_commit = commit("refs/heads/#{branch_name}")
+    upstream_commit = commit("refs/remotes/#{MIRROR_REMOTE}/#{branch_name}")
+
+    if upstream_commit
+      !raw_repository.ancestor?(branch_commit.id, upstream_commit.id)
+    else
+      false
+    end
+  end
+
+  def upstream_has_diverged?(branch_name, remote_ref)
+    branch_commit = commit("refs/heads/#{branch_name}")
+    upstream_commit = commit("refs/remotes/#{remote_ref}/#{branch_name}")
+
+    if upstream_commit
+      !raw_repository.ancestor?(upstream_commit.id, branch_commit.id)
+    else
+      false
+    end
+  end
+
+  def up_to_date_with_upstream?(branch_name)
+    branch_commit = commit("refs/heads/#{branch_name}")
+    upstream_commit = commit("refs/remotes/#{MIRROR_REMOTE}/#{branch_name}")
+
+    if upstream_commit
+      ancestor?(branch_commit.id, upstream_commit.id)
+    else
+      false
+    end
+  end
+
   def root_ref_sha
     @root_ref_sha ||= commit(root_ref).sha
   end
@@ -1034,7 +1081,7 @@ class Repository
   end
 
   def repository_event(event, tags = {})
-    Gitlab::Metrics.add_event(event, tags)
+    Gitlab::Metrics.add_event(event, { path: full_path }.merge(tags))
   end
 
   def initialize_raw_repository

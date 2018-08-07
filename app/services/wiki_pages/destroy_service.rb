@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module WikiPages
   class DestroyService < WikiPages::BaseService
     def execute(page)

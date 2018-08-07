@@ -122,6 +122,21 @@ describe('IDE merge requests actions', () => {
         });
       });
 
+      it('dispatches request', done => {
+        testAction(
+          fetchMergeRequests,
+          { type: 'created' },
+          mockedState,
+          [],
+          [
+            { type: 'requestMergeRequests' },
+            { type: 'resetMergeRequests' },
+            { type: 'receiveMergeRequestsSuccess' },
+          ],
+          done,
+        );
+      });
+
       it('dispatches success with received data', done => {
         testAction(
           fetchMergeRequests,
@@ -129,8 +144,8 @@ describe('IDE merge requests actions', () => {
           mockedState,
           [],
           [
-            { type: 'requestMergeRequests', payload: 'created' },
-            { type: 'resetMergeRequests', payload: 'created' },
+            { type: 'requestMergeRequests' },
+            { type: 'resetMergeRequests' },
             {
               type: 'receiveMergeRequestsSuccess',
               payload: { type: 'created', data: mergeRequests },
@@ -153,9 +168,9 @@ describe('IDE merge requests actions', () => {
           mockedState,
           [],
           [
-            { type: 'requestMergeRequests', payload: 'created' },
-            { type: 'resetMergeRequests', payload: 'created' },
-            { type: 'receiveMergeRequestsError', payload: { type: 'created', search: '' } },
+            { type: 'requestMergeRequests' },
+            { type: 'resetMergeRequests' },
+            { type: 'receiveMergeRequestsError' },
           ],
           done,
         );

@@ -71,9 +71,7 @@ export default {
       }
 
       if (this.approvalsLeft === 0) {
-        return this.userCanApprove ?
-          s__('mrWidget|Merge request approved; you can approve additionally') :
-          s__('mrWidget|Merge request approved');
+        return s__('mrWidget|Approved');
       }
 
       if (this.suggestedApprovers.length >= 1) {
@@ -128,7 +126,7 @@ export default {
         })
         .catch(() => {
           this.approving = false;
-          Flash(s__('mrWidget|An error occurred while submitting your approval.'));
+          Flash(s__('mrWidget|An error occured while submitting your approval.'));
         });
     },
   },

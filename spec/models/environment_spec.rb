@@ -170,8 +170,8 @@ describe Environment do
     end
   end
 
-  describe '#stop_action_available?' do
-    subject { environment.stop_action_available? }
+  describe '#stop_action?' do
+    subject { environment.stop_action? }
 
     context 'when no other actions' do
       it { is_expected.to be_falsey }
@@ -179,17 +179,8 @@ describe Environment do
 
     context 'when matching action is defined' do
       let(:build) { create(:ci_build) }
-
-      let!(:deployment) do
-        create(:deployment, environment: environment,
-                            deployable: build,
-                            on_stop: 'close_app')
-      end
-
-      let!(:close_action) do
-        create(:ci_build, :manual, pipeline: build.pipeline,
-                                   name: 'close_app')
-      end
+      let!(:deployment) { create(:deployment, environment: environment, deployable: build, on_stop: 'close_app') }
+      let!(:close_action) { create(:ci_build, :manual, pipeline: build.pipeline, name: 'close_app') }
 
       context 'when environment is available' do
         before do

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # Base class for services that count a single resource such as the number of
 # issues for a project.
 class BaseCountService

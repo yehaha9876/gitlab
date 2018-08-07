@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # Projects::TransferService class
 #
 # Used for transfer project to another namespace

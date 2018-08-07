@@ -16,7 +16,7 @@ describe 'Dashboard > Milestones' do
     let(:project) { create(:project, namespace: user.namespace) }
     let!(:milestone) { create(:milestone, project: project) }
     before do
-      project.add_maintainer(user)
+      project.add_master(user)
       sign_in(user)
       visit dashboard_milestones_path
     end

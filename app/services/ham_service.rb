@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class HamService
   attr_accessor :spam_log
 

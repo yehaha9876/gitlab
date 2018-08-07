@@ -20,10 +20,10 @@ describe Gitlab::Auth::GroupSaml::MembershipUpdater do
   end
 
   it "doesn't overwrite existing membership level" do
-    group.add_maintainer(user)
+    group.add_master(user)
 
     described_class.new(user, saml_provider).execute
 
-    expect(group.members.pluck(:access_level)).to eq([Gitlab::Access::MAINTAINER])
+    expect(group.members.pluck(:access_level)).to eq([Gitlab::Access::MASTER])
   end
 end

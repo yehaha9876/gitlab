@@ -56,7 +56,7 @@ export default {
     >
       <icon
         :size="12"
-        name="ellipsis_h"
+        name="more"
       />
     </button>
     <div class="dropdown-menu dropdown-menu-right">

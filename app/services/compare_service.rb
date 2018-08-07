@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'securerandom'
 
 # Compare 2 refs for one repo or between repositories

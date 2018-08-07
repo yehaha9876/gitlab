@@ -77,12 +77,10 @@ module EESpecificCheck
   end
 
   def find_backward_ce_head(ce_fetch_head, ce_fetch_base, ce_merge_base)
-    if ce_fetch_head.start_with?('canonical-ce') # No specific CE branch
-      say("No CE branch found, using merge base directly")
-      ce_merge_base
-    elsif ce_fetch_base == ce_merge_base # Up-to-date, no rebase needed
-      say("EE is up-to-date with CE, using #{ce_fetch_head} directly")
-      ce_fetch_head
+    if ce_fetch_head.start_with?('canonical-ce') || # No specific CE branch
+        ce_fetch_base == ce_merge_base # Up-to-date, no rebase needed
+      say("CE is up-to-date, using merge-base directly")
+      run_git_command("merge-base #{ce_merge_base} HEAD")
     else
       say("Performing rebase to remove commits in CE haven't merged into EE")
       checkout_and_rebase(ce_merge_base, ce_fetch_base, ce_fetch_head)
@@ -99,7 +97,6 @@ module EESpecificCheck
       if status.porcelain == ''
         status.head
       else
-        diff = run_git_command("diff")
         run_git_command("merge --abort")
 
         say <<~MESSAGE
@@ -107,9 +104,9 @@ module EESpecificCheck
           💥 #{ce_fetch_head} with canonical-ce/master. Please resolve
           💥 the conflict from CE master and retry this job.
 
-          ⚠️ Git diff:
+          ⚠️ Git status:
 
-          #{diff}
+          #{status.porcelain}
         MESSAGE
 
         exit(254)
@@ -162,22 +159,32 @@ module EESpecificCheck
       if status.porcelain == ''
         status.head
       else
-        diff = run_git_command("diff")
         run_git_command("rebase --abort")
 
         say <<~MESSAGE
-          💥 Git status is not clean! This means the CE branch has or had a
-          💥 conflict with CE master, and we cannot resolve this in an
-          💥 automatic way.
+          💥 Git status not clean! This shouldn't happen, but there are two
+          💥 known issues. One can be worked around, and the other can't.
           💥
-          💥 Please rebase #{target_head} with CE master.
+          💥 First please try to update your CE branch with CE master, and
+          💥 retry this job. You could find more information in this issue:
           💥
-          💥 For more details, please read:
-          💥   https://gitlab.com/gitlab-org/gitlab-ee/issues/6038#note_86862115
+          💥 https://gitlab.com/gitlab-org/gitlab-ee/issues/5960#note_72669536
           💥
-          💥 Git diff:
+          💥 It's possible, however, that that doesn't work out. In this case,
+          💥 please just disregard this job. You could find other information at:
+          💥
+          💥 https://gitlab.com/gitlab-org/gitlab-ee/issues/6038
+          💥
+          💥 There's a work-in-progress fix at:
+          💥
+          💥 https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/5719
+          💥
+          💥 If you would like to help, or have any questions, please
+          💥 contact @godfat
 
-          #{diff}
+          ⚠️ Git status:
+
+          #{status.porcelain}
         MESSAGE
 
         exit(255)

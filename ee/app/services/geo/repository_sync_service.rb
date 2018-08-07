@@ -10,7 +10,8 @@ module Geo
       update_gitattributes
 
       mark_sync_as_successful
-    rescue Gitlab::Shell::Error => e
+    rescue Gitlab::Shell::Error,
+           Gitlab::Git::RepositoryMirroring::RemoteError => e
       # In some cases repository does not exist, the only way to know about this is to parse the error text.
       # If it does not exist we should consider it as successfully downloaded.
       if e.message.include? Gitlab::GitAccess::ERROR_MESSAGES[:no_repo]

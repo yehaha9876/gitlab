@@ -18,7 +18,7 @@ describe('Pipeline details header', () => {
         details: {
           status: {
             group: 'failed',
-            icon: 'status_failed',
+            icon: 'ci-status-failed',
             label: 'failed',
             text: 'failed',
             details_path: 'path',

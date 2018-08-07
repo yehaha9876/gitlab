@@ -11,8 +11,6 @@ module Clusters
       include ::Clusters::Concerns::ApplicationStatus
       include ::Clusters::Concerns::ApplicationData
 
-      prepend EE::Clusters::Applications::Prometheus
-
       default_value_for :version, VERSION
 
       state_machine :status do
@@ -21,14 +19,6 @@ module Clusters
             project.find_or_initialize_service('prometheus').update(active: true)
           end
         end
-      end
-
-      def ready_status
-        [:installed]
-      end
-
-      def ready?
-        ready_status.include?(status_name)
       end
 
       def chart

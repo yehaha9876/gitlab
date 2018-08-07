@@ -27,7 +27,6 @@ EOT
       too_large: false
     }
 
-    # TODO use a Gitaly diff object instead
     @rugged_diff = Gitlab::GitalyClient::StorageSettings.allow_disk_access do
       repository.rugged.diff("5937ac0a7beb003549fc5fd26fc247adbce4a52e^", "5937ac0a7beb003549fc5fd26fc247adbce4a52e", paths:
                                               [".gitmodules"]).patches.first
@@ -267,12 +266,8 @@ EOT
 
   describe '#submodule?' do
     before do
-      # TODO use a Gitaly diff object instead
-      rugged_commit = Gitlab::GitalyClient::StorageSettings.allow_disk_access do
-        repository.rugged.rev_parse('5937ac0a7beb003549fc5fd26fc247adbce4a52e')
-      end
-
-      @diffs = rugged_commit.parents[0].diff(rugged_commit).patches
+      commit = repository.lookup('5937ac0a7beb003549fc5fd26fc247adbce4a52e')
+      @diffs = commit.parents[0].diff(commit).patches
     end
 
     it { expect(described_class.new(@diffs[0]).submodule?).to eq(false) }

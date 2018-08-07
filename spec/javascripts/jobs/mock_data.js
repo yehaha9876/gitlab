@@ -14,7 +14,7 @@ export default {
   finished_at: threeWeeksAgo.toISOString(),
   queued: 9.54,
   status: {
-    icon: 'status_success',
+    icon: 'icon_status_success',
     text: 'passed',
     label: 'passed',
     group: 'success',
@@ -72,7 +72,7 @@ export default {
     },
     details: {
       status: {
-        icon: 'status_success',
+        icon: 'icon_status_success',
         text: 'passed',
         label: 'passed',
         group: 'success',

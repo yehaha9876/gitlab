@@ -5,7 +5,7 @@ describe 'Projects tree' do
   let(:project) { create(:project, :repository) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
     sign_in(user)
 
     visit project_tree_path(project, 'master')

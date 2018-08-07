@@ -21,8 +21,8 @@ class CompositePrimaryKeysMigration < ActiveRecord::Migration
     Index.new(:merge_request_diff_commits, 'index_merge_request_diff_commits_on_mr_diff_id_and_order', %i(merge_request_diff_id relative_order)),
     Index.new(:project_authorizations, 'index_project_authorizations_on_user_id_project_id_access_level', %i(user_id project_id access_level)),
     Index.new(:push_event_payloads, 'index_push_event_payloads_on_event_id', %i(event_id)),
-    Index.new(:schema_migrations, 'unique_schema_migrations', %(version))
-  ].freeze
+    Index.new(:schema_migrations, 'unique_schema_migrations', %(version)),
+  ]
 
   disable_ddl_transaction!
 
@@ -45,7 +45,6 @@ class CompositePrimaryKeysMigration < ActiveRecord::Migration
   end
 
   private
-
   def add_primary_key(index)
     execute "ALTER TABLE #{index.table} ADD PRIMARY KEY USING INDEX #{index.name}"
   end
@@ -61,3 +60,4 @@ class CompositePrimaryKeysMigration < ActiveRecord::Migration
     execute "ALTER TABLE #{index.table} DROP CONSTRAINT IF EXISTS #{temp_index_name}"
   end
 end
+

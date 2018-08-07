@@ -6,8 +6,8 @@ RSpec.describe 'Dashboard Archived Project' do
   let(:archived_project) { create(:project, :archived) }
 
   before do
-    project.add_maintainer(user)
-    archived_project.add_maintainer(user)
+    project.add_master(user)
+    archived_project.add_master(user)
 
     sign_in(user)
 

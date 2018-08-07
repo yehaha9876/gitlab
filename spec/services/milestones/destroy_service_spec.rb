@@ -8,7 +8,7 @@ describe Milestones::DestroyService do
   let!(:merge_request) { create(:merge_request, source_project: project, milestone: milestone) }
 
   before do
-    project.add_maintainer(user)
+    project.add_master(user)
   end
 
   def service

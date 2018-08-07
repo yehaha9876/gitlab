@@ -11,3 +11,4 @@ class AddNegativeMatchingCommitMessagePushRule < ActiveRecord::Migration
     remove_column :push_rules, :commit_message_negative_regex
   end
 end
+

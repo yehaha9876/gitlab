@@ -10,7 +10,7 @@ describe('pipeline graph job component', () => {
     id: 4256,
     name: 'test',
     status: {
-      icon: 'status_success',
+      icon: 'icon_status_success',
       text: 'passed',
       label: 'passed',
       tooltip: 'passed',
@@ -65,7 +65,7 @@ describe('pipeline graph job component', () => {
           id: 4257,
           name: 'test',
           status: {
-            icon: 'status_success',
+            icon: 'icon_status_success',
             text: 'passed',
             label: 'passed',
             group: 'success',
@@ -111,7 +111,7 @@ describe('pipeline graph job component', () => {
           id: 4258,
           name: 'test',
           status: {
-            icon: 'status_success',
+            icon: 'icon_status_success',
           },
         },
       });
@@ -125,7 +125,7 @@ describe('pipeline graph job component', () => {
           id: 4259,
           name: 'test',
           status: {
-            icon: 'status_success',
+            icon: 'icon_status_success',
             label: 'success',
             tooltip: 'success',
           },

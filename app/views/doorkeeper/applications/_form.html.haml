@@ -2,22 +2,24 @@
   = form_errors(application)
 
   .form-group
-    = f.label :name, class: 'label-bold'
+    = f.label :name, class: 'label-light'
     = f.text_field :name, class: 'form-control', required: true
 
   .form-group
-    = f.label :redirect_uri, class: 'label-bold'
+    = f.label :redirect_uri, class: 'label-light'
     = f.text_area :redirect_uri, class: 'form-control', required: true
 
     %span.form-text.text-muted
-      = _('Use one line per URI')
+      Use one line per URI
     - if Doorkeeper.configuration.native_redirect_uri
       %span.form-text.text-muted
-        = _('Use <code>%{native_redirect_uri}</code> for local tests').html_safe % { native_redirect_uri: Doorkeeper.configuration.native_redirect_uri }
+        Use
+        %code= Doorkeeper.configuration.native_redirect_uri
+        for local tests
 
   .form-group
-    = f.label :scopes, class: 'label-bold'
+    = f.label :scopes, class: 'label-light'
     = render 'shared/tokens/scopes_form', prefix: 'doorkeeper_application', token: application, scopes: @scopes
 
   .prepend-top-default
-    = f.submit _('Save application'), class: "btn btn-create"
+    = f.submit 'Save application', class: "btn btn-create"

@@ -31,7 +31,7 @@ describe 'User views an open merge request' do
       let(:user) { create(:user) }
 
       before do
-        project.add_maintainer(user)
+        project.add_master(user)
         sign_in(user)
 
         visit(edit_project_merge_request_path(project, merge_request))

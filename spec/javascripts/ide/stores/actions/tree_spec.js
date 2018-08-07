@@ -192,8 +192,11 @@ describe('Multi-file store tree actions', () => {
         showTreeEntry,
         'grandparent/parent/child.txt',
         store.state,
-        [{ type: types.SET_TREE_OPEN, payload: 'grandparent/parent' }],
-        [{ type: 'showTreeEntry', payload: 'grandparent/parent' }],
+        [
+          { type: types.SET_TREE_OPEN, payload: 'grandparent/parent' },
+          { type: types.SET_TREE_OPEN, payload: 'grandparent' },
+        ],
+        [{ type: 'showTreeEntry' }],
         done,
       );
     });

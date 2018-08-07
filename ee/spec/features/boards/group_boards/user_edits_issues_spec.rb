@@ -13,7 +13,7 @@ describe 'label issues', :js do
 
   before do
     stub_licensed_features(group_issue_boards: true)
-    group.add_maintainer(user)
+    group.add_master(user)
 
     sign_in(user)
 

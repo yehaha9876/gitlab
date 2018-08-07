@@ -38,9 +38,9 @@ describe 'Projects > Show > User sees setup shortcut buttons' do
       end
     end
 
-    describe 'as a maintainer' do
+    describe 'as a master' do
       before do
-        project.add_maintainer(user)
+        project.add_master(user)
         sign_in(user)
 
         visit project_path(project)
@@ -138,10 +138,10 @@ describe 'Projects > Show > User sees setup shortcut buttons' do
       end
     end
 
-    describe 'as a maintainer' do
+    describe 'as a master' do
       before do
         allow_any_instance_of(AutoDevopsHelper).to receive(:show_auto_devops_callout?).and_return(false)
-        project.add_maintainer(user)
+        project.add_master(user)
         sign_in(user)
       end
 

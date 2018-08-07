@@ -38,18 +38,3 @@ export const stageKeys = {
   unstaged: 'unstaged',
   staged: 'staged',
 };
-
-export const commitItemIconMap = {
-  addition: {
-    icon: 'file-addition',
-    class: 'ide-file-addition',
-  },
-  modified: {
-    icon: 'file-modified',
-    class: 'ide-file-modified',
-  },
-  deleted: {
-    icon: 'file-deletion',
-    class: 'ide-file-deletion',
-  },
-};

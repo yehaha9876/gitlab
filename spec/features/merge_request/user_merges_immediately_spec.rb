@@ -19,7 +19,7 @@ describe 'Merge requests > User merges immediately', :js do
   context 'when there is active pipeline for merge request' do
     before do
       create(:ci_build, pipeline: pipeline)
-      project.add_maintainer(user)
+      project.add_master(user)
       sign_in(user)
       visit project_merge_request_path(project, merge_request)
     end

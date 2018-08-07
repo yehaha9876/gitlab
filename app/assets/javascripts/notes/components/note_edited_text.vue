@@ -42,7 +42,7 @@ export default {
       by
       <a
         :href="editedBy.path"
-        class="js-vue-author author-link">
+        class="js-vue-author author_link">
         {{ editedBy.name }}
       </a>
     </template>

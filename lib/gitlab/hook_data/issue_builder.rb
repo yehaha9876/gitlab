@@ -1,6 +1,6 @@
 module Gitlab
   module HookData
-    class IssueBuilder < BaseBuilder
+    class IssueBuilder
       SAFE_HOOK_ATTRIBUTES = %i[
         assignee_id
         author_id
@@ -30,11 +30,14 @@ module Gitlab
         total_time_spent
       ].freeze
 
-      alias_method :issue, :object
+      attr_accessor :issue
+
+      def initialize(issue)
+        @issue = issue
+      end
 
       def build
         attrs = {
-          description: absolute_image_urls(issue.description),
           url: Gitlab::UrlBuilder.build(issue),
           total_time_spent: issue.total_time_spent,
           human_total_time_spent: issue.human_total_time_spent,

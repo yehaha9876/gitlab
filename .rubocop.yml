@@ -10,9 +10,9 @@ AllCops:
   Exclude:
     - 'vendor/**/*'
     - 'node_modules/**/*'
+    - 'db/**/*'
     - 'db/fixtures/**/*'
-    - 'db/schema.rb'
-    - 'ee/db/geo/schema.rb'
+    - 'ee/db/**/*'
     - 'tmp/**/*'
     - 'bin/**/*'
     - 'generator_templates/**/*'
@@ -34,8 +34,6 @@ Style/MutableConstant:
 Naming/FileName:
   ExpectMatchingDefinition: true
   Exclude:
-    - 'db/**/*'
-    - 'ee/db/**/*'
     - 'spec/**/*'
     - 'features/**/*'
     - 'ee/spec/**/*'

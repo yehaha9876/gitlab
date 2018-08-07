@@ -107,7 +107,7 @@ gem 'hashie-forbidden_attributes'
 gem 'kaminari', '~> 1.0'
 
 # HAML
-gem 'hamlit', '~> 2.8.8'
+gem 'hamlit', '~> 2.6.1'
 
 # Files attachments
 gem 'carrierwave', '~> 1.2'
@@ -230,9 +230,6 @@ gem 'gemnasium-gitlab-service', '~> 0.2'
 # Slack integration
 gem 'slack-notifier', '~> 1.5.1'
 
-# Hangouts Chat integration
-gem 'hangouts-chat', '~> 0.0.5'
-
 # Asana integration
 gem 'asana', '~> 0.6.0'
 
@@ -243,7 +240,7 @@ gem 'ruby-fogbugz', '~> 0.2.1'
 gem 'kubeclient', '~> 3.1.0'
 
 # Sanitize user input
-gem 'sanitize', '~> 4.6'
+gem 'sanitize', '~> 4.6.5'
 gem 'babosa', '~> 1.0.2'
 
 # Sanitizes SVG input
@@ -338,7 +335,6 @@ group :development do
 end
 
 group :development, :test do
-  gem 'bootsnap', '~> 1.3'
   gem 'bullet', '~> 5.5.0', require: !!ENV['ENABLE_BULLET']
   gem 'pry-byebug', '~> 3.4.1', platform: :mri
   gem 'pry-rails', '~> 0.3.4'
@@ -412,7 +408,6 @@ gem 'email_reply_trimmer', '~> 0.1'
 gem 'html2text'
 
 gem 'ruby-prof', '~> 0.17.0'
-gem 'rbtrace', '~> 0.4', require: false
 
 # OAuth
 gem 'oauth2', '~> 1.4'
@@ -438,7 +433,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC client
-gem 'gitaly-proto', '~> 0.109.0', require: 'gitaly'
+gem 'gitaly-proto', '~> 0.105.0', require: 'gitaly'
 gem 'grpc', '~> 1.11.0'
 
 # Locked until https://github.com/google/protobuf/issues/4210 is closed
