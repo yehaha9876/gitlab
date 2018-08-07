@@ -64,9 +64,9 @@ module Projects
       old_tags = repository_tags_with_target.each_with_object({}) { |tag, tags| tags[tag.name] = tag }
 
       fetch_result = yield
-      return fetch_result unless fetch_result
+      debug(['update_tags result', fetch_result])
 
-      pp ['update_tags result', fetch_result]
+      return fetch_result unless fetch_result
 
       repository.expire_tags_cache
 
@@ -79,7 +79,7 @@ module Projects
 
         next if old_tag_target == tag_target
 
-        pp ['new tag', tag.name, tag]
+        debug(['new tag', tag.name, tag])
 
         GitTagPushService.new(
           project,
@@ -94,6 +94,12 @@ module Projects
       end
 
       fetch_result
+    end
+
+    def debug(msg)
+      [STDOUT, STDERR].each do |handle|
+        handle.puts msg.pretty_inspect
+      end
     end
 
     def handle_diverged_branch(upstream, local, branch_name, errors)
