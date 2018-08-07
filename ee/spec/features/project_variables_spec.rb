@@ -24,10 +24,11 @@ describe 'Project variables EE', :js do
         find('.js-ci-variable-input-key').set('somekey')
         find('.js-ci-variable-input-value').set('somevalue')
 
-        find('.js-variable-environment-trigger').click
-        find('.js-variable-environment-trigger', visible: false).set('review/*')
-        find('.dropdown-menu .dropdown-item', visible: false).click
+        find('.js-variable-environment-trigger.select2-container').click
       end
+      page.find('#select2-drop .select2-input', visible: false).set('review/*')
+      page.find('#select2-drop .select2-highlighted', visible: false).click
+
       expect(find('.js-ci-variable-list-section .js-row:nth-child(3) input[name="variables[variables_attributes][][environment_scope]"]', visible: false).value).to eq('review/*')
 
       click_button('Save variables')
@@ -37,7 +38,7 @@ describe 'Project variables EE', :js do
 
       page.within('.js-ci-variable-list-section .js-row:nth-child(2)') do
         expect(find('.js-ci-variable-input-key').value).to eq('somekey')
-        expect(find('.js-variable-environment-trigger').value).to eq('review/*')
+        expect(page).to have_content('review/*')
       end
     end
   end

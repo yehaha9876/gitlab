@@ -545,12 +545,6 @@ atob@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.0.3.tgz#19c7a760473774468f20b2d2d03372ad7d4cbf5d"
 
-autocomplete.js@^0.30.0:
-  version "0.30.0"
-  resolved "https://registry.yarnpkg.com/autocomplete.js/-/autocomplete.js-0.30.0.tgz#e7a1425474291d255911499cee2a3c5624c9ccc5"
-  dependencies:
-    immediate "^3.2.3"
-
 autosize@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/autosize/-/autosize-4.0.0.tgz#7a0599b1ba84d73bd7589b0d9da3870152c69237"
@@ -3971,10 +3965,6 @@ ignore-walk@^3.0.1:
 ignore@^3.3.3, ignore@^3.3.7:
   version "3.3.8"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-3.3.8.tgz#3f8e9c35d38708a3a7e0e9abb6c73e7ee7707b2b"
-
-immediate@^3.2.3:
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.2.3.tgz#d140fa8f614659bd6541233097ddaac25cdd991c"
 
 immediate@~3.0.5:
   version "3.0.6"

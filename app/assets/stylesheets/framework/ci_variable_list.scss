@@ -4,7 +4,6 @@
   padding-left: 0;
   list-style: none;
   clear: both;
-  overflow: unset;
 
   .table-section {
     font-size: $gl-font-size;
@@ -19,11 +18,6 @@
       @include media-breakpoint-down(xs) {
         padding-right: $gl-btn-padding;
       }
-
-      .dropdown {
-        width: 100%;
-        display: block !important; // using important to overide js styles
-      }
     }
   }
 }
@@ -32,7 +26,7 @@
   align-items: flex-start;
   position: relative;
 
-  @include media-breakpoint-down(sm) {
+  @include media-breakpoint-down(xs) {
     align-items: flex-end;
     border: 0;
   }
@@ -78,7 +72,7 @@
   &:not(:last-child) {
     padding-right: $gl-btn-padding;
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-down(xs) {
       border: 0;
       min-height: unset;
     }
@@ -118,15 +112,28 @@
   }
 }
 
+.ci-variable-environment-trigger {
+  .select2-choices .select2-search-choice {
+    border: 0;
+    background: transparent;
+  }
+
+  .select2-search-choice-close {
+    display: none;
+  }
+}
+
 .ci-variable-environment-help-text {
   color: $gl-text-color-secondary;
   cursor: default;
   display: block;
-  white-space: normal;
+  margin: ($gl-padding-8 * -1) ($gl-padding * -1);
+  padding: $gl-padding-8 $gl-padding;
+  background: $white-light;
 }
 
 .ci-variable-environment-dropdown-wrapper + .ci-variable-row-remove-button {
-  @include media-breakpoint-down(sm) {
+  @include media-breakpoint-down(xs) {
     position: absolute;
     border: 0;
     right: $gl-padding * -2;
