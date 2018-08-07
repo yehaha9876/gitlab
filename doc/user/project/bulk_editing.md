@@ -1,6 +1,6 @@
 # Bulk editing
 
->**Note:**
+NOTE: **Note:**
 - A permission level of `Reporter` or higher is required in order to manage
 issues.
 - A permission level of `Developer` or higher is required in order to manage
@@ -11,7 +11,7 @@ by using the bulk editing feature.
 
 ![Bulk editing](img/bulk-editing.png)
 
->**Note:**
+NOTE: **Note:**
 - Bulk editing of issues and merge requests is only available at the project level.
 
 To update multiple project issues or merge requests at the same time, navigate to
