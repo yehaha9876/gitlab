@@ -1,4 +1,4 @@
-# Bulk editing
+# Bulk editing issues and merge requests
 
 NOTE: **Note:**
 - A permission level of `Reporter` or higher is required in order to manage
