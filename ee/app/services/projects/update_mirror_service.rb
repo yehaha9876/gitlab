@@ -66,6 +66,8 @@ module Projects
       fetch_result = yield
       return fetch_result unless fetch_result
 
+      pp ['update_tags result', fetch_result]
+
       repository.expire_tags_cache
 
       tags = repository_tags_with_target
@@ -76,6 +78,8 @@ module Projects
         old_tag_target = old_tag ? old_tag.dereferenced_target.sha : Gitlab::Git::BLANK_SHA
 
         next if old_tag_target == tag_target
+
+        pp ['new tag', tag.name, tag]
 
         GitTagPushService.new(
           project,
