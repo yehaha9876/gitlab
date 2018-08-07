@@ -16,7 +16,7 @@
       padding-right: 0;
 
       @include media-breakpoint-down(xs) {
-        padding-right: $gl-btn-padding;
+        width: calc(100% - #{$ci-variable-remove-button-width});
       }
     }
   }
@@ -136,7 +136,7 @@
   @include media-breakpoint-down(xs) {
     position: absolute;
     border: 0;
-    right: $gl-padding * -2;
+    right: 0;
     bottom: $gl-btn-padding;
     min-height: auto;
   }
