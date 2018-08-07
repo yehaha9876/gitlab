@@ -7,7 +7,6 @@ module Gitlab
         return '' unless Gitlab::Geo.secondary?
         return 'The Geo database configuration file is missing.' unless Gitlab::Geo.geo_database_configured?
         return 'The Geo node has a database that is not configured for streaming replication with the primary node.' unless self.database_secondary?
-        return 'The Geo node does not appear to be replicating the database from the primary node.' if Gitlab::Database.pg_stat_wal_receiver_supported? && !self.streaming_active?
 
         database_version  = self.get_database_version.to_i
         migration_version = self.get_migration_version.to_i
@@ -87,17 +86,6 @@ module Gitlab
           .fetch('replication_lag')
 
         lag.present? ? lag.to_i : lag
-      end
-
-      def self.streaming_active?
-        # Get a streaming status
-        # This only works for Postgresql 9.6 and greater
-        pid =
-          ActiveRecord::Base.connection.select_values('
-          SELECT pid FROM pg_stat_wal_receiver;')
-          .first
-
-        pid.to_i > 0
       end
     end
   end
