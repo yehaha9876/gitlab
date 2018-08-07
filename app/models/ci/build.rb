@@ -441,9 +441,9 @@ module Ci
     end
 
     def artifacts_metadata_entry(path, **options)
-      artifacts_metadata.use_file do |metadata_path|
+      artifacts_metadata.open do |metadata_stream|
         metadata = Gitlab::Ci::Build::Artifacts::Metadata.new(
-          metadata_path,
+          metadata_stream,
           path,
           **options)
 
@@ -657,6 +657,7 @@ module Ci
         variables.append(key: 'CI_JOB_NAME', value: name)
         variables.append(key: 'CI_JOB_STAGE', value: stage)
         variables.append(key: 'CI_COMMIT_SHA', value: sha)
+        variables.append(key: 'CI_COMMIT_BEFORE_SHA', value: before_sha)
         variables.append(key: 'CI_COMMIT_REF_NAME', value: ref)
         variables.append(key: 'CI_COMMIT_REF_SLUG', value: ref_slug)
         variables.append(key: "CI_COMMIT_TAG", value: ref) if tag?

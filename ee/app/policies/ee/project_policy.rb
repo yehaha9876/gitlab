@@ -49,6 +49,10 @@ module EE
         @subject.feature_available?(:pod_logs, @user)
       end
 
+      condition(:prometheus_alerts_enabled) do
+        @subject.feature_available?(:prometheus_alerts, @user)
+      end
+
       rule { admin }.enable :change_repository_storage
 
       rule { support_bot }.enable :guest_access
@@ -90,13 +94,14 @@ module EE
 
       rule { deploy_board_disabled & ~is_development }.prevent :read_deploy_board
 
-      rule { can?(:master_access) }.policy do
+      rule { can?(:maintainer_access) }.policy do
         enable :push_code_to_protected_branches
         enable :admin_path_locks
         enable :update_approvers
       end
 
-      rule { pod_logs_enabled & can?(:master_access) }.enable :read_pod_logs
+      rule { pod_logs_enabled & can?(:maintainer_access) }.enable :read_pod_logs
+      rule { prometheus_alerts_enabled & can?(:maintainer_access) }.enable :read_prometheus_alerts
 
       rule { auditor }.policy do
         enable :public_user_access
@@ -117,9 +122,9 @@ module EE
 
       rule { ~can?(:push_code) }.prevent :push_code_to_protected_branches
 
-      rule { admin | (reject_unsigned_commits_disabled_globally & can?(:master_access)) }.enable :change_reject_unsigned_commits
+      rule { admin | (reject_unsigned_commits_disabled_globally & can?(:maintainer_access)) }.enable :change_reject_unsigned_commits
 
-      rule { admin | (commit_committer_check_disabled_globally & can?(:master_access)) }.enable :change_commit_committer_check
+      rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.enable :change_commit_committer_check
 
       rule { owner | reporter }.enable :build_read_project
 
@@ -138,7 +143,7 @@ module EE
         prevent :public_user_access
         prevent :reporter_access
         prevent :developer_access
-        prevent :master_access
+        prevent :maintainer_access
         prevent :owner_access
       end
 

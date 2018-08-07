@@ -88,14 +88,6 @@ describe Geo::RepositorySyncService do
       expect { subject.execute }.not_to raise_error
     end
 
-    it 'rescues when Gitlab::Git::RepositoryMirroring::RemoteError is raised' do
-      allow(repository).to receive(:fetch_as_mirror)
-        .with(url_to_repo, remote_name: 'geo', forced: true)
-        .and_raise(Gitlab::Git::RepositoryMirroring::RemoteError)
-
-      expect { subject.execute }.not_to raise_error
-    end
-
     it 'rescues exception and fires after_create hook when Gitlab::Git::Repository::NoRepository is raised' do
       allow(repository).to receive(:fetch_as_mirror)
       .with(url_to_repo, remote_name: 'geo', forced: true)
@@ -286,7 +278,11 @@ describe Geo::RepositorySyncService do
 
         subject.execute
 
-        expect(File.directory?(project.repository.path)).to be true
+        repo_path = Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+          project.repository.path
+        end
+
+        expect(File.directory?(repo_path)).to be true
       end
 
       it 'tries to redownload repo when force_redownload flag is set' do

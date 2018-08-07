@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GroupPolicy < BasePolicy
   prepend EE::GroupPolicy
 
@@ -13,7 +15,7 @@ class GroupPolicy < BasePolicy
   condition(:guest) { access_level >= GroupMember::GUEST }
   condition(:developer) { access_level >= GroupMember::DEVELOPER }
   condition(:owner) { access_level >= GroupMember::OWNER }
-  condition(:master) { access_level >= GroupMember::MASTER }
+  condition(:maintainer) { access_level >= GroupMember::MAINTAINER }
   condition(:reporter) { access_level >= GroupMember::REPORTER }
 
   condition(:nested_groups_supported, scope: :global) { Group.supports_nested_groups? }
@@ -62,7 +64,7 @@ class GroupPolicy < BasePolicy
     enable :admin_issue
   end
 
-  rule { master }.policy do
+  rule { maintainer }.policy do
     enable :create_projects
     enable :admin_pipeline
     enable :admin_build

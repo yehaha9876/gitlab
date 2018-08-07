@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Projects
   class CreateService < BaseService
     prepend ::EE::Projects::CreateService
@@ -117,7 +119,7 @@ module Projects
         @project.group.refresh_members_authorized_projects(blocking: false)
         current_user.refresh_authorized_projects
       else
-        @project.add_master(@project.namespace.owner, current_user: current_user)
+        @project.add_maintainer(@project.namespace.owner, current_user: current_user)
       end
     end
 

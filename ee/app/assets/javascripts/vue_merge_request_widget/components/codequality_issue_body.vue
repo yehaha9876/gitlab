@@ -3,7 +3,8 @@
  * Renders Code quality body text
  * Fixed: [name] in [link]:[line]
  */
-import ReportLink from 'ee/vue_shared/security_reports/components/report_link.vue';
+import ReportLink from '~/vue_shared/components/reports/report_link.vue';
+import { STATUS_SUCCESS } from '~/vue_shared/components/reports/constants';
 
 export default {
   name: 'CodequalityIssueBody',
@@ -11,15 +12,19 @@ export default {
   components: {
     ReportLink,
   },
-
   props: {
-    isStatusSuccess: {
-      type: Boolean,
+    status: {
+      type: String,
       required: true,
     },
     issue: {
       type: Object,
       required: true,
+    },
+  },
+  computed: {
+    isStatusSuccess() {
+      return this.status === STATUS_SUCCESS;
     },
   },
 };

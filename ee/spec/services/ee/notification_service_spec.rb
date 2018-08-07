@@ -12,7 +12,7 @@ describe EE::NotificationService, :mailer do
     let(:member) { create(:user) }
 
     before do
-      project.add_master(member)
+      project.add_maintainer(member)
       member.global_notification_setting.update!(level: :watch)
     end
 
@@ -173,10 +173,10 @@ describe EE::NotificationService, :mailer do
       end
     end
 
-    context 'when user is master' do
+    context 'when user is maintainer' do
       it 'sends email' do
         project = create(:project, :mirror, :import_hard_failed)
-        project.add_master(user)
+        project.add_maintainer(user)
 
         expect(Notify).to receive(:mirror_was_hard_failed_email).with(project.id, project.owner.id).and_call_original
         expect(Notify).to receive(:mirror_was_hard_failed_email).with(project.id, user.id).and_call_original
@@ -185,7 +185,7 @@ describe EE::NotificationService, :mailer do
       end
     end
 
-    context 'when user is not owner nor master' do
+    context 'when user is not owner nor maintainer' do
       it 'does not send email' do
         project = create(:project, :mirror, :import_hard_failed)
         project.add_developer(user)
@@ -210,10 +210,10 @@ describe EE::NotificationService, :mailer do
         end
       end
 
-      context 'when user is group master' do
+      context 'when user is group maintainer' do
         it 'sends email' do
           group = create(:group, :public) do |group|
-            group.add_master(user)
+            group.add_maintainer(user)
           end
 
           project = create(:project, :mirror, :import_hard_failed, namespace: group)
@@ -235,6 +235,23 @@ describe EE::NotificationService, :mailer do
       expect(Notify).to receive(:project_mirror_user_changed_email).with(new_mirror_user.id, mirror_user.name, project.id).and_call_original
 
       subject.project_mirror_user_changed(new_mirror_user, mirror_user.name, project)
+    end
+  end
+
+  describe '#prometheus_alerts_fired' do
+    it 'sends the email to owners and masters' do
+      project = create(:project)
+      prometheus_alert = create(:prometheus_alert, project: project)
+      master = create(:user)
+      developer = create(:user)
+
+      project.add_master(master)
+
+      expect(Notify).to receive(:prometheus_alert_fired_email).with(project.id, master.id, prometheus_alert).and_call_original
+      expect(Notify).to receive(:prometheus_alert_fired_email).with(project.id, project.owner.id, prometheus_alert).and_call_original
+      expect(Notify).not_to receive(:prometheus_alert_fired_email).with(project.id, developer.id, prometheus_alert)
+
+      subject.prometheus_alerts_fired(prometheus_alert.project, [prometheus_alert])
     end
   end
 

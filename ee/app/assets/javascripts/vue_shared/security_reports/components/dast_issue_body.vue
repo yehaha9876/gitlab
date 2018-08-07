@@ -4,21 +4,16 @@
  * [severity] ([confidence]): [name]
  */
 
-import ModalOpenName from './modal_open_name.vue';
+import ModalOpenName from '~/vue_shared/components/reports/modal_open_name.vue';
 
 export default {
-  name: 'SastIssueBody',
+  name: 'DastIssueBody',
   components: {
     ModalOpenName,
   },
   props: {
     issue: {
       type: Object,
-      required: true,
-    },
-
-    issueIndex: {
-      type: Number,
       required: true,
     },
     // failed || success

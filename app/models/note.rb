@@ -210,7 +210,7 @@ class Note < ActiveRecord::Base
   end
 
   def hook_attrs
-    attributes
+    Gitlab::HookData::NoteBuilder.new(self).build
   end
 
   def for_commit?
@@ -235,10 +235,6 @@ class Note < ActiveRecord::Base
 
   def for_project_noteable?
     !for_personal_snippet?
-  end
-
-  def for_issuable?
-    for_issue? || for_merge_request?
   end
 
   def skip_project_check?
