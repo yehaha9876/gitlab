@@ -5,6 +5,7 @@ describe 'Project variables EE', :js do
   let(:project)  { create(:project) }
   let(:variable) { create(:ci_variable, key: 'test_key', value: 'test value') }
   let(:page_path) { project_settings_ci_cd_path(project) }
+  environment_input_selector = 'input[name="variables[variables_attributes][][environment_scope]"]'
 
   before do
     stub_licensed_features(variable_environment_scope: variable_environment_scope)
@@ -29,7 +30,7 @@ describe 'Project variables EE', :js do
       page.find('#select2-drop .select2-input', visible: false).set('review/*')
       page.find('#select2-drop .select2-highlighted', visible: false).click
 
-      expect(find('.js-ci-variable-list-section .js-row:nth-child(3) input[name="variables[variables_attributes][][environment_scope]"]', visible: false).value).to eq('review/*')
+      expect(find(".js-row:nth-child(3) #{environment_input_selector}", visible: false).value).to eq('review/*')
 
       click_button('Save variables')
       wait_for_requests
@@ -47,7 +48,7 @@ describe 'Project variables EE', :js do
     let(:variable_environment_scope) { false }
 
     it 'does not show variable environment scope element' do
-      expect(page).not_to have_selector('input[name="variables[variables_attributes][][environment_scope]"]')
+      expect(page).not_to have_selector(environment_input_selector)
       expect(page).not_to have_selector('.js-variable-environment-dropdown-wrapper')
     end
   end
