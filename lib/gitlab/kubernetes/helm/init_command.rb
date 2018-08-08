@@ -25,7 +25,7 @@ module Gitlab
             " --tiller-tls-cert #{files_dir}/cert.pem" \
             " --tiller-tls-key #{files_dir}/key.pem"
 
-          "helm init #{tls_flags} >/dev/null"
+          "helm init --service-account tiller #{tls_flags} >/dev/null"
         end
       end
     end
