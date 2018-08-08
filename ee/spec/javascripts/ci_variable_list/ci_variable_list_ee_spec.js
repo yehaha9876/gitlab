@@ -24,8 +24,8 @@ describe('VariableList (EE features)', () => {
       function addRowByNewEnvironment(newEnv) {
         const $row = $wrapper.find('.js-row:last-child');
 
-        // // Open the dropdown
-        $($row.find('.select2-container.js-variable-environment-trigger')).select2('val', newEnv).trigger('change.select2');
+        // Open the dropdown
+        $row.find('.select2-container.js-variable-environment-trigger').select2('val', newEnv).trigger('change.select2');
         $row.find('input.js-variable-environment-trigger')
           .val(newEnv)
           .trigger('input');
