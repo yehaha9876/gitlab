@@ -8,6 +8,11 @@ module Projects
         return success
       end
 
+      debug(['can?',
+             can?(current_user, :push_code_to_protected_branches, project),
+             current_user,
+             project.team.max_member_access(current_user.id),
+             Rails.cache.read("max_member_access_for_projects:#{project.id}")])
       unless can?(current_user, :push_code_to_protected_branches, project)
         return error("The mirror user is not allowed to push code to all branches on this project.")
       end
@@ -79,7 +84,7 @@ module Projects
 
         next if old_tag_target == tag_target
 
-        debug(['new tag', tag.name, tag])
+        debug(['new tag', tag.name])
 
         GitTagPushService.new(
           project,
