@@ -1,0 +1,27 @@
+.custom-project-templates
+  - if groups_with_project_templates.present?
+    - groups_with_project_templates.each do |group|
+      %p= group.name
+
+      - group.project_templates.each do |project|
+        .template-option.d-flex.align-items-center
+          .avatar-container.s40
+            = project_icon(project, alt: project.name, class: 'btn-template-icon avatar s40 avatar-tile', lazy: false)
+          .description
+            %strong
+              = project.title
+            %br
+            .text-muted
+              = project.description
+          .controls.d-flex.align-items-baseline
+            %label.btn.btn-success.custom-template-button.choose-template.append-right-10.append-bottom-0{ for: project.name }
+              %input{ type: "radio",  autocomplete: "off", name: "project[template_name]", id: project.name, value: project.name, data: { subgroup_id: project.namespace_id } }
+              %span
+                = _('Use template')
+            %a.btn.btn-default{ href: project_path(project), rel: 'noopener noreferrer', target: '_blank' } Preview
+
+    = paginate groups_with_project_templates, params: {controller: 'users', action: 'available_templates', username: current_user.username}, theme: 'gitlab', remote: true
+  - else
+    Custom project templates have not been set up for groups that you are a member of. They are enabled from a group’s settings page. Contact your group’s Owner or Maintainer to setup custom project templates.
+
+    Learn more about group-level project templates

@@ -26,7 +26,7 @@ module EE
 
       def template_project
         strong_memoize(:template_project) do
-          current_user.available_custom_project_templates(search: template_name).first
+          current_user.available_custom_project_templates(search: template_name, subgroup_id: params.delete(:subgroup_with_project_templates_id)).first
         end
       end
     end

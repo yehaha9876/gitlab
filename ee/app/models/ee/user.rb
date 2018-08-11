@@ -102,8 +102,8 @@ module EE
       email_opted_in_source_id == EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM ? 'GitLab.com' : ''
     end
 
-    def available_custom_project_templates(search: nil)
-      templates = ::Gitlab::CurrentSettings.available_custom_project_templates
+    def available_custom_project_templates(search: nil, subgroup_id: nil)
+      templates = ::Gitlab::CurrentSettings.available_custom_project_templates(subgroup_id)
 
       ProjectsFinder.new(current_user: self,
                          project_ids_relation: templates,

@@ -1,6 +1,7 @@
 - project_template_count = current_user.available_custom_project_templates.count
+- group = project.group
 
-- if ::Gitlab::CurrentSettings.custom_project_templates_enabled? && project_template_count > 0
+- if ::Gitlab::CurrentSettings.custom_project_templates_enabled?
   .project-templates-buttons.col-sm-12
     %ul.nav-tabs.nav-links.nav.scrolling-tabs
       %li.built-in-tab
@@ -11,16 +12,24 @@
         %a.nav-link{ href: "#custom-templates", data: { toggle: 'tab'} }
           = _('Custom')
           %span.badge.badge-pill= project_template_count
+      %li.group-templates-tab
+        %a.nav-link{ href: "#group-templates", data: { toggle: 'tab'} }
+          = _('Group')
+          %span.badge.badge-pill
+            = ::GroupProjectTemplateFinder.new(current_user, group&.id).projects_count
 
   .tab-content
     .project-templates-buttons.import-buttons.tab-pane.active#built-in
       = render 'projects/project_templates/built_in_templates'
     .project-templates-buttons.import-buttons.tab-pane#custom-templates{ data: {initial_templates: user_available_templates_path(current_user)} }
       = icon("spin spinner 2x")
+    .project-templates-buttons.import-buttons.tab-pane#group-templates{ data: {initial_templates: user_available_templates_path(current_user, scope: 'groups', group_id: group&.id)} }
+      = icon("spin spinner 2x")
 
   .project-fields-form
     = render 'projects/project_templates/project_fields_form'
     = f.hidden_field(:use_custom_template, value: false)
+    = f.hidden_field(:subgroup_with_project_templates_id, value: nil)
     = render 'projects/new_project_fields', f: f, project_name_id: "template-project-name", hide_init_with_readme: true
 
 - else

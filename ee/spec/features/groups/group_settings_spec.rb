@@ -113,4 +113,77 @@ describe 'Edit group settings' do
       end
     end
   end
+
+  context 'when custom_project_templates feature' do
+    let!(:subgroup) { create(:group, :public, parent: group) }
+
+    shared_examples 'shows custom project templates settings' do
+      it 'shows the custom project templates selection menu' do
+        expect(page).to have_content('Custom project templates')
+      end
+
+      context 'group selection menu', :js do
+        before do
+          slow_requests do
+            find('#s2id_group_custom_project_templates_group_id').click
+            wait_for_all_requests
+          end
+        end
+
+        it 'shows only the parent group and the subgroups' do
+          page.within('.select2-drop .select2-results') do
+            results = find_all('.select2-result')
+
+            expect(results.count).to eq 2
+            expect(results.first.text).to eq "#{group.full_name} #{group.full_path}"
+            expect(results.last.text).to eq "#{subgroup.full_name} #{subgroup.full_path}"
+          end
+        end
+      end
+    end
+
+    shared_examples 'does not show custom project templates settings' do
+      it 'does not show the custom project templates selection menu' do
+        expect(page).not_to have_content('Custom project templates')
+      end
+    end
+
+    context 'is enabled' do
+      before do
+        stub_licensed_features(custom_project_templates: true)
+        visit edit_group_path(selected_group)
+      end
+
+      context 'when the group is a top parent group' do
+        let(:selected_group) { group }
+
+        it_behaves_like 'shows custom project templates settings'
+      end
+
+      context 'when the group is a subgroup' do
+        let(:selected_group) { subgroup }
+
+        it_behaves_like 'does not show custom project templates settings'
+      end
+    end
+
+    context 'is disabled' do
+      before do
+        stub_licensed_features(custom_project_templates: false)
+        visit edit_group_path(selected_group)
+      end
+
+      context 'when the group is the top parent group' do
+        let(:selected_group) { group }
+
+        it_behaves_like 'does not show custom project templates settings'
+      end
+
+      context 'when the group is a subgroup' do
+        let(:selected_group) { subgroup }
+
+        it_behaves_like 'does not show custom project templates settings'
+      end
+    end
+  end
 end

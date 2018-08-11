@@ -14,6 +14,7 @@ module EE
 
       has_many :ldap_group_links, foreign_key: 'group_id', dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :hooks, dependent: :destroy, class_name: 'GroupHook' # rubocop:disable Cop/ActiveRecordDependent
+      has_many :project_templates, class_name: 'Project', primary_key: :custom_project_templates_group_id, foreign_key: :namespace_id
 
       # We cannot simply set `has_many :audit_events, as: :entity, dependent: :destroy`
       # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.
@@ -24,6 +25,11 @@ module EE
 
       scope :where_group_links_with_provider, ->(provider) do
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })
+      end
+
+      scope :with_project_templates, -> do
+        joins(:project_templates)
+        .where('namespaces.custom_project_templates_group_id IS NOT NULL')
       end
 
       state_machine :ldap_sync_status, namespace: :ldap_sync, initial: :ready do

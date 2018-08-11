@@ -188,10 +188,10 @@ module EE
       custom_project_templates_enabled? && super
     end
 
-    def available_custom_project_templates
-      return [] unless group_id = custom_project_templates_group_id
+    def available_custom_project_templates(subgroup_id)
+      return [] unless namespace_id = (subgroup_id || custom_project_templates_group_id)
 
-      ::Project.where(namespace_id: group_id)
+      ::Project.where(namespace_id: namespace_id)
     end
 
     def instance_review_permitted?
