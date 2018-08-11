@@ -24,6 +24,7 @@ module EE
         use_custom_template
         packages_enabled
         merge_requests_author_approval
+        subgroup_with_project_templates_id
       ]
 
       if allow_mirror_params?

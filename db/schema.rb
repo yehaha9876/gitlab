@@ -1797,9 +1797,11 @@ ActiveRecord::Schema.define(version: 20180920043317) do
     t.integer "project_creation_level"
     t.string "runners_token"
     t.datetime_with_timezone "trial_ends_on"
+    t.integer "custom_project_templates_group_id"
   end
 
   add_index "namespaces", ["created_at"], name: "index_namespaces_on_created_at", using: :btree
+  add_index "namespaces", ["custom_project_templates_group_id"], name: "index_namespaces_on_custom_project_templates_group_id", using: :btree
   add_index "namespaces", ["ldap_sync_last_successful_update_at"], name: "index_namespaces_on_ldap_sync_last_successful_update_at", using: :btree
   add_index "namespaces", ["ldap_sync_last_update_at"], name: "index_namespaces_on_ldap_sync_last_update_at", using: :btree
   add_index "namespaces", ["name", "parent_id"], name: "index_namespaces_on_name_and_parent_id", unique: true, using: :btree
@@ -3210,6 +3212,7 @@ ActiveRecord::Schema.define(version: 20180920043317) do
   add_foreign_key "milestones", "namespaces", column: "group_id", name: "fk_95650a40d4", on_delete: :cascade
   add_foreign_key "milestones", "projects", name: "fk_9bd0a0c791", on_delete: :cascade
   add_foreign_key "namespace_statistics", "namespaces", on_delete: :cascade
+  add_foreign_key "namespaces", "namespaces", column: "custom_project_templates_group_id", on_delete: :nullify
   add_foreign_key "namespaces", "plans", name: "fk_fdd12e5b80", on_delete: :nullify
   add_foreign_key "note_diff_files", "notes", column: "diff_note_id", on_delete: :cascade
   add_foreign_key "notes", "projects", name: "fk_99e097b079", on_delete: :cascade

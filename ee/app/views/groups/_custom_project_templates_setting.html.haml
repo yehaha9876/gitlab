@@ -1,0 +1,7 @@
+- return unless ::Gitlab::CurrentSettings.custom_project_templates_enabled?
+- return if group.parent_id.present?
+
+.form-group
+  = form.label :custom_project_templates_group_id, class: 'label-bold' do
+    = _('Custom project templates')
+  = groups_select_tag('group[custom_project_templates_group_id]', data: { parent_id: group.id }, selected: group.custom_project_templates_group_id, class: 'input-clamp allowClear', multiple: false)

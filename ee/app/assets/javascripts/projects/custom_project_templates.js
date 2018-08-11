@@ -11,6 +11,7 @@ const bindEvents = () => {
   const $changeTemplateBtn = $('.change-template');
   const $projectTemplateButtons = $('.project-templates-buttons');
   const $projectFieldsFormInput = $('.project-fields-form input#project_use_custom_template');
+  const $subgroupWithTemplatesIdInput = $('.project-fields-form input#project_subgroup_with_project_templates_id');
 
   if ($newProjectForm.length !== 1 || $useCustomTemplateBtn.length === 0) {
     return;
@@ -30,8 +31,11 @@ const bindEvents = () => {
     $selectedIcon.empty();
 
     const value = $(this).val();
+    const subgroupId = $(this).data('subgroup-id');
 
     $selectedTemplateText.text(value);
+    $subgroupWithTemplatesIdInput.val(subgroupId);
+
     $(this)
       .parents('.template-option')
       .find('.avatar')
@@ -63,11 +67,18 @@ export default () => {
 
   const $navElement = $('.nav-link[href="#custom-templates"]');
   const $tabContent = $('.project-templates-buttons#custom-templates');
+  const $groupNavElement = $('.nav-link[href="#group-templates"]');
+  const $groupTabContent = $('.project-templates-buttons#group-templates');
 
   $tabContent.on('ajax:success', bindEvents);
+  $groupTabContent.on('ajax:success', bindEvents);
 
   $navElement.one('click', () => {
     $.get($tabContent.data('initialTemplates'));
+  });
+
+  $groupNavElement.one('click', () => {
+    $.get($groupTabContent.data('initialTemplates'));
   });
 
   bindEvents();

@@ -4,6 +4,8 @@ import initConfirmDangerModal from '~/confirm_danger_modal';
 import initSettingsPanels from '~/settings_panels';
 import mountBadgeSettings from '~/pages/shared/mount_badge_settings';
 import { GROUP_BADGE } from '~/badges/constants';
+import groupsSelect from '~/groups_select';
+
 
 document.addEventListener('DOMContentLoaded', () => {
   groupAvatar();
@@ -11,4 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initConfirmDangerModal();
   initSettingsPanels();
   mountBadgeSettings(GROUP_BADGE);
+
+  // Initialize Subgroups selector
+  groupsSelect();
 });
