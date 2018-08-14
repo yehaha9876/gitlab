@@ -101,7 +101,7 @@ module Clusters
       end
 
       def kubeclient
-        @kubeclient ||= build_kubeclient!
+        @kubeclient ||= Gitlab::Kubernetes::KubeClient.new(kubeclient_core, kubeclient_rbac)
       end
 
       private
@@ -119,6 +119,14 @@ module Clusters
 
         slug = "#{project.path}-#{project.id}".downcase
         slug.gsub(/[^-a-z0-9]/, '-').gsub(/^-+/, '')
+      end
+
+      def kubeclient_core
+        @kubeclient_core ||= build_kubeclient!
+      end
+
+      def kubeclient_rbac
+        @kubeclient_rbac ||= build_kubeclient!(api_path: 'apis/rbac.authorization.k8s.io')
       end
 
       def build_kubeclient!(api_path: 'api', api_version: 'v1')
