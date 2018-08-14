@@ -164,7 +164,18 @@ describe Clusters::Applications::Prometheus do
       expect(subject.name).to eq('prometheus')
       expect(subject.chart).to eq('stable/prometheus')
       expect(subject.version).to eq('6.7.3')
+      expect(subject.rbac).to be_falsey
       expect(subject.files).to eq(prometheus.files)
+    end
+
+    context 'on a rbac enabled cluster' do
+      before do
+        prometheus.cluster.platform_kubernetes.authorization_type = 'rbac'
+      end
+
+      it 'should be initialized with rbac true' do
+        expect(subject.rbac).to be_truthy
+      end
     end
 
     context 'application failed to install previously' do
