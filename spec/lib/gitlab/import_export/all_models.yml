@@ -343,6 +343,7 @@ project:
 - ci_cd_settings
 - import_export_upload
 - vulnerability_feedback
+- vulnerabilities
 - prometheus_alerts
 - software_license_policies
 - repository_languages

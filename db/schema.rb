@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180831152625) do
+ActiveRecord::Schema.define(version: 20180904171535) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -2926,6 +2926,61 @@ ActiveRecord::Schema.define(version: 20180831152625) do
   add_index "vulnerability_feedback", ["pipeline_id"], name: "index_vulnerability_feedback_on_pipeline_id", using: :btree
   add_index "vulnerability_feedback", ["project_id", "category", "feedback_type", "project_fingerprint"], name: "vulnerability_feedback_unique_idx", unique: true, using: :btree
 
+  create_table "vulnerability_identifiers", force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "namespace_id", null: false
+    t.string "external_type", null: false
+    t.string "external_id", null: false
+    t.string "name", null: false
+    t.text "url"
+  end
+
+  add_index "vulnerability_identifiers", ["external_id", "external_type", "namespace_id"], name: "vulnerability_identifiers_unique_index", unique: true, using: :btree
+
+  create_table "vulnerability_occurrence_identifiers", force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "occurrence_id", null: false
+    t.integer "identifier_id", null: false
+    t.boolean "primary", default: false, null: false
+  end
+
+  add_index "vulnerability_occurrence_identifiers", ["occurrence_id", "identifier_id"], name: "vulnerability_occurrence_identifiers_primary_unique_index", unique: true, where: "(\"primary\" IS TRUE)", using: :btree
+
+  create_table "vulnerability_occurrences", force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "severity"
+    t.integer "confidence"
+    t.integer "scanner_id", null: false
+    t.integer "pipeline_id", null: false
+    t.integer "project_id", null: false
+    t.integer "category", null: false
+    t.binary "first_seen_in_commit_sha", null: false
+    t.binary "project_fingerprint", null: false
+    t.binary "location_fingerprint", null: false
+    t.binary "primary_identifier_fingerprint", null: false
+    t.string "ref", null: false
+    t.string "name", null: false
+    t.string "metadata_version", null: false
+    t.text "raw_metadata", null: false
+  end
+
+  add_index "vulnerability_occurrences", ["location_fingerprint", "project_id", "primary_identifier_fingerprint", "ref", "scanner_id"], name: "vulnerability_occurrences_unique_index", unique: true, using: :btree
+  add_index "vulnerability_occurrences", ["project_fingerprint"], name: "index_vulnerability_occurrences_on_project_fingerprint", using: :btree
+  add_index "vulnerability_occurrences", ["project_id"], name: "index_vulnerability_occurrences_on_project_id", using: :btree
+
+  create_table "vulnerability_scanners", force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "namespace_id", null: false
+    t.string "external_id", null: false
+    t.string "name", null: false
+  end
+
+  add_index "vulnerability_scanners", ["external_id", "namespace_id"], name: "vulnerability_scanners_unique_index", unique: true, using: :btree
+
   create_table "web_hook_logs", force: :cascade do |t|
     t.integer "web_hook_id", null: false
     t.string "trigger"
@@ -3215,6 +3270,13 @@ ActiveRecord::Schema.define(version: 20180831152625) do
   add_foreign_key "vulnerability_feedback", "issues", on_delete: :nullify
   add_foreign_key "vulnerability_feedback", "projects", on_delete: :cascade
   add_foreign_key "vulnerability_feedback", "users", column: "author_id", on_delete: :cascade
+  add_foreign_key "vulnerability_identifiers", "namespaces", on_delete: :cascade
+  add_foreign_key "vulnerability_occurrence_identifiers", "vulnerability_identifiers", column: "identifier_id", on_delete: :cascade
+  add_foreign_key "vulnerability_occurrence_identifiers", "vulnerability_occurrences", column: "occurrence_id", on_delete: :cascade
+  add_foreign_key "vulnerability_occurrences", "ci_pipelines", column: "pipeline_id", on_delete: :cascade
+  add_foreign_key "vulnerability_occurrences", "projects", on_delete: :cascade
+  add_foreign_key "vulnerability_occurrences", "vulnerability_scanners", column: "scanner_id", on_delete: :cascade
+  add_foreign_key "vulnerability_scanners", "namespaces", on_delete: :cascade
   add_foreign_key "web_hook_logs", "web_hooks", on_delete: :cascade
   add_foreign_key "web_hooks", "projects", name: "fk_0c8ca6d9d1", on_delete: :cascade
 end
