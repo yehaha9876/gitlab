@@ -190,6 +190,7 @@ export default {
         ref="editableField"
         :value="weight"
         class="form-control"
+        placeholder="Input any integer value 0, 1, 5..."
         type="text"
         @blur="onSubmit"
         @keydown.enter="onSubmit"
