@@ -448,6 +448,15 @@ export default {
         this.canRetry
       );
     },
+
+    securityReport() {
+      // 1. get latest commit
+      // 2. fetch security report 
+      // 3. Return results or catch if none exist
+      return {
+        status: "✅"
+      };
+    }
   },
 
   methods: {
@@ -614,6 +623,22 @@ export default {
     </div>
 
     <div
+      class="table-section section-10"
+      role="gridcell"
+    >
+      <div
+        role="rowheader"
+        class="table-mobile-header"
+      >
+        {{ s__("Environments|Security") }}
+      </div>
+
+      <span class="environment-security table-mobile-content">
+        {{ securityReport.status }}
+      </span>
+    </div>
+
+    <div
       v-if="!model.isFolder"
       class="table-section section-10"
       role="gridcell"
@@ -632,7 +657,7 @@ export default {
 
     <div
       v-if="!model.isFolder && displayEnvironmentActions"
-      class="table-section section-30 table-button-footer"
+      class="table-section section-20 table-button-footer"
       role="gridcell">
 
       <div

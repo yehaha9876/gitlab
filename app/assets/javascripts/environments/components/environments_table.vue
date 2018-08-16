@@ -77,6 +77,12 @@ export default {
         {{ s__("Environments|Commit") }}
       </div>
       <div
+        class="table-section section-10 environments-security"
+        role="columnheader"
+      >
+        {{ s__("Environments|Security") }}
+      </div>
+      <div
         class="table-section section-10 environments-date"
         role="columnheader"
       >
