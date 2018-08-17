@@ -12,6 +12,7 @@ import TerminalButtonComponent from './environment_terminal_button.vue';
 import MonitoringButtonComponent from './environment_monitoring.vue';
 import CommitComponent from '../../vue_shared/components/commit.vue';
 import eventHub from '../event_hub';
+import SecurityStatus from 'ee/vue_shared/security_reports/components/security_status.vue';
 
 /**
  * Envrionment Item Component
@@ -30,6 +31,7 @@ export default {
     RollbackComponent,
     TerminalButtonComponent,
     MonitoringButtonComponent,
+    SecurityStatus
   },
 
   directives: {
@@ -447,15 +449,6 @@ export default {
         this.canStopEnvironment ||
         this.canRetry
       );
-    },
-
-    securityReport() {
-      // 1. get latest commit
-      // 2. fetch security report 
-      // 3. Return results or catch if none exist
-      return {
-        status: "✅"
-      };
     }
   },
 
@@ -634,7 +627,9 @@ export default {
       </div>
 
       <span class="environment-security table-mobile-content">
-        {{ securityReport.status }}
+        <security-status
+          :commit-short-sha="commitShortSha"
+        ></security-status>
       </span>
     </div>
 

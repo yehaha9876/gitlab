@@ -33,6 +33,7 @@ export default {
       default: false,
     },
   },
+
   methods: {
     folderUrl(model) {
       return `${window.location.pathname}/folders/${model.folderName}`;
