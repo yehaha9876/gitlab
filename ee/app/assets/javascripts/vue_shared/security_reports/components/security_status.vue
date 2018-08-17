@@ -1,5 +1,5 @@
 <script>
-import Icon from '~/vue_shared/components/ci_icon.vue';
+import StatusIcon from '~/vue_merge_request_widget/components/mr_widget_status_icon.vue';
 import Tooltip from '~/vue_shared/directives/tooltip';
 
 // TODO: Make this an action
@@ -14,7 +14,7 @@ const fetchReportStatusAction = () => new Promise((resolve, reject) => {
 
 export default {
   components: {
-    Icon,
+    StatusIcon,
   },
   directives: {
     Tooltip,
@@ -36,14 +36,12 @@ export default {
     reportUrl() {
       return this.data.pipeline_url;
     },
-    reportStatus() {
-      return this.data.is_secure ? 'success' : 'warning';
-    },
-    iconStatus() {
-      return {
-        icon: `status_${this.reportStatus}`,
-        group: this.reportStatus
+    status() {
+      if (this.isLoading) {
+        return 'loading';
       }
+
+      return this.data.is_secure ? 'success' : 'warning';
     }
   },
   methods: {
@@ -53,9 +51,12 @@ export default {
       fetchReportStatusAction(this.commitShortSha)
         .then(response => {
           this.isLoading = false;
+          this.hasError = false;
           this.data = response.data
         })
         .catch(error => {
+          this.isLoading = false;
+          this.hasError = true;
           //TODO: Handle the error
         })
     }
@@ -69,14 +70,22 @@ export default {
 <template>
   <a
     v-tooltip
-    v-if="!isLoading"
     data-placement="bottom"
     :title="s__('ciReport|Security Report')"
     :href="reportUrl"
   >
-    <icon
-      :status="iconStatus"
-      :size="24"
-    />
+    <status-icon
+      class="temp-class"
+      :status="status"
+    ></status-icon>
   </a>
 </template>
+
+<style scoped>
+/* TODO: This is a bit nonsensical, find a more sensible approach */
+.temp-class {
+  display: inline-block !important;
+  margin: 0;
+}
+</style>
+
