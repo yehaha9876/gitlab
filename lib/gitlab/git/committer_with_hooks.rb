@@ -1,3 +1,9 @@
+# TODO stop vendoring this file into gitaly-ruby and delete the gitlab-ce copy
+#
+# Note: this class is only used in gitaly-ruby anymore.
+
+require 'gollum-lib/committer'
+
 module Gitlab
   module Git
     class CommitterWithHooks < Gollum::Committer
