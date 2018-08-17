@@ -6,8 +6,8 @@ import Tooltip from '~/vue_shared/directives/tooltip';
 // TODO: Stop faking the data
 const fetchReportStatusAction = () => new Promise((resolve, reject) => {
   const dummyData = {
-   "is_secure": false,
-   "pipeline_url": "https://gitlab.com/"
+    is_secure: false,
+    pipeline_url: 'https://gitlab.com/',
   };
   setTimeout(resolve, 4000, { data: dummyData });
 });
@@ -23,7 +23,7 @@ export default {
     commitShortSha: {
       type: String,
       required: true,
-    }
+    },
   },
   data() {
     return {
@@ -42,7 +42,10 @@ export default {
       }
 
       return this.data.is_secure ? 'success' : 'warning';
-    }
+    },
+  },
+  created() {
+    this.fetchReportStatus();
   },
   methods: {
     fetchReportStatus() {
@@ -52,32 +55,29 @@ export default {
         .then(response => {
           this.isLoading = false;
           this.hasError = false;
-          this.data = response.data
+          this.data = response.data;
         })
         .catch(error => {
           this.isLoading = false;
           this.hasError = true;
-          //TODO: Handle the error
-        })
-    }
+          // TODO: Handle the error
+        });
+    },
   },
-  created() {
-    this.fetchReportStatus()
-  }
 };
 </script>
 
 <template>
   <a
     v-tooltip
-    data-placement="bottom"
     :title="s__('ciReport|Security Report')"
     :href="reportUrl"
+    data-placement="bottom"
   >
     <status-icon
-      class="temp-class"
       :status="status"
-    ></status-icon>
+      class="temp-class"
+    />
   </a>
 </template>
 

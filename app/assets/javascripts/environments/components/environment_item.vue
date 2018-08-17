@@ -1,6 +1,7 @@
 <script>
 import Timeago from 'timeago.js';
 import _ from 'underscore';
+import SecurityStatus from 'ee/vue_shared/security_reports/components/security_status.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import { humanize } from '~/lib/utils/text_utility';
@@ -12,7 +13,6 @@ import TerminalButtonComponent from './environment_terminal_button.vue';
 import MonitoringButtonComponent from './environment_monitoring.vue';
 import CommitComponent from '../../vue_shared/components/commit.vue';
 import eventHub from '../event_hub';
-import SecurityStatus from 'ee/vue_shared/security_reports/components/security_status.vue';
 
 /**
  * Envrionment Item Component
@@ -31,7 +31,7 @@ export default {
     RollbackComponent,
     TerminalButtonComponent,
     MonitoringButtonComponent,
-    SecurityStatus
+    SecurityStatus,
   },
 
   directives: {
@@ -449,7 +449,7 @@ export default {
         this.canStopEnvironment ||
         this.canRetry
       );
-    }
+    },
   },
 
   methods: {
@@ -629,7 +629,7 @@ export default {
       <span class="environment-security table-mobile-content">
         <security-status
           :commit-short-sha="commitShortSha"
-        ></security-status>
+        />
       </span>
     </div>
 
