@@ -8,6 +8,12 @@ milestones.
 
 ![epics list view](img/epics_list_view.png)
 
+## Use cases
+
+- Track a group of issues together that contribute to a single feature.
+- Track when the work for the group of issues is targeted to begin, and when it is targeted to end.
+- Discuss and collaborate on feature ideas and scope at a high-level.
+
 ## Creating an epic
 
 A paginated list of epics is available in each group from where you can create
