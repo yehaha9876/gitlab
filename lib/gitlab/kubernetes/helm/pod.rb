@@ -18,7 +18,7 @@ module Gitlab
 
         private
 
-        attr_reader :command, :namespace_name, :kubeclient, :config_map
+        attr_reader :command, :namespace_name
 
         def container_specification
           {
