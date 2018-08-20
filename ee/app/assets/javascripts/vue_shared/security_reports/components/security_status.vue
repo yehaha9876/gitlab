@@ -1,17 +1,8 @@
 <script>
+import axios from '~/lib/utils/axios_utils';
 import StatusIcon from '~/vue_merge_request_widget/components/mr_widget_status_icon.vue';
 import Tooltip from '~/vue_shared/directives/tooltip';
 import { ICON_WARNING, ICON_SUCCESS } from '~/reports/constants';
-
-// TODO: Stop faking the data
-// TODO: Handle a case where the commit/pipeline doesn't have security reports
-const fetchReportStatusAction = () => new Promise((resolve, reject) => {
-  const dummyData = {
-    is_secure: true,
-    pipeline_url: 'https://gitlab.com/',
-  };
-  setTimeout(resolve, 4000, { data: dummyData });
-});
 
 export default {
   components: {
@@ -50,18 +41,20 @@ export default {
   },
   methods: {
     fetchReportStatus() {
+      // TODO: Swap this for the real url when it arrives
+      const url = `/notarealendpoint/${this.commitShortSha}`;
       this.isLoading = true;
 
-      fetchReportStatusAction(this.commitShortSha)
+      axios.get(url)
         .then(response => {
           this.isLoading = false;
           this.hasError = false;
-          this.data = response.data;
+          this.data = response.data || {};
         })
-        .catch(error => {
+        .catch(() => {
+          // TODO: Handle the error
           this.isLoading = false;
           this.hasError = true;
-          // TODO: Handle the error
         });
     },
   },
