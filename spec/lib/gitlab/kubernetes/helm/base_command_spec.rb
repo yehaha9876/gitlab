@@ -6,6 +6,12 @@ describe Gitlab::Kubernetes::Helm::BaseCommand do
     Class.new do
       include Gitlab::Kubernetes::Helm::BaseCommand
 
+      attr_reader :rbac
+
+      def initialize(rbac)
+        @rbac = rbac
+      end
+
       def name
         "test-class-name"
       end
@@ -19,8 +25,9 @@ describe Gitlab::Kubernetes::Helm::BaseCommand do
   end
 
   let(:base_command) do
-    test_class.new
+    test_class.new(rbac)
   end
+  let(:rbac) { false }
 
   subject { base_command }
 
@@ -33,6 +40,14 @@ describe Gitlab::Kubernetes::Helm::BaseCommand do
 
     it 'should returns a kubeclient resoure with pod content for application' do
       is_expected.to be_an_instance_of ::Kubeclient::Resource
+    end
+
+    context 'when rbac is true' do
+      let(:rbac) { true }
+
+      it 'also returns a kubeclient resource' do
+        is_expected.to be_an_instance_of ::Kubeclient::Resource
+      end
     end
   end
 

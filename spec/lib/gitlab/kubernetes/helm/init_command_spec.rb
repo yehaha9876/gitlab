@@ -2,7 +2,11 @@ require 'spec_helper'
 
 describe Gitlab::Kubernetes::Helm::InitCommand do
   let(:application) { create(:clusters_applications_helm) }
-  let(:commands) { 'helm init --tiller-tls --tiller-tls-verify --tls-ca-cert /data/helm/helm/config/ca.pem --tiller-tls-cert /data/helm/helm/config/cert.pem --tiller-tls-key /data/helm/helm/config/key.pem >/dev/null' }
+  let(:commands) do
+    <<~EOS
+    helm init --tiller-tls --tiller-tls-verify --tls-ca-cert /data/helm/helm/config/ca.pem --tiller-tls-cert /data/helm/helm/config/cert.pem --tiller-tls-key /data/helm/helm/config/key.pem >/dev/null
+    EOS
+  end
 
   subject { described_class.new(name: application.name, files: {}, rbac: false) }
 
@@ -12,7 +16,51 @@ describe Gitlab::Kubernetes::Helm::InitCommand do
     subject { described_class.new(name: application.name, files: {}, rbac: true) }
 
     it_behaves_like 'helm commands' do
-      let(:commands) { 'helm init --tiller-tls --tiller-tls-verify --tls-ca-cert /data/helm/helm/config/ca.pem --tiller-tls-cert /data/helm/helm/config/cert.pem --tiller-tls-key /data/helm/helm/config/key.pem --service-account tiller >/dev/null' }
+      let(:commands) do
+        <<~EOS
+        helm init --tiller-tls --tiller-tls-verify --tls-ca-cert /data/helm/helm/config/ca.pem --tiller-tls-cert /data/helm/helm/config/cert.pem --tiller-tls-key /data/helm/helm/config/key.pem --service-account tiller >/dev/null
+        EOS
+      end
+    end
+  end
+
+  describe '#rbac' do
+    let(:init_command) { described_class.new(name: application.name, files: {}, rbac: rbac) }
+
+    subject { init_command.rbac }
+
+    context 'rbac is enabled' do
+      let(:rbac) { true }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'rbac is not enabled' do
+      let(:rbac) { false }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#pod_resource' do
+    let(:init_command) { described_class.new(name: application.name, files: {}, rbac: rbac) }
+
+    subject { init_command.pod_resource }
+
+    context 'rbac is enabled' do
+      let(:rbac) { true }
+
+      it 'generates a pod that uses the tiller serviceAccountName' do
+        expect(subject.spec.serviceAccountName).to eq('tiller')
+      end
+    end
+
+    context 'rbac is not enabled' do
+      let(:rbac) { false }
+
+      it 'generates a pod that uses the default serviceAccountName' do
+        expect(subject.spec.serviceAcccountName).to be_nil
+      end
     end
   end
 

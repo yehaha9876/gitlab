@@ -84,6 +84,42 @@ describe Gitlab::Kubernetes::Helm::InstallCommand do
     end
   end
 
+  describe '#rbac' do
+    subject { install_command.rbac }
+
+    context 'rbac is enabled' do
+      let(:rbac) { true }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'rbac is not enabled' do
+      let(:rbac) { false }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#pod_resource' do
+    subject { install_command.pod_resource }
+
+    context 'rbac is enabled' do
+      let(:rbac) { true }
+
+      it 'generates a pod that uses the tiller serviceAccountName' do
+        expect(subject.spec.serviceAccountName).to eq('tiller')
+      end
+    end
+
+    context 'rbac is not enabled' do
+      let(:rbac) { false }
+
+      it 'generates a pod that uses the default serviceAccountName' do
+        expect(subject.spec.serviceAcccountName).to be_nil
+      end
+    end
+  end
+
   describe '#create_resources' do
     let(:kubeclient) { double('kubeclient') } # strict double
 

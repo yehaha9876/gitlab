@@ -37,7 +37,7 @@ module Gitlab
             " --tiller-tls-cert #{files_dir}/cert.pem" \
             " --tiller-tls-key #{files_dir}/key.pem"
 
-          "helm init #{tls_flags}#{optional_service_account_flag} >/dev/null"
+          "helm init #{tls_flags}#{optional_service_account_flag} >/dev/null\n"
         end
 
         def optional_service_account_flag
@@ -56,10 +56,6 @@ module Gitlab
             cluster_role_name,
             subjects
           ).generate
-        end
-
-        def service_account_name
-          Gitlab::Kubernetes::Helm::SERVICE_ACCOUNT
         end
 
         def cluster_role_binding_name
