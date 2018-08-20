@@ -6,11 +6,12 @@ module Gitlab
       class UpgradeCommand
         include BaseCommand
 
-        attr_reader :name, :chart, :version, :repository, :files
+        attr_reader :name, :chart, :rbac, :version, :repository, :files
 
-        def initialize(name, chart:, files:, version: nil, repository: nil)
+        def initialize(name, chart:, files:, rbac:, version: nil, repository: nil)
           @name = name
           @chart = chart
+          @rbac = rbac
           @version = version
           @files = files
           @repository = repository
