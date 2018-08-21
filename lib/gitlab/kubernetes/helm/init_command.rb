@@ -32,16 +32,22 @@ module Gitlab
         private
 
         def init_helm_command
-          tls_flags = "--tiller-tls" \
+          "helm init #{init_command_flags} >/dev/null\n"
+        end
+
+        def init_command_flags
+          [tls_flags, optional_service_account_flag].compact.join(" ")
+        end
+
+        def tls_flags
+          "--tiller-tls" \
             " --tiller-tls-verify --tls-ca-cert #{files_dir}/ca.pem" \
             " --tiller-tls-cert #{files_dir}/cert.pem" \
             " --tiller-tls-key #{files_dir}/key.pem"
-
-          "helm init #{tls_flags}#{optional_service_account_flag} >/dev/null\n"
         end
 
         def optional_service_account_flag
-          " --service-account #{service_account_name}" if rbac
+          "--service-account #{service_account_name}" if rbac
         end
 
         def service_account_resource

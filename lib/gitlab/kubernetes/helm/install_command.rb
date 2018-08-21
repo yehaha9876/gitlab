@@ -35,27 +35,34 @@ module Gitlab
         end
 
         def script_command
-          init_flags = "--name #{name}#{optional_tls_flags}#{optional_version_flag}#{optional_rbac_create_flag}" \
-            " --namespace #{Gitlab::Kubernetes::Helm::NAMESPACE}" \
-            " -f /data/helm/#{name}/config/values.yaml"
+          "helm install #{chart} #{install_command_flags} >/dev/null\n"
+        end
 
-          "helm install #{chart} #{init_flags} >/dev/null\n"
+        def install_command_flags
+          [
+            "--name #{name}",
+            optional_tls_flags,
+            optional_version_flag,
+            optional_rbac_create_flag,
+            "--namespace #{Gitlab::Kubernetes::Helm::NAMESPACE}",
+            "-f /data/helm/#{name}/config/values.yaml"
+          ].compact.join(' ')
         end
 
         def optional_rbac_create_flag
           # jupyterhub helm chart is using rbac.enabled
           #   https://github.com/jupyterhub/zero-to-jupyterhub-k8s/tree/master/jupyterhub
-          ' --set rbac.create=true,rbac.enabled=true' if rbac
+          '--set rbac.create=true,rbac.enabled=true' if rbac
         end
 
         def optional_version_flag
-          " --version #{version}" if version
+          "--version #{version}" if version
         end
 
         def optional_tls_flags
           return unless files.key?(:'ca.pem')
 
-          " --tls" \
+          "--tls" \
             " --tls-ca-cert #{files_dir}/ca.pem" \
             " --tls-cert #{files_dir}/cert.pem" \
             " --tls-key #{files_dir}/key.pem"
