@@ -2906,6 +2906,9 @@ msgstr ""
 msgid "Environments|Rollback environment"
 msgstr ""
 
+msgid "Environments|Security"
+msgstr ""
+
 msgid "Environments|Show all"
 msgstr ""
 
@@ -8427,6 +8430,9 @@ msgid "ciReport|SAST is loading"
 msgstr ""
 
 msgid "ciReport|SAST resulted in error while loading results"
+msgstr ""
+
+msgid "ciReport|Security Report"
 msgstr ""
 
 msgid "ciReport|Security scanning"
