@@ -149,7 +149,7 @@ module API
             file_md5:  params['file.md5']
           }
 
-          ::Packages::CreatePackageFileService.new(package, file_params).execute
+          ::Packages::CreatePackageFileService.new(package, current_user, file_params).execute
         end
       end
     end
