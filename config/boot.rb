@@ -1,5 +1,5 @@
 def rails5?
-  %w[1 true].include?(ENV["RAILS5"])
+  !%w[0 false].include?(ENV["RAILS5"])
 end
 
 require 'rubygems' unless rails5?
