@@ -2353,6 +2353,101 @@ describe Ci::Build do
         expect(build.scoped_variables_hash).not_to include('MY_VAR': 'myvar')
       end
     end
+
+    describe 'AUTO_DEVOPS_DOMAIN precedence' do
+      subject { build.scoped_variables_hash }
+
+      context 'no cluster' do
+        context 'ProjectAutoDevops with no domain' do
+          before do
+            create(:project_auto_devops, project: project, domain: nil)
+          end
+
+          it { is_expected.not_to include('AUTO_DEVOPS_DOMAIN') }
+        end
+
+        context 'ProjectAutoDevops with a domain' do
+          before do
+            create(:project_auto_devops, project: project)
+          end
+
+          it { is_expected.to include('AUTO_DEVOPS_DOMAIN' => project.auto_devops.domain) }
+        end
+      end
+
+      context 'single cluster with ingress configured' do
+        before do
+          ingress = create(:clusters_applications_ingress, :installed, external_ip: '127.0.0.1')
+          ingress.cluster.projects << project
+        end
+
+        context 'ProjectAutoDevops with no domain' do
+          before do
+            create(:project_auto_devops, project: project, domain: nil)
+          end
+
+          it { is_expected.to include('AUTO_DEVOPS_DOMAIN' => '127.0.0.1.nip.io') }
+        end
+
+        context 'ProjectAutoDevops with a domain' do
+          before do
+            create(:project_auto_devops, project: project)
+          end
+
+          it { is_expected.to include('AUTO_DEVOPS_DOMAIN' => project.auto_devops.domain) }
+        end
+      end
+
+      context 'multiple clusters with ingresses configured' do
+        before do
+          stub_licensed_features(variable_environment_scope: true)
+
+          create(:environment, project: project, name: 'production')
+          create(:environment, project: project, name: 'staging')
+
+          ingress_production = create(:clusters_applications_ingress, :installed, external_ip: '127.0.0.1')
+          ingress_production.cluster.projects << project
+          ingress_production.cluster.update!(environment_scope: 'production')
+          ingress_staging = create(:clusters_applications_ingress, :installed, external_ip: '127.1.1.1')
+          ingress_staging.cluster.projects << project
+          ingress_staging.cluster.update!(environment_scope: 'staging')
+
+          build.update_attribute(:environment, 'production')
+        end
+
+        context 'ProjectAutoDevops with no domain' do
+          before do
+            create(:project_auto_devops, project: project, domain: nil)
+          end
+
+          it 'uses the production ingress domain' do
+            is_expected.to include('AUTO_DEVOPS_DOMAIN' => '127.0.0.1.nip.io')
+          end
+        end
+
+        context 'ProjectAutoDevops with a domain' do
+          before do
+            create(:project_auto_devops, project: project)
+          end
+
+          it 'uses the production ingress domain' do
+            is_expected.to include('AUTO_DEVOPS_DOMAIN' => '127.0.0.1.nip.io')
+          end
+        end
+
+        context 'scoped variables are set for multiple environments' do
+          before do
+            project.variables.create!(key: 'AUTO_DEVOPS_DOMAIN', value: 'staging.example.com', environment_scope: 'staging')
+            project.variables.create!(key: 'AUTO_DEVOPS_DOMAIN', value: 'production.example.com', environment_scope: 'production')
+          end
+
+          it 'uses the scoped variable for production' do
+            is_expected.to include('AUTO_DEVOPS_DOMAIN' => 'production.example.com')
+          end
+        end
+
+      end
+    end
   end
 
   describe '#yaml_variables' do
