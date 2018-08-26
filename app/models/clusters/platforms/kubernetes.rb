@@ -101,7 +101,7 @@ module Clusters
       end
 
       def kubeclient
-        @kubeclient ||= Gitlab::Kubernetes::KubeClient.new(kubeclient_core, kubeclient_rbac)
+        @kubeclient ||= build_kube_client!(api_groups: ['api', 'apis/rbac.authorization.k8s.io'])
       end
 
       private
@@ -121,23 +121,16 @@ module Clusters
         slug.gsub(/[^-a-z0-9]/, '-').gsub(/^-+/, '')
       end
 
-      def kubeclient_core
-        @kubeclient_core ||= build_kubeclient!
-      end
-
-      def kubeclient_rbac
-        @kubeclient_rbac ||= build_kubeclient!(api_path: 'apis/rbac.authorization.k8s.io')
-      end
-
-      def build_kubeclient!(api_path: 'api', api_version: 'v1')
+      def build_kube_client!(api_groups: ['api'], api_version: 'v1')
         raise "Incomplete settings" unless api_url && actual_namespace
 
         unless (username && password) || token
           raise "Either username/password or token is required to access API"
         end
 
-        ::Kubeclient::Client.new(
-          join_api_url(api_path),
+        Gitlab::Kubernetes::KubeClient.new(
+          api_url,
+          api_groups,
           api_version,
           auth_options: kubeclient_auth_options,
           ssl_options: kubeclient_ssl_options,
@@ -147,7 +140,7 @@ module Clusters
 
       # Returns a hash of all pods in the namespace
       def read_pods
-        kubeclient = build_kubeclient!
+        kubeclient = build_kube_client!
 
         kubeclient.get_pods(namespace: actual_namespace).as_json
       rescue Kubeclient::HttpError => err
@@ -169,15 +162,6 @@ module Clusters
 
       def kubeclient_auth_options
         { bearer_token: token }
-      end
-
-      def join_api_url(api_path)
-        url = URI.parse(api_url)
-        prefix = url.path.sub(%r{/+\z}, '')
-
-        url.path = [prefix, api_path].join("/")
-
-        url.to_s
       end
 
       def terminal_auth
