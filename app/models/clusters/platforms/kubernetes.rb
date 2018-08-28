@@ -5,6 +5,7 @@ module Clusters
     class Kubernetes < ActiveRecord::Base
       include Gitlab::Kubernetes
       include ReactiveCaching
+      include EnumWithNil
 
       prepend EE::KubernetesService
 
@@ -49,8 +50,10 @@ module Clusters
 
       alias_method :active?, :enabled?
 
-      enum authorization_type: {
-        rbac: 1
+      enum_with_nil authorization_type: {
+        unknown_authorization: nil,
+        rbac: 1,
+        abac: 2
       }
 
       def actual_namespace

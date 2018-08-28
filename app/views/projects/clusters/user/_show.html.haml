@@ -29,7 +29,7 @@
     - if rbac_clusters_feature_enabled?
       .form-group
         .form-check
-          = platform_kubernetes_field.check_box :authorization_type, { class: 'form-check-input', disabled: true }, 'rbac', nil
+          = platform_kubernetes_field.check_box :authorization_type, { class: 'form-check-input', disabled: true }, 'rbac', 'abac'
           = platform_kubernetes_field.label :authorization_type, s_('ClusterIntegration|RBAC-enabled cluster (experimental)'), class: 'form-check-label label-bold'
           .form-text.text-muted
             = s_('ClusterIntegration|Enable this setting if using role-based access control (RBAC).')
