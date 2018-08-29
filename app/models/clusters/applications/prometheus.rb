@@ -74,7 +74,7 @@ module Clusters
       private
 
       def kube_client
-        cluster&.kubeclient
+        cluster&.kubeclient&.core_client
       end
     end
   end

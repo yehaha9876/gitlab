@@ -40,6 +40,16 @@ describe Gitlab::Kubernetes::KubeClient do
     end
   end
 
+  describe '#core_client' do
+    subject { client.core_client }
+
+    it { is_expected.to be_an_instance_of Kubeclient::Client }
+
+    it 'has the core API endpoint' do
+      expect(subject.api_endpoint.to_s).to match(%r{\/api\Z})
+    end
+  end
+
   describe '#discover!' do
     it 'makes a discovery request for each API group' do
       client.discover!
@@ -78,6 +88,18 @@ describe Gitlab::Kubernetes::KubeClient do
     it 'responds_to methods that exist on the core client' do
       expect(core_client).to respond_to :get_pods
       expect(client).to respond_to :get_pods
+    end
+  end
+
+  describe 'non-entity methods' do
+    it 'does not proxy for non-entity methods' do
+      expect(client.clients.first).to respond_to :proxy_url
+
+      expect(client).not_to respond_to :proxy_url
+    end
+
+    it 'throws an error' do
+      expect { client.proxy_url }.to raise_error(NoMethodError)
     end
   end
 

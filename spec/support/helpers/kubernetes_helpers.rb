@@ -78,7 +78,8 @@ module KubernetesHelpers
       "resources" => [
         { "name" => "pods", "namespaced" => true, "kind" => "Pod" },
         { "name" => "deployments", "namespaced" => true, "kind" => "Deployment" },
-        { "name" => "secrets", "namespaced" => true, "kind" => "Secret" }
+        { "name" => "secrets", "namespaced" => true, "kind" => "Secret" },
+        { "name" => "services", "namespaced" => true, "kind" => "Service" }
       ]
     }
   end
@@ -89,7 +90,8 @@ module KubernetesHelpers
       "resources" => [
         { "name" => "pods", "namespaced" => true, "kind" => "Pod" },
         { "name" => "deployments", "namespaced" => true, "kind" => "Deployment" },
-        { "name" => "secrets", "namespaced" => true, "kind" => "Secret" }
+        { "name" => "secrets", "namespaced" => true, "kind" => "Secret" },
+        { "name" => "services", "namespaced" => true, "kind" => "Service" }
       ]
     }
   end

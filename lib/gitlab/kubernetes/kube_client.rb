@@ -18,7 +18,7 @@ module Gitlab
 
       attr_reader :hashed_clients
 
-      def initialize(api_prefix, api_groups, api_version = 'v1', **kubeclient_options)
+      def initialize(api_prefix, api_groups = ['api'], api_version = 'v1', **kubeclient_options)
         raise ArgumentError unless check_api_groups_supported?(api_groups)
 
         @hashed_clients = api_groups.each_with_object({}) do |api_group, hash|
@@ -32,7 +32,7 @@ module Gitlab
       end
 
       def method_missing(method, *args, &block)
-        client = find_client(method)
+        client = find_client_for_entity_method(method)
 
         if client
           client.public_send(method, *args, &block) # rubocop:disable GitlabSecurity/PublicSend
@@ -42,11 +42,15 @@ module Gitlab
       end
 
       def respond_to_missing?(method, include_private = false)
-        find_client(method) || super
+        find_client_for_entity_method(method) || super
       end
 
       def clients
         @hashed_clients.values
+      end
+
+      def core_client
+        @hashed_clients['api']
       end
 
       private
@@ -55,8 +59,9 @@ module Gitlab
         api_groups.all? {|api_group| SUPPORTED_API_GROUPS.include?(api_group) }
       end
 
-      def find_client(method)
-        clients.detect {|client| client.respond_to?(method) }
+      def find_client_for_entity_method(method)
+        ::Kubeclient::Client::ENTITY_METHODS.any? { |x| method.to_s.start_with?(x) } &&
+          clients.detect {|client| client.respond_to?(method) }
       end
 
       def join_api_url(api_prefix, api_path)
