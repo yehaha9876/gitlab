@@ -1,0 +1,5 @@
+---
+title: Support Kubernetes RBAC for GitLab Managed Apps
+merge_request: 21401
+author:
+type: changed
