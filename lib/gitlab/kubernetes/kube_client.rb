@@ -17,6 +17,8 @@ module Gitlab
         'apis/extensions'
       ].freeze
 
+      delegate :get_pod_log, :watch_pod_log, to: :core_client
+
       attr_reader :hashed_clients
 
       def initialize(api_prefix, api_groups = ['api'], api_version = 'v1', **kubeclient_options)

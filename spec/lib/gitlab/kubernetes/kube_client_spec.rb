@@ -103,6 +103,42 @@ describe Gitlab::Kubernetes::KubeClient do
     end
   end
 
+  describe '#get_pod_log' do
+    let(:core_client) { client.core_client }
+
+    it 'is delegated to the core client' do
+      expect(core_client).to receive(:get_pod_log)
+
+      client.get_pod_log
+    end
+
+    context 'when no core client' do
+      let(:api_groups) { ['apis/extensions'] }
+
+      it 'throws an error' do
+        expect { client.get_pod_log }.to raise_error(Module::DelegationError)
+      end
+    end
+  end
+
+  describe '#watch_pod_log' do
+    let(:core_client) { client.core_client }
+
+    it 'is delegated to the core client' do
+      expect(core_client).to receive(:watch_pod_log)
+
+      client.watch_pod_log
+    end
+
+    context 'when no core client' do
+      let(:api_groups) { ['apis/extensions'] }
+
+      it 'throws an error' do
+        expect { client.watch_pod_log }.to raise_error(Module::DelegationError)
+      end
+    end
+  end
+
   describe 'methods that do not exist on any client' do
     it 'throws an error' do
       expect { client.non_existent_method }.to raise_error(NoMethodError)
