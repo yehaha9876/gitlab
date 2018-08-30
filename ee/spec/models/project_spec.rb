@@ -198,6 +198,54 @@ describe Project do
               .to include(key: 'KUBE_TOKEN', value: 'default-AAA', public: false)
           end
         end
+
+        context 'when clusters have ingress IP configured' do
+          before do
+            create(:clusters_applications_ingress, :installed, cluster: default_cluster, external_ip: '127.0.0.1')
+            create(:clusters_applications_ingress, :installed, cluster: review_env_cluster, external_ip: '127.0.0.2')
+            stub_application_setting(auto_devops_enabled: true)
+          end
+
+          subject { project.deployment_variables(environment: environment.name) }
+
+          context 'when environment name is review/name' do
+            let(:environment) { create(:environment, project: project, name: 'review/name') }
+
+            it { is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: '127.0.0.2.nip.io', public: true) }
+
+            context 'when domain is configured' do
+              before do
+                stub_application_setting(auto_devops_domain: 'example.com')
+              end
+
+              it { is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: '127.0.0.2.nip.io', public: true) }
+              it { is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: 'example.com', public: true) }
+
+              it 'gives precendence to auto_devops' do
+                expect(subject.to_hash).to include('AUTO_DEVOPS_DOMAIN' => 'example.com')
+              end
+            end
+          end
+
+          context 'when environment name is other' do
+            let(:environment) { create(:environment, project: project, name: 'staging/name') }
+
+            it { is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: '127.0.0.1.nip.io', public: true) }
+
+            context 'when domain is configured' do
+              before do
+                stub_application_setting(auto_devops_domain: 'example.com')
+              end
+
+              it { is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: '127.0.0.1.nip.io', public: true) }
+              it { is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: 'example.com', public: true) }
+
+              it 'gives precendence to auto_devops' do
+                expect(subject.to_hash).to include('AUTO_DEVOPS_DOMAIN' => 'example.com')
+              end
+            end
+          end
+        end
       end
     end
   end

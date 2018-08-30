@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe EE::DeploymentPlatform do
-  describe '#deployment_platform' do
+  describe '#deployment_cluster' do
     let(:project) { create(:project) }
 
     shared_examples 'matching environment scope' do
@@ -11,7 +11,7 @@ describe EE::DeploymentPlatform do
         end
 
         it 'returns environment specific cluster' do
-          is_expected.to eq(cluster.platform_kubernetes)
+          is_expected.to eq(cluster)
         end
       end
 
@@ -20,8 +20,8 @@ describe EE::DeploymentPlatform do
           stub_licensed_features(multiple_clusters: false)
         end
 
-        it 'returns a kubernetes platform' do
-          is_expected.to be_kind_of(Clusters::Platforms::Kubernetes)
+        it 'returns a cluster' do
+          is_expected.to be_kind_of(Clusters::Cluster)
         end
       end
     end
@@ -33,7 +33,7 @@ describe EE::DeploymentPlatform do
         end
 
         it 'returns default cluster' do
-          is_expected.to eq(default_cluster.platform_kubernetes)
+          is_expected.to eq(default_cluster)
         end
       end
 
@@ -42,8 +42,8 @@ describe EE::DeploymentPlatform do
           stub_licensed_features(multiple_clusters: false)
         end
 
-        it 'returns a kubernetes platform' do
-          is_expected.to be_kind_of(Clusters::Platforms::Kubernetes)
+        it 'returns a cluster' do
+          is_expected.to be_kind_of(Clusters::Cluster)
         end
       end
     end
@@ -54,7 +54,7 @@ describe EE::DeploymentPlatform do
 
       let(:environment) { 'review/name' }
 
-      subject { project.deployment_platform(environment: environment) }
+      subject { project.deployment_cluster(environment: environment) }
 
       context 'when environment scope is exactly matched' do
         before do
@@ -88,7 +88,7 @@ describe EE::DeploymentPlatform do
         it 'does not treat it as wildcard' do
           cluster.update!(environment_scope: 'foo_bar/*')
 
-          is_expected.to eq(default_cluster.platform_kubernetes)
+          is_expected.to eq(default_cluster)
         end
 
         context 'when environment name contains an underscore' do
@@ -97,7 +97,7 @@ describe EE::DeploymentPlatform do
           it 'matches literally for _' do
             cluster.update!(environment_scope: 'foo_bar/*')
 
-            is_expected.to eq(cluster.platform_kubernetes)
+            is_expected.to eq(cluster)
           end
         end
       end
@@ -114,7 +114,7 @@ describe EE::DeploymentPlatform do
         it 'does not treat it as wildcard' do
           cluster.update_attribute(:environment_scope, '*%*')
 
-          is_expected.to eq(default_cluster.platform_kubernetes)
+          is_expected.to eq(default_cluster)
         end
 
         context 'when environment name contains a percent char' do
@@ -123,7 +123,7 @@ describe EE::DeploymentPlatform do
           it 'matches literally for %' do
             cluster.update_attribute(:environment_scope, 'foo%bar/*')
 
-            is_expected.to eq(cluster.platform_kubernetes)
+            is_expected.to eq(cluster)
           end
         end
       end
@@ -136,7 +136,7 @@ describe EE::DeploymentPlatform do
         end
 
         it 'returns perfectly matched cluster as highest precedence' do
-          is_expected.to eq(perfectly_matched_cluster.platform_kubernetes)
+          is_expected.to eq(perfectly_matched_cluster)
         end
       end
     end
@@ -153,8 +153,8 @@ describe EE::DeploymentPlatform do
       end
 
       it 'should return the appropriate cluster' do
-        expect(project.deployment_platform(environment: environment_1)).to eq(cluster_1.platform_kubernetes)
-        expect(project.deployment_platform(environment: environment_2)).to eq(cluster_2.platform_kubernetes)
+        expect(project.deployment_cluster(environment: environment_1)).to eq(cluster_1)
+        expect(project.deployment_cluster(environment: environment_2)).to eq(cluster_2)
       end
     end
   end
