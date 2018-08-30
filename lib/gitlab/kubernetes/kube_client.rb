@@ -13,7 +13,8 @@ module Gitlab
     class KubeClient
       SUPPORTED_API_GROUPS = [
         'api',
-        'apis/rbac.authorization.k8s.io'
+        'apis/rbac.authorization.k8s.io',
+        'apis/extensions'
       ].freeze
 
       attr_reader :hashed_clients
