@@ -1,20 +1,15 @@
-def find_group_title(title)
-  PrometheusMetric::GROUP_TITLES.map do |key, value|
-    return PrometheusMetric.groups[key] if value == title
-  end
 
-  raise "Invalid title: #{title}"
-end
-
-class ImportPrometheusMetrics
-  def initialize(file = 'config/prometheus/additional_metrics.yml')
-    @content = YAML.load_file('config/prometheus/additional_metrics.yml')
-  end
-  
-  def execute
-    @content.map do |group|
-      group_type = find_group_title(group['group'])
-      process_metrics(group_type, group['metrics'])
+module Helpers
+  class ImportPrometheusMetrics
+    def initialize(file = 'config/prometheus/additional_metrics.yml')
+      @content = YAML.load_file('config/prometheus/additional_metrics.yml')
+    end
+    
+    def execute
+      @content.map do |group|
+        group_type = find_group_title_key(group['group'])
+        process_metrics(group_type, group['metrics'])
+      end
     end
 
     private
@@ -37,6 +32,14 @@ class ImportPrometheusMetrics
         query: query['query_range'],
         unit: query['unit']
       )
+    end
+
+    def find_group_title_key(title)
+      PrometheusMetric.groups[find_group_title(title)]
+    end
+
+    def find_group_title(title)
+      PrometheusMetric::GROUP_TITLES.invert[title]
     end
   end
 end

@@ -4,14 +4,17 @@ class PrometheusMetric < ActiveRecord::Base
   has_many :prometheus_alerts, inverse_of: :prometheus_metric
 
   enum group: {
+    # built-in groups
+    nginx_ingress: -1,
+    ha_proxy: -2,
+    aws_elb: -3,
+    nginx: -4,
+    kubernetes: -5,
+
+    # custom groups
     business: 0,
     response: 1,
     system: 2,
-    nginx_ingress: 1000,
-    ha_proxy: 1001,
-    aws_elb: 1002,
-    nginx: 1003,
-    kubernetes: 1004
   }
 
   validates :title, presence: true
@@ -68,7 +71,7 @@ class PrometheusMetric < ActiveRecord::Base
 
   def query_series
     case legend
-    when "Status Code"
+    when 'Status Code'
       {
         label: 'status_code',
         when: [
