@@ -4,6 +4,7 @@ describe Projects::UploadsController do
   include WorkhorseHelpers
 
   let(:model) { create(:project, :public) }
+  let(:user)  { create(:user) }
   let(:params) do
     { namespace_id: model.namespace.to_param, project_id: model }
   end
@@ -15,6 +16,20 @@ describe Projects::UploadsController do
       get :show, namespace_id: 'project', project_id: 'avatar', filename: 'foo.png', secret: 'bar'
 
       expect(response).to redirect_to(new_user_session_path)
+    end
+  end
+
+  context "when exception occurs" do
+    before do
+      allow(FileUploader).to receive(:workhorse_authorize).and_raise(SocketError.new)
+      sign_in(user)
+    end
+
+    it "responds with status internal_server_error" do
+      post_authorize
+
+      expect(response).to have_gitlab_http_status(500)
+      expect(response.body).to eq('Error uploading file')
     end
   end
 
