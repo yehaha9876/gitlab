@@ -8,9 +8,12 @@ module Ci
     include ObjectStorage::BackgroundMove
     include Presentable
     include Importable
+    include IgnorableColumn
     include Gitlab::Utils::StrongMemoize
 
     prepend EE::Ci::Build
+
+    ignore_column :commands
 
     belongs_to :project, inverse_of: :builds
     belongs_to :runner
@@ -35,6 +38,7 @@ module Ci
       has_one :"job_artifacts_#{key}", -> { where(file_type: value) }, class_name: 'Ci::JobArtifact', inverse_of: :job, foreign_key: :job_id
     end
 
+    has_one :config, class_name: 'Ci::BuildConfig'
     has_one :metadata, class_name: 'Ci::BuildMetadata'
     has_one :runner_session, class_name: 'Ci::BuildRunnerSession', validate: true, inverse_of: :build
 
@@ -154,6 +158,11 @@ module Ci
         transition created: :manual
       end
 
+      before_transition any => [:pending, :running] do |build|
+        # forbid transition if job is archived
+        !build.archived?
+      end
+
       after_transition any => [:pending] do |build|
         build.run_after_commit do
           BuildQueueWorker.perform_async(id)
@@ -205,6 +214,12 @@ module Ci
       metadata || build_metadata(project: project)
     end
 
+    def archived?
+      return true unless self.options
+
+      !self.options.dig(:script).present?
+    end
+
     def detailed_status(current_user)
       Gitlab::Ci::Status::Build::Factory
         .new(self, current_user)
@@ -221,7 +236,7 @@ module Ci
     end
 
     def playable?
-      action? && (manual? || retryable?)
+      action? && !archived? && (manual? || retryable?)
     end
 
     def action?
@@ -239,7 +254,7 @@ module Ci
     end
 
     def retryable?
-      success? || failed? || canceled?
+      (success? || failed? || canceled?) && !archived?
     end
 
     def retries_count
@@ -455,12 +470,12 @@ module Ci
       artifacts_metadata?
     end
 
-    def artifacts_metadata_entry(path, **options)
+    def artifacts_metadata_entry(path, **params)
       artifacts_metadata.open do |metadata_stream|
         metadata = Gitlab::Ci::Build::Artifacts::Metadata.new(
           metadata_stream,
           path,
-          **options)
+          **params)
 
         metadata.to_entry
       end
@@ -523,11 +538,51 @@ module Ci
     end
 
     def when
-      read_attribute(:when) || build_attributes_from_config[:when] || 'on_success'
+      read_attribute(:when) || 'on_success'
+    end
+
+    def config
+      return unless BuildConfig.available?
+
+      super
+    end
+
+    def ensure_config
+      config || build_config
+    end
+
+    def options
+      read_attribute(:options) ||
+        config&.yaml_options ||
+        {}
+    end
+
+    def options=(value)
+      unless BuildConfig.available? && Feature.enabled?(:ci_use_build_config)
+        super
+        return
+      end
+
+      # save and remove from this model
+      ensure_config.yaml_options = value
+      write_attribute(:options, nil)
     end
 
     def yaml_variables
-      read_attribute(:yaml_variables) || build_attributes_from_config[:yaml_variables] || []
+      read_attribute(:yaml_variables) ||
+        config&.yaml_variables ||
+        []
+    end
+
+    def yaml_variables=(value)
+      unless BuildConfig.available? && Feature.enabled?(:ci_use_build_config)
+        super
+        return
+      end
+
+      # save and remove from this model
+      ensure_config.yaml_variables = value
+      write_attribute(:yaml_variables, nil)
     end
 
     def user_variables
@@ -635,8 +690,8 @@ module Ci
       trace
     end
 
-    def serializable_hash(options = {})
-      super(options).merge(when: read_attribute(:when))
+    def serializable_hash(params = {})
+      super(params).merge(when: read_attribute(:when))
     end
 
     def has_terminal?
