@@ -198,6 +198,37 @@ describe Project do
               .to include(key: 'KUBE_TOKEN', value: 'default-AAA', public: false)
           end
         end
+      end
+    end
+  end
+
+  describe '#auto_devops_domain_variable' do
+    context 'when project has a deployment platforms' do
+      context 'when multiple clusters (EEP) is enabled' do
+        before do
+          stub_licensed_features(multiple_clusters: true)
+        end
+
+        let(:project) { create(:project) }
+
+        let!(:default_cluster) do
+          create(:cluster,
+                 platform_type: :kubernetes,
+                 projects: [project],
+                 environment_scope: '*',
+                 platform_kubernetes: default_cluster_kubernetes)
+        end
+
+        let!(:review_env_cluster) do
+          create(:cluster,
+                 platform_type: :kubernetes,
+                 projects: [project],
+                 environment_scope: 'review/*',
+                 platform_kubernetes: review_env_cluster_kubernetes)
+        end
+
+        let(:default_cluster_kubernetes) { create(:cluster_platform_kubernetes, token: 'default-AAA') }
+        let(:review_env_cluster_kubernetes) { create(:cluster_platform_kubernetes, token: 'review-AAA') }
 
         context 'when clusters have ingress IP configured' do
           before do
@@ -206,7 +237,7 @@ describe Project do
             stub_application_setting(auto_devops_enabled: true)
           end
 
-          subject { project.deployment_variables(environment: environment.name) }
+          subject { project.auto_devops_domain_variable(environment: environment.name) }
 
           context 'when environment name is review/name' do
             let(:environment) { create(:environment, project: project, name: 'review/name') }
@@ -218,12 +249,7 @@ describe Project do
                 stub_application_setting(auto_devops_domain: 'example.com')
               end
 
-              it { is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: '127.0.0.2.nip.io', public: true) }
               it { is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: 'example.com', public: true) }
-
-              it 'gives precendence to auto_devops' do
-                expect(subject.to_hash).to include('AUTO_DEVOPS_DOMAIN' => 'example.com')
-              end
             end
           end
 
@@ -237,12 +263,7 @@ describe Project do
                 stub_application_setting(auto_devops_domain: 'example.com')
               end
 
-              it { is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: '127.0.0.1.nip.io', public: true) }
               it { is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: 'example.com', public: true) }
-
-              it 'gives precendence to auto_devops' do
-                expect(subject.to_hash).to include('AUTO_DEVOPS_DOMAIN' => 'example.com')
-              end
             end
           end
         end

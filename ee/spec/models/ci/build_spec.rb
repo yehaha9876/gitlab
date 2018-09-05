@@ -141,10 +141,6 @@ describe Ci::Build do
         end
       end
     end
-  end
-
-  describe '#scoped_variables_hash' do
-    subject { job.scoped_variables_hash }
 
     describe 'AUTO_DEVOPS_DOMAIN precedence' do
       before do
@@ -172,7 +168,7 @@ describe Ci::Build do
           end
 
           it 'uses the production ingress domain' do
-            is_expected.to include('AUTO_DEVOPS_DOMAIN' => '127.0.0.1.nip.io')
+            is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: '127.0.0.1.nip.io', public: true)
           end
         end
 
@@ -182,7 +178,7 @@ describe Ci::Build do
           end
 
           it 'uses the ProjectAutoDevops domain' do
-            is_expected.to include('AUTO_DEVOPS_DOMAIN' => project.auto_devops.domain)
+            is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: project.auto_devops.domain, public: true)
           end
         end
 
@@ -194,7 +190,7 @@ describe Ci::Build do
           end
 
           it 'uses the scoped variable for production' do
-            is_expected.to include('AUTO_DEVOPS_DOMAIN' => 'production.example.com')
+            is_expected.to include(key: 'AUTO_DEVOPS_DOMAIN', value: 'production.example.com', public: false)
           end
         end
       end
