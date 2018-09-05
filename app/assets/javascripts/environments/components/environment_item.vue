@@ -56,6 +56,12 @@ export default {
       required: false,
       default: false,
     },
+
+    hasSecurityReport: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
 
   computed: {
@@ -616,6 +622,7 @@ export default {
     </div>
 
     <div
+      v-if="!model.isFolder && hasSecurityReport"
       class="table-section section-10"
       role="gridcell"
     >
@@ -628,8 +635,15 @@ export default {
 
       <span class="environment-security table-mobile-content">
         <security-status
-          :commit-short-sha="commitShortSha"
+          v-if="model.security_reports.has_security_reports"
+          :sast-path="model.security_reports.sast_path"
+          :dependency-scanning-path="model.security_reports.dependency_scanning_path"
+          :container-scanning-path="model.security_reports.container_scanning_path"
+          :dast-path="model.security_reports.dast_path"
+          :vulnerability-feedback-path="model.security_reports.vulnerability_feedback_path"
+          :pipeline-security-path="model.security_reports.pipeline_security_path"
         />
+        <span v-else>–</span>
       </span>
     </div>
 

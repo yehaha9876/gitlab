@@ -3,6 +3,12 @@ import axios from '~/lib/utils/axios_utils';
 import StatusIcon from '~/vue_merge_request_widget/components/mr_widget_status_icon.vue';
 import Tooltip from '~/vue_shared/directives/tooltip';
 import { ICON_WARNING, ICON_SUCCESS } from '~/reports/constants';
+import {
+  parseDastIssues,
+  parseDependencyScanningIssues,
+  parseSastContainer,
+  parseSastIssues,
+} from 'ee/vue_shared/security_reports/store/utils';
 
 export default {
   components: {
@@ -12,7 +18,31 @@ export default {
     Tooltip,
   },
   props: {
-    commitShortSha: {
+    sastPath: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    dependencyScanningPath: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    containerScanningPath: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    dastPath: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    vulnerabilityFeedbackPath: {
+      type: String,
+      required: true,
+    },
+    pipelineSecurityPath: {
       type: String,
       required: true,
     },
@@ -26,30 +56,90 @@ export default {
   },
   computed: {
     status() {
-      if (this.isLoading) { return 'loading'; }
-      if (this.data.is_secure) { return ICON_SUCCESS; }
+      if (this.isLoading) {
+        return 'loading';
+      }
+      if (this.isSecure) {
+        return ICON_SUCCESS;
+      }
       return ICON_WARNING;
-    },
-    hasReports() {
-      // TODO: Come back to this when we have real data, this may not suffice
-      // If the data object is empty, return false
-      return Object.keys(this.data).length > 0;
     },
   },
   created() {
     this.fetchReportStatus();
   },
   methods: {
-    fetchReportStatus() {
-      // TODO: Swap this for the real url when it arrives
-      const url = `/notarealendpoint/${this.commitShortSha}`;
-      this.isLoading = true;
+    hasUnresolvedSastIssues(vulnerabilityFeedbackReport) {
+      if (!this.sastPath) {
+        return false;
+      }
 
-      axios.get(url)
-        .then(response => {
+      return axios.get(this.sastPath).then(res => {
+        const sastReport = res.data;
+        const parsed = parseSastIssues(sastReport, vulnerabilityFeedbackReport);
+        return parsed.some(vuln => !vuln.isDismissed);
+      });
+    },
+
+    hasUnresolvedDastIssues(vulnerabilityFeedbackReport) {
+      if (!this.dastPath) {
+        return false;
+      }
+
+      return axios.get(this.dastPath).then(res => {
+        const dastReport = (res.data && res.data.site && res.data.site.alerts) || [];
+        const parsed = parseDastIssues(dastReport, vulnerabilityFeedbackReport);
+        return parsed.some(vuln => !vuln.isDismissed);
+      });
+    },
+
+    hasUnresolvedContainerScanningIssues(vulnerabilityFeedbackReport) {
+      if (!this.containerScanningPath) {
+        return false;
+      }
+
+      return axios.get(this.containerScanningPath).then(res => {
+        const containerScanningReport = (res.data && res.data.vulnerabilities) || [];
+        const parsed = parseSastContainer(containerScanningReport, vulnerabilityFeedbackReport);
+        return parsed.some(vuln => !vuln.isDismissed);
+      });
+    },
+
+    hasUnresolvedDependencyScanningIssues(vulnerabilityFeedbackReport) {
+      if (!this.dependencyScanningPath) {
+        return false;
+      }
+
+      return axios.get(this.dependencyScanningPath).then(res => {
+        const dependencyScanningReport = (res.data && res.data.vulnerabilities) || [];
+        const parsed = parseDependencyScanningIssues(
+          dependencyScanningReport,
+          vulnerabilityFeedbackReport,
+        );
+        return parsed.some(vuln => !vuln.isDismissed);
+      });
+    },
+
+    fetchReportStatus() {
+      this.isLoading = true;
+      this.hasError = false;
+
+      return axios
+        .get(this.vulnerabilityFeedbackPath)
+        .then(res => res.data)
+        .catch(() => [])
+        .then(vulnerabilityFeedbackReport =>
+          Promise.all([
+            this.hasUnresolvedSastIssues(vulnerabilityFeedbackReport),
+            this.hasUnresolvedDastIssues(vulnerabilityFeedbackReport),
+            this.hasUnresolvedContainerScanningIssues(vulnerabilityFeedbackReport),
+            this.hasUnresolvedDependencyScanningIssues(vulnerabilityFeedbackReport),
+          ]),
+        )
+        .then(reports => reports.some(report => report))
+        .then(hasIssues => {
+          this.isSecure = !hasIssues;
           this.isLoading = false;
-          this.hasError = false;
-          this.data = response.data || {};
         })
         .catch(() => {
           // TODO: Handle the error
@@ -64,9 +154,8 @@ export default {
 <template>
   <a
     v-tooltip
-    v-if="hasReports || isLoading"
     :title="s__('ciReport|Security Report')"
-    :href="data.pipeline_url"
+    :href="pipelineSecurityPath"
     data-placement="bottom"
   >
     <status-icon
@@ -74,7 +163,6 @@ export default {
       class="temp-class"
     />
   </a>
-  <span v-else>–</span>
 </template>
 
 <style scoped>
@@ -84,4 +172,3 @@ export default {
   margin: 0;
 }
 </style>
-

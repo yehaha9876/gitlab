@@ -7,6 +7,13 @@ import environmentItem from './environment_item.vue';
 
 import deployBoard from 'ee/environments/components/deploy_board_component.vue'; // eslint-disable-line import/first
 
+const hasSecurityReport = environments =>
+  environments.some(
+    env =>
+      (!env.isFolder && env.security_reports && env.security_reports.has_security_reports) ||
+      (Array.isArray(env.children) && hasSecurityReport(env.children)),
+  );
+
 export default {
   components: {
     environmentItem,
@@ -31,6 +38,12 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+  },
+
+  computed: {
+    hasSecurityReport() {
+      return hasSecurityReport(this.environments);
     },
   },
 
@@ -77,12 +90,15 @@ export default {
       >
         {{ s__("Environments|Commit") }}
       </div>
+      <!-- EE-Specific -->
       <div
+        v-if="hasSecurityReport"
         class="table-section section-10 environments-security"
         role="columnheader"
       >
         {{ s__("Environments|Security") }}
       </div>
+      <!-- EE-Specific -->
       <div
         class="table-section section-10 environments-date"
         role="columnheader"
@@ -93,14 +109,13 @@ export default {
     <template
       v-for="(model, i) in environments"
       :model="model">
-      <div
-        is="environment-item"
+      <environment-item
         :model="model"
         :can-create-deployment="canCreateDeployment"
         :can-read-environment="canReadEnvironment"
+        :has-security-report="hasSecurityReport"
         :key="`environment-item-${i}`"
       />
-
       <div
         v-if="model.hasDeployBoard && model.isDeployBoardVisible"
         :key="`deploy-board-row-${i}`"
@@ -126,12 +141,12 @@ export default {
         </div>
 
         <template v-else>
-          <div
-            is="environment-item"
+          <environment-item
             v-for="(children, index) in model.children"
             :model="children"
             :can-create-deployment="canCreateDeployment"
             :can-read-environment="canReadEnvironment"
+            :has-security-report="hasSecurityReport"
             :key="`env-item-${i}-${index}`"
           />
 
