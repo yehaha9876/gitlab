@@ -12,6 +12,7 @@ const bindEvents = () => {
   const $projectTemplateButtons = $('.project-templates-buttons');
   const $projectFieldsFormInput = $('.project-fields-form input#project_use_custom_template');
   const $subgroupWithTemplatesIdInput = $('.project-fields-form input#project_subgroup_with_project_templates_id');
+  const $namespace_select = $projectFieldsForm.find('select#project_namespace_id');
 
   if ($newProjectForm.length !== 1 || $useCustomTemplateBtn.length === 0) {
     return;
@@ -26,15 +27,20 @@ const bindEvents = () => {
   }
 
   function chooseTemplate() {
+    const value = $(this).val();
+    const subgroupId = $(this).data('subgroup-id');
+
+    if (subgroupId) {
+      $subgroupWithTemplatesIdInput.val(subgroupId);
+      $namespace_select.prop('disabled', true);
+      $namespace_select.val(subgroupId).trigger('change');
+    }
+
     $projectTemplateButtons.addClass('hidden');
     $projectFieldsForm.addClass('selected');
     $selectedIcon.empty();
 
-    const value = $(this).val();
-    const subgroupId = $(this).data('subgroup-id');
-
     $selectedTemplateText.text(value);
-    $subgroupWithTemplatesIdInput.val(subgroupId);
 
     $(this)
       .parents('.template-option')
@@ -52,6 +58,8 @@ const bindEvents = () => {
     $activeTabProjectName.focus();
     $activeTabProjectName
       .keyup(() => projectNew.onProjectNameChange($activeTabProjectName, $activeTabProjectPath));
+
+    $projectFieldsForm.find('select#project_namespace_id').first().val(subgroupId);
   }
 
   $useCustomTemplateBtn.on('change', chooseTemplate);
@@ -59,6 +67,8 @@ const bindEvents = () => {
   $changeTemplateBtn.on('click', () => {
     $projectTemplateButtons.removeClass('hidden');
     $useCustomTemplateBtn.prop('checked', false);
+    $namespace_select.prop('disabled', false);
+    $namespace_select.val($namespace_select.find('option[data-options-parent="users"]').val()).trigger('change');
     disableCustomTemplate();
   });
 };
