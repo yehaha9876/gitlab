@@ -16,5 +16,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize Subgroups selector
   groupsSelect();
-
 });
