@@ -7,6 +7,32 @@ describe Group do
 
   describe 'associations' do
     it { is_expected.to have_many(:audit_events).dependent(false) }
+    it { is_expected.to have_many(:project_templates).dependent(false) }
+  end
+
+  describe 'validations' do
+    describe 'custom_project_templates_group_id' do
+      it 'rejects change if the group is not a top group' do
+        subgroup = build(:group, parent: group, custom_project_templates_group_id: group.id)
+
+        expect(subgroup).not_to be_valid
+        expect(subgroup.errors.messages[:custom_project_templates_group_id]).to eq ['can only be assigned to top groups']
+      end
+
+      it 'rejects change if the assigned group is not a descendant' do
+        group.custom_project_templates_group_id = create(:group).id
+
+        expect(group).not_to be_valid
+        expect(group.errors.messages[:custom_project_templates_group_id]).to eq ['has to be a descendant of the group']
+      end
+
+      it 'allows value if the current group is a top parent and the value is from a descendant' do
+        subgroup = create(:group, parent: group)
+        group.custom_project_templates_group_id = subgroup.id
+
+        expect(group).to be_valid
+      end
+    end
   end
 
   describe 'states' do

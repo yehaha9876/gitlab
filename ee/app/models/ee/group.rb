@@ -23,6 +23,8 @@ module EE
       validates :repository_size_limit,
                 numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
+      validate :custom_project_templates_group_allowed, if: :custom_project_templates_group_id_changed?
+
       scope :where_group_links_with_provider, ->(provider) do
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })
       end
@@ -116,6 +118,16 @@ module EE
 
     def first_non_empty_project
       projects.detect { |project| !project.empty_repo? }
+    end
+
+    def custom_project_templates_group_allowed
+      if has_parent?
+        return errors.add(:custom_project_templates_group_id, "can only be assigned to top groups")
+      end
+
+      unless descendants.exists?(id: custom_project_templates_group_id)
+        errors.add(:custom_project_templates_group_id, "has to be a descendant of the group")
+      end
     end
   end
 end
