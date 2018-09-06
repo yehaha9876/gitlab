@@ -11,7 +11,6 @@ const bindEvents = () => {
   const $changeTemplateBtn = $('.change-template');
   const $projectTemplateButtons = $('.project-templates-buttons');
   const $projectFieldsFormInput = $('.project-fields-form input#project_use_custom_template');
-  const $subgroupWithTemplatesIdInput = $('.project-fields-form input#project_subgroup_with_project_templates_id');
   const $namespace_select = $projectFieldsForm.find('select#project_namespace_id');
 
   if ($newProjectForm.length !== 1 || $useCustomTemplateBtn.length === 0) {
@@ -31,9 +30,21 @@ const bindEvents = () => {
     const subgroupId = $(this).data('subgroup-id');
 
     if (subgroupId) {
-      $subgroupWithTemplatesIdInput.val(subgroupId);
-      $namespace_select.prop('disabled', true);
       $namespace_select.val(subgroupId).trigger('change');
+      var path = `/${$namespace_select.find('option:selected').data('show-path').split('/')[1]}`
+
+      // Hiding alloptions whose path doesn't match the top parent one
+      $namespace_select.find('option').filter(function(){
+        var current_path = $(this).data('show-path');
+        return current_path != path && !current_path.startsWith(`${path}/`)
+      }).addClass('hidden');
+
+      // Hiding those optgroup that doesn't have any option visible
+      $namespace_select.find('optgroup').filter(function() {
+        var visible_options = $(this).find('option:not(.hidden)').length;
+        console.log(visible_options);
+        return visible_options == 0;
+      }).addClass('hidden');
     }
 
     $projectTemplateButtons.addClass('hidden');
@@ -67,8 +78,9 @@ const bindEvents = () => {
   $changeTemplateBtn.on('click', () => {
     $projectTemplateButtons.removeClass('hidden');
     $useCustomTemplateBtn.prop('checked', false);
-    $namespace_select.prop('disabled', false);
     $namespace_select.val($namespace_select.find('option[data-options-parent="users"]').val()).trigger('change');
+    $namespace_select.find('option').removeClass('hidden');
+    $namespace_select.find('optgroup').removeClass('hidden')
     disableCustomTemplate();
   });
 };
