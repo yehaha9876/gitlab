@@ -203,4 +203,94 @@ describe 'New project' do
       end
     end
   end
+
+  context 'Group-level project templates', :js do
+    let(:url) { new_project_path }
+
+    context 'when licensed' do
+      before do
+        stub_licensed_features(custom_project_templates: true)
+      end
+
+      it 'shows Group tab in Templates section' do
+        visit url
+        click_link 'Create from template'
+
+        expect(page).to have_css('.group-templates-tab')
+      end
+
+      shared_examples 'group templates displayed' do
+        before do
+          visit url
+          click_link 'Create from template'
+
+          page.within('#create-from-template-pane') do
+            click_link 'Group'
+          end
+        end
+
+        it 'the tab badge displays the number of templates available' do
+          page.within('.group-templates-tab') do
+            expect(page).to have_selector('span.badge', text: template_number)
+          end
+        end
+
+        it 'the tab shows the list of templates available' do
+          page.within('#group-templates') do
+            expect(page).to have_selector('.template-option', count: template_number)
+          end
+        end
+      end
+
+      context 'when group template is set' do
+        let(:group1) { create(:group) }
+        let(:group2) { create(:group) }
+        let(:subgroup1) { create(:group, parent: group1) }
+        let(:subgroup2) { create(:group, parent: group2) }
+        let!(:subgroup1_project1) { create(:project, namespace: subgroup1) }
+        let!(:subgroup1_project2) { create(:project, namespace: subgroup1) }
+        let!(:subgroup2_project) { create(:project, namespace: subgroup2) }
+
+        before do
+          group1.add_owner(user)
+          group2.add_owner(user)
+          group1.update(custom_project_templates_group_id: subgroup1.id)
+          group2.update(custom_project_templates_group_id: subgroup2.id)
+        end
+
+        context 'when top level context' do
+          it_behaves_like 'group templates displayed' do
+            let(:template_number) { 3 }
+          end
+        end
+
+        context 'when namespace context' do
+          let(:url) { new_project_path(namespace_id: group1.id) }
+
+          it_behaves_like 'group templates displayed' do
+            let(:template_number) { 2 }
+          end
+        end
+      end
+
+      context 'when group template is not set' do
+        it_behaves_like 'group templates displayed' do
+          let(:template_number) { 0 }
+        end
+      end
+    end
+
+    context 'when unlicensed' do
+      before do
+        stub_licensed_features(custom_project_templates: false)
+      end
+
+      it 'does not show Group tab in Templates section' do
+        visit url
+        click_link 'Create from template'
+
+        expect(page).not_to have_css('.group-templates-tab')
+      end
+    end
+  end
 end
