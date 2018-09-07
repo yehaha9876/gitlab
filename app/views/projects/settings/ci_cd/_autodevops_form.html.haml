@@ -37,17 +37,17 @@
                       %li
                         - project_clusters_link = link_to('Kubernetes cluster', project_clusters_path(@project))
                         = s_('CICD|Alternatively, create a %{kubernetes} with Ingress installed to automatically use a wildcard domain.').html_safe % { kubernetes: project_clusters_link }
+                  -# EE-specific start
+                  %li
+                    = s_('CICD|Do not set up a domain here if you are setting up multiple Kubernetes clusters with Auto DevOps.')
+                    = link_to icon('question-circle'), help_page_path('topics/autodevops/index.md', anchor: 'using-multiple-kubernetes-clusters-premium'), target: '_blank'
+                  -# EE-specific end
                 %p.form-text
                   - auto_devops_help_link = link_to s_('Auto DevOps domain configuration'), help_page_path('topics/autodevops/index.md', anchor: 'auto-devops-base-domain'), target: '_blank'
                   = s_('CICD|Read more about %{auto_devops_help_link}.').html_safe % { auto_devops_help_link: auto_devops_help_link }
 
                 = form.text_field :domain, class: 'form-control', placeholder: 'domain.com'
 
-                -# EE-specific start
-                .form-text.text-muted
-                  = s_('CICD|Do not set up a domain here if you are setting up multiple Kubernetes clusters with Auto DevOps.')
-                  = link_to icon('question-circle'), help_page_path('topics/autodevops/index.md', anchor: 'using-multiple-kubernetes-clusters-premium'), target: '_blank'
-                -# EE-specific end
 
                 %label.prepend-top-10
                   %strong= s_('CICD|Deployment strategy')
