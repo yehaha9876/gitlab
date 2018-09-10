@@ -6,7 +6,6 @@ module EE
 
       override :execute
       def execute
-        binding.pry
         return super unless use_custom_template?
 
         override_params = params.dup

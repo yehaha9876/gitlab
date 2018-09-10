@@ -226,6 +226,7 @@ describe 'New project' do
 
           page.within('#create-from-template-pane') do
             click_link 'Group'
+            wait_for_all_requests
           end
         end
 
@@ -242,14 +243,50 @@ describe 'New project' do
         end
       end
 
-      context 'when group template is set' do
+      shared_examples 'template selected' do
+        before do
+          visit url
+          click_link 'Create from template'
+
+          page.within('#create-from-template-pane') do
+            click_link 'Group'
+            wait_for_all_requests
+          end
+
+          page.within('.custom-project-templates') do
+            page.find(".template-option input[value='#{subgroup1_project1.name}']").first(:xpath, './/..').click
+            wait_for_all_requests
+          end
+        end
+
+        context 'when template is selected' do
+          context 'namespace selector' do
+            it "only shows the template's group hierarchy options" do
+              page.within('#create-from-template-pane') do
+                elements = page.find_all("#project_namespace_id option:not(.hidden)", visible: false).map { |e| e['data-name'] }
+                expect(elements).to contain_exactly(group1.name, subgroup1.name, subsubgroup1.name)
+              end
+            end
+
+            it 'does not show the user namespace options' do
+              page.within('#create-from-template-pane') do
+                expect(page.find_all("#project_namespace_id optgroup.hidden[label='Users']", visible: false)).not_to be_empty
+              end
+            end
+          end
+        end
+      end
+
+      context 'when custom project group template is set' do
         let(:group1) { create(:group) }
         let(:group2) { create(:group) }
         let(:subgroup1) { create(:group, parent: group1) }
         let(:subgroup2) { create(:group, parent: group2) }
+        let(:subsubgroup1) { create(:group, parent: subgroup1) }
         let!(:subgroup1_project1) { create(:project, namespace: subgroup1) }
         let!(:subgroup1_project2) { create(:project, namespace: subgroup1) }
         let!(:subgroup2_project) { create(:project, namespace: subgroup2) }
+        let!(:subsubgroup1_project) { create(:project, namespace: subsubgroup1) }
 
         before do
           group1.add_owner(user)
@@ -262,6 +299,8 @@ describe 'New project' do
           it_behaves_like 'group templates displayed' do
             let(:template_number) { 3 }
           end
+
+          it_behaves_like 'template selected'
         end
 
         context 'when namespace context' do
@@ -270,6 +309,8 @@ describe 'New project' do
           it_behaves_like 'group templates displayed' do
             let(:template_number) { 2 }
           end
+
+          it_behaves_like 'template selected'
         end
       end
 
