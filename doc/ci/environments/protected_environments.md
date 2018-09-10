@@ -12,11 +12,16 @@ specific environments are "protected" to avoid unauthorized people to affect the
 By default, a protected environment does one thing: it ensures that only people
 with the right privileges can deploy to it, thus keeping it safe.
 
+To protect, update, or unprotect an environment, you need to have at least
+[Maintainer permissions](../../user/permissions.md).
+
 NOTE: **Note**:
 A GitLab admin is always allowed to use environments, even if they are protected.
 
-To protect, update, or unprotect an environment, you need to have at least
-[Maintainer permissions](../../user/permissions.md).
+NOTE: **Note**:
+Protected Environments feature was introduced on 11.3 under a 
+[Feature Flag](../../development/feature_flags.md#developing-with-feature-flags), and thus 
+is only enabled by default on GitLab.com
 
 ## Configuring protected environments
 
@@ -43,6 +48,18 @@ Maintainers can update existing protected environments at any time
 by changing the access on "Allowed to Deploy" dropdown menu. Similarly,
 to unprotect a protected environment, Maintainers need to click the
 **Unprotect** button of the respective environment.
+
+## Enable Protected Environments on a on-premise instance.
+
+To enable this feature on an on-premise instance, a user with enough privileges
+will need to access to the rails console and execute the following:
+
+
+```ruby
+Feature.enable(:protected_environments)
+```
+
+After that Protected Environments will be available.
 
 [ee]: https://about.gitlab.com/pricing/
 [6303]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6303
