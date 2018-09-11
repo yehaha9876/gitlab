@@ -1,8 +1,16 @@
+require 'gitlab/ci/parsers/base_parser'
+
 module Gitlab
   module Ci
     module Parsers
-      class Junit
+      class Junit < BaseParser
+
+        FILE_TYPE = 'junit'
         JunitParserError = Class.new(StandardError)
+
+        def self.file_type
+          FILE_TYPE
+        end
 
         def parse!(xml_data, test_suite)
           root = Hash.from_xml(xml_data)

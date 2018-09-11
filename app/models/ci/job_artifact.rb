@@ -11,8 +11,8 @@ module Ci
     NotSupportedAdapterError = Class.new(StandardError)
 
     TEST_REPORT_FILE_TYPES = %w[junit].freeze
-    DEFAULT_FILE_NAMES = { junit: 'junit.xml' }.freeze
-    TYPE_AND_FORMAT_PAIRS = { archive: :zip, metadata: :gzip, trace: :raw, junit: :gzip }.freeze
+    DEFAULT_FILE_NAMES = { junit: 'junit.xml' }.merge(EE_DEFAULT_FILE_NAMES).freeze
+    TYPE_AND_FORMAT_PAIRS = { archive: :zip, metadata: :gzip, trace: :raw, junit: :gzip }.merge(EE_TYPE_AND_FORMAT_PAIRS).freeze
 
     belongs_to :project
     belongs_to :job, class_name: "Ci::Build", foreign_key: :job_id
@@ -42,7 +42,11 @@ module Ci
       archive: 1,
       metadata: 2,
       trace: 3,
-      junit: 4
+      junit: 4,
+      sast: 5,
+      dependency_scanning: 6,
+      container_scanning: 7,
+      dast: 8
     }
 
     enum file_format: {

@@ -11,9 +11,16 @@ module EE
       included do
         has_one :chat_data, class_name: 'Ci::PipelineChatData'
 
+        # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_security_reports, -> {
           joins(:artifacts).where(ci_builds: { name: %w[sast dependency_scanning sast:container container_scanning dast] })
         }
+
+        state_machine :status do
+          after_transition any => ::Ci::Pipeline::COMPLETED_STATUSES.map(&:to_sym) do |pipeline|
+            pipeline.run_after_commit { SecurityReportsWorker.perform_async(pipeline.id) } if pipeline.has_security_reports?
+          end
+        end
       end
 
       # codeclimate_artifact is deprecated and replaced with code_quality_artifact (#5779)
@@ -147,6 +154,18 @@ module EE
 
       def expose_code_quality_data?
         has_code_quality_data?
+      end
+
+      def has_security_reports?
+        complete? && builds.latest.with_security_reports.any?
+      end
+
+      def security_reports
+        ::Gitlab::Ci::Reports::Security::Reports.new.tap do |security_reports|
+          builds.latest.with_security_reports.each do |build|
+            build.collect_security_reports!(security_reports)
+          end
+        end
       end
 
       private

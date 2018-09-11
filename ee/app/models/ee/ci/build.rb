@@ -21,6 +21,12 @@ module EE
 
       included do
         after_save :stick_build_if_status_changed
+
+        scope :with_security_reports, ->() do
+          # FIXME: find workaround that doesn't need hardcoded report type
+          # includes(:job_artifacts_junit) # Prevent N+1 problem when iterating each ci_job_artifact row
+          where('EXISTS (?)', ::Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id').security_reports)
+        end
       end
 
       def shared_runners_minutes_limit_enabled?
@@ -79,6 +85,15 @@ module EE
       def has_dast_json?
         name_in?('dast') &&
           has_artifact?(DAST_FILE)
+      end
+
+      def collect_security_reports!(security_reports)
+        each_report(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES) do |file_type, blob|
+          # Group reports per file_type, which maps category
+          security_reports.get_report(file_type).tap do |security_report|
+            ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, security_report)
+          end
+        end
       end
 
       private

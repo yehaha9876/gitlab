@@ -6,10 +6,12 @@ module Gitlab
         # Entry that represents a configuration of job artifacts.
         #
         class Reports < Node
+          prepend EE::Gitlab::Ci::Config::Entry::Reports
+
           include Validatable
           include Attributable
 
-          ALLOWED_KEYS = %i[junit].freeze
+          ALLOWED_KEYS = %i[junit].concat(EE_ALLOWED_KEYS).freeze
 
           attributes ALLOWED_KEYS
 

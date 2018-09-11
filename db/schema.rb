@@ -2967,7 +2967,7 @@ ActiveRecord::Schema.define(version: 20180904171535) do
     t.text "raw_metadata", null: false
   end
 
-  add_index "vulnerability_occurrences", ["location_fingerprint", "project_id", "primary_identifier_fingerprint", "ref", "scanner_id"], name: "vulnerability_occurrences_unique_index", unique: true, using: :btree
+  add_index "vulnerability_occurrences", ["location_fingerprint", "primary_identifier_fingerprint", "project_id", "scanner_id", "ref"], name: "vulnerability_occurrences_unique_index", unique: true, using: :btree
   add_index "vulnerability_occurrences", ["project_fingerprint"], name: "index_vulnerability_occurrences_on_project_fingerprint", using: :btree
   add_index "vulnerability_occurrences", ["project_id"], name: "index_vulnerability_occurrences_on_project_id", using: :btree
 

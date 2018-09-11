@@ -645,7 +645,7 @@ module Ci
 
     def collect_test_reports!(test_reports)
       test_reports.get_suite(group_name).tap do |test_suite|
-        each_test_report do |file_type, blob|
+        each_report(Ci::JobArtifact::TEST_REPORT_FILE_TYPES) do |file_type, blob|
           Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, test_suite)
         end
       end
@@ -653,9 +653,12 @@ module Ci
 
     private
 
-    def each_test_report
-      Ci::JobArtifact::TEST_REPORT_FILE_TYPES.each do |file_type|
-        public_send("job_artifacts_#{file_type}").each_blob do |blob| # rubocop:disable GitlabSecurity/PublicSend
+    def each_report(report_types)
+      report_types.each do |file_type|
+        report_artifact = public_send("job_artifacts_#{file_type}") # rubocop:disable GitlabSecurity/PublicSend
+        next if report_artifact.nil?
+
+        report_artifact.each_blob do |blob|
           yield file_type, blob
         end
       end

@@ -4,7 +4,7 @@ class Vulnerabilities::Occurrence < ActiveRecord::Base
   self.table_name = "vulnerability_occurrences"
   include ShaAttribute
 
-  CATEGORIES = { sast: 0, dependency_scanning: 1, container_scanning: 2, dast: 3 }.freeze
+  CATEGORIES = { sast: 0, dependency_scanning: 1, container_scanning: 2, dast: 3 }.with_indifferent_access.freeze
   # Used for both severity and confidence
   LEVELS = { ignore: 0, unknown: 1, experimental: 2, low: 3, medium: 4, high: 5, critical: 6 }.with_indifferent_access.freeze
 
