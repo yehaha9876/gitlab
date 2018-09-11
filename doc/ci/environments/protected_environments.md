@@ -49,17 +49,17 @@ by changing the access on "Allowed to Deploy" dropdown menu. Similarly,
 to unprotect a protected environment, Maintainers need to click the
 **Unprotect** button of the respective environment.
 
-## Enable Protected Environments on a on-premise instance.
+## Enable Protected Environments for self-managed instances.
 
-To enable this feature on an on-premise instance, a user with enough privileges
-will need to access to the rails console and execute the following:
+To enable this feature on a self-managed instance, a user with proper privileges
+must access to the rails console and execute the following:
 
 
 ```ruby
 Feature.enable(:protected_environments)
 ```
 
-After that Protected Environments will be available.
+This will enable the protected environments feature.
 
 [ee]: https://about.gitlab.com/pricing/
 [6303]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6303
