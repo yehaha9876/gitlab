@@ -62,6 +62,7 @@
 - pipeline_default:build_trace_sections
 - pipeline_default:pipeline_metrics
 - pipeline_default:pipeline_notification
+- pipeline_default:ci_play_build
 - pipeline_hooks:build_hooks
 - pipeline_hooks:pipeline_hooks
 - pipeline_processing:build_finished

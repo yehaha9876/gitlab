@@ -182,6 +182,12 @@ module Ci
         end
       end
 
+      after_transition any => [:manual] do |build|
+        build.run_after_commit do
+          Ci::PlayBuildWorker.perform_at(autoplay_at, self.id) if build.autoplay?
+        end
+      end
+
       before_transition any => [:failed] do |build|
         next unless build.project
         next if build.retries_max.zero?
@@ -225,6 +231,18 @@ module Ci
 
     def playable?
       action? && (manual? || retryable?)
+    end
+
+    def autoplay?
+      manual? && options[:autoplay_in].present?
+    end
+
+    def autoplay_at
+      ChronicDuration.parse(options[:autoplay_in])&.seconds&.from_now
+    end
+
+    def autoplay_in
+      autoplay_at - Time.now
     end
 
     def action?
