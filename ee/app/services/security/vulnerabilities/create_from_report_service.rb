@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Security
   module Vulnerabilities
     class CreateFromReportService < ::BaseService
@@ -10,8 +12,8 @@ module Security
 
       def execute(reported_vulnerability)
         # Find the primary identifier of the vulnerability from the report
-        primary_identifier = reported_vulnerability.identifiers.detect{ |i| i.primary }
-        raise NoPrimaryIdentifier if !primary_identifier
+        primary_identifier = reported_vulnerability.identifiers.detect { |i| i.primary }
+        raise NoPrimaryIdentifier unless primary_identifier
 
         # Check if that primary identifier already exists in our DB
         db_primary_identifier = ::Vulnerabilities::Identifier.find_by(
@@ -33,7 +35,7 @@ module Security
             if same
               # If there is an existing vulnerability record with exact same location,
               # it's actually the same occurrence so let's update it
-              same.update_attributes!(
+              same.update!(
                 confidence: reported_vulnerability.confidence&.downcase,
                 metadata_version: reported_vulnerability.metadata_version,
                 name: reported_vulnerability.name,
@@ -89,22 +91,24 @@ module Security
         # Ensure find or create is atomic
         ActiveRecord::Base.transaction do
           identifiers.each do |identifier|
-            i = ::Vulnerabilities::Identifier.find_by(
+            db_identifier = ::Vulnerabilities::Identifier.find_by(
               external_type: identifier.external_type,
               external_id: identifier.external_id,
               namespace_id: @project.namespace_id
             )
 
-            i = ::Vulnerabilities::Identifier.create!(
-              external_type: identifier.external_type,
-              external_id: identifier.external_id,
-              namespace_id: @project.namespace_id,
-              name: identifier.name
-            ) if i.nil?
+            if db_identifier.nil?
+              db_identifier = ::Vulnerabilities::Identifier.create!(
+                external_type: identifier.external_type,
+                external_id: identifier.external_id,
+                namespace_id: @project.namespace_id,
+                name: identifier.name
+              )
+            end
 
             # Find or create join model for current identifier
             db_occurrence.occurrence_identifiers.find_or_create_by!(
-              identifier: i,
+              identifier: db_identifier,
               primary: identifier.primary == true
             )
           end
@@ -118,7 +122,7 @@ module Security
             external_id: scanner.external_id,
             namespace_id: @project.namespace_id
           )
-          return db_scanner if db_scanner
+          break db_scanner if db_scanner
 
           ::Vulnerabilities::Scanner.create!(
             external_id: scanner.external_id,

@@ -22,7 +22,7 @@ module EE
       included do
         after_save :stick_build_if_status_changed
 
-        scope :with_security_reports, ->() do
+        scope :with_security_reports, -> do
           # FIXME: find workaround that doesn't need hardcoded report type
           # includes(:job_artifacts_junit) # Prevent N+1 problem when iterating each ci_job_artifact row
           where('EXISTS (?)', ::Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id').security_reports)

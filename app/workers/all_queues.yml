@@ -174,7 +174,7 @@
 - geo:geo_repository_verification_secondary_single
 - geo:geo_truncate_event_log
 
-- pipeline_processing:security_reports
+- pipeline_default:security_reports
 
 - admin_emails
 - create_github_webhook

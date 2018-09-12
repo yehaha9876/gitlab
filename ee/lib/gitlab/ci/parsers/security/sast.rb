@@ -1,11 +1,10 @@
-require 'gitlab/ci/parsers/security/base'
+# frozen_string_literal: true
 
 module Gitlab
   module Ci
     module Parsers
       module Security
         class Sast < Base
-
           FILE_TYPE = 'sast'
           SastParserError = Class.new(StandardError)
 

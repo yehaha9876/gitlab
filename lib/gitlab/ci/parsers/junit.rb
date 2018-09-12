@@ -1,10 +1,9 @@
-require 'gitlab/ci/parsers/base_parser'
+# frozen_string_literal: true
 
 module Gitlab
   module Ci
     module Parsers
       class Junit < BaseParser
-
         FILE_TYPE = 'junit'
         JunitParserError = Class.new(StandardError)
 

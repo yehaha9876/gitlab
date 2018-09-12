@@ -1,11 +1,10 @@
-require 'gitlab/ci/parsers/base_parser'
+# frozen_string_literal: true
 
 module Gitlab
   module Ci
     module Parsers
       module Security
         class Base < ::Gitlab::Ci::Parsers::BaseParser
-
           def category
             self.class.file_type
           end
@@ -18,7 +17,7 @@ module Gitlab
             end
           end
 
-        protected
+          protected
 
           def create_vulnerability(data)
             # TODO: add backward compatibility here?
@@ -33,7 +32,7 @@ module Gitlab
               category: category,
               name: data['message'],
               description: data['description'],
-              compare_key: data['cve'], #FIXME: change that property name...
+              compare_key: data['cve'], # TODO: change that property name...
               severity: data['severity'],
               confidence: data['confidence'],
               solution: data['solution'],
@@ -51,7 +50,7 @@ module Gitlab
 
             ::Gitlab::Ci::Reports::Security::Vulnerabilities::Scanner.new(
               external_id: scanner['id'],
-              name: scanner['name'],
+              name: scanner['name']
             )
           end
 

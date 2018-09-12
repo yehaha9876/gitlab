@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     module Reports
@@ -6,7 +8,7 @@ module Gitlab
           class Occurrence
             attr_reader :category, :compare_key, :confidence, :description, :identifiers, :links, :location, :metadata_version, :name, :raw_metadata, :scanner, :severity, :solution
 
-            def initialize(category:, compare_key:, confidence: nil, description: nil, identifiers:, links:, location:, metadata_version:, name:, raw_metadata:, scanner:, severity: nil, solution: nil)
+            def initialize(category:, compare_key:, confidence: nil, description: nil, identifiers:, links:, location:, metadata_version:, name:, raw_metadata:, scanner:, severity: nil, solution: nil) # rubocop:disable Metrics/ParameterLists
               @category = category
               @compare_key = compare_key
               @confidence = confidence

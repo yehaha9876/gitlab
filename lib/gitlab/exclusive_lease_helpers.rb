@@ -21,7 +21,7 @@ module Gitlab
 
       raise FailedToObtainLockError, 'Failed to obtain a lock' unless uuid
 
-      yield
+      yield lease
     ensure
       Gitlab::ExclusiveLease.cancel(key, uuid)
     end

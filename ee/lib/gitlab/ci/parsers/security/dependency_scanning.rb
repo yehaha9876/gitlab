@@ -1,11 +1,10 @@
-require 'gitlab/ci/parsers/security/base'
+# frozen_string_literal: true
 
 module Gitlab
   module Ci
     module Parsers
       module Security
         class DependencyScanning < Base
-
           FILE_TYPE = 'dependency_scanning'
           DependencyScanningParserError = Class.new(StandardError)
 

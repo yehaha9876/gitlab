@@ -16,7 +16,7 @@ describe Gitlab::Ci::Parsers do
       let(:file_type) { 'undefined' }
 
       it 'raises an error' do
-        expect { subject }.to raise_error(NameError)
+        expect { subject }.to raise_error(Gitlab::Ci::Parsers::ParserNotFoundError)
       end
     end
   end

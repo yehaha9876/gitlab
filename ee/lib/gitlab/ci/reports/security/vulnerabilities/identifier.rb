@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     module Reports
@@ -6,7 +8,7 @@ module Gitlab
           class Identifier
             attr_reader :external_id, :external_type, :name, :primary, :url
 
-            def initialize(external_id:, external_type:, name:, primary:, url:nil)
+            def initialize(external_id:, external_type:, name:, primary:, url:  nil)
               @external_id = external_id
               @external_type = external_type
               @name = name
