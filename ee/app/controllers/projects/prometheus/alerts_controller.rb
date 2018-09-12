@@ -10,7 +10,10 @@ module Projects
       before_action :alert, only: [:update, :show, :destroy]
 
       def index
-        alerts = project.prometheus_alerts.reorder(id: :asc)
+        alerts = project
+          .prometheus_alerts
+          .where(environment_id: params[:environment_id])
+          .reorder(id: :asc)
 
         render json: serialize_as_json(alerts)
       end
@@ -26,19 +29,22 @@ module Projects
       end
 
       def create
-        @alert = project.prometheus_alerts.create(alerts_params)
+        @alert = project
+          .prometheus_alerts
+          .where(environment_id: params[:environment_id])
+          .create(create_alerts_params)
 
-        if @alert
+        if @alert.persisted?
           schedule_prometheus_update!
 
           render json: serialize_as_json(@alert)
         else
-          head :no_content
+          render_404
         end
       end
 
       def update
-        if alert.update(alerts_params)
+        if alert.update(update_alerts_params)
           schedule_prometheus_update!
 
           render json: serialize_as_json(alert)
@@ -59,14 +65,22 @@ module Projects
 
       private
 
-      def alerts_params
-        alerts_params = params.permit(:operator, :threshold, :environment_id, :prometheus_metric_id)
+      def create_alerts_params
+        alerts_params = params.permit(:operator, :threshold, :prometheus_metric_id)
+        resolve_operator(alerts_params)
+      end
 
-        if alerts_params[:operator].present?
-          alerts_params[:operator] = PrometheusAlert.operator_to_enum(alerts_params[:operator])
+      def update_alerts_params
+        alerts_params = params.permit(:operator, :threshold)
+        resolve_operator(alerts_params)
+      end
+
+      def resolve_operator(params)
+        if operator = params[:operator].presence
+          params[:operator] = PrometheusAlert.operator_to_enum(operator)
         end
 
-        alerts_params
+        params
       end
 
       def schedule_prometheus_update!
@@ -82,7 +96,10 @@ module Projects
       end
 
       def alert
-        @alert ||= project.prometheus_alerts.find_by(prometheus_metric_id: params[:id]) || render_404
+        @alert ||= project
+          .prometheus_alerts
+          .where(environment_id: params[:environment_id])
+          .find_by(prometheus_metric_id: params[:id]) || render_404
       end
 
       def application

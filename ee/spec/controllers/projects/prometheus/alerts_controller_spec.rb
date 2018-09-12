@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Projects::Prometheus::AlertsController do
   let(:user) { create(:user) }
   let(:project) { create(:project) }
-  let(:environment) { create(:environment, project: project) }
+  let(:production) { create(:environment, project: project) }
+  let(:staging) { create(:environment, project: project) }
   let(:metric) { create(:prometheus_metric, project: project) }
 
   before do
@@ -32,14 +33,38 @@ describe Projects::Prometheus::AlertsController do
 
     context 'when project has prometheus alerts' do
       before do
-        create_list(:prometheus_alert, 3, project: project, environment: environment)
+        create_list(:prometheus_alert, 2, project: project, environment: production)
+        create_list(:prometheus_alert, 1, project: project, environment: staging)
       end
 
-      it 'contains prometheus alerts' do
+      it 'contains prometheus alerts only for the production environment' do
+        get :index, project_params(environment_id: production.id)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(JSON.parse(response.body).count).to eq(2)
+      end
+
+      it 'contains prometheus alerts only for the staging environment' do
+        get :index, project_params(environment_id: staging.id)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(JSON.parse(response.body).count).to eq(1)
+      end
+
+      it 'does not return prometheus alerts without environment' do
         get :index, project_params
 
         expect(response).to have_gitlab_http_status(200)
-        expect(JSON.parse(response.body).count).to eq(3)
+        expect(JSON.parse(response.body)).to be_empty
+      end
+
+      it 'does not return prometheus alerts with a project non-specific environment' do
+        environment = create(:environment)
+
+        get :index, project_params(environment_id: environment.id)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(JSON.parse(response.body)).to be_empty
       end
     end
   end
@@ -47,19 +72,19 @@ describe Projects::Prometheus::AlertsController do
   describe 'GET #show' do
     context 'when alert does not exist' do
       it 'renders 404' do
-        get :show, project_params(id: PrometheusAlert.all.maximum(:prometheus_metric_id).to_i + 1)
+        get :show, project_params(id: PrometheusAlert.all.maximum(:prometheus_metric_id).to_i + 1, environment_id: production.id)
 
         expect(response).to have_gitlab_http_status(404)
       end
     end
 
     context 'when alert exists' do
-      let(:alert) { create(:prometheus_alert, project: project, environment: environment, prometheus_metric: metric) }
+      let(:alert) { create(:prometheus_alert, project: project, environment: production, prometheus_metric: metric) }
 
       it 'renders forbidden when unlicensed' do
         stub_licensed_features(prometheus_alerts: false)
 
-        get :show, project_params(id: alert.prometheus_metric_id)
+        get :show, project_params(id: alert.prometheus_metric_id, environment_id: alert.environment.id)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -74,17 +99,23 @@ describe Projects::Prometheus::AlertsController do
           "alert_path" => Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alert.prometheus_metric_id, environment_id: alert.environment.id, format: :json)
         }
 
-        get :show, project_params(id: alert.prometheus_metric_id)
+        get :show, project_params(id: alert.prometheus_metric_id, environment_id: alert.environment.id)
 
         expect(response).to have_gitlab_http_status(200)
         expect(JSON.parse(response.body)).to include(alert_params)
+      end
+
+      it 'renders 404 for a different environment' do
+        get :show, project_params(id: alert.prometheus_metric_id, environment_id: staging.id)
+
+        expect(response).to have_gitlab_http_status(404)
       end
     end
   end
 
   describe 'POST #notify' do
     it 'sends a notification' do
-      alert = create(:prometheus_alert, project: project, environment: environment, prometheus_metric: metric)
+      alert = create(:prometheus_alert, project: project, environment: production, prometheus_metric: metric)
       notification_service = spy
 
       alert_params = {
@@ -117,7 +148,7 @@ describe Projects::Prometheus::AlertsController do
       post :create, project_params(
         operator: ">",
         threshold: "1",
-        environment_id: environment.id,
+        environment_id: production.id,
         prometheus_metric_id: metric.id
       )
 
@@ -138,7 +169,7 @@ describe Projects::Prometheus::AlertsController do
       post :create, project_params(
         operator: ">",
         threshold: "1",
-        environment_id: environment.id,
+        environment_id: production.id,
         prometheus_metric_id: metric.id
       )
 
@@ -146,11 +177,35 @@ describe Projects::Prometheus::AlertsController do
       expect(response).to have_gitlab_http_status(200)
       expect(JSON.parse(response.body)).to include(alert_params)
     end
+
+    it 'renders 404 for a project non-specific environment' do
+      environment = create(:environment)
+
+      post :create, project_params(
+        operator: ">",
+        threshold: "1",
+        environment_id: environment.id,
+        prometheus_metric_id: metric.id
+      )
+
+      expect(response).to have_gitlab_http_status(:not_found)
+    end
+
+    it 'renders 404 for an invalid metric' do
+      post :create, project_params(
+        operator: ">",
+        threshold: "1",
+        environment_id: production.id,
+        prometheus_metric_id: "invalid"
+      )
+
+      expect(response).to have_gitlab_http_status(:not_found)
+    end
   end
 
   describe 'POST #update' do
     let(:schedule_update_service) { spy }
-    let(:alert) { create(:prometheus_alert, project: project, environment: environment, prometheus_metric: metric) }
+    let(:alert) { create(:prometheus_alert, project: project, environment: production, prometheus_metric: metric) }
 
     before do
       allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
@@ -159,7 +214,7 @@ describe Projects::Prometheus::AlertsController do
     it 'renders forbidden when unlicensed' do
       stub_licensed_features(prometheus_alerts: false)
 
-      put :update, project_params(id: alert.prometheus_metric_id, operator: "<")
+      put :update, project_params(id: alert.prometheus_metric_id, operator: "<", environment_id: alert.environment.id)
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
@@ -175,12 +230,18 @@ describe Projects::Prometheus::AlertsController do
       }
 
       expect do
-        put :update, project_params(id: alert.prometheus_metric_id, operator: "<")
+        put :update, project_params(id: alert.prometheus_metric_id, operator: "<", environment_id: alert.environment.id)
       end.to change { alert.reload.operator }.to("lt")
 
       expect(schedule_update_service).to have_received(:execute)
       expect(response).to have_gitlab_http_status(200)
       expect(JSON.parse(response.body)).to include(alert_params)
+    end
+
+    it 'renders 404 for a different environment' do
+      put :update, project_params(id: alert.prometheus_metric_id, operator: "<", environment_id: staging.id)
+
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -195,17 +256,23 @@ describe Projects::Prometheus::AlertsController do
     it 'renders forbidden when unlicensed' do
       stub_licensed_features(prometheus_alerts: false)
 
-      delete :destroy, project_params(id: alert.prometheus_metric_id)
+      delete :destroy, project_params(id: alert.prometheus_metric_id, environment_id: alert.environment.id)
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
 
     it 'destroys the specified prometheus alert' do
       expect do
-        delete :destroy, project_params(id: alert.prometheus_metric_id)
+        delete :destroy, project_params(id: alert.prometheus_metric_id, environment_id: alert.environment.id)
       end.to change { PrometheusAlert.count }.from(1).to(0)
 
       expect(schedule_update_service).to have_received(:execute)
+    end
+
+    it 'renders 404 for a different environment' do
+      delete :destroy, project_params(id: alert.prometheus_metric_id, environment_id: staging.id)
+
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
