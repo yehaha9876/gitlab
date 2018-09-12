@@ -10,7 +10,6 @@ module Security
     include ::Gitlab::ExclusiveLeaseHelpers
 
     FailedToRenewLeaseError = Class.new(StandardError)
-    StaleDataError = Class.new(StandardError)
 
     LOCK_RETRY = 10
     LOCK_SLEEP = 5.seconds
@@ -32,7 +31,6 @@ module Security
 
       # Process the reports in a lock to avoid concurrent upsert
       in_lock(lease_key, lock_options) do |lease|
-        ensure_no_stale_data
         store_reports(lease)
 
         # TODO: add step to remove stale data from DB
@@ -45,15 +43,15 @@ module Security
 
     private
 
-    # Ensure we're not overriding existing records with older data. Otherwise abort.
-    def ensure_no_stale_data
-      last_pipeline_id = @pipeline.project.vulnerabilities.where(ref: @pipeline.ref).first&.pipeline_id
-      raise StaleDataError, 'Reports data is older than existing records' if last_pipeline_id && last_pipeline_id > @pipeline.id
-    end
-
     def store_reports(lease)
       # Collect every reports from artifacts and parse them into structured ruby objects
       @pipeline.security_reports.reports.each do |category, report|
+        # Ensure we're not overriding existing records with older data for this report
+        if stale_data?(category)
+          log_info('stale report, skipping...')
+          next
+        end
+
         # Store parsed vulnerabilities into the database
         report.vulnerabilities.each do |reported_vulnerability|
           begin
@@ -85,6 +83,15 @@ module Security
         # (and very unlikely to happen) but if it happens we must abort current process to avoid storing stale data.
         raise FailedToRenewLeaseError, 'Failed to renew the lease, aborting...' unless lease.renew
       end
+    end
+
+    # Check that the existing records for given category come from an older pipeline
+    def stale_data?(category)
+      last_pipeline_id = @pipeline.project.vulnerabilities
+        .for_category(category)
+        .where(ref: @pipeline.ref)
+        .first&.pipeline_id
+      last_pipeline_id && last_pipeline_id > @pipeline.id
     end
   end
 end

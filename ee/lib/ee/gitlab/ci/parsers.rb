@@ -16,6 +16,15 @@ module EE
           ::Gitlab::Ci::Parsers::Security::ContainerScanning,
           ::Gitlab::Ci::Parsers::Security::Dast
         ].freeze
+
+        class_methods do
+          extend ::Gitlab::Utils::Override
+
+          override :parsers
+          def parsers
+            @parsers ||= super + EE_PARSERS
+          end
+        end
       end
     end
   end

@@ -17,7 +17,7 @@ module Gitlab
         end
       end
 
-      PARSERS = [ ::Gitlab::Ci::Parsers::Junit ].concat(EE_PARSERS).freeze
+      PARSERS = [::Gitlab::Ci::Parsers::Junit].freeze
 
       def self.fabricate!(file_type)
         klass = parser_for(file_type)
@@ -27,7 +27,11 @@ module Gitlab
       end
 
       def self.parser_for(file_type)
-        PARSERS.detect { |parser| parser.file_type == file_type }
+        parsers.detect { |parser| parser.file_type == file_type }
+      end
+
+      def self.parsers
+        @parsers ||= PARSERS
       end
     end
   end
