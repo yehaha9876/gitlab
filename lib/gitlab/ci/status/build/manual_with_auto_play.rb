@@ -11,15 +11,15 @@ module Gitlab
           # Core override
           ###
           def text
-            s_('CiStatusText|manual with auto play')
+            s_('CiStatusText|scheduled')
           end
 
           def label
-            s_('CiStatusLabel|manual action with auto play')
+            s_('CiStatusLabel|scheduled')
           end
 
           def icon
-            'soft-unwrap'
+            'timer'
           end
 
           def favicon
@@ -33,17 +33,17 @@ module Gitlab
             {
               image: 'illustrations/canceled-job_empty.svg',
               size: 'svg-394',
-              title: _('This job requires a manual action with auto play'),
+              title: _('This job is a scheduled job with manual actions!'),
               content: _('auto playyyyyyyyyyyyyy! This job depends on a user to trigger its process. Often they are used to deploy code to production environments')
             }
           end
 
           def status_tooltip
-            @status.status_tooltip + " (auto play) : Executed in #{(subject.build_schedule.execute_in / 1.minute).round}"
+            @status.status_tooltip + " (scheulded) : Execute in #{subject.build_schedule.execute_in.round} sec"
           end
 
           def self.matches?(build, user)
-            build.autoplay?
+            build.autoplay? && !build.canceled?
           end
         end
       end

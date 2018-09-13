@@ -8,12 +8,18 @@ module Ci
 
     belongs_to :build
 
-    after_create unless: :importing? do |build|
-      run_after_commit { Ci::PlayBuildWorker.perform_at(self.execute_at, self.build_id) }
-    end
+    after_create :schedule, unless: :importing?
 
     def execute_in
       self.execute_at - Time.now
+    end
+
+    private
+
+    def schedule
+      run_after_commit do
+        Ci::BuildScheduleWorker.perform_at(self.execute_at, self.build_id)
+      end
     end
   end
 end
