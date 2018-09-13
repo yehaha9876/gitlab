@@ -51,6 +51,14 @@ module QA
           end
         end
 
+        def click_members_settings
+          hover_settings do
+            within_submenu do
+              click_link('Members')
+            end
+          end
+        end
+
         def click_operations_kubernetes
           hover_operations do
             within_submenu do
