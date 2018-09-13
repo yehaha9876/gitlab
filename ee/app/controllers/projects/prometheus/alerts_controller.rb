@@ -32,7 +32,7 @@ module Projects
         @alert = project
           .prometheus_alerts
           .where(environment_id: params[:environment_id])
-          .create(create_alerts_params)
+          .create(create_alert_params)
 
         if @alert.persisted?
           schedule_prometheus_update!
@@ -44,7 +44,7 @@ module Projects
       end
 
       def update
-        if alert.update(update_alerts_params)
+        if alert.update(update_alert_params)
           schedule_prometheus_update!
 
           render json: serialize_as_json(alert)
@@ -65,12 +65,12 @@ module Projects
 
       private
 
-      def create_alerts_params
+      def create_alert_params
         alerts_params = params.permit(:operator, :threshold, :prometheus_metric_id)
         resolve_operator(alerts_params)
       end
 
-      def update_alerts_params
+      def update_alert_params
         alerts_params = params.permit(:operator, :threshold)
         resolve_operator(alerts_params)
       end
