@@ -39,7 +39,7 @@ module Gitlab
           end
 
           def status_tooltip
-            @status.status_tooltip + " (auto play) : Executed in #{subject.autoplay_in}"
+            @status.status_tooltip + " (auto play) : Executed in #{(subject.build_schedule.execute_in / 1.minute).round}"
           end
 
           def self.matches?(build, user)

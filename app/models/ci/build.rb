@@ -26,6 +26,7 @@ module Ci
     }.freeze
 
     has_one :last_deployment, -> { order('deployments.id DESC') }, as: :deployable, class_name: 'Deployment'
+    has_one :build_schedule, class_name: 'Ci::BuildSchedule', foreign_key: :build_id
     has_many :trace_sections, class_name: 'Ci::BuildTraceSection'
     has_many :trace_chunks, class_name: 'Ci::BuildTraceChunk', foreign_key: :build_id
 
@@ -184,7 +185,7 @@ module Ci
 
       after_transition any => [:manual] do |build|
         build.run_after_commit do
-          Ci::PlayBuildWorker.perform_at(autoplay_at, self.id) if build.autoplay?
+          build.schedule_delayed_execution
         end
       end
 
@@ -241,8 +242,10 @@ module Ci
       ChronicDuration.parse(options[:autoplay_in])&.seconds&.from_now
     end
 
-    def autoplay_in
-      autoplay_at - Time.now
+    def schedule_delayed_execution
+      return unless autoplay?
+
+      create_build_schedule!(execute_at: autoplay_at)
     end
 
     def action?
