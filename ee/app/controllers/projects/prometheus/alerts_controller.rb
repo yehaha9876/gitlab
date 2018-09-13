@@ -12,7 +12,7 @@ module Projects
       def index
         alerts = project
           .prometheus_alerts
-          .where(environment_id: params[:environment_id])
+          .for_environment(params[:environment_id])
           .reorder(id: :asc)
 
         render json: serialize_as_json(alerts)
@@ -31,7 +31,7 @@ module Projects
       def create
         @alert = project
           .prometheus_alerts
-          .where(environment_id: params[:environment_id])
+          .for_environment(params[:environment_id])
           .create(create_alert_params)
 
         if @alert.persisted?
@@ -98,7 +98,7 @@ module Projects
       def alert
         @alert ||= project
           .prometheus_alerts
-          .where(environment_id: params[:environment_id])
+          .for_environment(params[:environment_id])
           .find_by(prometheus_metric_id: params[:id]) || render_404
       end
 

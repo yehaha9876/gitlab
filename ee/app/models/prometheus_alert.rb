@@ -19,6 +19,8 @@ class PrometheusAlert < ActiveRecord::Base
 
   delegate :title, :query, to: :prometheus_metric
 
+  scope :for_environment, -> (environment) { where(environment_id: environment) }
+
   def self.operator_to_enum(op)
     OPERATORS_MAP.invert.fetch(op)
   end
