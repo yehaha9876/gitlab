@@ -10,10 +10,7 @@ module Projects
       before_action :alert, only: [:update, :show, :destroy]
 
       def index
-        alerts = project
-          .prometheus_alerts
-          .for_environment(params[:environment_id])
-          .reorder(id: :asc)
+        alerts = prometheus_alerts.reorder(id: :asc)
 
         render json: serialize_as_json(alerts)
       end
@@ -29,10 +26,7 @@ module Projects
       end
 
       def create
-        @alert = project
-          .prometheus_alerts
-          .for_environment(params[:environment_id])
-          .create(create_alert_params)
+        @alert = prometheus_alerts.create(create_alert_params)
 
         if @alert.persisted?
           schedule_prometheus_update!
@@ -96,14 +90,15 @@ module Projects
       end
 
       def alert
-        @alert ||= project
-          .prometheus_alerts
-          .for_environment(params[:environment_id])
-          .find_by(prometheus_metric_id: params[:id]) || render_404
+        @alert ||= prometheus_alerts.find_by(prometheus_metric_id: params[:id]) || render_404
       end
 
       def application
         @application ||= alert.environment.cluster_prometheus_adapter
+      end
+
+      def prometheus_alerts
+        project.prometheus_alerts.for_environment(params[:environment_id])
       end
     end
   end
