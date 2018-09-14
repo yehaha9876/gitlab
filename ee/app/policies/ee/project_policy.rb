@@ -202,11 +202,11 @@ module EE
         end
       end
 
-      condition(:web_ide_terminal_available) do
-        @subject.feature_available?(:webide_terminal)
+      condition(:ide_terminal_available) do
+        @subject.feature_available?(:ide_terminal)
       end
 
-      rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal
+      rule { ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :ide_terminal_enabled
     end
   end
 end

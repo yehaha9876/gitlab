@@ -80,7 +80,7 @@ module Ci
     end
 
     def check_access!
-      unless can?(current_user, :create_web_ide_terminal, project)
+      unless can?(current_user, :ide_terminal_enabled, project)
         raise TerminalCreationError, 'Insufficient permissions to create a terminal'
       end
 
