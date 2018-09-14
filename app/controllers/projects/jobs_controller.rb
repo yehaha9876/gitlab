@@ -1,6 +1,8 @@
 class Projects::JobsController < Projects::ApplicationController
   include SendFileUpload
 
+  prepend ::EE::Projects::JobsController
+
   before_action :build, except: [:index, :cancel_all]
   before_action :authorize_read_build!
   before_action :authorize_update_build!,
@@ -14,7 +16,7 @@ class Projects::JobsController < Projects::ApplicationController
   # rubocop: disable CodeReuse/ActiveRecord
   def index
     @scope = params[:scope]
-    @all_builds = project.builds.relevant
+    @all_builds = relevant_builds
     @builds = @all_builds.order('ci_builds.id DESC')
     @builds =
       case @scope
@@ -185,5 +187,9 @@ class Projects::JobsController < Projects::ApplicationController
 
   def build_path(build)
     project_job_path(build.project, build)
+  end
+
+  def relevant_builds
+    project.builds.relevant
   end
 end

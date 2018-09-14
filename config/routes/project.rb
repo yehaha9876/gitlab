@@ -325,6 +325,17 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
                   format: false
               end
             end
+
+            ## EE-specific
+            resources :ide_terminals, only: [:create], defaults: { format: 'json' } do
+              post :retry
+              post :cancel
+
+              collection do
+                get :valid_config
+              end
+            end
+            ## EE-specific
           end
 
           member do

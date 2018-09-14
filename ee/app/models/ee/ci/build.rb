@@ -18,9 +18,13 @@ module EE
       SAST_CONTAINER_FILE = 'gl-sast-container-report.json'.freeze
       CONTAINER_SCANNING_FILE = 'gl-container-scanning-report.json'.freeze
       DAST_FILE = 'gl-dast-report.json'.freeze
+      WEB_IDE_JOB_TAG = 'web-ide'.freeze
 
       prepended do
         after_save :stick_build_if_status_changed
+
+        scope :webide, -> { includes(:pipeline).where(ci_pipelines: { source: ::Ci::Pipeline.sources[:webide] }) }
+        scope :without_webide, -> { includes(:pipeline).where.not(ci_pipelines: { source: ::Ci::Pipeline.sources[:webide] }) }
       end
 
       def shared_runners_minutes_limit_enabled?

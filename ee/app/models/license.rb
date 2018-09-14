@@ -81,6 +81,7 @@ class License < ActiveRecord::Base
     pod_logs
     pseudonymizer
     prometheus_alerts
+    ide_terminal
   ].freeze
 
   # List all features available for early adopters,

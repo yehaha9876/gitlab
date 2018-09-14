@@ -113,6 +113,8 @@ module Ci
       where("EXISTS (?)", matcher)
     end
 
+    scope :created_by, ->(user) { where(user: user) }
+
     mount_uploader :legacy_artifacts_file, LegacyArtifactUploader, mount_on: :artifacts_file
     mount_uploader :legacy_artifacts_metadata, LegacyArtifactUploader, mount_on: :artifacts_metadata
 

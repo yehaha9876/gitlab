@@ -8,6 +8,7 @@ import JobsDetail from '../jobs/detail.vue';
 import MergeRequestInfo from '../merge_requests/info.vue';
 import ResizablePanel from '../resizable_panel.vue';
 import Clientside from '../preview/clientside.vue';
+import terminalView from '../terminal/view.vue';
 
 export default {
   directives: {
@@ -20,9 +21,10 @@ export default {
     ResizablePanel,
     MergeRequestInfo,
     Clientside,
+    terminalView,
   },
   computed: {
-    ...mapState(['rightPane', 'currentMergeRequestId', 'clientsidePreviewEnabled']),
+    ...mapState(['rightPane', 'currentMergeRequestId', 'clientsidePreviewEnabled', 'webIdeTerminalEnabled']),
     ...mapGetters(['packageJson']),
     pipelinesActive() {
       return (
@@ -32,6 +34,14 @@ export default {
     },
     showLivePreview() {
       return this.packageJson && this.clientsidePreviewEnabled;
+    },
+    terminalActive() {
+      return (
+        this.rightPane === rightSidebarViews.terminalView
+      );
+    },
+    showWebIdeTerminal() {
+      return this.webIdeTerminalEnabled;
     },
   },
   methods: {
@@ -102,6 +112,25 @@ export default {
             <icon
               :size="16"
               name="rocket"
+            />
+          </button>
+        </li>
+        <li v-if="showWebIdeTerminal">
+          <button
+            v-tooltip
+            :title="__('Terminal')"
+            :class="{
+              active: terminalActive
+            }"
+            data-container="body"
+            data-placement="left"
+            class="ide-sidebar-link is-right"
+            type="button"
+            @click="clickTab($event, $options.rightSidebarViews.terminalView)"
+          >
+            <icon
+              :size="16"
+              name="terminal"
             />
           </button>
         </li>

@@ -388,6 +388,10 @@ Settings.cron_jobs['prune_web_hook_logs_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['prune_web_hook_logs_worker']['cron'] ||= '0 */1 * * *'
 Settings.cron_jobs['prune_web_hook_logs_worker']['job_class'] = 'PruneWebHookLogsWorker'
 
+Settings.cron_jobs['clear_web_ide_pipelines_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['clear_web_ide_pipelines_worker']['cron'] ||= '0 0 3 * *'
+Settings.cron_jobs['clear_web_ide_pipelines_worker']['job_class'] = 'ClearWebIdePipelinesWorker'
+
 #
 # Sidekiq
 #

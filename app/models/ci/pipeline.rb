@@ -75,10 +75,8 @@ module Ci
       trigger: 3,
       schedule: 4,
       api: 5,
-      external: 6,
-      pipeline: 7,
-      chat: 8
-    }
+      external: 6
+    }.merge(EE_CONFIG_SOURCES)
 
     enum_with_nil config_source: {
       unknown_source: nil,

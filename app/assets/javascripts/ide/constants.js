@@ -33,6 +33,7 @@ export const rightSidebarViews = {
   jobsDetail: 'jobs-detail',
   mergeRequestInfo: 'merge-request-info',
   clientSidePreview: 'clientside',
+  terminalView: 'terminal-view',
 };
 
 export const stageKeys = {

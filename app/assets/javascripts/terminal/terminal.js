@@ -65,6 +65,11 @@ export default class GLTerminal {
     this.terminal.fit();
   }
 
+  destroyTerminal() {
+    this.socket.close();
+    this.terminal.dispose();
+  }
+
   handleSocketFailure() {
     this.terminal.write('\r\nConnection failure');
   }

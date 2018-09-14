@@ -13,7 +13,7 @@ class PipelinesFinder
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
-  def execute
+  def execute(with_web_ide_pipelines: false)
     unless Ability.allowed?(current_user, :read_pipeline, project)
       return Ci::Pipeline.none
     end
@@ -26,6 +26,8 @@ class PipelinesFinder
     items = by_name(items)
     items = by_username(items)
     items = by_yaml_errors(items)
+    items = by_source(items)
+    items = without_web_ide_pipelines(items) unless with_web_ide_pipelines
     sort_items(items)
   end
   # rubocop: enable CodeReuse/ActiveRecord
@@ -129,6 +131,16 @@ class PipelinesFinder
     end
   end
   # rubocop: enable CodeReuse/ActiveRecord
+
+  def by_source(items)
+    return items unless source = Ci::Pipeline.sources[params[:source]]
+
+    items.where(source: source)
+  end
+
+  def without_web_ide_pipelines(items)
+    items.where.not(source: Ci::Pipeline.sources[:webide])
+  end
 
   # rubocop: disable CodeReuse/ActiveRecord
   def sort_items(items)

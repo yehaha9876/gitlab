@@ -116,10 +116,11 @@ module API
       params do
         optional :scope, type: String, values: Ci::Runner::AVAILABLE_SCOPES,
                          desc: 'The scope of specific runners to show'
+        optional :tag_list, type: Array[String]
         use :pagination
       end
       get ':id/runners' do
-        runners = filter_runners(Ci::Runner.owned_or_instance_wide(user_project.id), params[:scope])
+        runners = filter_runners(Ci::Runner.owned_or_instance_wide(user_project.id), params[:scope], tag_list: params[:tag_list])
         present paginate(runners), with: Entities::Runner
       end
 
@@ -160,7 +161,7 @@ module API
     end
 
     helpers do
-      def filter_runners(runners, scope, allowed_scopes: ::Ci::Runner::AVAILABLE_SCOPES)
+      def filter_runners(runners, scope, allowed_scopes: ::Ci::Runner::AVAILABLE_SCOPES, tag_list: nil)
         return runners unless scope.present?
 
         unless allowed_scopes.include?(scope)
@@ -170,6 +171,10 @@ module API
         # Support deprecated scopes
         if runners.respond_to?("deprecated_#{scope}")
           scope = "deprecated_#{scope}"
+        end
+
+        if tag_list&.any?
+          runners = runners.tagged_with(tag_list)
         end
 
         runners.public_send(scope) # rubocop:disable GitlabSecurity/PublicSend

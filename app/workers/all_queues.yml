@@ -141,6 +141,7 @@
 - geo_repository_shard_sync
 
 - cronjob:clear_shared_runners_minutes
+- cronjob:clear_web_ide_pipelines
 - cronjob:geo_file_download_dispatch
 - cronjob:geo_metrics_update
 - cronjob:geo_prune_event_log

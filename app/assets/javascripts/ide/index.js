@@ -32,6 +32,8 @@ export function initIde(el) {
       });
       this.setInitialData({
         clientsidePreviewEnabled: convertPermissionToBoolean(el.dataset.clientsidePreviewEnabled),
+        webIdeTerminalEnabled: convertPermissionToBoolean(el.dataset.webIdeTerminalEnabled),
+        webIdeJobTag: el.dataset.webIdeJobTag,
       });
     },
     methods: {

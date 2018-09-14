@@ -6,6 +6,7 @@ module Ci
 
     SEQUENCE = [Gitlab::Ci::Pipeline::Chain::Build,
                 EE::Gitlab::Ci::Pipeline::Chain::RemoveUnwantedChatJobs,
+                EE::Gitlab::Ci::Pipeline::Chain::RemoveUnwantedWebIdeTerminalJobs,
                 Gitlab::Ci::Pipeline::Chain::Validate::Abilities,
                 Gitlab::Ci::Pipeline::Chain::Validate::Repository,
                 Gitlab::Ci::Pipeline::Chain::Validate::Config,
