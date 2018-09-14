@@ -20,6 +20,19 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get 'epics'
         end
       end
+
+      resources :ide_terminals, only: [:create, :show], constraints: { id: /\d+/, format: :json } do
+        member do
+          post :cancel
+          post :retry
+          get :terminal, constraints: { format: nil }
+          get '/terminal.ws/authorize', to: 'ide_terminals#terminal_websocket_authorize', constraints: { format: nil }
+        end
+
+        collection do
+          post :check_config
+        end
+      end
     end
   end
 end

@@ -1,0 +1,7 @@
+- @no_container = true
+
+- content_for :page_specific_javascripts do
+  = stylesheet_link_tag "xterm.css"
+
+.terminal-container{ class: container_class }
+  #terminal{ data: { project_path: terminal_project_ide_terminal_path(@project, @build, format: :ws) } }

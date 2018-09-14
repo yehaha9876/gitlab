@@ -201,6 +201,13 @@ module EE
           prevent(*::ProjectPolicy.create_update_admin_destroy(feature))
         end
       end
+
+      condition(:ide_terminal_feature) do
+        @subject.feature_available?(:ide_terminal) &&
+          ::Feature.enabled?(:ide_terminal_feature, @subject, default_enabled: true)
+      end
+
+      rule { ide_terminal_feature & can?(:create_pipeline) & can?(:maintainer_access) }.enable :ide_terminal_enabled
     end
   end
 end
