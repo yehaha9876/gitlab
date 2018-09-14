@@ -10,6 +10,7 @@ module EE
       LICENSED_PARSER_FEATURES = {
         sast: :sast
       }.with_indifferent_access.freeze
+      WEB_IDE_JOB_TAG = 'web-ide'.freeze
 
       prepended do
         after_save :stick_build_if_status_changed

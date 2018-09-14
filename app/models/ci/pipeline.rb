@@ -56,6 +56,7 @@ module Ci
 
     delegate :id, to: :project, prefix: true
     delegate :full_path, to: :project, prefix: true
+    delegate :ci_yaml_file_path, to: :project
 
     validates :sha, presence: { unless: :importing? }
     validates :ref, presence: { unless: :importing? }
@@ -264,7 +265,7 @@ module Ci
     end
 
     def self.internal_sources
-      sources.reject { |source| source == "external" }.values
+      sources.except(:external).values
     end
 
     def stages_count
@@ -501,14 +502,6 @@ module Ci
       rescue
         self.yaml_errors = 'Undefined error'
         nil
-      end
-    end
-
-    def ci_yaml_file_path
-      if project.ci_config_path.blank?
-        '.gitlab-ci.yml'
-      else
-        project.ci_config_path
       end
     end
 

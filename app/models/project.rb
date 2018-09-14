@@ -2075,6 +2075,10 @@ class Project < ActiveRecord::Base
     Ability.allowed?(user, :read_project_snippet, self)
   end
 
+  def ci_yaml_file_path
+    ci_config_path.presence || '.gitlab-ci.yml'
+  end
+
   private
 
   def use_hashed_storage

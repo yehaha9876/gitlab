@@ -2,9 +2,12 @@
 
 module Ci
   class CreatePipelineService < BaseService
+    prepend EE::Ci::CreatePipelineService
+
     attr_reader :pipeline
 
     SEQUENCE = [Gitlab::Ci::Pipeline::Chain::Build,
+                EE::Gitlab::Ci::Pipeline::Chain::FilterWebIdeTerminalJobs,
                 EE::Gitlab::Ci::Pipeline::Chain::RemoveUnwantedChatJobs,
                 Gitlab::Ci::Pipeline::Chain::Validate::Abilities,
                 Gitlab::Ci::Pipeline::Chain::Validate::Repository,

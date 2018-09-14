@@ -4,18 +4,24 @@ class Projects::JobsController < Projects::ApplicationController
   include SendFileUpload
   include ContinueParams
 
-  before_action :build, except: [:index, :cancel_all]
-  before_action :authorize_read_build!
+  prepend ::EE::Projects::JobsController
+
+  before_action :build,
+    only: [:show, :cancel, :retry, :play, :erase, :trace, :raw, :status, :terminal, :terminal_websocket_authorize]
+  before_action :authorize_read_build!,
+    only: [:show, :cancel, :retry, :play, :erase, :trace, :raw, :status, :terminal, :terminal_websocket_authorize]
   before_action :authorize_update_build!,
-    except: [:index, :show, :status, :raw, :trace, :cancel_all, :erase]
+    only: [:cancel, :retry, :play, :terminal, :terminal_websocket_authorize]
   before_action :authorize_erase_build!, only: [:erase]
-  before_action :authorize_use_build_terminal!, only: [:terminal, :terminal_workhorse_authorize]
+  before_action :authorize_use_build_terminal!, only: [:terminal, :terminal_websocket_authorize]
   before_action :verify_api_request!, only: :terminal_websocket_authorize
 
   layout 'project'
 
   # rubocop: disable CodeReuse/ActiveRecord
   def index
+    return access_denied! unless can?(current_user, :read_build, project)
+
     @scope = params[:scope]
     @all_builds = project.builds.relevant
     @builds = @all_builds.order('ci_builds.id DESC')
@@ -42,7 +48,7 @@ class Projects::JobsController < Projects::ApplicationController
   def cancel_all
     return access_denied! unless can?(current_user, :update_build, project)
 
-    @project.builds.running_or_pending.each do |build|
+    project.builds.running_or_pending.each do |build|
       build.cancel if can?(current_user, :update_build, build)
     end
 
@@ -94,7 +100,11 @@ class Projects::JobsController < Projects::ApplicationController
     return respond_422 unless @build.retryable?
 
     build = Ci::Build.retry(@build, current_user)
-    redirect_to build_path(build)
+
+    respond_to do |format|
+      format.html { redirect_to build_path(build) }
+      format.json { render_build(build) }
+    end
   end
 
   def play
@@ -109,10 +119,15 @@ class Projects::JobsController < Projects::ApplicationController
 
     @build.cancel
 
-    if continue_params
-      redirect_to continue_params[:to]
-    else
-      redirect_to builds_project_pipeline_path(@project, @build.pipeline.id)
+    respond_to do |format|
+      format.html do
+        if continue_params
+          redirect_to continue_params[:to]
+        else
+          redirect_to builds_project_pipeline_path(@project, @build.pipeline.id)
+        end
+      end
+      format.json { head :ok }
     end
   end
 
@@ -124,9 +139,7 @@ class Projects::JobsController < Projects::ApplicationController
   end
 
   def status
-    render json: BuildSerializer
-      .new(project: @project, current_user: @current_user)
-      .represent_status(@build)
+    render_build(@build)
   end
 
   def erase
@@ -165,6 +178,10 @@ class Projects::JobsController < Projects::ApplicationController
 
   private
 
+  def authorize_read_build!
+    return access_denied! unless can?(current_user, :read_build, build)
+  end
+
   def authorize_update_build!
     return access_denied! unless can?(current_user, :update_build, build)
   end
@@ -200,5 +217,11 @@ class Projects::JobsController < Projects::ApplicationController
 
   def build_path(build)
     project_job_path(build.project, build)
+  end
+
+  def render_build(current_build)
+    render json: BuildSerializer
+      .new(project: @project, current_user: @current_user)
+      .represent_status(current_build)
   end
 end
