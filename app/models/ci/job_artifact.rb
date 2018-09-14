@@ -2,8 +2,6 @@
 
 module Ci
   class JobArtifact < ActiveRecord::Base
-    prepend EE::Ci::JobArtifact
-
     include AfterCommitQueue
     include ObjectStorage::BackgroundMove
     extend Gitlab::Ci::Model
@@ -11,8 +9,12 @@ module Ci
     NotSupportedAdapterError = Class.new(StandardError)
 
     TEST_REPORT_FILE_TYPES = %w[junit].freeze
-    DEFAULT_FILE_NAMES = { junit: 'junit.xml' }.merge(EE_DEFAULT_FILE_NAMES).freeze
-    TYPE_AND_FORMAT_PAIRS = { archive: :zip, metadata: :gzip, trace: :raw, junit: :gzip }.merge(EE_TYPE_AND_FORMAT_PAIRS).freeze
+    DEFAULT_FILE_NAMES = { junit: 'junit.xml' }.freeze
+    TYPE_AND_FORMAT_PAIRS = { archive: :zip, metadata: :gzip, trace: :raw, junit: :gzip }.freeze
+
+    private_constant :DEFAULT_FILE_NAMES, :TYPE_AND_FORMAT_PAIRS
+
+    prepend EE::Ci::JobArtifact
 
     belongs_to :project
     belongs_to :job, class_name: "Ci::Build", foreign_key: :job_id
@@ -73,8 +75,16 @@ module Ci
       gzip: Gitlab::Ci::Build::Artifacts::GzipFileAdapter
     }.freeze
 
+    def self.default_file_names
+      DEFAULT_FILE_NAMES
+    end
+
+    def self.type_and_format_pairs
+      TYPE_AND_FORMAT_PAIRS
+    end
+
     def valid_file_format?
-      unless TYPE_AND_FORMAT_PAIRS[self.file_type&.to_sym] == self.file_format&.to_sym
+      unless self.class.type_and_format_pairs[self.file_type&.to_sym] == self.file_format&.to_sym
         errors.add(:file_format, 'Invalid file format with specified file type')
       end
     end

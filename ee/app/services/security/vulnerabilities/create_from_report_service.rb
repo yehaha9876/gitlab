@@ -46,7 +46,7 @@ module Security
               )
               db_occurrence = same
             end
-            # TODO: ELSE block
+            # TODO: ELSE block (see https://gitlab.com/gitlab-org/gitlab-ee/issues/7586)
             # if same is nil, then we should check if any similar_occurrences have had their location
             # changed in the diff with the commit_sha where location_fingerprint was generated.
             # For now let's just create a new vulnerability record, we'll improve later.

@@ -4,7 +4,6 @@ class Vulnerabilities::Occurrence < ActiveRecord::Base
   self.table_name = "vulnerability_occurrences"
   include ShaAttribute
 
-  CATEGORIES = { sast: 0, dependency_scanning: 1, container_scanning: 2, dast: 3 }.with_indifferent_access.freeze
   # Used for both severity and confidence
   LEVELS = { ignore: 0, unknown: 1, experimental: 2, low: 3, medium: 4, high: 5, critical: 6 }.with_indifferent_access.freeze
 
@@ -19,12 +18,11 @@ class Vulnerabilities::Occurrence < ActiveRecord::Base
 
   has_many :occurrence_identifiers, class_name: 'Vulnerabilities::OccurrenceIdentifier'
   has_many :identifiers, through: :occurrence_identifiers, class_name: 'Vulnerabilities::Identifier'
-  has_one :primary_identifier,  -> { where(occurrence_identifiers: { primary: true }) }, through: :occurrence_identifiers, class_name: 'Vulnerabilities::Identifier'
 
-  scope :for_category, -> (category) { where(category: CATEGORIES[category] )}
+  scope :for_category, -> (category) { where(category: self.categories[category] )}
 
-  enum category: CATEGORIES
-  enum severity: LEVELS
+  enum category: { sast: 0, dependency_scanning: 1, container_scanning: 2, dast: 3 }
+  enum severity: { ignore: 0, unknown: 1, experimental: 2, low: 3, medium: 4, high: 5, critical: 6 }
 
   validates :scanner, presence: true
   validates :project, presence: true

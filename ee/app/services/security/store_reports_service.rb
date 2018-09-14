@@ -32,11 +32,6 @@ module Security
       # Process the reports in a lock to avoid concurrent upsert
       in_lock(lease_key, lock_options) do |lease|
         store_reports(lease)
-
-        # TODO: add step to remove stale data from DB
-        # e.g. if a report type has been removed from the config, there won't be such
-        # report anymore so existing records for that category never get cleaned up.
-
         success
       end
     end

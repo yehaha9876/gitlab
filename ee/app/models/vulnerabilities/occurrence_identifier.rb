@@ -10,6 +10,4 @@ class Vulnerabilities::OccurrenceIdentifier < ActiveRecord::Base
   validates :identifier, presence: true
   validates :identifier_id, uniqueness: { scope: [:occurrence_id] }
   validates :occurrence_id, uniqueness: true, if: :primary
-
-  scope :primary, -> { where(primary: true) }
 end

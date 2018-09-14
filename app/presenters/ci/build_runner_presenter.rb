@@ -34,7 +34,7 @@ module Ci
         {
           artifact_type: k.to_sym,
           artifact_format: :gzip,
-          name: ::Ci::JobArtifact::DEFAULT_FILE_NAMES[k.to_sym],
+          name: ::Ci::JobArtifact.default_file_names([k.to_sym]),
           paths: v,
           when: 'always',
           expire_in: expire_in
