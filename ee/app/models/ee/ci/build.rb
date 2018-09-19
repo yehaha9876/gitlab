@@ -81,6 +81,15 @@ module EE
           has_artifact?(DAST_FILE)
       end
 
+      def collect_security_reports!(security_reports)
+        each_report(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES) do |file_type, blob|
+          # Group reports per file_type, which maps the type or report (SAST, DS, CS or DAST)
+          security_reports.get_report(file_type).tap do |security_report|
+            ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, security_report)
+          end
+        end
+      end
+
       private
 
       def has_artifact?(name)

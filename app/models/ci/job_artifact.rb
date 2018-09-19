@@ -2,8 +2,6 @@
 
 module Ci
   class JobArtifact < ActiveRecord::Base
-    prepend EE::Ci::JobArtifact
-
     include AfterCommitQueue
     include ObjectStorage::BackgroundMove
     extend Gitlab::Ci::Model
@@ -13,6 +11,10 @@ module Ci
     TEST_REPORT_FILE_TYPES = %w[junit].freeze
     DEFAULT_FILE_NAMES = { junit: 'junit.xml' }.freeze
     TYPE_AND_FORMAT_PAIRS = { archive: :zip, metadata: :gzip, trace: :raw, junit: :gzip }.freeze
+
+    private_constant :DEFAULT_FILE_NAMES, :TYPE_AND_FORMAT_PAIRS
+
+    prepend EE::Ci::JobArtifact
 
     belongs_to :project
     belongs_to :job, class_name: "Ci::Build", foreign_key: :job_id
@@ -30,10 +32,14 @@ module Ci
     scope :with_files_stored_locally, -> { where(file_store: [nil, ::JobArtifactUploader::Store::LOCAL]) }
     scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }
 
-    scope :test_reports, -> do
-      types = self.file_types.select { |file_type| TEST_REPORT_FILE_TYPES.include?(file_type) }.values
+    scope :with_file_types, -> (file_types) do
+      types = self.file_types.select { |file_type| file_types.include?(file_type) }.values
 
       where(file_type: types)
+    end
+
+    scope :test_reports, -> do
+      with_file_types(TEST_REPORT_FILE_TYPES)
     end
 
     delegate :filename, :exists?, :open, to: :file
@@ -42,7 +48,11 @@ module Ci
       archive: 1,
       metadata: 2,
       trace: 3,
-      junit: 4
+      junit: 4,
+      sast: 5, ## EE-specific
+      dependency_scanning: 6, ## EE-specific
+      container_scanning: 7, ## EE-specific
+      dast: 8 ## EE-specific
     }
 
     enum file_format: {
@@ -69,8 +79,16 @@ module Ci
       gzip: Gitlab::Ci::Build::Artifacts::GzipFileAdapter
     }.freeze
 
+    def self.default_file_names
+      DEFAULT_FILE_NAMES
+    end
+
+    def self.type_and_format_pairs
+      TYPE_AND_FORMAT_PAIRS
+    end
+
     def valid_file_format?
-      unless TYPE_AND_FORMAT_PAIRS[self.file_type&.to_sym] == self.file_format&.to_sym
+      unless self.class.type_and_format_pairs[self.file_type&.to_sym] == self.file_format&.to_sym
         errors.add(:file_format, 'Invalid file format with specified file type')
       end
     end

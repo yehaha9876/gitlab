@@ -72,17 +72,21 @@ module Ci
         '', Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id').archive)
     end
 
+    scope :with_existing_job_artifacts, ->(query) do
+      where('EXISTS (?)', ::Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id').merge(query))
+    end
+
     scope :with_archived_trace, ->() do
-      where('EXISTS (?)', Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id').trace)
+      with_existing_job_artifacts(Ci::JobArtifact.trace)
     end
 
     scope :without_archived_trace, ->() do
       where('NOT EXISTS (?)', Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id').trace)
     end
 
-    scope :with_test_reports, ->() do
-      includes(:job_artifacts_junit) # Prevent N+1 problem when iterating each ci_job_artifact row
-        .where('EXISTS (?)', Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id').test_reports)
+    scope :with_reports, ->(report_types) do
+      includes(:job_artifacts) # Prevent N+1 problem when iterating each ci_job_artifact row
+        .with_existing_job_artifacts(Ci::JobArtifact.with_file_types(report_types))
     end
 
     scope :with_artifacts_stored_locally, -> { with_artifacts_archive.where(artifacts_file_store: [nil, LegacyArtifactUploader::Store::LOCAL]) }
@@ -652,7 +656,7 @@ module Ci
 
     def collect_test_reports!(test_reports)
       test_reports.get_suite(group_name).tap do |test_suite|
-        each_test_report do |file_type, blob|
+        each_report(Ci::JobArtifact::TEST_REPORT_FILE_TYPES) do |file_type, blob|
           Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, test_suite)
         end
       end
@@ -683,10 +687,13 @@ module Ci
       :creating
     end
 
-    def each_test_report
-      Ci::JobArtifact::TEST_REPORT_FILE_TYPES.each do |file_type|
-        public_send("job_artifacts_#{file_type}").each_blob do |blob| # rubocop:disable GitlabSecurity/PublicSend
-          yield file_type, blob
+    def each_report(report_types)
+      # Rails 5 supports .where clause with enum keys, but for rails 4 we need the values
+      file_type_values = ::Ci::JobArtifact.file_types.select{|k| k.in? report_types}.values
+
+      job_artifacts.where(file_type: file_type_values).each do |report_artifact|
+        report_artifact.each_blob do |blob|
+          yield report_artifact.file_type, blob
         end
       end
     end

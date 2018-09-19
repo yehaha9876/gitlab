@@ -213,4 +213,41 @@ describe Ci::Build do
       end
     end
   end
+
+  describe '#collect_security_reports!' do
+    subject { job.collect_security_reports!(security_reports) }
+
+    let(:security_reports) { ::Gitlab::Ci::Reports::Security::Reports.new }
+
+    context 'when build has a security report' do
+      context 'when there is a sast report' do
+        before do
+          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
+        end
+
+        it 'parses blobs and add the results to the report' do
+          expect { subject }.not_to raise_error
+
+          # Currently parsers are just skeletons hence the expected empty array
+          expect(security_reports.get_report(:sast).vulnerabilities).to eq([])
+        end
+      end
+
+      context 'when there is a corrupted sast report' do
+        before do
+          create(:ee_ci_job_artifact, :sast_with_corrupted_data, job: job, project: job.project)
+        end
+
+        it 'raises an error' do
+          expect { subject }.to raise_error(::Gitlab::Ci::Parsers::Security::Sast::SastParserError)
+        end
+      end
+    end
+
+    context 'when build does not have security reports' do
+      it 'returns en empty reports collection' do
+        expect(subject.reports).to eq({})
+      end
+    end
+  end
 end

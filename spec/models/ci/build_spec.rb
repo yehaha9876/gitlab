@@ -152,18 +152,10 @@ describe Ci::Build do
     end
   end
 
-  describe '.with_test_reports' do
-    subject { described_class.with_test_reports }
+  describe '.with_reports' do
+    context 'with invalid report types' do
+      subject { described_class.with_reports(%w[invalid]) }
 
-    context 'when build has a test report' do
-      let!(:build) { create(:ci_build, :success, :test_reports) }
-
-      it 'selects the build' do
-        is_expected.to eq([build])
-      end
-    end
-
-    context 'when build does not have test reports' do
       let!(:build) { create(:ci_build, :success, :trace_artifact) }
 
       it 'does not select the build' do
@@ -171,19 +163,39 @@ describe Ci::Build do
       end
     end
 
-    context 'when there are multiple builds with test reports' do
-      let!(:builds) { create_list(:ci_build, 5, :success, :test_reports) }
+    context 'with valid report types (test reports)' do
+      subject { described_class.with_reports(::Ci::JobArtifact::TEST_REPORT_FILE_TYPES) }
 
-      it 'does not execute a query for selecting job artifact one by one' do
-        recorded = ActiveRecord::QueryRecorder.new do
-          subject.each do |build|
-            Ci::JobArtifact::TEST_REPORT_FILE_TYPES.each do |file_type|
-              build.public_send("job_artifacts_#{file_type}").file.exists?
+      context 'when build has a test report' do
+        let!(:build) { create(:ci_build, :success, :test_reports) }
+
+        it 'selects the build' do
+          is_expected.to eq([build])
+        end
+      end
+
+      context 'when build does not have test reports' do
+        let!(:build) { create(:ci_build, :success, :trace_artifact) }
+
+        it 'does not select the build' do
+          is_expected.to be_empty
+        end
+      end
+
+      context 'when there are multiple builds with test reports' do
+        let!(:builds) { create_list(:ci_build, 5, :success, :test_reports) }
+
+        it 'does not execute a query for selecting job artifact one by one' do
+          recorded = ActiveRecord::QueryRecorder.new do
+            subject.each do |build|
+              Ci::JobArtifact::TEST_REPORT_FILE_TYPES.each do |file_type|
+                build.public_send("job_artifacts_#{file_type}").file.exists?
+              end
             end
           end
-        end
 
-        expect(recorded.count).to eq(2)
+          expect(recorded.count).to eq(2)
+        end
       end
     end
   end
