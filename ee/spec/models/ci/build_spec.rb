@@ -245,8 +245,8 @@ describe Ci::Build do
     end
 
     context 'when build does not have security reports' do
-      it 'returns en empty reports collection' do
-        expect(subject.reports).to eq({})
+      it 'returns en empty reports object' do
+        expect(security_reports.reports).to eq({})
       end
     end
   end

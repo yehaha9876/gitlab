@@ -85,8 +85,12 @@ module Ci
     end
 
     scope :with_reports, ->(report_types) do
-      includes(:job_artifacts) # Prevent N+1 problem when iterating each ci_job_artifact row
-        .with_existing_job_artifacts(Ci::JobArtifact.with_file_types(report_types))
+      with_existing_job_artifacts(Ci::JobArtifact.with_file_types(report_types))
+        .eager_load_report_artifacts(report_types)
+    end
+
+    scope :eager_load_report_artifacts, ->(report_types) do
+      includes(report_types.map { |type| :"job_artifacts_#{type}" })
     end
 
     scope :with_artifacts_stored_locally, -> { with_artifacts_archive.where(artifacts_file_store: [nil, LegacyArtifactUploader::Store::LOCAL]) }
@@ -689,9 +693,9 @@ module Ci
 
     def each_report(report_types)
       # Rails 5 supports .where clause with enum keys, but for rails 4 we need the values
-      file_type_values = ::Ci::JobArtifact.file_types.select{|k| k.in? report_types}.values
+      file_type_values = ::Ci::JobArtifact.file_types.select { |k| k.in? report_types }.values
 
-      job_artifacts.where(file_type: file_type_values).each do |report_artifact|
+      job_artifacts.where(file_type: file_type_values).find_each do |report_artifact|
         report_artifact.each_blob do |blob|
           yield report_artifact.file_type, blob
         end
