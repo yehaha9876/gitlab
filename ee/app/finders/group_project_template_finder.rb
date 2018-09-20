@@ -9,26 +9,16 @@ class GroupProjectTemplateFinder
   end
 
   def execute
-    allowed_groups
+    allowed_subgroups
   end
 
   def projects_count
-    subgroup_ids = allowed_groups.select(:custom_project_templates_group_id)
-
-    Project.where(namespace_id: subgroup_ids).count
+    Project.in_namespace(allowed_subgroups).count
   end
 
   private
 
-  def allowed_groups
-    groups = GroupsFinder.new(current_user, min_access_level: ::Gitlab::Access::MAINTAINER)
-                         .execute
-                         .with_project_templates
-                         .includes(:project_templates)
-                         .reorder(nil)
-                         .distinct
-    groups = groups.where(id: current_group.id) if current_group
-
-    groups
+  def allowed_subgroups
+    current_user.available_subgroups_with_project_templates(current_group)
   end
 end

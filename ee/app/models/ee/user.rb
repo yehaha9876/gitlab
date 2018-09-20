@@ -111,6 +111,21 @@ module EE
                     .execute
     end
 
+    def available_subgroups_with_project_templates(current_group = nil)
+      subgroup_ids = if current_group
+                       current_group.custom_project_templates_group_id
+                     else
+                       ::Group.with_project_templates.select(:custom_project_templates_group_id)
+                     end
+
+      GroupsFinder.new(self, min_access_level: ::Gitlab::Access::MAINTAINER)
+                  .execute
+                  .where(id: subgroup_ids)
+                  .includes(:projects)
+                  .reorder(nil)
+                  .distinct
+    end
+
     def roadmap_layout
       super || DEFAULT_ROADMAP_LAYOUT
     end
