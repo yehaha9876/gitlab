@@ -207,6 +207,9 @@ gem 're2', '~> 1.1.1'
 
 gem 'version_sorter', '~> 2.1.0'
 
+# Parse version into components
+gem 'semantic', '~> 1.6.1'
+
 # Export Ruby Regex to Javascript
 gem 'js_regex', '~> 2.2.1'
 

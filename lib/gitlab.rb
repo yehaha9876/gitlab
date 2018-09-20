@@ -29,6 +29,7 @@ module Gitlab
   APP_DIRS_PATTERN = %r{^/?(app|config|ee|lib|spec|\(\w*\))}
   SUBDOMAIN_REGEX = %r{\Ahttps://[a-z0-9]+\.gitlab\.com\z}
   VERSION = File.read(root.join("VERSION")).strip.freeze
+  SEMANTIC_VERSION = Semantic::Version.new(VERSION).freeze
   INSTALLATION_TYPE = File.read(root.join("INSTALLATION_TYPE")).strip.freeze
 
   def self.com?

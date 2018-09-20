@@ -1,0 +1,5 @@
+---
+title: Add GitLab version components to CI environment variables
+merge_request: 46050
+author:
+type: added
