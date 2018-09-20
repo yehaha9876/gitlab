@@ -4,7 +4,7 @@
 
 - [![Ruby coverage](https://gitlab.com/gitlab-org/gitlab-ee/badges/master/coverage.svg?job=coverage)](https://gitlab-org.gitlab.io/gitlab-ee/coverage-ruby) Ruby
 - [![JavaScript coverage](https://gitlab.com/gitlab-org/gitlab-ee/badges/master/coverage.svg?job=karma)](https://gitlab-org.gitlab.io/gitlab-ee/coverage-javascript) JavaScript
-
+a
 ## Canonical source
 
 The canonical source of GitLab Community Edition is [hosted on GitLab.com](https://gitlab.com/gitlab-org/gitlab-ce/).
