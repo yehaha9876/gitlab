@@ -130,12 +130,11 @@ describe 'Edit group settings' do
           end
         end
 
-        it 'shows only the parent group and the subgroups' do
+        it 'shows only the subgroups' do
           page.within('.select2-drop .select2-results') do
             results = find_all('.select2-result')
 
-            expect(results.count).to eq 2
-            expect(results.first.text).to eq "#{group.full_name} #{group.full_path}"
+            expect(results.count).to eq 1
             expect(results.last.text).to eq "#{subgroup.full_name} #{subgroup.full_path}"
           end
         end

@@ -7,7 +7,6 @@ describe Group do
 
   describe 'associations' do
     it { is_expected.to have_many(:audit_events).dependent(false) }
-    it { is_expected.to have_many(:project_templates).dependent(false) }
   end
 
   describe 'validations' do

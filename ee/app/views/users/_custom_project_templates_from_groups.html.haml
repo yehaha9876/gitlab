@@ -3,7 +3,7 @@
     - groups_with_project_templates.each do |group|
       %p= group.name
 
-      - group.project_templates.each do |project|
+      - group.projects.each do |project|
         .template-option.d-flex.align-items-center
           .avatar-container.s40
             = project_icon(project, alt: project.name, class: 'btn-template-icon avatar s40 avatar-tile', lazy: false)
