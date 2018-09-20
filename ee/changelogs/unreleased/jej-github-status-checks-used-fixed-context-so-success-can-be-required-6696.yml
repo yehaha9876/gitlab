@@ -1,0 +1,5 @@
+---
+title: Add compatibility for GitHub Required Status Checks by using fixed context
+merge_request: 7442
+author:
+type: changed
