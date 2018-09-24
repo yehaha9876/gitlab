@@ -438,6 +438,9 @@ msgstr ""
 msgid "Add users to group"
 msgstr ""
 
+msgid "Adding new applications is disabled in your GitLab instance. Please contact your GitLab administrator to get the permission"
+msgstr ""
+
 msgid "Additional text"
 msgstr ""
 
@@ -4651,9 +4654,6 @@ msgstr ""
 msgid "MergeRequests|Toggle comments for this file"
 msgstr ""
 
-msgid "MergeRequests|Updating discussions failed"
-msgstr ""
-
 msgid "MergeRequests|View file @ %{commitId}"
 msgstr ""
 
@@ -6992,6 +6992,9 @@ msgid "SortOptions|More weight"
 msgstr ""
 
 msgid "SortOptions|Most popular"
+msgstr ""
+
+msgid "SortOptions|Most stars"
 msgstr ""
 
 msgid "SortOptions|Name"

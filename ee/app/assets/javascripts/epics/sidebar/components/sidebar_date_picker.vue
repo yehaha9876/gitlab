@@ -121,7 +121,11 @@ export default {
       return this.getPopoverConfig({
         title: s__('Epics|These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely.'),
         content: `
-          <a href="https://docs.gitlab.com/ee/user/group/epics/#Dates">${s__('Epics|More information')}</a>
+          <a
+            href="${gon.gitlab_url}/help/user/group/epics/index.md#planned-start-date-and-planned-finish-date"
+            target="_blank"
+            rel="noopener noreferrer"
+          >${s__('Epics|More information')}</a>
         `,
       });
     },
@@ -129,7 +133,11 @@ export default {
       return this.getPopoverConfig({
         title: this.dateInvalidTooltip,
         content: `
-          <a href="https://docs.gitlab.com/ee/user/group/epics/#Dates">${s__('Epics|How can I solve this?')}</a>
+          <a
+            href="${gon.gitlab_url}/help/user/group/epics/index.md#planned-start-date-and-planned-finish-date"
+            target="_blank"
+            rel="noopener noreferrer"
+          >${s__('Epics|How can I solve this?')}</a>
         `,
       });
     },
@@ -240,8 +248,8 @@ export default {
           <template v-if="dateFixed">
             <span>{{ dateFixedWords }}</span>
             <icon
-              v-popover="dateInvalidPopoverOptions"
               v-if="isDateInvalid && selectedDateIsFixed"
+              v-popover="dateInvalidPopoverOptions"
               name="warning"
               css-classes="date-warning-icon append-right-5 prepend-left-5"
               tab-index="0"
@@ -286,8 +294,8 @@ export default {
         <span class="prepend-left-5">{{ __('From milestones:') }}</span>
         <span class="value-content">{{ dateFromMilestonesWords }}</span>
         <icon
-          v-popover="dateInvalidPopoverOptions"
           v-if="isDateInvalid && !selectedDateIsFixed"
+          v-popover="dateInvalidPopoverOptions"
           name="warning"
           css-classes="date-warning-icon prepend-left-5"
           tab-index="0"
