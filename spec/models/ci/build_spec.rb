@@ -188,7 +188,6 @@ describe Ci::Build do
     end
   end
 
-
   describe '#actionize' do
     context 'when build is a created' do
       before do

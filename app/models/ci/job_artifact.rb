@@ -2,6 +2,8 @@
 
 module Ci
   class JobArtifact < ActiveRecord::Base
+    prepend EE::Ci::JobArtifact
+
     include AfterCommitQueue
     include ObjectStorage::BackgroundMove
     extend Gitlab::Ci::Model
@@ -28,10 +30,6 @@ module Ci
       container_scanning: :gzip,
       dast: :gzip
     }.freeze
-
-    private_constant :DEFAULT_FILE_NAMES, :TYPE_AND_FORMAT_PAIRS
-
-    prepend EE::Ci::JobArtifact
 
     belongs_to :project
     belongs_to :job, class_name: "Ci::Build", foreign_key: :job_id
@@ -105,12 +103,8 @@ module Ci
       DEFAULT_FILE_NAMES
     end
 
-    def self.type_and_format_pairs
-      TYPE_AND_FORMAT_PAIRS
-    end
-
     def valid_file_format?
-      unless self.class.type_and_format_pairs[self.file_type&.to_sym] == self.file_format&.to_sym
+      unless TYPE_AND_FORMAT_PAIRS[self.file_type&.to_sym] == self.file_format&.to_sym
         errors.add(:file_format, 'Invalid file format with specified file type')
       end
     end

@@ -10,8 +10,6 @@ module Gitlab
           junit: ::Gitlab::Ci::Parsers::Test::Junit
         }.freeze
 
-        private_constant :PARSERS
-
         def self.fabricate!(file_type)
           parsers.fetch(file_type.to_sym).new
         rescue KeyError
