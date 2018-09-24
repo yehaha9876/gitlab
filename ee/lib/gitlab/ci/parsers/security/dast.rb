@@ -5,11 +5,11 @@ module Gitlab
     module Parsers
       module Security
         class Dast < Base
-          FILE_TYPE = 'dast'
+          REPORT_TYPE = 'dast'
           DastParserError = Class.new(StandardError)
 
-          def self.file_type
-            FILE_TYPE
+          def self.report_type
+            REPORT_TYPE
           end
 
           def parse!(json_data, report)

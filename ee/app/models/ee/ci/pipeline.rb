@@ -147,12 +147,12 @@ module EE
       end
 
       def has_security_reports?
-        has_reports?(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES)
+        complete? && builds.latest.with_security_reports.any?
       end
 
       def security_reports
         ::Gitlab::Ci::Reports::Security::Reports.new.tap do |security_reports|
-          builds.latest.with_reports(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES).each do |build|
+          builds.latest.with_security_reports.each do |build|
             build.collect_security_reports!(security_reports)
           end
         end

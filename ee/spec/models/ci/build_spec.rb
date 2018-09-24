@@ -214,6 +214,42 @@ describe Ci::Build do
     end
   end
 
+  describe '.with_security_reports' do
+    subject { described_class.with_security_reports }
+
+    context 'when build has a security report' do
+      let!(:build) { create(:ci_build, :success, :security_reports) }
+
+      it 'selects the build' do
+        is_expected.to eq([build])
+      end
+    end
+
+    context 'when build does not have security reports' do
+      let!(:build) { create(:ci_build, :success, :trace_artifact) }
+
+      it 'does not select the build' do
+        is_expected.to be_empty
+      end
+    end
+
+    context 'when there are multiple builds with security reports' do
+      let!(:builds) { create_list(:ci_build, 5, :success, :security_reports) }
+
+      it 'does not execute a query for selecting job artifact one by one' do
+        recorded = ActiveRecord::QueryRecorder.new do
+          subject.each do |build|
+            ::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES.each do |file_type|
+              build.public_send("job_artifacts_#{file_type}").file.exists?
+            end
+          end
+        end
+
+        expect(recorded.count).to eq(2)
+      end
+    end
+  end
+
   describe '#collect_security_reports!' do
     subject { job.collect_security_reports!(security_reports) }
 

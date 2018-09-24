@@ -629,22 +629,18 @@ module Ci
     end
 
     def has_test_reports?
-      has_reports?(::Ci::JobArtifact::TEST_REPORT_FILE_TYPES)
+      complete? && builds.latest.with_test_reports.any?
     end
 
     def test_reports
       Gitlab::Ci::Reports::TestReports.new.tap do |test_reports|
-        builds.latest.with_reports(::Ci::JobArtifact::TEST_REPORT_FILE_TYPES).each do |build|
+        builds.latest.with_test_reports.each do |build|
           build.collect_test_reports!(test_reports)
         end
       end
     end
 
     private
-
-    def has_reports?(report_types)
-      complete? && builds.latest.with_reports(report_types).any?
-    end
 
     def ci_yaml_from_repo
       return unless project

@@ -5,11 +5,11 @@ module Gitlab
     module Parsers
       module Security
         class ContainerScanning < Base
-          FILE_TYPE = 'container_scanning'
+          REPORT_TYPE = 'container_scanning'
           ContainerScanningParserError = Class.new(StandardError)
 
-          def self.file_type
-            FILE_TYPE
+          def self.report_type
+            REPORT_TYPE
           end
 
           def parse!(json_data, report)

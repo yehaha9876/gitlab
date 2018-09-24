@@ -5,11 +5,11 @@ module Gitlab
     module Parsers
       module Security
         class DependencyScanning < Base
-          FILE_TYPE = 'dependency_scanning'
+          REPORT_TYPE = 'dependency_scanning'
           DependencyScanningParserError = Class.new(StandardError)
 
-          def self.file_type
-            FILE_TYPE
+          def self.report_type
+            REPORT_TYPE
           end
 
           def parse!(json_data, report)

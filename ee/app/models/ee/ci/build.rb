@@ -21,6 +21,11 @@ module EE
 
       prepended do
         after_save :stick_build_if_status_changed
+
+        scope :with_security_reports, ->() do
+          with_existing_job_artifacts(::Ci::JobArtifact.security_reports)
+            .eager_load_job_artifacts
+        end
       end
 
       def shared_runners_minutes_limit_enabled?
@@ -83,9 +88,9 @@ module EE
 
       def collect_security_reports!(security_reports)
         each_report(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES) do |file_type, blob|
-          # Group reports per file_type, which maps the type or report (SAST, DS, CS or DAST)
+          # Group reports per file_type, which maps the type of report (SAST, DS, CS or DAST)
           security_reports.get_report(file_type).tap do |security_report|
-            ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, security_report)
+            ::Gitlab::Ci::Parsers::Security::fabricate!(file_type).parse!(blob, security_report)
           end
         end
       end

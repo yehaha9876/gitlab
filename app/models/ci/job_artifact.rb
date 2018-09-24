@@ -9,8 +9,25 @@ module Ci
     NotSupportedAdapterError = Class.new(StandardError)
 
     TEST_REPORT_FILE_TYPES = %w[junit].freeze
-    DEFAULT_FILE_NAMES = { junit: 'junit.xml' }.freeze
-    TYPE_AND_FORMAT_PAIRS = { archive: :zip, metadata: :gzip, trace: :raw, junit: :gzip }.freeze
+    SECURITY_REPORT_FILE_TYPES = %w[sast dependency_scanning container_scanning dast].freeze ## EE-specific
+    DEFAULT_FILE_NAMES = {
+      junit: 'junit.xml',
+      sast: 'gl-sast-report.json',
+      dependency_scanning: 'gl-dependency-scanning-report.json',
+      container_scanning: 'gl-container-scanning-report.json',
+      dast: 'gl-dast-report.json'
+    }.freeze
+
+    TYPE_AND_FORMAT_PAIRS = {
+      archive: :zip,
+      metadata: :gzip,
+      trace: :raw,
+      junit: :gzip,
+      sast: :gzip,
+      dependency_scanning: :gzip,
+      container_scanning: :gzip,
+      dast: :gzip
+    }.freeze
 
     private_constant :DEFAULT_FILE_NAMES, :TYPE_AND_FORMAT_PAIRS
 
@@ -40,6 +57,11 @@ module Ci
 
     scope :test_reports, -> do
       with_file_types(TEST_REPORT_FILE_TYPES)
+    end
+
+    ## EE-specific
+    scope :security_reports, -> do
+      with_file_types(SECURITY_REPORT_FILE_TYPES)
     end
 
     delegate :filename, :exists?, :open, to: :file

@@ -84,13 +84,13 @@ module Ci
       where('NOT EXISTS (?)', Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id').trace)
     end
 
-    scope :with_reports, ->(report_types) do
-      with_existing_job_artifacts(Ci::JobArtifact.with_file_types(report_types))
-        .eager_load_report_artifacts(report_types)
+    scope :with_test_reports, ->() do
+      with_existing_job_artifacts(Ci::JobArtifact.test_reports)
+        .eager_load_job_artifacts
     end
 
-    scope :eager_load_report_artifacts, ->(report_types) do
-      includes(report_types.map { |type| :"job_artifacts_#{type}" })
+    scope :eager_load_job_artifacts, ->() do
+      includes(:job_artifacts)
     end
 
     scope :with_artifacts_stored_locally, -> { with_artifacts_archive.where(artifacts_file_store: [nil, LegacyArtifactUploader::Store::LOCAL]) }
@@ -661,7 +661,7 @@ module Ci
     def collect_test_reports!(test_reports)
       test_reports.get_suite(group_name).tap do |test_suite|
         each_report(Ci::JobArtifact::TEST_REPORT_FILE_TYPES) do |file_type, blob|
-          Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, test_suite)
+          Gitlab::Ci::Parsers::Test.fabricate!(file_type).parse!(blob, test_suite)
         end
       end
     end
@@ -692,10 +692,8 @@ module Ci
     end
 
     def each_report(report_types)
-      # Rails 5 supports .where clause with enum keys, but for rails 4 we need the values
-      file_type_values = ::Ci::JobArtifact.file_types.select { |k| k.in? report_types }.values
-
-      job_artifacts.where(file_type: file_type_values).find_each do |report_artifact|
+      # Use select to leverage cached associations and avoid N+1 queries
+      job_artifacts.select { |artifact| artifact.file_type.in? report_types }.each do |report_artifact|
         report_artifact.each_blob do |blob|
           yield report_artifact.file_type, blob
         end

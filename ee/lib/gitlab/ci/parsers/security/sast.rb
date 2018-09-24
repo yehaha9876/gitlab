@@ -5,19 +5,19 @@ module Gitlab
     module Parsers
       module Security
         class Sast < Base
-          FILE_TYPE = 'sast'
+          REPORT_TYPE = 'sast'
           SastParserError = Class.new(StandardError)
 
-          def self.file_type
-            FILE_TYPE
+          def self.report_type
+            REPORT_TYPE
           end
 
           def parse!(json_data, report)
             super
           rescue JSON::ParserError => e
-            raise SastParserError, "JSON parsing failed: #{e.message}"
+            raise SastParserError, "JSON parsing failed"
           rescue => e
-            raise SastParserError, "SAST report parsing failed: #{e.message}"
+            raise SastParserError, "SAST report parsing failed"
           end
         end
       end
