@@ -1,7 +1,8 @@
+- @content_class = "limit-container-width" unless fluid_layout
 - @no_container = true
 - page_title _("Locked Files")
 
-%div{ class: (container_class) }
+%div{ class: ([container_class, ("limit-container-width" unless fluid_layout)]) }
   .top-area
     .nav-text
       = _("Locks give the ability to lock specific file or folder.")
