@@ -2,22 +2,22 @@
 
 module Projects
   class IdeTerminalsController < Projects::ApplicationController
-    include Gitlab::Utils::StrongMemoize
-
     # FIXME: Uncomment
     # before_action :authorize_ide_terminal!
+    before_action :build, only: [:cancel, :retry]
     before_action :render_404, unless: :build, only: [:cancel, :retry]
-    before_action :check_valid_config!, only: [:valid_config, :create, :retry]
+    before_action :check_valid_branch!, only: [:valid_config, :create]
 
     def valid_config
+      return respond_422 unless valid_config_job?
+
       head :ok
     end
 
     def create
       @pipeline = ::Ci::CreatePipelineService.new(@project,
                                                   @current_user,
-                                                  ref: params[:branch],
-                                                  sha: last_commit_for_branch_id)
+                                                  ref: params[:branch])
                                              .execute(:webide)
 
       @build = @pipeline.builds.last
@@ -49,8 +49,8 @@ module Projects
       return access_denied! unless settings.web_terminal_enabled?
     end
 
-    def check_valid_config!
-      return respond_422 unless valid_config_job?
+    def check_valid_branch!
+      return respond_422 unless project.repository.branch_exists?(params[:branch])
     end
 
     def build
@@ -67,14 +67,6 @@ module Projects
         .represent(terminal_build, {}, BuildDetailsEntity)
     end
 
-    def last_commit_for_branch_id
-      strong_memoize(:last_commit_for_branch_id) do
-        if project.repository.branch_exists?(params[:branch])
-          project.commit(params[:branch])&.id
-        end
-      end
-    end
-
     def valid_config_job?
       return false unless config_data_for_branch
 
@@ -86,9 +78,11 @@ module Projects
     end
 
     def config_data_for_branch
-      return unless last_commit_for_branch_id
+      commit_id = project.commit(params[:branch])&.id
 
-      project.repository.gitlab_ci_yml_for(last_commit_for_branch_id)
+      return unless commit_id
+
+      project.repository.gitlab_ci_yml_for(commit_id)
     end
   end
 end
