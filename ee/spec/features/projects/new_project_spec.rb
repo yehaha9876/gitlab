@@ -204,7 +204,7 @@ describe 'New project' do
     end
   end
 
-  context 'Group-level project templates', :js do
+  context 'Group-level project templates', :js, :postgresql do
     let(:url) { new_project_path }
 
     context 'when licensed' do

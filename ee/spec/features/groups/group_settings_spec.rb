@@ -114,7 +114,7 @@ describe 'Edit group settings' do
     end
   end
 
-  context 'when custom_project_templates feature' do
+  context 'when custom_project_templates feature', :postgresql do
     let!(:subgroup) { create(:group, :public, parent: group) }
 
     shared_examples 'shows custom project templates settings' do
