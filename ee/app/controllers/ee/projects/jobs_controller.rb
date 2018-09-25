@@ -7,9 +7,9 @@ module EE
 
       private
 
-      override :relevant_builds
-      def relevant_builds
-        project.builds.without_webide.relevant
+      override :project_builds
+      def project_builds
+        project.builds.without_webide
       end
     end
   end

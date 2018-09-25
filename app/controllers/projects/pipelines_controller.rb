@@ -165,6 +165,7 @@ class Projects::PipelinesController < Projects::ApplicationController
   def pipeline
     @pipeline ||= project
                     .pipelines
+                    .visible
                     .includes(user: :status)
                     .find_by!(id: params[:id])
                     .present(current_user: current_user)

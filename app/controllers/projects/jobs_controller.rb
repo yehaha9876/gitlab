@@ -16,7 +16,7 @@ class Projects::JobsController < Projects::ApplicationController
   # rubocop: disable CodeReuse/ActiveRecord
   def index
     @scope = params[:scope]
-    @all_builds = relevant_builds
+    @all_builds = project_builds.relevant
     @builds = @all_builds.order('ci_builds.id DESC')
     @builds =
       case @scope
@@ -41,7 +41,7 @@ class Projects::JobsController < Projects::ApplicationController
   def cancel_all
     return access_denied! unless can?(current_user, :update_build, project)
 
-    @project.builds.running_or_pending.each do |build|
+    project_builds.running_or_pending.each do |build|
       build.cancel if can?(current_user, :update_build, build)
     end
 
@@ -181,7 +181,7 @@ class Projects::JobsController < Projects::ApplicationController
   end
 
   def build
-    @build ||= project.builds.find(params[:id])
+    @build ||= project_builds.find(params[:id])
       .present(current_user: current_user)
   end
 
@@ -189,7 +189,7 @@ class Projects::JobsController < Projects::ApplicationController
     project_job_path(build.project, build)
   end
 
-  def relevant_builds
-    project.builds.relevant
+  def project_builds
+    project.builds
   end
 end

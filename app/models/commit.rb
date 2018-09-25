@@ -309,7 +309,7 @@ class Commit
   end
 
   def pipelines
-    project.pipelines.where(sha: sha)
+    project.pipelines.visible.where(sha: sha)
   end
 
   def last_pipeline

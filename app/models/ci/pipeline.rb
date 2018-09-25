@@ -181,6 +181,7 @@ module Ci
     end
 
     scope :internal, -> { where(source: internal_sources) }
+    scope :visible, -> { where.not(source: hidden_sources) }
 
     # Returns the pipelines in descending order (= newest first), optionally
     # limited to a number of references.
@@ -254,6 +255,10 @@ module Ci
 
     def self.internal_sources
       sources.reject { |source| source == "external" }.values
+    end
+
+    def self.hidden_sources
+      []
     end
 
     def stages_count

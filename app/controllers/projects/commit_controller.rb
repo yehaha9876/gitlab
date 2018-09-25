@@ -40,7 +40,7 @@ class Projects::CommitController < Projects::ApplicationController
 
   # rubocop: disable CodeReuse/ActiveRecord
   def pipelines
-    @pipelines = @commit.pipelines.order(id: :desc)
+    @pipelines = @commit.pipelines.visible.order(id: :desc)
     @pipelines = @pipelines.where(ref: params[:ref]) if params[:ref]
 
     respond_to do |format|

@@ -4,14 +4,18 @@ module Projects
   class IdeTerminalsController < Projects::ApplicationController
     # FIXME: Uncomment
     # before_action :authorize_ide_terminal!
-    before_action :build, only: [:cancel, :retry]
-    before_action :render_404, unless: :build, only: [:cancel, :retry]
+    before_action :build, only: [:cancel, :retry, :show]
+    before_action :render_404, unless: :build, only: [:cancel, :retry, :show]
     before_action :check_valid_branch!, only: [:valid_config, :create]
 
     def valid_config
       return respond_422 unless valid_config_job?
 
       head :ok
+    end
+
+    def show
+      render_build(@build)
     end
 
     def create
@@ -54,7 +58,7 @@ module Projects
     end
 
     def build
-      @build ||= project.builds.created_by(current_user).find(params[:ide_terminal_id])
+      @build ||= project.builds.created_by(current_user).find(params[:id])
     end
 
     def settings

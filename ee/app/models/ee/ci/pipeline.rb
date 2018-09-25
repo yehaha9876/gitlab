@@ -22,6 +22,15 @@ module EE
         }
       end
 
+      class_methods do
+        extend ::Gitlab::Utils::Override
+
+        override :hidden_sources
+        def hidden_sources
+          sources.values_at(:webide)
+        end
+      end
+
       # codeclimate_artifact is deprecated and replaced with code_quality_artifact (#5779)
       def codeclimate_artifact
         @codeclimate_artifact ||= artifacts_with_files.find(&:has_codeclimate_json?)

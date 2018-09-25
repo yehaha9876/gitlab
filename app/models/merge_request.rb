@@ -1035,6 +1035,7 @@ class MergeRequest < ActiveRecord::Base
     return Ci::Pipeline.none unless source_project
 
     @all_pipelines ||= source_project.pipelines
+      .visible
       .where(sha: all_commit_shas, ref: source_branch)
       .order(id: :desc)
   end

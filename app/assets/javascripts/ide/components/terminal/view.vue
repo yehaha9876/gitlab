@@ -102,7 +102,7 @@ export default {
     },
     fetchRunningTerminal() {
       axios
-        .get(`${this.terminalBuildPath}`)
+        .get(`/${this.currentProject.path_with_namespace}/-/jobs/ide_terminals/${this.terminalBuildId}`)
         .then(response => (this.runningTerminalBuild(response.data)))
         .catch(error => (console.log(error.response)));
     },

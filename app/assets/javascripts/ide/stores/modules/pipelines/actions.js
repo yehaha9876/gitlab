@@ -47,7 +47,7 @@ export const receiveLatestPipelineSuccess = ({ rootGetters, commit }, { pipeline
 
   if (pipelines && pipelines.length) {
     const lastCommitHash = rootGetters.lastCommit && rootGetters.lastCommit.id;
-    lastCommitPipeline = pipelines.find(pipeline => pipeline.commit.id === lastCommitHash && pipeline.source !== 'webide');
+    lastCommitPipeline = pipelines.find(pipeline => pipeline.commit.id === lastCommitHash);
   }
 
   commit(types.RECEIVE_LASTEST_PIPELINE_SUCCESS, lastCommitPipeline);
