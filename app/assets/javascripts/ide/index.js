@@ -8,8 +8,20 @@ import { convertPermissionToBoolean } from '../lib/utils/common_utils';
 
 Vue.use(Translate);
 
-export function initIde(el) {
+/**
+ * Initialize the IDE on the given element.
+ *
+ * @param {Element} el - The element that will contain the IDE.
+ * @param {Object} options - Extra options for the IDE (Used by EE).
+ * @param {(e:Element) => Object} options.extraInitialData -
+ *   Function that returns extra properties to seed initial data.
+ */
+export function initIde(el, options = {}) {
   if (!el) return null;
+
+  const {
+    extraInitialData = () => ({}),
+  } = options;
 
   return new Vue({
     el,
@@ -34,6 +46,7 @@ export function initIde(el) {
         clientsidePreviewEnabled: convertPermissionToBoolean(el.dataset.clientsidePreviewEnabled),
         webIdeTerminalEnabled: convertPermissionToBoolean(el.dataset.webIdeTerminalEnabled),
         webIdeJobTag: el.dataset.webIdeJobTag,
+        ...extraInitialData(el),
       });
     },
     methods: {
@@ -53,4 +66,19 @@ export function resetServiceWorkersPublicPath() {
   const relativeRootPath = (gon && gon.relative_url_root) || '';
   const webpackAssetPath = `${relativeRootPath}/assets/webpack/`;
   __webpack_public_path__ = webpackAssetPath; // eslint-disable-line camelcase
+}
+
+/**
+ * Start the IDE.
+ *
+ * @param {Objects} options - Extra options for the IDE (Used by EE).
+ */
+export function startIde(options) {
+  document.addEventListener('DOMContentLoaded', () => {
+    const ideElement = document.getElementById('ide');
+    if (ideElement) {
+      resetServiceWorkersPublicPath();
+      initIde(ideElement, options);
+    }
+  });
 }
