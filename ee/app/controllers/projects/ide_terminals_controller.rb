@@ -23,10 +23,6 @@ module Projects
       @build = @pipeline.builds.last
 
       if @build
-        # FIXME: Ask how to if this can be done automatically
-        @build.tag_list.add(Ci::Build::WEB_IDE_JOB_TAG)
-        @build.save
-        ########
         render_build(@build)
       else
         render status: :bad_request, json: @pipeline.errors.full_messages
