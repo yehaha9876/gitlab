@@ -15,9 +15,6 @@
   "clientside-preview-enabled": Gitlab::CurrentSettings.current_application_settings.web_ide_clientside_preview_enabled.to_s,
   "web-ide-terminal-enabled": 'true',
   "web-ide-job-tag": 'web-ide' } }
-  -# "clientside-preview-enabled": @settings.live_preview_enabled?.to_s,
-  -# "web-ide-terminal-enabled": @settings.web_terminal_enabled?.to_s,
-  -# "web-ide-job-tag": @settings.web_ide_job_tag } }
   .text-center
     = icon('spinner spin 2x')
     %h2.clgray= _('Loading the GitLab IDE...')

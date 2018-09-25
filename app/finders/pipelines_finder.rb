@@ -149,7 +149,6 @@ class PipelinesFinder
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def by_all_visibility(items)
     if params[:all_visibility].present?
       items
@@ -157,5 +156,4 @@ class PipelinesFinder
       items.visible
     end
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 end
