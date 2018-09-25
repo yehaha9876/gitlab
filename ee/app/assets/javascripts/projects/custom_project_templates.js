@@ -11,7 +11,7 @@ const bindEvents = () => {
   const $changeTemplateBtn = $('.change-template');
   const $projectTemplateButtons = $('.project-templates-buttons');
   const $projectFieldsFormInput = $('.project-fields-form input#project_use_custom_template');
-  const $subgroupWithTemplatesIdInput = $('.project-fields-form input#project_subgroup_with_project_templates_id');
+  const $subgroupWithTemplatesIdInput = $('.project-fields-form input#project_group_with_project_templates_id');
   const $namespace_select = $projectFieldsForm.find('select#project_namespace_id');
 
   if ($newProjectForm.length !== 1 || $useCustomTemplateBtn.length === 0) {
