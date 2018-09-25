@@ -12,9 +12,12 @@
   "promotion-svg-path": image_path('illustrations/web-ide_promotion.svg'),
   "ci-help-page-path" => help_page_path('ci/quick_start/README'),
   "web-ide-help-page-path" => help_page_path('user/project/web_ide/index.html'),
-  "clientside-preview-enabled": @settings.live_preview_enabled?.to_s,
-  "web-ide-terminal-enabled": @settings.web_terminal_enabled?.to_s,
-  "web-ide-job-tag": @settings.web_ide_job_tag } }
+  "clientside-preview-enabled": Gitlab::CurrentSettings.current_application_settings.web_ide_clientside_preview_enabled.to_s,
+  "web-ide-terminal-enabled": 'true',
+  "web-ide-job-tag": 'web-ide' } }
+  -# "clientside-preview-enabled": @settings.live_preview_enabled?.to_s,
+  -# "web-ide-terminal-enabled": @settings.web_terminal_enabled?.to_s,
+  -# "web-ide-job-tag": @settings.web_ide_job_tag } }
   .text-center
     = icon('spinner spin 2x')
     %h2.clgray= _('Loading the GitLab IDE...')

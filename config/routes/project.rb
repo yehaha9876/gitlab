@@ -537,6 +537,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resource :repository, only: [:show], controller: :repository do
           post :create_deploy_token, path: 'deploy_token/create'
         end
+
+        resource :web_ide, only: [:show], constraints: { format: 'json' }, controller: 'web_ide'
       end
 
       # Since both wiki and repository routing contains wildcard characters
