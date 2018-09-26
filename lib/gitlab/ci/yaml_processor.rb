@@ -3,6 +3,7 @@ module Gitlab
     class YamlProcessor
       ValidationError = Class.new(StandardError)
 
+      prepend ::EE::Gitlab::Ci::YamlProcessor
       include Gitlab::Ci::Config::Entry::LegacyValidationHelpers
 
       attr_reader :cache, :stages, :jobs
