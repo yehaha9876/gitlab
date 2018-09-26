@@ -931,18 +931,19 @@ describe Ci::Pipeline, :mailer do
   shared_context 'with some outdated pipelines' do
     before do
       create_pipeline(:canceled, 'ref', 'A', project)
-      create_pipeline(:success, 'ref', 'A', project)
-      create_pipeline(:failed, 'ref', 'B', project)
+      create_pipeline(:success, 'ref', 'A', project, :external)
+      create_pipeline(:failed, 'ref', 'B', project, :external)
       create_pipeline(:skipped, 'feature', 'C', project)
     end
 
-    def create_pipeline(status, ref, sha, project)
+    def create_pipeline(status, ref, sha, project, source = :push)
       create(
         :ci_empty_pipeline,
         status: status,
         ref: ref,
         sha: sha,
-        project: project
+        project: project,
+        source: source
       )
     end
   end
@@ -953,6 +954,13 @@ describe Ci::Pipeline, :mailer do
     it 'returns the pipelines from new to old' do
       expect(described_class.newest_first.pluck(:status))
         .to eq(%w[skipped failed success canceled])
+    end
+
+    it 'does not return visible pipelines' do
+      allow(Ci::Pipeline).to receive(:hidden_source_keys).and_return([:external])
+
+      expect(described_class.newest_first.pluck(:status))
+        .to eq(%w[skipped canceled])
     end
   end
 

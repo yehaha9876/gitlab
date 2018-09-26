@@ -439,6 +439,8 @@ eos
                  sha: commit.sha,
                  status: status)
         end
+
+        expect(commit).to receive(:visible_pipelines).and_call_original
       end
 
       it 'gives compound status from latest pipelines' do

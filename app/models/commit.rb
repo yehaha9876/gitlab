@@ -309,7 +309,7 @@ class Commit
   end
 
   def pipelines
-    project.pipelines.visible.where(sha: sha)
+    visible_pipelines.where(sha: sha)
   end
 
   def last_pipeline
@@ -319,7 +319,7 @@ class Commit
   def status(ref = nil)
     return @statuses[ref] if @statuses.key?(ref)
 
-    @statuses[ref] = project.pipelines.latest_status_per_commit(id, ref)[id]
+    @statuses[ref] = visible_pipelines.latest_status_per_commit(id, ref)[id]
   end
 
   def set_status_for_ref(ref, status)
@@ -504,5 +504,9 @@ class Commit
 
   def merged_merge_request_no_cache(user)
     MergeRequestsFinder.new(user, project_id: project.id).find_by(merge_commit_sha: id) if merge_commit?
+  end
+
+  def visible_pipelines
+    project.pipelines.visible
   end
 end
