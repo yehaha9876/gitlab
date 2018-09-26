@@ -15,12 +15,12 @@ module Projects
     end
 
     def show
-      render_build(@build)
+      render_build(build)
     end
 
     def create
-      @pipeline = ::Ci::CreatePipelineService.new(@project,
-                                                  @current_user,
+      @pipeline = ::Ci::CreatePipelineService.new(project,
+                                                  current_user,
                                                   ref: params[:branch])
                                              .execute(:webide)
 
