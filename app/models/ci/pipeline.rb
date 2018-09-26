@@ -254,10 +254,14 @@ module Ci
     end
 
     def self.internal_sources
-      sources.reject { |source| source == "external" }.values
+      sources.except(:external).values
     end
 
     def self.hidden_sources
+      sources.values_at(*hidden_source_keys)
+    end
+
+    def self.hidden_source_keys
       []
     end
 
@@ -641,6 +645,10 @@ module Ci
           build.collect_test_reports!(test_reports)
         end
       end
+    end
+
+    def detached?
+      Ci::Pipeline.hidden_source_keys.include?(source.to_sym)
     end
 
     private

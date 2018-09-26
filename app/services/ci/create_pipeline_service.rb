@@ -97,6 +97,8 @@ module Ci
 
     # rubocop: disable CodeReuse/ActiveRecord
     def related_merge_requests
+      return MergeRequest.none unless pipeline.detached?
+
       pipeline.project.source_of_merge_requests.opened.where(source_branch: pipeline.ref)
     end
     # rubocop: enable CodeReuse/ActiveRecord

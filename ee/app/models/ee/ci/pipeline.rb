@@ -25,9 +25,9 @@ module EE
       class_methods do
         extend ::Gitlab::Utils::Override
 
-        override :hidden_sources
-        def hidden_sources
-          sources.values_at(:webide)
+        override :hidden_source_keys
+        def hidden_source_keys
+          [:webide]
         end
       end
 
