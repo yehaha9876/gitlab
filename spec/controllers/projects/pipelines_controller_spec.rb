@@ -18,7 +18,7 @@ describe Projects::PipelinesController do
   describe 'GET index.json' do
     it 'does not render hidden pipelines' do
       create(:ci_pipeline, project: project, source: :external)
-      allow(Ci::Pipeline).to receive(:hidden_sources).and_return(Ci::Pipeline.sources[:external])
+      allow(Ci::Pipeline).to receive(:hidden_source_keys).and_return([:external])
 
       get_pipelines_index_json
 

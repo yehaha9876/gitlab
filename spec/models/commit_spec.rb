@@ -613,4 +613,26 @@ eos
       expect(commit2.merge_requests).to contain_exactly(merge_request1)
     end
   end
+
+  describe '#pipelines' do
+    let!(:visible_pipeline) do
+      create(:ci_empty_pipeline,
+        project: project,
+        sha: commit.sha,
+        source: :push)
+    end
+    let!(:hidden_pipeline) do
+      create(:ci_empty_pipeline,
+        project: project,
+        sha: commit.sha,
+        source: :external)
+    end
+
+    it 'returns only visible pipelines' do
+      allow(Ci::Pipeline).to receive(:hidden_source_keys).and_return([:external])
+
+      expect(Ci::Pipeline.count).to eq 2
+      expect(commit.pipelines).to contain_exactly(visible_pipeline)
+    end
+  end
 end
