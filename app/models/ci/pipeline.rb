@@ -647,10 +647,6 @@ module Ci
       end
     end
 
-    def detached?
-      Ci::Pipeline.hidden_source_keys.include?(source.to_sym)
-    end
-
     private
 
     def ci_yaml_from_repo

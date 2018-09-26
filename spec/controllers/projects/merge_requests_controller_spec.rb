@@ -578,18 +578,6 @@ describe Projects::MergeRequestsController do
       expect(json_response['pipelines']).not_to be_empty
       expect(json_response['count']['all']).to eq 1
     end
-
-    it 'only returns visible pipelines' do
-      create(:ci_pipeline, project: merge_request.source_project,
-                           ref: merge_request.source_branch,
-                           sha: merge_request.diff_head_sha,
-                           source: :external)
-
-      allow(Ci::Pipeline).to receive(:hidden_sources).and_return(Ci::Pipeline.sources[:external])
-
-      expect(json_response['count']['all']).to eq 1
-      expect(json_response['pipelines'][0]['source']).not_to eq 'external'
-    end
   end
 
   describe 'GET test_reports' do

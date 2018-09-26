@@ -27,7 +27,7 @@ module EE
 
         override :hidden_source_keys
         def hidden_source_keys
-          [:webide]
+          super + [:webide]
         end
       end
 

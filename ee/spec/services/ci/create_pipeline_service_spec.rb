@@ -5,12 +5,16 @@ describe Ci::CreatePipelineService, '#execute' do
   set(:project) { create(:project, :repository, namespace: namespace) }
   set(:user) { create(:user) }
 
-  let(:service) do
-    params = { ref: 'master',
-               before: '00000000',
-               after: project.commit.id,
-               commits: [{ message: 'some commit' }] }
+  let(:params) do
+    {
+      ref: 'master',
+      before: '00000000',
+      after: project.commit.id,
+      commits: [{ message: 'some commit' }]
+    }
+  end
 
+  let(:service) do
     described_class.new(project, user, params)
   end
 
@@ -65,7 +69,27 @@ describe Ci::CreatePipelineService, '#execute' do
     end
   end
 
-  def create_pipeline!
-    service.execute(:push)
+  describe 'Web Ide Terminal pipelines' do
+    context'when the pipeline ref has an associated merge request' do
+      let(:merge_request) { create(:merge_request_with_diffs, target_project: project, source_project: project) }
+      let(:params) do
+        {
+          ref: merge_request.source_branch,
+          sha: merge_request.diff_head_sha
+        }
+      end
+
+      it 'does not link the pipeline with the merge request' do
+        expect(UpdateHeadPipelineForMergeRequestWorker).not_to receive(:perform_async)
+
+        pipeline = create_pipeline!(source: :webide)
+
+        expect(pipeline.webide?).to be true
+      end
+    end
+  end
+
+  def create_pipeline!(source: :push)
+    service.execute(source)
   end
 end
