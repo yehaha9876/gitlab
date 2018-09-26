@@ -11,6 +11,7 @@ module EE
         mirror_user_id = current_user.id if mirror
         mirror_trigger_builds = params.delete(:mirror_trigger_builds)
         ci_cd_only = ::Gitlab::Utils.to_boolean(params.delete(:ci_cd_only))
+        group_with_project_templates_id = params.delete(:group_with_project_templates_id)
 
         project = super do |project|
           # Repository size limit comes as MB from the view
@@ -23,6 +24,7 @@ module EE
           end
 
           validate_classification_label(project, :external_authorization_classification_label)
+          validate_namespace_used_with_template(project, group_with_project_templates_id)
         end
 
         if project&.persisted?
@@ -67,6 +69,19 @@ module EE
         return unless ::License.feature_available?(:ci_cd_projects)
 
         ::CiCd::SetupProject.new(project, current_user).execute
+      end
+
+      # When using a project template from a Group, the new project can only be created
+      # under the top level group or any subgroup
+      def validate_namespace_used_with_template(project, group_with_project_templates_id)
+        return unless project.namespace_id
+
+        parent_id = ::Group.find(group_with_project_templates_id).parent_id
+        project_namespace = project.namespace
+
+        unless parent_id == project_namespace.id || parent_id == project_namespace.parent_id
+          project.errors.add(:namespace, "is out of the hierarchy of the Group's owning the template")
+        end
       end
 
       def log_audit_event(project)
