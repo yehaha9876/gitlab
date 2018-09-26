@@ -1243,7 +1243,8 @@ describe MergeRequest do
         end
       end
 
-      it 'returns all pipelines' do
+      it 'returns all visible pipelines' do
+        expect(subject.source_project.pipelines).to receive(:visible).and_call_original
         expect(subject.all_pipelines).not_to be_empty
         expect(subject.all_pipelines).to eq(all_pipelines.reverse)
       end

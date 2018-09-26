@@ -16,100 +16,112 @@ describe Projects::PipelinesController do
   end
 
   describe 'GET index.json' do
-    before do
-      %w(pending running success failed canceled).each_with_index do |status, index|
-        create_pipeline(status, project.commit("HEAD~#{index}"))
-      end
-    end
+    it 'does not render hidden pipelines' do
+      create(:ci_pipeline, project: project, source: :external)
+      allow(Ci::Pipeline).to receive(:hidden_sources).and_return(Ci::Pipeline.sources[:external])
 
-    context 'when using persisted stages', :request_store do
-      before do
-        stub_feature_flags(ci_pipeline_persisted_stages: true)
-      end
-
-      it 'returns serialized pipelines', :request_store do
-        queries = ActiveRecord::QueryRecorder.new do
-          get_pipelines_index_json
-        end
-
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('pipeline')
-
-        expect(json_response).to include('pipelines')
-        expect(json_response['pipelines'].count).to eq 5
-        expect(json_response['count']['all']).to eq '5'
-        expect(json_response['count']['running']).to eq '1'
-        expect(json_response['count']['pending']).to eq '1'
-        expect(json_response['count']['finished']).to eq '3'
-
-        json_response.dig('pipelines', 0, 'details', 'stages').tap do |stages|
-          expect(stages.count).to eq 3
-        end
-
-        expect(queries.count).to be
-      end
-    end
-
-    context 'when using legacy stages', :request_store  do
-      before do
-        stub_feature_flags(ci_pipeline_persisted_stages: false)
-      end
-
-      it 'returns JSON with serialized pipelines' do
-        get_pipelines_index_json
-
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('pipeline')
-
-        expect(json_response).to include('pipelines')
-        expect(json_response['pipelines'].count).to eq 5
-        expect(json_response['count']['all']).to eq '5'
-        expect(json_response['count']['running']).to eq '1'
-        expect(json_response['count']['pending']).to eq '1'
-        expect(json_response['count']['finished']).to eq '3'
-
-        json_response.dig('pipelines', 0, 'details', 'stages').tap do |stages|
-          expect(stages.count).to eq 3
-        end
-      end
-
-      it 'does not execute N+1 queries' do
-        queries = ActiveRecord::QueryRecorder.new do
-          get_pipelines_index_json
-        end
-
-        expect(queries.count).to be <= 36
-      end
-    end
-
-    it 'does not include coverage data for the pipelines' do
       get_pipelines_index_json
 
-      expect(json_response['pipelines'][0]).not_to include('coverage')
+      expect(json_response['count']['all']).to eq "0"
+      expect(json_response['pipelines']).to be_empty
     end
 
-    context 'when performing gitaly calls', :request_store do
-      it 'limits the Gitaly requests' do
-        expect { get_pipelines_index_json }
-          .to change { Gitlab::GitalyClient.get_request_count }.by(2)
-      end
-    end
-
-    context 'when the project is private' do
-      let(:project) { create(:project, :private, :repository) }
-
-      it 'returns `not_found` when the user does not have access' do
-        sign_in(create(:user))
-
-        get_pipelines_index_json
-
-        expect(response).to have_gitlab_http_status(:not_found)
+    context do
+      before do
+        %w(pending running success failed canceled).each_with_index do |status, index|
+          create_pipeline(status, project.commit("HEAD~#{index}"))
+        end
       end
 
-      it 'returns the pipelines when the user has access' do
+      context 'when using persisted stages', :request_store do
+        before do
+          stub_feature_flags(ci_pipeline_persisted_stages: true)
+        end
+
+        it 'returns serialized pipelines', :request_store do
+          queries = ActiveRecord::QueryRecorder.new do
+            get_pipelines_index_json
+          end
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('pipeline')
+
+          expect(json_response).to include('pipelines')
+          expect(json_response['pipelines'].count).to eq 5
+          expect(json_response['count']['all']).to eq '5'
+          expect(json_response['count']['running']).to eq '1'
+          expect(json_response['count']['pending']).to eq '1'
+          expect(json_response['count']['finished']).to eq '3'
+
+          json_response.dig('pipelines', 0, 'details', 'stages').tap do |stages|
+            expect(stages.count).to eq 3
+          end
+
+          expect(queries.count).to be
+        end
+      end
+
+      context 'when using legacy stages', :request_store  do
+        before do
+          stub_feature_flags(ci_pipeline_persisted_stages: false)
+        end
+
+        it 'returns JSON with serialized pipelines' do
+          get_pipelines_index_json
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('pipeline')
+
+          expect(json_response).to include('pipelines')
+          expect(json_response['pipelines'].count).to eq 5
+          expect(json_response['count']['all']).to eq '5'
+          expect(json_response['count']['running']).to eq '1'
+          expect(json_response['count']['pending']).to eq '1'
+          expect(json_response['count']['finished']).to eq '3'
+
+          json_response.dig('pipelines', 0, 'details', 'stages').tap do |stages|
+            expect(stages.count).to eq 3
+          end
+        end
+
+        it 'does not execute N+1 queries' do
+          queries = ActiveRecord::QueryRecorder.new do
+            get_pipelines_index_json
+          end
+
+          expect(queries.count).to be <= 36
+        end
+      end
+
+      it 'does not include coverage data for the pipelines' do
         get_pipelines_index_json
 
-        expect(json_response['pipelines'].size).to eq(5)
+        expect(json_response['pipelines'][0]).not_to include('coverage')
+      end
+
+      context 'when performing gitaly calls', :request_store do
+        it 'limits the Gitaly requests' do
+          expect { get_pipelines_index_json }
+            .to change { Gitlab::GitalyClient.get_request_count }.by(2)
+        end
+      end
+
+      context 'when the project is private' do
+        let(:project) { create(:project, :private, :repository) }
+
+        it 'returns `not_found` when the user does not have access' do
+          sign_in(create(:user))
+
+          get_pipelines_index_json
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+
+        it 'returns the pipelines when the user has access' do
+          get_pipelines_index_json
+
+          expect(json_response['pipelines'].size).to eq(5)
+        end
       end
     end
 

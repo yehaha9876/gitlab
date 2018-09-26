@@ -181,7 +181,7 @@ class Projects::JobsController < Projects::ApplicationController
   end
 
   def build
-    @build ||= project_builds.find(params[:id])
+    @build ||= project.build.find(params[:id])
       .present(current_user: current_user)
   end
 
