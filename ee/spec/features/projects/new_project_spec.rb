@@ -275,6 +275,27 @@ describe 'New project' do
             end
           end
         end
+
+        context 'when user changes template' do
+          let(:url) { new_project_path }
+
+          before do
+            page.within('#create-from-template-pane') do
+              click_button 'Change template'
+
+              page.find(".template-option input[value='#{subgroup2_project.name}']").first(:xpath, './/..').click
+              wait_for_all_requests
+            end
+          end
+
+          it 'list the appropriate groups' do
+            page.within('#create-from-template-pane') do
+              elements = page.find_all("#project_namespace_id option:not(.hidden)", visible: false).map { |e| e['data-name'] }
+
+              expect(elements).to contain_exactly(group2.name, subgroup2.name)
+            end
+          end
+        end
       end
 
       context 'when custom project group template is set' do
