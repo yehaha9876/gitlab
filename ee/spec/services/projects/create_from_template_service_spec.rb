@@ -91,7 +91,7 @@ describe Projects::CreateFromTemplateService do
       end
     end
 
-    describe 'creating project from a Group project template' do
+    describe 'creating project from a Group project template', :postgresql do
       let(:project_name) { project_template.name }
       let(:group_with_project_templates_id) { subgroup.id }
 
