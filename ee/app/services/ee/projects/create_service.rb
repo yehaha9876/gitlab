@@ -11,7 +11,7 @@ module EE
         mirror_user_id = current_user.id if mirror
         mirror_trigger_builds = params.delete(:mirror_trigger_builds)
         ci_cd_only = ::Gitlab::Utils.to_boolean(params.delete(:ci_cd_only))
-        group_with_project_templates_id = params.delete(:group_with_project_templates_id)
+        subgroup_with_project_templates_id = params[:group_with_project_templates_id]
 
         project = super do |project|
           # Repository size limit comes as MB from the view
@@ -24,7 +24,7 @@ module EE
           end
 
           validate_classification_label(project, :external_authorization_classification_label)
-          validate_namespace_used_with_template(project, group_with_project_templates_id)
+          validate_namespace_used_with_template(project, subgroup_with_project_templates_id)
         end
 
         if project&.persisted?
@@ -73,14 +73,15 @@ module EE
 
       # When using a project template from a Group, the new project can only be created
       # under the top level group or any subgroup
-      def validate_namespace_used_with_template(project, group_with_project_templates_id)
+      def validate_namespace_used_with_template(project, subgroup_id)
         return unless project.namespace_id
+        return unless subgroup_id
 
-        parent_id = ::Group.find(group_with_project_templates_id).parent_id
+        parent_id = ::Group.find(subgroup_id).parent_id
         project_namespace = project.namespace
 
-        unless parent_id == project_namespace.id || parent_id == project_namespace.parent_id
-          project.errors.add(:namespace, "is out of the hierarchy of the Group's owning the template")
+        unless [project_namespace.id, project_namespace.parent_id].include?(parent_id)
+          project.errors.add(:namespace, "is out of the hierarchy of the Group owning the template")
         end
       end
 
