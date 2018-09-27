@@ -534,6 +534,10 @@ class Project < ActiveRecord::Base
     end
   end
 
+  def pipelines
+    super.visible
+  end
+
   # returns all ancestor-groups upto but excluding the given namespace
   # when no namespace is given, all ancestors upto the top are returned
   def ancestors_upto(top = nil)

@@ -189,7 +189,7 @@ module Ci
     # ref - The name (or names) of the branch(es)/tag(s) to limit the list of
     #       pipelines to.
     def self.newest_first(ref = nil)
-      relation = visible.order(id: :desc)
+      relation = order(id: :desc)
 
       ref ? relation.where(ref: ref) : relation
     end

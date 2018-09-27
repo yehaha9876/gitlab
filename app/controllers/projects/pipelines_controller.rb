@@ -142,9 +142,9 @@ class Projects::PipelinesController < Projects::ApplicationController
     @charts[:pipeline_times] = Gitlab::Ci::Charts::PipelineTime.new(project)
 
     @counts = {}
-    @counts[:total] = @project.pipelines.visible.count(:all)
-    @counts[:success] = @project.pipelines.visible.success.count(:all)
-    @counts[:failed] = @project.pipelines.visible.failed.count(:all)
+    @counts[:total] = @project.pipelines.count(:all)
+    @counts[:success] = @project.pipelines.success.count(:all)
+    @counts[:failed] = @project.pipelines.failed.count(:all)
   end
 
   private
@@ -165,7 +165,6 @@ class Projects::PipelinesController < Projects::ApplicationController
   def pipeline
     @pipeline ||= project
                     .pipelines
-                    .visible
                     .includes(user: :status)
                     .find_by!(id: params[:id])
                     .present(current_user: current_user)

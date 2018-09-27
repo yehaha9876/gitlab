@@ -26,7 +26,6 @@ class PipelinesFinder
     items = by_name(items)
     items = by_username(items)
     items = by_yaml_errors(items)
-    items = by_all_visibility(items)
     sort_items(items)
   end
   # rubocop: enable CodeReuse/ActiveRecord
@@ -148,12 +147,4 @@ class PipelinesFinder
     items.order(order_by => sort)
   end
   # rubocop: enable CodeReuse/ActiveRecord
-
-  def by_all_visibility(items)
-    if params[:all_visibility].present?
-      items
-    else
-      items.visible
-    end
-  end
 end

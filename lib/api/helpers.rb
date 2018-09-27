@@ -222,7 +222,7 @@ module API
     # rubocop: enable CodeReuse/ActiveRecord
 
     def find_build!(id)
-      user_project.builds.without_webide.find(id.to_i)
+      user_project.builds.find(id.to_i)
     end
 
     def authenticate!
