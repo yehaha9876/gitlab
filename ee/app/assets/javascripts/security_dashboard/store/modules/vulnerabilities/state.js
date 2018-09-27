@@ -1,6 +1,8 @@
 export default () => ({
-  vulnerabilitiesUrl: false,
-  vulnerabilities: [],
+  loadingVulnerabilities: false,
+  loadingVulnerabilitiesCount: false,
   pageInfo: {},
-  isLoading: false,
+  vulnerabilities: [],
+  vulnerabilitiesCount: {},
+  vulnerabilitiesUrl: false,
 });

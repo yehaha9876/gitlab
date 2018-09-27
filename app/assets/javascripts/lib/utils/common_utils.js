@@ -627,6 +627,25 @@ export const NavigationType = {
   TYPE_RESERVED: 255,
 };
 
+/**
+ * A simple method that returns the value of a + b
+ * It seems unessesary, but when combined with a reducer it
+ * adds up all the values in an array.
+ *
+ * e.g. `[1, 2, 3, 4, 5].reduce(accumulate) // => 15`
+ *
+ * @param {Float} a
+ * @param {Float} b
+ * @example
+ * // return 15
+ * [1, 2, 3, 4, 5].reduce(accumulate);
+ *
+ * // returns 6
+ * Object.values([{a: 1, b: 2, c: 3].reduce(accumulate);
+ * @returns {Float} The summed value
+ */
+export const accumulate = (a = 0, b = 0) => a + b;
+
 window.gl = window.gl || {};
 window.gl.utils = {
   ...(window.gl.utils || {}),

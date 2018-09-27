@@ -10,7 +10,7 @@ export default {
   },
   computed: {
     className() {
-      return `severity-badge severity-badge-${this.severity}`;
+      return `severity-badge-${this.severity}`;
     },
   },
 };
@@ -18,6 +18,7 @@ export default {
 
 <template>
   <div
+    class="severity-badge"
     :class="className"
   >{{ severity }}</div>
 </template>

@@ -6,11 +6,11 @@ import SecurityDashboardTableRow from './security_dashboard_table_row.vue';
 export default {
   name: 'SecurityDashboardTable',
   components: {
-    SecurityDashboardTableRow,
     Pagination,
+    SecurityDashboardTableRow,
   },
   computed: {
-    ...mapGetters(['vulnerabilities', 'pageInfo', 'isLoading']),
+    ...mapGetters(['vulnerabilities', 'pageInfo', 'loadingVulnerabilities']),
     showPagination() {
       return this.pageInfo && this.pageInfo.total;
     },
@@ -27,7 +27,7 @@ export default {
 <template>
   <div class="ci-table">
     <div
-      class="gl-responsive-table-row table-row-header"
+      class="gl-responsive-table-row table-row-header vulnerabilities-row-header"
       role="row"
     >
       <div
@@ -50,10 +50,12 @@ export default {
       </div>
     </div>
 
-    <gl-loading-icon
-      v-if="isLoading"
-      :size="2"
-    />
+    <div v-if="loadingVulnerabilities">
+      <security-dashboard-table-row
+        v-for="n in 10"
+        :key="n"
+      />
+    </div>
 
     <div v-else>
       <security-dashboard-table-row
@@ -72,3 +74,10 @@ export default {
   </div>
 </template>
 
+<style>
+.vulnerabilities-row-header {
+  color: #707070;
+  padding-left: .4em;
+  padding-right: .4em;
+}
+</style>

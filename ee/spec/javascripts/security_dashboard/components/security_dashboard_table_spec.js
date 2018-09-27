@@ -12,6 +12,7 @@ describe('Security Dashboard Table', () => {
   beforeEach(() => {
     const Component = Vue.extend(component);
     getters = {
+      loadingVulnerabilities: () => false,
       vulnerabilities: () => vulnerabilities,
       pageInfo: () => null,
     };

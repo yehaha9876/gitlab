@@ -1,4 +1,6 @@
 <script>
+import { mapGetters } from 'vuex';
+import { SkeletonLoading } from '@gitlab-org/gitlab-ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import SecurityDashboardActionButtons from './security_dashboard_action_buttons.vue';
 
@@ -7,22 +9,22 @@ export default {
   components: {
     SeverityBadge,
     SecurityDashboardActionButtons,
+    SkeletonLoading,
   },
   props: {
     vulnerability: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => ({}),
     },
   },
   computed: {
+    ...mapGetters(['loadingVulnerabilities']),
     confidence() {
       return this.vulnerability.confidence || '–';
     },
     severity() {
-      return this.vulnerability.severity || '–';
-    },
-    description() {
-      return this.vulnerability.description;
+      return this.vulnerability.severity || ' ';
     },
     projectNamespace() {
       const { project } = this.vulnerability;
@@ -54,13 +56,20 @@ export default {
         {{ s__('Reports|Vulnerability') }}
       </div>
       <div class="table-mobile-content">
-        <span>{{ description }}</span>
-        <br />
-        <span
-          v-if="projectNamespace"
-          class="vulnerability-namespace">
-          {{ projectNamespace }}
-        </span>
+        <skeleton-loading
+          v-if="loadingVulnerabilities"
+          class="mt-2"
+          :lines="2"
+        />
+        <div v-else>
+          <span>{{ vulnerability.description }}</span>
+          <br />
+          <span
+            v-if="projectNamespace"
+            class="vulnerability-namespace">
+            {{ projectNamespace }}
+          </span>
+        </div>
       </div>
     </div>
 
@@ -71,7 +80,7 @@ export default {
       >
         {{ s__('Reports|Confidence') }}
       </div>
-      <div class="table-mobile-content">
+      <div class="table-mobile-content text-capitalize">
         {{ confidence }}
       </div>
     </div>

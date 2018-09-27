@@ -25,21 +25,50 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('SET_LOADING', () => {
+  describe('SET_VULNERABILITIES_LOADING', () => {
     it('should set loading to true', () => {
       const state = initialState;
 
-      mutations[types.SET_LOADING](state, true);
+      mutations[types.SET_VULNERABILITIES_LOADING](state, true);
 
-      expect(state.isLoading).toBeTruthy();
+      expect(state.loadingVulnerabilities).toBeTruthy();
     });
 
     it('should not modify loading values are the same', () => {
       const state = initialState;
 
-      mutations[types.SET_LOADING](state, false);
+      mutations[types.SET_VULNERABILITIES_LOADING](state, false);
 
-      expect(state.isLoading).toBeFalsy();
+      expect(state.loadingVulnerabilities).toBeFalsy();
+    });
+  });
+
+  describe('SET_VULNERABILITIES_COUNT', () => {
+    it('should apply the payload to `pageInfo` in the state', () => {
+      const state = initialState;
+      const payload = [1, 2, 3, 4, 5];
+
+      mutations[types.SET_VULNERABILITIES_COUNT](state, payload);
+
+      expect(state.vulnerabilitiesCount).toEqual(payload);
+    });
+  });
+
+  describe('SET_VULNERABILITIES_COUNT_LOADING', () => {
+    it('should set loading to true', () => {
+      const state = initialState;
+
+      mutations[types.SET_VULNERABILITIES_COUNT_LOADING](state, true);
+
+      expect(state.loadingVulnerabilitiesCount).toBeTruthy();
+    });
+
+    it('should not modify loading values are the same', () => {
+      const state = initialState;
+
+      mutations[types.SET_VULNERABILITIES_COUNT_LOADING](state, false);
+
+      expect(state.loadingVulnerabilitiesCount).toBeFalsy();
     });
   });
 });
