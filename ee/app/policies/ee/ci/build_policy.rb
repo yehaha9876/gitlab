@@ -11,6 +11,19 @@ module EE
           prevent :update_build
         end
 
+        condition(:web_ide_terminal) do
+          @subject.pipeline.webide?
+        end
+
+        rule { web_ide_terminal & owner_of_job & can?(:maintainer_access) }.enable :manage_web_ide_terminal_build
+
+        rule { web_ide_terminal & ~can?(:manage_web_ide_terminal_build) }.policy do
+          prevent :read_build
+          prevent :update_build
+          prevent :erase_build
+          prevent :create_build_terminal
+        end
+
         private
 
         alias_method :current_user, :user

@@ -11,7 +11,6 @@ export default {
     return {
       terminalRunning: false,
       terminalBuildPath: '',
-      terminalBuildId: null,
       pendingBuild: false,
       availableWebIdeRunners: false,
       validConfig: false,
@@ -63,14 +62,17 @@ export default {
     stopTerminal() {
       if (this.terminalRunning || this.pendingBuild) {
         axios
-          .post(`/${this.currentProject.path_with_namespace}/-/jobs/ide_terminals/${this.terminalBuildId}/cancel`)
+          .post(`${this.terminalBuildPath}/cancel`)
           .then(response => (this.destroyTerminal()))
+          .catch(error => {
+            console.log(error.response.data)
+          });
       }
     },
     restartTerminal() {
       if (!this.terminalRunning) {
         axios
-          .post(`/${this.currentProject.path_with_namespace}/-/jobs/ide_terminals/${this.terminalBuildId}/retry`, { branch: this.currentBranchId, format: 'json' })
+          .post(`${this.terminalBuildPath}/retry`, { branch: this.currentBranchId, format: 'json' })
           .then(response => {
             this.setTerminalBuildData(response.data)
             this.startTerminalPolling(5000);
@@ -102,7 +104,7 @@ export default {
     },
     fetchRunningTerminal() {
       axios
-        .get(`/${this.currentProject.path_with_namespace}/-/jobs/ide_terminals/${this.terminalBuildId}`)
+        .get(`${this.terminalBuildPath}`)
         .then(response => (this.runningTerminalBuild(response.data)))
         .catch(error => (console.log(error.response)));
     },
@@ -124,8 +126,7 @@ export default {
       }, interval);
     },
     setTerminalBuildData(data) {
-      this.terminalBuildId = data.id;
-      this.terminalBuildPath = data.build_path;
+      this.terminalBuildPath = data.details_path;
     },
     destroyTerminal() {
       if (this.terminalRunning) {
@@ -167,7 +168,7 @@ export default {
           {{ __('Stop Console') }}
         </button>
         <button
-          v-if="!terminalRunning && !pendingBuild && terminalBuildId"
+          v-if="!terminalRunning && !pendingBuild && terminalBuildPath"
           type="button"
           class="btn btn-default btn-sm"
           @click="restartTerminal"
@@ -175,7 +176,7 @@ export default {
           {{ __('Restart Console') }}
         </button>
         <button
-          v-if="!terminalRunning && !pendingBuild && !terminalBuildId"
+          v-if="!terminalRunning && !pendingBuild && !terminalBuildPath"
           type="button"
           class="btn btn-default btn-sm"
           @click="startTerminal"

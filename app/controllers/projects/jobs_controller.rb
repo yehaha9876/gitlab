@@ -4,7 +4,7 @@ class Projects::JobsController < Projects::ApplicationController
   prepend ::EE::Projects::JobsController
 
   before_action :build, except: [:index, :cancel_all]
-  before_action :authorize_read_build!
+  before_action :authorize_read_build!, except: [:index, :cancel_all]
   before_action :authorize_update_build!,
     except: [:index, :show, :status, :raw, :trace, :cancel_all, :erase]
   before_action :authorize_erase_build!, only: [:erase]
@@ -15,6 +15,8 @@ class Projects::JobsController < Projects::ApplicationController
 
   # rubocop: disable CodeReuse/ActiveRecord
   def index
+    return access_denied! unless can?(current_user, :read_build, project)
+
     @scope = params[:scope]
     @all_builds = project_builds.relevant
     @builds = @all_builds.order('ci_builds.id DESC')
@@ -93,7 +95,11 @@ class Projects::JobsController < Projects::ApplicationController
     return respond_422 unless @build.retryable?
 
     build = Ci::Build.retry(@build, current_user)
-    redirect_to build_path(build)
+
+    respond_to do |format|
+      format.html { redirect_to build_path(build) }
+      format.json { render_build(build) }
+    end
   end
 
   def play
@@ -107,13 +113,15 @@ class Projects::JobsController < Projects::ApplicationController
     return respond_422 unless @build.cancelable?
 
     @build.cancel
-    redirect_to build_path(@build)
+
+    respond_to do |format|
+      format.html { redirect_to build_path(@build) }
+      format.json { head :ok }
+    end
   end
 
   def status
-    render json: BuildSerializer
-      .new(project: @project, current_user: @current_user)
-      .represent_status(@build)
+    render_build(@build)
   end
 
   def erase
@@ -151,6 +159,10 @@ class Projects::JobsController < Projects::ApplicationController
   end
 
   private
+
+  def authorize_read_build!
+    return access_denied! unless can?(current_user, :read_build, build)
+  end
 
   def authorize_update_build!
     return access_denied! unless can?(current_user, :update_build, build)
@@ -191,5 +203,11 @@ class Projects::JobsController < Projects::ApplicationController
 
   def project_builds
     project.builds
+  end
+
+  def render_build(current_build)
+    render json: BuildSerializer
+      .new(project: @project, current_user: @current_user)
+      .represent_status(current_build)
   end
 end
