@@ -3,12 +3,14 @@ class Projects::JobsController < Projects::ApplicationController
 
   prepend ::EE::Projects::JobsController
 
-  before_action :build, except: [:index, :cancel_all]
-  before_action :authorize_read_build!, except: [:index, :cancel_all]
+  before_action :build,
+    only: [:show, :cancel, :retry, :play, :erase, :trace, :raw, :terminal, :terminal_websocket_authorize]
+  before_action :authorize_read_build!,
+    only: [:show, :cancel, :retry, :play, :erase, :trace, :raw, :terminal, :terminal_websocket_authorize]
   before_action :authorize_update_build!,
-    except: [:index, :show, :status, :raw, :trace, :cancel_all, :erase]
+    only: [:cancel, :retry, :play, :terminal, :terminal_websocket_authorize]
   before_action :authorize_erase_build!, only: [:erase]
-  before_action :authorize_use_build_terminal!, only: [:terminal, :terminal_workhorse_authorize]
+  before_action :authorize_use_build_terminal!, only: [:terminal, :terminal_websocket_authorize]
   before_action :verify_api_request!, only: :terminal_websocket_authorize
 
   layout 'project'

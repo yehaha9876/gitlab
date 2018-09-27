@@ -318,6 +318,11 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           collection do
             post :cancel_all
 
+            ## EE-specific
+            post :create_webide_terminal, defaults: { format: 'json' }
+            get :valid_config, defaults: { format: 'json' }
+            ## EE-specific
+
             resources :artifacts, only: [] do
               collection do
                 get :latest_succeeded,
@@ -325,14 +330,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
                   format: false
               end
             end
-
-            ## EE-specific
-            resources :ide_terminals, only: [:create], defaults: { format: 'json' } do
-              collection do
-                get :valid_config
-              end
-            end
-            ## EE-specific
           end
 
           member do

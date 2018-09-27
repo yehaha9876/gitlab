@@ -49,7 +49,7 @@ export default {
     startTerminal() {
       if (!this.terminalRunning) {
         axios
-          .post(`/${this.currentProject.path_with_namespace}/-/jobs/ide_terminals`, { branch: this.currentBranchId, format: 'json' })
+          .post(`/${this.currentProject.path_with_namespace}/-/jobs/create_webide_terminal`, { branch: this.currentBranchId, format: 'json' })
           .then(response => {
             this.setTerminalBuildData(response.data)
             this.startTerminalPolling(5000);
@@ -136,7 +136,7 @@ export default {
     },
     checkValidConfig() {
       axios
-        .get(`/${this.currentProject.path_with_namespace}/-/jobs/ide_terminals/valid_config`, { params: { branch: this.currentBranchId, format: 'json' }})
+        .get(`/${this.currentProject.path_with_namespace}/-/jobs/valid_config`, { params: { branch: this.currentBranchId, format: 'json' }})
         .then(response => {
           this.validConfig = true;
         })

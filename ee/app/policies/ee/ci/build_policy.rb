@@ -15,9 +15,11 @@ module EE
           @subject.pipeline.webide?
         end
 
-        rule { web_ide_terminal & owner_of_job & can?(:maintainer_access) }.enable :manage_web_ide_terminal_build
+        condition(:web_ide_terminal_granted) do
+          can?(:web_ide_terminal_enabled) && owner_of_job?
+        end
 
-        rule { web_ide_terminal & ~can?(:manage_web_ide_terminal_build) }.policy do
+        rule { web_ide_terminal & ~web_ide_terminal_granted }.policy do
           prevent :read_build
           prevent :update_build
           prevent :erase_build
