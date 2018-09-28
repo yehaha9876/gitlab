@@ -210,6 +210,21 @@ module Gitlab
       end
     end
 
+    def self.bulk_insert_models(table, models)
+      rows = models.map do |model|
+        attributes = model.attributes.except("id")
+        attributes["created_at"] = Time.now if model.class.column_names.include?("created_at")
+        attributes["updated_at"] = Time.now if model.class.column_names.include?("updated_at")
+        attributes
+      end
+
+      ids = bulk_insert(table, rows, return_ids: true)
+
+      models.each_with_index do |model, index|
+        model.id = ids[index]
+      end
+    end
+
     def self.sanitize_timestamp(timestamp)
       MAX_TIMESTAMP_VALUE > timestamp ? timestamp : MAX_TIMESTAMP_VALUE.dup
     end
