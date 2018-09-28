@@ -3,8 +3,10 @@ class Projects::JobsController < Projects::ApplicationController
 
   prepend ::EE::Projects::JobsController
 
-  before_action :build, except: [:index, :cancel_all]
-  before_action :authorize_read_build!, except: [:index, :cancel_all]
+  before_action :build,
+    only: [:show, :cancel, :retry, :play, :erase, :trace, :raw, :status, :terminal, :terminal_websocket_authorize]
+  before_action :authorize_read_build!,
+    only: [:show, :cancel, :retry, :play, :erase, :trace, :raw, :status, :terminal, :terminal_websocket_authorize]
   before_action :authorize_update_build!,
     only: [:cancel, :retry, :play, :terminal, :terminal_websocket_authorize]
   before_action :authorize_erase_build!, only: [:erase]

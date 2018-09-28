@@ -136,7 +136,7 @@ export default {
     },
     checkValidConfig() {
       axios
-        .get(`/${this.currentProject.path_with_namespace}/-/jobs/valid_config`, { params: { branch: this.currentBranchId, format: 'json' }})
+        .get(`/${this.currentProject.path_with_namespace}/-/jobs/check_config`, { params: { branch: this.currentBranchId, format: 'json' }})
         .then(response => {
           this.validConfig = true;
         })
