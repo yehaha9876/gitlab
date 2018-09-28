@@ -408,6 +408,9 @@ msgstr ""
 msgid "Add Readme"
 msgstr ""
 
+msgid "Add a <code>%{jobTag}</code> job in your <code>.gitlab-ci.yml</code> file to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}"
+msgstr ""
+
 msgid "Add a homepage to your wiki that contains information about your project and GitLab will display it here instead of this message."
 msgstr ""
 
@@ -744,6 +747,18 @@ msgid "An error occurred while validating username"
 msgstr ""
 
 msgid "An error occurred. Please try again."
+msgstr ""
+
+msgid "An unexpected error occurred while checking the Web Terminal environment."
+msgstr ""
+
+msgid "An unexpected error occurred while communicating with the Web Terminal."
+msgstr ""
+
+msgid "An unexpected error occurred while starting the Web Terminal."
+msgstr ""
+
+msgid "An unexpected error occurred while stopping the Web Terminal."
 msgstr ""
 
 msgid "Analytics"
@@ -2205,6 +2220,9 @@ msgid "Confidential"
 msgstr ""
 
 msgid "Confidentiality"
+msgstr ""
+
+msgid "Configure GitLab runners to start using Web Terminal. %{helpStart}Learn more.%{helpEnd}"
 msgstr ""
 
 msgid "Configure Gitaly timeouts."
@@ -4771,6 +4789,9 @@ msgstr ""
 msgid "Learn more about Kubernetes"
 msgstr ""
 
+msgid "Learn more about Web Terminal"
+msgstr ""
+
 msgid "Learn more about protected branches"
 msgstr ""
 
@@ -6990,6 +7011,9 @@ msgstr ""
 msgid "Response metrics (NGINX)"
 msgstr ""
 
+msgid "Restart Terminal"
+msgstr ""
+
 msgid "Resume"
 msgstr ""
 
@@ -7035,6 +7059,9 @@ msgid "Roadmap"
 msgstr ""
 
 msgid "Run CI/CD pipelines for external repositories"
+msgstr ""
+
+msgid "Run tests against your code live using the Web Terminal"
 msgstr ""
 
 msgid "Run untagged jobs"
@@ -7789,6 +7816,9 @@ msgstr ""
 msgid "Starred projects"
 msgstr ""
 
+msgid "Start Web Terminal"
+msgstr ""
+
 msgid "Start a %{new_merge_request} with these changes"
 msgstr ""
 
@@ -7810,6 +7840,9 @@ msgstr ""
 msgid "Started"
 msgstr ""
 
+msgid "Starting..."
+msgstr ""
+
 msgid "Starts at (UTC)"
 msgstr ""
 
@@ -7817,6 +7850,9 @@ msgid "State your message to activate"
 msgstr ""
 
 msgid "Status"
+msgstr ""
+
+msgid "Stop Terminal"
 msgstr ""
 
 msgid "Stop environment"
@@ -7832,6 +7868,9 @@ msgid "Stopped"
 msgstr ""
 
 msgid "Stopping this environment is currently not possible as a deployment is in progress"
+msgstr ""
+
+msgid "Stopping..."
 msgstr ""
 
 msgid "Storage"
@@ -9079,6 +9118,9 @@ msgstr ""
 msgid "Web IDE"
 msgstr ""
 
+msgid "Web Terminal"
+msgstr ""
+
 msgid "Web terminal"
 msgstr ""
 
@@ -9323,6 +9365,9 @@ msgid "You cannot write to this read-only GitLab instance."
 msgstr ""
 
 msgid "You do not have any subscriptions yet"
+msgstr ""
+
+msgid "You do not have permission to run the Web Terminal. Please contact a project administrator."
 msgstr ""
 
 msgid "You do not have the correct permissions to override the settings from the LDAP group sync."
