@@ -1,0 +1,10 @@
+- content_for :page_specific_javascripts do
+  = stylesheet_link_tag "xterm.css"
+
+- extra_data = { |
+-   "ee-web-terminal-svg-path" => image_path('illustrations/web-ide_promotion.svg'), |
+-   "ee-ci-yaml-help-path" => help_page_path('ci/yaml/README.md'), |
+-   "ee-ci-runners-help-path" => help_page_path('ci/runners/README.md'), |
+-   "ee-web-terminal-help-path" => help_page_path('user/project/web_ide/index.md', anchor: 'client-side-evaluation') }
+
+= render partial: "ide/show", locals: { extra_data: extra_data }
