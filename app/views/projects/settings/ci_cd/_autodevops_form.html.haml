@@ -46,6 +46,11 @@
                     = s_('CICD|Continuous deployment to production')
                     = link_to icon('question-circle'), help_page_path('topics/autodevops/index.md', anchor: 'auto-deploy'), target: '_blank'
                 .form-check
+                  = form.radio_button :deploy_strategy, 'continuous_with_timed_incremental_rollout', class: 'form-check-input'
+                  = form.label :deploy_strategy_continuous_with_timed_incremental_rollout, class: 'form-check-label' do
+                    = s_('CICD|Continuous deployment to production using time incremental rollout')
+                    = link_to icon('question-circle'), help_page_path('topics/autodevops/index.md', anchor: 'incremental-rollout-to-production'), target: '_blank'
+                .form-check
                   = form.radio_button :deploy_strategy, 'manual', class: 'form-check-input'
                   = form.label :deploy_strategy_manual, class: 'form-check-label' do
                     = s_('CICD|Automatic deployment to staging, manual deployment to production')

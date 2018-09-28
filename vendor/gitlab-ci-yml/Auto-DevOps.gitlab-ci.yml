@@ -26,7 +26,7 @@
 #
 # Continuous deployment to production is enabled by default.
 # If you want to deploy to staging first, or enable incremental rollouts,
-# set STAGING_ENABLED or INCREMENTAL_ROLLOUT_ENABLED environment variables.
+# set STAGING_ENABLED or INCREMENTAL_ROLLOUT_TYPE == "manual" environment variables.
 # If you want to use canary deployments, set CANARY_ENABLED environment variable.
 #
 # If Auto DevOps fails to detect the proper buildpack, or if you want to
@@ -61,6 +61,10 @@ stages:
   - staging
   - canary
   - production
+  - incremental rollout 10%
+  - incremental rollout 25%
+  - incremental rollout 50%
+  - incremental rollout 100%
   - performance
   - cleanup
 
@@ -352,7 +356,7 @@ production:
     variables:
       - $STAGING_ENABLED
       - $CANARY_ENABLED
-      - $INCREMENTAL_ROLLOUT_ENABLED
+      - $INCREMENTAL_ROLLOUT_TYPE
 
 production_manual:
   <<: *production_template
@@ -367,12 +371,11 @@ production_manual:
       - $CANARY_ENABLED
   except:
     variables:
-      - $INCREMENTAL_ROLLOUT_ENABLED
+      - $INCREMENTAL_ROLLOUT_TYPE
 
 # This job implements incremental rollout on for every push to `master`.
 
-.rollout: &rollout_template
-  stage: production
+.rollout_scripts_template:
   script:
     - check_kube_domain
     - install_dependencies
@@ -389,53 +392,74 @@ production_manual:
     url: http://$CI_PROJECT_PATH_SLUG.$AUTO_DEVOPS_DOMAIN
   artifacts:
     paths: [environment_url.txt]
+  only:
+    refs:
+      - master
+    kubernetes: active
 
-rollout 10%:
-  <<: *rollout_template
+.manual_rollout_template:
+  extends: .rollout_scripts_template
+  when: manual
+  only:
+    variables:
+      - $INCREMENTAL_ROLLOUT_TYPE == "manual"
+
+.timed_rollout_template:
+  extends: .rollout_scripts_template
+  when: delayed
+  start_in: 10 minutes
+  only:
+    variables:
+      - $INCREMENTAL_ROLLOUT_TYPE == "timed"
+
+timed rollout 10%:
+  extends: .timed_rollout_template
+  stage: incremental rollout 10%
   variables:
     ROLLOUT_PERCENTAGE: 10
-  when: manual
-  only:
-    refs:
-      - master
-    kubernetes: active
-    variables:
-      - $INCREMENTAL_ROLLOUT_ENABLED
 
-rollout 25%:
-  <<: *rollout_template
+timed rollout 25%:
+  extends: .timed_rollout_template
+  stage: incremental rollout 25%
   variables:
     ROLLOUT_PERCENTAGE: 25
-  when: manual
-  only:
-    refs:
-      - master
-    kubernetes: active
-    variables:
-      - $INCREMENTAL_ROLLOUT_ENABLED
 
-rollout 50%:
-  <<: *rollout_template
+timed rollout 50%:
+  extends: .timed_rollout_template
+  stage: incremental rollout 50%
   variables:
     ROLLOUT_PERCENTAGE: 50
-  when: manual
-  only:
-    refs:
-      - master
-    kubernetes: active
-    variables:
-      - $INCREMENTAL_ROLLOUT_ENABLED
+
+timed rollout 100%:
+  <<: *production_template
+  extends: .timed_rollout_template
+  stage: incremental rollout 100%
+  variables:
+    ROLLOUT_PERCENTAGE: 100
+
+rollout 10%:
+  extends: .manual_rollout_template
+  stage: production
+  variables:
+    ROLLOUT_PERCENTAGE: 10
+
+rollout 25%:
+  extends: .manual_rollout_template
+  stage: production
+  variables:
+    ROLLOUT_PERCENTAGE: 25
+
+rollout 50%:
+  extends: .manual_rollout_template
+  stage: production
+  variables:
+    ROLLOUT_PERCENTAGE: 50
 
 rollout 100%:
   <<: *production_template
-  when: manual
+  stage: production
+  extends: .manual_rollout_template
   allow_failure: false
-  only:
-    refs:
-      - master
-    kubernetes: active
-    variables:
-      - $INCREMENTAL_ROLLOUT_ENABLED
 
 # ---------------------------------------------------------------------------
 

@@ -5,7 +5,8 @@ class ProjectAutoDevops < ActiveRecord::Base
 
   enum deploy_strategy: {
     continuous: 0,
-    manual: 1
+    manual: 1,
+    continuous_with_timed_incremental_rollout: 2,
   }
 
   scope :enabled, -> { where(enabled: true) }
@@ -32,7 +33,11 @@ class ProjectAutoDevops < ActiveRecord::Base
 
       if manual?
         variables.append(key: 'STAGING_ENABLED', value: '1')
-        variables.append(key: 'INCREMENTAL_ROLLOUT_ENABLED', value: '1')
+        variables.append(key: 'INCREMENTAL_ROLLOUT_TYPE', value: 'manual')
+      end
+
+      if continuous_with_timed_incremental_rollout?
+        variables.append(key: 'INCREMENTAL_ROLLOUT_TYPE', value: 'timed')
       end
     end
   end
