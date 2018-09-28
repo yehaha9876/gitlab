@@ -11,14 +11,14 @@ module Projects
     end
 
     def execute
-      if @params[:template_name]&.present?
+      if @params[:template_name].present?
         return ::Projects::CreateFromTemplateService.new(current_user, params).execute
       end
 
       forked_from_project_id = params.delete(:forked_from_project_id)
       import_data = params.delete(:import_data)
 
-      @project = Project.new(params)
+      @project = Project.new(params.except(:group_with_project_templates_id))
 
       # Make sure that the user is allowed to use the specified visibility level
       unless Gitlab::VisibilityLevel.allowed_for?(current_user, @project.visibility_level)

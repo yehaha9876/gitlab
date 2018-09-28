@@ -74,8 +74,8 @@ module EE
       # When using a project template from a Group, the new project can only be created
       # under the top level group or any subgroup
       def validate_namespace_used_with_template(project, subgroup_id)
-        return unless project.namespace_id
-        return unless subgroup_id
+        return if project.namespace_id.nil?
+        return if subgroup_id.blank?
 
         parent_id = ::Group.find(subgroup_id).parent_id
         project_namespace = project.namespace
