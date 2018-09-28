@@ -262,8 +262,7 @@ describe Ci::Build do
         it 'parses blobs and add the results to the report' do
           expect { subject }.not_to raise_error
 
-          # Currently parsers are just skeletons hence the expected empty array
-          expect(security_reports.get_report(:sast).vulnerabilities).to eq([])
+          expect(security_reports.get_report('sast').vulnerabilities.size).to eq(3)
         end
       end
 
