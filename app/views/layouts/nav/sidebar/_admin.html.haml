@@ -6,7 +6,7 @@
           = sprite_icon('admin', size: 24)
         .sidebar-context-title
           = _('Admin Area')
-    %ul.sidebar-top-level-items
+    %ul.sidebar-top-level-items.qa-sidebar
       = nav_link(controller: %w(dashboard admin admin/projects users groups jobs runners gitaly_servers), html_options: {class: 'home'}) do
         = link_to admin_root_path, class: 'shortcuts-tree' do
           .nav-icon-container
@@ -241,13 +241,13 @@
                 = _('Appearance')
 
       = nav_link(controller: :application_settings) do
-        = link_to admin_application_settings_path do
+        = link_to admin_application_settings_path, class: "qa-settings-menu-item" do
           .nav-icon-container
             = sprite_icon('settings')
           %span.nav-item-name
             = _('Settings')
 
-        %ul.sidebar-sub-level-items
+        %ul.sidebar-sub-level-items.qa-submenu
           = nav_link(controller: :application_settings, html_options: { class: "fly-out-top-item" } ) do
             = link_to admin_application_settings_path do
               %strong.fly-out-top-item-name
@@ -262,7 +262,7 @@
                 %span
                   = _('Integrations')
             = nav_link(path: 'application_settings#repository') do
-              = link_to repository_admin_application_settings_path, title: _('Repository') do
+              = link_to repository_admin_application_settings_path, title: _('Repository'), class: "qa-settings-repository-menu-item" do
                 %span
                   = _('Repository')
             - if template_exists?('admin/application_settings/templates')
