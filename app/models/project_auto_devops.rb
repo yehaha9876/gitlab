@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class ProjectAutoDevops < ActiveRecord::Base
+  # EE specific modules
+  prepend EE::ProjectAutoDevops
+
   belongs_to :project
 
   enum deploy_strategy: {

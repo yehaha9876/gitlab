@@ -48,6 +48,7 @@ class License < ActiveRecord::Base
     file_locks
     geo
     github_project_service_integration
+    incremental_rollout
     jira_dev_panel_integration
     ldap_group_sync_filter
     multiple_clusters

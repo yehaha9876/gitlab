@@ -34,21 +34,22 @@
                 .form-text.text-muted
                   = s_('CICD|Do not set up a domain here if you are setting up multiple Kubernetes clusters with Auto DevOps.')
                   = link_to icon('question-circle'), help_page_path('topics/autodevops/index.md', anchor: 'using-multiple-kubernetes-clusters-premium'), target: '_blank'
-                -# EE-specific end
 
-                %label.prepend-top-10
-                  %strong= s_('CICD|Deployment strategy')
-                %p.settings-message.text-center
-                  = s_('CICD|Deployment strategy needs a domain name to work correctly.')
-                .form-check
-                  = form.radio_button :deploy_strategy, 'continuous', class: 'form-check-input'
-                  = form.label :deploy_strategy_continuous, class: 'form-check-label' do
-                    = s_('CICD|Continuous deployment to production')
-                    = link_to icon('question-circle'), help_page_path('topics/autodevops/index.md', anchor: 'auto-deploy'), target: '_blank'
-                .form-check
-                  = form.radio_button :deploy_strategy, 'manual', class: 'form-check-input'
-                  = form.label :deploy_strategy_manual, class: 'form-check-label' do
-                    = s_('CICD|Automatic deployment to staging, manual deployment to production')
-                    = link_to icon('question-circle'), help_page_path('ci/environments.md', anchor: 'manually-deploying-to-environments'), target: '_blank'
+                - if @project.feature_available?(:incremental_rollout)
+                  %label.prepend-top-10
+                    %strong= s_('CICD|Deployment strategy')
+                  %p.settings-message.text-center
+                    = s_('CICD|Deployment strategy needs a domain name to work correctly.')
+                  .form-check
+                    = form.radio_button :deploy_strategy, 'continuous', class: 'form-check-input'
+                    = form.label :deploy_strategy_continuous, class: 'form-check-label' do
+                      = s_('CICD|Continuous deployment to production')
+                      = link_to icon('question-circle'), help_page_path('topics/autodevops/index.md', anchor: 'auto-deploy'), target: '_blank'
+                  .form-check
+                    = form.radio_button :deploy_strategy, 'manual', class: 'form-check-input'
+                    = form.label :deploy_strategy_manual, class: 'form-check-label' do
+                      = s_('CICD|Automatic deployment to staging, manual deployment to production')
+                      = link_to icon('question-circle'), help_page_path('ci/environments.md', anchor: 'manually-deploying-to-environments'), target: '_blank'
+                -# EE-specific end
 
           = f.submit _('Save changes'), class: "btn btn-success prepend-top-15"
