@@ -320,7 +320,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
             ## EE-specific
             post :create_webide_terminal, defaults: { format: 'json' }
-            get :valid_config, defaults: { format: 'json' }
+            get :check_config, defaults: { format: 'json' }
             ## EE-specific
 
             resources :artifacts, only: [] do

@@ -353,6 +353,7 @@ class ProjectPolicy < BasePolicy
 
   rule { public_builds }.policy do
     enable :read_build
+    enable :read_commit_status
   end
 
   rule { public_builds & can?(:guest_access) }.policy do

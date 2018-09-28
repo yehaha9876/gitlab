@@ -3,7 +3,11 @@ module CiCd
     include ::Gitlab::Utils::StrongMemoize
 
     def execute
-      web_ide_terminal_builds.any? ? success : error('No web ide terminal build found')
+      if web_ide_terminal_builds.any?
+        success
+      else
+        error('No web ide terminal build found')
+      end
     rescue ::Gitlab::Ci::YamlProcessor::ValidationError => e
       error(e.message)
     end

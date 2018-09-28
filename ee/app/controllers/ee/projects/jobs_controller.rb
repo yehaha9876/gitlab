@@ -7,10 +7,12 @@ module EE
       extend ::Gitlab::Utils::Override
 
       prepended do
-        before_action :authorize_web_ide_terminal_enabled!, only: [:valid_config, :create_webide_terminal]
+        before_action :authorize_web_ide_terminal_enabled!, only: [:check_config, :create_webide_terminal]
+        skip_before_action :build, only: [:check_config, :create_webide_terminal]
+        skip_before_action :authorize_read_build, only: [:check_config, :create_webide_terminal]
       end
 
-      def valid_config
+      def check_config
         result = CiCd::WebIdeConfigValidatorService.new(project, current_user, params).execute
 
         if result[:status] == :success

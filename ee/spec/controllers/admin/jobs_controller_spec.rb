@@ -7,18 +7,34 @@ describe Admin::JobsController do
     sign_in(admin)
   end
 
-  describe 'POST cancel_all' do
+  describe 'GET index' do
     let(:project) { create(:project, :private, shared_runners_enabled: true) }
 
     context 'when jobs pipeline is from webide source' do
       let(:pipeline) { create(:ci_pipeline, project: project, source: :webide) }
+      let!(:builds) { create_list(:ci_build, 2, :cancelable, pipeline: pipeline) }
 
+      it 'displays all jobs' do
+        get :index
+
+        expect(assigns(:builds)).to match_array(builds)
+      end
+    end
+  end
+
+  describe 'POST cancel_all' do
+    let(:project) { create(:project, :private, shared_runners_enabled: true) }
+    let(:pipeline) { create(:ci_pipeline, project: project, source: :web) }
+
+    subject { post :cancel_all }
+
+    shared_examples 'can cancel jobs' do
       before do
         create_list(:ci_build, 2, :cancelable, pipeline: pipeline)
 
         expect(Ci::Build.all).to all(be_pending)
 
-        post_cancel_all
+        subject
       end
 
       it 'cancels jobs' do
@@ -31,8 +47,12 @@ describe Admin::JobsController do
       end
     end
 
-    def post_cancel_all
-      post :cancel_all
+    it_behaves_like 'can cancel jobs'
+
+    context 'when jobs pipeline is from webide source' do
+      let(:pipeline) { create(:ci_pipeline, project: project, source: :webide) }
+
+      it_behaves_like 'can cancel jobs'
     end
   end
 end

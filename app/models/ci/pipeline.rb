@@ -245,6 +245,10 @@ module Ci
       end
     end
 
+    def self.visible
+      all
+    end
+
     def self.truncate_sha(sha)
       sha[0...8]
     end
@@ -255,14 +259,6 @@ module Ci
 
     def self.internal_sources
       sources.except(:external).values
-    end
-
-    def self.hidden_sources
-      sources.values_at(*hidden_source_keys)
-    end
-
-    def self.hidden_source_keys
-      []
     end
 
     def stages_count

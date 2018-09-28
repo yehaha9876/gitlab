@@ -23,7 +23,6 @@ module EE
       prepended do
         after_save :stick_build_if_status_changed
 
-        scope :webide, -> { includes(:pipeline).where(ci_pipelines: { source: ::Ci::Pipeline.sources[:webide] }) }
         scope :without_webide, -> { includes(:pipeline).where.not(ci_pipelines: { source: ::Ci::Pipeline.sources[:webide] }) }
       end
 

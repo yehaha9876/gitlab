@@ -25,9 +25,10 @@ module EE
       class_methods do
         extend ::Gitlab::Utils::Override
 
-        override :hidden_source_keys
-        def hidden_source_keys
-          super + [:webide]
+        override :visible
+        def visible
+          where(arel_table[:source].not_eq(sources[:webide])
+            .or(arel_table[:source].eq(sources[:unknown])))
         end
       end
 
