@@ -23,6 +23,26 @@ describe Ci::CreatePipelineService, '#execute' do
     stub_ci_pipeline_to_return_yaml_file
   end
 
+  describe 'Sequence' do
+    let(:scope) { EE::Gitlab::Ci::Pipeline::Chain }
+
+    it 'includes the RemoveUnwantedChatJobs step' do
+      expect(described_class::SEQUENCE.include?(scope::RemoveUnwantedChatJobs)).to eq true
+    end
+
+    it 'includes the FilterWebIdeTerminalJobs step' do
+      expect(described_class::SEQUENCE.include?(scope::FilterWebIdeTerminalJobs)).to eq true
+    end
+
+    it 'includes the Limit::Size step' do
+      expect(described_class::SEQUENCE.include?(scope::Limit::Size)).to eq true
+    end
+
+    it 'includes the Limit::Activity step' do
+      expect(described_class::SEQUENCE.include?(scope::Limit::Activity)).to eq true
+    end
+  end
+
   describe 'CI/CD Quotas / Limits' do
     context 'when there are not limits enabled' do
       it 'enqueues a new pipeline' do
@@ -69,7 +89,7 @@ describe Ci::CreatePipelineService, '#execute' do
     end
   end
 
-  describe 'Web Ide Terminal pipelines' do
+  describe 'Web IDE terminal pipelines' do
     context'when the pipeline ref has an associated merge request' do
       let(:merge_request) { create(:merge_request_with_diffs, target_project: project, source_project: project) }
       let(:params) do

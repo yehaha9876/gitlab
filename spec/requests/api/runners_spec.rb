@@ -587,6 +587,15 @@ describe API::Runners do
         expect(json_response[0]).to have_key('ip_address')
         expect(shared).to be_truthy
       end
+
+      it 'filters runners by tag' do
+        runner = create(:ci_runner, :project, projects: [project], tag_list: %w(tag1 tag2))
+
+        get api("/projects/#{project.id}/runners", user), tag_list: ['tag1']
+
+        expect(json_response.count).to eq 1
+        expect(json_response[0]['id']).to eq runner.id
+      end
     end
 
     context 'authorized user without maintainer privileges' do

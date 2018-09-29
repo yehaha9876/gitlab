@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CiCd
   class WebIdeConfigValidatorService < ::BaseService
     include ::Gitlab::Utils::StrongMemoize

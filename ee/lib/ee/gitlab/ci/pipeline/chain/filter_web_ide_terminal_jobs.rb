@@ -10,7 +10,7 @@ module EE
               return unless pipeline.config_processor
 
               # When scheduling a web ide terminal pipeline we only want to run
-              # the build that is configured.
+              # the build that is configured to run the terminal.
               # When not scheduling a web ide terminal pipeline we only want to run
               # those build that are not a web terminal.
               select_method = pipeline.webide? ? :select! : :reject!

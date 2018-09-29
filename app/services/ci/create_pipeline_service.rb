@@ -7,6 +7,7 @@ module Ci
     attr_reader :pipeline
 
     SEQUENCE = [Gitlab::Ci::Pipeline::Chain::Build,
+                EE::Gitlab::Ci::Pipeline::Chain::FilterWebIdeTerminalJobs,
                 EE::Gitlab::Ci::Pipeline::Chain::RemoveUnwantedChatJobs,
                 EE::Gitlab::Ci::Pipeline::Chain::FilterWebIdeTerminalJobs,
                 Gitlab::Ci::Pipeline::Chain::Validate::Abilities,

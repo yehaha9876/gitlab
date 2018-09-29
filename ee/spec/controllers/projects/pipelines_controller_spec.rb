@@ -145,4 +145,18 @@ describe Projects::PipelinesController do
       end
     end
   end
+
+  describe 'GET index.json' do
+    set(:user) { create(:admin) }
+
+    it 'does not render webide pipelines' do
+      create(:ci_pipeline, project: project, source: :webide)
+
+      get :index, namespace_id: project.namespace,
+                  project_id: project,
+                  format: :json
+
+      expect(json_response['pipelines'].find { |p| p['source'] == 'webide' }).to be_nil
+    end
+  end
 end

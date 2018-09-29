@@ -116,11 +116,24 @@ module API
       params do
         optional :scope, type: String, values: Ci::Runner::AVAILABLE_SCOPES,
                          desc: 'The scope of specific runners to show'
-        optional :tag_list, type: Array[String]
+        optional :type, type: String, values: Ci::Runner::AVAILABLE_TYPES,
+                        desc: 'The type of the runners to show'
+        optional :status, type: String, values: Ci::Runner::AVAILABLE_STATUSES,
+                          desc: 'The status of the runners to show'
+        optional :tag_list, type: Array[String],
+                            desc: 'The list of tags of the runners to show'
         use :pagination
       end
       get ':id/runners' do
-        runners = filter_runners(Ci::Runner.owned_or_instance_wide(user_project.id), params[:scope], tag_list: params[:tag_list])
+        runners = Ci::Runner.owned_or_instance_wide(user_project.id)
+        runners = filter_runners(runners, params[:scope])
+        runners = filter_runners(runners, params[:type], allowed_scopes: Ci::Runner::AVAILABLE_TYPES)
+        runners = filter_runners(runners, params[:status], allowed_scopes: Ci::Runner::AVAILABLE_STATUSES)
+
+        if params[:tag_list]&.any?
+          runners = runners.tagged_with(params[:tag_list])
+        end
+
         present paginate(runners), with: Entities::Runner
       end
 

@@ -180,7 +180,7 @@ module EE
       end
 
       condition(:web_ide_terminal_feature) do
-        @subject.feature_available?(:webide)
+        @subject.feature_available?(:ide_terminal)
       end
 
       rule { web_ide_terminal_feature & can?(:maintainer_access) }.enable :web_ide_terminal_enabled
