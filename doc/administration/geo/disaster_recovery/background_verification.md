@@ -123,8 +123,7 @@ sudo -u git -H bundle exec rake geo:verification:wiki:reset RAILS_ENV=production
 
 # Current limitations
 
-Until [issue #5064][ee-5064] is completed, background verification doesn't cover
-CI job artifacts and traces, LFS objects, or user uploads in file storage.
+Until [issue #5591][ee-5591] is completed, background verification doesn't cover user uploads in file storage.
 Verify their integrity manually by following [these instructions][foreground-verification]
 on both nodes, and comparing the output between them.
 
