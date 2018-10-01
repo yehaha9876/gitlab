@@ -17,7 +17,7 @@
       environment() {
         let environmentText;
         switch (this.deploymentStatus.status) {
-          case 'latest':
+          case 'last':
             environmentText = sprintf(
               __('This job is the most recent deployment to %{link}.'),
               { link: this.environmentLink },

@@ -367,18 +367,26 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
       end
     end
 
-    context 'when job starts environment' do
-      let(:environment) { create(:environment, project: project) }
-      let(:pipeline) { create(:ci_pipeline, project: project) }
+    context 'when job starts environment', :js do
+      let(:job) { create(:ci_build, :success, :trace_live, environment: 'production', pipeline: pipeline) }
+      let(:environment) { create(:environment, name: 'production', project: job.project) }
 
-      context 'job is successfull and has deployment' do
-        let(:deployment) { create(:deployment) }
-        let(:job) { create(:ci_build, :success, :trace_artifact, environment: environment.name, deployments: [deployment], pipeline: pipeline) }
+      context 'job is successful and has deployment' do
+        let!(:deployment) { create(:deployment, environment: environment, project: environment.project, deployable: job) }
+
+        before do
+          visit project_job_path(project, job)
+          wait_for_requests
+          # scroll to the top of the page first
+          execute_script "window.scrollTo(0,0)"
+        end
 
         it 'shows a link for the job' do
-          visit project_job_path(project, job)
-
           expect(page).to have_link environment.name
+        end
+
+        it 'shows deployment message' do
+          expect(page).to have_content 'This job is the most recent deployment'
         end
       end
 
@@ -387,19 +395,126 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
 
         it 'shows a link for the job' do
           visit project_job_path(project, job)
+          wait_for_requests
+          # scroll to the top of the page first
+          execute_script "window.scrollTo(0,0)"
 
           expect(page).to have_link environment.name
         end
       end
 
       context 'job creates a new deployment' do
-        let!(:deployment) { create(:deployment, environment: environment, sha: project.commit.id) }
         let(:job) { create(:ci_build, :success, :trace_artifact, environment: environment.name, pipeline: pipeline) }
+        let!(:deployment) { create(:deployment, environment: environment, sha: project.commit.id, project: environment.project, deployable: job) }
 
         it 'shows a link to latest deployment' do
           visit project_job_path(project, job)
+          wait_for_all_requests
+          # scroll to the top of the page first
+          execute_script "window.scrollTo(0,0)"
 
           expect(page).to have_link('latest deployment')
+        end
+      end
+    end
+
+    describe 'environment info in job view', :js do
+      before do
+        visit project_job_path(project, job)
+        wait_for_requests
+        # scroll to the top of the page first
+        execute_script "window.scrollTo(0,0)"
+      end
+
+      context 'job with outdated deployment' do
+        let(:job) { create(:ci_build, :success, :trace_artifact, environment: 'staging', pipeline: pipeline) }
+        let(:second_build) { create(:ci_build, :success, :trace_artifact, environment: 'staging', pipeline: pipeline) }
+        let(:environment) { create(:environment, name: 'staging', project: project) }
+        let!(:first_deployment) { create(:deployment, environment: environment, deployable: job) }
+        let!(:second_deployment) { create(:deployment, environment: environment, deployable: second_build) }
+
+        it 'shows deployment message' do
+          expected_text = 'This job is an out-of-date deployment ' \
+            "to staging.\nView the most recent deployment ##{second_deployment.iid}."
+
+          expect(page).to have_css('.environment-information', text: expected_text)
+        end
+      end
+
+      context 'job failed to deploy' do
+        let(:job) { create(:ci_build, :failed, :trace_artifact, environment: 'staging', pipeline: pipeline) }
+        let!(:environment) { create(:environment, name: 'staging', project: project) }
+
+        it 'shows deployment message' do
+          expected_text = 'The deployment of this job to staging did not succeed.'
+
+          expect(page).to have_css(
+            '.environment-information', text: expected_text)
+        end
+      end
+
+      context 'job will deploy' do
+        let(:job) { create(:ci_build, :running, :trace_live, environment: 'staging', pipeline: pipeline) }
+
+        context 'when environment exists' do
+          let!(:environment) { create(:environment, name: 'staging', project: project) }
+
+          it 'shows deployment message' do
+            expected_text = 'This job is creating a deployment to staging'
+
+            expect(page).to have_css(
+              '.environment-information', text: expected_text)
+          end
+
+          context 'when it has deployment' do
+            let!(:deployment) { create(:deployment, environment: environment) }
+
+            it 'shows that deployment will be overwritten' do
+              expected_text = 'This job is creating a deployment to staging'
+
+              expect(page).to have_css(
+                '.environment-information', text: expected_text)
+              expect(page).to have_css(
+                '.environment-information', text: 'latest deployment')
+            end
+          end
+        end
+
+        context 'when environment does not exist' do
+          it 'shows deployment message' do
+            expected_text = 'This job is creating a deployment to staging'
+
+            expect(page).to have_css(
+              '.environment-information', text: expected_text)
+            expect(page).not_to have_css(
+              '.environment-information', text: 'latest deployment')
+          end
+        end
+      end
+
+      context 'job that failed to deploy and environment has not been created' do
+        let(:job) { create(:ci_build, :failed, :trace_artifact, environment: 'staging', pipeline: pipeline) }
+        let!(:environment) { create(:environment, name: 'staging', project: project) }
+
+        it 'shows deployment message' do
+          expected_text = 'The deployment of this job to staging did not succeed'
+
+          expect(page).to have_css(
+            '.environment-information', text: expected_text)
+        end
+      end
+
+      context 'job that will deploy and environment has not been created' do
+        let(:job) { create(:ci_build, :running, :trace_live, environment: 'staging', pipeline: pipeline) }
+        let!(:environment) { create(:environment, name: 'staging', project: project) }
+
+        it 'shows deployment message' do
+          expected_text = 'This job is creating a deployment to staging'
+
+          expect(page).to have_css(
+            '.environment-information', text: expected_text)
+          expect(page).not_to have_css(
+            '.environment-information', text: 'latest deployment')
         end
       end
     end
