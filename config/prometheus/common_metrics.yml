@@ -213,3 +213,13 @@
       label: Pod average
       unit: "cores"
       track: canary
+  - title: "Memory Usage (Total)[Jose]"
+    y_label: "Total Memory Used"
+    required_metrics:
+      - process_resident_memory_bytes
+    weight: 1
+    queries:
+    - id: system_metrics_digital_ocean_process_resident
+      query_range: 'avg(sum(process_resident_memory_bytes{instance="localhost:9090"})) /1024/1024'
+      label: Total
+      unit: MB
