@@ -28,13 +28,13 @@ describe('vulnerabilities module getters', () => {
     });
   });
 
-  describe('loadingVulnerabilities', () => {
+  describe('isLoadingVulnerabilities', () => {
     it('should return the loading state from the store', () => {
-      const loadingVulnerabilities = true;
-      const state = { loadingVulnerabilities };
-      const result = getters.loadingVulnerabilities(state);
+      const isLoadingVulnerabilities = true;
+      const state = { isLoadingVulnerabilities };
+      const result = getters.isLoadingVulnerabilities(state);
 
-      expect(result).toBe(loadingVulnerabilities);
+      expect(result).toBe(isLoadingVulnerabilities);
     });
   });
 
@@ -54,13 +54,13 @@ describe('vulnerabilities module getters', () => {
     });
   });
 
-  describe('loadingVulnerabilitiesCount', () => {
+  describe('isLoadingVulnerabilitiesCount', () => {
     it('should return the loading state from the store', () => {
-      const loadingVulnerabilities = true;
-      const state = { loadingVulnerabilities };
-      const result = getters.loadingVulnerabilities(state);
+      const isLoadingVulnerabilities = true;
+      const state = { isLoadingVulnerabilities };
+      const result = getters.isLoadingVulnerabilities(state);
 
-      expect(result).toBe(loadingVulnerabilities);
+      expect(result).toBe(isLoadingVulnerabilities);
     });
   });
 

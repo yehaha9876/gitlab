@@ -1,10 +1,11 @@
-import { sum } from '~/lib/utils/common_utils';
+import { sum } from '~/lib/utils/number_utils';
 
 export const pageInfo = state => state.pageInfo;
 export const vulnerabilities = state => state.vulnerabilities || [];
-export const loadingVulnerabilities = state => state.loadingVulnerabilities;
+export const isLoadingVulnerabilities = state => state.isLoadingVulnerabilities;
 export const vulnerabilitiesCount = state => state.vulnerabilitiesCount || {};
-export const loadingVulnerabilitiesCount = state => state.loadingVulnerabilitiesCount;
+export const isLoadingVulnerabilitiesCount = state => state.isLoadingVulnerabilitiesCount;
+export const errorLoadingVulnerabilities = state => state.errorLoadingVulnerabilities;
 export const vulnerabilitiesCountBySeverity = (state, getters) => severity =>
   Object.values(getters.vulnerabilitiesCount)
     .map(count => count[severity])

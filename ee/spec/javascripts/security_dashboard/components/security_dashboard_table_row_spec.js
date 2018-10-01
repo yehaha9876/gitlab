@@ -18,7 +18,7 @@ describe('Security Dashboard Table Row', () => {
     });
 
     it('should display the skeleton loader', () => {
-      expect(vm.$el.querySelector('.js-skeleton-loader')).toExist();
+      expect(vm.$el.querySelector('.js-skeleton-loader')).not.toBeNull();
     });
 
     it('should render a ` ` for severity', () => {

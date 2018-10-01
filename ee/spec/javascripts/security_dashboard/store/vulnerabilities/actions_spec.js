@@ -80,7 +80,7 @@ describe('vulnerabiliites count actions', () => {
   });
 
   describe('requestVulnerabilitesCount', () => {
-    it('should commit the loading mutation', done => {
+    it('should commit the request mutation', done => {
       const state = initialState;
 
       testAction(
@@ -88,10 +88,7 @@ describe('vulnerabiliites count actions', () => {
         {},
         state,
         [
-          {
-            type: types.SET_VULNERABILITIES_COUNT_LOADING,
-            payload: true,
-          },
+          { type: types.REQUEST_VULNERABILITIES_COUNT },
         ],
         [],
         done,
@@ -100,7 +97,7 @@ describe('vulnerabiliites count actions', () => {
   });
 
   describe('receiveVulnerabilitesCountSuccess', () => {
-    it('should commit the required mutations', done => {
+    it('should commit the success mutation', done => {
       const state = initialState;
 
       testAction(
@@ -108,8 +105,7 @@ describe('vulnerabiliites count actions', () => {
         { data },
         state,
         [
-          { type: types.SET_VULNERABILITIES_COUNT_LOADING, payload: false },
-          { type: types.SET_VULNERABILITIES_COUNT, payload: data },
+          { type: types.RECEIVE_VULNERABILITIES_COUNT_SUCCESS, payload: data },
         ],
         [],
         done,
@@ -118,7 +114,7 @@ describe('vulnerabiliites count actions', () => {
   });
 
   describe('receivetVulnerabilitesCountError', () => {
-    it('should commit the loading mutation', done => {
+    it('should commit the error mutation', done => {
       const state = initialState;
 
       testAction(
@@ -126,7 +122,7 @@ describe('vulnerabiliites count actions', () => {
         {},
         state,
         [
-          { type: types.SET_VULNERABILITIES_COUNT_LOADING, payload: false },
+          { type: types.RECEIVE_VULNERABILITIES_COUNT_ERROR },
         ],
         [],
         done,
@@ -222,7 +218,7 @@ describe('vulnerabilities actions', () => {
   });
 
   describe('receiveVulnerabilitiesSuccess', () => {
-    it('should commit the required mutations', done => {
+    it('should commit the success mutation', done => {
       const state = initialState;
 
       testAction(
@@ -230,9 +226,10 @@ describe('vulnerabilities actions', () => {
         { headers, data },
         state,
         [
-          { type: types.SET_VULNERABILITIES_LOADING, payload: false },
-          { type: types.SET_VULNERABILITIES, payload: data },
-          { type: types.SET_PAGINATION, payload: pageInfo },
+          {
+            type: types.RECEIVE_VULNERABILITIES_SUCCESS,
+            payload: { pageInfo, vulnerabilities: data },
+          },
         ],
         [],
         done,
@@ -241,7 +238,7 @@ describe('vulnerabilities actions', () => {
   });
 
   describe('receiveVulnerabilitiesError', () => {
-    it('should commit the loading mutation', done => {
+    it('should commit the error mutation', done => {
       const state = initialState;
 
       testAction(
@@ -249,7 +246,7 @@ describe('vulnerabilities actions', () => {
         {},
         state,
         [
-          { type: types.SET_VULNERABILITIES_LOADING, payload: false },
+          { type: types.RECEIVE_VULNERABILITIES_ERROR },
         ],
         [],
         done,
@@ -258,7 +255,7 @@ describe('vulnerabilities actions', () => {
   });
 
   describe('requestVulnerabilities', () => {
-    it('should commit the loading mutation', done => {
+    it('should commit the request mutation', done => {
       const state = initialState;
 
       testAction(
@@ -266,7 +263,7 @@ describe('vulnerabilities actions', () => {
         {},
         state,
         [
-          { type: types.SET_VULNERABILITIES_LOADING, payload: true },
+          { type: types.REQUEST_VULNERABILITIES },
         ],
         [],
         done,

@@ -7,7 +7,7 @@ describe('Security Dashboard Table', () => {
   const vulnerabilities = [{ id: 0 }, { id: 1 }, { id: 2 }];
   const Component = Vue.extend(component);
   const getters = {
-    loadingVulnerabilities: () => false,
+    isLoadingVulnerabilities: () => false,
     vulnerabilities: () => vulnerabilities,
     pageInfo: () => null,
   };
@@ -27,7 +27,7 @@ describe('Security Dashboard Table', () => {
 
   describe('data is loading', () => {
     beforeEach(() => {
-      const loadingGetters = { ...getters, loadingVulnerabilities: () => true };
+      const loadingGetters = { ...getters, isLoadingVulnerabilities: () => true };
       const store = new Vuex.Store({ actions, getters: loadingGetters });
       vm = mountComponentWithStore(Component, { store });
     });

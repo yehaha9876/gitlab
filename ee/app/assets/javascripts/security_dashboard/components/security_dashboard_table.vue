@@ -10,7 +10,7 @@ export default {
     SecurityDashboardTableRow,
   },
   computed: {
-    ...mapGetters(['vulnerabilities', 'pageInfo', 'loadingVulnerabilities']),
+    ...mapGetters(['vulnerabilities', 'pageInfo', 'isLoadingVulnerabilities']),
     showPagination() {
       return this.pageInfo && this.pageInfo.total;
     },
@@ -50,10 +50,11 @@ export default {
       </div>
     </div>
 
-    <div v-if="loadingVulnerabilities">
+    <div v-if="isLoadingVulnerabilities">
       <security-dashboard-table-row
         v-for="n in 10"
         :key="n"
+        :is-loading="true"
       />
     </div>
 

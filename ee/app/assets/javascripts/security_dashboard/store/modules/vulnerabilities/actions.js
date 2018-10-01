@@ -17,17 +17,15 @@ export const fetchVulnerabilitiesCount = ({ dispatch }) => {
 };
 
 export const requestVulnerabilitiesCount = ({ commit }) => {
-  commit(types.SET_VULNERABILITIES_COUNT_LOADING, true);
+  commit(types.REQUEST_VULNERABILITIES_COUNT);
 };
 
 export const receiveVulnerabilitiesCountSuccess = ({ commit }, response) => {
-  commit(types.SET_VULNERABILITIES_COUNT_LOADING, false);
-  commit(types.SET_VULNERABILITIES_COUNT, response.data);
+  commit(types.RECEIVE_VULNERABILITIES_COUNT_SUCCESS, response.data);
 };
 
 export const receiveVulnerabilitiesCountError = ({ commit }) => {
-  // TODO: Show error state when we get it from UX
-  commit(types.SET_VULNERABILITIES_COUNT_LOADING, false);
+  commit(types.RECEIVE_VULNERABILITIES_COUNT_ERROR);
 };
 
 export const fetchVulnerabilities = ({ dispatch }, params = {}) => {
@@ -53,21 +51,19 @@ export const fetchVulnerabilities = ({ dispatch }, params = {}) => {
 };
 
 export const requestVulnerabilities = ({ commit }) => {
-  commit(types.SET_VULNERABILITIES_LOADING, true);
+  commit(types.REQUEST_VULNERABILITIES);
 };
 
 export const receiveVulnerabilitiesSuccess = ({ commit }, response = {}) => {
   const normalizedHeaders = normalizeHeaders(response.headers);
-  const paginationInformation = parseIntPagination(normalizedHeaders);
+  const pageInfo = parseIntPagination(normalizedHeaders);
+  const vulnerabilities = response.data;
 
-  commit(types.SET_VULNERABILITIES_LOADING, false);
-  commit(types.SET_VULNERABILITIES, response.data);
-  commit(types.SET_PAGINATION, paginationInformation);
+  commit(types.RECEIVE_VULNERABILITIES_SUCCESS, { pageInfo, vulnerabilities });
 };
 
 export const receiveVulnerabilitiesError = ({ commit }) => {
-  // TODO: Show error state when we get it from UX
-  commit(types.SET_VULNERABILITIES_LOADING, false);
+  commit(types.RECEIVE_VULNERABILITIES_ERROR);
 };
 
 export default () => {};

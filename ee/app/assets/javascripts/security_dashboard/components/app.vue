@@ -16,7 +16,7 @@ export default {
   computed: {
     ...mapGetters(['vulnerabilitiesCountByReportType']),
     sastCount() {
-      return this.vulnerabilitiesCountByReportType('sast') || null;
+      return this.vulnerabilitiesCountByReportType('sast');
     },
   },
   created() {
