@@ -11,11 +11,11 @@
           .text-muted
             = template.description
         .controls.d-flex.align-items-baseline
-          %label.btn.btn-success.custom-template-button.choose-template.append-right-10.append-bottom-0{ for: template.name }
+          %a.btn.btn-default.append-right-10{ href: project_path(template), rel: 'noopener noreferrer', target: '_blank' } Preview
+          %label.btn.btn-success.custom-template-button.choose-template.append-bottom-0{ for: template.name }
             %input{ type: "radio",  autocomplete: "off", name: "project[template_name]", id: template.name, value: template.name }
             %span
               = _('Use template')
-          %a.btn.btn-default{ href: project_path(template), rel: 'noopener noreferrer', target: '_blank' } Preview
 
     = paginate custom_project_templates, params: {controller: 'users', action: 'available_templates', username: current_user.username}, theme: 'gitlab', remote: true
   - else

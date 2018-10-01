@@ -510,7 +510,6 @@
 }
 
 .project-template {
-
   > .form-group {
     margin-bottom: 0;
   }
@@ -520,17 +519,61 @@
     padding-bottom: 0;
   }
 
+  .template-header,
+  .template-option {
+    padding: $gl-padding $gl-padding-8;
+    border-top: 1px solid $border-color;
+  }
+
+  .template-header {
+    cursor: pointer;
+
+    .template-options-icon {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .template-group-options {
+    &:first-child {
+      .template-header {
+        border-top: 0;
+      }
+    }
+
+    .options-expanded-icon {
+      display: none;
+    }
+
+    .template-option {
+      display: none;
+      background: $gray-light;
+
+      .avatar-container {
+        margin-left: 34px;
+      }
+    }
+
+    &.expanded {
+      .template-option {
+        display: flex;
+      }
+
+      .options-expanded-icon {
+        display: block;
+      }
+
+      .options-collapsed-icon {
+        display: none;
+      }
+    }
+  }
+
   .template-option {
     .logo {
       .btn-template-icon {
         width: 40px !important;
       }
-    }
-
-    padding: 16px 0;
-
-    &:not(:first-child) {
-      border-top: 1px solid $border-color;
     }
 
     .controls {
