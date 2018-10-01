@@ -2,8 +2,10 @@ import $ from 'jquery';
 import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
 
+Terminal.applyAddon(fit);
+
 export default class GLTerminal {
-  constructor(options = {}) {
+  constructor(element, options = {}) {
     this.options = Object.assign(
       {},
       {
@@ -13,7 +15,7 @@ export default class GLTerminal {
       options,
     );
 
-    this.container = document.querySelector(options.selector);
+    this.container = element;
 
     this.setSocketUrl();
     this.createTerminal();
@@ -34,8 +36,6 @@ export default class GLTerminal {
   }
 
   createTerminal() {
-    Terminal.applyAddon(fit);
-
     this.terminal = new Terminal(this.options);
 
     this.socket = new WebSocket(this.socketUrl, ['terminal.gitlab.com']);
@@ -71,5 +71,26 @@ export default class GLTerminal {
 
   handleSocketFailure() {
     this.terminal.write('\r\nConnection failure');
+  }
+
+  stop() {
+    this.terminal.setOption('cursorBlink', false);
+    this.terminal.setOption('theme', { foreground: '#707070' });
+    this.terminal.setOption('disableStdin', true);
+    this.socket.close();
+  }
+
+  dispose() {
+    this.terminal.off('data');
+    this.terminal.dispose();
+    this.socket.close();
+  }
+
+  scrollToTop() {
+    this.terminal.scrollToTop();
+  }
+
+  scrollToBottom() {
+    this.terminal.scrollToBottom();
   }
 }
