@@ -5,7 +5,7 @@ class Groups::Security::DashboardController < Groups::ApplicationController
   layout 'group'
 
   # Redirecting back to the group path till the page is ready
-  def show
-    redirect_to group_path(@group)
-  end
+  # def show
+  #   redirect_to group_path(@group)
+  # end
 end

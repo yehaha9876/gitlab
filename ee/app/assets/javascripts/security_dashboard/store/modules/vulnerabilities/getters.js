@@ -1,4 +1,4 @@
-import { accumulate } from '~/lib/utils/common_utils';
+import { sum } from '~/lib/utils/common_utils';
 
 export const pageInfo = state => state.pageInfo;
 export const vulnerabilities = state => state.vulnerabilities || [];
@@ -8,10 +8,10 @@ export const loadingVulnerabilitiesCount = state => state.loadingVulnerabilities
 export const vulnerabilitiesCountBySeverity = (state, getters) => severity =>
   Object.values(getters.vulnerabilitiesCount)
     .map(count => count[severity])
-    .reduce(accumulate, 0);
+    .reduce(sum, 0);
 export const vulnerabilitiesCountByReportType = (state, getters) => type => {
   const counts = getters.vulnerabilitiesCount[type];
-  return counts ? Object.values(counts).reduce(accumulate, 0) : 0;
+  return counts ? Object.values(counts).reduce(sum, 0) : 0;
 };
 
 export default () => {};

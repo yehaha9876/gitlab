@@ -1,5 +1,4 @@
 <script>
-import { mapGetters } from 'vuex';
 import { SkeletonLoading } from '@gitlab-org/gitlab-ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import SecurityDashboardActionButtons from './security_dashboard_action_buttons.vue';
@@ -17,9 +16,13 @@ export default {
       required: false,
       default: () => ({}),
     },
+    isLoading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
-    ...mapGetters(['loadingVulnerabilities']),
     confidence() {
       return this.vulnerability.confidence || '–';
     },
@@ -57,8 +60,8 @@ export default {
       </div>
       <div class="table-mobile-content">
         <skeleton-loading
-          v-if="loadingVulnerabilities"
-          class="mt-2"
+          v-if="isLoading"
+          class="mt-2 js-skeleton-loader"
           :lines="2"
         />
         <div v-else>

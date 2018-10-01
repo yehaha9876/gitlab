@@ -5,22 +5,19 @@ import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper
 
 describe('Security Dashboard Table', () => {
   const vulnerabilities = [{ id: 0 }, { id: 1 }, { id: 2 }];
-  let vm;
-  let getters;
+  const Component = Vue.extend(component);
+  const getters = {
+    loadingVulnerabilities: () => false,
+    vulnerabilities: () => vulnerabilities,
+    pageInfo: () => null,
+  };
   let actions;
+  let vm;
 
   beforeEach(() => {
-    const Component = Vue.extend(component);
-    getters = {
-      loadingVulnerabilities: () => false,
-      vulnerabilities: () => vulnerabilities,
-      pageInfo: () => null,
-    };
     actions = {
       fetchVulnerabilities: jasmine.createSpy('fetchVulnerabilities'),
     };
-    const store = new Vuex.Store({ actions, getters });
-    vm = mountComponentWithStore(Component, { store });
   });
 
   afterEach(() => {
@@ -28,11 +25,30 @@ describe('Security Dashboard Table', () => {
     vm.$destroy();
   });
 
-  it('should dispatch a `fetchVulnerabilities` action on creation', () => {
-    expect(actions.fetchVulnerabilities).toHaveBeenCalledTimes(1);
+  describe('data is loading', () => {
+    beforeEach(() => {
+      const loadingGetters = { ...getters, loadingVulnerabilities: () => true };
+      const store = new Vuex.Store({ actions, getters: loadingGetters });
+      vm = mountComponentWithStore(Component, { store });
+    });
+
+    it('should render 10 skeleton rows in the table', () => {
+      expect(vm.$el.querySelectorAll('.vulnerabilities-row')).toHaveLength(10);
+    });
   });
 
-  it('should render a row for each vulnerability', () => {
-    expect(vm.$el.querySelectorAll('.vulnerabilities-row')).toHaveLength(vulnerabilities.length);
+  describe('data has loaded', () => {
+    beforeEach(() => {
+      const store = new Vuex.Store({ actions, getters });
+      vm = mountComponentWithStore(Component, { store });
+    });
+
+    it('should dispatch a `fetchVulnerabilities` action on creation', () => {
+      expect(actions.fetchVulnerabilities).toHaveBeenCalledTimes(1);
+    });
+
+    it('should render a row for each vulnerability', () => {
+      expect(vm.$el.querySelectorAll('.vulnerabilities-row')).toHaveLength(vulnerabilities.length);
+    });
   });
 });

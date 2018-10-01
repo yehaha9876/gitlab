@@ -632,19 +632,19 @@ export const NavigationType = {
  * It seems unessesary, but when combined with a reducer it
  * adds up all the values in an array.
  *
- * e.g. `[1, 2, 3, 4, 5].reduce(accumulate) // => 15`
+ * e.g. `[1, 2, 3, 4, 5].reduce(sum) // => 15`
  *
  * @param {Float} a
  * @param {Float} b
  * @example
  * // return 15
- * [1, 2, 3, 4, 5].reduce(accumulate);
+ * [1, 2, 3, 4, 5].reduce(sum);
  *
  * // returns 6
- * Object.values([{a: 1, b: 2, c: 3].reduce(accumulate);
+ * Object.values([{a: 1, b: 2, c: 3].reduce(sum);
  * @returns {Float} The summed value
  */
-export const accumulate = (a = 0, b = 0) => a + b;
+export const sum = (a = 0, b = 0) => a + b;
 
 window.gl = window.gl || {};
 window.gl.utils = {
