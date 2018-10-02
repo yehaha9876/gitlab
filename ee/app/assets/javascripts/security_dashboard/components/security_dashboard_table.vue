@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import SecurityDashboardTableRow from './security_dashboard_table_row.vue';
 
@@ -10,7 +10,11 @@ export default {
     SecurityDashboardTableRow,
   },
   computed: {
-    ...mapGetters(['vulnerabilities', 'pageInfo', 'isLoadingVulnerabilities']),
+    ...mapState({
+      vulnerabilities: state => state.vulnerabilities.vulnerabilities,
+      pageInfo: state => state.vulnerabilities.pageInfo,
+      isLoadingVulnerabilities: state => state.vulnerabilities.isLoadingVulnerabilities,
+    }),
     showPagination() {
       return this.pageInfo && this.pageInfo.total;
     },

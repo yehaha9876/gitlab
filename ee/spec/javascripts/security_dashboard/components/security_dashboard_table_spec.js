@@ -1,16 +1,13 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import component from 'ee/security_dashboard/components/security_dashboard_table.vue';
+import State from 'ee/security_dashboard/store/modules/vulnerabilities/state';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 
 describe('Security Dashboard Table', () => {
   const vulnerabilities = [{ id: 0 }, { id: 1 }, { id: 2 }];
   const Component = Vue.extend(component);
-  const getters = {
-    isLoadingVulnerabilities: () => false,
-    vulnerabilities: () => vulnerabilities,
-    pageInfo: () => null,
-  };
+  const initialState = State();
   let actions;
   let vm;
 
@@ -27,8 +24,8 @@ describe('Security Dashboard Table', () => {
 
   describe('data is loading', () => {
     beforeEach(() => {
-      const loadingGetters = { ...getters, isLoadingVulnerabilities: () => true };
-      const store = new Vuex.Store({ actions, getters: loadingGetters });
+      const state = { vulnerabilities: { ...initialState, isLoadingVulnerabilities: true }};
+      const store = new Vuex.Store({ state, actions });
       vm = mountComponentWithStore(Component, { store });
     });
 
@@ -39,7 +36,8 @@ describe('Security Dashboard Table', () => {
 
   describe('data has loaded', () => {
     beforeEach(() => {
-      const store = new Vuex.Store({ actions, getters });
+      const state = { vulnerabilities: { ...initialState, vulnerabilities }};
+      const store = new Vuex.Store({ state, actions });
       vm = mountComponentWithStore(Component, { store });
     });
 
