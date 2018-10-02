@@ -14,6 +14,7 @@ class IssueAssignee < ActiveRecord::Base
         :update,
         'Issue',
         issue.id,
+        issue.es_id,
         changed_fields: ['assignee_ids']
       )
     end
