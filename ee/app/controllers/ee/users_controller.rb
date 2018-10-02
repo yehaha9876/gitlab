@@ -17,9 +17,12 @@ module EE
     end
 
     def load_group_project_templates
-      @groups_with_project_templates ||= ::GroupProjectTemplateFinder.new(user, params[:group_id])
-                                                                     .execute
-                                                                     .page(params[:page])
+      @groups_with_project_templates ||= begin
+        group = ::Group.find(params[:group_id]) if params[:group_id].present?
+
+        user.available_subgroups_with_project_templates(group&.custom_project_templates_group_id)
+            .page(params[:page])
+      end
     end
   end
 end

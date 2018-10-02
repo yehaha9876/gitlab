@@ -189,9 +189,9 @@ module EE
     end
 
     def available_custom_project_templates(subgroup_id = nil)
-      return [] unless namespace_id = (subgroup_id || custom_project_templates_group_id)
+      return [] unless group_id = (subgroup_id || custom_project_templates_group_id)
 
-      ::Project.where(namespace_id: namespace_id)
+      ::Project.where(namespace_id: group_id)
     end
 
     def instance_review_permitted?

@@ -14,7 +14,6 @@ class AddCustomProjectTemplatesGroupIdToNamespaces < ActiveRecord::Migration
   end
 
   def down
-    remove_foreign_key(:namespaces, column: :custom_project_templates_group_id)
     remove_column(:namespaces, :custom_project_templates_group_id)
   end
 end
