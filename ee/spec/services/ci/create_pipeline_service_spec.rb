@@ -14,9 +14,7 @@ describe Ci::CreatePipelineService, '#execute' do
     }
   end
 
-  let(:service) do
-    described_class.new(project, user, params)
-  end
+  subject { described_class.new(project, user, params) }
 
   before do
     project.add_developer(user)
@@ -110,6 +108,6 @@ describe Ci::CreatePipelineService, '#execute' do
   end
 
   def create_pipeline!(source: :push)
-    service.execute(source)
+    subject.execute(source)
   end
 end

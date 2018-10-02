@@ -19,21 +19,31 @@ describe Ci::BuildPolicy do
 
   describe 'manage a web ide terminal' do
     let(:build_permissions) { %i[read_build update_build erase_build create_build_terminal] }
-    let(:project) { create(:project, :public) }
     set(:maintainer) { create(:user) }
+    let(:owner) { create(:owner) }
+    let(:admin) { create(:admin) }
+    let(:maintainer) { create(:user) }
+    let(:developer) { create(:user) }
+    let(:reporter) { create(:user) }
+    let(:guest) { create(:user) }
+    let(:project) { create(:project, :public, namespace: owner.namespace) }
     let(:pipeline) { create(:ci_empty_pipeline, project: project, source: :webide) }
     let(:build) { create(:ci_build, pipeline: pipeline) }
 
     before do
       stub_licensed_features(ide_terminal: true)
+      allow(build).to receive(:has_terminal?).and_return(true)
 
       project.add_maintainer(maintainer)
+      project.add_developer(developer)
+      project.add_reporter(reporter)
+      project.add_guest(guest)
     end
 
     subject { described_class.new(current_user, build) }
 
     context 'when web_ide_terminal_enabled access disabled' do
-      let(:current_user) { create(:admin) }
+      let(:current_user) { admin }
 
       before do
         stub_licensed_features(ide_terminal: false)
@@ -45,10 +55,80 @@ describe Ci::BuildPolicy do
     end
 
     context 'when web_ide_terminal_enabled access enabled' do
-      let(:current_user) { maintainer }
+      context 'with admin' do
+        let(:current_user) { admin }
 
-      context 'when user is not the owner of the job' do
+        it { expect_allowed(*build_permissions) }
+      end
+
+      context 'with owner' do
+        let(:current_user) { owner }
+
         it { expect_disallowed(*build_permissions) }
+
+        context 'when user is the owner of the job' do
+          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
+
+          it { expect_allowed(*build_permissions) }
+        end
+      end
+
+      context 'with maintainer' do
+        let(:current_user) { maintainer }
+
+        it { expect_disallowed(*build_permissions) }
+
+        context 'when user is the owner of the job' do
+          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
+
+          it { expect_allowed(*build_permissions) }
+        end
+      end
+
+      context 'with developer' do
+        let(:current_user) { developer }
+
+        context 'when user is the owner of the job' do
+          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
+
+          it { expect_disallowed(*build_permissions) }
+        end
+      end
+
+      context 'with reporter' do
+        let(:current_user) { reporter }
+
+        it { expect_disallowed(*build_permissions) }
+
+        context 'when user is the owner of the job' do
+          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
+
+          it { expect_disallowed(*build_permissions) }
+        end
+      end
+
+      context 'with guest' do
+        let(:current_user) { guest }
+
+        it { expect_disallowed(*build_permissions) }
+
+        context 'when user is the owner of the job' do
+          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
+
+          it { expect_disallowed(*build_permissions) }
+        end
+      end
+
+      context 'with non member' do
+        let(:current_user) { create(:user) }
+
+        it { expect_disallowed(*build_permissions) }
+
+        context 'when user is the owner of the job' do
+          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
+
+          it { expect_disallowed(*build_permissions) }
+        end
       end
     end
 

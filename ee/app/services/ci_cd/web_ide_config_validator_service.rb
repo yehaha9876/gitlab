@@ -26,7 +26,7 @@ module CiCd
       return unless commit_id
 
       strong_memoize(:config_data) do
-        project.repository.gitlab_ci_yml_for(commit_id)
+        project.repository.gitlab_ci_yml_for(commit_id, project.ci_yaml_file_path)
       end
     end
 

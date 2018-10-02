@@ -42,11 +42,6 @@ module EE
       def authorize_web_ide_terminal_enabled!
         return render_403 unless can?(current_user, :web_ide_terminal_enabled, project)
       end
-
-      override :project_builds
-      def project_builds
-        project.builds.without_webide
-      end
     end
   end
 end

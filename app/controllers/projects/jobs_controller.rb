@@ -45,7 +45,7 @@ class Projects::JobsController < Projects::ApplicationController
   def cancel_all
     return access_denied! unless can?(current_user, :update_build, project)
 
-    project_builds.running_or_pending.each do |build|
+    project.builds.running_or_pending.each do |build|
       build.cancel if can?(current_user, :update_build, build)
     end
 
@@ -201,10 +201,6 @@ class Projects::JobsController < Projects::ApplicationController
 
   def build_path(build)
     project_job_path(build.project, build)
-  end
-
-  def project_builds
-    project.builds
   end
 
   def render_build(current_build)

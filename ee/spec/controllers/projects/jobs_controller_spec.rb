@@ -7,44 +7,155 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
   include ApiHelpers
   include HttpIOHelpers
 
-  let(:user) { create(:user) }
-  let(:project) { create(:project, :private, shared_runners_enabled: true) }
+  let(:owner) { create(:owner) }
+  let(:admin) { create(:admin) }
+  let(:maintainer) { create(:user) }
+  let(:developer) { create(:user) }
+  let(:reporter) { create(:user) }
+  let(:guest) { create(:user) }
+  let(:project) { create(:project, :private, :repository, namespace: owner.namespace) }
+  let(:user) { developer }
 
   before do
     stub_not_protect_default_branch
-    project.add_developer(user)
+
+    project.add_maintainer(maintainer)
+    project.add_developer(developer)
+    project.add_reporter(reporter)
+    project.add_guest(guest)
+
     sign_in(user)
   end
 
-  shared_examples 'job not found whith web ide pipeline' do
+  shared_examples 'returns 404' do
+    it 'returns 404' do
+      expect(response).to have_gitlab_http_status(404)
+    end
+  end
+
+  shared_examples 'when job pipeline is from webide source' do
     let(:pipeline) { create(:ci_pipeline, project: project, source: :webide) }
     let(:job) { create(:ci_build, pipeline: pipeline) }
+    let(:user) { maintainer }
 
-    context 'when job pipeline is from webide source' do
-      it 'returns not_found' do
-        expect(response).to have_gitlab_http_status(:not_found)
+    before do
+      stub_licensed_features(ide_terminal: true)
+
+      request
+    end
+
+    context 'with admin' do
+      let(:user) { admin }
+
+      it 'returns 200 or 302' do
+        expect(response.code).to eq('200').or(eq('302'))
+      end
+    end
+
+    context 'with owner' do
+      let(:user) { owner }
+
+      it_behaves_like 'returns 404'
+
+      context 'when user is the owner of the job' do
+        let(:job) { create(:ci_build, pipeline: pipeline, user: user) }
+
+        it 'returns 200 or 302' do
+          expect(response.code).to eq('200').or(eq('302'))
+        end
+      end
+    end
+
+    context 'with maintainer' do
+      let(:user) { maintainer }
+
+      it_behaves_like 'returns 404'
+
+      context 'when user is the owner of the job' do
+        let(:job) { create(:ci_build, pipeline: pipeline, user: user) }
+
+        it 'returns 200 or 302' do
+          expect(response.code).to eq('200').or(eq('302'))
+        end
+      end
+    end
+
+    context 'with developer' do
+      let(:user) { developer }
+
+      it_behaves_like 'returns 404'
+
+      context 'when user is the owner of the job' do
+        let(:job) { create(:ci_build, pipeline: pipeline, user: user) }
+
+        it_behaves_like 'returns 404'
+      end
+    end
+
+    context 'with reporter' do
+      let(:user) { reporter }
+
+      it_behaves_like 'returns 404'
+
+      context 'when user is the owner of the job' do
+        let(:job) { create(:ci_build, pipeline: pipeline, user: user) }
+
+        it_behaves_like 'returns 404'
+      end
+    end
+
+    context 'with guest' do
+      let(:user) { guest }
+
+      it_behaves_like 'returns 404'
+
+      context 'when user is the owner of the job' do
+        it_behaves_like 'returns 404'
+      end
+    end
+
+    context 'with non member' do
+      let(:user) { create(:user) }
+
+      it_behaves_like 'returns 404'
+
+      context 'when user is the owner of the job' do
+        let(:job) { create(:ci_build, pipeline: pipeline, user: user) }
+
+        it_behaves_like 'returns 404'
       end
     end
   end
 
   describe 'GET index' do
+    let(:user) { admin }
     let(:pipeline) { create(:ci_pipeline, project: project, source: :webide) }
     let!(:job) { create(:ci_build, pipeline: pipeline) }
     let(:pipeline2) { create(:ci_pipeline, project: project) }
     let!(:job2) { create(:ci_build, pipeline: pipeline2) }
 
-    before do
+    subject(:request) do
       get :index, namespace_id: project.namespace.to_param,
                   project_id: project
     end
 
-    it 'does not show web ide pipeline jobs' do
-      expect(assigns(:builds).count).to eq 1
-      expect(assigns(:builds).first).to eq job2
+    context 'when jobs pipeline is from webide source' do
+      before do
+        stub_licensed_features(ide_terminal: true)
+
+        request
+      end
+
+      it 'does not show webide pipeline jobs' do
+        expect(assigns(:builds).count).to eq 1
+        expect(assigns(:builds).first).to eq job2
+      end
     end
   end
 
   describe 'GET show' do
+    subject(:request) { get_show(id: job.id, format: :json) }
+
     context 'when requesting JSON' do
       let(:merge_request) { create(:merge_request, source_project: project) }
       let(:runner) { create(:ci_runner, :instance, description: 'Shared runner') }
@@ -56,7 +167,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
 
         stub_application_setting(shared_runners_minutes: minutes)
 
-        get_show(id: job.id, format: :json)
+        request
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('job/job_details', dir: 'ee')
@@ -89,13 +200,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
       end
     end
 
-    context do
-      before do
-        get_show(id: job.id)
-      end
-
-      it_behaves_like 'job not found whith web ide pipeline'
-    end
+    it_behaves_like 'when job pipeline is from webide source'
 
     private
 
@@ -110,62 +215,82 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
   end
 
   describe 'GET trace.json' do
-    before do
+    let(:user) { create(:admin) }
+
+    subject(:request) do
       get :trace, namespace_id: project.namespace,
                   project_id: project,
                   id: job.id,
                   format: :json
     end
 
-    it_behaves_like 'job not found whith web ide pipeline'
+    it_behaves_like 'when job pipeline is from webide source'
   end
 
   describe 'GET status.json' do
-    before do
+    subject(:request) do
       get :status, namespace_id: project.namespace,
                    project_id: project,
                    id: job.id,
                    format: :json
     end
 
-    it_behaves_like 'job not found whith web ide pipeline'
+    it_behaves_like 'when job pipeline is from webide source'
   end
 
   describe 'POST retry' do
-    before do
+    subject(:request) do
       post :retry, namespace_id: project.namespace,
                    project_id: project,
-                   id: job.id
+                   id: job.id,
+                   format: :json
     end
 
-    it_behaves_like 'job not found whith web ide pipeline'
+    before do
+      allow_any_instance_of(Ci::Build).to receive(:retryable?).and_return(true)
+    end
+
+    it_behaves_like 'when job pipeline is from webide source'
   end
 
   describe 'POST play' do
-    before do
+    subject(:request) do
       post :play, namespace_id: project.namespace,
                   project_id: project,
-                  id: job.id
+                  id: job.id,
+                  format: :json
     end
 
-    it_behaves_like 'job not found whith web ide pipeline'
+    before do
+      allow_any_instance_of(Ci::Build).to receive(:playable?).and_return(true)
+    end
+
+    it_behaves_like 'when job pipeline is from webide source'
   end
 
   describe 'POST cancel' do
-    before do
+    subject(:request) do
       post :cancel, namespace_id: project.namespace,
                     project_id: project,
-                    id: job.id
+                    id: job.id,
+                    format: :json
     end
 
-    it_behaves_like 'job not found whith web ide pipeline'
+    before do
+      allow_any_instance_of(Ci::Build).to receive(:cancelable?).and_return(true)
+    end
+
+    it_behaves_like 'when job pipeline is from webide source'
   end
 
   describe 'POST cancel_all' do
+    let(:user) { admin }
+
     context 'when jobs pipeline is from webide source' do
       let(:pipeline) { create(:ci_pipeline, project: project, source: :webide) }
 
       before do
+        stub_licensed_features(ide_terminal: true)
         create_list(:ci_build, 2, :cancelable, pipeline: pipeline)
 
         post_cancel_all
@@ -188,43 +313,185 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
   end
 
   describe 'POST erase' do
-    before do
+    subject(:request) do
       post :erase, namespace_id: project.namespace,
                    project_id: project,
                    id: job.id
     end
 
-    it_behaves_like 'job not found whith web ide pipeline'
+    before do
+      allow_any_instance_of(Ci::Build).to receive(:erase).and_return(true)
+    end
+
+    it_behaves_like 'when job pipeline is from webide source'
   end
 
   describe 'GET raw' do
-    before do
+    subject(:request) do
       post :raw, namespace_id: project.namespace,
                  project_id: project,
-                 id: job.id
+                 id: job.id,
+                 format: :json
     end
 
-    it_behaves_like 'job not found whith web ide pipeline'
+    it_behaves_like 'when job pipeline is from webide source'
   end
 
   describe 'GET terminal' do
-    before do
+    subject(:request) do
       get :terminal, namespace_id: project.namespace.to_param,
                      project_id: project,
                      id: job.id
     end
 
-    it_behaves_like 'job not found whith web ide pipeline'
+    before do
+      allow_any_instance_of(Ci::Build).to receive(:has_terminal?).and_return(true)
+      allow(Gitlab::Workhorse).to receive(:verify_api_request!)
+      allow(Gitlab::Workhorse).to receive(:terminal_websocket)
+    end
+
+    it_behaves_like 'when job pipeline is from webide source'
   end
 
   describe 'GET terminal_websocket_authorize' do
-    before do
+    subject(:request) do
       get :terminal_websocket_authorize,
           namespace_id: project.namespace.to_param,
           project_id: project,
-          id: job.id
+          id: job.id,
+          format: :json
     end
 
-    it_behaves_like 'job not found whith web ide pipeline'
+    before do
+      allow_any_instance_of(Ci::Build).to receive(:has_terminal?).and_return(true)
+      allow(Gitlab::Workhorse).to receive(:verify_api_request!)
+      allow(Gitlab::Workhorse).to receive(:terminal_websocket)
+    end
+
+    it_behaves_like 'when job pipeline is from webide source'
+  end
+
+  shared_examples 'EE jobs controller access rights' do
+    context 'with admin' do
+      let(:user) { admin }
+
+      it 'returns 200' do
+        expect(response).to have_gitlab_http_status(200)
+      end
+    end
+
+    context 'with owner' do
+      let(:user) { owner }
+
+      it 'returns 200' do
+        expect(response).to have_gitlab_http_status(200)
+      end
+    end
+
+    context 'with maintainer' do
+      let(:user) { maintainer }
+
+      it 'returns 200' do
+        expect(response).to have_gitlab_http_status(200)
+      end
+    end
+
+    context 'with developer' do
+      let(:user) { developer }
+
+      it 'returns 403' do
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'with reporter' do
+      let(:user) { reporter }
+
+      it 'returns 403' do
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'with guest' do
+      let(:user) { guest }
+
+      it 'returns 403' do
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'with non member' do
+      let(:user) { create(:user) }
+
+      it 'returns 404' do
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
+  describe 'GET check_config' do
+    let(:result) { { status: :success } }
+
+    before do
+      stub_licensed_features(ide_terminal: true)
+      allow_any_instance_of(CiCd::WebIdeConfigValidatorService)
+        .to receive(:execute).and_return(result)
+
+      get :check_config, namespace_id: project.namespace.to_param,
+                         project_id: project.to_param,
+                         branch: 'master'
+    end
+
+    context 'access rights' do
+      it_behaves_like 'EE jobs controller access rights'
+    end
+
+    context 'when invalid config file' do
+      let(:user) { admin }
+      let(:result) { { status: :error } }
+
+      it 'returns 422' do
+        expect(response).to have_gitlab_http_status(422)
+      end
+    end
+  end
+
+  describe 'POST create_webide_terminal' do
+    let(:branch) { 'master' }
+    let!(:pipeline) { create(:ci_pipeline, project: project) }
+
+    before do
+      stub_licensed_features(ide_terminal: true)
+      allow_any_instance_of(::Ci::CreatePipelineService)
+        .to receive(:execute).and_return(pipeline)
+
+      post :create_webide_terminal, namespace_id: project.namespace.to_param,
+                                    project_id: project.to_param,
+                                    branch: branch
+    end
+
+    context 'access rights' do
+      let(:build) { create(:ci_build, project: project) }
+      let(:pipeline) { build.pipeline }
+
+      it_behaves_like 'EE jobs controller access rights'
+    end
+
+    context 'when branch does not exist' do
+      let(:user) { admin }
+      let(:branch) { 'whatever' }
+
+      it 'returns 422' do
+        expect(response).to have_gitlab_http_status(422)
+      end
+    end
+
+    context 'when the job can not be created' do
+      let(:user) { admin }
+
+      it 'returns 400' do
+        expect(response.code).to eq '400'
+      end
+    end
   end
 end

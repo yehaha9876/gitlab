@@ -16,7 +16,7 @@ module EE
         end
 
         condition(:web_ide_terminal_granted) do
-          can?(:web_ide_terminal_enabled) && owner_of_job?
+          can?(:web_ide_terminal_enabled) && (current_user.admin? || owner_of_job?)
         end
 
         rule { web_ide_terminal & ~web_ide_terminal_granted }.policy do

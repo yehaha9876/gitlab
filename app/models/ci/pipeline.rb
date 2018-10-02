@@ -14,6 +14,8 @@ module Ci
 
     prepend ::EE::Ci::Pipeline
 
+    HIDDEN_SOURCE_ENUM_RANGE = (40..60).freeze
+
     belongs_to :project, inverse_of: :pipelines
     belongs_to :user
     belongs_to :auto_canceled_by, class_name: 'Ci::Pipeline'
@@ -55,6 +57,7 @@ module Ci
 
     delegate :id, to: :project, prefix: true
     delegate :full_path, to: :project, prefix: true
+    delegate :ci_yaml_file_path, to: :project
 
     validates :sha, presence: { unless: :importing? }
     validates :ref, presence: { unless: :importing? }
@@ -68,6 +71,9 @@ module Ci
 
     after_create :keep_around_commits, unless: :importing?
 
+    def self.source_enum_values
+    end
+
     enum_with_nil source: {
       unknown: nil,
       push: 1,
@@ -76,7 +82,7 @@ module Ci
       schedule: 4,
       api: 5,
       external: 6
-    }.merge(EE_CONFIG_SOURCES)
+    }.merge(source_enum_values)
 
     enum_with_nil config_source: {
       unknown_source: nil,
@@ -181,7 +187,16 @@ module Ci
     end
 
     scope :internal, -> { where(source: internal_sources) }
-    scope :visible, -> { where.not(source: hidden_sources) }
+    scope :visible, -> do
+      source_col = arel_table[:source]
+
+      where(
+        source_col.not_between(HIDDEN_SOURCE_ENUM_RANGE)
+          .or(
+            arel_table[:source].eq(sources[:unknown])
+          )
+      )
+    end
 
     # Returns the pipelines in descending order (= newest first), optionally
     # limited to a number of references.
@@ -489,14 +504,6 @@ module Ci
       rescue
         self.yaml_errors = 'Undefined error'
         nil
-      end
-    end
-
-    def ci_yaml_file_path
-      if project.ci_config_path.blank?
-        '.gitlab-ci.yml'
-      else
-        project.ci_config_path
       end
     end
 

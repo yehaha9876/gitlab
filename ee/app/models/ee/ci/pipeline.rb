@@ -25,10 +25,13 @@ module EE
       class_methods do
         extend ::Gitlab::Utils::Override
 
-        override :visible
-        def visible
-          where(arel_table[:source].not_eq(sources[:webide])
-            .or(arel_table[:source].eq(sources[:unknown])))
+        override :source_enum_values
+        def source_enum_values
+          {
+            pipeline: 7,
+            chat: 8,
+            webide: 40
+          }
         end
       end
 

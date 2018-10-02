@@ -3,6 +3,7 @@ require 'spec_helper'
 describe API::Pipelines do
   let(:user)        { create(:user) }
   let(:non_member)  { create(:user) }
+  let(:admin)       { create(:admin) }
   let(:project)     { create(:project, :repository, creator: user) }
 
   let!(:pipeline) do
