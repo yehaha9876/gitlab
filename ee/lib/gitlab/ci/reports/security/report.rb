@@ -5,12 +5,13 @@ module Gitlab
     module Reports
       module Security
         class Report
+          include Gitlab::Utils::StrongMemoize
+
           attr_reader :pipeline
           attr_reader :type
           attr_reader :occurrences
           attr_reader :scanners
           attr_reader :identifiers
-          attr_reader :occurrence_identifiers
 
           def initialize(pipeline, type)
             @pipeline = pipeline
@@ -21,13 +22,13 @@ module Gitlab
           end
 
           def add_scanner(params)
-            scanners[scanner_key(params)] ||= project.vulnerability_scanners.instantiate({}).tap do |scanner|
-              scanner.attributes = params
-            end
+            scanners[scanner_key(params)] ||= params
+            scanner_key(params)
           end
 
           def add_identifier(params)
-            identifiers[identifier_key(params)] ||= project.vulnerability_identifiers.instantiate(params)
+            identifiers[identifier_key(params)] ||= params
+            identifier_key(params)
           end
 
           def add_occurrence(params)
@@ -35,61 +36,71 @@ module Gitlab
               pipeline: pipeline,
               ref: pipeline.ref,
               first_seen_in_commit_sha: pipeline.sha)
-
-            project.vulnerabilities.build(params).tap do |occurence|
-              occurrences << occurence
-            end
+            occurrences << params
+            params
           end
 
           def persist!
-            persist_scanners!
-            persist_identifiers!
-            persist_occurrences!
+            vulnerabilities_objects.each(&:save!)
+          end
+
+          def vulnerabilities_objects
+            strong_memoize(:vulnerabilities_objects) do
+              # mutate AR model pointers to have proper relations between existing and new objects
+              occurrences.map do |occurrence|
+                occurrence[:scanner] = scanners_objects[occurrence[:scanner]]
+
+                occurrence[:identifiers].map! do |fingerprint|
+                  identifiers_objects[fingerprint]
+                end
+
+                project.vulnerabilities.build(occurrence)
+              end
+            end
+          end
+
+          def scanners_objects
+            strong_memoize(:scanners_objects) do
+              scanners.map do |key, scanner|
+                [key, existing_scanner_objects[key] || project.vulnerability_scanners.build(scanner)]
+              end.to_h
+            end
+          end
+
+          def all_scanners_external_ids
+            scanners.values.map { |scanner| scanner[:external_id] }
+          end
+
+          def existing_scanner_objects
+            strong_memoize(:existing_scanner_objects) do
+              # find existing scanners
+              project.vulnerability_scanners.where(external_id: all_scanners_external_ids).map do |scanner|
+                [scanner.external_id, scanner]
+              end.to_h
+            end
+          end
+
+          def identifiers_objects
+            strong_memoize(:identifiers_objects) do
+              identifiers.map do |key, identifier|
+                [key, existing_identifiers_objects[key] || project.vulnerability_identifiers.build(identifier)]
+              end.to_h
+            end
+          end
+
+          def all_identifiers_fingerprints
+            identifiers.values.map { |identifier| identifier[:fingerprint] }
+          end
+
+          def existing_identifiers_objects
+            strong_memoize(:existing_identifiers_objects) do
+              project.vulnerability_identifiers.where(fingerprint: all_identifiers_fingerprints).map do |identifier|
+                [identifier.fingerprint, identifier]
+              end.to_h
+            end
           end
 
           private
-
-          def persist_scanners!
-            external_ids = scanners.values.map(&:external_id)
-            break if external_id.empty?
-
-            # find existing scanners
-            project.vulnerability_scanners.where(external_id: external_ids).pluck(:id, :external_id) do |scanner|
-              scanners[scanner.second].id = scanner.first
-            end
-
-            scanners.each do |external_id, scanner|
-              scanner.save!(validate: false) unless scanner.id
-            end
-          end
-
-          def persist_identifiers!
-            fingerprints = identifiers.values.map(&:fingerprint)
-
-            project.vulnerability_identifiers.where(external_id: external_ids).pluck(:id, :fingerprint) do |identifier|
-              identifiers[identifier.second].id = identifier.first
-            end
-
-            identifiers.each do |fingerprint, identifier|
-              identifier.dup.tap do |new_identifier|
-                new_identifier.save!(validate: false)
-                identifier.id = new_identifier.id
-              end unless identifier.id
-            end
-          end
-
-          def persist_occurrences!
-            # mutate AR model pointers to have proper relations between existing and new objects
-            occurrences.each do |occurrence|
-              occurrence.scanner = scanners[occurrence.scanner.external_id] if occurrence.scanner
-
-              occurrence.occurrence_identifiers.each do |occurrence_identifier|
-                occurrence_identifier.identifier = identifiers[occurrence_identifier.identifier.fingerprint]
-              end
-
-              occurrence.save!(validate: false)
-            end
-          end
 
           def project
             pipeline.project

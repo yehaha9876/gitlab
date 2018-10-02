@@ -15,14 +15,14 @@ describe Gitlab::Ci::Parsers::Security::Sast do
     end
 
     it "parses all identifiers and occurences" do
-      expect(report.occurences.length).to eq(3)
+      expect(report.occurrences.length).to eq(3)
       expect(report.identifiers.length).to eq(4)
       expect(report.scanners.length).to eq(3)
     end
 
     context 'WIPWIPWIP tries to persist' do
-      describe '#persist_scanners!' do
-        subject { report.persist_scanners! }
+      describe '#scanners_objects' do
+        subject { report.scanners_objects.values.each(&:save!) }
 
         it 'persist all scanners' do
           expect { subject }.to change { Vulnerabilities::Scanner.where(project: project).count }.by(3)
@@ -37,8 +37,8 @@ describe Gitlab::Ci::Parsers::Security::Sast do
         end
       end
 
-      describe '#persist_identifiers!' do
-        subject { report.persist_identifiers! }
+      describe '#identifiers_objects' do
+        subject { report.identifiers_objects.values.each(&:save!) }
 
         it 'persist all identifiers' do
           expect { subject }.to change { Vulnerabilities::Identifier.where(project: project).count }.by(4)
@@ -53,8 +53,8 @@ describe Gitlab::Ci::Parsers::Security::Sast do
         end
       end
 
-      describe '#persist_occurrences!' do
-        subject { report.persist_occurrences! }
+      describe '#vulnerabilities_objects' do
+        subject { report.vulnerabilities_objects.each(&:save!) }
 
         it 'persist all occurrences' do
           expect { subject }.to change { Vulnerabilities::Occurrence.where(project: project).count }.by(3)
@@ -71,11 +71,6 @@ describe Gitlab::Ci::Parsers::Security::Sast do
         context 'when there are identifier and scanners created' do
           let!(:identifier) { create(:vulnerabilities_identifier, project: project, fingerprint: 'f5724386167705667ae25a1390c0a516020690ba') }
           let!(:scanner) { create(:vulnerabilities_scanner, project: project, external_id: 'find_sec_bugs') }
-
-          before do
-            report.persist_identifiers!
-            report.persist_scanners!
-          end
 
           it 'persist all occurrences' do
             expect { subject }.to change { Vulnerabilities::Occurrence.where(project: project).count }.by(3)

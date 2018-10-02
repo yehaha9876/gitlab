@@ -33,7 +33,7 @@ module Gitlab
             report.add_occurrence(
               report_type: report_type,
               name: data['message'],
-              primary_identifier_fingerprint: identifiers.first.fingerprint,
+              primary_identifier_fingerprint: identifiers.first,
               project_fingerprint: generate_project_fingerprint(data['cve']),
               location_fingerprint: generate_location_fingerprint(data['location']),
               severity: parse_level(data['severity']),
