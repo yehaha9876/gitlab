@@ -131,10 +131,6 @@ describe 'Edit group settings' do
         end
 
         it 'shows only the subgroups' do
-          # the default value of 0.2 from the slow_requests helper isn't
-          # enough when this spec is exec along with other feature specs.
-          sleep 0.5
-
           page.within('.select2-drop .select2-results') do
             results = find_all('.select2-result')
 
