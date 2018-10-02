@@ -19,6 +19,9 @@
 
     = paginate custom_project_templates, params: {controller: 'users', action: 'available_templates', username: current_user.username}, theme: 'gitlab', remote: true
   - else
-    There are no custom project templates set up for this GitLab instance. They are enabled from GitLab's Admin Area. Contact your GitLab instance administrator to setup custom project templates.
+    .bs-callout.bs-callout-warning
+      %p
+        There are no custom project templates set up for this GitLab instance. They are enabled from GitLab's Admin Area. Contact your GitLab instance administrator to setup custom project templates.
 
-    Learn more about custom project templates
+      %strong
+        = link_to _("Learn more about custom project templates"), help_page_path("user/admin_area/custom_project_templates")
