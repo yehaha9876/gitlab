@@ -131,11 +131,5 @@ module EE
         errors.add(:custom_project_templates_group_id, "has to be a descendant of the group")
       end
     end
-
-    private
-
-    def custom_project_templates_group_id_changed?
-      has_attribute?(:custom_project_templates_group_id) && super
-    end
   end
 end
