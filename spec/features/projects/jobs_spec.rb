@@ -368,14 +368,14 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
     end
 
     context 'when job starts environment', :js do
-      let(:job) { create(:ci_build, :success, :trace_live, environment: 'production', pipeline: pipeline) }
-      let(:environment) { create(:environment, name: 'production', project: job.project) }
+      let(:environment) { create(:environment, name: 'production', project: project) }
 
       context 'job is successful and has deployment' do
-        let!(:deployment) { create(:deployment, environment: environment, project: environment.project, deployable: job) }
+        let(:build) { create(:ci_build, :success, :trace_live, environment: environment.name, pipeline: pipeline) }
+        let!(:deployment) { create(:deployment, environment: environment, project: environment.project, deployable: build) }
 
         before do
-          visit project_job_path(project, job)
+          visit project_job_path(project, build)
           wait_for_requests
           # scroll to the top of the page first
           execute_script "window.scrollTo(0,0)"
@@ -387,33 +387,36 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
 
         it 'shows deployment message' do
           expect(page).to have_content 'This job is the most recent deployment'
+          expect(find('.js-environment-link')['href']).to match("environments/#{environment.id}")
         end
       end
 
       context 'job is complete and not successful' do
-        let(:job) { create(:ci_build, :failed, :trace_artifact, environment: environment.name, pipeline: pipeline) }
+        let(:build) { create(:ci_build, :failed, :trace_artifact, environment: environment.name, pipeline: pipeline) }
 
         it 'shows a link for the job' do
-          visit project_job_path(project, job)
+          visit project_job_path(project, build)
           wait_for_requests
           # scroll to the top of the page first
           execute_script "window.scrollTo(0,0)"
 
           expect(page).to have_link environment.name
+          expect(find('.js-environment-link')['href']).to match("environments/#{environment.id}")
         end
       end
 
-      context 'job creates a new deployment' do
-        let(:job) { create(:ci_build, :success, :trace_artifact, environment: environment.name, pipeline: pipeline) }
-        let!(:deployment) { create(:deployment, environment: environment, sha: project.commit.id, project: environment.project, deployable: job) }
+      context 'deployment still not finished' do
+        let(:build) { create(:ci_build, :success, environment: environment.name, pipeline: pipeline) }
 
         it 'shows a link to latest deployment' do
-          visit project_job_path(project, job)
+          visit project_job_path(project, build)
           wait_for_all_requests
           # scroll to the top of the page first
           execute_script "window.scrollTo(0,0)"
 
-          expect(page).to have_link('latest deployment')
+          expect(page).to have_link environment.name
+          expect(page).to have_content 'This job is creating a deployment'
+          expect(find('.js-environment-link')['href']).to match("environments/#{environment.id}")
         end
       end
     end
@@ -435,9 +438,14 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
 
         it 'shows deployment message' do
           expected_text = 'This job is an out-of-date deployment ' \
-            "to staging.\nView the most recent deployment ##{second_deployment.iid}."
+            "to staging. View the most recent deployment ##{second_deployment.iid}."
 
           expect(page).to have_css('.environment-information', text: expected_text)
+        end
+
+        it 'renders a link to the most recent deployment' do
+          expect(find('.js-environment-link')['href']).to match("environments/#{environment.id}")
+          expect(find('.js-job-deployment-link')['href']).to include(second_deployment.deployable.project.path, second_deployment.deployable_id.to_s)
         end
       end
 
@@ -464,6 +472,7 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
 
             expect(page).to have_css(
               '.environment-information', text: expected_text)
+            expect(find('.js-environment-link')['href']).to match("environments/#{environment.id}")
           end
 
           context 'when it has deployment' do
@@ -476,11 +485,14 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
                 '.environment-information', text: expected_text)
               expect(page).to have_css(
                 '.environment-information', text: 'latest deployment')
+              expect(find('.js-environment-link')['href']).to match("environments/#{environment.id}")
             end
           end
         end
 
         context 'when environment does not exist' do
+          let!(:environment) { create(:environment, name: 'staging', project: project) }
+
           it 'shows deployment message' do
             expected_text = 'This job is creating a deployment to staging'
 
@@ -488,6 +500,7 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
               '.environment-information', text: expected_text)
             expect(page).not_to have_css(
               '.environment-information', text: 'latest deployment')
+            expect(find('.js-environment-link')['href']).to match("environments/#{environment.id}")
           end
         end
       end

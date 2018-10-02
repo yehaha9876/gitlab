@@ -6093,7 +6093,7 @@ msgstr ""
 msgid "This job is an out-of-date deployment to %{environmentLink}. View the most recent deployment %{deploymentLink}."
 msgstr ""
 
-msgid "This job is creating a deployment to %{environmentLink} and will overwrite the last %{deploymentLink}."
+msgid "This job is creating a deployment to %{environmentLink} and will overwrite the %{deploymentLink}."
 msgstr ""
 
 msgid "This job is creating a deployment to %{environmentLink}."
@@ -7033,6 +7033,9 @@ msgid "importing"
 msgstr ""
 
 msgid "issue boards"
+msgstr ""
+
+msgid "latest deployment"
 msgstr ""
 
 msgid "latest version"

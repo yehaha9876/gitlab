@@ -29,5 +29,14 @@ export const jobHasStarted = state => !(state.job.started === false);
 
 export const hasEnvironment = state => !_.isEmpty(state.job.deployment_status);
 
+/**
+ * When the job is pending and there are no available runners
+ * we need to render the stuck block;
+ *
+ * @returns {Boolean}
+ */
+export const isJobStuck = state =>
+  state.job.status.group === 'pending' && state.job.runners && state.job.runners.available === false;
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

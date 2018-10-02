@@ -128,7 +128,18 @@ describe('Job App ', () => {
 
   describe('stuck block', () => {
     it('renders stuck block when there are no runners', () => {
-      store.dispatch('receiveJobSuccess', job);
+      store.dispatch(
+        'receiveJobSuccess',
+        Object.assign({}, job, {
+          status: {
+            group: 'pending',
+            icon: 'status_pending',
+            label: 'pending',
+            text: 'pending',
+            details_path: 'path',
+          },
+        }),
+      );
 
       vm = mountComponentWithStore(Component, {
         props,
@@ -139,7 +150,18 @@ describe('Job App ', () => {
     });
 
     it('renders tags in stuck block when there are no runners', () => {
-      store.dispatch('receiveJobSuccess', job);
+      store.dispatch(
+        'receiveJobSuccess',
+        Object.assign({}, job, {
+          status: {
+            group: 'pending',
+            icon: 'status_pending',
+            label: 'pending',
+            text: 'pending',
+            details_path: 'path',
+          },
+        }),
+      );
 
       vm = mountComponentWithStore(Component, {
         props,

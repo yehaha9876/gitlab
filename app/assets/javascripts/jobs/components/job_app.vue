@@ -30,6 +30,7 @@
         'shouldRenderCalloutMessage',
         'jobHasStarted',
         'hasEnvironment',
+        'isJobStuck',
       ]),
     },
   };
@@ -67,7 +68,7 @@
 
       <!-- Body Section -->
       <stuck-block
-        v-if="!job.runners.available"
+        v-if="isJobStuck"
         class="js-job-stuck"
         :has-no-runners-for-project="job.runners.available"
         :tags="job.tags"
@@ -77,6 +78,7 @@
       <environments-block
         v-if="hasEnvironment"
         :deployment-status="job.deployment_status"
+        :icon-status="job.status"
       />
 
       <erased-block
