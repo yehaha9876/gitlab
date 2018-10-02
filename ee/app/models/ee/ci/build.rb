@@ -90,7 +90,7 @@ module EE
         each_report(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES) do |file_type, blob|
           # Group reports per file_type, which maps the type of report (SAST, DS, CS or DAST)
           security_reports.get_report(file_type).tap do |security_report|
-            ::Gitlab::Ci::Parsers::Security.fabricate!(file_type).parse!(blob, security_report)
+            ::Gitlab::Ci::Parsers::Security.fabricate!(self.pipeline, file_type)&.parse!(blob, security_report)
           end
         end
       end

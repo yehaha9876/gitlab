@@ -10,10 +10,10 @@ module Gitlab
           sast: ::Gitlab::Ci::Parsers::Security::Sast
         }.freeze
 
-        def self.fabricate!(file_type)
-          PARSERS.fetch(file_type.to_sym).new
+        def self.fabricate!(pipeline, file_type)
+          PARSERS.fetch(file_type.to_sym).new(pipeline, file_type)
         rescue KeyError
-          raise ParserNotFoundError, "Cannot find any parser matching file type '#{file_type}'"
+          # raise ParserNotFoundError, "Cannot find any parser matching file type '#{file_type}'"
         end
       end
     end

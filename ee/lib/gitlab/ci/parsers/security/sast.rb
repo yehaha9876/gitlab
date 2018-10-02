@@ -5,11 +5,14 @@ module Gitlab
     module Parsers
       module Security
         class Sast
-          REPORT_TYPE = 'sast'
           SastParserError = Class.new(StandardError)
 
-          def report_type
-            REPORT_TYPE
+          def initialize(pipeline, type)
+            @pipeline = pipeline
+            @project = pipeline.project
+            @type = type
+            @scanners = {}
+            @identifiers = {}
           end
 
           def parse!(json_data, report)
@@ -27,63 +30,66 @@ module Gitlab
           protected
 
           def create_vulnerability(data)
-            # TODO: add backward compatibility here?
-            data['scanner'] = generate_scanner(data) if data['scanner'].nil?
-
-            scanner = create_scanner(data['scanner'])
+            scanner = create_scanner(data['scanner'] || mutate_scanner_tool(data['tool']))
             identifiers = create_identifiers(data['identifiers'])
 
-            ::Vulnerabilities::Occurrence.new(
-              report_type: report_type,
+            @project.vulnerabilities.build(
+              pipeline: @pipeline,
+              ref: @pipeline.ref,
+              uuid: SecureRandom.uuid,
+              report_type: @type,
               name: data['message'],
+              primary_identifier_fingerprint: identifiers.first.fingerprint,
               project_fingerprint: generate_project_fingerprint(data['cve']),
-              primary_identifier_fingerprint: identifiers.first&.fingerprint,
               location_fingerprint: generate_location_fingerprint(data['location']),
               severity: parse_level(data['severity']),
               confidence: parse_level(data['confidence']),
               scanner: scanner,
               identifiers: identifiers,
               raw_metadata: data.to_json,
-              metadata_version: "#{report_type}:1.3" # hardcoded untill provided in the report
+              metadata_version: "#{@type}:1.3" # hardcoded untill provided in the report
             )
           end
 
           def create_scanner(scanner)
-            return nil unless scanner.is_a?(Hash) && !scanner.empty?
+            return unless scanner.is_a?(Hash) && !scanner.empty?
 
-            ::Vulnerabilities::Scanner.new(
+            @scanners[scanner['id']] ||= @project.vulnerability_scanners.build(
               external_id: scanner['id'],
-              name: scanner['name']
-            )
+              name: scanner['name'])
           end
 
           def create_identifiers(identifiers)
             return [] unless identifiers.is_a?(Array) && !identifiers.empty?
 
             identifiers.map do |identifier|
-              ::Vulnerabilities::Identifier.new(
-                external_type: identifier['type'],
-                external_id: identifier['value'],
-                name: identifier['name'],
-                fingerprint: generate_identifier_fingerprint(identifier),
-                url: identifier['url']
-              )
-            end
+              create_identifier(identifier)
+            end.compact
+          end
+
+          def create_identifier(identifier)
+            return unless identifier.is_a?(Hash)
+
+            fingerprint = generate_identifier_fingerprint(identifier)
+
+            @identifiers[fingerprint] ||= @project.vulnerability_identifiers.build(
+              external_type: identifier['type'],
+              external_id: identifier['value'],
+              name: identifier['name'],
+              fingerprint: fingerprint,
+              url: identifier['url'])
+          end
+
+          def mutate_scanner_tool(tool)
+            { 'id' => tool, 'name' => tool.capitalize } if tool
           end
 
           def parse_level(input)
-            input.blank? ? :undefined : input.downcase
-          end
-
-          def generate_scanner(data)
-            {
-              id: data['tool'],
-              name: data['tool'].capitalize
-            }.with_indifferent_access
+            input.blank? ? 'undefined' : input.downcase
           end
 
           def generate_location_fingerprint(location)
-            Digest::SHA1.hexdigest "#{location['file_path']}:#{location['start_line']}:#{location['end_line']}"
+            Digest::SHA1.hexdigest("#{location['file']}:#{location['start_line']}:#{location['end_line']}")
           end
 
           def generate_project_fingerprint(compare_key)
@@ -91,7 +97,7 @@ module Gitlab
           end
 
           def generate_identifier_fingerprint(identifier)
-            Digest::SHA1.hexdigest "#{identifier['external_type']}:#{identifier['external_id']}"
+            Digest::SHA1.hexdigest("#{identifier['type']}:#{identifier['value']}")
           end
         end
       end

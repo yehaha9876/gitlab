@@ -1,0 +1,57 @@
+<%= form_for(@vulnerability) do |f| %>
+  <% if @vulnerability.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@vulnerability.errors.count, "error") %> prohibited this vulnerability from being saved:</h2>
+
+      <ul>
+      <% @vulnerability.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :type %><br>
+    <%= f.text_field :type %>
+  </div>
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.number_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :severity %><br>
+    <%= f.text_field :severity %>
+  </div>
+  <div class="field">
+    <%= f.label :confidence %><br>
+    <%= f.text_field :confidence %>
+  </div>
+  <div class="field">
+    <%= f.label :ref %><br>
+    <%= f.text_field :ref %>
+  </div>
+  <div class="field">
+    <%= f.label :pipeline_id %><br>
+    <%= f.number_field :pipeline_id %>
+  </div>
+  <div class="field">
+    <%= f.label :scanner_id %><br>
+    <%= f.number_field :scanner_id %>
+  </div>
+  <div class="field">
+    <%= f.label :commit_sha %><br>
+    <%= f.text_field :commit_sha %>
+  </div>
+  <div class="field">
+    <%= f.label :location_fingerprint %><br>
+    <%= f.text_field :location_fingerprint %>
+  </div>
+  <div class="field">
+    <%= f.label :primary_identifier_fingerprint %><br>
+    <%= f.text_field :primary_identifier_fingerprint %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

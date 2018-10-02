@@ -14,7 +14,8 @@ describe Gitlab::Ci::Reports::Security::Reports do
       it { expect(subject.type).to eq('sast') }
 
       it 'initializes a new report and returns it' do
-        expect(Gitlab::Ci::Reports::Security::Report).to receive(:new).and_call_original
+        expect(Gitlab::Ci::Reports::Security::Report).to receive(:new)
+          .with('sast').and_call_original
 
         is_expected.to be_a(Gitlab::Ci::Reports::Security::Report)
       end

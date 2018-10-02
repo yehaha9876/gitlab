@@ -1,0 +1,136 @@
+<style>
+body {
+  background-color: #fff;
+  color: #333;
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+p, ol, ul, td {
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+pre {
+  background-color: #eee;
+  padding: 10px;
+  font-size: 11px;
+}
+
+a {
+  color: #000;
+
+  &:visited {
+    color: #666;
+  }
+
+  &:hover {
+    color: #fff;
+    background-color: #000;
+  }
+}
+
+div {
+  &.field, &.actions {
+    margin-bottom: 10px;
+  }
+}
+
+#notice {
+  color: green;
+}
+
+.field_with_errors {
+  padding: 2px;
+  background-color: red;
+  display: table;
+}
+
+#error_explanation {
+  width: 450px;
+  border: 2px solid red;
+  padding: 7px;
+  padding-bottom: 0;
+  margin-bottom: 20px;
+  background-color: #f0f0f0;
+
+  h2 {
+    text-align: left;
+    font-weight: bold;
+    padding: 5px 5px 5px 15px;
+    font-size: 12px;
+    margin: -7px;
+    margin-bottom: 0px;
+    background-color: #c00;
+    color: #fff;
+  }
+
+  ul li {
+    font-size: 12px;
+    list-style: square;
+  }
+}
+</style>
+
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Vulnerabilities</h1>
+
+<h2>Counts by Severity:</h2>
+<table>
+  <thead>
+    <tr>
+      <% @severity_counts.each do |id, count| %>
+        <th><%= Vulnerabilities::Occurrence::LEVELS.key(id) %></th>
+      <% end %>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <% @severity_counts.each do |id, count| %>
+        <td><%= count %></td>
+      <% end %>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Current vulnerabilities:</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Identifiers</th>
+      <th>Name</th>
+      <th>Severity</th>
+      <th>Confidence</th>
+      <th>Ref</th>
+      <th>Pipeline id</th>
+      <th>Location fingerprint</th>
+      <th>Primary identifier fingerprint</th>
+      <th>Scanner</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @vulnerabilities.each do |vulnerability| %>
+      <tr>
+        <td><%= vulnerability.id %></td>
+        <td><%= vulnerability.identifiers.pluck :name %></td>
+        <td><%= vulnerability.name %></td>
+        <td><%= vulnerability.severity %></td>
+        <td><%= vulnerability.confidence %></td>
+        <td><%= vulnerability.ref %></td>
+        <td><%= vulnerability.pipeline_id %></td>
+        <td><%= vulnerability.location_fingerprint[0..6] %></td>
+        <td><%= vulnerability.primary_identifier_fingerprint[0..6] %></td>
+        <td><%= vulnerability.scanner.name %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+

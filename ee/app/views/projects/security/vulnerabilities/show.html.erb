@@ -1,0 +1,54 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Type:</strong>
+  <%= @vulnerability.type %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @vulnerability.name %>
+</p>
+
+<p>
+  <strong>Severity:</strong>
+  <%= @vulnerability.severity %>
+</p>
+
+<p>
+  <strong>Confidence:</strong>
+  <%= @vulnerability.confidence %>
+</p>
+
+<p>
+  <strong>Ref:</strong>
+  <%= @vulnerability.ref %>
+</p>
+
+<p>
+  <strong>Pipeline:</strong>
+  <%= @vulnerability.pipeline_id %>
+</p>
+
+<p>
+  <strong>Scanner:</strong>
+  <%= @vulnerability.scanner_id %>
+</p>
+
+<p>
+  <strong>Commit sha:</strong>
+  <%= @vulnerability.commit_sha %>
+</p>
+
+<p>
+  <strong>Location fingerprint:</strong>
+  <%= @vulnerability.location_fingerprint %>
+</p>
+
+<p>
+  <strong>Primary identifier fingerprint:</strong>
+  <%= @vulnerability.primary_identifier_fingerprint %>
+</p>
+
+<%= link_to 'Edit', edit_vulnerability_path(@vulnerability) %> |
+<%= link_to 'Back', vulnerabilities_path %>
