@@ -2,6 +2,7 @@
 
 import { mapState } from 'vuex';
 import initTerminal from '~/terminal/';
+import initSyncProxy from '~/sync_proxy'
 
 export default {
   components: {},
@@ -37,6 +38,8 @@ export default {
   updated() {
     if (this.terminalRunning) {
       this.terminal = initTerminal();
+      debugger
+      initSyncProxy({url: this.wsTerminalPath});
     }
   },
   beforeDestroy() {
