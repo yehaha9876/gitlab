@@ -11,7 +11,7 @@ module EE
         mirror_user_id = current_user.id if mirror
         mirror_trigger_builds = params.delete(:mirror_trigger_builds)
         ci_cd_only = ::Gitlab::Utils.to_boolean(params.delete(:ci_cd_only))
-        subgroup_with_project_templates_id = params[:group_with_project_templates_id]
+        subgroup_with_project_templates_id = extract_subgroup_with_templates_id
 
         project = super do |project|
           # Repository size limit comes as MB from the view
@@ -74,14 +74,38 @@ module EE
       # When using a project template from a Group, the new project can only be created
       # under the top level group or any subgroup
       def validate_namespace_used_with_template(project, subgroup_id)
-        return if project.namespace_id.nil?
+        return unless project.group
         return if subgroup_id.blank?
 
-        parent_id = ::Group.find(subgroup_id).parent_id
-        project_namespace = project.namespace
+        project_ancestor_ids = extract_ancestor_ids(project.group.hierarchy)
+        subgroup_ancestor_ids = extract_ancestor_ids(::Group.find(subgroup_id).hierarchy)
 
-        unless [project_namespace.id, project_namespace.parent_id].include?(parent_id)
+        if (project_ancestor_ids & subgroup_ancestor_ids).empty?
           project.errors.add(:namespace, "is out of the hierarchy of the Group owning the template")
+        end
+      end
+
+      # hierarchy can be a Hash of Groups or a single Group in case it's the top parent.
+      def extract_ancestor_ids(hierarchy, ids = [])
+        if hierarchy.is_a?(Group)
+          return ids.concat([hierarchy.id])
+        else
+          hierarchy.each_with_object(ids) do |(group, parents), list|
+            list << group.id
+
+            return ancestor_ids(parents, list)
+          end
+        end
+      end
+
+      # We need to exec this helper method before invoking super
+      # so we can extract group_with_project_templates_id if required
+      # and avoid an error when initializing the Project given this is not a valid attr
+      def extract_subgroup_with_templates_id
+        if params[:template_name].present?
+          params[:group_with_project_templates_id]
+        else
+          params.delete(:group_with_project_templates_id)
         end
       end
 

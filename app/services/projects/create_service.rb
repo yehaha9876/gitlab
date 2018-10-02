@@ -18,7 +18,7 @@ module Projects
       forked_from_project_id = params.delete(:forked_from_project_id)
       import_data = params.delete(:import_data)
 
-      @project = Project.new(params.except(:group_with_project_templates_id))
+      @project = Project.new(params)
 
       # Make sure that the user is allowed to use the specified visibility level
       unless Gitlab::VisibilityLevel.allowed_for?(current_user, @project.visibility_level)

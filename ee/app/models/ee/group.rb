@@ -19,6 +19,8 @@ module EE
       # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.
       has_many :audit_events, -> { where(entity_type: ::Group) }, foreign_key: 'entity_id'
 
+      has_many :project_templates, through: :projects, foreign_key: 'custom_project_templates_group_id'
+
       validates :repository_size_limit,
                 numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
@@ -30,7 +32,8 @@ module EE
 
       scope :with_project_templates, -> do
         joins("INNER JOIN projects ON projects.namespace_id = namespaces.custom_project_templates_group_id")
-        .where('namespaces.custom_project_templates_group_id IS NOT NULL')
+        .where("namespaces.type = 'Group' AND namespaces.custom_project_templates_group_id IS NOT NULL")
+        .distinct
       end
 
       state_machine :ldap_sync_status, namespace: :ldap_sync, initial: :ready do

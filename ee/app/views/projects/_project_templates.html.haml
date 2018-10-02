@@ -16,7 +16,7 @@
         %a.nav-link{ href: "#group-templates", data: { toggle: 'tab'} }
           = _('Group')
           %span.badge.badge-pill
-            = ::GroupProjectTemplateFinder.new(current_user, group_id).projects_count
+            = project_templates_from_groups_counter(project.group&.custom_project_templates_group_id)
 
   .tab-content
     .project-templates-buttons.import-buttons.tab-pane.active#built-in

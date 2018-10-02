@@ -284,6 +284,7 @@ describe 'New project' do
               click_button 'Change template'
 
               page.find(".template-option input[value='#{subgroup2_project.name}']").first(:xpath, './/..').click
+
               wait_for_all_requests
             end
           end

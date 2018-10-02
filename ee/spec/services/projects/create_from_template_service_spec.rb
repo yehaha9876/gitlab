@@ -8,8 +8,9 @@ describe Projects::CreateFromTemplateService do
   let(:use_custom_template) { true }
 
   let(:group2) { create(:group) }
-  let(:subgroup) { create(:group, parent: group) }
-  let(:project_template) { create(:project, :public, namespace: subgroup) }
+  let(:subgroup_1) { create(:group, parent: group) }
+  let(:subgroup_1_1) { create(:group, parent: subgroup_1) }
+  let(:project_template) { create(:project, :public, namespace: subgroup_1) }
   let(:namespace_id) { nil }
   let(:group_with_project_templates_id) { nil }
 
@@ -93,7 +94,7 @@ describe Projects::CreateFromTemplateService do
 
     describe 'creating project from a Group project template', :postgresql do
       let(:project_name) { project_template.name }
-      let(:group_with_project_templates_id) { subgroup.id }
+      let(:group_with_project_templates_id) { subgroup_1.id }
 
       before do
         group.add_maintainer(user)
@@ -127,7 +128,13 @@ describe Projects::CreateFromTemplateService do
       end
 
       context 'when project is created under a subgroup' do
-        let(:namespace_id) { subgroup.id }
+        let(:namespace_id) { subgroup_1.id }
+
+        it_behaves_like 'a persisted project'
+      end
+
+      context 'when project is created under a nested subgroup' do
+        let(:namespace_id) { subgroup_1_1.id }
 
         it_behaves_like 'a persisted project'
       end
