@@ -88,12 +88,12 @@ module EE
       # hierarchy can be a Hash of Groups or a single Group in case it's the top parent.
       def extract_ancestor_ids(hierarchy, ids = [])
         if hierarchy.is_a?(Group)
-          return ids.concat([hierarchy.id])
+          ids.concat([hierarchy.id])
         else
           hierarchy.each_with_object(ids) do |(group, parents), list|
             list << group.id
 
-            return ancestor_ids(parents, list)
+            break extract_ancestor_ids(parents, list)
           end
         end
       end

@@ -1,4 +1,5 @@
 - project_template_count = current_user.available_custom_project_templates.count
+- project = f.object
 - group_id = project.group&.id
 
 - if ::Gitlab::CurrentSettings.custom_project_templates_enabled?
