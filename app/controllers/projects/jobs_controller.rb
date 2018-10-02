@@ -20,7 +20,7 @@ class Projects::JobsController < Projects::ApplicationController
     return access_denied! unless can?(current_user, :read_build, project)
 
     @scope = params[:scope]
-    @all_builds = project_builds.relevant
+    @all_builds = project.builds.relevant
     @builds = @all_builds.order('ci_builds.id DESC')
     @builds =
       case @scope

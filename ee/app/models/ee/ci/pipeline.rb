@@ -8,12 +8,6 @@ module EE
         size_limit_exceeded: 21
       }.freeze
 
-      EE_CONFIG_SOURCES = {
-        pipeline: 7,
-        chat: 8,
-        webide: 20
-      }.freeze
-
       prepended do
         has_one :chat_data, class_name: 'Ci::PipelineChatData'
 

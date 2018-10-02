@@ -260,10 +260,6 @@ module Ci
       end
     end
 
-    def self.visible
-      all
-    end
-
     def self.truncate_sha(sha)
       sha[0...8]
     end
