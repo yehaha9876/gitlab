@@ -251,7 +251,7 @@ describe Ci::Build do
   describe '#collect_security_reports!' do
     subject { job.collect_security_reports!(security_reports) }
 
-    let(:security_reports) { ::Gitlab::Ci::Reports::Security::Reports.new }
+    let(:security_reports) { ::Gitlab::Ci::Reports::Security::Reports.new(pipeline) }
 
     context 'when build has a security report' do
       context 'when there is a sast report' do
@@ -262,7 +262,7 @@ describe Ci::Build do
         it 'parses blobs and add the results to the report' do
           expect { subject }.not_to raise_error
 
-          expect(security_reports.get_report('sast').vulnerabilities.size).to eq(3)
+          expect(security_reports.get_report('sast').occurrences.size).to eq(3)
         end
       end
 
