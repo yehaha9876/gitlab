@@ -120,7 +120,16 @@ export default {
   },
   componentNames,
   computed: {
-    ...mapState(['sast', 'sastContainer', 'dast', 'dependencyScanning', 'summaryCounts']),
+    ...mapState([
+      'sast',
+      'sastContainer',
+      'dast',
+      'dependencyScanning',
+      'summaryCounts',
+      'modal',
+      'canCreateIssuePermission',
+      'canCreateFeedbackPermission',
+    ]),
     ...mapGetters([
       'groupedSastText',
       'groupedSummaryText',
@@ -207,6 +216,9 @@ export default {
       'setPipelineId',
       'setCanCreateIssuePermission',
       'setCanCreateFeedbackPermission',
+      'dismissIssue',
+      'revertDismissIssue',
+      'createNewIssue',
     ]),
   },
 };
@@ -227,7 +239,7 @@ export default {
       <a
         :href="securityTab"
         target="_blank"
-        class="btn btn-default btn-sm float-right append-right-default"
+        class="btn btn-default btn-sm float-right"
       >
         <span>{{ s__("ciReport|View full report") }}</span>
         <icon
@@ -311,7 +323,15 @@ export default {
         />
       </template>
 
-      <issue-modal />
+      <issue-modal
+        :modal="modal"
+        :vulnerabilityFeedbackHelpPath="vulnerabilityFeedbackHelpPath"
+        :canCreateIssuePermission="canCreateIssuePermission"
+        :canCreateFeedbackPermission="canCreateFeedbackPermission"
+        :dismissIssue="dismissIssue"
+        :revertDismissIssue="revertDismissIssue"
+        :createNewIssue="createNewIssue"
+      ></issue-modal>
     </div>
   </report-section>
 </template>

@@ -1,5 +1,4 @@
 <script>
-  import { mapActions, mapState } from 'vuex';
   import { s__ } from '~/locale';
   import Modal from '~/vue_shared/components/gl_modal.vue';
   import LoadingButton from '~/vue_shared/components/loading_button.vue';
@@ -13,13 +12,39 @@
       ExpandButton,
       Icon,
     },
+    props: {
+      modal: {
+        type: Object,
+        required: true,
+      },
+      vulnerabilityFeedbackHelpPath: {
+        type: String,
+        required: false
+      },
+      canCreateIssuePermission: {
+        type: Boolean,
+        required: false,
+        default: false,
+      },
+      canCreateFeedbackPermission: {
+        type: Boolean,
+        required: false,
+        default: false,
+      },
+      dismissIssue: {
+        type: Function,
+        required: false,
+      },
+      revertDismissIssue: {
+        type: Function,
+        required: false,
+      },
+      createNewIssue: {
+        type: Function,
+        required: false,
+      },
+    },
     computed: {
-      ...mapState([
-        'modal',
-        'vulnerabilityFeedbackHelpPath',
-        'canCreateIssuePermission',
-        'canCreateFeedbackPermission',
-      ]),
       revertTitle() {
         return this.modal.vulnerability.isDismissed
           ? s__('ciReport|Revert dismissal')
@@ -43,7 +68,6 @@
       },
     },
     methods: {
-      ...mapActions(['dismissIssue', 'revertDismissIssue', 'createNewIssue']),
       handleDismissClick() {
         if (this.modal.vulnerability.isDismissed) {
           this.revertDismissIssue();
