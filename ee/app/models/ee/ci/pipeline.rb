@@ -18,7 +18,7 @@ module EE
 
         state_machine :status do
           after_transition any => ::Ci::Pipeline::COMPLETED_STATUSES.map(&:to_sym) do |pipeline|
-            return unless pipeline.has_security_reports?
+            break unless pipeline.has_security_reports?
 
             pipeline.run_after_commit do
               SecurityReportsWorker.perform_async(pipeline.id)
