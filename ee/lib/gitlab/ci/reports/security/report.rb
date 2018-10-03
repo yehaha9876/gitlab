@@ -20,21 +20,21 @@ module Gitlab
           end
 
           def add_scanner(params)
-            scanners[scanner_key(params)] ||= params
-            scanner_key(params)
+            scanner_key(params).tap do |key|
+              scanners[key] ||= params
+            end
           end
 
           def add_identifier(params)
-            identifiers[identifier_key(params)] ||= params
-            identifier_key(params)
+            identifier_key(params).tap do |key|
+              identifiers[key] ||= params
+            end
           end
 
           def add_occurrence(params)
-            params = params.merge(
-              pipeline: pipeline,
-              ref: pipeline.ref)
-            occurrences << params
-            params
+            params.merge(pipeline: pipeline, ref: pipeline.ref).tap do |occurrence|
+              occurrences << occurrence
+            end
           end
 
           private
