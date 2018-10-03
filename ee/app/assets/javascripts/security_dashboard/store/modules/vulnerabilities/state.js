@@ -4,5 +4,6 @@ export default () => ({
   pageInfo: {},
   vulnerabilities: [],
   vulnerabilitiesCount: {},
+  currentVulnerability: {},
   errorLoadingVulnerabilities: false,
 });

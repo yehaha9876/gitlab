@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import * as types from './mutation_types';
 import mockDataVulnerabilities from './mock_data_vulnerabilities.json';
 import mockDataVulnerabilitiesOverview from './mock_data_vulnerabilities_count.json';
@@ -64,6 +65,12 @@ export const receiveVulnerabilitiesSuccess = ({ commit }, response = {}) => {
 
 export const receiveVulnerabilitiesError = ({ commit }) => {
   commit(types.RECEIVE_VULNERABILITIES_ERROR);
+};
+
+export const openModal = ({ commit }, vulnerability = {}) => {
+  commit(types.OPEN_MODAL, vulnerability);
+  
+  $('#modal-mrwidget-security-issue').modal('show');
 };
 
 export default () => {};

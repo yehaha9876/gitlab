@@ -52,6 +52,7 @@
       },
       hasDismissedBy() {
         return (
+          this.modal.vulnerability &&
           this.modal.vulnerability.dismissalFeedback &&
           this.modal.vulnerability.dismissalFeedback.pipeline &&
           this.modal.vulnerability.dismissalFeedback.author

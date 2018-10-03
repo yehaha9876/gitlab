@@ -26,4 +26,7 @@ export default {
     state.isLoadingVulnerabilitiesCount = false;
     state.errorLoadingVulnerabilities = true;
   },
+  [types.OPEN_MODAL](state, payload) {
+    state.currentVulnerability = payload;
+  },
 };

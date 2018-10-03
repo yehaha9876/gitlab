@@ -88,7 +88,6 @@ export default {
       </div>
     </div>
 
-    <!-- This is hidden till we can hook up the actions
     <div class="table-section section-20">
       <div
         class="table-mobile-header"
@@ -102,7 +101,6 @@ export default {
         />
       </div>
     </div>
-    -->
   </div>
 </template>
 
