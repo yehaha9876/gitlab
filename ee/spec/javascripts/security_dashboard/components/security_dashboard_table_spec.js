@@ -4,6 +4,7 @@ import component from 'ee/security_dashboard/components/security_dashboard_table
 import State from 'ee/security_dashboard/store/modules/vulnerabilities/state';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 
+Vue.use(Vuex);
 describe('Security Dashboard Table', () => {
   const vulnerabilities = [{ id: 0 }, { id: 1 }, { id: 2 }];
   const Component = Vue.extend(component);
@@ -24,8 +25,12 @@ describe('Security Dashboard Table', () => {
 
   describe('data is loading', () => {
     beforeEach(() => {
-      const state = { vulnerabilities: { ...initialState, isLoadingVulnerabilities: true }};
-      const store = new Vuex.Store({ state, actions });
+      const state = { ...initialState, isLoadingVulnerabilities: true };
+      const store = new Vuex.Store({
+        modules: {
+          vulnerabilities: { namespaced: true, state, actions },
+        },
+      });
       vm = mountComponentWithStore(Component, { store });
     });
 
@@ -36,8 +41,12 @@ describe('Security Dashboard Table', () => {
 
   describe('data has loaded', () => {
     beforeEach(() => {
-      const state = { vulnerabilities: { ...initialState, vulnerabilities }};
-      const store = new Vuex.Store({ state, actions });
+      const state = { ...initialState, vulnerabilities };
+      const store = new Vuex.Store({
+        modules: {
+          vulnerabilities: { namespaced: true, state, actions },
+        },
+      });
       vm = mountComponentWithStore(Component, { store });
     });
 

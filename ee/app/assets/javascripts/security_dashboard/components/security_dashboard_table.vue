@@ -10,11 +10,7 @@ export default {
     SecurityDashboardTableRow,
   },
   computed: {
-    ...mapState({
-      vulnerabilities: state => state.vulnerabilities.vulnerabilities,
-      pageInfo: state => state.vulnerabilities.pageInfo,
-      isLoadingVulnerabilities: state => state.vulnerabilities.isLoadingVulnerabilities,
-    }),
+    ...mapState('vulnerabilities', ['vulnerabilities', 'pageInfo', 'isLoadingVulnerabilities']),
     showPagination() {
       return this.pageInfo && this.pageInfo.total;
     },
@@ -23,7 +19,7 @@ export default {
     this.fetchVulnerabilities();
   },
   methods: {
-    ...mapActions(['fetchVulnerabilities']),
+    ...mapActions('vulnerabilities', ['fetchVulnerabilities']),
   },
 };
 </script>

@@ -14,7 +14,7 @@ export default {
     VulnerabilityCountList,
   },
   computed: {
-    ...mapGetters(['vulnerabilitiesCountByReportType']),
+    ...mapGetters('vulnerabilities', ['vulnerabilitiesCountByReportType']),
     sastCount() {
       return this.vulnerabilitiesCountByReportType('sast');
     },
@@ -23,7 +23,7 @@ export default {
     this.fetchVulnerabilitiesCount();
   },
   methods: {
-    ...mapActions(['fetchVulnerabilitiesCount']),
+    ...mapActions('vulnerabilities', ['fetchVulnerabilitiesCount']),
   },
 };
 </script>
