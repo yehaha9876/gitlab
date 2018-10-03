@@ -6,7 +6,7 @@ describe Security::StoreReportService, '#execute' do
   let(:pipeline) { artifact.job.pipeline }
   let(:report) { pipeline.security_reports.get_report('sast') }
 
-  subject { described_class.new(pipeline).execute(report) }
+  subject { described_class.new(pipeline, report).execute }
 
   context 'without existing data' do
     it 'inserts all scanners' do
@@ -36,7 +36,7 @@ describe Security::StoreReportService, '#execute' do
     let(:new_pipeline) { create(:ci_pipeline, project: project) }
     let(:new_report) { new_pipeline.security_reports.get_report('sast') }
 
-    subject { described_class.new(new_pipeline).execute(new_report) }
+    subject { described_class.new(new_pipeline, new_report).execute }
 
     it 'inserts new scanners' do
       expect { subject }.to change { Vulnerabilities::Scanner.where(project: project).count }.by(2)

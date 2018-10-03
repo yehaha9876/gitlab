@@ -12,7 +12,7 @@ describe Security::StoreReportsService, '#execute' do
 
     it 'initializes a new StoreReportService and execute it' do
       expect(Security::StoreReportService).to receive(:new)
-        .with(pipeline).and_call_original
+        .with(pipeline, instance_of(::Gitlab::Ci::Reports::Security::Report)).and_call_original
 
       expect_any_instance_of(Security::StoreReportService).to receive(:execute)
         .once.and_call_original
@@ -29,15 +29,15 @@ describe Security::StoreReportsService, '#execute' do
 
       before do
         allow(pipeline).to receive(:security_reports).and_return(reports)
-        allow_any_instance_of(Security::StoreReportService).to receive(:execute)
-          .with(sast_report).and_return(error)
-        allow_any_instance_of(Security::StoreReportService).to receive(:execute)
-          .with(dast_report).and_return(success)
       end
 
       it 'returns the errors after having processed all reports' do
-        expect(Security::StoreReportService).to receive(:new)
-        .twice.with(pipeline).and_call_original
+        expect_next_instance_of(Security::StoreReportService, pipeline, sast_report) do |store_service|
+          expect(store_service).to receive(:execute).and_return(error)
+        end
+        expect_next_instance_of(Security::StoreReportService, pipeline, dast_report) do |store_service|
+          expect(store_service).to receive(:execute).and_return(success)
+        end
 
         is_expected.to eq(error)
       end

@@ -16,5 +16,9 @@ FactoryBot.define do
     scanner factory: :vulnerabilities_scanner
     metadata_version 'sast:1.0'
     raw_metadata 'raw_metadata'
+
+    trait :dynamic do
+      uuid { SecureRandom.uuid }
+    end
   end
 end

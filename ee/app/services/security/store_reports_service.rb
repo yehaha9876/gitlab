@@ -11,7 +11,7 @@ module Security
     def execute
       errors = []
       @pipeline.security_reports.reports.each do |report_type, report|
-        result = StoreReportService.new(@pipeline).execute(report)
+        result = StoreReportService.new(@pipeline, report).execute
         errors << result[:message] if result[:status] == :error
       end
 

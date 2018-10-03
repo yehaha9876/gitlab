@@ -6,42 +6,28 @@ module Security
   class StoreReportService < ::BaseService
     include Gitlab::Utils::StrongMemoize
 
-    def initialize(pipeline)
+    def initialize(pipeline, report)
       @pipeline = pipeline
+      @report = report
       @project = @pipeline.project
     end
 
-    def execute(report)
-      @report = report
-
+    def execute
       # Ensure we're not overriding existing records with older data for this report
-      if stale_data?(report.type)
-        msg = "#{report.type} report contains stale data, skipping..."
-        log_info(msg)
-        return error(msg)
-      end
+      return error("#{@report.type} report contains stale data, skipping...") if stale_data?
 
       vulnerabilities_objects.each(&:save!)
 
-      # Cleanup previously existing vulnerabilities that have not been found in the latest report for that report type.
-      # For now we just remove the records but they could be flagged as fixed instead so that we
-      # can have metrics about fixed vulnerabilities, SLAs, etc. and then garbage collect old records.
-
-      @project.vulnerabilities
-        .report_type(report.type)
-        .where(ref: @pipeline.ref)
-        .where.not(pipeline_id: @pipeline.id)
-        .delete_all
-
+      CleanupReportService.new(@pipeline, @report.type).execute
       success
     end
 
     private
 
     # Check that the existing records for given report type come from an older pipeline
-    def stale_data?(report_type)
+    def stale_data?
       last_pipeline_id = @pipeline.project.vulnerabilities
-        .report_type(report_type)
+        .report_type(@report.type)
         .where(ref: @pipeline.ref)
         .pluck(:pipeline_id).first
 
