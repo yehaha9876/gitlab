@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -214,6 +213,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
     end
   end
 
+<<<<<<< ours
   describe 'GET trace.json' do
     let(:user) { create(:admin) }
 
@@ -406,91 +406,123 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
 
     context 'with reporter' do
       let(:user) { reporter }
-
-      it 'returns 403' do
-        expect(response).to have_gitlab_http_status(403)
-      end
-    end
-
-    context 'with guest' do
-      let(:user) { guest }
-
-      it 'returns 403' do
-        expect(response).to have_gitlab_http_status(403)
-      end
-    end
-
-    context 'with non member' do
-      let(:user) { create(:user) }
-
-      it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
-      end
-    end
-  end
-
-  describe 'GET check_config' do
-    let(:result) { { status: :success } }
-
-    before do
-      stub_licensed_features(ide_terminal: true)
-      allow_any_instance_of(CiCd::WebIdeConfigValidatorService)
-        .to receive(:execute).and_return(result)
-
-      get :check_config, namespace_id: project.namespace.to_param,
-                         project_id: project.to_param,
-                         branch: 'master'
-    end
-
-    context 'access rights' do
-      it_behaves_like 'EE jobs controller access rights'
-    end
-
-    context 'when invalid config file' do
-      let(:user) { admin }
-      let(:result) { { status: :error } }
-
-      it 'returns 422' do
-        expect(response).to have_gitlab_http_status(422)
-      end
-    end
-  end
-
+=======
   describe 'POST create_webide_terminal' do
-    let(:branch) { 'master' }
-    let!(:pipeline) { create(:ci_pipeline, project: project) }
+    let(:guest) { create(:user) }
+    let(:reporter) { create(:user) }
+    let(:developer) { create(:user) }
+    let(:maintainer) { create(:user) }
+    let(:owner) { create(:user) }
+    let(:admin) { create(:admin) }
+    let(:project) { create(:project, :repository, :private, shared_runners_enabled: true, namespace: owner.namespace) }
+    let(:pipeline) { create(:ci_pipeline, project: project) }
+    let(:feature_enabled) { true }
+    let(:branch_name) { 'master' }
 
     before do
-      stub_licensed_features(ide_terminal: true)
-      allow_any_instance_of(::Ci::CreatePipelineService)
-        .to receive(:execute).and_return(pipeline)
+      allow_any_instance_of(::Ci::CreatePipelineService).to receive(:execute).and_return(pipeline)
+
+      project.add_guest(guest)
+      project.add_maintainer(maintainer)
+      project.add_developer(developer)
+      project.add_reporter(reporter)
+
+      stub_licensed_features(ide_terminal: feature_enabled)
+
+      sign_in(user)
 
       post :create_webide_terminal, namespace_id: project.namespace.to_param,
-                                    project_id: project.to_param,
-                                    branch: branch
+                                    project_id: project,
+                                    branch: branch_name
     end
 
-    context 'access rights' do
-      let(:build) { create(:ci_build, project: project) }
-      let(:pipeline) { build.pipeline }
-
-      it_behaves_like 'EE jobs controller access rights'
-    end
-
-    context 'when branch does not exist' do
+    context 'when ide_terminal feature disabled' do
       let(:user) { admin }
-      let(:branch) { 'whatever' }
+      let(:feature_enabled) { false }
+>>>>>>> theirs
 
-      it 'returns 422' do
-        expect(response).to have_gitlab_http_status(422)
+      it 'returns 403' do
+        expect(response).to have_gitlab_http_status(403)
       end
     end
 
-    context 'when the job can not be created' do
-      let(:user) { admin }
+    context 'when ide_terminal feature enabled' do
+      context 'when branch does not exist' do
+        let(:user) { admin }
+        let(:branch_name) { 'whatever' }
 
-      it 'returns 400' do
-        expect(response.code).to eq '400'
+        it 'returns 422' do
+          expect(response).to have_gitlab_http_status(422)
+        end
+      end
+
+      context 'access rights' do
+        let(:job) { create(:ci_build) }
+        let(:pipeline) { job.pipeline }
+
+        context 'with admin' do
+          let(:user) { admin }
+
+          it 'returns 200' do
+            expect(response).to have_gitlab_http_status(200)
+          end
+        end
+
+        context 'with owner' do
+          let(:user) { owner }
+
+          it 'returns 200' do
+            expect(response).to have_gitlab_http_status(200)
+          end
+        end
+
+        context 'with maintainer' do
+          let(:user) { maintainer }
+
+          it 'returns 200' do
+            expect(response).to have_gitlab_http_status(200)
+          end
+        end
+
+        context 'with developer' do
+          let(:user) { developer }
+
+          it 'returns 403' do
+            expect(response).to have_gitlab_http_status(403)
+          end
+        end
+
+        context 'with reporter' do
+          let(:user) { reporter }
+
+          it 'returns 403' do
+            expect(response).to have_gitlab_http_status(403)
+          end
+        end
+
+        context 'with guest' do
+          let(:user) { guest }
+
+          it 'returns 403' do
+            expect(response).to have_gitlab_http_status(403)
+          end
+        end
+
+        context 'with non member' do
+          let(:user) { create(:user) }
+
+          it 'returns 404' do
+            expect(response).to have_gitlab_http_status(404)
+          end
+        end
+      end
+
+      context 'when error creating the pipeline builds' do
+        let(:user) { admin }
+
+        it 'returns 400' do
+          expect(response).to have_gitlab_http_status(400)
+        end
       end
     end
   end

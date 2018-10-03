@@ -4,20 +4,9 @@ module EE
   module Projects
     module JobsController
       extend ActiveSupport::Concern
-      extend ::Gitlab::Utils::Override
 
       prepended do
-        before_action :authorize_web_ide_terminal_enabled!, only: [:check_config, :create_webide_terminal]
-      end
-
-      def check_config
-        result = CiCd::WebIdeConfigValidatorService.new(project, current_user, params).execute
-
-        if result[:status] == :success
-          head :ok
-        else
-          respond_422
-        end
+        before_action :authorize_web_ide_terminal_enabled!, only: [:create_webide_terminal]
       end
 
       def create_webide_terminal

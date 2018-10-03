@@ -24,7 +24,7 @@ module EE
           {
             pipeline: 7,
             chat: 8,
-            webide: 40
+            webide: 20
           }
         end
       end

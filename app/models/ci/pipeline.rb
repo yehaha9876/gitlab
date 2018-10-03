@@ -72,6 +72,7 @@ module Ci
     after_create :keep_around_commits, unless: :importing?
 
     def self.source_enum_values
+      {}
     end
 
     enum_with_nil source: {
