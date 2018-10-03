@@ -56,6 +56,8 @@ module Vulnerabilities
     validates :metadata_version, presence: true
     validates :raw_metadata, presence: true
 
+    scope :report_type, -> (type) { where(report_type: self.report_types[type] )}
+
     # Override getter and setter for :severity as we can't use enum (it conflicts with :confidence)
     # To be replaced with enum using _prefix when migrating to rails 5
     def severity

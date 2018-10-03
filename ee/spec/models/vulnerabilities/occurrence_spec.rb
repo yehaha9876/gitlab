@@ -61,4 +61,24 @@ describe Vulnerabilities::Occurrence do
       end
     end
   end
+
+  describe '.report_type' do
+    subject { described_class.report_type(:sast) }
+
+    context 'when occurrence has the corresponding report type' do
+      let(:occurrence) { create(:vulnerabilities_occurrence, report_type: :sast) }
+
+      it 'selects the occurrence' do
+        is_expected.to eq([occurrence])
+      end
+    end
+
+    context 'when build does not have security reports' do
+      let(:occurrence) { create(:vulnerabilities_occurrence, report_type: :dependency_scanning) }
+
+      it 'does not select the occurrence' do
+        is_expected.to be_empty
+      end
+    end
+  end
 end

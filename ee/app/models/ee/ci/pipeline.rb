@@ -15,6 +15,12 @@ module EE
         scope :with_security_reports, -> {
           joins(:artifacts).where(ci_builds: { name: %w[sast dependency_scanning sast:container container_scanning dast] })
         }
+
+        state_machine :status do
+          after_transition any => ::Ci::Pipeline::COMPLETED_STATUSES.map(&:to_sym) do |pipeline|
+            pipeline.run_after_commit { SecurityReportsWorker.perform_async(pipeline.id) } if pipeline.has_security_reports?
+          end
+        end
       end
 
       # codeclimate_artifact is deprecated and replaced with code_quality_artifact (#5779)
@@ -151,7 +157,7 @@ module EE
       end
 
       def security_reports
-        ::Gitlab::Ci::Reports::Security::Reports.new.tap do |security_reports|
+        ::Gitlab::Ci::Reports::Security::Reports.new(self).tap do |security_reports|
           builds.latest.with_security_reports.each do |build|
             build.collect_security_reports!(security_reports)
           end

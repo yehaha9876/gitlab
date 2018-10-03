@@ -253,7 +253,7 @@ describe Ci::Pipeline do
 
       it 'returns security reports with collected data grouped as expected' do
         expect(subject.reports.keys).to eq(%w(sast))
-        expect(subject.get_report('sast').vulnerabilities.size).to eq(6)
+        expect(subject.get_report('sast').occurrences.size).to eq(6)
       end
 
       context 'when builds are retried' do
