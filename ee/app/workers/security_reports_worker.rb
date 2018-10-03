@@ -20,7 +20,7 @@ class SecurityReportsWorker
       break unless pipeline.project.security_reports_feature_available?
 
       # Only store security reports for default_branch for now
-      break unless pipeline.ref == pipeline.project.default_branch
+      break unless pipeline.default_branch?
 
       # The lock is scoped on project and ref as there is no harm to concurrently
       # execute the StoreReportsService for other refs or other projects.
