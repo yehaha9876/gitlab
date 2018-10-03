@@ -14,7 +14,7 @@ describe('vulnerabiliites count actions', () => {
 
   describe('fetchVulnerabilitesCount', () => {
     let mock;
-    const state = initialState;
+    const state = initialState();
 
     beforeEach(() => {
       state.vulnerabilitiesCountUrl = `${TEST_HOST}/vulnerabilities_count.json`;
@@ -81,7 +81,7 @@ describe('vulnerabiliites count actions', () => {
 
   describe('requestVulnerabilitesCount', () => {
     it('should commit the request mutation', done => {
-      const state = initialState;
+      const state = initialState();
 
       testAction(
         actions.requestVulnerabilitiesCount,
@@ -98,7 +98,7 @@ describe('vulnerabiliites count actions', () => {
 
   describe('receiveVulnerabilitesCountSuccess', () => {
     it('should commit the success mutation', done => {
-      const state = initialState;
+      const state = initialState();
 
       testAction(
         actions.receiveVulnerabilitiesCountSuccess,
@@ -115,7 +115,7 @@ describe('vulnerabiliites count actions', () => {
 
   describe('receivetVulnerabilitesCountError', () => {
     it('should commit the error mutation', done => {
-      const state = initialState;
+      const state = initialState();
 
       testAction(
         actions.receiveVulnerabilitiesCountError,
@@ -152,7 +152,7 @@ describe('vulnerabilities actions', () => {
 
   describe('fetchVulnerabilities', () => {
     let mock;
-    const state = initialState;
+    const state = initialState();
 
     beforeEach(() => {
       state.vulnerabilitiesUrl = `${TEST_HOST}/vulnerabilities.json`;
@@ -219,7 +219,7 @@ describe('vulnerabilities actions', () => {
 
   describe('receiveVulnerabilitiesSuccess', () => {
     it('should commit the success mutation', done => {
-      const state = initialState;
+      const state = initialState();
 
       testAction(
         actions.receiveVulnerabilitiesSuccess,
@@ -239,7 +239,7 @@ describe('vulnerabilities actions', () => {
 
   describe('receiveVulnerabilitiesError', () => {
     it('should commit the error mutation', done => {
-      const state = initialState;
+      const state = initialState();
 
       testAction(
         actions.receiveVulnerabilitiesError,
@@ -256,7 +256,7 @@ describe('vulnerabilities actions', () => {
 
   describe('requestVulnerabilities', () => {
     it('should commit the request mutation', done => {
-      const state = initialState;
+      const state = initialState();
 
       testAction(
         actions.requestVulnerabilities,
@@ -264,6 +264,27 @@ describe('vulnerabilities actions', () => {
         state,
         [
           { type: types.REQUEST_VULNERABILITIES },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('openModal', () => {
+    it('should commit the modalData mutation', done => {
+      const state = initialState();
+      const payload = { a: 1, b: 2, c: 3 };
+
+      testAction(
+        actions.openModal,
+        { ...payload },
+        state,
+        [
+          {
+            payload,
+            type: types.SET_MODAL_DATA,
+          },
         ],
         [],
         done,

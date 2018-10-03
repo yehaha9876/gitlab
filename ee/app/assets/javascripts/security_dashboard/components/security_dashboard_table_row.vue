@@ -1,4 +1,5 @@
 <script>
+import { mapActions } from 'vuex';
 import { SkeletonLoading } from '@gitlab-org/gitlab-ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import SecurityDashboardActionButtons from './security_dashboard_action_buttons.vue';
@@ -34,6 +35,9 @@ export default {
       return project && project.name_with_namespace ? project.name_with_namespace : null;
     },
   },
+  methods: {
+    ...mapActions('vulnerabilities', ['openModal']),
+  },
 };
 </script>
 
@@ -65,7 +69,9 @@ export default {
           :lines="2"
         />
         <div v-else>
-          <span>{{ vulnerability.description }}</span>
+          <span
+            @click="openModal(vulnerability)"
+          >{{ vulnerability.description }}</span>
           <br />
           <span
             v-if="projectNamespace"

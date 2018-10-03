@@ -225,6 +225,7 @@
             >#{{ modal.vulnerability.dismissalFeedback.pipeline.id }}</a>.
           </template>
           <a
+            v-if="vulnerabilityFeedbackHelpPath"
             :href="vulnerabilityFeedbackHelpPath"
             class="js-link-vulnerabilityFeedbackHelpPath"
           >
