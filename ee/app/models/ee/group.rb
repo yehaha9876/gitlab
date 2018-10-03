@@ -123,10 +123,6 @@ module EE
     end
 
     def custom_project_templates_group_allowed
-      if has_parent?
-        return errors.add(:custom_project_templates_group_id, "can only be assigned to top groups")
-      end
-
       unless descendants.exists?(id: custom_project_templates_group_id)
         errors.add(:custom_project_templates_group_id, "has to be a descendant of the group")
       end
