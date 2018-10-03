@@ -68,8 +68,8 @@ export const receiveVulnerabilitiesError = ({ commit }) => {
 };
 
 export const openModal = ({ commit }, vulnerability = {}) => {
-  commit(types.OPEN_MODAL, vulnerability);
-  
+  commit(types.SET_MODAL_DATA, vulnerability);
+
   $('#modal-mrwidget-security-issue').modal('show');
 };
 

@@ -19,7 +19,8 @@
       },
       vulnerabilityFeedbackHelpPath: {
         type: String,
-        required: false
+        required: false,
+        default: '',
       },
       canCreateIssuePermission: {
         type: Boolean,
@@ -34,14 +35,17 @@
       dismissIssue: {
         type: Function,
         required: false,
+        default: () => {},
       },
       revertDismissIssue: {
         type: Function,
         required: false,
+        default: () => {},
       },
       createNewIssue: {
         type: Function,
         required: false,
+        default: () => {},
       },
     },
     computed: {

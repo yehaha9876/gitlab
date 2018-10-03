@@ -1,10 +1,10 @@
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import Tabs from '~/vue_shared/components/tabs/tabs';
 import Tab from '~/vue_shared/components/tabs/tab.vue';
+import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
-import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 
 export default {
   name: 'SecurityDashboardApp',
@@ -16,7 +16,8 @@ export default {
     VulnerabilityCountList,
   },
   computed: {
-    ...mapGetters('vulnerabilities', ['vulnerabilitiesCountByReportType', 'modal']),
+    ...mapGetters('vulnerabilities', ['vulnerabilitiesCountByReportType']),
+    ...mapState('vulnerabilities', ['modal']),
     sastCount() {
       return this.vulnerabilitiesCountByReportType('sast');
     },
@@ -49,7 +50,7 @@ export default {
     </tabs>
     <issue-modal
       :modal="modal"
-    ></issue-modal>
+    />
   </div>
 </template>
 

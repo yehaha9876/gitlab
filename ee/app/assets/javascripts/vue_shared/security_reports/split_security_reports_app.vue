@@ -279,12 +279,12 @@ export default {
 
     <issue-modal
       :modal="modal"
-      :vulnerabilityFeedbackHelpPath="vulnerabilityFeedbackHelpPath"
-      :canCreateIssuePermission="canCreateIssuePermission"
-      :canCreateFeedbackPermission="canCreateFeedbackPermission"
-      :dismissIssue="dismissIssue"
-      :revertDismissIssue="revertDismissIssue"
-      :createNewIssue="createNewIssue"
-    ></issue-modal>
+      :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
+      :can-create-issue-permission="canCreateIssuePermission"
+      :can-create-feedback-permission="canCreateFeedbackPermission"
+      :dismiss-issue="dismissIssue"
+      :revert-dismiss-issue="revertDismissIssue"
+      :create-new-issue="createNewIssue"
+    />
   </div>
 </template>
