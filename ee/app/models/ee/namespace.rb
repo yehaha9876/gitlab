@@ -197,6 +197,14 @@ module EE
         actual_plan_name == FREE_PLAN
     end
 
+    def store_security_reports_available?
+      Feature.enabled?(:store_security_reports, self) && (
+        feature_available?(:sast) ||
+        feature_available?(:dependency_scanning) ||
+        feature_available?(:sast_container) ||
+        feature_available?(:dast))
+    end
+
     private
 
     def validate_plan_name

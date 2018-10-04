@@ -91,6 +91,8 @@ module EE
       end
 
       default_value_for :packages_enabled, true
+
+      delegate :store_security_reports_available?, to: :namespace
     end
 
     class_methods do
