@@ -95,6 +95,12 @@ module EE
         end
       end
 
+      def log_geo_deleted_event
+        # It is not needed to generate a Geo deleted event
+        # since Legacy Artifacts are migrated to multi-build artifacts
+        # See https://gitlab.com/gitlab-org/gitlab-ce/issues/46652
+      end
+
       private
 
       def has_artifact?(name)

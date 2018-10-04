@@ -217,6 +217,7 @@ ActiveRecord::Schema.define(version: 20180930171532) do
     t.integer "custom_project_templates_group_id"
     t.integer "usage_stats_set_by_user_id"
     t.integer "receive_max_input_size"
+    t.integer "diff_max_patch_bytes", default: 102400, null: false
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -1942,6 +1943,24 @@ ActiveRecord::Schema.define(version: 20180930171532) do
     t.string "nonce", null: false
   end
 
+  create_table "operations_feature_flags", id: :bigserial, force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.boolean "active", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.string "name", null: false
+    t.text "description"
+  end
+
+  add_index "operations_feature_flags", ["project_id", "name"], name: "index_operations_feature_flags_on_project_id_and_name", unique: true, using: :btree
+
+  create_table "operations_feature_flags_clients", id: :bigserial, force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.string "token", null: false
+  end
+
+  add_index "operations_feature_flags_clients", ["project_id", "token"], name: "index_operations_feature_flags_clients_on_project_id_and_token", unique: true, using: :btree
+
   create_table "packages_maven_metadata", id: :bigserial, force: :cascade do |t|
     t.integer "package_id", limit: 8, null: false
     t.datetime_with_timezone "created_at", null: false
@@ -2271,6 +2290,18 @@ ActiveRecord::Schema.define(version: 20180930171532) do
   add_index "projects", ["runners_token"], name: "index_projects_on_runners_token", using: :btree
   add_index "projects", ["star_count"], name: "index_projects_on_star_count", using: :btree
   add_index "projects", ["visibility_level"], name: "index_projects_on_visibility_level", using: :btree
+
+  create_table "prometheus_alert_events", id: :bigserial, force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "prometheus_alert_id", null: false
+    t.datetime_with_timezone "started_at", null: false
+    t.datetime_with_timezone "ended_at"
+    t.integer "status", limit: 2
+    t.string "payload_key"
+  end
+
+  add_index "prometheus_alert_events", ["project_id", "status"], name: "index_prometheus_alert_events_on_project_id_and_status", using: :btree
+  add_index "prometheus_alert_events", ["prometheus_alert_id", "payload_key"], name: "index_prometheus_alert_event_scoped_payload_key", unique: true, using: :btree
 
   create_table "prometheus_alerts", force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
@@ -3220,6 +3251,8 @@ ActiveRecord::Schema.define(version: 20180930171532) do
   add_foreign_key "notes", "projects", name: "fk_99e097b079", on_delete: :cascade
   add_foreign_key "notification_settings", "users", name: "fk_0c95e91db7", on_delete: :cascade
   add_foreign_key "oauth_openid_requests", "oauth_access_grants", column: "access_grant_id", name: "fk_oauth_openid_requests_oauth_access_grants_access_grant_id"
+  add_foreign_key "operations_feature_flags", "projects", on_delete: :cascade
+  add_foreign_key "operations_feature_flags_clients", "projects", on_delete: :cascade
   add_foreign_key "packages_maven_metadata", "packages_packages", column: "package_id", name: "fk_be88aed360", on_delete: :cascade
   add_foreign_key "packages_package_files", "packages_packages", column: "package_id", name: "fk_86f0f182f8", on_delete: :cascade
   add_foreign_key "packages_packages", "projects", on_delete: :cascade
@@ -3240,6 +3273,8 @@ ActiveRecord::Schema.define(version: 20180930171532) do
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
+  add_foreign_key "prometheus_alert_events", "projects", on_delete: :cascade
+  add_foreign_key "prometheus_alert_events", "prometheus_alerts", on_delete: :cascade
   add_foreign_key "prometheus_alerts", "environments", on_delete: :cascade
   add_foreign_key "prometheus_alerts", "projects", on_delete: :cascade
   add_foreign_key "prometheus_alerts", "prometheus_metrics", on_delete: :cascade

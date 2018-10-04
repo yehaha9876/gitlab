@@ -56,7 +56,10 @@ project:
 - vulnerability_feedback
 - vulnerability_identifiers
 - vulnerability_scanners
+- operations_feature_flags
+- operations_feature_flags_client
 - prometheus_alerts
+- prometheus_alert_events
 - software_license_policies
 - project_registry
 - packages
@@ -64,6 +67,9 @@ prometheus_metrics:
 - project
 - prometheus_alerts
 prometheus_alerts:
+- project
+- prometheus_alert_events
+prometheus_alert_events:
 - project
 epic_issues:
 - issue
