@@ -3,10 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::Ci::Reports::Security::Reports do
-  let(:pipeline) { create(:ci_pipeline) }
-  let(:security_reports) { described_class.new(pipeline) }
-
-  it { expect(security_reports.pipeline).to eq(pipeline) }
+  let(:security_reports) { described_class.new }
 
   describe '#get_report' do
     subject { security_reports.get_report(report_type) }
@@ -18,7 +15,7 @@ describe Gitlab::Ci::Reports::Security::Reports do
 
       it 'initializes a new report and returns it' do
         expect(Gitlab::Ci::Reports::Security::Report).to receive(:new)
-          .with(pipeline, 'sast').and_call_original
+          .with('sast').and_call_original
 
         is_expected.to be_a(Gitlab::Ci::Reports::Security::Report)
       end

@@ -7,7 +7,7 @@ describe Gitlab::Ci::Parsers::Security::Sast do
     let(:artifact) { create(:ee_ci_job_artifact, :sast) }
     let(:project) { artifact.project }
     let(:pipeline) { artifact.job.pipeline }
-    let(:report) { Gitlab::Ci::Reports::Security::Report.new(pipeline, artifact.file_type) }
+    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type) }
     let(:sast) { described_class.new }
 
     before do

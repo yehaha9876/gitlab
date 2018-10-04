@@ -5,14 +5,12 @@ module Gitlab
     module Reports
       module Security
         class Report
-          attr_reader :pipeline
           attr_reader :type
           attr_reader :occurrences
           attr_reader :scanners
           attr_reader :identifiers
 
-          def initialize(pipeline, type)
-            @pipeline = pipeline
+          def initialize(type)
             @type = type
             @occurrences = []
             @scanners = {}
@@ -32,7 +30,7 @@ module Gitlab
           end
 
           def add_occurrence(params)
-            params.merge(pipeline: pipeline, ref: pipeline.ref).tap do |occurrence|
+            params.tap do |occurrence|
               occurrences << occurrence
             end
           end

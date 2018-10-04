@@ -4,10 +4,9 @@ require 'spec_helper'
 
 describe Gitlab::Ci::Reports::Security::Report do
   let(:pipeline) { create(:ci_pipeline) }
-  let(:report) { described_class.new(pipeline, 'sast') }
+  let(:report) { described_class.new('sast') }
 
   it { expect(report.type).to eq('sast') }
-  it { expect(report.pipeline).to eq(pipeline) }
 
   describe '#add_scanner' do
     let(:scanner) { { external_id: 'find_sec_bugs' } }
@@ -43,12 +42,11 @@ describe Gitlab::Ci::Reports::Security::Report do
 
   describe '#add_occurrence' do
     let(:occurrence) { { foo: :bar } }
-    let(:stored_occurrence) { occurrence.merge(pipeline: pipeline, ref: pipeline.ref) }
 
     it 'enriches given occurrence and stores it in the collection' do
       report.add_occurrence(occurrence)
 
-      expect(report.occurrences).to eq([stored_occurrence])
+      expect(report.occurrences).to eq([occurrence])
     end
   end
 end

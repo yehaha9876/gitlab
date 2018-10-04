@@ -251,7 +251,7 @@ describe Ci::Build do
   describe '#collect_security_reports!' do
     subject { job.collect_security_reports!(security_reports) }
 
-    let(:security_reports) { ::Gitlab::Ci::Reports::Security::Reports.new(pipeline) }
+    let(:security_reports) { ::Gitlab::Ci::Reports::Security::Reports.new }
 
     context 'when build has a security report' do
       context 'when there is a sast report' do

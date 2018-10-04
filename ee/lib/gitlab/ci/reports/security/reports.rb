@@ -5,11 +5,9 @@ module Gitlab
     module Reports
       module Security
         class Reports
-          attr_reader :pipeline
           attr_reader :reports
 
-          def initialize(pipeline)
-            @pipeline = pipeline
+          def initialize
             @reports = {}
           end
 
