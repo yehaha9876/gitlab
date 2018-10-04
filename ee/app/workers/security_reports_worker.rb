@@ -15,7 +15,7 @@ class SecurityReportsWorker
   LOCK_TTL = 2.minutes
 
   def perform(pipeline_id)
-    Ci::Pipeline.find_by(id: pipeline_id).try do |pipeline|
+    Ci::Pipeline.find_by(id: pipeline_id).try do |pipeline| # rubocop: disable CodeReuse/ActiveRecord
       # License check
       break unless pipeline.project.security_reports_feature_available?
 

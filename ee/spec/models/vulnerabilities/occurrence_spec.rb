@@ -62,22 +62,79 @@ describe Vulnerabilities::Occurrence do
     end
   end
 
+  describe '.latest_pipeline_id_for' do
+    let(:report_type) { :sast }
+    let(:ref) { 'master' }
+
+    subject { described_class.latest_pipeline_id_for(report_type, ref) }
+
+    context 'when occurrence has the corresponding report type and ref' do
+      let!(:occurrence) { create(:vulnerabilities_occurrence, report_type: report_type, ref: ref) }
+
+      it 'returns the pipeline_id' do
+        is_expected.to eq(occurrence.pipeline_id)
+      end
+    end
+
+    # This case is unlikely to happen has we cleanup occurences from previous pipeline
+    context 'when there are occurrences from different pipelines for the corresponding report type and ref' do
+      let!(:occurrence_1) { create(:vulnerabilities_occurrence, report_type: report_type, ref: ref) }
+      let!(:occurrence_2) { create(:vulnerabilities_occurrence, :uuid, report_type: report_type, ref: ref) }
+
+      it 'returns the latest pipeline_id' do
+        is_expected.to eq(occurrence_2.pipeline_id)
+      end
+    end
+
+    context 'when there is no occurrences with corresponding report type and ref' do
+      let!(:occurrence) { create(:vulnerabilities_occurrence, report_type: :dependency_scanning) }
+
+      it 'returns nil' do
+        is_expected.to be_nil
+      end
+    end
+  end
+
   describe '.report_type' do
-    subject { described_class.report_type(:sast) }
+    let(:report_type) { :sast }
+
+    subject { described_class.report_type(report_type) }
 
     context 'when occurrence has the corresponding report type' do
-      let(:occurrence) { create(:vulnerabilities_occurrence, report_type: :sast) }
+      let!(:occurrence) { create(:vulnerabilities_occurrence, report_type: report_type) }
 
       it 'selects the occurrence' do
         is_expected.to eq([occurrence])
       end
     end
 
-    context 'when build does not have security reports' do
-      let(:occurrence) { create(:vulnerabilities_occurrence, report_type: :dependency_scanning) }
+    context 'when occurrence does not have security reports' do
+      let!(:occurrence) { create(:vulnerabilities_occurrence, report_type: :dependency_scanning) }
 
       it 'does not select the occurrence' do
         is_expected.to be_empty
+      end
+    end
+  end
+
+  describe '.excluding_pipeline' do
+    let(:pipeline) { create(:ci_pipeline) }
+
+    subject { described_class.excluding_pipeline(pipeline.id) }
+
+    context 'when occurrence belongs to the given pipeline' do
+      let!(:occurrence) { create(:vulnerabilities_occurrence, pipeline: pipeline) }
+
+      it 'does not select the occurrence' do
+        is_expected.to be_empty
+      end
+    end
+
+    context 'when occurrence does not belong to pipeline' do
+      let!(:occurrence) { create(:vulnerabilities_occurrence) }
+
+      it 'selects the occurrence' do
+        is_expected.to eq([occurrence])
       end
     end
   end

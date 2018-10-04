@@ -6,9 +6,9 @@ describe Security::CleanupReportService, '#execute' do
   let!(:old_pipeline_1) { create(:ci_pipeline, project: project) }
   let!(:old_pipeline_2) { create(:ci_pipeline, project: project) }
   let!(:new_pipeline) { create(:ci_pipeline, project: project) }
-  let!(:old_occurrences_1) { create_list(:vulnerabilities_occurrence, 1, :dynamic, report_type: report_type, pipeline: old_pipeline_1, project: project) }
-  let!(:old_occurrences_2) { create_list(:vulnerabilities_occurrence, 2, :dynamic, report_type: report_type, pipeline: old_pipeline_2, project: project) }
-  let!(:new_occurrences) { create_list(:vulnerabilities_occurrence, 3, :dynamic, report_type: report_type, pipeline: new_pipeline, project: project) }
+  let!(:old_occurrences_1) { create_list(:vulnerabilities_occurrence, 1, :uuid, report_type: report_type, pipeline: old_pipeline_1, project: project) }
+  let!(:old_occurrences_2) { create_list(:vulnerabilities_occurrence, 2, :uuid, report_type: report_type, pipeline: old_pipeline_2, project: project) }
+  let!(:new_occurrences) { create_list(:vulnerabilities_occurrence, 3, :uuid, report_type: report_type, pipeline: new_pipeline, project: project) }
   let!(:old_occurrence_identifiers_1) do
     old_occurrences_1.each do |occurrence|
       create(:vulnerabilities_occurrence_identifier, occurrence: occurrence)

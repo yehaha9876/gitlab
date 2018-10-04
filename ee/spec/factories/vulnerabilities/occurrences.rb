@@ -17,7 +17,7 @@ FactoryBot.define do
     metadata_version 'sast:1.0'
     raw_metadata 'raw_metadata'
 
-    trait :dynamic do
+    trait :uuid do
       uuid { SecureRandom.uuid }
     end
   end

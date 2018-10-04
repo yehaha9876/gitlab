@@ -15,8 +15,7 @@ module Security
     def execute
       @project.vulnerabilities
         .report_type(@report_type)
-        .where(ref: @pipeline.ref)
-        .where.not(pipeline_id: @pipeline.id)
+        .excluding_pipeline(@pipeline.id)
         .delete_all
 
       success

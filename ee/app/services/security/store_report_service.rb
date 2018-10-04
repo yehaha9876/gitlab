@@ -19,6 +19,7 @@ module Security
       vulnerabilities_objects.each(&:save!)
 
       CleanupReportService.new(@pipeline, @report.type).execute
+
       success
     end
 
@@ -27,9 +28,7 @@ module Security
     # Check that the existing records for given report type come from an older pipeline
     def stale_data?
       last_pipeline_id = @pipeline.project.vulnerabilities
-        .report_type(@report.type)
-        .where(ref: @pipeline.ref)
-        .pluck(:pipeline_id).first
+        .latest_pipeline_id_for(@report.type, @pipeline.ref)
 
       last_pipeline_id && last_pipeline_id >= @pipeline.id
     end
@@ -63,8 +62,7 @@ module Security
 
     def existing_scanner_objects
       strong_memoize(:existing_scanner_objects) do
-        # find existing scanners
-        project.vulnerability_scanners.where(external_id: all_scanners_external_ids).map do |scanner|
+        project.vulnerability_scanners.with_external_id(all_scanners_external_ids).map do |scanner|
           [scanner.external_id, scanner]
         end.to_h
       end
@@ -84,7 +82,7 @@ module Security
 
     def existing_identifiers_objects
       strong_memoize(:existing_identifiers_objects) do
-        project.vulnerability_identifiers.where(fingerprint: all_identifiers_fingerprints).map do |identifier|
+        project.vulnerability_identifiers.with_fingerprint(all_identifiers_fingerprints).map do |identifier|
           [identifier.fingerprint, identifier]
         end.to_h
       end

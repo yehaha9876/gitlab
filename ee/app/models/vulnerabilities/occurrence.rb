@@ -57,6 +57,14 @@ module Vulnerabilities
     validates :raw_metadata, presence: true
 
     scope :report_type, -> (type) { where(report_type: self.report_types[type] )}
+    scope :excluding_pipeline, -> (pipeline_id) { where.not(pipeline: pipeline_id )}
+
+    def self.latest_pipeline_id_for(report_type, ref)
+      report_type(report_type)
+      .where(ref: ref)
+      .pluck(:pipeline_id)
+      .max
+    end
 
     # Override getter and setter for :severity as we can't use enum (it conflicts with :confidence)
     # To be replaced with enum using _prefix when migrating to rails 5

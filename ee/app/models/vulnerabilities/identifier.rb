@@ -21,5 +21,7 @@ module Vulnerabilities
     # TODO: find out why it fails
     # validates :fingerprint, presence: true, uniqueness: { scope: :project_id }
     validates :name, presence: true
+
+    scope :with_fingerprint, -> (fingerprints) { where(fingerprint: fingerprints )}
   end
 end
