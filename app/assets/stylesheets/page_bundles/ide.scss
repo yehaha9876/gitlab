@@ -10,6 +10,25 @@ $ide-tree-text-start: $ide-activity-bar-width + $ide-tree-padding;
 $ide-commit-row-height: 32px;
 $ide-commit-header-height: 48px;
 
+@mixin ide-trace-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-top: -$grid-size;
+  margin-bottom: -$grid-size;
+
+  &.build-page .top-bar {
+    top: 0;
+    height: auto;
+    font-size: 12px;
+    border-top-right-radius: $border-radius-default;
+  }
+
+  .top-bar {
+    margin-left: -$gl-padding;
+  }
+}
+
 .project-refs-form,
 .project-refs-target-form {
   display: inline-block;
@@ -1111,11 +1130,7 @@ $ide-commit-header-height: 48px;
 }
 
 .ide-pipeline {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  margin-top: -$grid-size;
-  margin-bottom: -$grid-size;
+  @include ide-trace-view();
 
   .empty-state {
     margin-top: auto;
@@ -1133,16 +1148,8 @@ $ide-commit-header-height: 48px;
     }
   }
 
-  .build-trace,
-  .top-bar {
+  .build-trace {
     margin-left: -$gl-padding;
-  }
-
-  &.build-page .top-bar {
-    top: 0;
-    height: auto;
-    font-size: 12px;
-    border-top-right-radius: $border-radius-default;
   }
 }
 
@@ -1392,5 +1399,26 @@ $ide-commit-header-height: 48px;
 
   .folder-icon {
     fill: $gl-text-color-secondary;
+  }
+}
+
+// TODO move to ee specific file
+.ide-terminal {
+  @include ide-trace-view();
+
+  .terminal-wrapper {
+    margin-left: -$gl-padding;
+    background: $black;
+    color: $gray-darkest;
+    overflow: hidden;
+  }
+
+  .xterm {
+    height: 100%;
+    padding: $grid-size;
+  }
+
+  .xterm-viewport {
+    overflow-y: auto;
   }
 }
