@@ -8,6 +8,10 @@ describe Security::StoreReportService, '#execute' do
   let(:pipeline) { artifact.job.pipeline }
   let(:report) { pipeline.security_reports.get_report('sast') }
 
+  before do
+    stub_licensed_features(sast: true)
+  end
+
   subject { described_class.new(pipeline, report).execute }
 
   context 'without existing data' do
@@ -30,13 +34,20 @@ describe Security::StoreReportService, '#execute' do
 
   context 'with existing data from previous pipeline' do
     let!(:scanner) { create(:vulnerabilities_scanner, project: project, external_id: 'find_sec_bugs', name: 'existing_name') }
-    let!(:occurrence) { create(:vulnerabilities_occurrence, pipeline: pipeline, scanner: scanner, project: project) }
-    let!(:occurrence_identifier) { create(:vulnerabilities_occurrence_identifier, occurrence: occurrence, identifier: identifier) }
     let!(:identifier) { create(:vulnerabilities_identifier, project: project, fingerprint: 'f5724386167705667ae25a1390c0a516020690ba') }
     let!(:new_artifact) { create(:ee_ci_job_artifact, :sast, job: new_build) }
     let(:new_build) { create(:ci_build, pipeline: new_pipeline) }
     let(:new_pipeline) { create(:ci_pipeline, project: project) }
     let(:new_report) { new_pipeline.security_reports.get_report('sast') }
+
+    let!(:occurrence) do
+      create(:vulnerabilities_occurrence, 
+        pipelines: [pipeline],
+        identifiers: [identifier],
+        primary_identifier: identifier,
+        scanner: scanner,
+        project: project)
+    end
 
     subject { described_class.new(new_pipeline, new_report).execute }
 
@@ -49,31 +60,12 @@ describe Security::StoreReportService, '#execute' do
     end
 
     it 'inserts all occurrences for this pipeline' do
-      expect { subject }.to change { Vulnerabilities::Occurrence.where(project: project, pipeline: new_pipeline).count }.by(3)
-    end
-
-    it 'deletes existing occurrences from previous pipelines' do
-      subject
-      expect { occurrence.reload }.to raise_error(ActiveRecord::RecordNotFound)
-    end
-
-    it 'inserts all occurrence_identifiers (join model) for this pipeline' do
-      expect { subject }.to change {
-        Vulnerabilities::OccurrenceIdentifier
-          .joins(:occurrence).where(vulnerability_occurrences: { project_id: project.id, pipeline_id: new_pipeline.id })
-          .count
-      }.by(5)
-    end
-
-    it 'deletes existing occurrence_identifiers (join model) from previous pipelines' do
-      subject
-
-      expect { occurrence_identifier.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { subject }.to change { Vulnerabilities::Occurrence.where(project: project).count }.by(3)
     end
   end
 
   context 'with existing data from same pipeline' do
-    let!(:occurrence) { create(:vulnerabilities_occurrence, project: project, pipeline: pipeline) }
+    let!(:occurrence) { create(:vulnerabilities_occurrence, project: project, pipelines: [pipeline]) }
 
     it 'skips report' do
       expect(subject).to eq({

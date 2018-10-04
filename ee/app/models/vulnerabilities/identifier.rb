@@ -11,10 +11,7 @@ module Vulnerabilities
     has_many :occurrence_identifiers, class_name: 'Vulnerabilities::OccurrenceIdentifier'
     has_many :occurrences, through: :occurrence_identifiers, class_name: 'Vulnerabilities::Occurrence'
 
-    has_many :occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
-    has_many :pipelines, through: :occurrence_pipelines, class_name: 'Ci::Pipeline'
-
-    has_one :primary_identifier, class_name: 'Vulnerabilities::Identifier'
+    has_many :primary_occurrences, class_name: 'Vulnerabilities::Identifier', inverse_of: :primary_identifier
 
     belongs_to :project
 

@@ -12,7 +12,7 @@ module Gitlab
           end
 
           def get_report(report_type)
-            reports[report_type] ||= Report.new(@pipeline, report_type)
+            reports[report_type] ||= Report.new(report_type)
           end
         end
       end

@@ -2,10 +2,10 @@
 
 module Vulnerabilities
   class OccurrencePipeline < ActiveRecord::Base
-    self.table_name = "vulnerability_occurrence_identifiers"
+    self.table_name = "vulnerability_occurrence_pipelines"
 
     belongs_to :occurrence, class_name: 'Vulnerabilities::Occurrence'
-    belongs_to :pipeline, class_name: 'Vulnerabilities::Pipeline'
+    belongs_to :pipeline, class_name: '::Ci::Pipeline'
 
     validates :occurrence, presence: true
     validates :pipeline, presence: true

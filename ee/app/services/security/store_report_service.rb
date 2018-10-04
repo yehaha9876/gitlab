@@ -6,6 +6,8 @@ module Security
   class StoreReportService < ::BaseService
     include Gitlab::Utils::StrongMemoize
 
+    attr_reader :pipeline, :report, :project
+
     def initialize(pipeline, report)
       @pipeline = pipeline
       @report = report
@@ -14,11 +16,9 @@ module Security
 
     def execute
       # Ensure we're not overriding existing records with older data for this report
-      return error("#{@report.type} report contains stale data, skipping...") if stale_data?
+      return error("#{@report.type} report contains stale data, skipping...") if executed?
 
-      vulnerabilities_objects.each(&:save!)
-
-      CleanupReportService.new(@pipeline, @report.type).execute
+      create_all_vulnerabilities!
 
       success
     end
@@ -26,26 +26,49 @@ module Security
     private
 
     # Check that the existing records for given report type come from an older pipeline
-    def stale_data?
-      last_pipeline_id = @pipeline.project.vulnerabilities
-        .latest_pipeline_id_for(@report.type, @pipeline.ref)
-
-      last_pipeline_id && last_pipeline_id >= @pipeline.id
+    def executed?
+      pipeline.vulnerabilities.any?
     end
 
-    def vulnerabilities_objects
-      strong_memoize(:vulnerabilities_objects) do
-        # mutate AR model pointers to have proper relations between existing and new objects
-        @report.occurrences.map do |occurrence|
-          occurrence[:scanner] = scanners_objects[occurrence[:scanner]]
-
-          occurrence[:identifiers].map! do |fingerprint|
-            identifiers_objects[fingerprint]
-          end
-
-          project.vulnerabilities.build(occurrence)
-        end
+    def create_all_vulnerabilities!
+      @report.occurrences.each do |occurrence|
+        create_vulnerability(occurrence)
       end
+    end
+
+    def create_vulnerability(occurrence)
+      params = occurrence.except(
+        :scanner, :primary_identifier,
+        :location_fingerprint, :identifiers)
+
+      # TODO: This creates object with N+1
+      vulnerability = project.vulnerabilities
+        .create_with(params)
+        .find_or_create_by!(
+          scanner: scanners_objects[occurrence[:scanner]],
+          primary_identifier: identifiers_objects[occurrence[:primary_identifier]],
+          location_fingerprint: occurrence[:location_fingerprint])
+
+      # Save all new identifiers
+      occurrence[:identifiers].map do |identifier|
+        vulnerability.occurrence_identifiers.create(identifier: identifiers_objects[identifier])
+      end
+
+      # Save pipeline
+      vulnerability.occurrence_pipelines.create(pipeline: pipeline)
+    end
+    
+
+    def all_vulnerabilities_scanners
+      @report.occurrences.values.map { |occurrence| occurrence[:scanner] }
+    end
+
+    def all_vulnerabilities_location_fingerprint
+      @report.occurrences.values.map { |occurrence| occurrence[:location_fingerprint] }
+    end
+
+    def all_vulnerabilities_primary_identifiers
+      @report.occurrences.values.map { |occurrence| occurrence[:primary_identifier] }
     end
 
     def scanners_objects

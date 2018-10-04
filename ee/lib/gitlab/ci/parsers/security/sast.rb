@@ -29,7 +29,7 @@ module Gitlab
               uuid: SecureRandom.uuid,
               report_type: report.type,
               name: data['message'],
-              primary_identifier_fingerprint: identifiers.first,
+              primary_identifier: identifiers.first,
               project_fingerprint: generate_project_fingerprint(data['cve']),
               location_fingerprint: generate_location_fingerprint(data['location']),
               severity: parse_level(data['severity']),

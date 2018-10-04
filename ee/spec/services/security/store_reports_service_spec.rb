@@ -9,6 +9,7 @@ describe Security::StoreReportsService, '#execute' do
 
   context 'when there are reports' do
     before do
+      stub_licensed_features(sast: true)
       create(:ee_ci_build, :security_reports, pipeline: pipeline)
     end
 

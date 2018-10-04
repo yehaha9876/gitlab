@@ -11,6 +11,9 @@ module EE
       prepended do
         has_one :chat_data, class_name: 'Ci::PipelineChatData'
 
+        has_many :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
+        has_many :vulnerabilities, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
+
         # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_security_reports, -> {
           joins(:artifacts).where(ci_builds: { name: %w[sast dependency_scanning sast:container container_scanning dast] })
