@@ -11,6 +11,11 @@ module Vulnerabilities
     has_many :occurrence_identifiers, class_name: 'Vulnerabilities::OccurrenceIdentifier'
     has_many :occurrences, through: :occurrence_identifiers, class_name: 'Vulnerabilities::Occurrence'
 
+    has_many :occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
+    has_many :pipelines, through: :occurrence_pipelines, class_name: 'Ci::Pipeline'
+
+    has_one :primary_identifier, class_name: 'Vulnerabilities::Identifier'
+
     belongs_to :project
 
     validates :project, presence: true
@@ -22,6 +27,6 @@ module Vulnerabilities
     # validates :fingerprint, presence: true, uniqueness: { scope: :project_id }
     validates :name, presence: true
 
-    scope :with_fingerprint, -> (fingerprints) { where(fingerprint: fingerprints )}
+    scope :with_fingerprint, -> (fingerprints) { where(fingerprint: fingerprints) }
   end
 end
