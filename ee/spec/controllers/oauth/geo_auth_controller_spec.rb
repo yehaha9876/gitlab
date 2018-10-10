@@ -87,23 +87,36 @@ describe Oauth::GeoAuthController do
   end
 
   describe 'GET logout' do
-    let(:logout_state) { Gitlab::Geo::OauthSession.new(access_token: access_token).generate_logout_state }
+    render_views
 
-    context 'access_token error' do
-      render_views
+    before do
+      sign_in(user)
+    end
 
-      before do
-        sign_in(user)
-      end
+    context 'when correct access_token is informed' do
+      it 'logs out and redirects to root_url when return_to is not informed' do
+        logout_state = Gitlab::Geo::OauthSession.new(access_token: access_token).generate_logout_state
 
-      it 'logs out when correct access_token is informed' do
         get :logout, state: logout_state
 
         expect(response).to redirect_to root_url
       end
 
+      it 'logs out and redirects to oauth state when return_to is informed' do
+        oauth_return_to = 'http://secondary/oauth/geo/callback'
+        logout_state = Gitlab::Geo::OauthSession.new(access_token: access_token, return_to: oauth_return_to).generate_logout_state
+
+        get :logout, state: logout_state
+
+        expect(response).to redirect_to oauth_return_to
+      end
+    end
+
+    context 'when correct access_token is invalid' do
       it 'handles access token problems' do
         allow_any_instance_of(Oauth2::LogoutTokenValidationService).to receive(:execute) { { status: :error, message: :expired } }
+        logout_state = Gitlab::Geo::OauthSession.new(access_token: access_token).generate_logout_state
+
         get :logout, state: logout_state
 
         expect(response.body).to include("There is a problem with the OAuth access_token: expired")

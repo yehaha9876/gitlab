@@ -11,7 +11,15 @@ module Gitlab
         return false unless state
 
         salt, hmac, return_to = state.split(':', 3)
+        return false unless return_to
 
+        hmac == generate_oauth_hmac(salt, return_to)
+      end
+
+      def logout_state_valid?
+        return false unless state
+
+        salt, _, hmac, return_to = state.split(':', 4)
         return false unless return_to
 
         hmac == generate_oauth_hmac(salt, return_to)
@@ -25,11 +33,13 @@ module Gitlab
       end
 
       def generate_logout_state
-        return unless access_token
+        return unless access_token && return_to
 
         cipher = logout_token_cipher(oauth_salt, :encrypt)
         encrypted = cipher.update(access_token) + cipher.final
-        self.state = "#{oauth_salt}:#{Base64.urlsafe_encode64(encrypted)}"
+        hmac = generate_oauth_hmac(oauth_salt, return_to)
+
+        self.state = "#{oauth_salt}:#{Base64.urlsafe_encode64(encrypted)}:#{hmac}:#{return_to}"
       rescue OpenSSL::OpenSSLError
         false
       end
@@ -37,7 +47,7 @@ module Gitlab
       def extract_logout_token
         return unless state
 
-        salt, encrypted = state.split(':', 2)
+        salt, encrypted, _, _ = state.split(':', 4)
         decipher = logout_token_cipher(salt, :decrypt)
         decipher.update(Base64.urlsafe_decode64(encrypted)) + decipher.final
       rescue OpenSSL::OpenSSLError
@@ -46,6 +56,10 @@ module Gitlab
 
       def get_oauth_state_return_to
         state.split(':', 3)[2] if state
+      end
+
+      def get_logout_state_return_to
+        state.split(':', 4)[3] if state
       end
 
       def authorize_url(params = {})

@@ -69,14 +69,17 @@ describe Gitlab::Geo::OauthSession do
       expect(subject.generate_logout_state).to be_falsey
     end
 
-    it 'returns a string with salt and encrypted access token colon separated' do
-      state = described_class.new(access_token: access_token).generate_logout_state
+    it 'returns a string with salt, encrypted access token and return_to value colon separated' do
+      subject = described_class.new(access_token: access_token, return_to: oauth_return_to)
+
+      state = subject.generate_logout_state
+      salt, encrypted, return_to = state.split(':', 3)
+
       expect(state).to be_a String
       expect(state).not_to be_blank
-
-      salt, encrypted = state.split(':', 2)
       expect(salt).not_to be_blank
       expect(encrypted).not_to be_blank
+      expect(return_to).not_to be_blank
     end
   end
 

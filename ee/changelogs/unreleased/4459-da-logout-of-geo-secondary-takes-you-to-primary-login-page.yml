@@ -1,0 +1,5 @@
+---
+title: Geo - Redirect user back to the secondary node after a logout/login
+merge_request: 8108
+author:
+type: fixed
