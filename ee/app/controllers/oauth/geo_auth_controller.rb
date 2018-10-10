@@ -4,6 +4,7 @@ class Oauth::GeoAuthController < ActionController::Base
 
   def auth
     oauth = Gitlab::Geo::OauthSession.new(state: params[:state])
+
     unless oauth.oauth_state_valid?
       redirect_to root_url
       return
@@ -15,6 +16,7 @@ class Oauth::GeoAuthController < ActionController::Base
   # rubocop: disable CodeReuse/ActiveRecord
   def callback
     oauth = Gitlab::Geo::OauthSession.new(state: params[:state])
+
     unless oauth.oauth_state_valid?
       redirect_to new_user_session_path
       return
@@ -25,7 +27,7 @@ class Oauth::GeoAuthController < ActionController::Base
 
     user = User.find_by(id: remote_user['id'])
 
-    if user && sign_in(user, bypass: true)
+    if user && bypass_sign_in(user)
       after_sign_in_with_gitlab(token, oauth.get_oauth_state_return_to)
     else
       invalid_credentials
@@ -35,10 +37,12 @@ class Oauth::GeoAuthController < ActionController::Base
 
   def logout
     logout = Oauth2::LogoutTokenValidationService.new(current_user, params)
+    return_to = logout.oauth_session.get_oauth_state_return_to
     result = logout.execute
+
     if result[:status] == :success
       sign_out current_user
-      redirect_to root_path
+      redirect_to(return_to || root_path)
     else
       access_token_error(result[:message])
     end

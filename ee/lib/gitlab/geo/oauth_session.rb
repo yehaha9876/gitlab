@@ -11,7 +11,6 @@ module Gitlab
         return false unless state
 
         salt, hmac, return_to = state.split(':', 3)
-
         return false unless return_to
 
         hmac == generate_oauth_hmac(salt, return_to)
@@ -29,7 +28,8 @@ module Gitlab
 
         cipher = logout_token_cipher(oauth_salt, :encrypt)
         encrypted = cipher.update(access_token) + cipher.final
-        self.state = "#{oauth_salt}:#{Base64.urlsafe_encode64(encrypted)}"
+
+        self.state = "#{oauth_salt}:#{Base64.urlsafe_encode64(encrypted)}:#{return_to}"
       rescue OpenSSL::OpenSSLError
         false
       end

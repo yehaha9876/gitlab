@@ -35,5 +35,9 @@ module Oauth2
         Doorkeeper::AccessToken.by_token(logout_token)
       end
     end
+
+    def oauth_session
+      @oauth_session ||= Gitlab::Geo::OauthSession.new(state: params[:state])
+    end
   end
 end
