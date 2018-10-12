@@ -11,11 +11,22 @@ class Projects::BoardsController < Projects::ApplicationController
   before_action :assign_endpoint_vars
 
   def index
-    respond_with_boards
+    respond_with_boards && return if request.format.json?
+
+    recently_visited = Boards::Visits::LatestService.new(project, current_user).execute
+
+    if recently_visited
+      redirect_to(namespace_project_board_path(id: recently_visited.board_id), status: :found)
+    else
+      respond_with_boards
+    end
   end
 
   def show
     @board = boards.find(params[:id])
+
+    # add/update the board in the recent visited table
+    Boards::Visits::CreateService.new(@board.project, current_user).execute(@board) if request.format.html?
 
     respond_with_board
   end
@@ -34,7 +45,7 @@ class Projects::BoardsController < Projects::ApplicationController
   end
 
   def authorize_read_board!
-    return access_denied! unless can?(current_user, :read_board, project)
+    access_denied! unless can?(current_user, :read_board, project)
   end
 
   def serialize_as_json(resource)

@@ -8,11 +8,22 @@ class Groups::BoardsController < Groups::ApplicationController
   before_action :boards, only: :index
 
   def index
-    respond_with_boards
+    respond_with_boards && return if request.format.json?
+
+    recently_visited = Boards::Visits::LatestService.new(group, current_user).execute
+
+    if recently_visited
+      redirect_to(group_board_path(id: recently_visited.board_id), status: :found)
+    else
+      respond_with_boards
+    end
   end
 
   def show
     @board = boards.find(params[:id])
+
+    # add/update the board in the recent visited table
+    Boards::Visits::CreateService.new(@board.group, current_user).execute(@board) if request.format.html?
 
     respond_with_board
   end
