@@ -5,6 +5,7 @@ module Clusters
     prepend EE::Clusters::Cluster
 
     include Presentable
+    include Gitlab::Utils::StrongMemoize
 
     self.table_name = 'clusters'
 
@@ -21,6 +22,9 @@ module Clusters
 
     has_many :cluster_projects, class_name: 'Clusters::Project'
     has_many :projects, through: :cluster_projects, class_name: '::Project'
+
+    has_many :cluster_groups, class_name: 'Clusters::Group'
+    has_many :groups, through: :cluster_groups, class_name: '::Group'
 
     # we force autosave to happen when we save `Cluster` model
     has_one :provider_gcp, class_name: 'Clusters::Providers::Gcp', autosave: true
@@ -40,7 +44,11 @@ module Clusters
     accepts_nested_attributes_for :platform_kubernetes, update_only: true
 
     validates :name, cluster_name: true
+    validates :cluster_type, presence: true, on: :create
     validate :restrict_modification, on: :update
+
+    validate :no_groups, unless: :group_type?
+    validate :no_projects, unless: :project_type?
 
     delegate :status, to: :provider, allow_nil: true
     delegate :status_reason, to: :provider, allow_nil: true
@@ -51,6 +59,12 @@ module Clusters
     delegate :available?, to: :application_helm, prefix: true, allow_nil: true
     delegate :available?, to: :application_ingress, prefix: true, allow_nil: true
     delegate :available?, to: :application_prometheus, prefix: true, allow_nil: true
+
+    enum cluster_type: {
+      instance_type: 1,
+      group_type: 2,
+      project_type: 3
+    }
 
     enum platform_type: {
       kubernetes: 1
@@ -110,6 +124,13 @@ module Clusters
     end
     alias_method :project, :first_project
 
+    def first_group
+      strong_memoize(:first_group) do
+        groups.first
+      end
+    end
+    alias_method :group, :first_group
+
     def kubeclient
       platform_kubernetes.kubeclient if kubernetes?
     end
@@ -123,6 +144,18 @@ module Clusters
       end
 
       true
+    end
+
+    def no_groups
+      if groups.any?
+        errors.add(:cluster, 'cannot have groups assigned')
+      end
+    end
+
+    def no_projects
+      if projects.any?
+        errors.add(:cluster, 'cannot have projects assigned')
+      end
     end
   end
 end
