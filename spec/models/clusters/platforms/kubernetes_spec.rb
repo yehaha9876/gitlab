@@ -124,9 +124,17 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
   end
 
   describe '#kubeclient' do
+    let(:cluster) { create(:cluster, :project) }
+    let(:kubernetes) { build(:cluster_platform_kubernetes, :configured, namespace: 'a-namespace', cluster: cluster) }
+
     subject { kubernetes.kubeclient }
 
-    let(:kubernetes) { build(:cluster_platform_kubernetes, :configured, namespace: 'a-namespace') }
+    before do
+      create(:cluster_kubernetes_namespace,
+             cluster: kubernetes.cluster,
+             cluster_project: kubernetes.cluster.cluster_project,
+             project: kubernetes.cluster.cluster_project.project)
+    end
 
     it { is_expected.to be_an_instance_of(Gitlab::Kubernetes::KubeClient) }
   end
@@ -317,6 +325,29 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
       end
 
       it { is_expected.to include(pods: []) }
+    end
+  end
+
+  describe '#update_kubernetes_namespace' do
+    let(:cluster) { create(:cluster, :provided_by_gcp) }
+    let(:platform) { cluster.platform }
+
+    context 'when namespace is updated' do
+      it 'should call ConfigureWorker' do
+        expect(ClusterPlatformConfigureWorker).to receive(:perform_async).with(cluster.id).once
+
+        platform.namespace = 'new-namespace'
+        platform.save
+      end
+    end
+
+    context 'when namespace is not updated' do
+      it 'should not call ConfigureWorker' do
+        expect(ClusterPlatformConfigureWorker).not_to receive(:perform_async)
+
+        platform.username = "new-username"
+        platform.save
+      end
     end
   end
 end

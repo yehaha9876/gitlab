@@ -23,6 +23,11 @@ module Clusters
       "#{namespace}-token"
     end
 
+    def configure_credentials
+      self.namespace = default_namespace
+      self.service_account_name = default_service_account_name
+    end
+
     private
 
     def set_namespace_and_service_account_to_default

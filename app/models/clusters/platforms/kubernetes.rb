@@ -6,6 +6,7 @@ module Clusters
       include Gitlab::Kubernetes
       include ReactiveCaching
       include EnumWithNil
+      include AfterCommitQueue
 
       prepend EE::KubernetesService
 
@@ -45,6 +46,7 @@ module Clusters
       validate :prevent_modification, on: :update
 
       after_save :clear_reactive_cache!
+      after_update :update_kubernetes_namespace
 
       alias_attribute :ca_pem, :ca_cert
 
@@ -118,8 +120,12 @@ module Clusters
         to_kubeconfig(
           url: api_url,
           namespace: actual_namespace,
-          token: token,
+          token: fetch_token,
           ca_pem: ca_pem)
+      end
+
+      def fetch_token
+        kubernetes_namespace&.service_account_token.presence || token
       end
 
       def default_namespace
@@ -200,6 +206,14 @@ module Clusters
         end
 
         true
+      end
+
+      def update_kubernetes_namespace
+        return unless namespace_changed?
+
+        run_after_commit do
+          ClusterPlatformConfigureWorker.perform_async(cluster_id)
+        end
       end
     end
   end
