@@ -188,8 +188,24 @@ describe AuditEventService do
     end
 
     describe 'entity has the audit_events feature' do
+      let(:logger) { instance_double(Gitlab::AuditJsonLogger) }
+      let(:logged_payload) do
+        {
+          author_id: user.id,
+          entity_id: project.id,
+          entity_type: 'Project',
+          add: 'project',
+          author_name: user.name,
+          target_id: project.full_path,
+          target_type: 'Project',
+          target_details: project.full_path
+        }
+      end
+
       before do
         allow(service).to receive(:audit_events_enabled?).and_return(true)
+        allow(service).to receive(:file_logger).and_return(logger)
+        expect(logger).to receive(:info).with(logged_payload)
       end
 
       it 'logs an audit event' do
