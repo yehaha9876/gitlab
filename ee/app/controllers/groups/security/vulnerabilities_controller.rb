@@ -28,7 +28,7 @@ class Groups::Security::VulnerabilitiesController < Groups::ApplicationControlle
   private
 
   def ensure_security_dashboard_feature_enabled
-    render_404 unless @group.feature_available?(:security_dashboard)
+    render_404 unless @group.security_dashboard_feature_available?
   end
 
   def authorize_read_group_security_dashboard!

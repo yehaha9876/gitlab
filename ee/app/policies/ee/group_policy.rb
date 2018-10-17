@@ -26,7 +26,7 @@ module EE
       end
 
       condition(:security_dashboard_feature_disabled) do
-        !@subject.feature_available?(:security_dashboard)
+        !@subject.security_dashboard_feature_available?
       end
 
       rule { reporter }.policy do

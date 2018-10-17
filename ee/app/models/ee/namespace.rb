@@ -200,6 +200,11 @@ module EE
         actual_plan_name == FREE_PLAN
     end
 
+    def security_dashboard_feature_available?
+      Feature.enabled?(:security_dashboard, self) &&
+        feature_available?(:security_dashboard)
+    end
+
     private
 
     def validate_plan_name
