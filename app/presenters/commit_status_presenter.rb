@@ -9,7 +9,7 @@ class CommitStatusPresenter < Gitlab::View::Presenter::Delegated
     missing_dependency_failure: 'There has been a missing dependency failure',
     runner_unsupported: 'Your runner is outdated, please upgrade your runner',
     stale_schedule: 'Delayed job could not be executed by some reason, please try again',
-    runner_execution_timeout: 'The script exceeded the maximum execution time of the runner'
+    runner_execution_timeout: 'The script exceeded the maximum execution time set for the runner'
   }.freeze
 
   private_constant :CALLOUT_FAILURE_MESSAGES
