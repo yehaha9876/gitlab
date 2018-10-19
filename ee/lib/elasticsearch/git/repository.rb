@@ -110,7 +110,7 @@ module Elasticsearch
                   file_name: blob.path,
                   # Linguist is not available in the Ruby indexer. The Go indexer can
                   # fill in the right language.
-                  language: nil,
+                  language: nil
                 },
                 type: es_type,
                 join_field: {
