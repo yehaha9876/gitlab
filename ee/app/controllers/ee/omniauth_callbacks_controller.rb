@@ -18,7 +18,9 @@ module EE
 
     override :fail_login
     def fail_login(user)
-      log_failed_login(user.username, oauth['provider'])
+      #TODO: posibly discard these changes? Not used now GroupSAML callback controller implements fail_login
+      username = user&.username || 'Unknown user'
+      log_failed_login(username, oauth['provider'])
 
       super
     end
