@@ -60,7 +60,24 @@ class Groups::SsoController < Groups::ApplicationController
   end
 
   def check_user_can_sign_in_with_provider
-    route_not_found unless can?(current_user, :sign_in_with_saml_provider, @unauthenticated_group.saml_provider)
+    actor = current_user || saml_discovery_token_actor
+    route_not_found unless can?(actor, :sign_in_with_saml_provider, @unauthenticated_group.saml_provider)
+  end
+
+  class SamlDiscoveryTokenActor
+    def initialize(group, token)
+      @group = group
+      @token = token
+    end
+
+    def authenticated?
+      @group.saml_discovery_token.present? && @group.saml_discovery_token == @token
+    end
+  end
+
+  def saml_discovery_token_actor
+    #TODO: test with private group to verify fix made here (group vs @unauthenticated_group)
+    SamlDiscoveryTokenActor.new(@unauthenticated_group, params[:token])
   end
 
   def redirect_if_group_moved
