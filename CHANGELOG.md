@@ -2,14 +2,18 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
-## 11.3.4 (2018-10-05)
+## 11.3.6 (2018-10-17)
 
-### Security (3 changes)
+- No changes.
 
-- Filter user sensitive data from discussions JSON. !2537
-- Properly filter private references from system notes.
-- Markdown API no longer displays confidential title references unless authorized.
+## 11.3.5 (2018-10-15)
 
+### Fixed (2 changes)
+
+- Fix loading issue on some merge request discussion. !21982
+- Fix project deletion when there is a export available. !22276
+
+- No changes.
 
 ## 11.3.3 (2018-10-04)
 

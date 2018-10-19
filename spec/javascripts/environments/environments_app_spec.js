@@ -50,7 +50,7 @@ describe('Environment', () => {
 
         expect(
           component.$el.querySelector('.js-blank-state-title').textContent,
-        ).toContain('You don\'t have any environments right now.');
+        ).toContain('You don\'t have any environments right now');
       });
     });
 
@@ -94,6 +94,7 @@ describe('Environment', () => {
           spyOn(component, 'updateContent');
           setTimeout(() => {
             component.$el.querySelector('.gl-pagination li:nth-child(5) a').click();
+
             expect(component.updateContent).toHaveBeenCalledWith({ scope: 'available', page: '2' });
             done();
           }, 0);
@@ -113,9 +114,7 @@ describe('Environment', () => {
       describe('deploy boards', () => {
         it('should render arrow to open deploy boards', (done) => {
           setTimeout(() => {
-            expect(
-              component.$el.querySelector('.deploy-board-icon i.fa-caret-right'),
-            ).toBeDefined();
+            expect(component.$el.querySelector('.deploy-board-icon.ic-chevron-right')).toBeDefined();
             done();
           }, 0);
         });
@@ -137,7 +136,7 @@ describe('Environment', () => {
     it('should render empty state', () => {
       expect(
         component.$el.querySelector('.js-blank-state-title').textContent,
-      ).toContain('You don\'t have any environments right now.');
+      ).toContain('You don\'t have any environments right now');
     });
   });
 
@@ -169,12 +168,7 @@ describe('Environment', () => {
         component.$el.querySelector('.folder-name').click();
 
         Vue.nextTick(() => {
-          expect(
-            component.$el.querySelector('.folder-icon i.fa-caret-right').getAttribute('style'),
-          ).toContain('display: none');
-          expect(
-            component.$el.querySelector('.folder-icon i.fa-caret-down').getAttribute('style'),
-          ).not.toContain('display: none');
+          expect(component.$el.querySelector('.folder-icon.ic-chevron-right')).toBe(null);
           done();
         });
       }, 0);
@@ -190,12 +184,7 @@ describe('Environment', () => {
           component.$el.querySelector('.folder-name').click();
 
           Vue.nextTick(() => {
-            expect(
-              component.$el.querySelector('.folder-icon i.fa-caret-down').getAttribute('style'),
-            ).toContain('display: none');
-            expect(
-              component.$el.querySelector('.folder-icon i.fa-caret-right').getAttribute('style'),
-            ).not.toContain('display: none');
+            expect(component.$el.querySelector('.folder-icon.ic-chevron-down')).toBe(null);
             done();
           });
         });

@@ -29,7 +29,7 @@ describe('NodeDetailsSectionSync', () => {
     it('returns default data props', () => {
       expect(vm.showSectionItems).toBe(false);
       expect(Array.isArray(vm.nodeDetailItems)).toBe(true);
-      expect(vm.nodeDetailItems.length > 0).toBe(true);
+      expect(vm.nodeDetailItems.length).toBeGreaterThan(0);
     });
   });
 
@@ -40,6 +40,7 @@ describe('NodeDetailsSectionSync', () => {
         Vue.nextTick()
           .then(() => {
             const syncSettings = vm.syncSettings();
+
             expect(syncSettings.syncStatusUnavailable).toBe(true);
             expect(syncSettings.namespaces).toBe(mockNodeDetails.namespaces);
             expect(syncSettings.lastEvent).toBe(mockNodeDetails.lastEvent);

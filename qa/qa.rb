@@ -36,6 +36,7 @@ module QA
   # GitLab QA fabrication mechanisms
   #
   module Factory
+    autoload :ApiFabricator, 'qa/factory/api_fabricator'
     autoload :Base, 'qa/factory/base'
     autoload :Dependency, 'qa/factory/dependency'
     autoload :Product, 'qa/factory/product'
@@ -45,10 +46,12 @@ module QA
       autoload :Group, 'qa/factory/resource/group'
       autoload :Issue, 'qa/factory/resource/issue'
       autoload :Project, 'qa/factory/resource/project'
+      autoload :Label, 'qa/factory/resource/label'
       autoload :MergeRequest, 'qa/factory/resource/merge_request'
       autoload :ProjectImportedFromGithub, 'qa/factory/resource/project_imported_from_github'
       autoload :MergeRequestFromFork, 'qa/factory/resource/merge_request_from_fork'
       autoload :DeployKey, 'qa/factory/resource/deploy_key'
+      autoload :DeployToken, 'qa/factory/resource/deploy_token'
       autoload :Branch, 'qa/factory/resource/branch'
       autoload :SecretVariable, 'qa/factory/resource/secret_variable'
       autoload :Runner, 'qa/factory/resource/runner'
@@ -177,6 +180,7 @@ module QA
         autoload :Repository, 'qa/page/project/settings/repository'
         autoload :CICD, 'qa/page/project/settings/ci_cd'
         autoload :DeployKeys, 'qa/page/project/settings/deploy_keys'
+        autoload :DeployTokens, 'qa/page/project/settings/deploy_tokens'
         autoload :ProtectedBranches, 'qa/page/project/settings/protected_branches'
         autoload :SecretVariables, 'qa/page/project/settings/secret_variables'
         autoload :Runners, 'qa/page/project/settings/runners'
@@ -236,6 +240,11 @@ module QA
 
     module Layout
       autoload :Banner, 'qa/page/layout/banner'
+    end
+
+    module Label
+      autoload :New, 'qa/page/label/new'
+      autoload :Index, 'qa/page/label/index'
     end
 
     module MergeRequest

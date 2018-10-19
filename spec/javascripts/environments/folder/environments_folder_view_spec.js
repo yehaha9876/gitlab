@@ -107,6 +107,7 @@ describe('Environments Folder View', () => {
         spyOn(component, 'updateContent');
         setTimeout(() => {
           component.$el.querySelector('.gl-pagination .js-last-button a').click();
+
           expect(component.updateContent).toHaveBeenCalledWith({ scope: component.scope, page: '10' });
           done();
         }, 0);
@@ -116,6 +117,7 @@ describe('Environments Folder View', () => {
         setTimeout(() => {
           spyOn(component, 'updateContent');
           component.$el.querySelector('.js-environments-tab-stopped').click();
+
           expect(component.updateContent).toHaveBeenCalledWith({ scope: 'stopped', page: '1' });
           done();
         });
@@ -125,9 +127,7 @@ describe('Environments Folder View', () => {
     describe('deploy boards', () => {
       it('should render arrow to open deploy boards', (done) => {
         setTimeout(() => {
-          expect(
-            component.$el.querySelector('.deploy-board-icon i').classList.contains('fa-caret-right'),
-          ).toEqual(true);
+          expect(component.$el.querySelector('.folder-icon.ic-chevron-right')).not.toBeNull();
           done();
         }, 0);
       });

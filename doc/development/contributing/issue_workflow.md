@@ -9,6 +9,7 @@ Most issues will have labels for at least one of the following:
 - Type: ~"feature proposal", ~bug, ~customer, etc.
 - Subject: ~wiki, ~"container registry", ~ldap, ~api, ~frontend, etc.
 - Team: ~"CI/CD", ~Plan, ~Manage, ~Quality, etc.
+- Stage: ~"devops:plan", ~"devops:create", etc.
 - Release Scoping: ~Deliverable, ~Stretch, ~"Next Patch Release"
 - Priority: ~P1, ~P2, ~P3, ~P4
 - Severity: ~S1, ~S2, ~S3, ~S4
@@ -20,7 +21,6 @@ If you come across an issue that has none of these, and you're allowed to set
 labels, you can _always_ add the team and type, and often also the subject.
 
 [milestones-page]: https://gitlab.com/gitlab-org/gitlab-ce/milestones
-[labels-page]: https://gitlab.com/gitlab-org/gitlab-ce/labels
 
 ## Type labels
 
@@ -84,6 +84,39 @@ indicate if an issue needs backend work, frontend work, or both.
 Team labels are always capitalized so that they show up as the first label for
 any issue.
 
+## Stage labels
+
+Stage labels specify which [DevOps stage][devops-stages] the issue belongs to.
+
+The current stage labels are:
+
+- ~"devops:manage"
+- ~"devops:plan"
+- ~"devops:create"
+- ~"devops:verify"
+- ~"devops:package"
+- ~"devops:release"
+- ~"devops:configure"
+- ~"devops:monitor"
+- ~"devops:secure"
+
+These labels should be mutually exclusive. If an issue belongs to multiple
+stages, the most relevant should be used.
+
+They differ from the [Team labels](#team-labels) because teams may work on
+issues outside their stage.
+
+Normally there is a 1:1 relationship between Stage labels and Team labels, but
+any issue can be picked up by any team, depending on current priorities.
+So, an issue labeled ~"devops:create" may be scheduled by the ~Plan team, for
+example. In such cases, it's usual to include both team labels so each team can
+be aware of the progress.
+
+The Stage labels are used to generate the [direction pages][direction-pages] automatically.
+
+[devops-stages]: https://about.gitlab.com/direction/#devops-stages
+[direction-pages]: https://about.gitlab.com/direction/
+
 ## Release Scoping labels
 
 Release Scoping labels help us clearly communicate expectations of the work for the
@@ -115,6 +148,9 @@ This label documents the planned timeline & urgency which is used to measure aga
 | ~P3   | Medium Priority | Within the next 3 releases (approx one quarter or 90 days)                 |
 | ~P4   | Low Priority    | Anything outside the next 3 releases (more than one quarter or 120 days)   |
 
+If an issue seems to fall between two priority labels, assign it to the higher-
+priority label.
+
 ## Severity labels
 
 Severity labels help us clearly communicate the impact of a ~bug on users.
@@ -125,6 +161,10 @@ Severity labels help us clearly communicate the impact of a ~bug on users.
 | ~S2   | Critical Severity | Broken Feature, workaround too complex & unacceptable | Can push commits, but only via the command line. |
 | ~S3   | Major Severity    | Broken Feature, workaround acceptable                 | Can create merge requests only from the Merge Requests page, not through the Issue. |
 | ~S4   | Low Severity      | Functionality inconvenience or cosmetic issue         | Label colors are incorrect / not being displayed. |
+
+If an issue seems to fall between two severity labels, even taking the
+[severity impact guidance](#severity-impact-guidance) into account, assign
+it to the higher-severity label.
 
 ### Severity impact guidance
 
@@ -208,6 +248,7 @@ project.
 [GitLab Triage]: https://gitlab.com/gitlab-org/gitlab-triage
 [scheduled pipeline]: https://gitlab.com/gitlab-org/quality/triage-ops/pipeline_schedules/10512/edit
 [quality/triage-ops]: https://gitlab.com/gitlab-org/quality/triage-ops
+[team]: https://about.gitlab.com/team/
 
 ## Feature proposals
 
@@ -234,6 +275,8 @@ need to ask one of the [core team] members to add the label, if you do not have 
 
 If you want to create something yourself, consider opening an issue first to
 discuss whether it is interesting to include this in GitLab.
+
+[fpl]: https://gitlab.com/gitlab-org/gitlab-ce/issues?label_name=feature+proposal
 
 ## Issue tracker guidelines
 
@@ -313,6 +356,45 @@ for a release by the appropriate person.
 Make sure to mention the merge request that the ~"technical debt" issue or
 ~"UX debt" issue is associated with in the description of the issue.
 
+## Technical debt in follow-up issues
+
+It's common to discover technical debt during development of a new feature. In
+the spirit of "minimum viable change", resolution is often deferred to a
+follow-up issue. However, this cannot be used as an excuse to merge poor-quality
+code that would otherwise not pass review, or to overlook trivial matters that
+don't deserve the be scheduled independently, and would be best resolved in the
+original merge request - or not tracked at all!
+
+The overheads of scheduling, and rate of change in the GitLab codebase, mean
+that the cost of a trivial technical debt issue can quickly exceed the value of
+tracking it. This generally means we should resolve these in the original merge
+request - or simply not create a follow-up issue at all.
+
+For example, a typo in a comment that is being copied between files is worth
+fixing in the same MR, but not worth creating a follow-up issue for. Renaming a
+method that is used in many places to make its intent slightly clearer may be
+worth fixing, but it should not happen in the same MR, and is generally not
+worth the overhead of having an issue of its own. These issues would invariably
+be labelled `~P4 ~S4` if we were to create them.
+
+More severe technical debt can have implications for development velocity. If
+it isn't addressed in a timely manner, the codebase becomes needlessly difficult
+to change, new features become difficult to add, and regressions abound.
+
+Discoveries of this kind of technical debt should be treated seriously, and
+while resolution in a follow-up issue may be appropriate, maintainers should
+generally obtain a scheduling commitment from the author of the original MR, or
+the engineering or product manager for the relevant area. This may take the form
+of appropriate Priority / Severity labels on the issue, or an explicit milestone
+and assignee.
+
+The maintainer must always agree before an outstanding discussion is resolved in
+this manner, and will be the one to create the issue. The title and description
+should be of the same quality as those created
+[in the usual manner](#technical-and-ux-debt) - in particular, the issue title
+**must not** begin with `Follow-up`! The creating maintainer should also expect
+to be involved in some capacity when work begins on the follow-up issue.
+
 ## Stewardship
 
 For issues related to the open source stewardship of GitLab,
@@ -331,3 +413,7 @@ A recent example of this was the issue for
 ---
 
 [Return to Contributing documentation](index.md)
+
+[labels-page]: https://gitlab.com/gitlab-org/gitlab-ce/labels
+[ce-tracker]: https://gitlab.com/gitlab-org/gitlab-ce/issues
+[ee-tracker]: https://gitlab.com/gitlab-org/gitlab-ee/issues

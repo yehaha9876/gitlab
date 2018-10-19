@@ -1,5 +1,19 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.3.6 (2018-10-17)
+
+### Fixed (1 change)
+
+- Don't reset the default branch when repository mirroring is enabled. !7944
+
+
+## 11.3.5 (2018-10-15)
+
+### Fixed (1 change)
+
+- Fix epic milestone dates incorrect after issue is linked to another epic. !7809
+
+
 ## 11.3.4 (2018-10-05)
 
 ### Security (1 change)

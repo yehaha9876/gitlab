@@ -150,13 +150,21 @@ module BlobHelper
   # example of Javascript) we tell the browser of the victim not to
   # execute untrusted data.
   def safe_content_type(blob)
-    if blob.text?
+    if blob.extension == 'svg'
+      blob.mime_type
+    elsif blob.text?
       'text/plain; charset=utf-8'
     elsif blob.image?
       blob.content_type
     else
       'application/octet-stream'
     end
+  end
+
+  def content_disposition(blob, inline)
+    return 'attachment' if blob.extension == 'svg'
+
+    inline ? 'inline' : 'attachment'
   end
 
   def ref_project
@@ -195,7 +203,7 @@ module BlobHelper
     {
       'relative-url-root' => Rails.application.config.relative_url_root,
       'assets-prefix' => Gitlab::Application.config.assets.prefix,
-      'blob-language' => @blob && @blob.language.try(:ace_mode),
+      'blob-filename' => @blob && @blob.path,
       'project-id' => project.id
     }
   end
