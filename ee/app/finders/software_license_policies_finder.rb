@@ -6,20 +6,46 @@ class SoftwareLicensePoliciesFinder
 
   attr_accessor :current_user, :project
 
-  def initialize(current_user, project)
+  def initialize(current_user, project, params = {})
     @current_user = current_user
     @project = project
+    @params = params
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
-  def find_by_name_or_id(id)
-    return nil unless can?(current_user, :read_software_license_policy, project)
+  def execute
+    return SoftwareLicensePolicy.none unless can?(current_user, :read_software_license_policy, project)
+
+    items = init_collection
+    items = by_name(items)
+    items = by_name_or_id(items)
+    sort(items)
+  end
+  # rubocop: enable CodeReuse/ActiveRecord
+
+  private
+
+  def init_collection
+    SoftwareLicensePolicy.includes(:software_license).joins(:software_license).where(project: @project)
+  end
+
+  def by_name(items)
+    return items unless @params[:name]
+
+    items.where(software_licenses: { name: @params[:name] })
+  end
+
+  def by_name_or_id(items)
+    return items unless @params[:name_or_id]
 
     software_licenses = SoftwareLicense.arel_table
     software_license_policies = SoftwareLicensePolicy.arel_table
-    project.software_license_policies.joins(:software_license).where(
-      software_licenses[:name].eq(id).or(software_license_policies[:id].eq(id))
-    ).take
+    value = @params[:name_or_id]
+    items.where(software_licenses[:name].eq(value).or(software_license_policies[:id].eq(value)))
   end
-  # rubocop: enable CodeReuse/ActiveRecord
+
+  def sort(items)
+    return items unless @params[:sort]
+    items.order(@params[:sort])
+  end
 end

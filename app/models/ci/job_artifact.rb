@@ -11,6 +11,7 @@ module Ci
     NotSupportedAdapterError = Class.new(StandardError)
 
     TEST_REPORT_FILE_TYPES = %w[junit].freeze
+    LICENSE_MANAGEMENT_REPORT_FILE_TYPES = %w[license_management].freeze
     NON_ERASABLE_FILE_TYPES = %w[trace].freeze
     DEFAULT_FILE_NAMES = {
       archive: nil,

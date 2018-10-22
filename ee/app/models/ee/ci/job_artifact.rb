@@ -17,6 +17,10 @@ module EE
       scope :security_reports, -> do
         with_file_types(SECURITY_REPORT_FILE_TYPES)
       end
+
+      scope :license_management_reports, -> do
+        with_file_types(::Ci::JobArtifact::LICENSE_MANAGEMENT_REPORT_FILE_TYPES)
+      end
     end
 
     def log_geo_deleted_event

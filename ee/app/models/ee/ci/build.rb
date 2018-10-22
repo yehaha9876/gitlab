@@ -21,6 +21,11 @@ module EE
           with_existing_job_artifacts(::Ci::JobArtifact.security_reports)
             .eager_load_job_artifacts
         end
+
+        scope :with_license_management_reports, ->() do
+          with_existing_job_artifacts(::Ci::JobArtifact.license_management_reports)
+              .eager_load_job_artifacts
+        end
       end
 
       def shared_runners_minutes_limit_enabled?
@@ -61,6 +66,14 @@ module EE
 
           security_reports.get_report(file_type).tap do |security_report|
             ::Gitlab::Ci::Parsers::Security.fabricate!(file_type).parse!(blob, security_report)
+          end
+        end
+      end
+
+      def collect_license_management_reports!(license_management_report)
+        license_management_report.tap do |license_management_report|
+          each_report(::Ci::JobArtifact::LICENSE_MANAGEMENT_REPORT_FILE_TYPES) do |file_type, blob|
+            ::Gitlab::Ci::Parsers::LicenseManagement.fabricate!(file_type).parse!(blob, license_management_report)
           end
         end
       end

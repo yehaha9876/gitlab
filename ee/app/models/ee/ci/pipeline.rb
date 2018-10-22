@@ -134,6 +134,14 @@ module EE
         end
       end
 
+      def license_management_report
+        ::Gitlab::Ci::Reports::LicenseManagementReport.new.tap do |license_management_report|
+          builds.latest.with_license_management_reports.each do |build|
+            build.collect_license_management_reports!(license_management_report)
+          end
+        end
+      end
+
       private
 
       def available_licensed_report_type?(file_type)
