@@ -134,6 +134,10 @@ module EE
         end
       end
 
+      def has_license_management_reports?
+        complete? && builds.latest.with_license_management_reports.any?
+      end
+
       def license_management_report
         ::Gitlab::Ci::Reports::LicenseManagementReport.new.tap do |license_management_report|
           builds.latest.with_license_management_reports.each do |build|

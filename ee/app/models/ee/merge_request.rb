@@ -61,5 +61,25 @@ module EE
     def participant_approvers
       approval_needed? ? approvers_left : []
     end
+
+    def has_license_management_reports?
+      actual_head_pipeline&.has_license_management_reports?
+    end
+
+    # rubocop: disable CodeReuse/ServiceClass
+    def compare_license_management_reports
+      unless has_license_management_reports?
+        return { status: :error, status_reason: 'This merge request does not have license management reports' }
+      end
+      with_reactive_cache(:compare_license_management_results) do |data|
+        unless Ci::CompareLicenseManagementReportsService.new(project)
+                   .latest?(base_pipeline, actual_head_pipeline, data)
+          raise InvalidateReactiveCache
+        end
+
+        data
+      end || { status: :parsing }
+    end
+    # rubocop: enable CodeReuse/ServiceClass
   end
 end

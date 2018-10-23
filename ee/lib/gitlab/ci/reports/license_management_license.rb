@@ -2,7 +2,7 @@ module Gitlab
   module Ci
     module Reports
       class LicenseManagementLicense
-        attr_reader :dependencies, :name
+        attr_reader :name, :status
 
         def initialize(name)
           @name = name
@@ -10,7 +10,11 @@ module Gitlab
         end
 
         def add_dependency(name)
-          @dependencies.add(name)
+          @dependencies.add(LicenseManagementDependency.new(name))
+        end
+
+        def dependencies
+          @dependencies.to_a
         end
       end
     end

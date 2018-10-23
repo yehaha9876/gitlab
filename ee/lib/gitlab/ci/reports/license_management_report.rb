@@ -2,14 +2,16 @@ module Gitlab
   module Ci
     module Reports
       class LicenseManagementReport
-        attr_reader :found_licenses
-
         def initialize
           @found_licenses = {}
         end
 
-        def compliant_with_project?
-          @found_licenses.all? { |license| license.approved }
+        def licenses
+          @found_licenses.values
+        end
+
+        def license_names
+          @found_licenses.values.map(&:name)
         end
 
         def add_dependency(license_name, dependency_name)

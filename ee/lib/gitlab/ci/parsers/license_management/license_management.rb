@@ -10,9 +10,6 @@ module Gitlab
           def parse!(json_data, license_management_report)
             root = JSON.parse(json_data)
 
-            # Build a list of license objects containing their dependencies
-            #puts root.to_yaml
-
             root['licenses'].each do |license_hash|
               license_expression = license_hash['name']
               puts "Found license expression #{license_expression}"
