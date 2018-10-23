@@ -84,7 +84,8 @@ module Gitlab
             snippets: count(Snippet),
             todos: count(Todo),
             uploads: count(Upload),
-            web_hooks: count(WebHook)
+            web_hooks: count(WebHook),
+            prometheus_alerts: PrometheusAlert.count("distinct project_id")
           }.merge(services_usage)
         }
       end
