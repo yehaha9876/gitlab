@@ -84,8 +84,7 @@ module Gitlab
             snippets: count(Snippet),
             todos: count(Todo),
             uploads: count(Upload),
-            web_hooks: count(WebHook),
-            projects_prometheus_alerts: count(PrometheusAlert, count_string: "distinct project_id")
+            web_hooks: count(WebHook)
           }.merge(services_usage)
         }
       end
@@ -139,8 +138,8 @@ module Gitlab
         types.each_with_object({}) { |(klass, key), response| response[key] = results[klass.to_s] || 0 }
       end
 
-      def count(relation, fallback: -1, count_string: nil)
-        relation.count(count_string)
+      def count(relation, fallback: -1)
+        relation.count
       rescue ActiveRecord::StatementInvalid
         fallback
       end

@@ -23,6 +23,8 @@ class PrometheusAlert < ActiveRecord::Base
 
   scope :for_metric, -> (metric) { where(prometheus_metric: metric) }
 
+  scope :distinct_projects, -> () { select(:project_id).order(:project_id).distinct }
+
   def self.operator_to_enum(op)
     OPERATORS_MAP.invert.fetch(op)
   end

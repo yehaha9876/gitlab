@@ -14,6 +14,11 @@ describe Gitlab::UsageData do
       create(:ci_build, name: 'dependency_scanning', pipeline: pipeline)
       create(:ci_build, name: 'license_management', pipeline: pipeline)
       create(:ci_build, name: 'sast', pipeline: pipeline)
+
+      create(:prometheus_alert, project: projects[0])
+      create(:prometheus_alert, project: projects[0])
+      create(:prometheus_alert, project: projects[1])
+      create(:prometheus_alert, project: projects[1])
     end
 
     subject { described_class.data }
@@ -41,6 +46,9 @@ describe Gitlab::UsageData do
       expect(count_data[:boards]).to eq(1)
       expect(count_data[:projects]).to eq(3)
 
+      expect(PrometheusAlert.count).to eq(4)
+      expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
+
       expect(count_data.keys).to include(*%i(
         projects_mirrored_with_pipelines_enabled
         epics
@@ -54,6 +62,7 @@ describe Gitlab::UsageData do
         dependency_scanning_jobs
         license_management_jobs
         sast_jobs
+        projects_with_prometheus_alerts
       ))
     end
 

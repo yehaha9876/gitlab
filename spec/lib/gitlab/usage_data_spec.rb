@@ -10,12 +10,6 @@ describe Gitlab::UsageData do
       create(:jira_service, project: projects[0])
       create(:jira_service, project: projects[1])
       create(:prometheus_service, project: projects[1])
-
-      create(:prometheus_alert, project: projects[1])
-      create(:prometheus_alert, project: projects[1])
-      create(:prometheus_alert, project: projects[0])
-      create(:prometheus_alert, project: projects[0])
-
       create(:service, project: projects[0], type: 'SlackSlashCommandsService', active: true)
       create(:service, project: projects[1], type: 'SlackService', active: true)
       create(:service, project: projects[2], type: 'SlackService', active: true)
@@ -105,7 +99,6 @@ describe Gitlab::UsageData do
         projects_slack_notifications_active
         projects_slack_slash_active
         projects_prometheus_active
-        projects_prometheus_alerts
         pages_domains
         protected_branches
         releases
@@ -122,10 +115,6 @@ describe Gitlab::UsageData do
 
       expect(count_data[:projects]).to eq(3)
       expect(count_data[:projects_prometheus_active]).to eq(1)
-
-      expect(PrometheusAlert.count).to eq(4)
-      expect(count_data[:projects_prometheus_alerts]).to eq(2)
-
       expect(count_data[:projects_jira_active]).to eq(2)
       expect(count_data[:projects_slack_notifications_active]).to eq(2)
       expect(count_data[:projects_slack_slash_active]).to eq(1)
