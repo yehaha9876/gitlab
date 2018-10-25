@@ -4,6 +4,7 @@ module API
   class Groups < Grape::API
     include PaginationParams
     include Helpers::CustomAttributes
+    prepend EE::API::Groups
 
     before { authenticate_non_get! }
 

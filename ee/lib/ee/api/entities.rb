@@ -457,6 +457,10 @@ module EE
           object.operations_feature_flags.ordered
         end
       end
+
+      class GitlabSubscription < Grape::Entity
+        expose :seats, :trial, :start_date, :end_date
+      end
     end
   end
 end

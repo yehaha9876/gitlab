@@ -1270,6 +1270,19 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["upload_id"], name: "index_geo_upload_deleted_events_on_upload_id", using: :btree
   end
 
+  create_table "gitlab_subscriptions", force: :cascade do |t|
+    t.integer "seats"
+    t.integer "max_seats_used"
+    t.date "start_date"
+    t.date "end_date"
+    t.boolean "trial", default: false
+    t.integer "namespace_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "gitlab_subscriptions", ["namespace_id"], name: "index_gitlab_subscriptions_on_namespace_id", using: :btree
+
   create_table "gpg_key_subkeys", force: :cascade do |t|
     t.integer "gpg_key_id", null: false
     t.binary "keyid"
@@ -3137,6 +3150,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
   add_foreign_key "geo_repository_renamed_events", "projects", on_delete: :cascade
   add_foreign_key "geo_repository_updated_events", "projects", on_delete: :cascade
   add_foreign_key "geo_reset_checksum_events", "projects", on_delete: :cascade
+  add_foreign_key "gitlab_subscriptions", "namespaces"
   add_foreign_key "gpg_key_subkeys", "gpg_keys", on_delete: :cascade
   add_foreign_key "gpg_keys", "users", on_delete: :cascade
   add_foreign_key "gpg_signatures", "gpg_key_subkeys", on_delete: :nullify
