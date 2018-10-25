@@ -1281,7 +1281,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.datetime "updated_at", null: false
   end
 
-  add_index "gitlab_subscriptions", ["namespace_id"], name: "index_gitlab_subscriptions_on_namespace_id", using: :btree
+  add_index "gitlab_subscriptions", ["namespace_id"], name: "index_gitlab_subscriptions_on_namespace_id", unique: true, using: :btree
 
   create_table "gpg_key_subkeys", force: :cascade do |t|
     t.integer "gpg_key_id", null: false

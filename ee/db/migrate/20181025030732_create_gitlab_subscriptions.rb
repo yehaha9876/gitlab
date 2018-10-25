@@ -6,7 +6,7 @@ class CreateGitlabSubscriptions < ActiveRecord::Migration
       t.date :start_date
       t.date :end_date
       t.boolean :trial, default: false
-      t.references :namespace, index: true, foreign_key: true
+      t.references :namespace, index: { unique: true }, foreign_key: true
 
       t.timestamps null: false
     end
