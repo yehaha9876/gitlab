@@ -5,6 +5,7 @@ module API
     include PaginationParams
     include APIGuard
     include Helpers::CustomAttributes
+    prepend EE::API::Users
 
     allow_access_with_scope :read_user, if: -> (request) { request.get? }
 

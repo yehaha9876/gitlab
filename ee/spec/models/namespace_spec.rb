@@ -4,6 +4,7 @@ describe Namespace do
   let!(:namespace) { create(:namespace) }
 
   it { is_expected.to have_one(:namespace_statistics) }
+  it { is_expected.to have_one(:gitlab_subscription) }
   it { is_expected.to belong_to(:plan) }
 
   it { is_expected.to delegate_method(:shared_runners_minutes).to(:namespace_statistics) }

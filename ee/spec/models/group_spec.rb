@@ -6,7 +6,6 @@ describe Group do
   it { is_expected.to include_module(EE::Group) }
 
   describe 'associations' do
-    it { is_expected.to have_one(:gitlab_subscription) }
     it { is_expected.to have_many(:audit_events).dependent(false) }
     it { is_expected.to belong_to(:file_template_project) }
   end

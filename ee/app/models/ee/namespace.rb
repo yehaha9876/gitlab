@@ -29,6 +29,7 @@ module EE
       belongs_to :plan
 
       has_one :namespace_statistics
+      has_one :gitlab_subscription
 
       scope :with_plan, -> { where.not(plan_id: nil) }
 
