@@ -1277,8 +1277,8 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.date "end_date"
     t.boolean "trial", default: false
     t.integer "namespace_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
   end
 
   add_index "gitlab_subscriptions", ["namespace_id"], name: "index_gitlab_subscriptions_on_namespace_id", unique: true, using: :btree
