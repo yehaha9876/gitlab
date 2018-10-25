@@ -1271,12 +1271,14 @@ ActiveRecord::Schema.define(version: 20181107054254) do
   end
 
   create_table "gitlab_subscriptions", force: :cascade do |t|
-    t.integer "seats"
-    t.integer "max_seats_used"
+    t.integer "namespace_id"
     t.date "start_date"
     t.date "end_date"
+    t.integer "seats"
+    t.integer "max_seats_used"
     t.boolean "trial", default: false
-    t.integer "namespace_id"
+    t.string "plan_code"
+    t.string "plan_name"
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
   end

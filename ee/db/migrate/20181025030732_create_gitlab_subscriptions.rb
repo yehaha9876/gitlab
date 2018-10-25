@@ -1,12 +1,18 @@
 class CreateGitlabSubscriptions < ActiveRecord::Migration
   def change
     create_table :gitlab_subscriptions do |t|
-      t.integer :seats
-      t.integer :max_seats_used
+      t.references :namespace, index: { unique: true }, foreign_key: true
+
       t.date :start_date
       t.date :end_date
+
+      t.integer :seats
+      t.integer :max_seats_used
+
       t.boolean :trial, default: false
-      t.references :namespace, index: { unique: true }, foreign_key: true
+
+      t.string :plan_code
+      t.string :plan_name
 
       t.timestamps_with_timezone null: false
     end
