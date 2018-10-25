@@ -33,6 +33,7 @@ module EE
             success ::EE::API::Entities::GitlabSubscription
           end
           params do
+            requires :id, type: Integer, desc: 'The ID of the namespace'
             requires :seats, type: Integer, desc: 'The number of seats purchased'
             requires :plan_code, type: String, desc: 'The code of the purchased plan'
             requires :plan_name, type: String, desc: 'The name of the purchased plan'
@@ -53,6 +54,19 @@ module EE
             else
               render_validation_error!(subscription)
             end
+          end
+
+          desc 'Returns the subscription for the namespace' do
+            success ::EE::API::Entities::GitlabSubscription
+          end
+          params do
+            requires :id, type: Integer, desc: 'The ID of the namespace'
+          end
+          get ":id/gitlab_subscription" do
+            namespace = find_namespace!(params[:id])
+            authorize! :admin_namespace, namespace
+
+            present namespace.gitlab_subscription || {}, with: ::EE::API::Entities::GitlabSubscription
           end
         end
       end

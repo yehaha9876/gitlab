@@ -147,12 +147,6 @@ describe API::Namespaces do
     end
 
     context 'when authenticated as an admin' do
-      it 'is only accessible by the admin' do
-        do_post(user, params)
-
-        expect(response).to have_gitlab_http_status(403)
-      end
-
       it 'fails when some attrs are missing' do
         params.keys.each do |name|
           do_post(admin, params.except(name))
@@ -166,6 +160,47 @@ describe API::Namespaces do
 
         expect(response).to have_gitlab_http_status(201)
         expect(group1.gitlab_subscription).to be_present
+      end
+    end
+  end
+
+  describe 'GET :id/gitlab_subscription' do
+    def do_get(current_user)
+      get api("/namespaces/#{namespace.id}/gitlab_subscription", current_user)
+    end
+
+    set(:owner) { create(:user) }
+    set(:developer) { create(:user) }
+    set(:namespace) { create(:group) }
+    set(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace) }
+
+    before do
+      namespace.add_owner(owner)
+      namespace.add_developer(developer)
+    end
+
+    context 'with a regular user' do
+      it 'returns an unauthroized error' do
+        do_get(developer)
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'with the owner of the Group' do
+      it 'has access to the object' do
+        do_get(owner)
+
+        expect(response).to have_gitlab_http_status(200)
+      end
+
+      it 'returns data in a proper format' do
+        do_get(owner)
+
+        expect(json_response.keys).to match_array(%w[plan usage billing])
+        expect(json_response['plan'].keys).to match_array(%w[name code trial])
+        expect(json_response['usage'].keys).to match_array(%w[seats_in_subscription seats_in_use max_seats_used seats_owed])
+        expect(json_response['billing'].keys).to match_array(%w[subscription_start_date subscription_end_date])
       end
     end
   end
