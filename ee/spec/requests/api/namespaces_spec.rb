@@ -124,4 +124,49 @@ describe API::Namespaces do
       end
     end
   end
+
+  describe 'POST :id/gitlab_subscription' do
+    let(:params) do
+      { seats: 10,
+        plan_code: 'gold',
+        plan_name: 'Gold',
+        start_date: '01/01/2018',
+        end_date: '01/01/2019' }
+    end
+
+    def do_post(current_user, payload)
+      post api("/namespaces/#{group1.id}/gitlab_subscription", current_user), payload
+    end
+
+    context 'when authenticated as a regular user' do
+      it 'returns an unauthroized error' do
+        do_post(user, params)
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'when authenticated as an admin' do
+      it 'is only accessible by the admin' do
+        do_post(user, params)
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+
+      it 'fails when some attrs are missing' do
+        params.keys.each do |name|
+          do_post(admin, params.except(name))
+
+          expect(response).to have_gitlab_http_status(400)
+        end
+      end
+
+      it 'creates a subscription for the Group' do
+        do_post(admin, params)
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(group1.gitlab_subscription).to be_present
+      end
+    end
+  end
 end

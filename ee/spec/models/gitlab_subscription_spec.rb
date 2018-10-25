@@ -5,6 +5,8 @@ describe GitlabSubscription do
     it { is_expected.to validate_presence_of(:seats) }
     it { is_expected.to validate_presence_of(:start_date) }
     it { is_expected.to validate_presence_of(:end_date) }
+    it { is_expected.to validate_presence_of(:plan_code) }
+    it { is_expected.to validate_presence_of(:plan_name) }
 
     it do
       subject.namespace = create(:namespace)

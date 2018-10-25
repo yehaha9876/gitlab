@@ -28,6 +28,32 @@ module EE
               render_validation_error!(namespace)
             end
           end
+
+          desc 'Create a subscription for the namespace' do
+            success ::EE::API::Entities::GitlabSubscription
+          end
+          params do
+            requires :seats, type: Integer, desc: 'The number of seats purchased'
+            requires :plan_code, type: String, desc: 'The code of the purchased plan'
+            requires :plan_name, type: String, desc: 'The name of the purchased plan'
+            requires :start_date, type: Date, desc: 'The date when subscription was started'
+            requires :end_date, type: Date, desc: 'The date when subscription expires'
+
+            optional :trial, type: Grape::API::Boolean, desc: 'Wether the subscription is trial'
+          end
+          post ":id/gitlab_subscription" do
+            authenticated_as_admin!
+
+            namespace = find_namespace!(params[:id])
+
+            subscription_params = declared_params(include_missing: false)
+            subscription = namespace.create_gitlab_subscription(subscription_params)
+            if subscription.persisted?
+              present subscription, with: ::EE::API::Entities::GitlabSubscription
+            else
+              render_validation_error!(subscription)
+            end
+          end
         end
       end
     end

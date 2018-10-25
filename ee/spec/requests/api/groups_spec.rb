@@ -4,7 +4,6 @@ describe API::Groups do
   set(:group) { create(:group) }
   set(:project) { create(:project, group: group) }
   set(:user) { create(:user) }
-  set(:admin) { create(:user, :admin) }
 
   describe 'PUT /groups/:id' do
     before do
@@ -27,39 +26,6 @@ describe API::Groups do
       expect { do_it }.to change { group.reload.file_template_project_id }.to(project.id)
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['file_template_project_id']).to eq(project.id)
-    end
-  end
-
-  describe 'POST /subscription' do
-    let(:params) do
-      { seats: 10,
-        start_date: '01/01/2018',
-        end_date: '01/01/2019' }
-    end
-
-    def do_post(current_user, payload)
-      post api("/groups/#{group.id}/subscription", current_user), payload
-    end
-
-    it 'is only accessible by the admin' do
-      do_post(user, params)
-
-      expect(response).to have_gitlab_http_status(403)
-    end
-
-    it 'fails when some attrs are missing' do
-      params.keys.each do |name|
-        do_post(admin, params.except(name))
-
-        expect(response).to have_gitlab_http_status(400)
-      end
-    end
-
-    it 'creates a subscription for the Group' do
-      do_post(admin, params)
-
-      expect(response).to have_gitlab_http_status(201)
-      expect(group.gitlab_subscription).to be_present
     end
   end
 end

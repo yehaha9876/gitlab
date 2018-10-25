@@ -459,7 +459,7 @@ module EE
       end
 
       class GitlabSubscription < Grape::Entity
-        expose :seats, :trial, :start_date, :end_date
+        expose :seats, :trial, :plan_code, :plan_name, :start_date, :end_date
       end
     end
   end
