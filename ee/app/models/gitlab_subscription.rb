@@ -6,7 +6,12 @@ class GitlabSubscription < ActiveRecord::Base
   validates :namespace_id, uniqueness: true, allow_blank: true
 
   def seats_in_use
-    # pending
+    if namespace.kind == 'group'
+      namespace.users_with_descendants.count
+    else
+      # If subscription is for a User namespace we only charge for 1 seat
+      1
+    end
   end
 
   def seats_owed

@@ -148,5 +148,14 @@ module EE
 
       project
     end
+
+    override :users_with_descendants
+    def users_with_descendants
+      if exclude_guests_from_active_count?
+        super.excluding_guests
+      else
+        super
+      end
+    end
   end
 end

@@ -190,6 +190,10 @@ module EE
         end
     end
 
+    def exclude_guests_from_active_count?
+      actual_plan_name == GOLD_PLAN
+    end
+
     def eligible_for_trial?
       ::Gitlab.com? &&
         parent_id.nil? &&
