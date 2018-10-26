@@ -1275,7 +1275,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.date "start_date"
     t.date "end_date"
     t.integer "seats"
-    t.integer "max_seats_used"
+    t.integer "max_seats_used", default: 0
     t.boolean "trial", default: false
     t.string "plan_code"
     t.string "plan_name"

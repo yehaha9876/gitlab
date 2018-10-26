@@ -7,7 +7,7 @@ class CreateGitlabSubscriptions < ActiveRecord::Migration
       t.date :end_date
 
       t.integer :seats
-      t.integer :max_seats_used
+      t.integer :max_seats_used, default: 0
 
       t.boolean :trial, default: false
 
