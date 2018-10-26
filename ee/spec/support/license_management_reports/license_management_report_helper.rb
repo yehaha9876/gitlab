@@ -11,17 +11,17 @@ module LicenseManagementReportHelper
 
   def create_report1
     create_report(
-      License1: ['Dependency1', 'Dependency2'],
-      License2: ['Dependency1'],
-      License3: ['Dependency3']
+      License1: %w(Dependency1 Dependency2),
+      License2: %w(Dependency1),
+      License3: %w(Dependency3)
     )
   end
 
   def create_report2
     create_report(
-      License2: ['Dependency1'],
-      License3: ['Dependency3'],
-      License4: ['Dependency4', 'Dependency1']
+      License2: %w(Dependency1),
+      License3: %w(Dependency3),
+      License4: %w(Dependency4 Dependency1)
     )
   end
 

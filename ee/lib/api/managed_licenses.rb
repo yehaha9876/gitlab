@@ -6,6 +6,7 @@ module API
 
     before { authenticate! }
 
+    # rubocop: disable CodeReuse/ActiveRecord
     helpers do
       # Make the software license policy specified by id in the request available
       def software_license_policy
@@ -22,6 +23,7 @@ module API
         authorize!(:admin_software_license_policy, user_project)
       end
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     params do
       requires :id, type: String, desc: 'The ID of a project'

@@ -81,6 +81,7 @@ class Projects::ManagedLicensesController < Projects::ApplicationController
   end
 
   # Fetch the existing software license policy when given an id or name
+  # rubocop: disable CodeReuse/ActiveRecord
   def software_license_policy
     id = params[:id]
     id = CGI.unescape(id) unless id.is_a?(Integer) || id =~ /^\d+$/
@@ -91,6 +92,7 @@ class Projects::ManagedLicensesController < Projects::ApplicationController
       render_404
     end
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 
   def render_ok
     render status: :ok, nothing: true

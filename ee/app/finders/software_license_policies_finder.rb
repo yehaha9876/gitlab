@@ -25,16 +25,21 @@ class SoftwareLicensePoliciesFinder
 
   private
 
+  # rubocop: disable CodeReuse/ActiveRecord
   def init_collection
     SoftwareLicensePolicy.includes(:software_license).joins(:software_license).where(project: @project)
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 
+  # rubocop: disable CodeReuse/ActiveRecord
   def by_name(items)
     return items unless @params[:name]
 
     items.where(software_licenses: { name: @params[:name] })
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 
+  # rubocop: disable CodeReuse/ActiveRecord
   def by_name_or_id(items)
     return items unless @params[:name_or_id]
 
@@ -43,9 +48,13 @@ class SoftwareLicensePoliciesFinder
     value = @params[:name_or_id]
     items.where(software_licenses[:name].eq(value).or(software_license_policies[:id].eq(value)))
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 
+  # rubocop: disable CodeReuse/ActiveRecord
   def sort(items)
     return items unless @params[:sort]
+    
     items.order(@params[:sort])
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 end

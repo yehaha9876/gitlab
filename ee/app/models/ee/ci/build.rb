@@ -22,7 +22,7 @@ module EE
             .eager_load_job_artifacts
         end
 
-        scope :with_license_management_reports, ->() do
+        scope :with_license_management_reports, -> do
           with_existing_job_artifacts(::Ci::JobArtifact.license_management_reports)
               .eager_load_job_artifacts
         end

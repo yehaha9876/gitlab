@@ -13,16 +13,17 @@ module Gitlab
             root['licenses'].each do |license_hash|
               license_expression = license_hash['name']
 
+              # Extract licenses from the license_expression as it can contain comas.
               LicenseManagement.each_license(license_expression) do |license_name|
-                root['dependencies'].select do |dependency|
+                license_dependencies = root['dependencies'].select do |dependency|
                   LicenseManagement.uses_license?(dependency['license']['name'], license_name)
-                end.each do |dependency|
+                end
+
+                license_dependencies.each do |dependency|
                   license_management_report.add_dependency(license_name, dependency['dependency']['name'])
                 end
               end
             end
-
-
           rescue JSON::ParserError => e
             raise LicenseManagementParserError, "JSON parsing failed: #{e.message}"
           rescue => e
