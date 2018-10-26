@@ -490,11 +490,11 @@ Check the [Troubleshooting section](#troubleshooting) before proceeding.
 
 1. [Reconfigure GitLab] for the changes to take effect.
 
-1. Create a `.pgpass` file so Consule is able to
+1. Create a `.pgpass` file so Consul is able to
    reload pgbouncer. Enter the `PGBOUNCER_PASSWORD` twice when asked:
 
     ```sh
-    gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user pgbouncer --hostuser gitlab-consul
+    gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user gitlab-consul --hostuser gitlab-consul
     ```
 
 #### PGBouncer Checkpoint
@@ -738,7 +738,7 @@ After deploying the configuration follow these steps:
     Set gitlab-consul's pgbouncer password to `toomanysecrets`
 
     ```sh
-    gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user pgbouncer --hostuser gitlab-consul
+    gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user gitlab-consul --hostuser gitlab-consul
     ```
 
     Run database migrations
