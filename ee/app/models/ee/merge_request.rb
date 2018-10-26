@@ -72,9 +72,9 @@ module EE
         return { status: :error, status_reason: 'This merge request does not have license management reports' }
       end
       with_reactive_cache(:compare_license_management_results) do |data|
-        unless Ci::CompareLicenseManagementReportsService.new(project)
+        unless ::Ci::CompareLicenseManagementReportsService.new(project)
                    .latest?(base_pipeline, actual_head_pipeline, data)
-          raise InvalidateReactiveCache
+          raise ::ReactiveCaching::InvalidateReactiveCache
         end
 
         data

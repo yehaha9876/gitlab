@@ -12,7 +12,6 @@ module Gitlab
 
             root['licenses'].each do |license_hash|
               license_expression = license_hash['name']
-              puts "Found license expression #{license_expression}"
 
               LicenseManagement.each_license(license_expression) do |license_name|
                 root['dependencies'].select do |dependency|
