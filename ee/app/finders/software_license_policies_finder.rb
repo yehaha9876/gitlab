@@ -53,7 +53,7 @@ class SoftwareLicensePoliciesFinder
   # rubocop: disable CodeReuse/ActiveRecord
   def sort(items)
     return items unless @params[:sort]
-    
+
     items.order(@params[:sort])
   end
   # rubocop: enable CodeReuse/ActiveRecord
