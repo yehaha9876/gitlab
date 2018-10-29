@@ -72,19 +72,27 @@ module Clusters
       end
 
       def predefined_variables
-        config = YAML.dump(kubeconfig)
-
         Gitlab::Ci::Variables::Collection.new.tap do |variables|
-          variables
-            .append(key: 'KUBE_URL', value: api_url)
-            .append(key: 'KUBE_TOKEN', value: token, public: false)
-            .append(key: 'KUBE_NAMESPACE', value: actual_namespace)
-            .append(key: 'KUBECONFIG', value: config, public: false, file: true)
+          variables.append(key: 'KUBE_URL', value: api_url)
 
           if ca_pem.present?
             variables
               .append(key: 'KUBE_CA_PEM', value: ca_pem)
               .append(key: 'KUBE_CA_PEM_FILE', value: ca_pem, file: true)
+          end
+
+          # From 11.5, every Cluster should have at least one
+          # KubernetesNamespace, so once migration has been completed,
+          # below branching will be removed. For more information, please see
+          # https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22433
+          unless kubernetes_namespace.present?
+            config = YAML.dump(kubeconfig)
+
+            variables
+              .append(key: 'KUBE_URL', value: api_url)
+              .append(key: 'KUBE_TOKEN', value: token, public: false)
+              .append(key: 'KUBE_NAMESPACE', value: actual_namespace)
+              .append(key: 'KUBECONFIG', value: config, public: false, file: true)
           end
         end
       end
@@ -120,11 +128,11 @@ module Clusters
         to_kubeconfig(
           url: api_url,
           namespace: actual_namespace,
-          token: fetch_token,
+          token: default_service_account_token,
           ca_pem: ca_pem)
       end
 
-      def fetch_token
+      def default_service_account_token
         kubernetes_namespace&.service_account_token.presence || token
       end
 

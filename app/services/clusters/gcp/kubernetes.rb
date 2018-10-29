@@ -8,6 +8,7 @@ module Clusters
       GITLAB_ADMIN_TOKEN_NAME = 'gitlab-token'
       CLUSTER_ROLE_BINDING_NAME = 'gitlab-admin'
       CLUSTER_ROLE_NAME = 'cluster-admin'
+      ROLE_BINDING_ROLE = 'edit'
     end
   end
 end

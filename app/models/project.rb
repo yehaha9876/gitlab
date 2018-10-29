@@ -1832,7 +1832,17 @@ class Project < ActiveRecord::Base
   end
 
   def deployment_variables(environment: nil)
-    deployment_platform(environment: environment)&.predefined_variables || []
+    platform = deployment_platform(environment: environment)
+
+    Gitlab::Ci::Variables::Collection.new.tap do |variables|
+      break [] unless platform
+
+      variables.concat(platform.predefined_variables)
+
+      if platform.respond_to?(:kubernetes_namespace)
+        variables.concat(platform.kubernetes_namespace&.predefined_variables || [])
+      end
+    end
   end
 
   def auto_devops_variables

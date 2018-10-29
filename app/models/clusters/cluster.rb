@@ -131,6 +131,13 @@ module Clusters
       platform_kubernetes.kubeclient if kubernetes?
     end
 
+    def find_or_initialize_kubernetes_namespace(cluster_project)
+      kubernetes_namespaces.find_or_initialize_by(
+        project: cluster_project.project,
+        cluster_project: cluster_project
+      )
+    end
+
     private
 
     def restrict_modification

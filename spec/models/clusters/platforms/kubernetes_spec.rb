@@ -194,29 +194,14 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
 
   describe '#predefined_variables' do
     let!(:cluster) { create(:cluster, :project, platform_kubernetes: kubernetes) }
-    let(:kubernetes) { create(:cluster_platform_kubernetes, api_url: api_url, ca_cert: ca_pem, token: token) }
+    let(:kubernetes) { create(:cluster_platform_kubernetes, api_url: api_url, ca_cert: ca_pem) }
     let(:api_url) { 'https://kube.domain.com' }
     let(:ca_pem) { 'CA PEM DATA' }
-    let(:token) { 'token' }
-
-    let(:kubeconfig) do
-      config_file = expand_fixture_path('config/kubeconfig.yml')
-      config = YAML.load(File.read(config_file))
-      config.dig('users', 0, 'user')['token'] = token
-      config.dig('contexts', 0, 'context')['namespace'] = namespace
-      config.dig('clusters', 0, 'cluster')['certificate-authority-data'] =
-        Base64.strict_encode64(ca_pem)
-
-      YAML.dump(config)
-    end
 
     shared_examples 'setting variables' do
       it 'sets the variables' do
         expect(kubernetes.predefined_variables).to include(
           { key: 'KUBE_URL', value: api_url, public: true },
-          { key: 'KUBE_TOKEN', value: token, public: false },
-          { key: 'KUBE_NAMESPACE', value: namespace, public: true },
-          { key: 'KUBECONFIG', value: kubeconfig, public: false, file: true },
           { key: 'KUBE_CA_PEM', value: ca_pem, public: true },
           { key: 'KUBE_CA_PEM_FILE', value: ca_pem, public: true, file: true }
         )
@@ -237,13 +222,6 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
       let(:namespace) { kubernetes.actual_namespace }
 
       it_behaves_like 'setting variables'
-
-      it 'sets the KUBE_NAMESPACE' do
-        kube_namespace = kubernetes.predefined_variables.find { |h| h[:key] == 'KUBE_NAMESPACE' }
-
-        expect(kube_namespace).not_to be_nil
-        expect(kube_namespace[:value]).to match(/\A#{Gitlab::PathRegex::PATH_REGEX_STR}-\d+\z/)
-      end
     end
   end
 

@@ -2,15 +2,21 @@
 
 require 'spec_helper'
 
-describe Clusters::Kubernetes::ConfigureService, '#execute' do
+describe Clusters::Gcp::Kubernetes::CreateOrUpdateNamespaceService, '#execute' do
   include KubernetesHelpers
 
   let(:cluster) { create(:cluster, :project, :provided_by_gcp) }
   let(:platform) { cluster.platform }
   let(:api_url) { 'https://kubernetes.example.com' }
   let(:project) { cluster.project }
+  let(:cluster_project) { cluster.cluster_project }
 
-  subject { described_class.new(cluster).execute }
+  subject do
+    described_class.new(
+      cluster: cluster,
+      kubernetes_namespace: kubernetes_namespace
+    ).execute
+  end
 
   shared_context 'kubernetes requests' do
     before do
@@ -34,25 +40,15 @@ describe Clusters::Kubernetes::ConfigureService, '#execute' do
     end
   end
 
-  shared_examples 'project service account and token'  do
-    it 'creates project service account' do
-      expect_any_instance_of(Clusters::Gcp::Kubernetes::ServiceAccounts::ProjectService).to receive(:execute).once
-
-      subject
-    end
-
-    it 'configures kubernetes token' do
-      subject
-
-      kubernetes_namespace = cluster.reload.kubernetes_namespace
-      expect(kubernetes_namespace.namespace).to eq(namespace)
-      expect(kubernetes_namespace.service_account_name).to eq("#{namespace}-service-account")
-      expect(kubernetes_namespace.encrypted_service_account_token).to be_present
-    end
-  end
-
-  context 'when there is no KubernetesNamespace associated' do
+  context 'when kubernetes namespace is not persisted' do
     let(:namespace) { "#{project.path}-#{project.id}" }
+
+    let(:kubernetes_namespace) do
+      build(:cluster_kubernetes_namespace,
+            cluster: cluster,
+            project: cluster_project.project,
+            cluster_project: cluster_project)
+    end
 
     include_context 'kubernetes requests'
 
@@ -62,41 +58,58 @@ describe Clusters::Kubernetes::ConfigureService, '#execute' do
       end.to change(Clusters::KubernetesNamespace, :count).by(1)
     end
 
-    it_behaves_like 'project service account and token'
+    it 'creates project service account' do
+      expect_any_instance_of(Clusters::Gcp::Kubernetes::CreateServiceAccountService).to receive(:execute).once
+
+      subject
+    end
+
+    it 'configures kubernetes token' do
+      subject
+
+      kubernetes_namespace.reload
+      expect(kubernetes_namespace.namespace).to eq(namespace)
+      expect(kubernetes_namespace.service_account_name).to eq("#{namespace}-service-account")
+      expect(kubernetes_namespace.encrypted_service_account_token).to be_present
+    end
   end
 
-  context 'when there is a KubernetesNamespace associated' do
+  context 'when there is a Kubernetes Namespace associated' do
     let(:namespace) { 'new-namespace' }
 
     let(:kubernetes_namespace) do
       create(:cluster_kubernetes_namespace,
              cluster: cluster,
-             cluster_project: cluster.cluster_project,
-             project: cluster.cluster_project.project)
+             project: cluster_project.project,
+             cluster_project: cluster_project)
     end
 
     include_context 'kubernetes requests'
 
     before do
-      kubernetes_namespace
-
-      platform.update_attribute(:namespace, namespace)
+      platform.update_column(:namespace, 'new-namespace')
     end
 
     it 'does not create any Clusters::KubernetesNamespace' do
-      expect do
-        subject
-      end.not_to change(Clusters::KubernetesNamespace, :count)
+      subject
+
+      expect(cluster.kubernetes_namespace).to eq(kubernetes_namespace)
+    end
+
+    it 'creates project service account' do
+      expect_any_instance_of(Clusters::Gcp::Kubernetes::CreateServiceAccountService).to receive(:execute).once
+
+      subject
     end
 
     it 'updates Clusters::KubernetesNamespace' do
+      subject
+
       kubernetes_namespace.reload
 
       expect(kubernetes_namespace.namespace).to eq(namespace)
       expect(kubernetes_namespace.service_account_name).to eq("#{namespace}-service-account")
       expect(kubernetes_namespace.encrypted_service_account_token).to be_present
     end
-
-    it_behaves_like 'project service account and token'
   end
 end

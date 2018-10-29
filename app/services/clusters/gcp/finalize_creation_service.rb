@@ -25,7 +25,7 @@ module Clusters
       private
 
       def create_gitlab_service_account!
-        Clusters::Gcp::Kubernetes::ServiceAccounts::GitlabService.new(
+        Clusters::Gcp::Kubernetes::CreateServiceAccountService.gitlab_creator(
           kube_client,
           rbac: create_rbac_cluster?
         ).execute
@@ -56,7 +56,12 @@ module Clusters
       end
 
       def configure_project_service_account
-        Clusters::Kubernetes::ConfigureService.new(cluster).execute
+        kubernetes_namespace = cluster.find_or_initialize_kubernetes_namespace(cluster.cluster_project)
+
+        Clusters::Gcp::Kubernetes::CreateOrUpdateNamespaceService.new(
+          cluster: cluster,
+          kubernetes_namespace: kubernetes_namespace
+        ).execute
       end
 
       def authorization_type
