@@ -80,5 +80,14 @@ module EE
         data
       end || { status: :parsing }
     end
+
+    def calculate_reactive_cache(identifier, *args)
+      if identifier.to_sym == :compare_license_management_results
+        ::Ci::CompareLicenseManagementReportsService.new(project).execute(
+          base_pipeline, actual_head_pipeline)
+      else
+        super(identifier, *args)
+      end
+    end
   end
 end

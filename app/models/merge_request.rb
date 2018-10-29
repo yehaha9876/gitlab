@@ -1078,9 +1078,6 @@ class MergeRequest < ActiveRecord::Base
     when :compare_test_results
       Ci::CompareTestReportsService.new(project).execute(
         base_pipeline, actual_head_pipeline)
-    when :compare_license_management_results
-      Ci::CompareLicenseManagementReportsService.new(project).execute(
-        base_pipeline, actual_head_pipeline)
     else
       raise NotImplementedError, "Unknown identifier: #{identifier}"
     end

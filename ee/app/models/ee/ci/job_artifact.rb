@@ -6,6 +6,8 @@ module EE
   module Ci::JobArtifact
     extend ActiveSupport::Concern
 
+    LICENSE_MANAGEMENT_REPORT_FILE_TYPES = %w[license_management].freeze
+
     prepended do
       after_destroy :log_geo_deleted_event
 
