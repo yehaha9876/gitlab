@@ -180,6 +180,15 @@ Geo on the new primary.
 
 To bring a new secondary online, follow the [Geo setup instructions][setup-geo].
 
+### Step 6. (Optional) Removing the secondary's tracking database
+
+Every **secondary** has a special tracking database which is used to save the status of the synchronisation of all the items from the **primary**.
+As you already promoted the secondary you don't need that data anymore so you can consider removing it with the command:
+
+    ```
+    sudo rm -rf /var/opt/gitlab/geo-postgresql
+    ```
+
 ## Promoting secondary Geo replica in multi-secondary configurations
 
 If you have more than one secondary and you need to promote one of them we suggest you to follow
