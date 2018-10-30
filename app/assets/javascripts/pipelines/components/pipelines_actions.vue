@@ -2,15 +2,17 @@
 import { s__, sprintf } from '~/locale';
 import { formatTime } from '~/lib/utils/datetime_utility';
 import eventHub from '../event_hub';
-import icon from '../../vue_shared/components/icon.vue';
+import Icon from '../../vue_shared/components/icon.vue';
 import tooltip from '../../vue_shared/directives/tooltip';
+import GlCountdown from '~/vue_shared/components/gl_countdown.vue';
 
 export default {
   directives: {
     tooltip,
   },
   components: {
-    icon,
+    Icon,
+    GlCountdown,
   },
   props: {
     actions: {
