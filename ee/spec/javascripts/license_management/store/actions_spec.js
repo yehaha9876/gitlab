@@ -81,49 +81,6 @@ describe('License store actions', () => {
     });
   });
 
-  describe('requestDeleteLicense', () => {
-    it('commits REQUEST_DELETE_LICENSE', done => {
-      testAction(
-        actions.requestDeleteLicense,
-        null,
-        state,
-        [{ type: mutationTypes.REQUEST_DELETE_LICENSE }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('receiveDeleteLicense', () => {
-    it('commits RECEIVE_DELETE_LICENSE and dispatches loadManagedLicenses', done => {
-      testAction(
-        actions.receiveDeleteLicense,
-        null,
-        state,
-        [{ type: mutationTypes.RECEIVE_DELETE_LICENSE }],
-        [{ type: 'loadManagedLicenses' }],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('receiveDeleteLicenseError', () => {
-    it('commits RECEIVE_DELETE_LICENSE_ERROR', done => {
-      const error = new Error('Test');
-      testAction(
-        actions.receiveDeleteLicenseError,
-        error,
-        state,
-        [{ type: mutationTypes.RECEIVE_DELETE_LICENSE_ERROR, payload: error }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
   describe('deleteLicense', () => {
     let endpointMock;
     let deleteUrl;
@@ -143,8 +100,11 @@ describe('License store actions', () => {
         actions.deleteLicense,
         null,
         state,
-        [],
-        [{ type: 'requestDeleteLicense' }, { type: 'receiveDeleteLicense' }],
+        [
+          { type: mutationTypes.REQUEST_DELETE_LICENSE },
+          { type: mutationTypes.RECEIVE_DELETE_LICENSE },
+        ],
+        [{ type: 'loadManagedLicenses' }],
       )
         .then(done)
         .catch(done.fail);
@@ -160,53 +120,10 @@ describe('License store actions', () => {
         actions.deleteLicense,
         null,
         state,
-        [],
         [
-          { type: 'requestDeleteLicense' },
-          { type: 'receiveDeleteLicenseError', payload: jasmine.any(Error) },
+          { type: mutationTypes.REQUEST_DELETE_LICENSE },
+          { type: mutationTypes.RECEIVE_DELETE_LICENSE_ERROR, payload: jasmine.any(Error) },
         ],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('requestSetLicenseApproval', () => {
-    it('commits REQUEST_SET_LICENSE_APPROVAL', done => {
-      testAction(
-        actions.requestSetLicenseApproval,
-        null,
-        state,
-        [{ type: mutationTypes.REQUEST_SET_LICENSE_APPROVAL }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('receiveSetLicenseApproval', () => {
-    it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadManagedLicenses', done => {
-      testAction(
-        actions.receiveSetLicenseApproval,
-        null,
-        state,
-        [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
-        [{ type: 'loadManagedLicenses' }],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('receiveSetLicenseApprovalError', () => {
-    it('commits RECEIVE_SET_LICENSE_APPROVAL_ERROR', done => {
-      const error = new Error('Test');
-      testAction(
-        actions.receiveSetLicenseApprovalError,
-        error,
-        state,
-        [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL_ERROR, payload: error }],
         [],
       )
         .then(done)
@@ -240,8 +157,11 @@ describe('License store actions', () => {
           actions.setLicenseApproval,
           { license: newLicense, newStatus },
           state,
-          [],
-          [{ type: 'requestSetLicenseApproval' }, { type: 'receiveSetLicenseApproval' }],
+          [
+            { type: mutationTypes.REQUEST_SET_LICENSE_APPROVAL },
+            { type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL },
+          ],
+          [{ type: 'loadManagedLicenses' }],
         )
           .then(done)
           .catch(done.fail);
@@ -257,11 +177,11 @@ describe('License store actions', () => {
           actions.setLicenseApproval,
           { license: newLicense, newStatus },
           state,
-          [],
           [
-            { type: 'requestSetLicenseApproval' },
-            { type: 'receiveSetLicenseApprovalError', payload: jasmine.any(Error) },
+            { type: mutationTypes.REQUEST_SET_LICENSE_APPROVAL },
+            { type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL_ERROR, payload: jasmine.any(Error) },
           ],
+          [],
         )
           .then(done)
           .catch(done.fail);
@@ -291,8 +211,11 @@ describe('License store actions', () => {
           actions.setLicenseApproval,
           { license: approvedLicense, newStatus },
           state,
-          [],
-          [{ type: 'requestSetLicenseApproval' }, { type: 'receiveSetLicenseApproval' }],
+          [
+            { type: mutationTypes.REQUEST_SET_LICENSE_APPROVAL },
+            { type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL },
+          ],
+          [{ type: 'loadManagedLicenses' }],
         )
           .then(done)
           .catch(done.fail);
@@ -308,11 +231,11 @@ describe('License store actions', () => {
           actions.setLicenseApproval,
           { license: approvedLicense, newStatus },
           state,
-          [],
           [
-            { type: 'requestSetLicenseApproval' },
-            { type: 'receiveSetLicenseApprovalError', payload: jasmine.any(Error) },
+            { type: mutationTypes.REQUEST_SET_LICENSE_APPROVAL },
+            { type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL_ERROR, payload: jasmine.any(Error) },
           ],
+          [],
         )
           .then(done)
           .catch(done.fail);
@@ -396,50 +319,6 @@ describe('License store actions', () => {
     });
   });
 
-  describe('requestLoadManagedLicenses', () => {
-    it('commits REQUEST_LOAD_MANAGED_LICENSES', done => {
-      testAction(
-        actions.requestLoadManagedLicenses,
-        null,
-        state,
-        [{ type: mutationTypes.REQUEST_LOAD_MANAGED_LICENSES }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('receiveLoadManagedLicenses', () => {
-    it('commits RECEIVE_LOAD_MANAGED_LICENSES', done => {
-      const payload = [approvedLicense];
-      testAction(
-        actions.receiveLoadManagedLicenses,
-        payload,
-        state,
-        [{ type: mutationTypes.RECEIVE_LOAD_MANAGED_LICENSES, payload }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('receiveLoadManagedLicensesError', () => {
-    it('commits RECEIVE_LOAD_MANAGED_LICENSES_ERROR', done => {
-      const error = new Error('Test');
-      testAction(
-        actions.receiveLoadManagedLicensesError,
-        error,
-        state,
-        [{ type: mutationTypes.RECEIVE_LOAD_MANAGED_LICENSES_ERROR, payload: error }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
   describe('loadManagedLicenses', () => {
     let endpointMock;
 
@@ -455,8 +334,11 @@ describe('License store actions', () => {
         actions.loadManagedLicenses,
         null,
         state,
+        [
+          { type: mutationTypes.REQUEST_LOAD_MANAGED_LICENSES },
+          { type: mutationTypes.RECEIVE_LOAD_MANAGED_LICENSES, payload },
+        ],
         [],
-        [{ type: 'requestLoadManagedLicenses' }, { type: 'receiveLoadManagedLicenses', payload }],
       )
         .then(done)
         .catch(done.fail);
@@ -469,54 +351,10 @@ describe('License store actions', () => {
         actions.loadManagedLicenses,
         null,
         state,
-        [],
         [
-          { type: 'requestLoadManagedLicenses' },
-          { type: 'receiveLoadManagedLicensesError', payload: jasmine.any(Error) },
+          { type: mutationTypes.REQUEST_LOAD_MANAGED_LICENSES },
+          { type: mutationTypes.RECEIVE_LOAD_MANAGED_LICENSES_ERROR, payload: jasmine.any(Error) },
         ],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('requestLoadLicenseReport', () => {
-    it('commits REQUEST_LOAD_LICENSE_REPORT', done => {
-      testAction(
-        actions.requestLoadLicenseReport,
-        null,
-        state,
-        [{ type: mutationTypes.REQUEST_LOAD_LICENSE_REPORT }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('receiveLoadLicenseReport', () => {
-    it('commits RECEIVE_LOAD_LICENSE_REPORT', done => {
-      const payload = { headReport: licenseHeadIssues, baseReport: licenseBaseIssues };
-      testAction(
-        actions.receiveLoadLicenseReport,
-        payload,
-        state,
-        [{ type: mutationTypes.RECEIVE_LOAD_LICENSE_REPORT, payload }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('receiveLoadLicenseReportError', () => {
-    it('commits RECEIVE_LOAD_LICENSE_REPORT_ERROR', done => {
-      const error = new Error('Test');
-      testAction(
-        actions.receiveLoadLicenseReportError,
-        error,
-        state,
-        [{ type: mutationTypes.RECEIVE_LOAD_LICENSE_REPORT_ERROR, payload: error }],
         [],
       )
         .then(done)
@@ -542,8 +380,11 @@ describe('License store actions', () => {
         actions.loadLicenseReport,
         null,
         state,
+        [
+          { type: mutationTypes.REQUEST_LOAD_LICENSE_REPORT },
+          { type: mutationTypes.RECEIVE_LOAD_LICENSE_REPORT, payload },
+        ],
         [],
-        [{ type: 'requestLoadLicenseReport' }, { type: 'receiveLoadLicenseReport', payload }],
       )
         .then(done)
         .catch(done.fail);
@@ -558,8 +399,11 @@ describe('License store actions', () => {
         actions.loadLicenseReport,
         null,
         state,
+        [
+          { type: mutationTypes.REQUEST_LOAD_LICENSE_REPORT },
+          { type: mutationTypes.RECEIVE_LOAD_LICENSE_REPORT, payload },
+        ],
         [],
-        [{ type: 'requestLoadLicenseReport' }, { type: 'receiveLoadLicenseReport', payload }],
       )
         .then(done)
         .catch(done.fail);
@@ -573,11 +417,11 @@ describe('License store actions', () => {
         actions.loadLicenseReport,
         null,
         state,
-        [],
         [
-          { type: 'requestLoadLicenseReport' },
-          { type: 'receiveLoadLicenseReportError', payload: jasmine.any(Error) },
+          { type: mutationTypes.REQUEST_LOAD_LICENSE_REPORT },
+          { type: mutationTypes.RECEIVE_LOAD_LICENSE_REPORT_ERROR, payload: jasmine.any(Error) },
         ],
+        [],
       )
         .then(done)
         .catch(done.fail);
@@ -591,11 +435,11 @@ describe('License store actions', () => {
         actions.loadLicenseReport,
         null,
         state,
-        [],
         [
-          { type: 'requestLoadLicenseReport' },
-          { type: 'receiveLoadLicenseReportError', payload: jasmine.any(Error) },
+          { type: mutationTypes.REQUEST_LOAD_LICENSE_REPORT },
+          { type: mutationTypes.RECEIVE_LOAD_LICENSE_REPORT_ERROR, payload: jasmine.any(Error) },
         ],
+        [],
       )
         .then(done)
         .catch(done.fail);
