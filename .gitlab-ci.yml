@@ -1106,10 +1106,23 @@ no_ee_check:
     - //@gitlab-org/gitlab-ce
 
 # GitLab Review apps
-review:
+# GitLab Review apps
+.review_common: &review_common
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-charts-build-base
-  stage: test
   allow_failure: true
+  only:
+    refs:
+      - branches@gitlab-org/gitlab-ce
+      - branches@gitlab-org/gitlab-ee
+    kubernetes: active
+  except:
+    refs:
+      - master
+      - /(^docs[\/-].*|.*-docs$)/
+
+review:
+  <<: *review_common
+  stage: test
   before_script:
     - gem install gitlab --no-document
   variables:
@@ -1134,15 +1147,20 @@ review:
     name: review/$CI_COMMIT_REF_NAME
     url: https://gitlab-$CI_ENVIRONMENT_SLUG.$REVIEW_APPS_DOMAIN
     on_stop: stop_review
-  only:
-    refs:
-      - branches@gitlab-org/gitlab-ce
-      - branches@gitlab-org/gitlab-ee
-    kubernetes: active
-  except:
-    refs:
-      - master
-      - /(^docs[\/-].*|.*-docs$)/
+
+review_schema:
+  <<: *review_common
+  stage: post-test
+  before_script:
+    - export TASK_RUNNER=$(kubectl get pods -lapp=task-runner,release=${CI_ENVIRONMENT_SLUG} -ojsonpath='{.items[0].metadata.name}')
+  variables:
+    GIT_DEPTH: "1"
+  script:
+    - kubectl exec -it ${TASK_RUNNER} -- bash -c 'echo gem \"activerecord_sane_schema_dumper\", gem_versions[\"activerecord_sane_schema_dumper\"] >> /srv/gitlab/Gemfile; cd /srv/gitlab/; bundle install'
+    - kubectl exec -it ${TASK_RUNNER} -- bash -c 'gitlab-rake db:schema:dump; cat /srv/gitlab/db/schema.rb' > db/schema.rb
+    - git diff --exit-code
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
 
 stop_review:
   <<: *single-script-job
