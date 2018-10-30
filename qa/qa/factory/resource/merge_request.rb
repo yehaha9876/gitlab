@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 
 module QA
@@ -10,7 +12,9 @@ module QA
                       :target_branch,
                       :assignee,
                       :milestone,
-                      :labels
+                      :labels,
+                      :file_name,
+                      :file_content
 
         attribute :source_branch
 
@@ -36,8 +40,8 @@ module QA
             resource.branch_name = target_branch
             resource.remote_branch = source_branch
             resource.new_branch = false
-            resource.file_name = "added_file.txt"
-            resource.file_content = "File Added"
+            resource.file_name = file_name
+            resource.file_content = file_content
           end
         end
 
@@ -49,6 +53,8 @@ module QA
           @assignee = nil
           @milestone = nil
           @labels = []
+          @file_name = "added_file.txt"
+          @file_content = "File Added"
         end
 
         def fabricate!
