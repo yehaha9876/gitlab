@@ -71,7 +71,7 @@ module Clusters
         end
       end
 
-      def predefined_variables
+      def predefined_variables_for_project(project:)
         Gitlab::Ci::Variables::Collection.new.tap do |variables|
           variables.append(key: 'KUBE_URL', value: api_url)
 
@@ -81,11 +81,14 @@ module Clusters
               .append(key: 'KUBE_CA_PEM_FILE', value: ca_pem, file: true)
           end
 
-          # From 11.5, every Cluster should have at least one
-          # KubernetesNamespace, so once migration has been completed,
-          # below branching will be removed. For more information, please see
-          # https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22433
-          unless kubernetes_namespace.present?
+          if project.kubernetes_namespace.present?
+            variables
+              .concat(project.kubernetes_namespace.predefined_variables)
+          else
+            # From 11.5, every Clusters::Project should have at least one
+            # Clusters::KubernetesNamespace, so once migration has been completed,
+            # this else will be removed. For more information, please see
+            # https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22433
             config = YAML.dump(kubeconfig)
 
             variables

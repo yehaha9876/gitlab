@@ -421,6 +421,7 @@ describe Project do
 
     it { is_expected.to delegate_method(:members).to(:team).with_prefix(true) }
     it { is_expected.to delegate_method(:name).to(:owner).with_prefix(true).with_arguments(allow_nil: true) }
+    it { is_expected.to delegate_method(:kubernetes_namespace).to(:cluster_project).with_arguments(allow_nil: true) }
   end
 
   describe '#to_reference_with_postfix' do
@@ -2693,7 +2694,7 @@ describe Project do
         it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
       end
 
-      context 'when user configured kubernetes frmo CI/CD > Clusters and KubernetesNamespace migration has been executed' do
+      context 'when user configured kubernetes from CI/CD > Clusters and KubernetesNamespace migration has been executed' do
         let!(:kubernetes_namespace) { create(:cluster_kubernetes_namespace) }
         let!(:cluster) { kubernetes_namespace.cluster }
         let(:project) { kubernetes_namespace.project }

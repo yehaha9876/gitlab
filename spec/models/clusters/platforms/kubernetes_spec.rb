@@ -192,7 +192,7 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
     end
   end
 
-  describe '#predefined_variables' do
+  describe '#predefined_variables_for_project' do
     let!(:cluster) { create(:cluster, :project, platform_kubernetes: kubernetes) }
     let(:kubernetes) { create(:cluster_platform_kubernetes, api_url: api_url, ca_cert: ca_pem) }
     let(:api_url) { 'https://kube.domain.com' }
@@ -200,7 +200,7 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
 
     shared_examples 'setting variables' do
       it 'sets the variables' do
-        expect(kubernetes.predefined_variables).to include(
+        expect(kubernetes.predefined_variables_for_project(project: cluster.project)).to include(
           { key: 'KUBE_URL', value: api_url, public: true },
           { key: 'KUBE_CA_PEM', value: ca_pem, public: true },
           { key: 'KUBE_CA_PEM_FILE', value: ca_pem, public: true, file: true }

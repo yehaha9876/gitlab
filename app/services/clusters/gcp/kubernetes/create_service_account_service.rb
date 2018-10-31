@@ -4,12 +4,13 @@ module Clusters
   module Gcp
     module Kubernetes
       class CreateServiceAccountService
-        def initialize(kubeclient, service_account_name:, service_account_namespace:, token_name:, rbac:)
+        def initialize(kubeclient, service_account_name:, service_account_namespace:, token_name:, rbac:, namespace_creator: false)
           @kubeclient = kubeclient
           @service_account_name = service_account_name
           @service_account_namespace = service_account_namespace
           @token_name = token_name
           @rbac = rbac
+          @namespace_creator = namespace_creator
         end
 
         def self.gitlab_creator(kubeclient, rbac:)
@@ -28,12 +29,13 @@ module Clusters
             service_account_name: service_account_name,
             service_account_namespace: service_account_namespace,
             token_name: "#{service_account_namespace}-token",
-            rbac: rbac
+            rbac: rbac,
+            namespace_creator: true
           )
         end
 
         def execute
-          ensure_project_namespace_exists if namespace_creator?
+          ensure_project_namespace_exists if namespace_creator
           kubeclient.create_service_account(service_account_resource)
           kubeclient.create_secret(service_account_token_resource)
           create_role_or_cluster_role_binding if rbac
@@ -41,11 +43,7 @@ module Clusters
 
         private
 
-        attr_reader :kubeclient, :service_account_name, :service_account_namespace, :token_name, :rbac
-
-        def namespace_creator?
-          service_account_name != Clusters::Gcp::Kubernetes::GITLAB_SERVICE_ACCOUNT_NAME
-        end
+        attr_reader :kubeclient, :service_account_name, :service_account_namespace, :token_name, :rbac, :namespace_creator
 
         def ensure_project_namespace_exists
           Gitlab::Kubernetes::Namespace.new(
@@ -55,7 +53,7 @@ module Clusters
         end
 
         def create_role_or_cluster_role_binding
-          if namespace_creator?
+          if namespace_creator
             kubeclient.create_role_binding(role_binding_resource)
           else
             kubeclient.create_cluster_role_binding(cluster_role_binding_resource)
