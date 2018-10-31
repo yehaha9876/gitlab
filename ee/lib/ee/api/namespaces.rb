@@ -68,6 +68,32 @@ module EE
 
             present namespace.gitlab_subscription || {}, with: ::EE::API::Entities::GitlabSubscription
           end
+
+          desc 'Update the subscription for the namespace' do
+            success ::EE::API::Entities::GitlabSubscription
+          end
+          params do
+            optional :seats, type: Integer, desc: 'The number of seats purchased'
+            optional :plan_code, type: String, desc: 'The code of the purchased plan'
+            optional :plan_name, type: String, desc: 'The name of the purchased plan'
+            optional :start_date, type: Date, desc: 'The date when subscription was started'
+            optional :end_date, type: Date, desc: 'The date when subscription expires'
+            optional :trial, type: Grape::API::Boolean, desc: 'Wether the subscription is trial'
+          end
+          put ":id/gitlab_subscription" do
+            authenticated_as_admin!
+
+            namespace = find_namespace!(params[:id])
+            subscription = namespace.gitlab_subscription
+
+            break not_found!('GitlabSubscription') unless subscription
+
+            if subscription.update(declared_params)
+              present subscription, with: ::EE::API::Entities::GitlabSubscription
+            else
+              render_validation_error!(subscription)
+            end
+          end
         end
       end
     end

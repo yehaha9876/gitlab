@@ -42,14 +42,14 @@ describe GitlabSubscription do
       expect(gitlab_subscription.seats_in_use).to eq(1)
     end
 
-    it 'also counts users from subgroups' do
+    it 'also counts users from subgroups', :postgresql do
       group.add_developer(user_1)
       subgroup_1.add_developer(user_2)
 
       expect(gitlab_subscription.seats_in_use).to eq(2)
     end
 
-    it 'does not count duplicated members' do
+    it 'does not count duplicated members', :postgresql do
       group.add_developer(user_1)
       subgroup_1.add_developer(user_2)
       subgroup_2.add_developer(user_2)
@@ -72,7 +72,7 @@ describe GitlabSubscription do
 
       context 'with a gold plan' do
         it 'excludes these members' do
-          group.update_attributes!(plan: 'gold')
+          group.update!(plan: 'gold')
 
           expect(gitlab_subscription.seats_in_use).to eq(0)
         end
@@ -81,7 +81,7 @@ describe GitlabSubscription do
       context 'with other plans' do
         %w[bronze silver].each do |plan|
           it 'excludes these members' do
-            group.update_attributes!(plan: plan)
+            group.update!(plan: plan)
 
             expect(gitlab_subscription.seats_in_use).to eq(1)
           end
@@ -91,7 +91,7 @@ describe GitlabSubscription do
 
     context 'when subscription is for a User' do
       before do
-        gitlab_subscription.update_attributes!(namespace: user_namespace)
+        gitlab_subscription.update!(namespace: user_namespace)
 
         user_project.add_developer(user_1)
         user_project.add_developer(user_2)
@@ -99,7 +99,7 @@ describe GitlabSubscription do
 
       it 'always returns 1 seat' do
         %w[bronze silver gold].each do |plan|
-          user_namespace.update_attributes!(plan: plan)
+          user_namespace.update!(plan: plan)
 
           expect(gitlab_subscription.seats_in_use).to eq(1)
         end

@@ -204,4 +204,70 @@ describe API::Namespaces do
       end
     end
   end
+
+  describe 'PUT :id/gitlab_subscription' do
+    def do_put(namespace_id, current_user, payload)
+      put api("/namespaces/#{namespace_id}/gitlab_subscription", current_user), payload
+    end
+
+    set(:namespace) { create(:group) }
+    set(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace) }
+
+    let(:params) do
+      {
+        seats: 150,
+        plan_code: 'silver',
+        plan_name: 'Silver',
+        start_date: '01/01/2018',
+        end_date: '01/01/2019'
+      }
+    end
+
+    context 'when authenticated as a regular user' do
+      it 'returns an unauthroized error' do
+        do_put(namespace.id, user, { seats: 150 })
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'when authenticated as an admin' do
+      context 'when namespace is not found' do
+        it 'returns a 404 error' do
+          do_put(1111, admin, params)
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'when namespace does not have a subscription' do
+        set(:namespace_2) { create(:group) }
+
+        it 'returns a 404 error' do
+          do_put(namespace_2.id, admin, params)
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'when params are invalid' do
+        it 'returns a 400 error' do
+          do_put(namespace.id, admin, params.merge(seats: nil))
+
+          expect(response).to have_gitlab_http_status(400)
+        end
+      end
+
+      context 'when params are valid' do
+        it 'updates the subscription for the Group' do
+          do_put(namespace.id, admin, params)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(gitlab_subscription.reload.seats).to eq(150)
+          expect(gitlab_subscription.plan_code).to eq('silver')
+          expect(gitlab_subscription.plan_name).to eq('Silver')
+        end
+      end
+    end
+  end
 end

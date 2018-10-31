@@ -22,6 +22,7 @@
 - cronjob:trending_projects
 - cronjob:issue_due_scheduler
 - cronjob:prune_web_hook_logs
+- cronjob:update_max_seats_used_for_gitlab_com_subscriptions
 
 - gcp_cluster:cluster_install_app
 - gcp_cluster:cluster_update_app
