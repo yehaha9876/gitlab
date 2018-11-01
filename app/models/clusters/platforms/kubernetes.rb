@@ -87,7 +87,7 @@ module Clusters
           else
             # From 11.5, every Clusters::Project should have at least one
             # Clusters::KubernetesNamespace, so once migration has been completed,
-            # this else will be removed. For more information, please see
+            # this 'else' branch will be removed. For more information, please see
             # https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22433
             config = YAML.dump(kubeconfig)
 
@@ -131,12 +131,8 @@ module Clusters
         to_kubeconfig(
           url: api_url,
           namespace: actual_namespace,
-          token: default_service_account_token,
+          token: token,
           ca_pem: ca_pem)
-      end
-
-      def default_service_account_token
-        kubernetes_namespace&.service_account_token.presence || token
       end
 
       def default_namespace

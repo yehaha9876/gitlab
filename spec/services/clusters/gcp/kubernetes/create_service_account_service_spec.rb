@@ -148,7 +148,7 @@ describe Clusters::Gcp::Kubernetes::CreateServiceAccountService do
             metadata: { name: "gitlab-#{namespace}", namespace: "#{namespace}" },
             roleRef: {
               apiGroup: 'rbac.authorization.k8s.io',
-              kind: 'Role',
+              kind: 'ClusterRole',
               name: 'edit'
             },
             subjects: [

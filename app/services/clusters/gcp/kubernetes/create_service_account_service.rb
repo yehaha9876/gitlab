@@ -4,13 +4,14 @@ module Clusters
   module Gcp
     module Kubernetes
       class CreateServiceAccountService
-        def initialize(kubeclient, service_account_name:, service_account_namespace:, token_name:, rbac:, namespace_creator: false)
+        def initialize(kubeclient, service_account_name:, service_account_namespace:, token_name:, rbac:, namespace_creator: false, role_binding_name: nil)
           @kubeclient = kubeclient
           @service_account_name = service_account_name
           @service_account_namespace = service_account_namespace
           @token_name = token_name
           @rbac = rbac
           @namespace_creator = namespace_creator
+          @role_binding_name = role_binding_name
         end
 
         def self.gitlab_creator(kubeclient, rbac:)
@@ -30,7 +31,8 @@ module Clusters
             service_account_namespace: service_account_namespace,
             token_name: "#{service_account_namespace}-token",
             rbac: rbac,
-            namespace_creator: true
+            namespace_creator: true,
+            role_binding_name: "gitlab-#{service_account_namespace}"
           )
         end
 
@@ -43,7 +45,7 @@ module Clusters
 
         private
 
-        attr_reader :kubeclient, :service_account_name, :service_account_namespace, :token_name, :rbac, :namespace_creator
+        attr_reader :kubeclient, :service_account_name, :service_account_namespace, :token_name, :rbac, :namespace_creator, :role_binding_name
 
         def ensure_project_namespace_exists
           Gitlab::Kubernetes::Namespace.new(
@@ -87,7 +89,8 @@ module Clusters
 
         def role_binding_resource
           Gitlab::Kubernetes::RoleBinding.new(
-            role_name: Clusters::Gcp::Kubernetes::ROLE_BINDING_ROLE,
+            name: role_binding_name,
+            role_name: Clusters::Gcp::Kubernetes::ROLE_BINDING_ROLE_NAME,
             namespace: service_account_namespace,
             service_account_name: service_account_name
           ).generate
