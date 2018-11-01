@@ -49,7 +49,7 @@ export default {
       <div
         v-for="n in 3"
         :key="n"
-        class="multi-file-loading-container"
+        class="multi-file-loading-container qa-file-loading"
       >
         <gl-skeleton-loading />
       </div>

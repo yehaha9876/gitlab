@@ -13,6 +13,7 @@ module QA
 
           view 'app/assets/javascripts/ide/components/ide_tree_list.vue' do
             element :file_list
+            element :file_loading
           end
 
           view 'app/assets/javascripts/ide/components/new_dropdown/modal.vue' do
@@ -32,6 +33,14 @@ module QA
           view 'app/assets/javascripts/ide/components/commit_sidebar/form.vue' do
             element :begin_commit_button
             element :commit_button
+          end
+
+          view 'app/assets/javascripts/vue_shared/components/file_row.vue' do
+            element :file_name
+          end
+
+          view 'app/assets/javascripts/ide/components/repo_editor.vue' do
+            element :file_editor
           end
 
           def has_file?(file_name)
@@ -71,6 +80,26 @@ module QA
             wait(reload: false) do
               page.has_content?('Your changes have been committed')
             end
+          end
+
+          def edit(file_name)
+            files.each do |file|
+              file.click if file.text == file_name
+            end
+          end
+
+          def files
+            wait(reload: false) do
+              !has_element? :file_loading
+            end
+            within_element(:file_list) do
+              all_elements(:file_name)
+            end
+          end
+
+          def append_text(text)
+            click_element :file_editor
+            send_keys [:control, :end], :return, text
           end
         end
       end

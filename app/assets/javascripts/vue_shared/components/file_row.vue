@@ -170,7 +170,7 @@ export default {
         <span
           ref="textOutput"
           :style="levelIndentation"
-          class="file-row-name str-truncated"
+          class="file-row-name str-truncated qa-file-name"
         >
           <file-icon
             v-if="!showChangedIcon || file.type === 'tree'"

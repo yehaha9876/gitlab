@@ -260,7 +260,7 @@ export default {
         'is-deleted': file.deleted,
         'is-added': file.tempFile
       }"
-      class="multi-file-editor-holder"
+      class="multi-file-editor-holder qa-file-editor"
     >
     </div>
     <content-viewer
