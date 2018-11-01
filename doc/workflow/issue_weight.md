@@ -5,7 +5,10 @@
 
 When you have a lot of issues, it can be hard to get an overview.
 By adding a weight to each issue, you can get a better idea of how much time,
-value or complexity a given issue has or will cost.
+value or complexity a given issue has or will cost. An example of this may be 
+that a simple text change may have a value of a 1 whereas a multiple day change 
+may hold a weight of a 4 or 5 or whatever value the the issue owner believes will 
+be the effort
 
 You can set the weight of an issue during its creation, by simply changing the
 value in the dropdown menu. You can set it to a non-negative integer
