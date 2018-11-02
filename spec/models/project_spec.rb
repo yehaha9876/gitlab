@@ -421,7 +421,6 @@ describe Project do
 
     it { is_expected.to delegate_method(:members).to(:team).with_prefix(true) }
     it { is_expected.to delegate_method(:name).to(:owner).with_prefix(true).with_arguments(allow_nil: true) }
-    it { is_expected.to delegate_method(:kubernetes_namespace).to(:cluster_project).with_arguments(allow_nil: true) }
   end
 
   describe '#to_reference_with_postfix' do

@@ -285,7 +285,6 @@ class Project < ActiveRecord::Base
   delegate :add_guest, :add_reporter, :add_developer, :add_maintainer, :add_role, to: :team
   delegate :add_master, to: :team # @deprecated
   delegate :group_runners_enabled, :group_runners_enabled=, :group_runners_enabled?, to: :ci_cd_settings
-  delegate :kubernetes_namespace, to: :cluster_project, allow_nil: true
 
   # Validations
   validates :creator, presence: true, on: :create
@@ -1833,7 +1832,7 @@ class Project < ActiveRecord::Base
   end
 
   def deployment_variables(environment: nil)
-    deployment_platform(environment: environment)&.predefined_variables_for_project(project: self) || []
+    deployment_platform(environment: environment)&.predefined_variables(project: self) || []
   end
 
   def auto_devops_variables

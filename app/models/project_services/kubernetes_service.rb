@@ -111,7 +111,7 @@ class KubernetesService < DeploymentService
   # as a way to keep this service compatible with
   # Clusters::Platforms::Kubernetes, it won't be used on this method
   # as it's only needed for Clusters::Cluster.
-  def predefined_variables_for_project(project:)
+  def predefined_variables(project:)
     config = YAML.dump(kubeconfig)
 
     Gitlab::Ci::Variables::Collection.new.tap do |variables|

@@ -81,8 +81,8 @@ module Clusters
           subjects = [{ kind: 'ServiceAccount', name: service_account_name, namespace: service_account_namespace }]
 
           Gitlab::Kubernetes::ClusterRoleBinding.new(
-            Clusters::Gcp::Kubernetes::CLUSTER_ROLE_BINDING_NAME,
-            Clusters::Gcp::Kubernetes::CLUSTER_ROLE_NAME,
+            Clusters::Gcp::Kubernetes::GITLAB_CLUSTER_ROLE_BINDING_NAME,
+            Clusters::Gcp::Kubernetes::GITLAB_CLUSTER_ROLE_NAME,
             subjects
           ).generate
         end
@@ -90,7 +90,7 @@ module Clusters
         def role_binding_resource
           Gitlab::Kubernetes::RoleBinding.new(
             name: role_binding_name,
-            role_name: Clusters::Gcp::Kubernetes::ROLE_BINDING_ROLE_NAME,
+            role_name: Clusters::Gcp::Kubernetes::PROJECT_CLUSTER_ROLE_NAME,
             namespace: service_account_namespace,
             service_account_name: service_account_name
           ).generate

@@ -71,7 +71,7 @@ module Clusters
         end
       end
 
-      def predefined_variables_for_project(project:)
+      def predefined_variables(project:)
         Gitlab::Ci::Variables::Collection.new.tap do |variables|
           variables.append(key: 'KUBE_URL', value: api_url)
 
@@ -81,9 +81,8 @@ module Clusters
               .append(key: 'KUBE_CA_PEM_FILE', value: ca_pem, file: true)
           end
 
-          if project.kubernetes_namespace.present?
-            variables
-              .concat(project.kubernetes_namespace.predefined_variables)
+          if kubernetes_namespace = cluster.kubernetes_namespaces.find_by(project: project)
+            variables.concat(kubernetes_namespace.predefined_variables)
           else
             # From 11.5, every Clusters::Project should have at least one
             # Clusters::KubernetesNamespace, so once migration has been completed,
