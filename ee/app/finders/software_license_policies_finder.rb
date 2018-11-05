@@ -12,7 +12,6 @@ class SoftwareLicensePoliciesFinder
     @params = params
   end
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def execute
     return SoftwareLicensePolicy.none unless can?(current_user, :read_software_license_policy, project)
 
@@ -21,7 +20,6 @@ class SoftwareLicensePoliciesFinder
     items = by_name_or_id(items)
     sort(items)
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 
   private
 
