@@ -8,7 +8,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
-            Rails.root.join('ee/spec/fixtures/reports/security/sast.json'), 'application/json')
+          Rails.root.join('ee/spec/fixtures/reports/security/sast.json'), 'application/json')
       end
     end
 
@@ -18,7 +18,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
-            Rails.root.join('ee/spec/fixtures/reports/security/sast_with_corrupted_data.json'), 'application/json')
+          Rails.root.join('ee/spec/fixtures/reports/security/sast_with_corrupted_data.json'), 'application/json')
       end
     end
 

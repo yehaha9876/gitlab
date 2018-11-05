@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LicenseManagementReportHelper
   def create_report(dependencies)
     Gitlab::Ci::Reports::LicenseManagementReport.new.tap do |report|
