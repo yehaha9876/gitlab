@@ -3,7 +3,7 @@
 module Ci
   class CompareLicenseManagementReportsService < ::Ci::CompareReportsBaseService
     def comparer_class
-      Gitlab::Ci::Reports::LicenseManagementReportsComparer
+      Gitlab::Ci::Reports::LicenseManagement::ReportsComparer
     end
 
     def serializer_class

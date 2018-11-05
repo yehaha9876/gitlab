@@ -255,7 +255,7 @@ describe Ci::Build do
   describe '#collect_license_management_reports!' do
     subject { job.collect_license_management_reports!(license_management_report) }
 
-    let(:license_management_report) { Gitlab::Ci::Reports::LicenseManagementReport.new }
+    let(:license_management_report) { Gitlab::Ci::Reports::LicenseManagement::Report.new }
 
     it { expect(license_management_report.licenses.count).to eq(0) }
 

@@ -2,7 +2,7 @@
 
 module LicenseManagementReportHelper
   def create_report(dependencies)
-    Gitlab::Ci::Reports::LicenseManagementReport.new.tap do |report|
+    Gitlab::Ci::Reports::LicenseManagement::Report.new.tap do |report|
       dependencies.each do |license_name, dependencies|
         dependencies.each do |dependency_name|
           report.add_dependency(license_name.to_s, dependency_name)
@@ -28,17 +28,17 @@ module LicenseManagementReportHelper
   end
 
   def create_comparer
-    Gitlab::Ci::Reports::LicenseManagementReportsComparer.new(create_report1, create_report2)
+    Gitlab::Ci::Reports::LicenseManagement::ReportsComparer.new(create_report1, create_report2)
   end
 
   def create_license
-    Gitlab::Ci::Reports::LicenseManagementLicense.new('License1').tap do |license|
+    Gitlab::Ci::Reports::LicenseManagement::License.new('License1').tap do |license|
       license.add_dependency('Dependency1')
       license.add_dependency('Dependency2')
     end
   end
 
   def create_dependency
-    Gitlab::Ci::Reports::LicenseManagementDependency.new('Dependency1')
+    Gitlab::Ci::Reports::LicenseManagement::Dependency.new('Dependency1')
   end
 end

@@ -6,7 +6,7 @@ describe Gitlab::Ci::Parsers::LicenseManagement::LicenseManagement do
   describe '#parse!' do
     subject { described_class.new.parse!(data, report) }
 
-    let(:report) { Gitlab::Ci::Reports::LicenseManagementReport.new }
+    let(:report) { Gitlab::Ci::Reports::LicenseManagement::Report.new }
 
     context 'when data is a JSON license management report' do
       let(:data) { File.read(Rails.root.join('ee/spec/fixtures/license_management/report.json')) }
