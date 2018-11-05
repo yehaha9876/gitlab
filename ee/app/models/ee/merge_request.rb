@@ -81,6 +81,7 @@ module EE
       end || { status: :parsing }
     end
 
+    override :calculate_reactive_cache
     def calculate_reactive_cache(identifier, *args)
       if identifier.to_sym == :compare_license_management_results
         ::Ci::CompareLicenseManagementReportsService.new(project).execute(
