@@ -24,10 +24,10 @@ module Gitlab
                 end
               end
             end
-          rescue JSON::ParserError => e
-            raise LicenseManagementParserError, "JSON parsing failed: #{e.message}"
-          rescue => e
-            raise LicenseManagementParserError, "License management report parsing failed: #{e.message}"
+          rescue JSON::ParserError
+            raise LicenseManagementParserError, 'JSON parsing failed'
+          rescue
+            raise LicenseManagementParserError, 'License management report parsing failed '
           end
 
           def self.remove_suffix(name)
