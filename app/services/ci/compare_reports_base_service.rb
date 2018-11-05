@@ -2,7 +2,6 @@
 
 module Ci
   class CompareReportsBaseService < ::BaseService
-
     def comparer_class
       raise NotImplementedError
     end
@@ -16,7 +15,6 @@ module Ci
     end
 
     def execute(base_pipeline, head_pipeline)
-      # rubocop: disable CodeReuse/Serializer
       comparer = comparer_class.new(get_report(base_pipeline), get_report(head_pipeline))
       {
         status: :parsed,
@@ -31,7 +29,6 @@ module Ci
         key: key(base_pipeline, head_pipeline),
         status_reason: e.message
       }
-      # rubocop: enable CodeReuse/Serializer
     end
 
     def latest?(base_pipeline, head_pipeline, data)
