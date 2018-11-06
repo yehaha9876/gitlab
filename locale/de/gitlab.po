@@ -5372,9 +5372,6 @@ msgstr ""
 msgid "Pipeline %{pipelineLinkStart} #%{pipelineId} %{pipelineLinkEnd} from %{pipelineLinkRefStart} %{pipelineRef} %{pipelineLinkRefEnd}"
 msgstr ""
 
-msgid "Pipeline Health"
-msgstr "Zustand der Pipeline"
-
 msgid "Pipeline Schedule"
 msgstr "Zeitplan der Pipeline"
 

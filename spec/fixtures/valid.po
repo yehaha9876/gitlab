@@ -583,9 +583,6 @@ msgstr "Propietario"
 msgid "Pipeline"
 msgstr "Pipeline"
 
-msgid "Pipeline Health"
-msgstr "Estado del Pipeline"
-
 msgid "Pipeline Schedule"
 msgstr "Programación del Pipeline"
 

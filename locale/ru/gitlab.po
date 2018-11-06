@@ -5452,9 +5452,6 @@ msgstr "Сборочная линия"
 msgid "Pipeline %{pipelineLinkStart} #%{pipelineId} %{pipelineLinkEnd} from %{pipelineLinkRefStart} %{pipelineRef} %{pipelineLinkRefEnd}"
 msgstr ""
 
-msgid "Pipeline Health"
-msgstr "Работоспособность Сборочной Линии"
-
 msgid "Pipeline Schedule"
 msgstr "Расписание Сборочной Линии"
 

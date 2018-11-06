@@ -5332,9 +5332,6 @@ msgstr "流水线"
 msgid "Pipeline %{pipelineLinkStart} #%{pipelineId} %{pipelineLinkEnd} from %{pipelineLinkRefStart} %{pipelineRef} %{pipelineLinkRefEnd}"
 msgstr "流水线 %{pipelineLinkStart} #%{pipelineId} %{pipelineLinkEnd} 来自 %{pipelineLinkRefStart} %{pipelineRef} %{pipelineLinkRefEnd}"
 
-msgid "Pipeline Health"
-msgstr "流水线运行状况指标"
-
 msgid "Pipeline Schedule"
 msgstr "流水线计划"
 

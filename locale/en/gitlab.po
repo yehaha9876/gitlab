@@ -657,9 +657,6 @@ msgstr ""
 msgid "Pipeline"
 msgstr ""
 
-msgid "Pipeline Health"
-msgstr ""
-
 msgid "Pipeline Schedule"
 msgstr ""
 

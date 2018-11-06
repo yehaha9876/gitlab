@@ -5332,9 +5332,6 @@ msgstr "파이프라인"
 msgid "Pipeline %{pipelineLinkStart} #%{pipelineId} %{pipelineLinkEnd} from %{pipelineLinkRefStart} %{pipelineRef} %{pipelineLinkRefEnd}"
 msgstr ""
 
-msgid "Pipeline Health"
-msgstr "파이프라인 상태"
-
 msgid "Pipeline Schedule"
 msgstr "파이프라인 스케쥴"
 

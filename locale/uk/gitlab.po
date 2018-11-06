@@ -5452,9 +5452,6 @@ msgstr "Конвеєр"
 msgid "Pipeline %{pipelineLinkStart} #%{pipelineId} %{pipelineLinkEnd} from %{pipelineLinkRefStart} %{pipelineRef} %{pipelineLinkRefEnd}"
 msgstr ""
 
-msgid "Pipeline Health"
-msgstr "Стан Конвеєра"
-
 msgid "Pipeline Schedule"
 msgstr "Розклад Конвеєра"
 

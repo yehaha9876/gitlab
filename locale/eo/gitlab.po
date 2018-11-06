@@ -5372,9 +5372,6 @@ msgstr "Ĉenstablo"
 msgid "Pipeline %{pipelineLinkStart} #%{pipelineId} %{pipelineLinkEnd} from %{pipelineLinkRefStart} %{pipelineRef} %{pipelineLinkRefEnd}"
 msgstr ""
 
-msgid "Pipeline Health"
-msgstr "Stato"
-
 msgid "Pipeline Schedule"
 msgstr "Ĉenstabla plano"
 
