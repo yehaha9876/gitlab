@@ -7,11 +7,11 @@ class Projects::JobsController < Projects::ApplicationController
   prepend ::EE::Projects::JobsController
 
   before_action :build,
-    only: [:show, :cancel, :retry, :play, :erase, :trace, :raw, :status, :terminal, :terminal_websocket_authorize]
+    only: [:show, :cancel, :retry, :play, :erase, :trace, :raw, :status, :terminal, :terminal_websocket_authorize, :unschedule]
   before_action :authorize_read_build!,
-    only: [:show, :cancel, :retry, :play, :erase, :trace, :raw, :status, :terminal, :terminal_websocket_authorize]
+    only: [:show, :cancel, :retry, :play, :erase, :trace, :raw, :status, :terminal, :terminal_websocket_authorize, :unschedule]
   before_action :authorize_update_build!,
-    only: [:cancel, :retry, :play, :terminal, :terminal_websocket_authorize]
+    only: [:cancel, :retry, :play, :terminal, :terminal_websocket_authorize, :unschedule]
   before_action :authorize_erase_build!, only: [:erase]
   before_action :authorize_use_build_terminal!, only: [:terminal, :terminal_websocket_authorize]
   before_action :verify_api_request!, only: :terminal_websocket_authorize

@@ -10,7 +10,7 @@ module EE
 
       override :related_merge_requests
       def related_merge_requests
-        return ::MergeRequest.none if pipeline.webide? # rubocop: disable CodeReuse/ActiveRecord
+        return ::MergeRequest.none if pipeline.webide?
 
         super
       end
