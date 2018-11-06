@@ -102,3 +102,21 @@
     font-weight: normal;
   }
 }
+
+.boards-switcher {
+  .dropdown.show .dropdown-menu {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .dropdown-content,
+  .dropdown-content-faded-mask {
+    overflow-y: auto;
+    max-height: 100%;
+  }
+
+  .dropdown-footer {
+    margin-top: 0;
+  }
+}
