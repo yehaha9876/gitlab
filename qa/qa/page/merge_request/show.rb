@@ -57,6 +57,10 @@ module QA
           element :labels_block
         end
 
+        view 'app/assets/javascripts/notes/components/note_form.vue' do
+          element :comment_button
+        end
+
         def fast_forward_possible?
           !has_text?('Fast-forward merge is not possible')
         end
@@ -145,11 +149,15 @@ module QA
           click_element :diffs_tab
         end
 
-        def add_comment_to_diff(text)
+        def comment
+          click_element :comment_button
+        end
+
+        def add_comment_to_diff(text, line_number = 0)
           wait(time: 5) do
             page.has_text?("No newline at end of file")
           end
-          all_elements(:new_diff_line).first.hover
+          all_elements(:new_diff_line)[line_number].hover
           click_element :diff_comment
           fill_element :reply_input, text
         end
@@ -164,6 +172,13 @@ module QA
         def reply_to_discussion(reply_text)
           all_elements(:discussion_reply).last.click
           fill_element :reply_input, reply_text
+        end
+
+        def expand_diff
+          wait(time: 5) do
+            page.has_text?("Click to expand it.")
+          end
+          all_elements(:click_to_expand).last.click
         end
       end
     end
