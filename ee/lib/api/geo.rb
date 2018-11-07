@@ -58,6 +58,21 @@ module API
       resource 'proxy_git_push_ssh' do
         format :json
 
+        helpers do
+          def custom_action_data_response
+            status 200
+            content_type Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE
+
+            {
+              'proxy_git_push_ssh' => {
+                'gitlab_shell_custom_action_data' => params['data'],
+                'gitlab_shell_output' => params['output'],
+                'authorization' => Gitlab::Geo::BaseRequest.new.authorization
+              }.to_json
+            }
+          end
+        end
+
         # Responsible for making HTTP GET /repo.git/info/refs?service=git-receive-pack
         # request *from* secondary gitlab-shell to primary
         #
@@ -72,9 +87,7 @@ module API
           authenticate_by_gitlab_shell_token!
           params.delete(:secret_token)
 
-          response = Gitlab::Geo::GitPushSSHProxy.new(params['data']).info_refs
-          status(response.code)
-          response.body
+          custom_action_data_response
         end
 
         # Responsible for making HTTP POST /repo.git/git-receive-pack
@@ -92,9 +105,7 @@ module API
           authenticate_by_gitlab_shell_token!
           params.delete(:secret_token)
 
-          response = Gitlab::Geo::GitPushSSHProxy.new(params['data']).push(params['output'])
-          status(response.code)
-          response.body
+          custom_action_data_response
         end
       end
     end

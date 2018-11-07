@@ -306,7 +306,7 @@ describe API::Geo do
   describe '/geo/proxy_git_push_ssh' do
     let(:secret_token) { Gitlab::Shell.secret_token }
     let(:primary_repo) { 'http://localhost:3001/testuser/repo.git' }
-    let(:data) { { primary_repo: primary_repo, gl_id: 'key-1', gl_username: 'testuser' } }
+    let(:data) { { 'primary_repo' => primary_repo, 'gl_id' => 'key-1', 'gl_username' => 'testuser' } }
 
     before do
       stub_current_geo_node(secondary_node)
@@ -323,12 +323,6 @@ describe API::Geo do
       end
 
       context 'with all required params' do
-        let(:git_push_ssh_proxy) { double(Gitlab::Geo::GitPushSSHProxy) }
-
-        before do
-          allow(Gitlab::Geo::GitPushSSHProxy).to receive(:new).with(data).and_return(git_push_ssh_proxy)
-        end
-
         context 'with an invalid secret_token' do
           it 'responds with 401' do
             post(api('/geo/proxy_git_push_ssh/info_refs'), params: { secret_token: 'invalid', data: data })
@@ -338,35 +332,20 @@ describe API::Geo do
           end
         end
 
-        context 'where an exception occurs' do
-          it 'responds with 500' do
-            expect(git_push_ssh_proxy).to receive(:info_refs).and_raise('deliberate exception raised')
-
-            post api('/geo/proxy_git_push_ssh/info_refs'), params: { secret_token: secret_token, data: data }
-
-            expect(response).to have_gitlab_http_status(500)
-            expect(json_response['message']).to include('RuntimeError (deliberate exception raised)')
-            expect(json_response['result']).to be_nil
-          end
-        end
-
         context 'with a valid secret token' do
-          let(:http_response) { double(Net::HTTPOK, code: 200, body: 'something here') }
-          let(:api_response) { Gitlab::Geo::GitPushSSHProxy::APIResponse.from_http_response(http_response, primary_repo) }
-
-          before do
-            # Mocking a real Net::HTTPSuccess is very difficult as it's not
-            # easy to instantiate the class due to the way it sets the body
-            expect(http_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return(true)
-          end
-
           it 'responds with 200' do
-            expect(git_push_ssh_proxy).to receive(:info_refs).and_return(api_response)
-
-            post api('/geo/proxy_git_push_ssh/info_refs'), params: { secret_token: secret_token, data: data }
+            post api('/geo/proxy_git_push_ssh/info_refs'), { secret_token: secret_token, data: data }
 
             expect(response).to have_gitlab_http_status(200)
-            expect(Base64.decode64(json_response['result'])).to eql('something here')
+            expect(response.headers['Content-Type']).to eq('application/vnd.gitlab-workhorse+json')
+
+            expect(json_response).to have_key('proxy_git_push_ssh')
+
+            proxy_git_push_ssh = JSON.parse(json_response['proxy_git_push_ssh'])
+
+            expect(proxy_git_push_ssh['gitlab_shell_custom_action_data']).to eq(data)
+            expect(proxy_git_push_ssh['gitlab_shell_output']).to be_nil
+            expect(proxy_git_push_ssh['authorization']).to match(/^GL-Geo .+$/)
           end
         end
       end
@@ -384,11 +363,6 @@ describe API::Geo do
 
       context 'with all required params' do
         let(:output) { Base64.encode64('info_refs content') }
-        let(:git_push_ssh_proxy) { double(Gitlab::Geo::GitPushSSHProxy) }
-
-        before do
-          allow(Gitlab::Geo::GitPushSSHProxy).to receive(:new).with(data).and_return(git_push_ssh_proxy)
-        end
 
         context 'with an invalid secret_token' do
           it 'responds with 401' do
@@ -399,34 +373,20 @@ describe API::Geo do
           end
         end
 
-        context 'where an exception occurs' do
-          it 'responds with 500' do
-            expect(git_push_ssh_proxy).to receive(:push).and_raise('deliberate exception raised')
-            post api('/geo/proxy_git_push_ssh/push'), params: { secret_token: secret_token, data: data, output: output }
-
-            expect(response).to have_gitlab_http_status(500)
-            expect(json_response['message']).to include('RuntimeError (deliberate exception raised)')
-            expect(json_response['result']).to be_nil
-          end
-        end
-
         context 'with a valid secret token' do
-          let(:http_response) { double(Net::HTTPCreated, code: 201, body: 'something here', class: Net::HTTPCreated) }
-          let(:api_response) { Gitlab::Geo::GitPushSSHProxy::APIResponse.from_http_response(http_response, primary_repo) }
-
-          before do
-            # Mocking a real Net::HTTPSuccess is very difficult as it's not
-            # easy to instantiate the class due to the way it sets the body
-            expect(http_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return(true)
-          end
-
           it 'responds with 201' do
-            expect(git_push_ssh_proxy).to receive(:push).with(output).and_return(api_response)
+            post api('/geo/proxy_git_push_ssh/push'), { secret_token: secret_token, data: data, output: output }
 
-            post api('/geo/proxy_git_push_ssh/push'), params: { secret_token: secret_token, data: data, output: output }
+            expect(response).to have_gitlab_http_status(200)
+            expect(response.headers['Content-Type']).to eq('application/vnd.gitlab-workhorse+json')
 
-            expect(response).to have_gitlab_http_status(201)
-            expect(Base64.decode64(json_response['result'])).to eql('something here')
+            expect(json_response).to have_key('proxy_git_push_ssh')
+
+            proxy_git_push_ssh = JSON.parse(json_response['proxy_git_push_ssh'])
+
+            expect(proxy_git_push_ssh['gitlab_shell_custom_action_data']).to eq(data)
+            expect(proxy_git_push_ssh['gitlab_shell_output']).to eq(output)
+            expect(proxy_git_push_ssh['authorization']).to match(/^GL-Geo .+$/)
           end
         end
       end
