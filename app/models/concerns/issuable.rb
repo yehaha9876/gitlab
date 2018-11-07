@@ -9,6 +9,7 @@
 module Issuable
   extend ActiveSupport::Concern
   include Gitlab::SQL::Pattern
+  include Redactable
   include CacheMarkdownField
   include Participable
   include Mentionable
@@ -33,6 +34,8 @@ module Issuable
   included do
     cache_markdown_field :title, pipeline: :single_line
     cache_markdown_field :description, issuable_state_filter_enabled: true
+
+    redact_field :description
 
     belongs_to :author, class_name: "User"
     belongs_to :updated_by, class_name: "User"
@@ -362,7 +365,7 @@ module Issuable
   end
 
   ##
-  # Overriden in MergeRequest
+  # Overridden in MergeRequest
   #
   def wipless_title_changed(old_title)
     old_title != title

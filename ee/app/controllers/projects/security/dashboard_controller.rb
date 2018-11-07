@@ -6,6 +6,7 @@ module Projects
 
       def show
         @pipeline = @project.latest_pipeline_with_security_reports
+          &.present(current_user: current_user)
       end
 
       private

@@ -25,8 +25,6 @@
 #     updated_before: datetime
 #
 class IssuesFinder < IssuableFinder
-  prepend EE::IssuesFinder
-
   CONFIDENTIAL_ACCESS_LEVEL = Gitlab::Access::REPORTER
 
   def self.scalar_params
@@ -137,17 +135,19 @@ class IssuesFinder < IssuableFinder
     current_user.blank?
   end
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def by_assignee(items)
-    if assignee
-      items.assigned_to(assignee)
-    elsif no_assignee?
+    if filter_by_no_assignee?
       items.unassigned
+    elsif filter_by_any_assignee?
+      items.assigned
+    elsif assignee
+      items.assigned_to(assignee)
     elsif assignee_id? || assignee_username? # assignee not found
       items.none
     else
       items
     end
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 end
+
+IssuesFinder.prepend(EE::IssuesFinder)

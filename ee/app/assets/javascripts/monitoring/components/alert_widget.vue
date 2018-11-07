@@ -3,11 +3,13 @@ import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
 import AlertsService from '../services/alerts_service';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
 export default {
   components: {
     Icon,
     AlertWidgetForm,
+    GlLoadingIcon,
   },
   props: {
     alertsEndpoint: {
@@ -97,14 +99,12 @@ export default {
       this.isLoading = true;
       return Promise.all(
         this.alerts.map(alertPath =>
-          this.service
-            .readAlert(alertPath)
-            .then(alertData => {
-              this.$emit('setAlerts', this.customMetricId, {
-                ...this.alertData,
-                [alertPath]: alertData,
-              });
-            }),
+          this.service.readAlert(alertPath).then(alertData => {
+            this.$emit('setAlerts', this.customMetricId, {
+              ...this.alertData,
+              [alertPath]: alertData,
+            });
+          }),
         ),
       )
         .then(() => {

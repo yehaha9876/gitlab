@@ -3,8 +3,6 @@
 module QuickActions
   class InterpretService < BaseService
     include Gitlab::QuickActions::Dsl
-    prepend EE::QuickActions::InterpretService
-
     attr_reader :issuable
 
     SHRUG = '¯\\＿(ツ)＿/¯'.freeze
@@ -434,14 +432,14 @@ module QuickActions
       end
     end
 
-    desc 'Add or substract spent time'
+    desc 'Add or subtract spent time'
     explanation do |time_spent, time_spent_date|
       if time_spent
         if time_spent > 0
           verb = 'Adds'
           value = time_spent
         else
-          verb = 'Substracts'
+          verb = 'Subtracts'
           value = -time_spent
         end
 
@@ -701,3 +699,5 @@ module QuickActions
     # rubocop: enable CodeReuse/ActiveRecord
   end
 end
+
+QuickActions::InterpretService.prepend(EE::QuickActions::InterpretService)

@@ -52,7 +52,7 @@ describe('Job App ', () => {
     });
   });
 
-  describe('with successfull request', () => {
+  describe('with successful request', () => {
     beforeEach(() => {
       mock.onGet(`${props.pagePath}/trace.json`).replyOnce(200, {});
     });
@@ -101,7 +101,7 @@ describe('Job App ', () => {
                 .querySelector('.header-main-content')
                 .textContent.replace(/\s+/g, ' ')
                 .trim(),
-            ).toEqual('passed Job #4757 triggered 1 year ago by Root');
+            ).toContain('passed Job #4757 triggered 1 year ago by Root');
             done();
           }, 0);
         });
@@ -127,7 +127,7 @@ describe('Job App ', () => {
                 .querySelector('.header-main-content')
                 .textContent.replace(/\s+/g, ' ')
                 .trim(),
-            ).toEqual('passed Job #4757 created 3 weeks ago by Root');
+            ).toContain('passed Job #4757 created 3 weeks ago by Root');
             done();
           }, 0);
         });
@@ -234,7 +234,7 @@ describe('Job App ', () => {
             );
             done();
           }, 0);
-        })
+        });
       });
 
       it('does not renders stuck block when there are no runners', done => {
@@ -420,6 +420,40 @@ describe('Job App ', () => {
           done();
         }, 0);
       });
+    });
+  });
+
+  describe('archived job', () => {
+    beforeEach(() => {
+      mock.onGet(props.endpoint).reply(200, Object.assign({}, job, { archived: true }), {});
+      vm = mountComponentWithStore(Component, {
+        props,
+        store,
+      });
+    });
+
+    it('renders warning about job being archived', done => {
+      setTimeout(() => {
+        expect(vm.$el.querySelector('.js-archived-job ')).not.toBeNull();
+        done();
+      }, 0);
+    });
+  });
+
+  describe('non-archived job', () => {
+    beforeEach(() => {
+      mock.onGet(props.endpoint).reply(200, job, {});
+      vm = mountComponentWithStore(Component, {
+        props,
+        store,
+      });
+    });
+
+    it('does not warning about job being archived', done => {
+      setTimeout(() => {
+        expect(vm.$el.querySelector('.js-archived-job ')).toBeNull();
+        done();
+      }, 0);
     });
   });
 

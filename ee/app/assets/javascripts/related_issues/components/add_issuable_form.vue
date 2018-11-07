@@ -1,6 +1,7 @@
 <script>
 import $ from 'jquery';
 import GfmAutoComplete from '~/gfm_auto_complete';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import eventHub from '../event_hub';
 import issueToken from './issue_token.vue';
 
@@ -8,6 +9,7 @@ export default {
   name: 'AddIssuableForm',
   components: {
     issueToken,
+    GlLoadingIcon,
   },
   props: {
     inputValue: {
@@ -43,8 +45,9 @@ export default {
       return `Paste issue link${this.allowAutoComplete ? ' or <#issue id>' : ''}`;
     },
     isSubmitButtonDisabled() {
-      return (this.inputValue.length === 0 && this.pendingReferences.length === 0)
-        || this.isSubmitting;
+      return (
+        (this.inputValue.length === 0 && this.pendingReferences.length === 0) || this.isSubmitting
+      );
     },
     allowAutoComplete() {
       return Object.keys(this.autoCompleteSources).length > 0;

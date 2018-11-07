@@ -27,7 +27,6 @@ import actions, {
   toggleShowTreeList,
 } from '~/diffs/store/actions';
 import * as types from '~/diffs/store/mutation_types';
-import { reduceDiscussionsToLineCodes } from '~/notes/stores/utils';
 import axios from '~/lib/utils/axios_utils';
 import testAction from '../../helpers/vuex_action_helper';
 
@@ -152,7 +151,7 @@ describe('DiffsStoreActions', () => {
         original_position: diffPosition,
       };
 
-      const discussions = reduceDiscussionsToLineCodes([singleDiscussion]);
+      const discussions = [singleDiscussion];
 
       testAction(
         assignDiscussionsToDiff,
@@ -162,8 +161,7 @@ describe('DiffsStoreActions', () => {
           {
             type: types.SET_LINE_DISCUSSIONS_FOR_FILE,
             payload: {
-              fileHash: 'ABC',
-              discussions: [singleDiscussion],
+              discussion: singleDiscussion,
               diffPositionByLineCode: {
                 ABC_1_1: {
                   baseSha: 'abc',
@@ -220,6 +218,7 @@ describe('DiffsStoreActions', () => {
         ],
       };
       const singleDiscussion = {
+        id: '1',
         fileHash: 'ABC',
         line_code: 'ABC_1_1',
       };
@@ -232,6 +231,7 @@ describe('DiffsStoreActions', () => {
           {
             type: types.REMOVE_LINE_DISCUSSIONS_FOR_FILE,
             payload: {
+              id: '1',
               fileHash: 'ABC',
               lineCode: 'ABC_1_1',
             },
@@ -581,7 +581,6 @@ describe('DiffsStoreActions', () => {
   describe('saveDiffDiscussion', () => {
     beforeEach(() => {
       spyOnDependency(actions, 'getNoteFormData').and.returnValue('testData');
-      spyOnDependency(actions, 'reduceDiscussionsToLineCodes').and.returnValue('discussions');
     });
 
     it('dispatches actions', done => {
@@ -602,7 +601,7 @@ describe('DiffsStoreActions', () => {
         .then(() => {
           expect(dispatch.calls.argsFor(0)).toEqual(['saveNote', 'testData', { root: true }]);
           expect(dispatch.calls.argsFor(1)).toEqual(['updateDiscussion', 'test', { root: true }]);
-          expect(dispatch.calls.argsFor(2)).toEqual(['assignDiscussionsToDiff', 'discussions']);
+          expect(dispatch.calls.argsFor(2)).toEqual(['assignDiscussionsToDiff', ['discussion']]);
         })
         .then(done)
         .catch(done.fail);

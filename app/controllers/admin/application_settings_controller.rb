@@ -2,8 +2,6 @@
 
 class Admin::ApplicationSettingsController < Admin::ApplicationController
   include InternalRedirect
-  prepend EE::Admin::ApplicationSettingsController
-
   before_action :set_application_setting
 
   def show
@@ -63,7 +61,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
       format.html do
         usage_data_json = JSON.pretty_generate(Gitlab::UsageData.data)
 
-        render html: Gitlab::Highlight.highlight('payload.json', usage_data_json)
+        render html: Gitlab::Highlight.highlight('payload.json', usage_data_json, language: 'json')
       end
       format.json { render json: Gitlab::UsageData.to_json }
     end
@@ -135,3 +133,5 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     ]
   end
 end
+
+Admin::ApplicationSettingsController.prepend(EE::Admin::ApplicationSettingsController)

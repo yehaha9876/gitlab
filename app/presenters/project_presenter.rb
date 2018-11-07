@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ProjectPresenter < Gitlab::View::Presenter::Delegated
-  prepend EE::ProjectPresenter
-
   include ActionView::Helpers::NumberHelper
   include ActionView::Helpers::UrlHelper
   include GitlabRoutingHelper
@@ -178,7 +176,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
       AnchorData.new(false,
                      _('New file'),
                      project_new_blob_path(project, default_branch || 'master'),
-                     'new')
+                     'success')
     end
   end
 
@@ -320,3 +318,5 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
     )
   end
 end
+
+ProjectPresenter.prepend(EE::ProjectPresenter)

@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import SecurityDashboardTableRow from './security_dashboard_table_row.vue';
 
@@ -11,6 +11,7 @@ export default {
   },
   computed: {
     ...mapState('vulnerabilities', ['vulnerabilities', 'pageInfo', 'isLoadingVulnerabilities']),
+    ...mapGetters('vulnerabilities', ['dashboardListError']),
     showPagination() {
       return this.pageInfo && this.pageInfo.total;
     },
@@ -19,7 +20,7 @@ export default {
     this.fetchVulnerabilities();
   },
   methods: {
-    ...mapActions('vulnerabilities', ['fetchVulnerabilities']),
+    ...mapActions('vulnerabilities', ['fetchVulnerabilities', 'openModal']),
   },
 };
 </script>
@@ -49,6 +50,16 @@ export default {
         {{ s__('Reports|Confidence') }}
       </div>
     </div>
+    
+    <div class="flash-container">
+      <div 
+        v-if="dashboardListError" 
+        class="flash-alert">
+        <div class="flash-text container-fluid container-limited limit-container-width">
+          {{ s__('Security Dashboard|Error fetching the vulnerability list. Please check your network connection and try again.') }}
+        </div>
+      </div>
+    </div>
 
     <div v-if="isLoadingVulnerabilities">
       <security-dashboard-table-row
@@ -63,6 +74,7 @@ export default {
         v-for="vulnerability in vulnerabilities"
         :key="vulnerability.id"
         :vulnerability="vulnerability"
+        @openModal="openModal({ vulnerability })"
       />
 
       <pagination

@@ -37,13 +37,7 @@ Rails.application.routes.draw do
     match '*all', via: [:get, :post], to: proc { [404, {}, ['']] }
   end
 
-  namespace :oauth do
-    scope path: 'geo', controller: :geo_auth, as: :geo do
-      get 'auth'
-      get 'callback'
-      get 'logout'
-    end
-  end
+  draw :oauth
 
   use_doorkeeper_openid_connect
 
@@ -93,7 +87,28 @@ Rails.application.routes.draw do
     get 'ide' => 'ide#index'
     get 'ide/*vueroute' => 'ide#index', format: false
 
+    draw :operations
     draw :instance_statistics
+  end
+
+  concern :clusterable do
+    resources :clusters, only: [:index, :new, :show, :update, :destroy] do
+      collection do
+        post :create_user
+        post :create_gcp
+      end
+
+      member do
+        # EE specific
+        get :metrics, format: :json
+
+        scope :applications do
+          post '/:application', to: 'clusters/applications#create', as: :install_applications
+        end
+
+        get :cluster_status, format: :json
+      end
+    end
   end
 
   draw :api

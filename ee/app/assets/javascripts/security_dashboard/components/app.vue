@@ -1,11 +1,12 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import { s__ } from '~/locale';
+import { spriteIcon } from '~/lib/utils/common_utils';
 import Tabs from '~/vue_shared/components/tabs/tabs';
 import Tab from '~/vue_shared/components/tabs/tab.vue';
+import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
-import SvgBlankState from '~/pipelines/components/blank_state.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import popover from '~/vue_shared/directives/popover';
 
@@ -16,22 +17,14 @@ export default {
   },
   components: {
     Icon,
+    IssueModal,
     SecurityDashboardTable,
-    SvgBlankState,
     Tab,
     Tabs,
     VulnerabilityCountList,
   },
   props: {
     dashboardDocumentation: {
-      type: String,
-      required: true,
-    },
-    emptyStateSvgPath: {
-      type: String,
-      required: true,
-    },
-    errorStateSvgPath: {
       type: String,
       required: true,
     },
@@ -46,7 +39,7 @@ export default {
   },
   computed: {
     ...mapGetters('vulnerabilities', ['vulnerabilitiesCountByReportType']),
-    ...mapState('vulnerabilities', ['hasError']),
+    ...mapState('vulnerabilities', ['modal']),
     sastCount() {
       return this.vulnerabilitiesCountByReportType('sast');
     },
@@ -54,21 +47,19 @@ export default {
       return {
         trigger: 'click',
         placement: 'right',
-        title: s__(
-          'Security Reports|At this time, the security dashboard only supports SAST. More analyzers are coming soon.',
-        ),
+        title: s__('Security Reports|At this time, the security dashboard only supports SAST.'),
         content: `
           <a
-            title="${s__('Security Reports|Security Dashboard Roadmap')}"
+            title="${s__('Security Reports|Security Dashboard Documentation')}"
             href="${this.dashboardDocumentation}"
             target="_blank"
             rel="noopener
             noreferrer"
           >
             <span class="vertical-align-middle">${s__(
-              'Security Reports|Security Dashboard Roadmap',
+              'Security Reports|Security Dashboard Documentation',
             )}</span>
-            ${gl.utils.spriteIcon('external-link', 's16 vertical-align-middle')}
+            ${spriteIcon('external-link', 's16 vertical-align-middle')}
           </a>
         `,
         html: true,
@@ -85,6 +76,9 @@ export default {
       'setVulnerabilitiesCountEndpoint',
       'setVulnerabilitiesEndpoint',
       'fetchVulnerabilitiesCount',
+      'createIssue',
+      'dismissVulnerability',
+      'undoDismissal',
     ]),
   },
 };
@@ -92,40 +86,39 @@ export default {
 
 <template>
   <div>
-    <svg-blank-state
-      v-if="hasError"
-      :svg-path="errorStateSvgPath"
-      :message="s__(`Security Reports|There was an error fetching the dashboard.
-      Please try again in a few moments or contact your support team.`)"
-    />
-    <div v-else>
-      <vulnerability-count-list />
-      <tabs stop-propagation>
-        <tab active>
-          <template slot="title">
-            <span>{{ __('SAST') }}</span>
-            <span
-              v-if="sastCount"
-              class="badge badge-pill"
-            >
-              {{ sastCount }}
-            </span>
-            <span
-              v-popover="popoverOptions"
-              class="text-muted ml-1"
-            >
-              <icon
-                name="question"
-                class="vertical-align-middle"
-              />
-            </span>
-          </template>
+    <vulnerability-count-list />
+    <tabs stop-propagation>
+      <tab active>
+        <template slot="title">
+          <span>{{ __('SAST') }}</span>
+          <span
+            v-if="sastCount"
+            class="badge badge-pill"
+          >
+            {{ sastCount }}
+          </span>
+          <span
+            v-popover="popoverOptions"
+            class="text-muted prepend-left-4"
+            :aria-label="__('help')"
+          >
+            <icon
+              name="question"
+              class="vertical-align-middle"
+            />
+          </span>
+        </template>
 
-          <security-dashboard-table
-            :empty-state-svg-path="emptyStateSvgPath"
-          />
-        </tab>
-      </tabs>
-    </div>
+        <security-dashboard-table />
+      </tab>
+    </tabs>
+    <issue-modal
+      :modal="modal"
+      :can-create-issue-permission="true"
+      :can-create-feedback-permission="true"
+      @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
+      @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
+      @revertDismissIssue="undoDismissal({ vulnerability: modal.vulnerability })"
+    />
   </div>
 </template>

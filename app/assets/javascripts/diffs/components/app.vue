@@ -3,6 +3,7 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
 import { __ } from '~/locale';
 import createFlash from '~/flash';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import eventHub from '../../notes/event_hub';
 import CompareVersions from './compare_versions.vue';
 import DiffFile from './diff_file.vue';
@@ -21,6 +22,7 @@ export default {
     HiddenFilesWarning,
     CommitWidget,
     TreeList,
+    GlLoadingIcon,
   },
   props: {
     endpoint: {
@@ -41,6 +43,11 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      assignedDiscussions: false,
+    };
+  },
   computed: {
     ...mapState({
       isLoading: state => state.diffs.isLoading,
@@ -58,9 +65,9 @@ export default {
       plainDiffPath: state => state.diffs.plainDiffPath,
       emailPatchPath: state => state.diffs.emailPatchPath,
     }),
-    ...mapState('diffs', ['showTreeList']),
+    ...mapState('diffs', ['showTreeList', 'isLoading']),
     ...mapGetters('diffs', ['isParallelView']),
-    ...mapGetters(['isNotesFetched', 'discussionsStructuredByLineCode']),
+    ...mapGetters(['isNotesFetched', 'getNoteableData']),
     targetBranch() {
       return {
         branchName: this.targetBranchName,
@@ -147,13 +154,10 @@ export default {
       }
     },
     setDiscussions() {
-      if (this.isNotesFetched) {
-        requestIdleCallback(
-          () => {
-            this.assignDiscussionsToDiff(this.discussionsStructuredByLineCode);
-          },
-          { timeout: 1000 },
-        );
+      if (this.isNotesFetched && !this.assignedDiscussions && !this.isLoading) {
+        this.assignedDiscussions = true;
+
+        requestIdleCallback(() => this.assignDiscussionsToDiff(), { timeout: 1000 });
       }
     },
     adjustView() {
@@ -221,7 +225,10 @@ export default {
         :commit="commit"
       />
 
-      <div class="files d-flex prepend-top-default">
+      <div
+        :data-can-create-note="getNoteableData.current_user.can_create_note"
+        class="files d-flex prepend-top-default"
+      >
         <div
           v-show="showTreeList"
           class="diff-tree-list"

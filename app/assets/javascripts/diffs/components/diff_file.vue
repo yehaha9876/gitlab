@@ -3,6 +3,7 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import _ from 'underscore';
 import { __, sprintf } from '~/locale';
 import createFlash from '~/flash';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import DiffFileHeader from './diff_file_header.vue';
 import DiffContent from './diff_content.vue';
 
@@ -10,6 +11,7 @@ export default {
   components: {
     DiffFileHeader,
     DiffContent,
+    GlLoadingIcon,
   },
   props: {
     file: {
@@ -29,7 +31,7 @@ export default {
   },
   computed: {
     ...mapState('diffs', ['currentDiffFileId']),
-    ...mapGetters(['isNotesFetched', 'discussionsStructuredByLineCode']),
+    ...mapGetters(['isNotesFetched']),
     isCollapsed() {
       return this.file.collapsed || false;
     },
@@ -79,7 +81,7 @@ export default {
         .then(() => {
           requestIdleCallback(
             () => {
-              this.assignDiscussionsToDiff(this.discussionsStructuredByLineCode);
+              this.assignDiscussionsToDiff();
             },
             { timeout: 1000 },
           );

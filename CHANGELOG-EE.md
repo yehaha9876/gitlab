@@ -1,5 +1,35 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.4.5 (2018-11-04)
+
+### Fixed (1 change)
+
+- Stops showing review actions on commit discussions in merge requests. !8007
+
+### Performance (1 change)
+
+- Add indexes to all geo event foreign keys. !7990
+
+
+## 11.4.4 (2018-10-30)
+
+- No changes.
+
+## 11.4.3 (2018-10-26)
+
+- No changes.
+
+## 11.4.2 (2018-10-25)
+
+### Security (1 change)
+
+- Escape entity title while autocomplete template rendering to prevent XSS. !707
+
+
+## 11.4.1 (2018-10-23)
+
+- No changes.
+
 ## 11.4.0 (2018-10-22)
 
 ### Security (3 changes)
@@ -87,6 +117,21 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Group weight icon and text on issue list and issue boards. !7484 (George Tsiolis)
 - Adds expandable/collapsable section for Snowplow. !7798
 - API: Allow issue weight parameter to be greater than or equal to zero.
+
+
+## 11.3.9 (2018-10-31)
+
+- No changes.
+
+## 11.3.8 (2018-10-27)
+
+- No changes.
+
+## 11.3.7 (2018-10-26)
+
+### Security (1 change)
+
+- Escape entity title while autocomplete template rendering to prevent XSS. !697
 
 
 ## 11.3.6 (2018-10-17)
@@ -203,6 +248,21 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Creates vue component for shared runner limit.
 - Allow MR authors to approve their MRs.
 - Remove differences between CE and EE settings panel component.
+
+
+## 11.2.8 (2018-10-31)
+
+- No changes.
+
+## 11.2.7 (2018-10-27)
+
+- No changes.
+
+## 11.2.6 (2018-10-26)
+
+### Security (1 change)
+
+- Escape entity title while autocomplete template rendering to prevent XSS. !698
 
 
 ## 11.2.5 (2018-10-05)
