@@ -101,7 +101,7 @@ class IrkerService < Service
 
     unless uri.present? && default_irc_uri.nil?
       begin
-        new_recipient = Gitlab::Utils.append_path(default_irc_uri, recipient)
+        new_recipient = URI.join(default_irc_uri, '/', recipient).to_s
         uri = consider_uri(URI.parse(new_recipient))
       rescue
         log_error("Unable to create a valid URL", default_irc_uri: default_irc_uri, recipient: recipient)
