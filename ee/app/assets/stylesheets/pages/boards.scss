@@ -104,16 +104,18 @@
 }
 
 .boards-switcher {
-  .dropdown.show .dropdown-menu {
+  .dropdown.show .dropdown-menu,
+  .dropdown-content-faded-mask {
     display: flex;
     flex-direction: column;
-    overflow: visible;
+    overflow: hidden;
   }
 
-  .dropdown-content,
-  .dropdown-content-faded-mask {
-    overflow-y: auto;
+  .dropdown-content {
+    display: flex;
+    flex-direction: column;
     max-height: 100%;
+    overflow-y: auto;
   }
 
   .dropdown-footer {
