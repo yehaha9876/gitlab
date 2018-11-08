@@ -42,7 +42,7 @@ A few details from the EKS cluster will be required to connect it to GitLab.
 
 1. **Create admin token** - A `cluster-admin` token is required to install and manage Helm Tiller. GitLab establishes mutual SSL auth with Helm Tiller and creates limited service accounts for each application. To create the token we will create an admin service account as follows:
 
-   * Create a file called eks-admin-service-account.yaml with the text below:
+   * Create a file called `eks-admin-service-account.yaml` with the text below:
 
       ```bash
       apiVersion: v1
@@ -62,7 +62,7 @@ A few details from the EKS cluster will be required to connect it to GitLab.
       serviceaccount "eks-admin" created
       ```
 
-    * Create a file called eks-admin-cluster-role-binding.yaml with the text below:
+    * Create a file called `eks-admin-cluster-role-binding.yaml` with the text below:
       ```bash
       apiVersion: rbac.authorization.k8s.io/v1beta1
       kind: ClusterRoleBinding
