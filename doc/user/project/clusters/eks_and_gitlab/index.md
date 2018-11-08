@@ -53,16 +53,19 @@ A few details from the EKS cluster will be required to connect it to GitLab.
       ```
 
     * Apply the service account to your cluster:
+
       ```bash
       kubectl apply -f eks-admin-service-account.yaml
       ```
 
       Output:
+
       ```bash
       serviceaccount "eks-admin" created
       ```
 
     * Create a file called `eks-admin-cluster-role-binding.yaml` with the text below:
+
       ```bash
       apiVersion: rbac.authorization.k8s.io/v1beta1
       kind: ClusterRoleBinding
@@ -79,21 +82,25 @@ A few details from the EKS cluster will be required to connect it to GitLab.
       ```
 
     * Apply the cluster role binding to your cluster:
+
       ```bash
       kubectl apply -f eks-admin-cluster-role-binding.yaml
       ```
 
       Output:
+
       ```bash
       clusterrolebinding "eks-admin" created
       ```
 
     * Retrieve the token for the `eks-admin` service account. Copy the `<authentication_token>` value from the output.
+
       ```bash
       kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep eks-admin | awk '{print $1}')
       ```
-      
+
       Output:
+      
       ```bash
        Name:         eks-admin-token-b5zv4
        Namespace:    kube-system
