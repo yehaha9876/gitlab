@@ -10,7 +10,7 @@ module EE
         params[:external_url] = params[:external_url].presence
       end
 
-      # Delete the row in project_tracing_settings table if external_row is to be
+      # Delete the row in project_tracing_settings table if external_url is to be
       # set to nil since that is currently the only value in the table.
       if params[:external_url].nil?
         destroy
