@@ -5,6 +5,7 @@ describe API::Namespaces do
   let(:user) { create(:user) }
   let!(:group1) { create(:group) }
   let!(:group2) { create(:group, :nested) }
+  let!(:gold_plan) { create(:gold_plan) }
 
   describe "GET /namespaces" do
     context "when authenticated as admin" do
@@ -129,7 +130,6 @@ describe API::Namespaces do
     let(:params) do
       { seats: 10,
         plan_code: 'gold',
-        plan_name: 'Gold',
         start_date: '01/01/2018',
         end_date: '01/01/2019' }
     end
@@ -169,10 +169,11 @@ describe API::Namespaces do
       get api("/namespaces/#{namespace.id}/gitlab_subscription", current_user)
     end
 
+    set(:silver_plan) { create(:silver_plan) }
     set(:owner) { create(:user) }
     set(:developer) { create(:user) }
     set(:namespace) { create(:group) }
-    set(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace) }
+    set(:gitlab_subscription) { create(:gitlab_subscription, hosted_plan: silver_plan, namespace: namespace) }
 
     before do
       namespace.add_owner(owner)
@@ -199,6 +200,9 @@ describe API::Namespaces do
 
         expect(json_response.keys).to match_array(%w[plan usage billing])
         expect(json_response['plan'].keys).to match_array(%w[name code trial])
+        expect(json_response['plan']['name']).to eq('Silver')
+        expect(json_response['plan']['code']).to eq('silver')
+        expect(json_response['plan']['trial']).to eq(false)
         expect(json_response['usage'].keys).to match_array(%w[seats_in_subscription seats_in_use max_seats_used seats_owed])
         expect(json_response['billing'].keys).to match_array(%w[subscription_start_date subscription_end_date])
       end
@@ -217,7 +221,6 @@ describe API::Namespaces do
       {
         seats: 150,
         plan_code: 'silver',
-        plan_name: 'Silver',
         start_date: '01/01/2018',
         end_date: '01/01/2019'
       }
@@ -264,8 +267,8 @@ describe API::Namespaces do
 
           expect(response).to have_gitlab_http_status(200)
           expect(gitlab_subscription.reload.seats).to eq(150)
-          expect(gitlab_subscription.plan_code).to eq('silver')
-          expect(gitlab_subscription.plan_name).to eq('Silver')
+          expect(gitlab_subscription.plan_name).to eq('silver')
+          expect(gitlab_subscription.plan_title).to eq('Silver')
         end
       end
     end

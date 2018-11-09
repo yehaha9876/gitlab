@@ -36,7 +36,6 @@ module EE
             requires :id, type: Integer, desc: 'The ID of the namespace'
             requires :seats, type: Integer, desc: 'The number of seats purchased'
             requires :plan_code, type: String, desc: 'The code of the purchased plan'
-            requires :plan_name, type: String, desc: 'The name of the purchased plan'
             requires :start_date, type: Date, desc: 'The date when subscription was started'
             requires :end_date, type: Date, desc: 'The date when subscription expires'
 
@@ -75,7 +74,6 @@ module EE
           params do
             optional :seats, type: Integer, desc: 'The number of seats purchased'
             optional :plan_code, type: String, desc: 'The code of the purchased plan'
-            optional :plan_name, type: String, desc: 'The name of the purchased plan'
             optional :start_date, type: Date, desc: 'The date when subscription was started'
             optional :end_date, type: Date, desc: 'The date when subscription expires'
             optional :trial, type: Grape::API::Boolean, desc: 'Wether the subscription is trial'

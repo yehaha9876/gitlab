@@ -1,8 +1,7 @@
 FactoryBot.define do
   factory :gitlab_subscription do
+    association :hosted_plan, factory: :gold_plan
     seats 10
-    plan_code 'bronze'
-    plan_name 'Bronze'
     start_date { Date.today }
     end_date { Date.today.advance(years: 1) }
     trial false

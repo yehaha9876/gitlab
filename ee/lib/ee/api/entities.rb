@@ -460,8 +460,8 @@ module EE
 
       class GitlabSubscription < Grape::Entity
         expose :plan do
-          expose :plan_name, as: :name
-          expose :plan_code, as: :code
+          expose :plan_name, as: :code
+          expose :plan_title, as: :name
           expose :trial
         end
 

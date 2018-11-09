@@ -5,8 +5,6 @@ describe GitlabSubscription do
     it { is_expected.to validate_presence_of(:seats) }
     it { is_expected.to validate_presence_of(:start_date) }
     it { is_expected.to validate_presence_of(:end_date) }
-    it { is_expected.to validate_presence_of(:plan_code) }
-    it { is_expected.to validate_presence_of(:plan_name) }
 
     it do
       subject.namespace = create(:namespace)
@@ -16,6 +14,7 @@ describe GitlabSubscription do
 
   describe 'associations' do
     it { is_expected.to belong_to(:namespace) }
+    it { is_expected.to belong_to(:hosted_plan) }
   end
 
   describe '#seats_in_use' do
