@@ -121,4 +121,8 @@
   .dropdown-footer {
     margin-top: 0;
   }
+
+  .dropdown-list > :last-child {
+    margin-bottom: $gl-padding-8;
+  }
 }
