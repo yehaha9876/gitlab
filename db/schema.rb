@@ -3153,7 +3153,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
   add_foreign_key "geo_repository_updated_events", "projects", on_delete: :cascade
   add_foreign_key "geo_reset_checksum_events", "projects", on_delete: :cascade
   add_foreign_key "gitlab_subscriptions", "namespaces"
-  add_foreign_key "gitlab_subscriptions", "plans", column: "hosted_plan_id"
+  add_foreign_key "gitlab_subscriptions", "plans", column: "hosted_plan_id", name: "fk_bd0c4019c3", on_delete: :cascade
   add_foreign_key "gpg_key_subkeys", "gpg_keys", on_delete: :cascade
   add_foreign_key "gpg_keys", "users", on_delete: :cascade
   add_foreign_key "gpg_signatures", "gpg_key_subkeys", on_delete: :nullify
