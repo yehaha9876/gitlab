@@ -36,15 +36,15 @@ From the left side bar, hover over `Operations` and select `Kubernetes`, then cl
 
 A few details from the EKS cluster will be required to connect it to GitLab.
 
-1. **Retrieve the certificate** - A valid Kubernetes certificate is needed to authenticate to the EKS cluster. We will use the certificate created by default. Open a shell and use `kubectl` to retrieve it:
-   * List the secrets with `kubectl get secrets`, and one should named similar to `default-token-xxxxx`. Copy that token name for use below.
-   * Get the certificate with `kubectl get secret <secret name> -o jsonpath="{['data']['ca\.crt']}" | base64 -D`
+1. **Retrieve the certificate**: A valid Kubernetes certificate is needed to authenticate to the EKS cluster. We will use the certificate created by default. Open a shell and use `kubectl` to retrieve it:
+   - List the secrets with `kubectl get secrets`, and one should named similar to `default-token-xxxxx`. Copy that token name for use below.
+   - Get the certificate with `kubectl get secret <secret name> -o jsonpath="{['data']['ca\.crt']}" | base64 -D`
 
-1. **Create admin token** - A `cluster-admin` token is required to install and manage Helm Tiller. GitLab establishes mutual SSL auth with Helm Tiller and creates limited service accounts for each application. To create the token we will create an admin service account as follows:
+1. **Create admin token**: A `cluster-admin` token is required to install and manage Helm Tiller. GitLab establishes mutual SSL auth with Helm Tiller and creates limited service accounts for each application. To create the token we will create an admin service account as follows:
 
-   * Create a file called `eks-admin-service-account.yaml` with the text below:
+   - Create a file called `eks-admin-service-account.yaml` with the text below:
 
-      ```bash
+      ```yaml
       apiVersion: v1
       kind: ServiceAccount
       metadata:
@@ -52,21 +52,21 @@ A few details from the EKS cluster will be required to connect it to GitLab.
         namespace: kube-system
       ```
 
-    * Apply the service account to your cluster:
+    - Apply the service account to your cluster:
 
-      ```bash
+      ```yaml
       kubectl apply -f eks-admin-service-account.yaml
       ```
 
       Output:
 
-      ```bash
+      ```yaml
       serviceaccount "eks-admin" created
       ```
 
-    * Create a file called `eks-admin-cluster-role-binding.yaml` with the text below:
+    - Create a file called `eks-admin-cluster-role-binding.yaml` with the text below:
 
-      ```bash
+      ```yaml
       apiVersion: rbac.authorization.k8s.io/v1beta1
       kind: ClusterRoleBinding
       metadata:
@@ -81,27 +81,27 @@ A few details from the EKS cluster will be required to connect it to GitLab.
         namespace: kube-system
       ```
 
-    * Apply the cluster role binding to your cluster:
+    - Apply the cluster role binding to your cluster:
 
-      ```bash
+      ```yaml
       kubectl apply -f eks-admin-cluster-role-binding.yaml
       ```
 
       Output:
 
-      ```bash
+      ```yaml
       clusterrolebinding "eks-admin" created
       ```
 
-    * Retrieve the token for the `eks-admin` service account. Copy the `<authentication_token>` value from the output.
+    - Retrieve the token for the `eks-admin` service account. Copy the `<authentication_token>` value from the output.
 
-      ```bash
+      ```yaml
       kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep eks-admin | awk '{print $1}')
       ```
 
       Output:
       
-      ```bash
+      ```yaml
        Name:         eks-admin-token-b5zv4
        Namespace:    kube-system
        Labels:       <none>
@@ -121,12 +121,12 @@ A few details from the EKS cluster will be required to connect it to GitLab.
 
 You now have all the information needed to connect the EKS cluster:
 
-* Kubernetes cluster name: Provide a name for the cluster to identify it within GitLab.
-* Environment scope: Leave this as `*` for now, since we are only connecting a single cluster.
-* API URL: Paste in the API server endpoint retrieved above.
-* CA Certificate: Paste the certificate data from the earlier step, as-is.
-* Paste the admin token value.
-* Project namespace: This can be left blank to accept the default namespace, based on the project name.
+- Kubernetes cluster name: Provide a name for the cluster to identify it within GitLab.
+- Environment scope: Leave this as `*` for now, since we are only connecting a single cluster.
+- API URL: Paste in the API server endpoint retrieved above.
+- CA Certificate: Paste the certificate data from the earlier step, as-is.
+- Paste the admin token value.
+- Project namespace: This can be left blank to accept the default namespace, based on the project name.
 
 ![Add Cluster](img/add_cluster.png)
 
@@ -144,7 +144,7 @@ When connecting a cluster via GitLab integration, you may specify whether the cl
 
 To effectively disable RBAC, global permissions can be applied granting full access:
 
-```bash
+```yaml
 kubectl create clusterrolebinding permissive-binding \
   --clusterrole=cluster-admin \
   --user=admin \
