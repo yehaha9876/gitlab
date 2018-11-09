@@ -54,13 +54,13 @@ A few details from the EKS cluster will be required to connect it to GitLab.
 
     - Apply the service account to your cluster:
 
-      ```yaml
+      ```bash
       kubectl apply -f eks-admin-service-account.yaml
       ```
 
       Output:
 
-      ```yaml
+      ```bash
       serviceaccount "eks-admin" created
       ```
 
@@ -83,19 +83,19 @@ A few details from the EKS cluster will be required to connect it to GitLab.
 
     - Apply the cluster role binding to your cluster:
 
-      ```yaml
+      ```bash
       kubectl apply -f eks-admin-cluster-role-binding.yaml
       ```
 
       Output:
 
-      ```yaml
+      ```bash
       clusterrolebinding "eks-admin" created
       ```
 
     - Retrieve the token for the `eks-admin` service account. Copy the `<authentication_token>` value from the output.
 
-      ```yaml
+      ```bash
       kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep eks-admin | awk '{print $1}')
       ```
 
@@ -144,7 +144,7 @@ When connecting a cluster via GitLab integration, you may specify whether the cl
 
 To effectively disable RBAC, global permissions can be applied granting full access:
 
-```yaml
+```bash
 kubectl create clusterrolebinding permissive-binding \
   --clusterrole=cluster-admin \
   --user=admin \
