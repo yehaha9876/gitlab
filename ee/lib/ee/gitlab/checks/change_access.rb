@@ -13,19 +13,12 @@ module EE
           push_rule_committer_not_allowed: "You cannot push commits for '%{committer_email}'. You can only push commits that were committed with one of your own verified emails."
         }.freeze
 
-        override :exec
-        def exec
-          return true if skip_authorization
-
-          super(skip_commits_check: true)
+        override :ref_level_checks
+        def ref_level_checks
+          super
 
           push_rule_check
-          file_size_check
-          # Check of commits should happen as the last step
-          # given they're expensive in terms of performance
-          commits_check
-
-          true
+          file_size_check #per_blob_checks?
         end
 
         private
@@ -102,6 +95,7 @@ module EE
             tag_exists?
         end
 
+        #CAN CHECK COMMIT MESSAGE
         def push_rule_commit_check(commit)
           if push_rule.try(:commit_validation?)
             error = check_commit(commit)

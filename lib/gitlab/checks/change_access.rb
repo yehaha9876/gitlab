@@ -22,6 +22,7 @@ module Gitlab
 
       def initialize(
         change, user_access:, project:, skip_authorization: false,
+        change_access_cache: change_access_cache
         skip_lfs_integrity_check: false, protocol:
       )
         @oldrev, @newrev, @ref = change.values_at(:oldrev, :newrev, :ref)
@@ -32,21 +33,30 @@ module Gitlab
         @skip_authorization = skip_authorization
         @skip_lfs_integrity_check = skip_lfs_integrity_check
         @protocol = protocol
+        @change_access_cache = change_access_cache
       end
 
-      def exec(skip_commits_check: false)
+      def exec
         return true if skip_authorization
 
-        push_checks
-        branch_checks
-        tag_checks
-        lfs_objects_exist_check unless skip_lfs_integrity_check
-        commits_check unless skip_commits_check
+        ref_level_checks
+
+        # Check of commits should happen as the last step
+        # given they're expensive in terms of performance
+        commits_check
 
         true
       end
 
       protected
+
+      def ref_level_checks
+        push_checks
+        branch_checks
+        tag_checks
+        lfs_objects_exist_check unless skip_lfs_integrity_check
+      end
+
 
       def push_checks
         unless can_push?
@@ -124,6 +134,7 @@ module Gitlab
 
       def commits_check
         return if deletion? || newrev.nil?
+        #return unless commit_validations.select(&:active?).present?
         return unless should_run_commit_validations?
 
         # n+1: https://gitlab.com/gitlab-org/gitlab-ee/issues/3593
@@ -194,6 +205,7 @@ module Gitlab
         Checks::MatchingMergeRequest.new(newrev, branch_name, project).match?
       end
 
+      #CacheBy: newrev
       def lfs_objects_exist_check
         lfs_check = Checks::LfsIntegrity.new(project, newrev)
 

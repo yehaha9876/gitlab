@@ -47,6 +47,10 @@ class PushRule < ActiveRecord::Base
       prevent_secrets
   end
 
+  def validates_filenames?
+    file_name_regex.present? || prevent_secrets
+  end
+
   def commit_signature_allowed?(commit)
     return true unless available?(:reject_unsigned_commits)
     return true unless reject_unsigned_commits

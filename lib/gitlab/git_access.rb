@@ -297,12 +297,17 @@ module Gitlab
     def check_single_change_access(change, skip_lfs_integrity_check: false)
       Checks::ChangeAccess.new(
         change,
+        change_access_cache: change_access_cache,
         user_access: user_access,
         project: project,
         skip_authorization: deploy_key?,
         skip_lfs_integrity_check: skip_lfs_integrity_check,
         protocol: protocol
       ).exec
+    end
+
+    def change_access_cache
+      @change_access_cache ||= ChangeAccessCache.new
     end
 
     def deploy_key
