@@ -37,4 +37,45 @@ describe API::Variables do
       end
     end
   end
+
+  describe 'PUT /projects/:id/variables' do
+    before do
+      stub_licensed_features(variable_environment_scope: true)
+
+      project.add_maintainer(user)
+    end
+
+    let!(:production_variable) { create(:ci_variable, key: 'TEST_VAR', value: 'prd', environment_scope: 'production', project: project) }
+    let!(:wildcard_variable) { create(:ci_variable, key: 'TEST_VAR', value: 'wildcard', environment_scope: '*', project: project) }
+
+    context 'when environment scope is specified' do
+      before do
+        put api("/projects/#{project.id}/variables/TEST_VAR", user), value: 'new', environment_scope: 'production'
+
+        production_variable.reload
+        wildcard_variable.reload
+      end
+
+      it 'updates a variable with the specific environment scope' do
+        expect(response).to have_gitlab_http_status(201)
+        expect(production_variable.value).to eq('new')
+        expect(wildcard_variable.value).to eq('wildcard')
+      end
+    end
+
+    context 'when environment scope is not specified' do
+      before do
+        put api("/projects/#{project.id}/variables/TEST_VAR", user), value: 'new'
+
+        production_variable.reload
+        wildcard_variable.reload
+      end
+
+      it 'updates all variables across all environments' do
+        expect(response).to have_gitlab_http_status(201)
+        expect(production_variable.value).to eq('new')
+        expect(wildcard_variable.value).to eq('new')
+      end
+    end
+  end
 end
