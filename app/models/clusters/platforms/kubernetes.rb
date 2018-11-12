@@ -56,7 +56,6 @@ module Clusters
       delegate :enabled?, to: :cluster, allow_nil: true
       delegate :managed?, to: :cluster, allow_nil: true
       delegate :allow_user_defined_namespace?, to: :cluster, allow_nil: true
-      delegate :kubernetes_namespace, to: :cluster
 
       alias_method :active?, :enabled?
 
@@ -77,7 +76,7 @@ module Clusters
         if namespace.present?
           namespace
         else
-          kubernetes_namespace&.namespace.presence || fallback_default_namespace
+          cluster.kubernetes_namespace&.namespace.presence || fallback_default_namespace
         end
       end
 
