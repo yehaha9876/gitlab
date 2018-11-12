@@ -3,11 +3,12 @@ class UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker
   include CronjobQueue
 
   def perform
-    GitlabSubscription.all.each do |subscription|
+    GitlabSubscription.with_a_gl_com_paid_plan.find_each(batch_size: 100) do |subscription|
       seats_in_use = subscription.seats_in_use
-      max_seats_used = subscription.max_seats_used
 
-      subscription.update_attribute(:max_seats_used, seats_in_use) if seats_in_use > max_seats_used
+      return if subscription.max_seats_used >= seats_in_use
+
+      subscription.update_attribute(:max_seats_used, seats_in_use)
     end
   end
 end

@@ -7,6 +7,10 @@ class GitlabSubscription < ActiveRecord::Base
 
   delegate :name, :title, to: :hosted_plan, prefix: :plan
 
+  scope :with_a_gl_com_paid_plan, -> do
+    joins(:hosted_plan).where(trial: false, 'plans.name' => Plan::GL_COM_PAID_PLANS)
+  end
+
   def seats_in_use
     if namespace.kind == 'group'
       namespace.users_with_descendants.count
