@@ -77,7 +77,7 @@ module Clusters
         if namespace.present?
           namespace
         else
-          default_namespace
+          kubernetes_namespace&.namespace.presence || fallback_default_namespace
         end
       end
 
@@ -142,10 +142,6 @@ module Clusters
           namespace: actual_namespace,
           token: token,
           ca_pem: ca_pem)
-      end
-
-      def default_namespace
-        kubernetes_namespace&.namespace.presence || fallback_default_namespace
       end
 
       # DEPRECATED
