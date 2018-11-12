@@ -125,4 +125,22 @@
   .dropdown-list > :last-child {
     margin-bottom: $gl-padding-8;
   }
+
+  // IE 11 only
+  @media all and (-ms-high-contrast:none) {
+    // scss-lint:disable PseudoElement
+    // IE11 will ignore this if we use only one :
+    *::-ms-backdrop,
+    .dropdown.show .dropdown-menu {
+      overflow-y: auto;
+    }
+
+    // scss-lint:disable PseudoElement
+    // IE11 will ignore this if we use only one :
+    *::-ms-backdrop,
+    .dropdown-content-faded-mask .dropdown-list {
+      overflow: visible;
+      max-height: none;
+    }
+  }
 }
