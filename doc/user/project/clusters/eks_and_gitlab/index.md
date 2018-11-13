@@ -42,7 +42,7 @@ A few details from the EKS cluster will be required to connect it to GitLab.
 
 1. **Create admin token**: A `cluster-admin` token is required to install and manage Helm Tiller. GitLab establishes mutual SSL auth with Helm Tiller and creates limited service accounts for each application. To create the token we will create an admin service account as follows:
 
-   - Create a file called `eks-admin-service-account.yaml` with the text below:
+   1. Create a file called `eks-admin-service-account.yaml` with the text below:
 
       ```yaml
       apiVersion: v1
@@ -52,7 +52,7 @@ A few details from the EKS cluster will be required to connect it to GitLab.
         namespace: kube-system
       ```
 
-    - Apply the service account to your cluster:
+    2. Apply the service account to your cluster:
 
       ```bash
       kubectl apply -f eks-admin-service-account.yaml
@@ -64,7 +64,7 @@ A few details from the EKS cluster will be required to connect it to GitLab.
       serviceaccount "eks-admin" created
       ```
 
-    - Create a file called `eks-admin-cluster-role-binding.yaml` with the text below:
+    3. Create a file called `eks-admin-cluster-role-binding.yaml` with the text below:
 
       ```yaml
       apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -81,7 +81,7 @@ A few details from the EKS cluster will be required to connect it to GitLab.
         namespace: kube-system
       ```
 
-    - Apply the cluster role binding to your cluster:
+    4. Apply the cluster role binding to your cluster:
 
       ```bash
       kubectl apply -f eks-admin-cluster-role-binding.yaml
@@ -93,7 +93,7 @@ A few details from the EKS cluster will be required to connect it to GitLab.
       clusterrolebinding "eks-admin" created
       ```
 
-    - Retrieve the token for the `eks-admin` service account. Copy the `<authentication_token>` value from the output.
+    5. Retrieve the token for the `eks-admin` service account. Copy the `<authentication_token>` value from the output.
 
       ```bash
       kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep eks-admin | awk '{print $1}')
