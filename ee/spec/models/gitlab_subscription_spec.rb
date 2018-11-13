@@ -105,4 +105,46 @@ describe GitlabSubscription do
       end
     end
   end
+
+  describe '#seats_owed' do
+    let!(:bronze_plan)         { create(:bronze_plan) }
+    let!(:early_adopter_plan)  { create(:early_adopter_plan) }
+    let!(:gitlab_subscription) { create(:gitlab_subscription, subscription_attrs) }
+
+    before do
+      gitlab_subscription.update_attributes!(seats: 5, max_seats_used: 10)
+    end
+
+    shared_examples 'always returns a total of 0' do
+      it 'does not update max_seats_used' do
+        expect(gitlab_subscription.seats_owed).to eq(0)
+      end
+    end
+
+    context 'with a free plan' do
+      let(:subscription_attrs) { { hosted_plan: nil } }
+
+      include_examples 'always returns a total of 0'
+    end
+
+    context 'with a trial plan' do
+      let(:subscription_attrs) { { hosted_plan: bronze_plan, trial: true } }
+
+      include_examples 'always returns a total of 0'
+    end
+
+    context 'with an early adopter plan' do
+      let(:subscription_attrs) { { hosted_plan: early_adopter_plan } }
+
+      include_examples 'always returns a total of 0'
+    end
+
+    context 'with a paid plan' do
+      let(:subscription_attrs) { { hosted_plan: bronze_plan } }
+
+      it 'calculates the number of owed seats' do
+        expect(gitlab_subscription.reload.seats_owed).to eq(5)
+      end
+    end
+  end
 end
