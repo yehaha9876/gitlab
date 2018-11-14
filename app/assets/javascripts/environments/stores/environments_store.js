@@ -96,6 +96,8 @@ export default class EnvironmentsStore {
 
     this.state.environments = filteredEnvironments;
 
+    this.setCanaryDeploymentPromo();
+
     return filteredEnvironments;
   }
 
@@ -227,6 +229,12 @@ export default class EnvironmentsStore {
       return updated;
     });
 
+    return this.state.environments;
+  }
+
+  setCanaryDeploymentPromo() {
+    // TODO: Show canary promo based on license and if they've dismissed it already
+    this.state.environments[1].showCanaryPromo = true;
     return this.state.environments;
   }
 }

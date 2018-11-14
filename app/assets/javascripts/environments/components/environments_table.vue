@@ -4,6 +4,7 @@
  */
 import { GlLoadingIcon } from '@gitlab/ui';
 import environmentItem from './environment_item.vue';
+import upgradePlan from './upgrade_plan.vue';
 
 import deployBoard from 'ee/environments/components/deploy_board_component.vue'; // eslint-disable-line import/order
 
@@ -12,6 +13,7 @@ export default {
     environmentItem,
     deployBoard,
     GlLoadingIcon,
+    upgradePlan,
   },
 
   props: {
@@ -110,6 +112,13 @@ export default {
           </div>
         </template>
       </template>
+
+      <div
+        v-if="model.showCanaryPromo"
+        :key="`canary-promo-${i}`"
+      >
+        <upgrade-plan />
+      </div>
     </template>
   </div>
 </template>
