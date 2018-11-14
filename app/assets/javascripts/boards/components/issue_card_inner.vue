@@ -208,7 +208,11 @@ export default {
           >#{{ issue.iid }}
         </span>
         <span class="board-info-items prepend-top-8 d-inline-block">
-          <issue-due-date v-if="issue.dueDate" :date="issue.dueDate" /><issue-time-estimate
+          <issue-due-date
+            v-if="issue.dueDate"
+            :date="issue.dueDate"
+          />
+          <issue-time-estimate
             v-if="issue.timeEstimate"
             :estimate="issue.timeEstimate"
           /><issue-card-weight

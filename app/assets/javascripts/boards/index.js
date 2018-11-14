@@ -21,7 +21,11 @@ import BoardSidebar from 'ee/boards/components/board_sidebar';
 import initNewListDropdown from './components/new_list_dropdown';
 import BoardAddIssuesModal from 'ee/boards/components/modal/index';
 import '~/vue_shared/vue_resource_interceptor';
-import { NavigationType, parseBoolean } from '~/lib/utils/common_utils';
+import {
+  NavigationType,
+  convertObjectPropsToCamelCase,
+  parseBoolean,
+} from '~/lib/utils/common_utils';
 
 import 'ee/boards/models/list';
 import 'ee/boards/models/issue';
@@ -141,17 +145,26 @@ export default () => {
           BoardService.getIssueInfo(sidebarInfoEndpoint)
             .then(res => res.data)
             .then(data => {
+              const {
+                weight,
+                epic,
+                subscribed,
+                totalTimeSpent,
+                timeEstimate,
+                humanTimeEstimate,
+                humanTotalTimeSpent,
+              } = convertObjectPropsToCamelCase(data);
               newIssue.setFetchingState('subscriptions', false);
               newIssue.setFetchingState('weight', false);
               newIssue.setFetchingState('epic', false);
               newIssue.updateData({
-                subscribed: data.subscribed,
-                weight: data.weight,
-                epic: data.epic,
-                timeSpent: data.total_time_spent,
-                timeEstimate: data.time_estimate,
-                humanTimeEstimate: data.human_time_estimate,
-                humanTimeSpent: data.human_total_time_spent,
+                weight,
+                epic,
+                subscribed,
+                timeSpent: totalTimeSpent,
+                timeEstimate,
+                humanTimeEstimate,
+                humanTimeSpent: humanTotalTimeSpent,
               });
             })
             .catch(() => {
