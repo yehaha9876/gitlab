@@ -148,6 +148,10 @@ export default () => {
                 subscribed: data.subscribed,
                 weight: data.weight,
                 epic: data.epic,
+                timeSpent: data.total_time_spent,
+                timeEstimate: data.time_estimate,
+                humanTimeEstimate: data.human_time_estimate,
+                humanTimeSpent: data.human_total_time_spent,
               });
             })
             .catch(() => {

@@ -16,6 +16,7 @@ import LabelsSelect from '../../labels_select';
 import Subscriptions from '../../sidebar/components/subscriptions/subscriptions.vue';
 import MilestoneSelect from '../../milestone_select';
 import boardsStore from '../stores/boards_store';
+import TimeTracker from '../../sidebar/components/time_tracking/time_tracker.vue';
 
 export default Vue.extend({
   components: {
@@ -24,6 +25,7 @@ export default Vue.extend({
     RemoveBtn,
     Subscriptions,
     Weight,
+    TimeTracker,
   },
   props: {
     currentUser: {
