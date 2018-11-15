@@ -6,7 +6,7 @@ Run serverless workloads on Kubernetes using [Knative](https://cloud.google.com/
 
 ## Overview
 
-Knative extends Kubernetes to provide a set of middleware components that are useful to build modern, source-centric, and container-based applications. Knative brings some significant benefits out of the box through its main components:
+Knative extends Kubernetes to provide a set of middleware components that are useful to build modern, source-centric, container-based applications. Knative brings some significant benefits out of the box through its main components:
 
 - [Build:](https://github.com/knative/build) Source-to-container build orchestration
 - [Eventing:](https://github.com/knative/eventing) Management and delivery of events
@@ -61,8 +61,8 @@ To run Knative on Gitlab, you will need:
         - tm -n "$KUBE_NAMESPACE" --config "$KUBECONFIG" deploy service "$CI_PROJECT_NAME" --from-image "$CI_REGISTRY_IMAGE" --wait
     ```
 
-1. **Docker File:** Knative requires a docker file in order to build your application. It should be included 
-    at the root of your project's repo.
+1. **Dockerfile:** Knative requires a Dockerfile in order to build your application. It should be included 
+    at the root of your project's repo and expose port 8080.
 
 ## Installing Knative via GitLab's Kubernetes integration
 
