@@ -23,9 +23,7 @@ class GitlabSubscription < ActiveRecord::Base
   def seats_owed
     return 0 if trial? || Plan::GL_COM_PAID_PLANS.exclude?(hosted_plan&.name)
 
-    value = max_seats_used - seats
-
-    value > 0 ? value : 0
+    [0, max_seats_used - seats].max
   end
 
   def plan_code=(code)
