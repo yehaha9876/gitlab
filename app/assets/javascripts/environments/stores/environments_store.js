@@ -1,8 +1,14 @@
-import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
+import {
+  parseIntPagination,
+  normalizeHeaders
+} from '~/lib/utils/common_utils';
 
 // ee-only
-import { CLUSTER_TYPE } from '~/clusters/constants';
+import {
+  CLUSTER_TYPE
+} from '~/clusters/constants';
 
+import Cookies from 'js-cookie';
 /**
  * Environments Store.
  *
@@ -16,6 +22,7 @@ export default class EnvironmentsStore {
     this.state.stoppedCounter = 0;
     this.state.availableCounter = 0;
     this.state.paginationInformation = {};
+    this.state.showCanaryPromo = true;
 
     return this;
   }
@@ -81,12 +88,10 @@ export default class EnvironmentsStore {
       ) {
         filtered = Object.assign({}, filtered, {
           hasDeployBoard: true,
-          isDeployBoardVisible:
-            oldEnvironmentState.isDeployBoardVisible === false
-              ? oldEnvironmentState.isDeployBoardVisible
-              : true,
-          deployBoardData:
-            filtered.rollout_status.status === 'found' ? filtered.rollout_status : {},
+          isDeployBoardVisible: oldEnvironmentState.isDeployBoardVisible === false ?
+            oldEnvironmentState.isDeployBoardVisible :
+            true,
+          deployBoardData: filtered.rollout_status.status === 'found' ? filtered.rollout_status : {},
           isLoadingDeployBoard: filtered.rollout_status.status === 'loading',
           isEmptyDeployBoard: filtered.rollout_status.status === 'not_found',
         });
@@ -96,7 +101,8 @@ export default class EnvironmentsStore {
 
     this.state.environments = filteredEnvironments;
 
-    this.setCanaryDeploymentPromo();
+    this.setShowCanaryPromo();
+    this.state.environments[1].showCanaryPromo = this.state.showCanaryPromo;
 
     return filteredEnvironments;
   }
@@ -191,7 +197,9 @@ export default class EnvironmentsStore {
    * @return {Array}
    */
   updateEnvironmentProp(environment, prop, newValue) {
-    const { environments } = this.state;
+    const {
+      environments
+    } = this.state;
 
     const updatedEnvironments = environments.map(env => {
       const updateEnv = Object.assign({}, env);
@@ -206,7 +214,9 @@ export default class EnvironmentsStore {
   }
 
   getOpenFolders() {
-    const { environments } = this.state;
+    const {
+      environments
+    } = this.state;
 
     return environments.filter(env => env.isFolder && env.isOpen);
   }
@@ -224,7 +234,9 @@ export default class EnvironmentsStore {
       let updated = Object.assign({}, env);
 
       if (env.id === environmentID) {
-        updated = Object.assign({}, updated, { isDeployBoardVisible: !env.isDeployBoardVisible });
+        updated = Object.assign({}, updated, {
+          isDeployBoardVisible: !env.isDeployBoardVisible,
+        });
       }
       return updated;
     });
@@ -232,9 +244,19 @@ export default class EnvironmentsStore {
     return this.state.environments;
   }
 
-  setCanaryDeploymentPromo() {
-    // TODO: Show canary promo based on license and if they've dismissed it already
-    this.state.environments[1].showCanaryPromo = true;
-    return this.state.environments;
+  dismissCanaryPromo() {
+    this.state.showCanaryPromo = false;
+    Cookies.set('has_dismissed_canary_deployment_promo', true);
+  }
+
+  setShowCanaryPromo() {
+    const hasDismissedPromo = Cookies.get('has_dismissed_canary_deployment_promo');
+    if (hasDismissedPromo) {
+      this.state.showCanaryPromo = false;
+      return;
+    }
+
+    // TODO: Show canary promo based on license
+    this.state.showCanaryPromo = true;
   }
 }

@@ -49,6 +49,7 @@ export default {
   created() {
     eventHub.$on('toggleFolder', this.toggleFolder);
     eventHub.$on('toggleDeployBoard', this.toggleDeployBoard);
+    eventHub.$on('dismissCanaryPromo', this.dismissCanaryPromo);
   },
 
   beforeDestroy() {
@@ -57,6 +58,10 @@ export default {
   },
 
   methods: {
+    dismissCanaryPromo() {
+      this.store.dismissCanaryPromo();
+    },
+
     /**
      * Toggles the visibility of the deploy boards of the clicked environment.
      * @param {Object} model
