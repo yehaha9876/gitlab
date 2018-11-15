@@ -1280,10 +1280,9 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.boolean "trial", default: false
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.index ["hosted_plan_id"], name: "index_gitlab_subscriptions_on_hosted_plan_id", using: :btree
+    t.index ["namespace_id"], name: "index_gitlab_subscriptions_on_namespace_id", unique: true, using: :btree
   end
-
-  add_index "gitlab_subscriptions", ["hosted_plan_id"], name: "index_gitlab_subscriptions_on_hosted_plan_id", using: :btree
-  add_index "gitlab_subscriptions", ["namespace_id"], name: "index_gitlab_subscriptions_on_namespace_id", unique: true, using: :btree
 
   create_table "gpg_key_subkeys", force: :cascade do |t|
     t.integer "gpg_key_id", null: false
