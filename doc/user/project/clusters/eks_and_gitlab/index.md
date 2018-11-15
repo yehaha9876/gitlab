@@ -2,7 +2,7 @@
 
 ## Introduction
 
-In this tutorial, we will show how to integrate an [Amazon EKS](https://aws.amazon.com/eks/) cluster with GitLab, and begin deploying applications.
+In this tutorial, we will show how to integrate an [Amazon EKS](https://aws.amazon.com/eks/) cluster with GitLab and begin deploying applications.
 
 For an end-to-end walkthrough we will:
 
