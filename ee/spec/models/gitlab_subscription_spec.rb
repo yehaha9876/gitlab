@@ -112,7 +112,7 @@ describe GitlabSubscription do
     let!(:gitlab_subscription) { create(:gitlab_subscription, subscription_attrs) }
 
     before do
-      gitlab_subscription.update_attributes!(seats: 5, max_seats_used: 10)
+      gitlab_subscription.update!(seats: 5, max_seats_used: 10)
     end
 
     shared_examples 'always returns a total of 0' do

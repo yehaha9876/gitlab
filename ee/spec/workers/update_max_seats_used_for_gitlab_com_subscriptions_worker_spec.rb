@@ -15,7 +15,7 @@ describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker do
 
   shared_examples 'keeps original max_seats_used value' do
     before do
-      gitlab_subscription.update_attributes!(subscription_attrs)
+      gitlab_subscription.update!(subscription_attrs)
     end
 
     it 'does not update max_seats_used' do
@@ -43,7 +43,7 @@ describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker do
 
   context 'with a paid plan' do
     before do
-      gitlab_subscription.update_attributes(hosted_plan: bronze_plan)
+      gitlab_subscription.update!(hosted_plan: bronze_plan)
     end
 
     it 'only updates max_seats_used if active users count is greater than it' do
