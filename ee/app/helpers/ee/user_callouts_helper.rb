@@ -3,6 +3,7 @@
 module EE
   module UserCalloutsHelper
     GOLD_TRIAL = 'gold_trial'.freeze
+    CANARY_DEPLOYMENT = 'canary_deployment'.freeze
 
     def show_gold_trial?(user = current_user)
       return false unless user
@@ -21,6 +22,14 @@ module EE
       return false if user.any_namespace_with_gold?
 
       !user.any_namespace_with_trial?
+    end
+
+    def show_canary_deployment_callout?(user = current_user)
+      # TODO figure out how to check self-hosted and plan
+      !user_dismissed?(CANARY_DEPLOYMENT) &&
+        (::Gitlab.com? || Rails.env.development?) &&
+        !user.any_namespace_with_gold? &&
+        !user.any_namespace_with_trial?
     end
   end
 end

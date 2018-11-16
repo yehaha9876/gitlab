@@ -44,12 +44,23 @@ export default {
       type: String,
       required: true,
     },
+    canaryDeploymentFeatureId: {
+      type: String,
+      required: true,
+    },
+    showCanaryDeploymentCallout: {
+      type: String,
+      required: true,
+    },
+    userCalloutsPath: {
+      type: String,
+      required: true,
+    },
   },
 
   created() {
     eventHub.$on('toggleFolder', this.toggleFolder);
     eventHub.$on('toggleDeployBoard', this.toggleDeployBoard);
-    eventHub.$on('dismissCanaryPromo', this.dismissCanaryPromo);
   },
 
   beforeDestroy() {
@@ -58,10 +69,6 @@ export default {
   },
 
   methods: {
-    dismissCanaryPromo() {
-      this.store.dismissCanaryPromo();
-    },
-
     /**
      * Toggles the visibility of the deploy boards of the clicked environment.
      * @param {Object} model
@@ -123,6 +130,9 @@ export default {
       :pagination="state.paginationInformation"
       :can-create-deployment="canCreateDeployment"
       :can-read-environment="canReadEnvironment"
+      :canary-deployment-feature-id="canaryDeploymentFeatureId"
+      :show-canary-deployment-callout="showCanaryDeploymentCallout"
+      :user-callouts-path="userCalloutsPath"
       @onChangePage="onChangePage"
     >
       <empty-state

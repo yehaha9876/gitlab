@@ -7,8 +7,6 @@ import {
 import {
   CLUSTER_TYPE
 } from '~/clusters/constants';
-
-import Cookies from 'js-cookie';
 /**
  * Environments Store.
  *
@@ -22,7 +20,6 @@ export default class EnvironmentsStore {
     this.state.stoppedCounter = 0;
     this.state.availableCounter = 0;
     this.state.paginationInformation = {};
-    this.state.showCanaryPromo = true;
 
     return this;
   }
@@ -89,8 +86,7 @@ export default class EnvironmentsStore {
         filtered = Object.assign({}, filtered, {
           hasDeployBoard: true,
           isDeployBoardVisible: oldEnvironmentState.isDeployBoardVisible === false ?
-            oldEnvironmentState.isDeployBoardVisible :
-            true,
+            oldEnvironmentState.isDeployBoardVisible : true,
           deployBoardData: filtered.rollout_status.status === 'found' ? filtered.rollout_status : {},
           isLoadingDeployBoard: filtered.rollout_status.status === 'loading',
           isEmptyDeployBoard: filtered.rollout_status.status === 'not_found',
@@ -101,8 +97,7 @@ export default class EnvironmentsStore {
 
     this.state.environments = filteredEnvironments;
 
-    this.setShowCanaryPromo();
-    this.state.environments[1].showCanaryPromo = this.state.showCanaryPromo;
+    this.state.environments[1].showCanaryPromo = true; // TODO: come up with a better way to do this
 
     return filteredEnvironments;
   }
@@ -242,21 +237,5 @@ export default class EnvironmentsStore {
     });
 
     return this.state.environments;
-  }
-
-  dismissCanaryPromo() {
-    this.state.showCanaryPromo = false;
-    Cookies.set('has_dismissed_canary_deployment_promo', true);
-  }
-
-  setShowCanaryPromo() {
-    const hasDismissedPromo = Cookies.get('has_dismissed_canary_deployment_promo');
-    if (hasDismissedPromo) {
-      this.state.showCanaryPromo = false;
-      return;
-    }
-
-    // TODO: Show canary promo based on license
-    this.state.showCanaryPromo = true;
   }
 }

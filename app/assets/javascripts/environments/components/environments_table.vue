@@ -34,6 +34,21 @@ export default {
       required: false,
       default: false,
     },
+
+    canaryDeploymentFeatureId: {
+      type: String,
+      required: true,
+    },
+
+    showCanaryDeploymentCallout: {
+      type: String,
+      required: true,
+    },
+
+    userCalloutsPath: {
+      type: String,
+      required: true,
+    },
   },
   methods: {
     folderUrl(model) {
@@ -114,8 +129,10 @@ export default {
       </template>
 
       <div
-        v-if="model.showCanaryPromo"
+        v-if="model.showCanaryPromo && showCanaryDeploymentCallout"
         :key="`canary-promo-${i}`"
+        :canary-deployment-feature-id="canaryDeploymentFeatureId"
+        :user-callouts-path="userCalloutsPath"
       >
         <upgrade-plan />
       </div>

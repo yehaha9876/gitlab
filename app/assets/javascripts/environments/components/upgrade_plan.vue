@@ -1,27 +1,45 @@
 <script>
+// TODO move this file to ee
+// TODO change name to something like 'canary_deployment_callout'
+// TODO figure out how to add "canary_deployment" to possible feature IDs
 import lockPromotionIllustration from '@gitlab/svgs/dist/illustrations/lock_promotion.svg';
 import Icon from '~/vue_shared/components/icon.vue';
-import eventHub from '../event_hub';
+import PersistentUserCallout from '~/persistent_user_callout';
 
 export default {
   components: {
     Icon,
+  },
+  props: {
+    canaryDeploymentFeatureId: {
+      type: String,
+      required: true,
+    },
+    userCalloutsPath: {
+      type: String,
+      required: true,
+    },
+  },
+  mounted() {
+    // TODO change class names to 'canary-deployment-callout`
+    const callout = document.querySelector('.environments-canary-promo');
+
+    if (callout) new PersistentUserCallout(callout); // eslint-disable-line no-new
   },
   computed: {
     lockPromotionIllustration() {
       return lockPromotionIllustration;
     },
   },
-  methods: {
-    dismissCanaryPromo() {
-      eventHub.$emit('dismissCanaryPromo');
-    },
-  },
 };
 </script>
 
 <template>
-  <div class="d-flex p-3 environments-canary-promo">
+  <div
+    class="d-flex p-3 environments-canary-promo"
+    :data-dismiss-endpoint="userCalloutsPath"
+    :data-feature-id="canaryDeploymentFeatureId"
+  >
     <div
       class="svg-container pr-3"
       v-html="lockPromotionIllustration"
@@ -45,7 +63,7 @@ export default {
       </a>
     </div>
 
-    <div class="ml-auto pr-2 environments-canary-promo-close" @click="dismissCanaryPromo"> 
+    <div class="ml-auto pr-2 environments-canary-promo-close js-close"> 
       <icon name="close" />
     </div>
   </div>

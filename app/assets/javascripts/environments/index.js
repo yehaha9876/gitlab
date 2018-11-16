@@ -22,6 +22,9 @@ export default () =>
         canCreateEnvironment: parseBoolean(environmentsData.canCreateEnvironment),
         canCreateDeployment: parseBoolean(environmentsData.canCreateDeployment),
         canReadEnvironment: parseBoolean(environmentsData.canReadEnvironment),
+        canaryDeploymentFeatureId: environmentsData.canaryDeploymentFeatureId,
+        showCanaryDeploymentCallout: environmentsData.showCanaryDeploymentCallout,
+        userCalloutsPath: environmentsData.userCalloutsPath,
       };
     },
     render(createElement) {
@@ -34,6 +37,9 @@ export default () =>
           canCreateEnvironment: this.canCreateEnvironment,
           canCreateDeployment: this.canCreateDeployment,
           canReadEnvironment: this.canReadEnvironment,
+          canaryDeploymentFeatureId: this.canaryDeploymentFeatureId,
+          showCanaryDeploymentCallout: this.showCanaryDeploymentCallout,
+          userCalloutsPath: this.userCalloutsPath,
         },
       });
     },

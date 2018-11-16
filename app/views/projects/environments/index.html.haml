@@ -1,3 +1,4 @@
+-# TODO figure out a better way to pass "show_canary_deployment_callout"
 - @no_container = true
 - page_title _("Environments")
 
@@ -7,4 +8,7 @@
   "can-create-environment" => can?(current_user, :create_environment, @project).to_s,
   "new-environment-path" => new_project_environment_path(@project),
   "help-page-path" => help_page_path("ci/environments"),
+  "canary_deployment_feature_id" => UserCalloutsHelper::CANARY_DEPLOYMENT,
+  "show-canary-deployment-callout" => show_canary_deployment_callout? ? 'true' : 'false',
+  "user-callouts-path" => user_callouts_path,
   "css-class" => container_class } }

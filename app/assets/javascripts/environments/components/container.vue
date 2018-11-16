@@ -30,6 +30,18 @@ export default {
       type: Boolean,
       required: true,
     },
+    canaryDeploymentFeatureId: {
+      type: String,
+      required: true,
+    },
+    showCanaryDeploymentCallout: {
+      type: String,
+      required: true,
+    },
+    userCalloutsPath: {
+      type: String,
+      required: true,
+    },
   },
   methods: {
     onChangePage(page) {
@@ -55,6 +67,9 @@ export default {
         :environments="environments"
         :can-create-deployment="canCreateDeployment"
         :can-read-environment="canReadEnvironment"
+        :canary-deployment-feature-id="canaryDeploymentFeatureId"
+        :show-canary-deployment-callout="showCanaryDeploymentCallout"
+        :user-callouts-path="userCalloutsPath"
       />
 
       <table-pagination
