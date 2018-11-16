@@ -26,6 +26,7 @@ module EE
 
     def show_canary_deployment_callout?(user = current_user)
       # TODO figure out how to check self-hosted and plan
+      # TODO figure out how to add CANARY_DEPLOYMENT to the feature ID list
       !user_dismissed?(CANARY_DEPLOYMENT) &&
         (::Gitlab.com? || Rails.env.development?) &&
         !user.any_namespace_with_gold? &&

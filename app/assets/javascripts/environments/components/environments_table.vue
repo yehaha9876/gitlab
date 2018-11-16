@@ -4,16 +4,16 @@
  */
 import { GlLoadingIcon } from '@gitlab/ui';
 import environmentItem from './environment_item.vue';
-import upgradePlan from './upgrade_plan.vue';
 
 import deployBoard from 'ee/environments/components/deploy_board_component.vue'; // eslint-disable-line import/order
+import canaryDeploymentCallout from 'ee/environments/components/canary_deployment_callout.vue'; // eslint-disable-line import/order
 
 export default {
   components: {
     environmentItem,
     deployBoard,
+    canaryDeploymentCallout,
     GlLoadingIcon,
-    upgradePlan,
   },
 
   props: {
@@ -41,7 +41,7 @@ export default {
     },
 
     showCanaryDeploymentCallout: {
-      type: String,
+      type: Boolean,
       required: true,
     },
 
@@ -128,13 +128,15 @@ export default {
         </template>
       </template>
 
+      <!-- TODO: figure out a better way to render this -->
       <div
         v-if="model.showCanaryPromo && showCanaryDeploymentCallout"
         :key="`canary-promo-${i}`"
-        :canary-deployment-feature-id="canaryDeploymentFeatureId"
-        :user-callouts-path="userCalloutsPath"
       >
-        <upgrade-plan />
+        <canary-deployment-callout
+          :canary-deployment-feature-id="canaryDeploymentFeatureId"
+          :user-callouts-path="userCalloutsPath"
+        />
       </div>
     </template>
   </div>

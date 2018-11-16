@@ -722,15 +722,15 @@
   }
 }
 
-.environments-canary-promo {
+.canary-deployment-callout {
   border-bottom: 1px solid $white-normal;
 
-  .environments-canary-promo-message {
+  &-message {
     max-width: 600px;
     color: $theme-gray-700;
   }
 
-  .environments-canary-promo-close {
+  &-close {
     color: $theme-gray-700;
     cursor: pointer;
   }

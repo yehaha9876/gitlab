@@ -1,7 +1,4 @@
 <script>
-// TODO move this file to ee
-// TODO change name to something like 'canary_deployment_callout'
-// TODO figure out how to add "canary_deployment" to possible feature IDs
 import lockPromotionIllustration from '@gitlab/svgs/dist/illustrations/lock_promotion.svg';
 import Icon from '~/vue_shared/components/icon.vue';
 import PersistentUserCallout from '~/persistent_user_callout';
@@ -21,8 +18,7 @@ export default {
     },
   },
   mounted() {
-    // TODO change class names to 'canary-deployment-callout`
-    const callout = document.querySelector('.environments-canary-promo');
+    const callout = document.querySelector('.canary-deployment-callout');
 
     if (callout) new PersistentUserCallout(callout); // eslint-disable-line no-new
   },
@@ -36,7 +32,7 @@ export default {
 
 <template>
   <div
-    class="d-flex p-3 environments-canary-promo"
+    class="d-flex p-3 canary-deployment-callout"
     :data-dismiss-endpoint="userCalloutsPath"
     :data-feature-id="canaryDeploymentFeatureId"
   >
@@ -50,7 +46,7 @@ export default {
         Upgrade plan to unlock Canary Development feature
       </p>
 
-      <p class="environments-canary-promo-message">
+      <p class="canary-deployment-callout-message">
         Canary Development is a popular CI strategy, where a small portion of the fleet is
         updated to the new version of your application.
         <a href="https://docs.gitlab.com/ee/user/project/canary_deployments.html">
@@ -63,7 +59,7 @@ export default {
       </a>
     </div>
 
-    <div class="ml-auto pr-2 environments-canary-promo-close js-close"> 
+    <div class="ml-auto pr-2 canary-deployment-callout-close js-close"> 
       <icon name="close" />
     </div>
   </div>

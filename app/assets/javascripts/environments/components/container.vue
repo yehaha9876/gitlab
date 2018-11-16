@@ -35,7 +35,7 @@ export default {
       required: true,
     },
     showCanaryDeploymentCallout: {
-      type: String,
+      type: Boolean,
       required: true,
     },
     userCalloutsPath: {

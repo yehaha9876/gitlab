@@ -23,7 +23,7 @@ export default () =>
         canCreateDeployment: parseBoolean(environmentsData.canCreateDeployment),
         canReadEnvironment: parseBoolean(environmentsData.canReadEnvironment),
         canaryDeploymentFeatureId: environmentsData.canaryDeploymentFeatureId,
-        showCanaryDeploymentCallout: environmentsData.showCanaryDeploymentCallout,
+        showCanaryDeploymentCallout: convertPermissionToBoolean(environmentsData.showCanaryDeploymentCallout),
         userCalloutsPath: environmentsData.userCalloutsPath,
       };
     },
