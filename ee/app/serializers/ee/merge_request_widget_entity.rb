@@ -134,6 +134,10 @@ module EE
       expose :approvals_path do |merge_request|
         presenter(merge_request).approvals_path
       end
+
+      expose :mergeable_license_management_state, as: :mergeable_license_management_state do |merge_request|
+        presenter(merge_request).mergeable_license_management_state
+      end
     end
 
     private

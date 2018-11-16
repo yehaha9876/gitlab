@@ -36,6 +36,13 @@ module EE
       super
     end
 
+    override :mergeable_state?
+    def mergeable_state?(skip_ci_check: false, skip_discussions_check: false)
+      return false if software_license_policies_conflict?
+
+      super
+    end
+
     def supports_weight?
       false
     end
@@ -89,6 +96,22 @@ module EE
       else
         super(identifier, *args)
       end
+    end
+
+    def software_license_policies_conflict?
+      return false unless has_license_management_reports?
+
+      license_names = actual_head_pipeline.license_management_report.license_names
+
+      project_blacklisted_licenses = project.software_license_policies.select do |license_policy|
+        license_policy.approval_status = 'blacklisted'
+      end
+
+      pipeline_blacklisted_licenses = license_names.select do |license_name|
+        project_blacklisted_licenses.any? { |blacklisted_license| blacklisted_license.name.casecmp(license_name) == 0  }
+      end
+
+      !pipeline_blacklisted_licenses.empty?
     end
   end
 end
