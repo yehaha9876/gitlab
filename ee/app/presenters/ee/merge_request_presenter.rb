@@ -21,7 +21,7 @@ module EE
       # considering the state of the MR first. If a MR isn't mergeable, we can
       # safely short-circuit it.
       if merge_request.mergeable_state?(skip_ci_check: true, skip_discussions_check: true)
-        !merge_request.software_license_policies_conflict?
+        merge_request.mergeable_license_management_state?
       else
         false
       end

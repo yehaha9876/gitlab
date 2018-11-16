@@ -94,6 +94,7 @@ module EE
 
       default_value_for :packages_enabled, true
       default_value_for :only_mirror_protected_branches, true
+      default_value_for :only_allow_merge_if_software_licenses_are_compliant, false
 
       delegate :store_security_reports_available?, to: :namespace
     end

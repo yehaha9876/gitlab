@@ -24,6 +24,7 @@ module EE
         use_custom_template
         packages_enabled
         merge_requests_author_approval
+        only_allow_merge_if_software_licenses_are_compliant
       ]
 
       if allow_mirror_params?

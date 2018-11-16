@@ -98,6 +98,12 @@ module EE
       end
     end
 
+    def mergeable_license_management_state?
+      return true unless project.only_allow_merge_if_software_licenses_are_compliant?
+
+      !software_license_policies_conflict?
+    end
+
     def software_license_policies_conflict?
       return false unless has_license_management_reports?
 
