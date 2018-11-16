@@ -57,6 +57,10 @@ module QA
           expect(mr_page.approvers).to include(approver.name)
           expect(mr_page.approvers).not_to include(non_approver.name)
         end
+
+        # Check that notifications are not enabled for the code owner
+
+        # Check that the code owner does not have a todo for the merge request
       end
     end
   end
