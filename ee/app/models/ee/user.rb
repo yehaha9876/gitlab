@@ -206,6 +206,12 @@ module EE
         .any?
     end
 
+    def can_upgrade_to_premium?
+      license = ::License.current
+      edition = license ? license.edition : 'EE Free'
+      edition != 'EEU' && edition != 'EEP'
+    end
+
     override :has_current_license?
     def has_current_license?
       License.current.present?

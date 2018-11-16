@@ -9,7 +9,7 @@ module EE
 
       override :feature_names
       def feature_names
-        super.merge(cluster_security_warning: 3, gold_trial: 4)
+        super.merge(cluster_security_warning: 3, gold_trial: 4, canary_deployment: 5)
       end
     end
   end
