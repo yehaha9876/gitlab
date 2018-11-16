@@ -1,0 +1,6 @@
+---
+title: Optionaly forbid merge requests with code or dependencies under blacklisted
+  software licenses from being merged.
+merge_request: 8485
+author:
+type: added
