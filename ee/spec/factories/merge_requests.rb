@@ -12,5 +12,8 @@ FactoryBot.define do
           sha: merge_request.diff_head_sha)
       end
     end
+
+
+    factory :ee_merge_request_with_license_management_reports, traits: [:with_license_management_reports]
   end
 end

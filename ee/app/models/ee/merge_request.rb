@@ -38,7 +38,7 @@ module EE
 
     override :mergeable_state?
     def mergeable_state?(skip_ci_check: false, skip_discussions_check: false)
-      return false if software_license_policies_conflict?
+      return false unless mergeable_license_management_state?
 
       super
     end

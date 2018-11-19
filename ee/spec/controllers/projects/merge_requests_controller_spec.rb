@@ -351,4 +351,97 @@ describe Projects::MergeRequestsController do
       it_behaves_like 'approvals'
     end
   end
+
+  describe 'POST merge' do
+    let(:base_params) do
+      {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: merge_request.iid,
+          squash: false,
+          format: 'json'
+      }
+    end
+
+    def merge
+      post_params = base_params.merge(sha: merge_request.diff_head_sha)
+      if Gitlab.rails5?
+        post :merge, params: post_params, as: :json
+      else
+        post :merge, post_params
+      end
+    end
+
+    describe 'only_allow_merge_if_software_licenses_are_compliant? setting' do
+      let(:merge_request) do
+        create(:ee_merge_request_with_license_management_reports,
+          target_project: project,
+          source_project: project,
+          author: user)
+      end
+
+      before do
+        software_license = create(:software_license, name: 'MIT')
+        software_license_policy = create(
+          :software_license_policy,
+          project: project,
+          software_license: software_license,
+          approval_status: 'blacklisted'
+        )
+        project.software_license_policies << software_license_policy
+      end
+
+      context 'when enabled' do
+        before do
+          project.update_column(:only_allow_merge_if_software_licenses_are_compliant, true)
+        end
+
+        context 'with blacklisted licenses' do
+          it 'returns :failed' do
+            merge
+
+            expect(json_response).to eq('status' => 'failed')
+          end
+        end
+
+        context 'with no blacklisted license' do
+          before do
+            project.software_license_policies.destroy_all
+          end
+
+          it 'returns :success' do
+            merge
+
+            expect(json_response).to eq('status' => 'success')
+          end
+        end
+      end
+
+      context 'when disabled' do
+        before do
+          project.update_column(:only_allow_merge_if_software_licenses_are_compliant, false)
+        end
+
+        context 'with blacklisted licenses' do
+          it 'returns :success' do
+            merge
+
+            expect(json_response).to eq('status' => 'success')
+          end
+        end
+
+        context 'with no blacklisted license' do
+          before do
+            project.software_license_policies.destroy_all
+          end
+
+          it 'returns :success' do
+            merge
+
+            expect(json_response).to eq('status' => 'success')
+          end
+        end
+      end
+    end
+  end
 end
