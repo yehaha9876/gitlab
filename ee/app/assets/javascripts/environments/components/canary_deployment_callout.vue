@@ -1,10 +1,13 @@
 <script>
-import lockPromotionIllustration from '@gitlab/svgs/dist/illustrations/lock_promotion.svg';
+import { __ } from '~/locale';
+import { GlButton, GlLink } from '@gitlab-org/gitlab-ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import PersistentUserCallout from '~/persistent_user_callout';
 
 export default {
   components: {
+    GlButton,
+    GlLink,
     Icon,
   },
   props: {
@@ -16,16 +19,19 @@ export default {
       type: String,
       required: true,
     },
+    lockPromotionSvgPath: {
+      type: String,
+      required: true,
+    },
+    helpCanaryDeploymentsPath: {
+      type: String,
+      required: true,
+    },
   },
   mounted() {
-    const callout = document.querySelector('.canary-deployment-callout');
+    const callout = this.$refs['canary-deployment-callout'];
 
     if (callout) new PersistentUserCallout(callout); // eslint-disable-line no-new
-  },
-  computed: {
-    lockPromotionIllustration() {
-      return lockPromotionIllustration;
-    },
   },
 };
 </script>
@@ -35,28 +41,29 @@ export default {
     class="d-flex p-3 canary-deployment-callout"
     :data-dismiss-endpoint="userCalloutsPath"
     :data-feature-id="canaryDeploymentFeatureId"
+    ref="canary-deployment-callout"
   >
-    <div
-      class="svg-container pr-3"
-      v-html="lockPromotionIllustration"
-    />
+    <img class="pr-3" :src="lockPromotionSvgPath" />
 
     <div class="pl-3">
       <p class="font-weight-bold mb-1">
-        Upgrade plan to unlock Canary Development feature
+        {{__('Upgrade plan to unlock Canary Development feature')}}
       </p>
 
       <p class="canary-deployment-callout-message">
-        Canary Development is a popular CI strategy, where a small portion of the fleet is
-        updated to the new version of your application.
-        <a href="https://docs.gitlab.com/ee/user/project/canary_deployments.html">
-          Read more
-        </a>
+        {{__('Canary Development is a popular CI strategy, where a small portion of the fleet is updated to the new version of your application.')}}
+        <gl-link :href="helpCanaryDeploymentsPath">
+          {{__('Read more')}}
+        </gl-link>
       </p>
 
-      <a href="https://about.gitlab.com/sales/" class="btn btn-outline-primary">
-        Contact sales to upgrade
-      </a>
+      <gl-button
+        href="https://about.gitlab.com/sales/"
+        variant="outline-primary"
+        class="canary-deployment-callout-button"
+      >
+        {{__('Contact sales to upgrade')}}
+      </gl-button>
     </div>
 
     <div class="ml-auto pr-2 canary-deployment-callout-close js-close"> 

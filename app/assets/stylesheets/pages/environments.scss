@@ -722,8 +722,9 @@
   }
 }
 
+// TODO: make this responsive
 .canary-deployment-callout {
-  border-bottom: 1px solid $white-normal;
+  border-bottom: 1px solid $border-white-normal;
 
   &-message {
     max-width: 600px;
@@ -735,8 +736,14 @@
     cursor: pointer;
   }
 
-  .btn.btn-outline-primary {
+  &-button {
     color: $blue-600;
     border-color: $blue-600;
+
+    &:hover {
+      color: $white-normal;
+      background-color: $blue-600;
+      border-color: $blue-600;
+    }
   }
 }

@@ -25,6 +25,8 @@ export default () =>
         canaryDeploymentFeatureId: environmentsData.canaryDeploymentFeatureId,
         showCanaryDeploymentCallout: parseBoolean(environmentsData.showCanaryDeploymentCallout),
         userCalloutsPath: environmentsData.userCalloutsPath,
+        lockPromotionSvgPath: environmentsData.lockPromotionSvgPath,
+        helpCanaryDeploymentsPath: environmentsData.helpCanaryDeploymentsPath,
       };
     },
     render(createElement) {
@@ -40,6 +42,8 @@ export default () =>
           canaryDeploymentFeatureId: this.canaryDeploymentFeatureId,
           showCanaryDeploymentCallout: this.showCanaryDeploymentCallout,
           userCalloutsPath: this.userCalloutsPath,
+          lockPromotionSvgPath: this.lockPromotionSvgPath,
+          helpCanaryDeploymentsPath: this.helpCanaryDeploymentsPath,
         },
       });
     },

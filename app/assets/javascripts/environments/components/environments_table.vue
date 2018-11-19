@@ -6,13 +6,13 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import environmentItem from './environment_item.vue';
 
 import deployBoard from 'ee/environments/components/deploy_board_component.vue'; // eslint-disable-line import/order
-import canaryDeploymentCallout from 'ee/environments/components/canary_deployment_callout.vue'; // eslint-disable-line import/order
+import CanaryDeploymentCallout from 'ee/environments/components/canary_deployment_callout.vue'; // eslint-disable-line import/order
 
 export default {
   components: {
     environmentItem,
     deployBoard,
-    canaryDeploymentCallout,
+    CanaryDeploymentCallout,
     GlLoadingIcon,
   },
 
@@ -46,6 +46,16 @@ export default {
     },
 
     userCalloutsPath: {
+      type: String,
+      required: true,
+    },
+
+    lockPromotionSvgPath: {
+      type: String,
+      required: true,
+    },
+
+    helpCanaryDeploymentsPath: {
       type: String,
       required: true,
     },
@@ -136,6 +146,8 @@ export default {
         <canary-deployment-callout
           :canary-deployment-feature-id="canaryDeploymentFeatureId"
           :user-callouts-path="userCalloutsPath"
+          :lock-promotion-svg-path="lockPromotionSvgPath"
+          :help-canary-deployments-path="helpCanaryDeploymentsPath"
         />
       </div>
     </template>

@@ -42,6 +42,14 @@ export default {
       type: String,
       required: true,
     },
+    lockPromotionSvgPath: {
+      type: String,
+      required: true,
+    },
+    helpCanaryDeploymentsPath: {
+      type: String,
+      required: true,
+    },
   },
   methods: {
     onChangePage(page) {
@@ -70,6 +78,8 @@ export default {
         :canary-deployment-feature-id="canaryDeploymentFeatureId"
         :show-canary-deployment-callout="showCanaryDeploymentCallout"
         :user-callouts-path="userCalloutsPath"
+        :lock-promotion-svg-path="lockPromotionSvgPath"
+        :help-canary-deployments-path="helpCanaryDeploymentsPath"
       />
 
       <table-pagination
