@@ -6,7 +6,6 @@ const CLUSTERS_MOCK_DATA = {
       data: {
         status: 'errored',
         status_reason: 'Failed to request to CloudPlatform.',
-<<<<<<< HEAD
         applications: [
           {
             name: 'helm',
@@ -51,7 +50,6 @@ const CLUSTERS_MOCK_DATA = {
       data: {
         status: 'errored',
         status_reason: 'Failed to request to CloudPlatform.',
-<<<<<<< HEAD
         applications: [
           {
             name: 'helm',
