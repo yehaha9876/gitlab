@@ -34,8 +34,8 @@ export default class EEPrometheusMetrics extends PrometheusMetrics {
       '.js-no-active-integration-text',
     );
     this.$newCustomMetricButton = this.$monitoredCustomMetricsPanel.find('.js-new-metric-button');
-    this.$newCustomMetricButtonBody = this.$monitoredCustomMetricsPanel.find(
-      '.js-new-metric-body-button',
+    this.$noCustomMetricsText = this.$monitoredCustomMetricsPanel.find(
+      '.js-no-custom-metrics-text',
     );
     this.$flashCustomMetricsContainer = this.$wrapperCustomMetrics.find('.flash-container');
 
@@ -43,7 +43,7 @@ export default class EEPrometheusMetrics extends PrometheusMetrics {
       this.$monitoredCustomMetricsLoading,
       this.$monitoredCustomMetricsList,
       this.$newCustomMetricButton,
-      this.$newCustomMetricButtonBody,
+      this.$noCustomMetricsText,
       this.$monitoredCustomMetricsNoIntegrationText,
       this.$monitoredCustomMetricsEmpty,
     ];
@@ -86,7 +86,7 @@ export default class EEPrometheusMetrics extends PrometheusMetrics {
         this.setVisible(
           this.$monitoredCustomMetricsEmpty,
           this.$newCustomMetricButton,
-          this.$newCustomMetricButtonBody,
+          this.$noCustomMetricsText,
         );
         break;
     }
