@@ -28,10 +28,6 @@ describe Ci::CreatePipelineService, '#execute' do
       expect(described_class::SEQUENCE.include?(scope::RemoveUnwantedChatJobs)).to eq true
     end
 
-    it 'includes the FilterWebIdeTerminalJobs step' do
-      expect(described_class::SEQUENCE.include?(scope::FilterWebIdeTerminalJobs)).to eq true
-    end
-
     it 'includes the Limit::Size step' do
       expect(described_class::SEQUENCE.include?(scope::Limit::Size)).to eq true
     end

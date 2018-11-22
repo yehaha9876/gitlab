@@ -87,19 +87,6 @@ module EE
         end
       end
 
-      class_methods do
-        extend ::Gitlab::Utils::Override
-
-        override :source_enum_values
-        def source_enum_values
-          {
-            pipeline: 7,
-            chat: 8,
-            webide: 20
-          }
-        end
-      end
-
       def any_report_artifact_for_type(file_type)
         report_artifact_for_file_type(file_type) || legacy_report_artifact_for_file_type(file_type)
       end

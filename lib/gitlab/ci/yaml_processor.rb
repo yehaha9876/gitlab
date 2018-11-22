@@ -5,7 +5,6 @@ module Gitlab
     class YamlProcessor
       ValidationError = Class.new(StandardError)
 
-      prepend ::EE::Gitlab::Ci::YamlProcessor
       include Gitlab::Ci::Config::Entry::LegacyValidationHelpers
 
       attr_reader :cache, :stages, :jobs
@@ -88,10 +87,6 @@ module Gitlab
         rescue ValidationError => e
           e.message
         end
-      end
-
-      def builds_with_tag(tag_name)
-        builds.select { |data| data[:tag_list].include?(tag_name) }
       end
 
       private

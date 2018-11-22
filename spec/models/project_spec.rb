@@ -4355,30 +4355,6 @@ describe Project do
     end
   end
 
-  context '#ci_yaml_file_path' do
-    let(:project) { create(:project, :repository) }
-
-    subject { project.ci_yaml_file_path }
-
-    it 'returns the path from project' do
-      allow(project).to receive(:ci_config_path) { 'custom/path' }
-
-      is_expected.to eq('custom/path')
-    end
-
-    it 'returns default when custom path is nil' do
-      allow(project).to receive(:ci_config_path) { nil }
-
-      is_expected.to eq('.gitlab-ci.yml')
-    end
-
-    it 'returns default when custom path is empty' do
-      allow(project).to receive(:ci_config_path) { '' }
-
-      is_expected.to eq('.gitlab-ci.yml')
-    end
-  end
-
   def rugged_config
     rugged_repo(project.repository).config
   end
