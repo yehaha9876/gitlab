@@ -31,14 +31,16 @@ module EE
             private
 
             def excessive_seeds_count
-              @excessive ||= stages_size - @namespace.max_pipeline_size
+              @excessive ||= jobs_count - @namespace.max_pipeline_size
             end
 
-            def stages_size
+            # rubocop: disable CodeReuse/ActiveRecord
+            def jobs_count
               @pipeline.stages.sum do |stage|
                 stage.builds.size
               end
             end
+            # rubocop: enable CodeReuse/ActiveRecord
           end
         end
       end

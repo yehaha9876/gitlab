@@ -45,7 +45,7 @@ module Gitlab
           def repository_source
             return unless project
             return unless @pipeline.sha
-      
+
             ci_yml_file = project.repository.gitlab_ci_yml_for(@pipeline.sha, ci_yaml_file_path)
             [:repository_source, ci_yml_file] if ci_yml_file
           rescue GRPC::NotFound, GRPC::Internal

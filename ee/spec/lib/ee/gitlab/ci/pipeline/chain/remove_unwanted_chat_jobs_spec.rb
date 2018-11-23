@@ -44,7 +44,7 @@ describe EE::Gitlab::Ci::Pipeline::Chain::RemoveUnwantedChatJobs do
     context 'for regular pipelines' do
       it 'does not remove any jobs' do
         step.perform!
-    
+
         expect(command.config_processor.jobs.keys).to eq %i[rspec echo]
       end
     end

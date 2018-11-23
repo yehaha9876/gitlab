@@ -41,12 +41,12 @@ module Gitlab
           end
 
           private
-  
+
           def stage_seeds
             seeds = @command.config_processor.stages_attributes.map do |attributes|
               Gitlab::Ci::Pipeline::Seed::Stage.new(pipeline, attributes)
             end
-  
+
             seeds.select(&:included?)
           end
         end
