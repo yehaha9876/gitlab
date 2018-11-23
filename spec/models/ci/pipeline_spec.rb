@@ -285,6 +285,209 @@ describe Ci::Pipeline, :mailer do
     end
   end
 
+  describe 'legacy stages' do
+    before do
+      create(:commit_status, pipeline: pipeline,
+                             stage: 'build',
+                             name: 'linux',
+                             stage_idx: 0,
+                             status: 'success')
+
+      create(:commit_status, pipeline: pipeline,
+                             stage: 'build',
+                             name: 'mac',
+                             stage_idx: 0,
+                             status: 'failed')
+
+      create(:commit_status, pipeline: pipeline,
+                             stage: 'deploy',
+                             name: 'staging',
+                             stage_idx: 2,
+                             status: 'running')
+
+      create(:commit_status, pipeline: pipeline,
+                             stage: 'test',
+                             name: 'rspec',
+                             stage_idx: 1,
+                             status: 'success')
+    end
+
+    describe '#legacy_stages' do
+      subject { pipeline.legacy_stages }
+
+      context 'stages list' do
+        it 'returns ordered list of stages' do
+          expect(subject.map(&:name)).to eq(%w[build test deploy])
+        end
+      end
+
+      context 'stages with statuses' do
+        let(:statuses) do
+          subject.map { |stage| [stage.name, stage.status] }
+        end
+
+        it 'returns list of stages with correct statuses' do
+          expect(statuses).to eq([%w(build failed),
+                                  %w(test success),
+                                  %w(deploy running)])
+        end
+
+        context 'when commit status is retried' do
+          before do
+            create(:commit_status, pipeline: pipeline,
+                                   stage: 'build',
+                                   name: 'mac',
+                                   stage_idx: 0,
+                                   status: 'success')
+
+            pipeline.process!
+          end
+
+          it 'ignores the previous state' do
+            expect(statuses).to eq([%w(build success),
+                                    %w(test success),
+                                    %w(deploy running)])
+          end
+        end
+      end
+
+      context 'when there is a stage with warnings' do
+        before do
+          create(:commit_status, pipeline: pipeline,
+                                 stage: 'deploy',
+                                 name: 'prod:2',
+                                 stage_idx: 2,
+                                 status: 'failed',
+                                 allow_failure: true)
+        end
+
+        it 'populates stage with correct number of warnings' do
+          deploy_stage = pipeline.legacy_stages.third
+
+          expect(deploy_stage).not_to receive(:statuses)
+          expect(deploy_stage).to have_warnings
+        end
+      end
+    end
+
+    describe '#stages_count' do
+      it 'returns a valid number of stages' do
+        expect(pipeline.stages_count).to eq(3)
+      end
+    end
+
+    describe '#stages_names' do
+      it 'returns a valid names of stages' do
+        expect(pipeline.stages_names).to eq(%w(build test deploy))
+      end
+    end
+  end
+
+  describe '#legacy_stage' do
+    subject { pipeline.legacy_stage('test') }
+
+    context 'with status in stage' do
+      before do
+        create(:commit_status, pipeline: pipeline, stage: 'test')
+      end
+
+      it { expect(subject).to be_a Ci::LegacyStage }
+      it { expect(subject.name).to eq 'test' }
+      it { expect(subject.statuses).not_to be_empty }
+    end
+
+    context 'without status in stage' do
+      before do
+        create(:commit_status, pipeline: pipeline, stage: 'build')
+      end
+
+      it 'return stage object' do
+        is_expected.to be_nil
+      end
+    end
+  end
+
+  describe '#stages' do
+    before do
+      create(:ci_stage_entity, project: project,
+                               pipeline: pipeline,
+                               name: 'build')
+    end
+
+    it 'returns persisted stages' do
+      expect(pipeline.stages).not_to be_empty
+      expect(pipeline.stages).to all(be_persisted)
+    end
+  end
+
+  describe '#ordered_stages' do
+    before do
+      create(:ci_stage_entity, project: project,
+                               pipeline: pipeline,
+                               position: 4,
+                               name: 'deploy')
+
+      create(:ci_build, project: project,
+                        pipeline: pipeline,
+                        stage: 'test',
+                        stage_idx: 3,
+                        name: 'test')
+
+      create(:ci_build, project: project,
+                        pipeline: pipeline,
+                        stage: 'build',
+                        stage_idx: 2,
+                        name: 'build')
+
+      create(:ci_stage_entity, project: project,
+                               pipeline: pipeline,
+                               position: 1,
+                               name: 'sanity')
+
+      create(:ci_stage_entity, project: project,
+                               pipeline: pipeline,
+                               position: 5,
+                               name: 'cleanup')
+    end
+
+    subject { pipeline.ordered_stages }
+
+    context 'when using legacy stages' do
+      before do
+        stub_feature_flags(ci_pipeline_persisted_stages: false)
+      end
+
+      it 'returns legacy stages in valid order' do
+        expect(subject.map(&:name)).to eq %w[build test]
+      end
+    end
+
+    context 'when using persisted stages' do
+      before do
+        stub_feature_flags(ci_pipeline_persisted_stages: true)
+      end
+
+      context 'when pipelines is not complete' do
+        it 'still returns legacy stages' do
+          expect(subject).to all(be_a Ci::LegacyStage)
+          expect(subject.map(&:name)).to eq %w[build test]
+        end
+      end
+
+      context 'when pipeline is complete' do
+        before do
+          pipeline.succeed!
+        end
+
+        it 'returns stages in valid order' do
+          expect(subject).to all(be_a Ci::Stage)
+          expect(subject.map(&:name))
+            .to eq %w[sanity build test deploy cleanup]
+        end
+      end
+    end
+  end
+
   describe 'state machine' do
     let(:current) { Time.now.change(usec: 0) }
     let(:build) { create_build('build1', queued_at: 0) }

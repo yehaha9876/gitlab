@@ -36,13 +36,6 @@ FactoryBot.define do
     end
 
     factory :ci_pipeline do
-      transient { config nil }
-
-      after(:build) do |pipeline, evaluator|
-        # TODO: not supported
-        # pipeline.instance_variable_set(:@ci_yaml_file, File.read(Rails.root.join('spec/support/gitlab_stubs/gitlab_ci.yml')))
-      end
-
       trait :invalid do
         yaml_errors 'yaml errors'
         failure_reason :config_error
