@@ -462,14 +462,6 @@ module Ci
       end
     end
 
-    def set_config_source
-      if ci_yaml_from_repo
-        self.config_source = :repository_source
-      elsif implied_ci_yaml_file
-        self.config_source = :auto_devops_source
-      end
-    end
-
     def degenerate!
       self.builds = []
       self.stages = []

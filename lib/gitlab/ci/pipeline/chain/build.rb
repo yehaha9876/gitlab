@@ -19,8 +19,6 @@ module Gitlab
               protected: @command.protected_ref?,
               variables_attributes: Array(@command.variables_attributes)
             )
-
-            @pipeline.set_config_source
           end
 
           def break?
