@@ -443,22 +443,6 @@ module Ci
       end
     end
 
-    def stage_seeds
-      return [] unless config_processor
-
-      strong_memoize(:stage_seeds) do
-        seeds = config_processor.stages_attributes.map do |attributes|
-          Gitlab::Ci::Pipeline::Seed::Stage.new(self, attributes)
-        end
-
-        seeds.select(&:included?)
-      end
-    end
-
-    def seeds_size
-      stage_seeds.sum(&:size)
-    end
-
     def has_kubernetes_active?
       project.deployment_platform&.active?
     end
@@ -486,22 +470,9 @@ module Ci
       end
     end
 
-    ##
-    # TODO, setting yaml_errors should be moved to the pipeline creation chain.
-    #
-    def config_processor
-      return unless ci_yaml_file
-      return @config_processor if defined?(@config_processor)
-
-      @config_processor ||= begin
-        ::Gitlab::Ci::YamlProcessor.new(ci_yaml_file, { project: project, sha: sha })
-      rescue Gitlab::Ci::YamlProcessor::ValidationError => e
-        self.yaml_errors = e.message
-        nil
-      rescue
-        self.yaml_errors = 'Undefined error'
-        nil
-      end
+    def degenerate!
+      self.builds = []
+      self.stages = []
     end
 
     def ci_yaml_file_path

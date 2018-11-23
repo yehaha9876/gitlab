@@ -11,6 +11,7 @@ module Gitlab
           :trigger_request, :schedule,
           :ignore_skip_ci, :save_incompleted,
           :seeds_block, :variables_attributes,
+          :config_processor,
 
           # EE specific
           :allow_mirror_update,

@@ -18,6 +18,7 @@ module EE
                 return unless @limit.exceeded?
 
                 if @command.save_incompleted
+                  @pipeline.degenerate!
                   @pipeline.drop!(:size_limit_exceeded)
                 end
 
