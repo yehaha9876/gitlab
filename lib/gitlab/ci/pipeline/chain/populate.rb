@@ -21,7 +21,7 @@ module Gitlab
             ##
             # Populate pipeline with all stages, and stages with builds.
             #
-            pipeline.stage_seeds.each do |stage|
+            stage_seeds.each do |stage|
               pipeline.stages << stage.to_resource
             end
 
@@ -39,16 +39,16 @@ module Gitlab
           def break?
             pipeline.errors.any?
           end
-        end
 
-        private
-
-        def stage_seeds
-          seeds = @command.config_processor.stages_attributes.map do |attributes|
-            Gitlab::Ci::Pipeline::Seed::Stage.new(pipeline, attributes)
+          private
+  
+          def stage_seeds
+            seeds = @command.config_processor.stages_attributes.map do |attributes|
+              Gitlab::Ci::Pipeline::Seed::Stage.new(pipeline, attributes)
+            end
+  
+            seeds.select(&:included?)
           end
-
-          seeds.select(&:included?)
         end
       end
     end

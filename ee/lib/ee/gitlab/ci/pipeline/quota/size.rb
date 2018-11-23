@@ -31,7 +31,13 @@ module EE
             private
 
             def excessive_seeds_count
-              @excessive ||= @pipeline.seeds_size - @namespace.max_pipeline_size
+              @excessive ||= stages_size - @namespace.max_pipeline_size
+            end
+
+            def stages_size
+              @pipeline.stages.sum do |stage|
+                stage.builds.size
+              end
             end
           end
         end

@@ -5,8 +5,16 @@ module Gitlab
     module Pipeline
       module Chain
         class Config < Chain::Base
+          include ::Gitlab::Ci::Pipeline::Chain::Helpers
+
           def perform!
-            set_config_processor
+            config_source, yaml_content = config_with_source
+            unless yaml_content
+              error("Missing #{ci_yaml_file_path} file")
+              return
+            end
+
+            set_config_processor(config_source, yaml_content)
           ensure
             # persist yaml errors
             if @pipeline.has_yaml_errors? && @command.save_incompleted
@@ -20,17 +28,14 @@ module Gitlab
 
           private
 
-          def set_config_processor
-            config_source, content = config_with_source
-            return error("Missing #{ci_yaml_file_path} file") unless content
-
+          def set_config_processor(config_source, content)
             @pipeline.config_source = config_source
-            @command.config_processor = ::Gitlab::Ci::YamlProcessor.new(@pipeline.ci_yaml_file,
-              project: @command.project, sha: @command.sha)
+            @command.config_processor = ::Gitlab::Ci::YamlProcessor.new(
+              content, project: @command.project, sha: @command.sha)
           rescue Gitlab::Ci::YamlProcessor::ValidationError => e
-            error(e.message)
+            yaml_error(e.message)
           rescue
-            error('Undefined error')
+            yaml_error('Undefined error')
           end
 
           def config_with_source
@@ -61,9 +66,9 @@ module Gitlab
             @pipeline.ci_yaml_file_path
           end
 
-          def error(message)
+          def yaml_error(message)
             @pipeline.yaml_errors = message
-            super
+            error(message)
           end
         end
       end

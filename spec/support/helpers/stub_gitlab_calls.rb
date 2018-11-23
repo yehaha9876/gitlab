@@ -17,7 +17,9 @@ module StubGitlabCalls
   end
 
   def stub_ci_pipeline_yaml_file(ci_yaml)
-    allow_any_instance_of(Ci::Pipeline).to receive(:ci_yaml_file) { ci_yaml }
+    allow_any_instance_of(Repository)
+      .to receive(:gitlab_ci_yml_for).with(anything, '.gitlab-ci.yml')
+      .and_return(ci_yaml)
   end
 
   def stub_repository_ci_yaml_file(sha:, path: '.gitlab-ci.yml')
