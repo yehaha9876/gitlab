@@ -621,11 +621,11 @@ module Ci
     end
 
     def when
-      read_attribute(:when) || build_attributes_from_config[:when] || 'on_success'
+      read_attribute(:when) || 'on_success'
     end
 
     def yaml_variables
-      read_attribute(:yaml_variables) || build_attributes_from_config[:yaml_variables] || []
+      read_attribute(:yaml_variables) || []
     end
 
     def user_variables
@@ -902,12 +902,6 @@ module Ci
     def normalized_retry
       value = options&.dig(:retry)
       value.is_a?(Integer) ? { max: value } : value.to_h
-    end
-
-    def build_attributes_from_config
-      return {} unless pipeline.config_processor
-
-      pipeline.config_processor.build_attributes(name)
     end
 
     def update_project_statistics_after_save
