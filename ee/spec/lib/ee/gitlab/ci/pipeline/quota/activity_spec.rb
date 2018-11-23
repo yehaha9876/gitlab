@@ -8,7 +8,6 @@ describe EE::Gitlab::Ci::Pipeline::Quota::Activity do
 
   shared_context 'pipeline activity limit exceeded' do
     before do
-      create(:ci_pipeline, project: project, status: 'created')
       create(:ci_pipeline, project: project, status: 'pending')
       create(:ci_pipeline, project: project, status: 'running')
 
