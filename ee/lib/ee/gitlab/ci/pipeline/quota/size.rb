@@ -36,9 +36,7 @@ module EE
 
             # rubocop: disable CodeReuse/ActiveRecord
             def jobs_count
-              @pipeline.stages.sum do |stage|
-                stage.builds.size
-              end
+              @pipeline.stages.map(&:builds).map(&:size).sum
             end
             # rubocop: enable CodeReuse/ActiveRecord
           end
