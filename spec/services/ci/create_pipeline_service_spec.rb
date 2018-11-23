@@ -9,6 +9,7 @@ describe Ci::CreatePipelineService do
 
   before do
     stub_repository_ci_yaml_file(sha: anything)
+    stub_application_setting(auto_devops_enabled: false)
   end
 
   describe '#execute' do
@@ -263,11 +264,26 @@ describe Ci::CreatePipelineService do
       end
     end
 
-    it 'skips creating pipeline for refs without .gitlab-ci.yml' do
-      stub_ci_pipeline_yaml_file(nil)
+    context 'when there is no .gitlab-ci.yml' do
+      before do
+        stub_ci_pipeline_yaml_file(nil)
+      end
 
-      expect(execute_service).not_to be_persisted
-      expect(Ci::Pipeline.count).to eq(0)
+      it 'skips creating pipeline' do
+        expect(execute_service).not_to be_persisted
+        expect(Ci::Pipeline.count).to eq(0)
+      end
+
+      context 'when auto devops is enabled' do
+        before do
+          stub_application_setting(auto_devops_enabled: true)
+        end
+
+        it 'creates pipeline' do
+          expect(execute_service).to be_persisted
+          expect(Ci::Pipeline.count).to eq(1)
+        end
+      end
     end
 
     shared_examples 'a failed pipeline' do

@@ -486,7 +486,7 @@ describe CommitStatus do
       end
 
       let(:commit_status) do
-        create(:commit_status, stage_id: stage.id, name: 'rspec', stage: 'test')
+        create(:commit_status, pipeline: pipeline, stage_id: stage.id, name: 'rspec', stage: 'test')
       end
 
       it 'does not create a new stage' do
