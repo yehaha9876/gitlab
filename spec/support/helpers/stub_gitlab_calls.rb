@@ -16,16 +16,14 @@ module StubGitlabCalls
     stub_ci_pipeline_yaml_file(gitlab_ci_yaml)
   end
 
-  def stub_ci_pipeline_yaml_file(ci_yaml)
+  def stub_ci_pipeline_yaml_file(ci_yaml, sha: anything, path: '.gitlab-ci.yml')
     allow_any_instance_of(Repository)
-      .to receive(:gitlab_ci_yml_for).with(anything, '.gitlab-ci.yml')
+      .to receive(:gitlab_ci_yml_for).with(sha, path)
       .and_return(ci_yaml)
   end
 
   def stub_repository_ci_yaml_file(sha:, path: '.gitlab-ci.yml')
-    allow_any_instance_of(Repository)
-      .to receive(:gitlab_ci_yml_for).with(sha, path)
-      .and_return(gitlab_ci_yaml)
+    stub_ci_pipeline_yaml_file(gitlab_ci_yaml, sha: sha, path: path)
   end
 
   def stub_ci_builds_disabled

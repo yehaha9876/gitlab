@@ -31,7 +31,8 @@ module EE
             private
 
             def excessive_pipelines_count
-              @excessive ||= alive_pipelines_count - max_active_pipelines_count
+              # we add +1 as this is our not yet saved pipeline
+              @excessive ||= alive_pipelines_count - max_active_pipelines_count + 1
             end
 
             def alive_pipelines_count

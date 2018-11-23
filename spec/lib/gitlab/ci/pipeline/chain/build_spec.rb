@@ -48,12 +48,6 @@ describe Gitlab::Ci::Pipeline::Chain::Build do
       .to eq variables_attributes.map(&:with_indifferent_access)
   end
 
-  it 'sets a valid config source' do
-    step.perform!
-
-    expect(pipeline.repository_source?).to be true
-  end
-
   it 'returns a valid pipeline' do
     step.perform!
 

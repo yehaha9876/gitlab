@@ -1871,7 +1871,7 @@ describe Ci::Pipeline, :mailer do
   describe '#has_yaml_errors?' do
     context 'when pipeline has errors' do
       let(:pipeline) do
-        create(:ci_pipeline, config: { rspec: nil })
+        create(:ci_pipeline, :with_yaml_errors)
       end
 
       it 'contains yaml errors' do
@@ -1880,9 +1880,8 @@ describe Ci::Pipeline, :mailer do
     end
 
     context 'when pipeline does not have errors' do
-      let(:project) { create(:project, :repository) }
       let(:pipeline) do
-        create(:ci_pipeline, project: project, config: { rspec: { script: 'rake test' } })
+        create(:ci_pipeline)
       end
 
       it 'does not contain yaml errors' do

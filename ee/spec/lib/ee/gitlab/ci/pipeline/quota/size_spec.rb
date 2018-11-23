@@ -9,10 +9,7 @@ describe EE::Gitlab::Ci::Pipeline::Quota::Size do
 
   shared_context 'pipeline size limit exceeded' do
     let(:pipeline) do
-      config = { rspec: { script: 'rspec' },
-                 spinach: { script: 'spinach' } }
-
-      build(:ci_pipeline, project: project, config: config)
+      build(:ci_pipeline, :with_rspec_and_spinach, project: project)
     end
 
     before do

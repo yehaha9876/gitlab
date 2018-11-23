@@ -16,9 +16,15 @@ FactoryBot.define do
 
     factory :ci_pipeline_with_one_job do
       after(:build) do |pipeline|
-        allow(pipeline).to receive(:ci_yaml_file) do
-          pipeline.instance_variable_set(:@ci_yaml_file, YAML.dump({ rspec: { script: "ls" } }))
-        end
+        pipeline.stages << build(:ci_stage_entity, :with_rspec,
+          project: pipeline.project, pipeline: pipeline)
+      end
+    end
+
+    trait :with_rspec_and_spinach do
+      after(:build) do |pipeline|
+        pipeline.stages << build(:ci_stage_entity, :with_rspec, :with_spinach,
+          project: pipeline.project, pipeline: pipeline)
       end
     end
 
@@ -67,6 +73,11 @@ FactoryBot.define do
       end
 
       trait :failed do
+        status :failed
+      end
+
+      trait :with_yaml_errors do
+        yaml_errors 'yaml errors'
         status :failed
       end
 

@@ -19,7 +19,6 @@ module EE
                 return unless @limit.exceeded?
 
                 retry_optimistic_lock(@pipeline) do
-                  @pipeline.degenerate!
                   @pipeline.drop!(:activity_limit_exceeded)
                 end
               end

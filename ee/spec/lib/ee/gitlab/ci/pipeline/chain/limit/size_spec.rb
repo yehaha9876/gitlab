@@ -25,10 +25,7 @@ describe EE::Gitlab::Ci::Pipeline::Chain::Limit::Size do
     end
 
     let(:pipeline) do
-      config = { rspec: { script: 'rspec' },
-                 spinach: { script: 'spinach' } }
-
-      create(:ci_pipeline, project: project, config: config)
+      create(:ci_empty_pipeline, :with_rspec_and_spinach, project: project)
     end
 
     context 'when saving incomplete pipelines' do

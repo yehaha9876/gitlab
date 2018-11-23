@@ -23,5 +23,19 @@ FactoryBot.define do
     name 'test'
     position 1
     status 'pending'
+
+    trait :with_rspec do
+      after(:build) do |stage|
+        stage.builds << build(:ci_build, name: 'rspec',
+          pipeline: stage.pipeline, project: stage.project)
+      end
+    end
+
+    trait :with_spinach do
+      after(:build) do |stage|
+        stage.builds << build(:ci_build, name: 'spinach',
+          pipeline: stage.pipeline, project: stage.project)
+      end
+    end
   end
 end

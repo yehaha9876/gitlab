@@ -53,6 +53,8 @@ module Gitlab
 
           def auto_devops_source
             return unless project
+
+            binding.pry
             return unless project.auto_devops_enabled?
 
             [:auto_devops_source, Gitlab::Template::GitlabCiYmlTemplate.find('Auto-DevOps').content]
