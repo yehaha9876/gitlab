@@ -1871,7 +1871,7 @@ describe Ci::Pipeline, :mailer do
   describe '#has_yaml_errors?' do
     context 'when pipeline has errors' do
       let(:pipeline) do
-        create(:ci_pipeline, :with_yaml_errors)
+        create(:ci_pipeline, :invalid)
       end
 
       it 'contains yaml errors' do

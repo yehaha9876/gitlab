@@ -113,7 +113,7 @@ describe PipelineDetailsEntity do
 
     context 'when pipeline has YAML errors' do
       let(:pipeline) do
-        create(:ci_pipeline, :with_yaml_errors)
+        create(:ci_pipeline, :invalid)
       end
 
       it 'contains information about error' do

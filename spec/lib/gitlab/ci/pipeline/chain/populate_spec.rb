@@ -5,16 +5,22 @@ describe Gitlab::Ci::Pipeline::Chain::Populate do
   set(:user) { create(:user) }
 
   let(:pipeline) do
-    build(:ci_pipeline_with_one_job, project: project,
-                                     ref: 'master',
-                                     user: user)
+    build(:ci_empty_pipeline, project: project, ref: 'master', user: user)
+  end
+
+  let(:config) { { rspec: { script: 'ls' } }.to_yaml }
+
+  let(:config_processor) do
+    ::Gitlab::Ci::YamlProcessor.new(
+      config, project: project, sha: pipeline.sha)
   end
 
   let(:command) do
     Gitlab::Ci::Pipeline::Chain::Command.new(
       project: project,
       current_user: user,
-      seeds_block: nil)
+      seeds_block: nil,
+      config_processor: config_processor)
   end
 
   let(:step) { described_class.new(pipeline, command) }
@@ -53,7 +59,7 @@ describe Gitlab::Ci::Pipeline::Chain::Populate do
       { rspec: {
           script: 'ls',
           only: ['something']
-      } }
+      } }.to_yaml
     end
 
     let(:pipeline) do
@@ -80,7 +86,7 @@ describe Gitlab::Ci::Pipeline::Chain::Populate do
 
   context 'when pipeline has validation errors' do
     let(:pipeline) do
-      build(:ci_pipeline, project: project, ref: nil)
+      build(:ci_empty_pipeline, project: project, ref: nil)
     end
 
     before do
@@ -106,7 +112,8 @@ describe Gitlab::Ci::Pipeline::Chain::Populate do
       Gitlab::Ci::Pipeline::Chain::Command.new(
         project: project,
         current_user: user,
-        seeds_block: seeds_block)
+        seeds_block: seeds_block,
+        config_processor: config_processor)
     end
 
     context 'when seeds block builds some resources' do
@@ -170,7 +177,7 @@ describe Gitlab::Ci::Pipeline::Chain::Populate do
     context 'when using only/except build policies' do
       let(:config) do
         { rspec: { script: 'rspec', stage: 'test', only: ['master'] },
-          prod: { script: 'cap prod', stage: 'deploy', only: ['tags'] } }
+          prod: { script: 'cap prod', stage: 'deploy', only: ['tags'] } }.to_yaml
       end
 
       let(:pipeline) do
@@ -183,7 +190,7 @@ describe Gitlab::Ci::Pipeline::Chain::Populate do
         context 'when pipeline iid is the subject' do
           let(:config) do
             { rspec: { script: 'rspec', only: { variables: ["$CI_PIPELINE_IID == '1'"] } },
-              prod: { script: 'cap prod', only: { variables: ["$CI_PIPELINE_IID == '1000'"] } } }
+              prod: { script: 'cap prod', only: { variables: ["$CI_PIPELINE_IID == '1000'"] } } }.to_yaml
           end
 
           it_behaves_like 'a correct pipeline'

@@ -41,19 +41,14 @@ FactoryBot.define do
       transient { config nil }
 
       after(:build) do |pipeline, evaluator|
-        if evaluator.config
-          pipeline.instance_variable_set(:@ci_yaml_file, YAML.dump(evaluator.config))
-
-          # Populates pipeline with errors
-          pipeline.config_processor if evaluator.config
-        else
-          pipeline.instance_variable_set(:@ci_yaml_file, File.read(Rails.root.join('spec/support/gitlab_stubs/gitlab_ci.yml')))
-        end
+        # TODO: not supported
+        # pipeline.instance_variable_set(:@ci_yaml_file, File.read(Rails.root.join('spec/support/gitlab_stubs/gitlab_ci.yml')))
       end
 
       trait :invalid do
-        config(rspec: nil)
+        yaml_errors 'yaml errors'
         failure_reason :config_error
+        status :failed
       end
 
       trait :blocked do
@@ -73,11 +68,6 @@ FactoryBot.define do
       end
 
       trait :failed do
-        status :failed
-      end
-
-      trait :with_yaml_errors do
-        yaml_errors 'yaml errors'
         status :failed
       end
 
