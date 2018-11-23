@@ -56,7 +56,7 @@ describe 'User browses commits' do
 
       create(:ci_build, pipeline: pipeline)
 
-      allow_any_instance_of(Ci::Pipeline).to receive(:ci_yaml_file).and_return('')
+      # TODO: allow_any_instance_of(Ci::Pipeline).to receive(:ci_yaml_file).and_return('')
     end
 
     it 'renders commit ci info' do

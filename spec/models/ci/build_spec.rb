@@ -2049,56 +2049,6 @@ describe Ci::Build do
     end
   end
 
-  describe '#when' do
-    subject { build.when }
-
-    context 'when `when` is undefined' do
-      before do
-        build.when = nil
-      end
-
-      context 'use from gitlab-ci.yml' do
-        let(:project) { create(:project, :repository) }
-        let(:pipeline) { create(:ci_pipeline, project: project) }
-
-        before do
-          stub_ci_pipeline_yaml_file(config)
-        end
-
-        context 'when config is not found' do
-          let(:config) { nil }
-
-          it { is_expected.to eq('on_success') }
-        end
-
-        context 'when config does not have a questioned job' do
-          let(:config) do
-            YAML.dump({
-              test_other: {
-                script: 'Hello World'
-              }
-            })
-          end
-
-          it { is_expected.to eq('on_success') }
-        end
-
-        context 'when config has `when`' do
-          let(:config) do
-            YAML.dump({
-              test: {
-                script: 'Hello World',
-                when: 'always'
-              }
-            })
-          end
-
-          it { is_expected.to eq('always') }
-        end
-      end
-    end
-  end
-
   describe '#variables' do
     let(:container_registry_enabled) { false }
 
@@ -2165,62 +2115,6 @@ describe Ci::Build do
       end
 
       it { is_expected.to include(*predefined_variables) }
-
-      context 'when yaml variables are undefined' do
-        let(:pipeline) do
-          create(:ci_pipeline, project: project,
-                               sha: project.commit.id,
-                               ref: project.default_branch)
-        end
-
-        before do
-          build.yaml_variables = nil
-        end
-
-        context 'use from gitlab-ci.yml' do
-          before do
-            stub_ci_pipeline_yaml_file(config)
-          end
-
-          context 'when config is not found' do
-            let(:config) { nil }
-
-            it { is_expected.to include(*predefined_variables) }
-          end
-
-          context 'when config does not have a questioned job' do
-            let(:config) do
-              YAML.dump({
-                test_other: {
-                  script: 'Hello World'
-                }
-              })
-            end
-
-            it { is_expected.to include(*predefined_variables) }
-          end
-
-          context 'when config has variables' do
-            let(:config) do
-              YAML.dump({
-                test: {
-                  script: 'Hello World',
-                  variables: {
-                    KEY: 'value'
-                  }
-                }
-              })
-            end
-
-            let(:variables) do
-              [{ key: 'KEY', value: 'value', public: true }]
-            end
-
-            it { is_expected.to include(*predefined_variables) }
-            it { is_expected.to include(*variables) }
-          end
-        end
-      end
 
       describe 'variables ordering' do
         context 'when variables hierarchy is stubbed' do

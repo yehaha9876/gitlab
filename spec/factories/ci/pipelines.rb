@@ -9,9 +9,7 @@ FactoryBot.define do
     project
 
     factory :ci_pipeline_without_jobs do
-      after(:build) do |pipeline|
-        pipeline.instance_variable_set(:@ci_yaml_file, YAML.dump({}))
-      end
+      # no-op
     end
 
     factory :ci_pipeline_with_one_job do
