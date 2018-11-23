@@ -204,8 +204,7 @@ export default {
             :title="issueReferencePath"
             placement="bottom"
             class="board-issue-path block-truncated bold"
-            >{{ issueReferencePath }}</tooltip-on-truncate
-          >#{{ issue.iid }}
+          >{{ issueReferencePath }}</tooltip-on-truncate>#{{ issue.iid }}
         </span>
         <span class="board-info-items prepend-top-8 d-inline-block">
           <issue-due-date
