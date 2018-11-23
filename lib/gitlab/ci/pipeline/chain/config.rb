@@ -46,15 +46,14 @@ module Gitlab
             return unless project
             return unless @pipeline.sha
       
-            [:repository_source, project.repository.gitlab_ci_yml_for(@pipeline.sha, ci_yaml_file_path)]
+            ci_yml_file = project.repository.gitlab_ci_yml_for(@pipeline.sha, ci_yaml_file_path)
+            [:repository_source, ci_yml_file] if ci_yml_file
           rescue GRPC::NotFound, GRPC::Internal
             nil
           end
 
           def auto_devops_source
             return unless project
-
-            binding.pry
             return unless project.auto_devops_enabled?
 
             [:auto_devops_source, Gitlab::Template::GitlabCiYmlTemplate.find('Auto-DevOps').content]
