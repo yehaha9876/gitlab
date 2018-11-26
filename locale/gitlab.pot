@@ -447,6 +447,9 @@ msgstr ""
 msgid "Add user(s) to the group:"
 msgstr ""
 
+msgid "Add users or groups who are allowed to approve every merge request"
+msgstr ""
+
 msgid "Add users to group"
 msgstr ""
 
@@ -776,6 +779,12 @@ msgstr ""
 msgid "Applications"
 msgstr ""
 
+msgid "Approvals required"
+msgstr ""
+
+msgid "Approvers"
+msgstr ""
+
 msgid "Apr"
 msgstr ""
 
@@ -801,6 +810,12 @@ msgid "Are you sure you want to regenerate the public key? You will have to upda
 msgstr ""
 
 msgid "Are you sure you want to remove %{group_name}?"
+msgstr ""
+
+msgid "Are you sure you want to remove approver %{name}?"
+msgstr ""
+
+msgid "Are you sure you want to remove group %{name}?"
 msgstr ""
 
 msgid "Are you sure you want to remove this identity?"
@@ -1405,6 +1420,9 @@ msgstr ""
 msgid "Callback URL"
 msgstr ""
 
+msgid "Can override approvers and approvals required per merge request"
+msgstr ""
+
 msgid "Can't find HEAD commit for this branch"
 msgstr ""
 
@@ -1726,6 +1744,9 @@ msgstr ""
 msgid "ClusterIntegration|CA Certificate"
 msgstr ""
 
+msgid "ClusterIntegration|Cert-Manager"
+msgstr ""
+
 msgid "ClusterIntegration|Certificate Authority bundle (PEM format)"
 msgstr ""
 
@@ -1897,6 +1918,9 @@ msgstr ""
 msgid "ClusterIntegration|Learn more about group Kubernetes clusters"
 msgstr ""
 
+msgid "ClusterIntegration|Let's Encrypt"
+msgstr ""
+
 msgid "ClusterIntegration|Machine type"
 msgstr ""
 
@@ -2057,6 +2081,9 @@ msgid "ClusterIntegration|Zone"
 msgstr ""
 
 msgid "ClusterIntegration|access to Google Kubernetes Engine"
+msgstr ""
+
+msgid "ClusterIntegration|cert-manager is a native Kubernetes certificate management controller that helps with issuing certificates. Installing cert-manager on your cluster will issue a certificate by %{letsEncrypt} and ensure that certificates are valid and up to date."
 msgstr ""
 
 msgid "ClusterIntegration|check the pricing here"
@@ -2555,6 +2582,9 @@ msgstr ""
 msgid "Customize how Google Code email addresses and usernames are imported into GitLab. In the next step, you'll be able to select the projects you want to import."
 msgstr ""
 
+msgid "Customize your merge request approval settings."
+msgstr ""
+
 msgid "Customize your pipeline configuration, view your pipeline status and coverage report."
 msgstr ""
 
@@ -3023,6 +3053,9 @@ msgid "Enable or disable version check and usage ping."
 msgstr ""
 
 msgid "Enable reCAPTCHA or Akismet and set IP limits."
+msgstr ""
+
+msgid "Enable self approval of merge requests"
 msgstr ""
 
 msgid "Enable the Performance Bar for a given group."
@@ -4097,6 +4130,9 @@ msgid "Group maintainers can register group runners in the %{link}"
 msgstr ""
 
 msgid "Group name"
+msgstr ""
+
+msgid "Group:"
 msgstr ""
 
 msgid "Group: %{group_name}"
@@ -6831,6 +6867,12 @@ msgstr ""
 msgid "Remove Runner"
 msgstr ""
 
+msgid "Remove all approvals in a merge request when new commits are pushed to its source branch"
+msgstr ""
+
+msgid "Remove approver"
+msgstr ""
+
 msgid "Remove avatar"
 msgstr ""
 
@@ -7385,6 +7427,9 @@ msgstr ""
 msgid "Set notification email for abuse reports."
 msgstr ""
 
+msgid "Set number of approvers required before open merge requests can be merged"
+msgstr ""
+
 msgid "Set requirements for a user to sign-in. Enable mandatory two-factor authentication."
 msgstr ""
 
@@ -7607,6 +7652,9 @@ msgid "Sorry, no epics matched your search"
 msgstr ""
 
 msgid "Sorry, no projects matched your search"
+msgstr ""
+
+msgid "Sorry, your filter produced no results"
 msgstr ""
 
 msgid "Sort by"
@@ -8112,6 +8160,9 @@ msgstr ""
 msgid "The value lying at the midpoint of a series of observed values. E.g., between 3, 5, 9, the median is 5. Between 3, 5, 7, 8, the median is (5+7)/2 = 6."
 msgstr ""
 
+msgid "There are no approvers"
+msgstr ""
+
 msgid "There are no archived projects yet"
 msgstr ""
 
@@ -8119,9 +8170,6 @@ msgid "There are no issues to show"
 msgstr ""
 
 msgid "There are no labels yet"
-msgstr ""
-
-msgid "There are no merge requests to show"
 msgstr ""
 
 msgid "There are no projects shared with this group yet"
@@ -8600,6 +8648,9 @@ msgid "To validate your GitLab CI configurations, go to 'CI/CD → Pipelines' in
 msgstr ""
 
 msgid "To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown."
+msgstr ""
+
+msgid "To widen your search, change or remove filters above"
 msgstr ""
 
 msgid "To widen your search, change or remove filters."
