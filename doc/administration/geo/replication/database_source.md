@@ -52,47 +52,47 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
 
 1. SSH into your GitLab **primary** server and login as root:
 
-    ```bash
-    sudo -i
-    ```
+```bash
+sudo -i
+```
 
 1. Add this node as the Geo primary by running:
 
-    ```bash
-    bundle exec rake geo:set_primary_node
-    ```
+```bash
+bundle exec rake geo:set_primary_node
+```
 
 1. Create a [replication user] named `gitlab_replicator`:
 
-    ```sql
-    --- Create a new user 'replicator'
-    CREATE USER gitlab_replicator;
+```sql
+--- Create a new user 'replicator'
+CREATE USER gitlab_replicator;
     
-    --- Set/change a password and grants replication privilege 
-    ALTER USER gitlab_replicator WITH REPLICATION ENCRYPTED PASSWORD 'replicationpasswordhere';
-    ```
+--- Set/change a password and grants replication privilege 
+ALTER USER gitlab_replicator WITH REPLICATION ENCRYPTED PASSWORD 'replicationpasswordhere';
+```
     
 1. Make sure your the `gitlab` database user has a password defined
 
-    ```bash
-    sudo -u postgres psql -d template1 -c "ALTER USER gitlab WITH ENCRYPTED PASSWORD 'mydatabasepassword';"
-    ```
+```bash
+sudo -u postgres psql -d template1 -c "ALTER USER gitlab WITH ENCRYPTED PASSWORD 'mydatabasepassword';"
+```
     
 1. Edit the content of `database.yml` in `production:` and add the password like the exemple below:
 
-    ```yaml
-    #
-    # PRODUCTION
-    #
-    production:
-      adapter: postgresql
-      encoding: unicode
-      database: gitlabhq_production
-      pool: 10
-      username: gitlab
-      password: mydatabasepassword
-      host: /var/opt/gitlab/geo-postgresql
-    ```
+```yaml
+#
+# PRODUCTION
+#
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: gitlabhq_production
+  pool: 10
+  username: gitlab
+  password: mydatabasepassword
+  host: /var/opt/gitlab/geo-postgresql
+```
 
 1. Set up TLS support for the PostgreSQL primary server
 
@@ -109,43 +109,43 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
 
     To generate a self-signed certificate and key, run this command:
 
-    ```bash
-    openssl req -nodes -batch -x509 -newkey rsa:4096 -keyout server.key -out server.crt -days 3650
-    ```
+```bash
+openssl req -nodes -batch -x509 -newkey rsa:4096 -keyout server.key -out server.crt -days 3650
+```
 
     This will create two files - `server.key` and `server.crt` - that you can
     use for authentication.
 
     Copy them to the correct location for your PostgreSQL installation:
 
-    ```bash
-    # Copying a self-signed certificate and key
-    install -o postgres -g postgres -m 0400 -T server.crt ~postgres/9.x/main/data/server.crt
-    install -o postgres -g postgres -m 0400 -T server.key ~postgres/9.x/main/data/server.key
-    ```
+```bash
+# Copying a self-signed certificate and key
+install -o postgres -g postgres -m 0400 -T server.crt ~postgres/9.x/main/data/server.crt
+install -o postgres -g postgres -m 0400 -T server.key ~postgres/9.x/main/data/server.key
+```
 
     Add this configuration to `postgresql.conf`, removing any existing
     configuration for `ssl_cert_file` or `ssl_key_file`:
 
-    ```
-    ssl = on
-    ssl_cert_file='server.crt'
-    ssl_key_file='server.key'
-    ```
+```
+ssl = on
+ssl_cert_file='server.crt'
+ssl_key_file='server.key'
+```
 
 1. Edit `postgresql.conf` to configure the primary server for streaming replication
    (for Debian/Ubuntu that would be `/etc/postgresql/9.x/main/postgresql.conf`):
 
-    ```
-    listen_address = '1.2.3.4'
-    wal_level = hot_standby
-    max_wal_senders = 5
-    min_wal_size = 80MB
-    max_wal_size = 1GB
-    max_replicaton_slots = 1 # Number of Geo secondary nodes
-    wal_keep_segments = 10
-    hot_standby = on
-    ```
+```
+listen_address = '1.2.3.4'
+wal_level = hot_standby
+max_wal_senders = 5
+min_wal_size = 80MB
+max_wal_size = 1GB
+max_replicaton_slots = 1 # Number of Geo secondary nodes
+wal_keep_segments = 10
+hot_standby = on
+```
 
     NOTE: **Note**:
     Be sure to set `max_replication_slots` to the number of Geo secondary
@@ -170,21 +170,21 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
    password.  Edit `pg_hba.conf` (for Debian/Ubuntu that would be
    `/etc/postgresql/9.x/main/pg_hba.conf`):
 
-    ```bash
-    host    all             all                      1.2.3.4/32      md5
-    host    replication     gitlab_replicator        5.6.7.8/32      md5
-    ```
+```bash
+host    all             all                      1.2.3.4/32      md5
+host    replication     gitlab_replicator        5.6.7.8/32      md5
+```
 
     Where `1.2.3.4` is the public IP address of the primary server, and `5.6.7.8`
     the public IP address of the secondary one. If you want to add another
     secondary, add one more row like the replication one and change the IP
     address:
 
-    ```bash
-    host    all             all                      1.2.3.4/32      md5
-    host    replication     gitlab_replicator        5.6.7.8/32      md5
-    host    replication     gitlab_replicator        11.22.33.44/32  md5
-    ```
+```bash
+host    all             all                      1.2.3.4/32      md5
+host    replication     gitlab_replicator        5.6.7.8/32      md5
+host    replication     gitlab_replicator        11.22.33.44/32  md5
+```
 
 1. Restart PostgreSQL for the changes to take effect.
 
@@ -195,13 +195,13 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
 
 1. Create the replication slot on the primary:
 
-    ```bash
-    $ sudo -u postgres psql -c "SELECT * FROM pg_create_physical_replication_slot('secondary_example');"
-      slot_name         | xlog_position
-      ------------------+---------------
-      secondary_example |
-      (1 row)
-    ```
+```bash
+$ sudo -u postgres psql -c "SELECT * FROM pg_create_physical_replication_slot('secondary_example');"
+  slot_name         | xlog_position
+  ------------------+---------------
+  secondary_example |
+  (1 row)
+```
 
 1. Now that the PostgreSQL server is set up to accept remote connections, run
    `netstat -plnt` to make sure that PostgreSQL is listening to the server's
@@ -218,13 +218,13 @@ the primary's database" step, continue here:
 1. Edit `postgresql.conf` to configure the secondary for streaming replication
    (for Debian/Ubuntu that would be `/etc/postgresql/9.*/main/postgresql.conf`):
 
-    ```bash
-    wal_level = hot_standby
-    max_wal_senders = 5
-    checkpoint_segments = 10
-    wal_keep_segments = 10
-    hot_standby = on
-    ```
+```bash
+wal_level = hot_standby
+max_wal_senders = 5
+checkpoint_segments = 10
+wal_keep_segments = 10
+hot_standby = on
+```
 
 1. Restart PostgreSQL for the changes to take effect.
 
@@ -237,65 +237,65 @@ the tracking database.
 1. On the secondary node, run the following command to create `database_geo.yml` with the
 information of your secondary PostgreSQL instance:
 
-    ```bash
-    sudo cp /home/git/gitlab/config/database_geo.yml.postgresql /home/git/gitlab/config/database_geo.yml
-    ```
+```bash
+sudo cp /home/git/gitlab/config/database_geo.yml.postgresql /home/git/gitlab/config/database_geo.yml
+```
 
 1. Edit the content of `database_geo.yml` in `production:` as in the example below:
 
-    ```yaml
-    #
-    # PRODUCTION
-    #
-    production:
-      adapter: postgresql
-      encoding: unicode
-      database: gitlabhq_geo_production
-      pool: 10
-      username: gitlab_geo
-      # password:
-      host: /var/opt/gitlab/geo-postgresql
-    ```
+```yaml
+#
+# PRODUCTION
+#
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: gitlabhq_geo_production
+  pool: 10
+  username: gitlab_geo
+  # password:
+  host: /var/opt/gitlab/geo-postgresql
+```
 
 1. Create the database `gitlabhq_geo_production` on the PostgreSQL instance of the secondary
 node.
 
 1. Set up the Geo tracking database:
 
-    ```bash
-    bundle exec rake geo:db:migrate
-    ```
+```bash
+bundle exec rake geo:db:migrate
+```
 
 1. Configure the [PostgreSQL FDW][FDW] connection and credentials:
 
     Save the script below in a file, ex. `/tmp/geo_fdw.sh` and modify the connection
     params to match your environment. Execute it to set up the FDW connection.
     
-    ```bash
-    #!/bin/bash
- 
-    # Secondary Database connection params:
-    DB_HOST="/var/opt/gitlab/postgresql" # change to the public IP or VPC private IP if its an external server
-    DB_NAME="gitlabhq_production"
-    DB_USER="gitlab"
-    DB_PORT="5432"
-    
-    # Tracking Database connection params:
-    GEO_DB_HOST="/var/opt/gitlab/geo-postgresql" # change to the public IP or VPC private IP if its an external server
-    GEO_DB_NAME="gitlabhq_geo_production"
-    GEO_DB_USER="gitlab_geo"
-    GEO_DB_PORT="5432"
- 
-    query_exec () {
-      gitlab-psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "${1}"
-    }
- 
-    query_exec "CREATE EXTENSION postgres_fdw;"
-    query_exec "CREATE SERVER gitlab_secondary FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host '${DB_HOST}', dbname '${DB_NAME}', port '${DB_PORT}');"
-    query_exec "CREATE USER MAPPING FOR ${GEO_DB_USER} SERVER gitlab_secondary OPTIONS (user '${DB_USER}');"
-    query_exec "CREATE SCHEMA gitlab_secondary;"
-    query_exec "GRANT USAGE ON FOREIGN SERVER gitlab_secondary TO ${GEO_DB_USER};"
-    ```
+```bash
+#!/bin/bash
+
+# Secondary Database connection params:
+DB_HOST="/var/opt/gitlab/postgresql" # change to the public IP or VPC private IP if its an external server
+DB_NAME="gitlabhq_production"
+DB_USER="gitlab"
+DB_PORT="5432"
+
+# Tracking Database connection params:
+GEO_DB_HOST="/var/opt/gitlab/geo-postgresql" # change to the public IP or VPC private IP if its an external server
+GEO_DB_NAME="gitlabhq_geo_production"
+GEO_DB_USER="gitlab_geo"
+GEO_DB_PORT="5432"
+
+query_exec () {
+  gitlab-psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "${1}"
+}
+
+query_exec "CREATE EXTENSION postgres_fdw;"
+query_exec "CREATE SERVER gitlab_secondary FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host '${DB_HOST}', dbname '${DB_NAME}', port '${DB_PORT}');"
+query_exec "CREATE USER MAPPING FOR ${GEO_DB_USER} SERVER gitlab_secondary OPTIONS (user '${DB_USER}');"
+query_exec "CREATE SCHEMA gitlab_secondary;"
+query_exec "GRANT USAGE ON FOREIGN SERVER gitlab_secondary TO ${GEO_DB_USER};"
+```
 
     And edit the content of `database_geo.yml` and to add `fdw: true` to
     the  `production:` block.
@@ -315,62 +315,62 @@ data before running `pg_basebackup`.
 
 1. SSH into your GitLab **secondary** server and login as root:
 
-    ```bash
-    sudo -i
-    ```
+```bash
+sudo -i
+```
 
 1. Save the snippet below in a file, let's say `/tmp/replica.sh`. Modify the
    embedded paths if necessary:
 
-    ```
-    #!/bin/bash
+```
+#!/bin/bash
 
-    PORT="5432"
-    USER="gitlab_replicator"
-    echo ---------------------------------------------------------------
-    echo WARNING: Make sure this script is run from the secondary server
-    echo ---------------------------------------------------------------
-    echo
-    echo Enter the IP or FQDN of the primary PostgreSQL server
-    read HOST
-    echo Enter the password for $USER@$HOST
-    read -s PASSWORD
-    echo Enter the required sslmode
-    read SSLMODE
+PORT="5432"
+USER="gitlab_replicator"
+echo ---------------------------------------------------------------
+echo WARNING: Make sure this script is run from the secondary server
+echo ---------------------------------------------------------------
+echo
+echo Enter the IP or FQDN of the primary PostgreSQL server
+read HOST
+echo Enter the password for $USER@$HOST
+read -s PASSWORD
+echo Enter the required sslmode
+read SSLMODE
 
-    echo Stopping PostgreSQL and all GitLab services
-    sudo service gitlab stop
-    sudo service postgresql stop
+echo Stopping PostgreSQL and all GitLab services
+sudo service gitlab stop
+sudo service postgresql stop
 
-    echo Backing up postgresql.conf
-    sudo -u postgres mv /var/opt/gitlab/postgresql/data/postgresql.conf /var/opt/gitlab/postgresql/
+echo Backing up postgresql.conf
+sudo -u postgres mv /var/opt/gitlab/postgresql/data/postgresql.conf /var/opt/gitlab/postgresql/
 
-    echo Cleaning up old cluster directory
-    sudo -u postgres rm -rf /var/opt/gitlab/postgresql/data
+echo Cleaning up old cluster directory
+sudo -u postgres rm -rf /var/opt/gitlab/postgresql/data
 
-    echo Starting base backup as the replicator user
-    echo Enter the password for $USER@$HOST
-    sudo -u postgres /opt/gitlab/embedded/bin/pg_basebackup -h $HOST -D /var/opt/gitlab/postgresql/data -U gitlab_replicator -v -x -P
+echo Starting base backup as the replicator user
+echo Enter the password for $USER@$HOST
+sudo -u postgres /opt/gitlab/embedded/bin/pg_basebackup -h $HOST -D /var/opt/gitlab/postgresql/data -U gitlab_replicator -v -x -P
 
-    echo Writing recovery.conf file
-    sudo -u postgres bash -c "cat > /var/opt/gitlab/postgresql/data/recovery.conf <<- _EOF1_
-      standby_mode = 'on'
-      primary_conninfo = 'host=$HOST port=$PORT user=$USER password=$PASSWORD sslmode=$SSLMODE'
-    _EOF1_
-    "
+echo Writing recovery.conf file
+sudo -u postgres bash -c "cat > /var/opt/gitlab/postgresql/data/recovery.conf <<- _EOF1_
+  standby_mode = 'on'
+  primary_conninfo = 'host=$HOST port=$PORT user=$USER password=$PASSWORD sslmode=$SSLMODE'
+_EOF1_
+"
 
-    echo Restoring postgresql.conf
-    sudo -u postgres mv /var/opt/gitlab/postgresql/postgresql.conf /var/opt/gitlab/postgresql/data/
+echo Restoring postgresql.conf
+sudo -u postgres mv /var/opt/gitlab/postgresql/postgresql.conf /var/opt/gitlab/postgresql/data/
 
-    echo Starting PostgreSQL
-    sudo service postgresql start
-    ```
+echo Starting PostgreSQL
+sudo service postgresql start
+```
 
 1. Run it with:
 
-    ```bash
-    bash /tmp/replica.sh
-    ```
+```bash
+bash /tmp/replica.sh
+```
 
     When prompted, enter the IP/FQDN of the primary, and the password you set up
     for the `gitlab_replicator` user in the first step.
@@ -393,25 +393,25 @@ The replication process is now over.
 
 2. Then create the read-only user:
 
-    ```sql
-    -- NOTE: Use the password defined earlier
-    CREATE USER gitlab_geo_fdw WITH password 'mypassword';
-    GRANT CONNECT ON DATABASE gitlabhq_production to gitlab_geo_fdw;
-    GRANT USAGE ON SCHEMA public TO gitlab_geo_fdw;
-    GRANT SELECT ON ALL TABLES IN SCHEMA public TO gitlab_geo_fdw;
-    GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO gitlab_geo_fdw;
+```sql
+-- NOTE: Use the password defined earlier
+CREATE USER gitlab_geo_fdw WITH password 'mypassword';
+GRANT CONNECT ON DATABASE gitlabhq_production to gitlab_geo_fdw;
+GRANT USAGE ON SCHEMA public TO gitlab_geo_fdw;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO gitlab_geo_fdw;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO gitlab_geo_fdw;
 
-    -- Tables created by "gitlab" should be made read-only for "gitlab_geo_fdw"
-    -- automatically.
-    ALTER DEFAULT PRIVILEGES FOR USER gitlab IN SCHEMA public GRANT SELECT ON TABLES TO gitlab_geo_fdw;
-    ALTER DEFAULT PRIVILEGES FOR USER gitlab IN SCHEMA public GRANT SELECT ON SEQUENCES TO gitlab_geo_fdw;
-    ```
+-- Tables created by "gitlab" should be made read-only for "gitlab_geo_fdw"
+-- automatically.
+ALTER DEFAULT PRIVILEGES FOR USER gitlab IN SCHEMA public GRANT SELECT ON TABLES TO gitlab_geo_fdw;
+ALTER DEFAULT PRIVILEGES FOR USER gitlab IN SCHEMA public GRANT SELECT ON SEQUENCES TO gitlab_geo_fdw;
+```
 
 3. Enter the PostgreSQL console on the secondary tracking database and change the user mapping to this new user:
 
-    ```
-    ALTER USER MAPPING FOR gitlab_geo SERVER gitlab_secondary OPTIONS (SET user 'gitlab_geo_fdw')
-    ```
+```
+ALTER USER MAPPING FOR gitlab_geo SERVER gitlab_secondary OPTIONS (SET user 'gitlab_geo_fdw')
+```
 
 ## MySQL replication
 
