@@ -40,6 +40,10 @@ module QA
         ENV['CI'] || ENV['CI_SERVER']
       end
 
+      def qa_cookie
+        ENV['QA_COOKIE'] && ENV['QA_COOKIE'].split('=')
+      end
+
       def signup_disabled?
         enabled?(ENV['SIGNUP_DISABLED'], default: false)
       end
