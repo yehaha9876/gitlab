@@ -261,6 +261,9 @@ msgstr[1] ""
 msgid "1st contribution!"
 msgstr ""
 
+msgid "2FA"
+msgstr ""
+
 msgid "2FA enabled"
 msgstr ""
 
@@ -992,6 +995,12 @@ msgstr ""
 msgid "Available group Runners : %{runners}."
 msgstr ""
 
+msgid "Available shared Runners:"
+msgstr ""
+
+msgid "Available specific runners"
+msgstr ""
+
 msgid "Avatar will be removed. Are you sure?"
 msgstr ""
 
@@ -1173,6 +1182,9 @@ msgid "Bitbucket Server Import"
 msgstr ""
 
 msgid "Bitbucket import"
+msgstr ""
+
+msgid "Blocked"
 msgstr ""
 
 msgid "Blog"
@@ -1442,6 +1454,9 @@ msgid "Certificate fingerprint"
 msgstr ""
 
 msgid "Change Weight"
+msgstr ""
+
+msgid "Change permissions"
 msgstr ""
 
 msgid "Change template"
@@ -2878,6 +2893,12 @@ msgstr ""
 msgid "Disable group Runners"
 msgstr ""
 
+msgid "Disable shared Runners"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
 msgid "Discard"
 msgstr ""
 
@@ -3056,6 +3077,9 @@ msgid "Enable reCAPTCHA or Akismet and set IP limits."
 msgstr ""
 
 msgid "Enable self approval of merge requests"
+msgstr ""
+
+msgid "Enable shared Runners"
 msgstr ""
 
 msgid "Enable the Performance Bar for a given group."
@@ -3310,6 +3334,9 @@ msgstr ""
 msgid "Every week (Sundays at 4:00am)"
 msgstr ""
 
+msgid "Everyone"
+msgstr ""
+
 msgid "Everyone can contribute"
 msgstr ""
 
@@ -3323,6 +3350,9 @@ msgid "Expand sidebar"
 msgstr ""
 
 msgid "Expiration date"
+msgstr ""
+
+msgid "Expires in %{expires_at}"
 msgstr ""
 
 msgid "Explain the problem. If appropriate, provide a link to the relevant issue or comment."
@@ -3530,6 +3560,9 @@ msgid "Filter by %{issuable_type} that are currently opened."
 msgstr ""
 
 msgid "Filter by commit message"
+msgstr ""
+
+msgid "Filter by two-factor authentication"
 msgstr ""
 
 msgid "Filter..."
@@ -4030,6 +4063,9 @@ msgstr ""
 msgid "GitLab Import"
 msgstr ""
 
+msgid "GitLab Shared Runners execute code of different projects on the same Runner unless you configure GitLab Runner Autoscale with MaxBuilds 1 (which it is on GitLab.com)."
+msgstr ""
+
 msgid "GitLab User"
 msgstr ""
 
@@ -4063,6 +4099,9 @@ msgstr ""
 msgid "Gitea Import"
 msgstr ""
 
+msgid "Given access %{time_ago}"
+msgstr ""
+
 msgid "Go Back"
 msgstr ""
 
@@ -4085,6 +4124,9 @@ msgid "Google authentication is not %{link_to_documentation}. Ask your GitLab ad
 msgstr ""
 
 msgid "Got it!"
+msgstr ""
+
+msgid "Grant access"
 msgstr ""
 
 msgid "Graph"
@@ -4577,6 +4619,15 @@ msgstr ""
 msgid "IssueBoards|Boards"
 msgstr ""
 
+msgid "IssueBoards|Create new board"
+msgstr ""
+
+msgid "IssueBoards|Delete board"
+msgstr ""
+
+msgid "IssueBoards|Some of your boards are hidden, activate a license to see them again."
+msgstr ""
+
 msgid "Issues"
 msgstr ""
 
@@ -4608,6 +4659,9 @@ msgid "IssuesAnalytics|There are no issues for the projects in your group"
 msgstr ""
 
 msgid "IssuesAnalytics|To widen your search, change or remove filters in the filter bar above"
+msgstr ""
+
+msgid "It's you"
 msgstr ""
 
 msgid "Jaeger URL"
@@ -5199,6 +5253,12 @@ msgstr ""
 msgid "Metrics|Create metric"
 msgstr ""
 
+msgid "Metrics|Delete metric"
+msgstr ""
+
+msgid "Metrics|Delete metric?"
+msgstr ""
+
 msgid "Metrics|Edit metric"
 msgstr ""
 
@@ -5272,6 +5332,9 @@ msgid "Metrics|Used if the query returns a single series. If it returns multiple
 msgstr ""
 
 msgid "Metrics|Y-axis label"
+msgstr ""
+
+msgid "Metrics|You're about to permanently delete this metric. This cannot be undone."
 msgstr ""
 
 msgid "Metrics|e.g. HTTP requests"
@@ -5419,6 +5482,9 @@ msgid "Nav|Sign In / Register"
 msgstr ""
 
 msgid "Nav|Sign out and sign in with a different account"
+msgstr ""
+
+msgid "Need help?"
 msgstr ""
 
 msgid "Network"
@@ -6984,6 +7050,9 @@ msgstr ""
 msgid "Request Access"
 msgstr ""
 
+msgid "Requested %{time_ago}"
+msgstr ""
+
 msgid "Requests Profiles"
 msgstr ""
 
@@ -6991,6 +7060,9 @@ msgid "Require all users in this group to setup Two-factor authentication"
 msgstr ""
 
 msgid "Require all users to accept Terms of Service and Privacy Policy when they access GitLab."
+msgstr ""
+
+msgid "Resend invite"
 msgstr ""
 
 msgid "Reset health check access token"
@@ -7095,6 +7167,9 @@ msgid "Runners"
 msgstr ""
 
 msgid "Runners API"
+msgstr ""
+
+msgid "Runners activated for this project"
 msgstr ""
 
 msgid "Runners can be placed on separate users, servers, and even on your local machine."
@@ -8385,9 +8460,6 @@ msgstr ""
 msgid "This user will be the author of all events in the activity feed that are the result of an update, like new branches being created or new commits being pushed to existing branches. Upon creation or when reassigning you can only assign yourself to be the mirror user."
 msgstr ""
 
-msgid "This will delete the custom metric, Are you sure?"
-msgstr ""
-
 msgid "Those emails automatically become issues (with the comments becoming the email conversation) listed here."
 msgstr ""
 
@@ -8639,6 +8711,9 @@ msgid "To set up SAML authentication for your group through an identity provider
 msgstr ""
 
 msgid "To start serving your jobs you can add Runners to your group"
+msgstr ""
+
+msgid "To start serving your jobs you can either add specific Runners to your project or use shared Runners"
 msgstr ""
 
 msgid "To this GitLab instance"
@@ -8972,6 +9047,9 @@ msgid "UserProfile|View user in admin area"
 msgstr ""
 
 msgid "Users"
+msgstr ""
+
+msgid "Users requesting access to"
 msgstr ""
 
 msgid "Variables"
