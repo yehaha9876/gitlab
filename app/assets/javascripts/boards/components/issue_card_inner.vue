@@ -171,9 +171,10 @@ export default {
           :title="__('Confidential')"
           class="confidential-icon append-right-4"
           :aria-label="__('Confidential')"
-        /><a :href="issue.path" :title="issue.title" class="js-no-trigger" @mousemove.stop>{{
-          issue.title
-        }}</a>
+        />
+        <a :href="issue.path" :title="issue.title" class="js-no-trigger" @mousemove.stop>
+          {{ issue.title }}
+        </a>
       </h4>
     </div>
     <div v-if="showLabelFooter" class="board-card-labels prepend-top-4 d-flex flex-wrap">
@@ -204,21 +205,18 @@ export default {
             :title="issueReferencePath"
             placement="bottom"
             class="board-issue-path block-truncated bold"
-          >{{ issueReferencePath }}</tooltip-on-truncate>#{{ issue.iid }}
+            >{{ issueReferencePath }}</tooltip-on-truncate
+          >
+          #{{ issue.iid }}
         </span>
         <span class="board-info-items prepend-top-8 d-inline-block">
-          <issue-due-date
-            v-if="issue.dueDate"
-            :date="issue.dueDate"
-          />
-          <issue-time-estimate
-            v-if="issue.timeEstimate"
-            :estimate="issue.timeEstimate"
-          /><issue-card-weight
+          <issue-due-date v-if="issue.dueDate" :date="issue.dueDate" />
+          <issue-card-weight
             v-if="issue.weight"
             :weight="issue.weight"
             @click="filterByWeight(issue.weight);"
           />
+          <issue-time-estimate v-if="issue.timeEstimate" :estimate="issue.timeEstimate" />
         </span>
       </div>
       <div class="board-card-assignee">
@@ -244,9 +242,8 @@ export default {
           :title="assigneeCounterTooltip"
           class="avatar-counter"
           data-placement="bottom"
+          >{{ assigneeCounterLabel }}</span
         >
-          {{ assigneeCounterLabel }}
-        </span>
       </div>
     </div>
   </div>
