@@ -118,10 +118,13 @@ module QA
         def perform(&block)
           visit(url)
 
-          if QA::Runtime::Env.qa_cookie
-            cookie = QA::Runtime::Env.qa_cookie
+          if QA::Runtime::Env.qa_cookies
             browser = Capybara.current_session.driver.browser
-            browser.manage.add_cookie name: cookie.fetch(0), value: cookie.fetch(1, "")
+            QA::Runtime::Env.qa_cookies.each do |cookie|
+              name, value = cookie.split("=")
+              value ||= ""
+              browser.manage.add_cookie name: name, value: value
+            end
           end
 
           yield.tap { clear! } if block_given?
