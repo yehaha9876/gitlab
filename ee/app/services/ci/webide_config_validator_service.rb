@@ -24,7 +24,7 @@ module Ci
       end
 
       begin
-        EE::Gitlab::Ci::WebideYamlProcessor.new(config_file, { project: project, sha: params[:sha] })
+        ::Gitlab::Ci::WebideYamlProcessor.new(config_file, { project: project, sha: params[:sha] })
       rescue ::Gitlab::Ci::YamlProcessor::ValidationError => e
         raise ValidationError, e.message
       rescue
