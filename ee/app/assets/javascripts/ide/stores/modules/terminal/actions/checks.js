@@ -34,7 +34,7 @@ export const fetchConfigCheck = ({ dispatch, rootState, rootGetters }) => {
   const { currentProject } = rootGetters;
 
   axios
-    .get(`/${currentProject.path_with_namespace}/-/jobs/check_config`, { params: { branch: currentBranchId, format: 'json' } })
+    .post(`/-/ide/terminals/check_config`, { project: currentProject.path_with_namespace, branch: currentBranchId, format: 'json' })
     .then(() => {
       dispatch('receiveConfigCheckSuccess');
     })

@@ -40,7 +40,7 @@ export const startSession = ({ state, dispatch, rootGetters, rootState }) => {
   dispatch('requestStartSession');
 
   axios
-    .post(`/${currentProject.path_with_namespace}/-/jobs/create_webide_terminal`, { branch: currentBranchId, format: 'json' })
+    .post(`/-/ide/terminals`, { project: 'currentProject.path_with_namespace', branch: currentBranchId, format: 'json' })
     .then(({ data }) => {
       dispatch('receiveStartSessionSuccess', data);
     })
