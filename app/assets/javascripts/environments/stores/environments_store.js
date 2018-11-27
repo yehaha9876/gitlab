@@ -97,7 +97,11 @@ export default class EnvironmentsStore {
 
     this.state.environments = filteredEnvironments;
 
-    this.state.environments[1].showCanaryPromo = true; // TODO: come up with a better way to do this
+    if (this.state.environments.length >= 2) {
+      this.state.environments[1].showCanaryCallout = true;
+    } else if (this.state.environments.length > 0) {
+      this.state.environments[0].showCanaryCallout = true;
+    }
 
     return filteredEnvironments;
   }

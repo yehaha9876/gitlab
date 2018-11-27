@@ -67,7 +67,10 @@ export default {
     shouldRenderFolderContent(env) {
       return env.isFolder && env.isOpen && env.children && env.children.length > 0;
     },
-  },
+    shouldShowCanaryCallout(env) {
+      return env.showCanaryCallout && this.showCanaryDeploymentCallout;
+    }
+  }
 };
 </script>
 <template>
@@ -138,18 +141,17 @@ export default {
         </template>
       </template>
 
-      <!-- TODO: figure out a better way to render this -->
-      <div
-        v-if="model.showCanaryPromo && showCanaryDeploymentCallout"
-        :key="`canary-promo-${i}`"
+      <template
+        v-if="shouldShowCanaryCallout(model)"
       >
         <canary-deployment-callout
+          :key="`canary-promo-${i}`"
           :canary-deployment-feature-id="canaryDeploymentFeatureId"
           :user-callouts-path="userCalloutsPath"
           :lock-promotion-svg-path="lockPromotionSvgPath"
           :help-canary-deployments-path="helpCanaryDeploymentsPath"
         />
-      </div>
+      </template>
     </template>
   </div>
 </template>
