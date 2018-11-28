@@ -6,6 +6,7 @@ import Tabs from '~/vue_shared/components/tabs/tabs';
 import Tab from '~/vue_shared/components/tabs/tab.vue';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
+import VulnerabilityChart from './vulnerability_chart.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import popover from '~/vue_shared/directives/popover';
@@ -21,6 +22,7 @@ export default {
     SecurityDashboardTable,
     Tab,
     Tabs,
+    VulnerabilityChart,
     VulnerabilityCountList,
   },
   props: {
@@ -108,7 +110,9 @@ export default {
           </span>
         </template>
         <vulnerability-count-list />
-        <h5 class="mt-4 mb-4">{{ __('Vulnerability List') }}</h5>
+        <h4 class="my-4">{{ __('Vulnerability Chart') }}</h4>
+        <vulnerability-chart />
+        <h4 class="my-4">{{ __('Vulnerability List') }}</h4>
         <security-dashboard-table
           :dashboard-documentation="dashboardDocumentation"
           :empty-state-svg-path="emptyStateSvgPath"

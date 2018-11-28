@@ -131,6 +131,66 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
+  describe('SET_VULNERABILITIES_TIMELINE_ENDPOINT', () => {
+    it('should set `vulnerabilitiesTimelineEndpoint` to `fakepath.json`', () => {
+      const state = createState();
+      const endpoint = 'fakepath.json';
+
+      mutations[types.SET_VULNERABILITIES_TIMELINE_ENDPOINT](state, endpoint);
+
+      expect(state.vulnerabilitiesTimelineEndpoint).toEqual(endpoint);
+    });
+  });
+
+  describe('REQUEST_VULNERABILITIES_TIMELINE', () => {
+    let state;
+
+    beforeEach(() => {
+      state = {
+        ...createState(),
+        errorLoadingVulnerabilitiesTimeline: true,
+      };
+      mutations[types.REQUEST_VULNERABILITIES_TIMELINE](state);
+    });
+
+    it('should set `isLoadingVulnerabilitiesTimeline` to `true`', () => {
+      expect(state.isLoadingVulnerabilitiesTimeline).toBeTruthy();
+    });
+
+    it('should set `errorLoadingVulnerabilitiesTimeline` to `false`', () => {
+      expect(state.errorLoadingVulnerabilitiesTimeline).toBeFalsy();
+    });
+  });
+
+  describe('RECEIVE_VULNERABILITIES_TIMELINE_SUCCESS', () => {
+    let payload;
+    let state;
+
+    beforeEach(() => {
+      payload = mockData;
+      state = createState();
+      mutations[types.RECEIVE_VULNERABILITIES_TIMELINE_SUCCESS](state, payload);
+    });
+
+    it('should set `isLoadingVulnerabilitiesTimeline` to `false`', () => {
+      expect(state.isLoadingVulnerabilitiesTimeline).toBeFalsy();
+    });
+
+    it('should set `vulnerabilitiesTimeline`', () => {
+      expect(state.vulnerabilitiesTimeline).toBe(payload);
+    });
+  });
+
+  describe('RECEIVE_VULNERABILITIES_TIMELINE_ERROR', () => {
+    it('should set `isLoadingVulnerabilitiesTimeline` to `false`', () => {
+      const state = createState();
+
+      mutations[types.RECEIVE_VULNERABILITIES_TIMELINE_ERROR](state);
+
+      expect(state.isLoadingVulnerabilitiesTimeline).toBeFalsy();
+    });
+  });
+
   describe('SET_MODAL_DATA', () => {
     describe('with all the data', () => {
       const vulnerability = mockData[0];
