@@ -21,6 +21,11 @@ Rails.application.routes.draw do
   draw :development
   draw :ci
 
+
+  # EE specific
+  draw :ide
+  # EE specific
+
   use_doorkeeper do
     controllers applications: 'oauth/applications',
                 authorized_applications: 'oauth/authorized_applications',
@@ -84,13 +89,8 @@ Rails.application.routes.draw do
     # UserCallouts
     resources :user_callouts, only: [:create]
 
-    # EE specific
-    draw :ide
-    # EE specific
-
     get 'ide' => 'ide#index'
     get 'ide/*vueroute' => 'ide#index', format: false
-
 
     draw :operations
     draw :instance_statistics

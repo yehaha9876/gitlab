@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Ide::TerminalsController < ApplicationController
-  before_action :load_project, except: :show
+  before_action :load_project
   before_action :authorize_use_build_terminal!, only: [:terminal, :terminal_websocket_authorize]
   before_action :verify_api_request!, only: :terminal_websocket_authorize
 
@@ -18,8 +18,6 @@ class Ide::TerminalsController < ApplicationController
   end
 
   def show
-    @build = Ci::Build.find(params[:id]).present(current_user: current_user)
-    @project = @build.project
     Gitlab::PollingInterval.set_header(response, interval: 10_000)
 
     render_build(build)
@@ -74,7 +72,10 @@ class Ide::TerminalsController < ApplicationController
   end
 
   def project
-    @project ||= Project.find_by_full_path(params[:project])
+    @project ||= begin
+      path = File.join(params[:namespace_id], params[:project_id] || params[:id])
+      Project.find_by_full_path(path)
+    end
   end
 
   def build

@@ -18,7 +18,7 @@ export const requestStartSession = ({ commit }) => {
 
 export const receiveStartSessionSuccess = ({ commit, dispatch }, data) => {
   commit(types.START_SESSION, {
-    sessionPath: `/-/ide/terminals/${data.id}`,
+    sessionPath: `/${currentProject.path_with_namespace}/ide/terminals/${data.id}`,
   });
 
   dispatch('startPollingSessionStatus');
@@ -40,7 +40,7 @@ export const startSession = ({ state, dispatch, rootGetters, rootState }) => {
   dispatch('requestStartSession');
 
   axios
-    .post(`/-/ide/terminals`, { project: currentProject.path_with_namespace, branch: currentBranchId, format: 'json' })
+    .post(`/${currentProject.path_with_namespace}/ide/terminals/`, { branch: currentBranchId, format: 'json' })
     .then(({ data }) => {
       dispatch('receiveStartSessionSuccess', data);
     })
@@ -71,7 +71,7 @@ export const stopSession = ({ state, dispatch }) => {
   dispatch('requestStopSession');
 
   axios
-    .post(`${sessionPath}/cancel`, { project: currentProject.path_with_namespace })
+    .post(`${sessionPath}/cancel`)
     .then(() => {
       dispatch('receiveStopSessionSuccess');
     })
@@ -99,7 +99,7 @@ export const restartSession = ({ state, dispatch, rootState }) => {
   dispatch('requestStartSession');
 
   axios
-    .post(`${sessionPath}/retry`, { project: currentProject.path_with_namespace, branch: currentBranchId, format: 'json' })
+    .post(`${sessionPath}/retry`, { branch: currentBranchId, format: 'json' })
     .then(({ data }) => {
       dispatch('receiveStartSessionSuccess', data);
     })
