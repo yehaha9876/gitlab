@@ -19,6 +19,18 @@ shared_examples_for '400 response' do
   end
 end
 
+shared_examples_for '401 response' do
+  before do
+    # Fires the request
+    request
+  end
+
+  it 'returns 401' do
+    expect(response).to have_gitlab_http_status(401)
+    expect(json_response['message']).to eq('401 Unauthorized')
+  end
+end
+
 shared_examples_for '403 response' do
   before do
     # Fires the request
