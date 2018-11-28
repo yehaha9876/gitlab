@@ -13,7 +13,7 @@ module QA
             end
 
             view 'ee/app/views/groups/epics/_epic.html.haml' do
-              element :epic_title
+              element :epic_title_text
             end
 
             def click_new_epic
@@ -29,7 +29,7 @@ module QA
             end
 
             def click_first_epic
-              all_elements(:epic_title).first.click
+              all_elements(:epic_title_text).first.click
             end
           end
         end
