@@ -726,6 +726,13 @@
 .canary-deployment-callout {
   border-bottom: 1px solid $border-white-normal;
 
+  &-lock {
+    @include media-breakpoint-down(sm) {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
   &-message {
     max-width: 600px;
     color: $theme-gray-700;

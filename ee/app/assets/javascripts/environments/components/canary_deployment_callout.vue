@@ -1,6 +1,6 @@
 <script>
 import { __ } from '~/locale';
-import { GlButton, GlLink } from '@gitlab-org/gitlab-ui';
+import { GlButton, GlLink } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import PersistentUserCallout from '~/persistent_user_callout';
 
@@ -38,14 +38,14 @@ export default {
 
 <template>
   <div
-    class="d-flex p-3 canary-deployment-callout"
+    class="d-flex py-3 px-3-sm canary-deployment-callout"
     :data-dismiss-endpoint="userCalloutsPath"
     :data-feature-id="canaryDeploymentFeatureId"
     ref="canary-deployment-callout"
   >
-    <img class="pr-3" :src="lockPromotionSvgPath" />
+    <img class="pr-2 pr-3-sm canary-deployment-callout-lock" :src="lockPromotionSvgPath" />
 
-    <div class="pl-3">
+    <div class="pl-3-sm">
       <p class="font-weight-bold mb-1">
         {{__('Upgrade plan to unlock Canary Development feature')}}
       </p>
@@ -66,7 +66,7 @@ export default {
       </gl-button>
     </div>
 
-    <div class="ml-auto pr-2 canary-deployment-callout-close js-close"> 
+    <div class="ml-auto pr-2-sm canary-deployment-callout-close js-close"> 
       <icon name="close" />
     </div>
   </div>
