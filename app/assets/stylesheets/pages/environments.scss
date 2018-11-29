@@ -725,12 +725,10 @@
 // TODO: make this responsive
 .canary-deployment-callout {
   border-bottom: 1px solid $border-white-normal;
+  display: flex;
 
-  &-lock {
-    @include media-breakpoint-down(sm) {
-      width: 48px;
-      height: 48px;
-    }
+  @include media-breakpoint-down(sm) {
+    display: none;
   }
 
   &-message {
