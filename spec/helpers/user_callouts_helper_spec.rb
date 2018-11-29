@@ -53,4 +53,40 @@ describe UserCalloutsHelper do
       helper.render_flash_user_callout(:warning, 'foo', 'bar')
     end
   end
+
+  describe '.show_canary_deployment_callout?' do
+    context 'when user can upgrade to premium' do
+      let!(:license) { create(:license, plan: License::STARTER_PLAN) }
+      let!(:user) { create(:user) }
+
+      context 'when user has dismissed' do
+        before do
+          allow(helper).to receive(:user_dismissed?).and_return(true)
+        end
+
+        it 'should return false' do
+          expect(helper.show_canary_deployment_callout?(user)).to be_falsey
+        end
+      end
+
+      context 'when user has not dismissed' do
+        before do
+          allow(helper).to receive(:user_dismissed?).and_return(true)
+        end
+
+        it 'should return true' do
+          expect(helper.show_canary_deployment_callout?(user)).to be_falsey
+        end
+      end
+    end
+
+    context 'when user cannot upgrade to premium' do
+      let!(:license) { create(:license, plan: License::PREMIUM_PLAN) }
+      let!(:user) { create(:user) }
+
+      it 'should return false' do
+        expect(helper.show_canary_deployment_callout?(user)).to be_falsey
+      end
+    end
+  end
 end

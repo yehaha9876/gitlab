@@ -3402,4 +3402,30 @@ describe User do
       expect(described_class.reorder_by_name).to eq([user1, user2])
     end
   end
+
+  describe '#can_upgrade_to_premium?' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:plan, :should_return_true) do
+      License::ULTIMATE_PLAN  | false
+      License::PREMIUM_PLAN   | false
+      License::STARTER_PLAN   | true
+      nil                     | true
+    end
+
+    with_them do
+      let!(:license) { create(:license, plan: plan) }
+      let!(:user) { create(:user) }
+
+      if params[:should_return_true]
+        it 'should return true' do
+          expect(user.can_upgrade_to_premium?).to be_truthy
+        end
+      else
+        it 'should return false' do
+          expect(user.can_upgrade_to_premium?).to be_falsey
+        end
+      end
+    end
+  end
 end
