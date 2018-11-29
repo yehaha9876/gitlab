@@ -2,6 +2,7 @@
 
 class License < ActiveRecord::Base
   include ActionView::Helpers::NumberHelper
+  include Sortable
 
   STARTER_PLAN = 'starter'.freeze
   PREMIUM_PLAN = 'premium'.freeze
@@ -190,6 +191,7 @@ class License < ActiveRecord::Base
   after_destroy :reset_current
 
   scope :previous, -> { order(created_at: :desc).offset(1) }
+  scope :by_id, -> (id) { where(id: id) }
 
   class << self
     def features_for_plan(plan)
@@ -374,6 +376,19 @@ class License < ActiveRecord::Base
     (expires_at - Date.today).to_i
   end
 
+  def overage(user_count = current_active_users_count)
+    difference = user_count - restricted_user_count
+
+    [difference, 0].max
+  end
+
+  def historical_max(from = nil, to = nil)
+    from ||= starts_at - 1.year
+    to   ||= starts_at
+
+    HistoricalData.during(from..to).maximum(:active_user_count) || 0
+  end
+
   private
 
   def restricted_attr(name, default = nil)
@@ -395,13 +410,6 @@ class License < ActiveRecord::Base
     return if license?
 
     self.errors.add(:base, "The license key is invalid. Make sure it is exactly as you received it from GitLab Inc.")
-  end
-
-  def historical_max(from = nil, to = nil)
-    from ||= starts_at - 1.year
-    to   ||= starts_at
-
-    HistoricalData.during(from..to).maximum(:active_user_count) || 0
   end
 
   def empty_historical_max?
@@ -447,12 +455,12 @@ class License < ActiveRecord::Base
   end
 
   def add_limit_error(current_period: true, user_count:)
-    overage = user_count - restricted_user_count
+    overage_count = overage(user_count)
 
     message =  [current_period ? "This GitLab installation currently has" : "During the year before this license started, this GitLab installation had"]
     message << "#{number_with_delimiter(user_count)} active #{"user".pluralize(user_count)},"
     message << "exceeding this license's limit of #{number_with_delimiter(restricted_user_count)} by"
-    message << "#{number_with_delimiter(overage)} #{"user".pluralize(overage)}."
+    message << "#{number_with_delimiter(overage_count)} #{"user".pluralize(overage_count)}."
     message << "Please upload a license for at least"
     message << "#{number_with_delimiter(user_count)} #{"user".pluralize(user_count)} or contact sales at renewals@gitlab.com"
 
