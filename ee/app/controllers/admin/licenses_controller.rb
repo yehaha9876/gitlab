@@ -1,18 +1,10 @@
 # frozen_string_literal: true
 
 class Admin::LicensesController < Admin::ApplicationController
-  before_action :license, only: [:show, :download, :destroy]
-  before_action :require_license, only: [:download, :destroy]
+  before_action :license, only: [:download]
+  before_action :require_license, only: [:download]
 
   respond_to :html
-
-  def show
-    if @license.blank?
-      render :missing
-    else
-      @previous_licenses = License.previous
-    end
-  end
 
   def download
     send_data @license.data, filename: @license.data_filename, disposition: 'attachment'
@@ -38,18 +30,6 @@ class Admin::LicensesController < Admin::ApplicationController
         flash[:notice] = "The license was successfully uploaded and is now active. You can see the details below."
       end
     end
-  end
-
-  def destroy
-    license.destroy
-
-    if License.current
-      flash[:notice] = "The license was removed. GitLab has fallen back on the previous license."
-    else
-      flash[:alert] = "The license was removed. GitLab now no longer has a valid license."
-    end
-
-    redirect_to admin_license_path, status: :found
   end
 
   private

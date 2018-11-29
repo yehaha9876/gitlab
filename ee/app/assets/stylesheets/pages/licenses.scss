@@ -5,3 +5,108 @@
     color: $gl-gray-light;
   }
 }
+
+.instance-license-skeleton-card {
+  .animation-container {
+    height: 21px;
+    width: 85%;
+
+    &.thick {
+      height: 30px;
+    }
+  }
+
+  .skeleton-line-1 {
+    height: 100%;
+    width: 100%;
+  }
+
+  .value .animation-container {
+    width: 42.5%;
+  }
+
+  .card-header .animation-container {
+    max-width: 500px;
+  }
+}
+
+.instance-license-card {
+  margin-bottom: 32px;
+}
+
+.license-list {
+  .popover,
+  .popover-header {
+    font-size: 0.75rem;
+  }
+
+  .popover-header {
+    font-weight: normal;
+  }
+}
+
+.license-table {
+  min-width: max-content;
+}
+
+.license-card-body {
+  overflow-x: scroll;
+}
+
+.license-card-loading {
+  height: 242px;
+}
+
+.license-table-cell {
+  flex-grow: 1;
+  flex-basis: 0;
+  flex-shrink: 0;
+  border-color: $theme-gray-200;
+  border-style: solid;
+  border-width: 1px 1px 0 0;
+  white-space: nowrap;
+  padding: $gl-padding;
+
+  &:last-child {
+    border-right: 0;
+  }
+
+  .number-value {
+    font-size: 1.25rem;
+  }
+
+  .title {
+    color: $theme-gray-700;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    line-height: 16px;
+  }
+
+  .value {
+    color: $theme-gray-900;
+  }
+}
+
+.license-table-header-cell {
+  width: 144px;
+  flex-grow: initial;
+  flex-basis: initial;
+
+  .title {
+    color: $theme-gray-900;
+
+    .text {
+      margin-left: $btn-side-margin;
+    }
+  }
+}
+
+.license-table-row:first-child .license-table-cell {
+  border-top: 0;
+}
+
+.license-table-info-cell .information-target {
+  width: 16px;
+  height: 16px;
+}

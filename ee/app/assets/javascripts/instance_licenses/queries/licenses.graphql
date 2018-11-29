@@ -1,0 +1,28 @@
+query licensesQuery($first: Int, $after: String!) {
+  licenses(first: $first, after: $after) {
+    edges {
+      node {
+        id
+        plan
+        expired
+        createdAt
+        startsAt
+        expiresAt
+        currentActiveUsersCount
+        restrictedUserCount
+        historicalMax
+        overage
+        licensee {
+          name
+          email
+          company
+        }
+      }
+      cursor
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
