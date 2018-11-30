@@ -47,27 +47,26 @@ export default {
 
     <div class="pl-3">
       <p class="font-weight-bold mb-1">
-        {{__('Upgrade plan to unlock Canary Deployments feature')}}
+        {{ __('Upgrade plan to unlock Canary Deployments feature') }}
       </p>
 
       <p class="canary-deployment-callout-message">
-        {{__('Canary Deployments is a popular CI strategy, where a small portion of the fleet is updated to the new version of your application.')}}
-        <gl-link :href="helpCanaryDeploymentsPath">
-          {{__('Read more')}}
-        </gl-link>
+        {{
+          __(
+            'Canary Deployments is a popular CI strategy, where a small portion of the fleet is updated to the new version of your application.',
+          )
+        }}
+        <gl-link :href="helpCanaryDeploymentsPath">{{ __('Read more') }}</gl-link>
       </p>
 
       <gl-button
         href="https://about.gitlab.com/sales/"
         variant="outline-primary"
         class="canary-deployment-callout-button"
+        >{{ __('Contact sales to upgrade') }}</gl-button
       >
-        {{__('Contact sales to upgrade')}}
-      </gl-button>
     </div>
 
-    <div class="ml-auto pr-2 canary-deployment-callout-close js-close"> 
-      <icon name="close" />
-    </div>
+    <div class="ml-auto pr-2 canary-deployment-callout-close js-close"><icon name="close" /></div>
   </div>
 </template>

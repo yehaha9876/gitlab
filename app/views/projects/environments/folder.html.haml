@@ -5,5 +5,10 @@
   "folder-name" => @folder,
   "can-create-deployment" => can?(current_user, :create_deployment, @project).to_s,
   "can-read-environment" => can?(current_user, :read_environment, @project).to_s,
+  "canary_deployment_feature_id" => UserCalloutsHelper::CANARY_DEPLOYMENT,
+  "show-canary-deployment-callout" => show_canary_deployment_callout?(@project).to_s,
+  "user-callouts-path" => user_callouts_path,
+  "lock-promotion-svg-path" => image_path('illustrations/lock_promotion.svg'),
+  "help-canary-deployments-path" => help_page_path('user/project/canary_deployments'),
   "css-class" => container_class } }
 

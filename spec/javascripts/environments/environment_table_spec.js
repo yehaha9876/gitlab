@@ -29,6 +29,11 @@ describe('Environment table', () => {
       environments: [mockItem],
       canCreateDeployment: false,
       canReadEnvironment: true,
+      canaryDeploymentFeatureId: 'canary_deployment',
+      showCanaryDeploymentCallout: true,
+      userCalloutsPath: '/callouts',
+      lockPromotionSvgPath: '/assets/illustrations/lock-promotion.svg',
+      helpCanaryDeploymentsPath: 'help/canary-deployments',
     });
 
     expect(vm.$el.getAttribute('class')).toContain('ci-table');
@@ -51,6 +56,11 @@ describe('Environment table', () => {
       environments: [mockItem],
       canCreateDeployment: false,
       canReadEnvironment: true,
+      canaryDeploymentFeatureId: 'canary_deployment',
+      showCanaryDeploymentCallout: true,
+      userCalloutsPath: '/callouts',
+      lockPromotionSvgPath: '/assets/illustrations/lock-promotion.svg',
+      helpCanaryDeploymentsPath: 'help/canary-deployments',
     });
 
     expect(vm.$el.querySelector('.js-deploy-board-row')).toBeDefined();
@@ -83,6 +93,11 @@ describe('Environment table', () => {
       environments: [mockItem],
       canCreateDeployment: false,
       canReadEnvironment: true,
+      canaryDeploymentFeatureId: 'canary_deployment',
+      showCanaryDeploymentCallout: true,
+      userCalloutsPath: '/callouts',
+      lockPromotionSvgPath: '/assets/illustrations/lock-promotion.svg',
+      helpCanaryDeploymentsPath: 'help/canary-deployments',
     });
 
     vm.$el.querySelector('.deploy-board-icon').click();

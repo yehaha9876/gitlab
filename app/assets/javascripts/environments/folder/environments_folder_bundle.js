@@ -20,6 +20,11 @@ export default () =>
         cssContainerClass: environmentsData.cssClass,
         canCreateDeployment: parseBoolean(environmentsData.canCreateDeployment),
         canReadEnvironment: parseBoolean(environmentsData.canReadEnvironment),
+        canaryDeploymentFeatureId: environmentsData.canaryDeploymentFeatureId,
+        showCanaryDeploymentCallout: parseBoolean(environmentsData.showCanaryDeploymentCallout),
+        userCalloutsPath: environmentsData.userCalloutsPath,
+        lockPromotionSvgPath: environmentsData.lockPromotionSvgPath,
+        helpCanaryDeploymentsPath: environmentsData.helpCanaryDeploymentsPath,
       };
     },
     render(createElement) {
@@ -30,6 +35,11 @@ export default () =>
           cssContainerClass: this.cssContainerClass,
           canCreateDeployment: this.canCreateDeployment,
           canReadEnvironment: this.canReadEnvironment,
+          canaryDeploymentFeatureId: this.canaryDeploymentFeatureId,
+          showCanaryDeploymentCallout: this.showCanaryDeploymentCallout,
+          userCalloutsPath: this.userCalloutsPath,
+          lockPromotionSvgPath: this.lockPromotionSvgPath,
+          helpCanaryDeploymentsPath: this.helpCanaryDeploymentsPath,
         },
       });
     },

@@ -69,8 +69,8 @@ export default {
     },
     shouldShowCanaryCallout(env) {
       return env.showCanaryCallout && this.showCanaryDeploymentCallout;
-    }
-  }
+    },
+  },
 };
 </script>
 <template>
@@ -133,17 +133,15 @@ export default {
 
           <div :key="`sub-div-${i}`">
             <div class="text-center prepend-top-10">
-              <a :href="folderUrl(model)" class="btn btn-default">
-                {{ s__('Environments|Show all') }}
-              </a>
+              <a :href="folderUrl(model)" class="btn btn-default">{{
+                s__('Environments|Show all')
+              }}</a>
             </div>
           </div>
         </template>
       </template>
 
-      <template
-        v-if="shouldShowCanaryCallout(model)"
-      >
+      <template v-if="shouldShowCanaryCallout(model)">
         <canary-deployment-callout
           :key="`canary-promo-${i}`"
           :canary-deployment-feature-id="canaryDeploymentFeatureId"
