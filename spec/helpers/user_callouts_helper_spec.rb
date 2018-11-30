@@ -55,38 +55,43 @@ describe UserCalloutsHelper do
   end
 
   describe '.show_canary_deployment_callout?' do
+    let(:project) { build(:project) }
+
+    subject { helper.show_canary_deployment_callout?(project) }
+
+    before do
+      allow(helper).to receive(:show_promotions?).and_return(true)
+    end
+
     context 'when user can upgrade to premium' do
-      let!(:license) { create(:license, plan: License::STARTER_PLAN) }
-      let!(:user) { create(:user) }
+      before do
+        allow(project).to receive(:feature_available?).with(:deploy_board).and_return(false)
+      end
 
       context 'when user has dismissed' do
         before do
           allow(helper).to receive(:user_dismissed?).and_return(true)
         end
 
-        it 'should return false' do
-          expect(helper.show_canary_deployment_callout?(user)).to be_falsey
-        end
+        it { is_expected.to be_falsey }
       end
 
       context 'when user has not dismissed' do
         before do
-          allow(helper).to receive(:user_dismissed?).and_return(true)
+          allow(helper).to receive(:user_dismissed?).and_return(false)
         end
 
-        it 'should return true' do
-          expect(helper.show_canary_deployment_callout?(user)).to be_falsey
-        end
+        it { is_expected.to be_truthy }
       end
     end
 
     context 'when user cannot upgrade to premium' do
-      let!(:license) { create(:license, plan: License::PREMIUM_PLAN) }
-      let!(:user) { create(:user) }
-
-      it 'should return false' do
-        expect(helper.show_canary_deployment_callout?(user)).to be_falsey
+      before do
+        allow(project).to receive(:feature_available?).with(:deploy_board).and_return(true)
+        allow(helper).to receive(:user_dismissed?).and_return(false)
       end
+
+      it { is_expected.to be_falsey }
     end
   end
 end

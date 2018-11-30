@@ -8,7 +8,7 @@
   "new-environment-path" => new_project_environment_path(@project),
   "help-page-path" => help_page_path("ci/environments"),
   "canary_deployment_feature_id" => UserCalloutsHelper::CANARY_DEPLOYMENT,
-  "show-canary-deployment-callout" => show_canary_deployment_callout?.to_s,
+  "show-canary-deployment-callout" => show_canary_deployment_callout?(@project).to_s,
   "user-callouts-path" => user_callouts_path,
   "lock-promotion-svg-path" => image_path('illustrations/lock_promotion.svg'),
   "help-canary-deployments-path" => help_page_path('user/project/canary_deployments'),

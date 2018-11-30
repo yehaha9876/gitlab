@@ -24,10 +24,10 @@ module EE
       !user.any_namespace_with_trial?
     end
 
-    def show_canary_deployment_callout?(user = current_user)
+    def show_canary_deployment_callout?(project)
       !user_dismissed?(CANARY_DEPLOYMENT) &&
-        (!::Gitlab.com? || Rails.env.development?) &&
-        user.can_upgrade_to_premium?
+        show_promotions? &&
+        !project.feature_available?(:deploy_board)
     end
   end
 end
