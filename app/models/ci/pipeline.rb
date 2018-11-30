@@ -77,7 +77,7 @@ module Ci
       unknown_source: nil,
       repository_source: 1,
       auto_devops_source: 2,
-      webide_source: 3 #TODO REMOVE
+      webide_source: 3 # EE-only
     }
 
     # We use `Ci::PipelineEnums.failure_reasons` here so that EE can more easily
