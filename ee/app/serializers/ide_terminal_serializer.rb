@@ -4,6 +4,6 @@ class IdeTerminalSerializer < BaseSerializer
   entity IdeTerminalEntity
 
   def represent(resource, opts = {})
-    super(::IdeTerminal.new(resource), opts)
+    super(IdeTerminal.new(resource), opts)
   end
 end
