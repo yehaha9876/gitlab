@@ -36,7 +36,7 @@ module Ci
         raise TerminalCreationError, 'Pipelines are disabled!'
       end
 
-      unless can?(current_user, :web_ide_terminal_enabled, project)
+      unless can?(current_user, :ide_terminal_enabled, project)
         raise TerminalCreationError, 'Insufficient permissions to create a terminal'
       end
 

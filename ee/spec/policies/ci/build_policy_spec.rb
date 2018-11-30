@@ -76,9 +76,7 @@ describe Ci::BuildPolicy do
         end
       end
 
-      context 'with owner' do
-        let(:current_user) { owner }
-
+      shared_examples 'allowed build owner access' do
         it { expect_disallowed(*build_permissions) }
 
         context 'when user is the owner of the job' do
@@ -86,64 +84,52 @@ describe Ci::BuildPolicy do
 
           it { expect_allowed(*build_permissions) }
         end
+      end
+
+      shared_examples 'forbidden access' do
+        it { expect_disallowed(*build_permissions) }
+
+        context 'when user is the owner of the job' do
+          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
+
+          it { expect_disallowed(*build_permissions) }
+        end
+      end
+
+      context 'with owner' do
+        let(:current_user) { owner }
+
+        it_behaves_like 'allowed build owner access'
       end
 
       context 'with maintainer' do
         let(:current_user) { maintainer }
 
-        it { expect_disallowed(*build_permissions) }
-
-        context 'when user is the owner of the job' do
-          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
-
-          it { expect_allowed(*build_permissions) }
-        end
+        it_behaves_like 'allowed build owner access'
       end
 
       context 'with developer' do
         let(:current_user) { developer }
 
-        context 'when user is the owner of the job' do
-          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
-
-          it { expect_disallowed(*build_permissions) }
-        end
+        it_behaves_like 'forbidden access'
       end
 
       context 'with reporter' do
         let(:current_user) { reporter }
 
-        it { expect_disallowed(*build_permissions) }
-
-        context 'when user is the owner of the job' do
-          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
-
-          it { expect_disallowed(*build_permissions) }
-        end
+        it_behaves_like 'forbidden access'
       end
 
       context 'with guest' do
         let(:current_user) { guest }
 
-        it { expect_disallowed(*build_permissions) }
-
-        context 'when user is the owner of the job' do
-          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
-
-          it { expect_disallowed(*build_permissions) }
-        end
+        it_behaves_like 'forbidden access'
       end
 
       context 'with non member' do
         let(:current_user) { create(:user) }
 
-        it { expect_disallowed(*build_permissions) }
-
-        context 'when user is the owner of the job' do
-          let(:build) { create(:ci_build, pipeline: pipeline, user: current_user) }
-
-          it { expect_disallowed(*build_permissions) }
-        end
+        it_behaves_like 'forbidden access'
       end
     end
 

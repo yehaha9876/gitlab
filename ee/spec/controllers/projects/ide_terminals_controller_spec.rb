@@ -10,7 +10,7 @@ describe Projects::IdeTerminalsController do
   let(:reporter) { create(:user) }
   let(:guest) { create(:user) }
   let(:project) { create(:project, :private, :repository, namespace: owner.namespace) }
-  let(:pipeline) { create(:ci_pipeline, project: project, source: :webide, user: user) }
+  let(:pipeline) { create(:ci_pipeline, project: project, source: :webide, config_source: :webide_source, user: user) }
   let(:job) { create(:ci_build, pipeline: pipeline, user: user, project: project) }
   let(:user) { maintainer }
 
@@ -97,22 +97,11 @@ describe Projects::IdeTerminalsController do
 
   describe 'GET show' do
     before do
-      get_show(id: job.id)
+      get(:show, namespace_id: project.namespace.to_param, project_id: project, id: job.id)
     end
 
     it_behaves_like 'terminal access rights'
     it_behaves_like 'when pipeline is not from a webide source'
-
-    private
-
-    def get_show(**extra_params)
-      params = {
-          namespace_id: project.namespace.to_param,
-          project_id: project
-      }
-
-      get :show, params.merge(extra_params)
-    end
   end
 
   describe 'POST check_config' do
@@ -141,7 +130,6 @@ describe Projects::IdeTerminalsController do
 
   describe 'POST create' do
     let(:branch) { 'master' }
-    let!(:pipeline) { create(:ci_pipeline, project: project, source: :webide, config_source: :webide_source) }
 
     before do
       allow_any_instance_of(::Ci::CreateWebideTerminalService)
@@ -181,7 +169,9 @@ describe Projects::IdeTerminalsController do
     let(:job) { create(:ci_build, :running, pipeline: pipeline, user: user, project: project) }
 
     before do
-      post_cancel(id: job.id)
+      post(:cancel, namespace_id: project.namespace.to_param,
+                    project_id: project.to_param,
+                    id: job.id)
     end
 
     it_behaves_like 'terminal access rights'
@@ -194,22 +184,15 @@ describe Projects::IdeTerminalsController do
         expect(response).to have_gitlab_http_status(422)
       end
     end
-
-    def post_cancel(**extra_params)
-      params = {
-        namespace_id: project.namespace.to_param,
-        project_id: project
-      }
-
-      post :cancel, params.merge(extra_params)
-    end
   end
 
   describe 'POST retry' do
     let(:job) { create(:ci_build, :failed, pipeline: pipeline, user: user, project: project) }
 
     before do
-      post_retry(id: job.id)
+      post(:retry, namespace_id: project.namespace.to_param,
+                   project_id: project.to_param,
+                   id: job.id)
     end
 
     it_behaves_like 'terminal access rights'
@@ -222,24 +205,11 @@ describe Projects::IdeTerminalsController do
         expect(response).to have_gitlab_http_status(422)
       end
     end
-
-    def post_retry(**extra_params)
-      params = {
-        namespace_id: project.namespace.to_param,
-        project_id: project
-      }
-
-      post :retry, params.merge(extra_params)
-    end
   end
 
-  describe 'GET #terminal' do
+  shared_examples 'create build terminal access' do
     context 'when job has a terminal' do
       let!(:job) { create(:ci_build, :running, :with_runner_session, pipeline: pipeline, user: user) }
-
-      before do
-        get_terminal(id: job.id)
-      end
 
       it_behaves_like 'terminal access rights'
       it_behaves_like 'when pipeline is not from a webide source'
@@ -249,8 +219,6 @@ describe Projects::IdeTerminalsController do
       let!(:job) { create(:ci_build, :running, pipeline: pipeline) }
 
       it 'returns not_found' do
-        get_terminal(id: job.id)
-
         expect(response).to have_gitlab_http_status(:not_found)
       end
     end
@@ -259,20 +227,19 @@ describe Projects::IdeTerminalsController do
       let!(:job) { create(:ci_build, :with_runner_session, pipeline: pipeline) }
 
       it 'returns not_found' do
-        get_terminal(id: job.id)
-
         expect(response).to have_gitlab_http_status(:not_found)
       end
     end
+  end
 
-    def get_terminal(**extra_params)
-      params = {
-        namespace_id: project.namespace.to_param,
-        project_id: project
-      }
-
-      get :terminal, params.merge(extra_params)
+  describe 'GET #terminal' do
+    before do
+      get(:terminal, namespace_id: project.namespace.to_param,
+                     project_id: project.to_param,
+                     id: job.id)
     end
+
+    it_behaves_like 'create build terminal access'
   end
 
   describe 'GET #terminal_websocket_authorize' do
@@ -284,34 +251,11 @@ describe Projects::IdeTerminalsController do
       end
 
       context 'and valid id' do
-        context 'when job has a terminal' do
-          before do
-            get_terminal_websocket(id: job.id)
-          end
-
-          it_behaves_like 'terminal access rights'
-          it_behaves_like 'when pipeline is not from a webide source'
+        before do
+          get_terminal_websocket(id: job.id)
         end
 
-        context 'when job does not have a terminal' do
-          let!(:job) { create(:ci_build, :running, pipeline: pipeline) }
-
-          it 'returns not_found' do
-            get_terminal_websocket(id: job.id)
-
-            expect(response).to have_gitlab_http_status(:not_found)
-          end
-        end
-
-        context 'when job is not running' do
-          let!(:job) { create(:ci_build, :with_runner_session, pipeline: pipeline) }
-
-          it 'returns not_found' do
-            get_terminal_websocket(id: job.id)
-
-            expect(response).to have_gitlab_http_status(:not_found)
-          end
-        end
+        it_behaves_like 'create build terminal access'
 
         it 'returns the terminal for the job' do
           expect(Gitlab::Workhorse)

@@ -29,8 +29,11 @@ class IdeTerminal
   private
 
   def route_generator(route = nil)
-    route = [route, 'project_ide_terminal_path'].compact.join('_')
+    route = [route, 'namespace_project_ide_terminal_path'].compact.join('_')
 
-    Gitlab::Routing.url_helpers.public_send(route, project, build) # rubocop:disable GitlabSecurity/PublicSend
+    Gitlab::Routing.url_helpers.public_send(route, # rubocop:disable GitlabSecurity/PublicSend
+                                            namespace_id: project.namespace.to_param,
+                                            project_id: project.to_param,
+                                            id: build)
   end
 end
