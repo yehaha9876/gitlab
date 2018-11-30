@@ -47,11 +47,11 @@ export default {
 
     <div class="pl-3">
       <p class="font-weight-bold mb-1">
-        {{__('Upgrade plan to unlock Canary Development feature')}}
+        {{__('Upgrade plan to unlock Canary Deployments feature')}}
       </p>
 
       <p class="canary-deployment-callout-message">
-        {{__('Canary Development is a popular CI strategy, where a small portion of the fleet is updated to the new version of your application.')}}
+        {{__('Canary Deployments is a popular CI strategy, where a small portion of the fleet is updated to the new version of your application.')}}
         <gl-link :href="helpCanaryDeploymentsPath">
           {{__('Read more')}}
         </gl-link>
