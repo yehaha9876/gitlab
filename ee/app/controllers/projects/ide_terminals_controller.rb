@@ -7,10 +7,6 @@ class Projects::IdeTerminalsController < Projects::ApplicationController
   before_action :authorize_ide_terminal_enabled!
   before_action :authorize_read_ide_terminal!, except: [:check_config, :create]
   before_action :authorize_update_ide_terminal!, only: [:cancel, :retry]
-  before_action :authorize_create_ide_terminal!, only: [:terminal, :terminal_workhorse_authorize]
-  before_action :verify_api_request!, only: :terminal_websocket_authorize
-
-  layout 'application', only: :terminal
 
   def check_config
     return respond_422 unless branch_sha
@@ -61,15 +57,6 @@ class Projects::IdeTerminalsController < Projects::ApplicationController
     render_terminal(new_build)
   end
 
-  def terminal
-  end
-
-  # GET .../terminal.ws : implemented in gitlab-workhorse
-  def terminal_websocket_authorize
-    set_workhorse_internal_api_content_type
-    render json: Gitlab::Workhorse.terminal_websocket(build.terminal_specification)
-  end
-
   private
 
   def authorize_ide_terminal_enabled!
@@ -84,16 +71,8 @@ class Projects::IdeTerminalsController < Projects::ApplicationController
     authorize_build_ability!(:update_ide_terminal)
   end
 
-  def authorize_create_ide_terminal!
-    authorize_build_ability!(:create_ide_terminal)
-  end
-
   def authorize_build_ability!(ability)
     return access_denied! unless can?(current_user, ability, build)
-  end
-
-  def verify_api_request!
-    Gitlab::Workhorse.verify_api_request!(request.headers)
   end
 
   def build

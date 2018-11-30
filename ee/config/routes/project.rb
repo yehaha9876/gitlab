@@ -25,8 +25,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         member do
           post :cancel
           post :retry
-          get :terminal, constraints: { format: nil }
-          get '/terminal.ws/authorize', to: 'ide_terminals#terminal_websocket_authorize', constraints: { format: nil }
         end
 
         collection do

@@ -19,12 +19,16 @@ module EE
           can?(:ide_terminal_enabled) && (current_user.admin? || owner_of_job?)
         end
 
+        rule { is_webide_terminal & terminal }.enable :create_build_terminal
+
         rule { is_webide_terminal & ide_terminal_granted }.policy do
           enable :read_ide_terminal
           enable :update_ide_terminal
         end
 
-        rule { can?(:update_ide_terminal) & terminal }.enable :create_ide_terminal
+        rule { is_webide_terminal & ~ide_terminal_granted }.policy do
+          prevent :create_build_terminal
+        end
 
         private
 
