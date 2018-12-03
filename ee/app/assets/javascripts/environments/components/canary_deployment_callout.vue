@@ -1,5 +1,4 @@
 <script>
-import { __ } from '~/locale';
 import { GlButton, GlLink } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import PersistentUserCallout from '~/persistent_user_callout';
@@ -38,10 +37,10 @@ export default {
 
 <template>
   <div
+    ref="canary-deployment-callout"
     class="p-3 canary-deployment-callout"
     :data-dismiss-endpoint="userCalloutsPath"
     :data-feature-id="canaryDeploymentFeatureId"
-    ref="canary-deployment-callout"
   >
     <img class="pr-3" :src="lockPromotionSvgPath" />
 

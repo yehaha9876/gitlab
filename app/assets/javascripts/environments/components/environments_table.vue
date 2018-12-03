@@ -3,10 +3,10 @@
  * Render environments table.
  */
 import { GlLoadingIcon } from '@gitlab/ui';
-import environmentItem from './environment_item.vue';
 
-import deployBoard from 'ee/environments/components/deploy_board_component.vue'; // eslint-disable-line import/order
-import CanaryDeploymentCallout from 'ee/environments/components/canary_deployment_callout.vue'; // eslint-disable-line import/order
+import deployBoard from 'ee/environments/components/deploy_board_component.vue';
+import CanaryDeploymentCallout from 'ee/environments/components/canary_deployment_callout.vue';
+import environmentItem from './environment_item.vue';
 
 export default {
   components: {

@@ -27,6 +27,7 @@ module EE
     def show_canary_deployment_callout?(project)
       !user_dismissed?(CANARY_DEPLOYMENT) &&
         show_promotions? &&
+        # use :canary_deployments if we create a feature flag for it in the future
         !project.feature_available?(:deploy_board)
     end
   end
