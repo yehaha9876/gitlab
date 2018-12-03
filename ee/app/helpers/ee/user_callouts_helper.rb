@@ -5,6 +5,7 @@ module EE
     GOLD_TRIAL = 'gold_trial'
 
     def show_gold_trial?(user = current_user)
+      # return unless user
       return false if user_dismissed?(GOLD_TRIAL)
       return false unless show_gold_trial_suitable_env?
 
