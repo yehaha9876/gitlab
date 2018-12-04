@@ -242,4 +242,6 @@ export const receiveVulnerabilitiesTimelineError = ({ commit }) => {
   commit(types.RECEIVE_VULNERABILITIES_TIMELINE_ERROR);
 };
 
+// prevent babel-plugin-rewire from generating an invalid default during karma tests
+// This is no longer needed after gitlab-ce#52179 is merged
 export default () => {};
