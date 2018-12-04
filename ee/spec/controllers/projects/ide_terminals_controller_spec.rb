@@ -16,7 +16,6 @@ describe Projects::IdeTerminalsController do
 
   before do
     stub_licensed_features(ide_terminal: true)
-    stub_feature_flags(ide_terminal_feature: true)
 
     project.add_maintainer(maintainer)
     project.add_developer(developer)
@@ -108,7 +107,7 @@ describe Projects::IdeTerminalsController do
     let(:result) { { status: :success } }
 
     before do
-      allow_any_instance_of(::Ci::WebideConfigValidatorService)
+      allow_any_instance_of(::Ci::WebideConfigService)
         .to receive(:execute).and_return(result)
 
       post :check_config, namespace_id: project.namespace.to_param,

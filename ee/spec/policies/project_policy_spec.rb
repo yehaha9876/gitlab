@@ -635,7 +635,6 @@ describe ProjectPolicy do
   describe 'ide_terminal_enabled' do
     before do
       stub_licensed_features(ide_terminal: true)
-      stub_feature_flags(ide_terminal_feature: true)
     end
 
     subject { described_class.new(current_user, project) }
@@ -643,16 +642,6 @@ describe ProjectPolicy do
     context 'without ide terminal feature available' do
       before do
         stub_licensed_features(ide_terminal: false)
-      end
-
-      let(:current_user) { admin }
-
-      it { is_expected.to be_disallowed(:ide_terminal_enabled) }
-    end
-
-    context 'with feature flag ide_terminal_feature disabled' do
-      before do
-        stub_feature_flags(ide_terminal_feature: false)
       end
 
       let(:current_user) { admin }
