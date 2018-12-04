@@ -8,7 +8,7 @@ describe Ci::CreateWebideTerminalService do
   let(:ref) { 'master' }
 
   before do
-    stub_licensed_features(webide_terminal: true)
+    stub_licensed_features(ide_terminal: true)
   end
 
   describe '#execute' do
