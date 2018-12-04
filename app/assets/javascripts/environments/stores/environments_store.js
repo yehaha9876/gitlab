@@ -97,6 +97,11 @@ export default class EnvironmentsStore {
 
     this.state.environments = filteredEnvironments;
 
+    /**
+     * Add the canary callout banner underneath the second environment listed.
+     * 
+     * If there is only one environment, then add to it underneath the first.
+     */
     if (this.state.environments.length >= 2) {
       this.state.environments[1].showCanaryCallout = true;
     } else if (this.state.environments.length > 0) {
