@@ -18,5 +18,9 @@ module GeoBackoffDelay
     def should_be_skipped?
       Rails.cache.read(skip_cache_key)
     end
+
+    def should_be_skipped_reason_detail
+      'GeoBackoffDelay: Backoff of 5 mins in affect'
+    end
   end
 end

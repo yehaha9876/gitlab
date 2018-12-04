@@ -35,11 +35,16 @@ module Geo
         try_obtain_lease do
           log_info('Started scheduler')
           reason = :unknown
+          reason_detail = nil
 
           begin
             reason = loop do
               break :node_disabled unless node_enabled?
-              break :skipped       if should_be_skipped?
+
+              if should_be_skipped?
+                reason_detail = should_be_skipped_reason_detail
+                break :skipped
+              end
 
               update_jobs_in_progress
               update_pending_resources
@@ -64,7 +69,9 @@ module Geo
             raise err
           ensure
             duration = Time.now.utc - start_time
-            log_info('Finished scheduler', total_loops: loops, duration: duration, reason: reason)
+            params = { total_loops: loops, duration: duration, reason: reason }
+            params[:reason_detail] = reason_detail if reason_detail
+            log_info('Finished scheduler', params)
           end
         end
       end
@@ -110,7 +117,7 @@ module Geo
       end
 
       def should_apply_backoff?
-        pending_resources.empty?
+        pending_resources.size > max_capacity
       end
 
       # rubocop: disable CodeReuse/ActiveRecord
