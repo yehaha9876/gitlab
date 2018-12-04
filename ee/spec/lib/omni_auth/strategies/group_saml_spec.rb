@@ -1,6 +1,12 @@
 require 'spec_helper'
+# require 'fast_spec_helper'
+# require 'ruby-saml'
+# require './ee/lib/omni_auth/strategies/group_saml'
+# require 'rspec/rails'
 
 describe OmniAuth::Strategies::GroupSaml, type: :strategy do
+  # include FactoryBot::Syntax::Methods
+
   let(:strategy) { [OmniAuth::Strategies::GroupSaml, {}] }
   let!(:group) { create(:group, name: 'my-group') }
   let(:idp_sso_url) { 'https://saml.example.com/adfs/ls' }
@@ -36,6 +42,8 @@ describe OmniAuth::Strategies::GroupSaml, type: :strategy do
     end
   end
 
+  #TODO: it 'accpets identity provider initiated requests'
+  #TODO: it 'fails when InResponseTo doesn't match expectations'
   describe 'POST /groups/:group_path/-/saml/callback' do
     context 'with valid SAMLResponse' do
       before do

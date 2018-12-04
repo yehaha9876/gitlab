@@ -42,24 +42,16 @@ module OmniAuth
 
       override :callback_phase
       def callback_phase
-
-        #IDEA: Parse SAML response to determine if InResponse to
-        #      is presant. If it is set :matches_request_id and
-        #      allow response.is_valid? to validate. A variation
-        #      on this uses SamlOriginValidator with a generated
-        #      response and the if condition ? super : fail(:blah)
-
-        # response = OneLogin::RubySaml::Response.new(request.params["SAMLResponse"])
-        # set_matches_request_id if response.in_response_to.present?
-
-        super_response = super
-
-        b_r = validate_in_response_to_if_present(@response_object)
-
-        b_r || super_response
-        # super.tap do #TODO: NOT SAFE. Won't return failure below, but needed to return result of super :shrug:
-        #   validate_in_response_to_if_present(@response_object)
+        response = OneLogin::RubySaml::Response.new(request.params["SAMLResponse"])
+        # if response.in_response_to.present?
+        #   env['omniauth.strategy'].options.merge!(matches_request_id: session['last_authn_request_id'])
         # end
+
+        validate_in_response_to_if_present!(response)
+
+        super
+      rescue ValidationError
+        fail!(:invalid_ticket, $!)
       end
 
       def self.invalid_group!(path)
@@ -76,12 +68,11 @@ module OmniAuth
         Gitlab::Auth::SamlOriginValidator.new(session).store_origin!(authn_request)
       end
 
-      def validate_in_response_to_if_present(saml_response)
-        return if env['omniauth.error.type']
+      def validate_in_response_to_if_present!(saml_response)
         return if Gitlab::Auth::SamlOriginValidator.new(session).valid?(saml_response)
 
         message = "SAML InResponseTo doesn't match the last reqeuest"
-        fail!(:invalid_ticket, ValidationError.new(message))
+        raise ValidationError.new(message)
       end
 
       def group_lookup
