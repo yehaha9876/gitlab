@@ -42,6 +42,10 @@ export default {
       type: String,
       required: true,
     },
+    vulnerabilitiesHistoryEndpoint: {
+      type: String,
+      required: true,
+    },
     vulnerabilityFeedbackHelpPath: {
       type: String,
       required: true,
@@ -82,11 +86,13 @@ export default {
   created() {
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
     this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
+    this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
     this.fetchVulnerabilitiesCount();
   },
   methods: {
     ...mapActions('vulnerabilities', [
       'setVulnerabilitiesCountEndpoint',
+      'setVulnerabilitiesHistoryEndpoint',
       'setVulnerabilitiesEndpoint',
       'fetchVulnerabilitiesCount',
       'createIssue',

@@ -9,7 +9,7 @@ import * as actions from 'ee/security_dashboard/store/modules/vulnerabilities/ac
 
 import mockDataVulnerabilities from './data/mock_data_vulnerabilities.json';
 import mockDataVulnerabilitiesCount from './data/mock_data_vulnerabilities_count.json';
-import mockDataVulnerabilitiesTimeline from './data/mock_data_vulnerabilities_timeline.json';
+import mockDataVulnerabilitiesHistory from './data/mock_data_vulnerabilities_history.json';
 
 describe('vulnerabiliites count actions', () => {
   const data = mockDataVulnerabilitiesCount;
@@ -637,20 +637,20 @@ describe('revert vulnerability dismissal', () => {
 });
 
 describe('vulnerabiliites timeline actions', () => {
-  const data = mockDataVulnerabilitiesTimeline;
+  const data = mockDataVulnerabilitiesHistory;
 
-  describe('setVulnerabilitiesTimelineEndpoint', () => {
+  describe('setVulnerabilitiesHistoryEndpoint', () => {
     it('should commit the correct mutuation', done => {
       const state = initialState;
       const endpoint = 'fakepath.json';
 
       testAction(
-        actions.setVulnerabilitiesTimelineEndpoint,
+        actions.setVulnerabilitiesHistoryEndpoint,
         endpoint,
         state,
         [
           {
-            type: types.SET_VULNERABILITIES_TIMELINE_ENDPOINT,
+            type: types.SET_VULNERABILITIES_HISTORY_ENDPOINT,
             payload: endpoint,
           },
         ],
@@ -665,7 +665,7 @@ describe('vulnerabiliites timeline actions', () => {
     const state = initialState;
 
     beforeEach(() => {
-      state.vulnerabilitiesCountEndpoint = `${TEST_HOST}/vulnerabilities_timeline.json`;
+      state.vulnerabilitiesCountEndpoint = `${TEST_HOST}/vulnerabilitIES_HISTORY.json`;
       mock = new MockAdapter(axios);
     });
 
@@ -675,19 +675,19 @@ describe('vulnerabiliites timeline actions', () => {
 
     describe('on success', () => {
       beforeEach(() => {
-        mock.onGet(state.vulnerabilitiesTimelineEndpoint).replyOnce(200, data);
+        mock.onGet(state.vulnerabilitiesHistoryEndpoint).replyOnce(200, data);
       });
 
       it('should dispatch the request and success actions', done => {
         testAction(
-          actions.fetchVulnerabilitiesTimeline,
+          actions.fetchVulnerabilitiesHistory,
           {},
           state,
           [],
           [
-            { type: 'requestVulnerabilitiesTimeline' },
+            { type: 'requestVulnerabilitiesHistory' },
             {
-              type: 'receiveVulnerabilitiesTimelineSuccess',
+              type: 'receiveVulnerabilitiesHistorySuccess',
               payload: { data },
             },
           ],
@@ -698,18 +698,18 @@ describe('vulnerabiliites timeline actions', () => {
 
     describe('on error', () => {
       beforeEach(() => {
-        mock.onGet(state.vulnerabilitiesTimelineEndpoint).replyOnce(404, {});
+        mock.onGet(state.vulnerabilitiesHistoryEndpoint).replyOnce(404, {});
       });
 
       it('should dispatch the request and error actions', done => {
         testAction(
-          actions.fetchVulnerabilitiesTimeline,
+          actions.fetchVulnerabilitiesHistory,
           {},
           state,
           [],
           [
-            { type: 'requestVulnerabilitiesTimeline' },
-            { type: 'receiveVulnerabilitiesTimelineError' },
+            { type: 'requestVulnerabilitiesHistory' },
+            { type: 'receiveVulnerabilitiesHistoryError' },
           ],
           done,
         );
@@ -722,10 +722,10 @@ describe('vulnerabiliites timeline actions', () => {
       const state = initialState;
 
       testAction(
-        actions.requestVulnerabilitiesTimeline,
+        actions.requestVulnerabilitiesHistory,
         {},
         state,
-        [{ type: types.REQUEST_VULNERABILITIES_TIMELINE }],
+        [{ type: types.REQUEST_VULNERABILITIES_HISTORY }],
         [],
         done,
       );
@@ -737,10 +737,10 @@ describe('vulnerabiliites timeline actions', () => {
       const state = initialState;
 
       testAction(
-        actions.receiveVulnerabilitiesTimelineSuccess,
+        actions.receiveVulnerabilitiesHistorySuccess,
         { data },
         state,
-        [{ type: types.RECEIVE_VULNERABILITIES_TIMELINE_SUCCESS, payload: data }],
+        [{ type: types.RECEIVE_VULNERABILITIES_HISTORY_SUCCESS, payload: data }],
         [],
         done,
       );
@@ -752,10 +752,10 @@ describe('vulnerabiliites timeline actions', () => {
       const state = initialState;
 
       testAction(
-        actions.receiveVulnerabilitiesTimelineError,
+        actions.receiveVulnerabilitiesHistoryError,
         {},
         state,
-        [{ type: types.RECEIVE_VULNERABILITIES_TIMELINE_ERROR }],
+        [{ type: types.RECEIVE_VULNERABILITIES_HISTORY_ERROR }],
         [],
         done,
       );

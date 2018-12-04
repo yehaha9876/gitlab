@@ -5,9 +5,6 @@ import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
 
-// TODO: Remove this mock
-import mockData from '../../../../../../../spec/javascripts/security_dashboard/store/vulnerabilities/data/mock_data_vulnerabilities_timeline.json';
-
 export const setVulnerabilitiesEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_VULNERABILITIES_ENDPOINT, endpoint);
 };
@@ -207,39 +204,36 @@ export const receiveRevertDismissalError = ({ commit }, { flashError }) => {
   }
 };
 
-export const setVulnerabilitiesTimelineEndpoint = ({ commit }, endpoint) => {
-  commit(types.SET_VULNERABILITIES_TIMELINE_ENDPOINT, endpoint);
+export const setVulnerabilitiesHistoryEndpoint = ({ commit }, endpoint) => {
+  commit(types.SET_VULNERABILITIES_HISTORY_ENDPOINT, endpoint);
 };
 
-export const fetchVulnerabilitiesTimeline = ({ state, dispatch }) => {
-  dispatch('requestVulnerabilitiesTimeline');
-
-  // TODO: Remove this mocking
-  return dispatch('receiveVulnerabilitiesTimelineSuccess', { data: mockData });
+export const fetchVulnerabilitiesHistory = ({ state, dispatch }) => {
+  dispatch('requestVulnerabilitiesHistory');
 
   axios({
     method: 'GET',
-    url: state.vulnerabilitiesTimelineEndpoint,
+    url: state.vulnerabilitiesHistoryEndpoint,
   })
     .then(response => {
       const { data } = response;
-      dispatch('receiveVulnerabilitiesTimelineSuccess', { data });
+      dispatch('receiveVulnerabilitiesHistorySuccess', { data });
     })
     .catch(() => {
-      dispatch('receiveVulnerabilitiesTimelineError');
+      dispatch('receiveVulnerabilitiesHistoryError');
     });
 };
 
-export const requestVulnerabilitiesTimeline = ({ commit }) => {
-  commit(types.REQUEST_VULNERABILITIES_TIMELINE);
+export const requestVulnerabilitiesHistory = ({ commit }) => {
+  commit(types.REQUEST_VULNERABILITIES_HISTORY);
 };
 
-export const receiveVulnerabilitiesTimelineSuccess = ({ commit }, { data }) => {
-  commit(types.RECEIVE_VULNERABILITIES_TIMELINE_SUCCESS, data);
+export const receiveVulnerabilitiesHistorySuccess = ({ commit }, { data }) => {
+  commit(types.RECEIVE_VULNERABILITIES_HISTORY_SUCCESS, data);
 };
 
-export const receiveVulnerabilitiesTimelineError = ({ commit }) => {
-  commit(types.RECEIVE_VULNERABILITIES_TIMELINE_ERROR);
+export const receiveVulnerabilitiesHistoryError = ({ commit }) => {
+  commit(types.RECEIVE_VULNERABILITIES_HISTORY_ERROR);
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

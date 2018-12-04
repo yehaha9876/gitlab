@@ -131,63 +131,63 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('SET_VULNERABILITIES_TIMELINE_ENDPOINT', () => {
-    it('should set `vulnerabilitiesTimelineEndpoint` to `fakepath.json`', () => {
+  describe('SET_VULNERABILITIES_HISTORY_ENDPOINT', () => {
+    it('should set `vulnerabilitiesHistoryEndpoint` to `fakepath.json`', () => {
       const state = createState();
       const endpoint = 'fakepath.json';
 
-      mutations[types.SET_VULNERABILITIES_TIMELINE_ENDPOINT](state, endpoint);
+      mutations[types.SET_VULNERABILITIES_HISTORY_ENDPOINT](state, endpoint);
 
-      expect(state.vulnerabilitiesTimelineEndpoint).toEqual(endpoint);
+      expect(state.vulnerabilitiesHistoryEndpoint).toEqual(endpoint);
     });
   });
 
-  describe('REQUEST_VULNERABILITIES_TIMELINE', () => {
+  describe('REQUEST_VULNERABILITIES_HISTORY', () => {
     let state;
 
     beforeEach(() => {
       state = {
         ...createState(),
-        errorLoadingVulnerabilitiesTimeline: true,
+        errorLoadingVulnerabilitiesHistory: true,
       };
-      mutations[types.REQUEST_VULNERABILITIES_TIMELINE](state);
+      mutations[types.REQUEST_VULNERABILITIES_HISTORY](state);
     });
 
-    it('should set `isLoadingVulnerabilitiesTimeline` to `true`', () => {
-      expect(state.isLoadingVulnerabilitiesTimeline).toBeTruthy();
+    it('should set `isLoadingVulnerabilitiesHistory` to `true`', () => {
+      expect(state.isLoadingVulnerabilitiesHistory).toBeTruthy();
     });
 
-    it('should set `errorLoadingVulnerabilitiesTimeline` to `false`', () => {
-      expect(state.errorLoadingVulnerabilitiesTimeline).toBeFalsy();
+    it('should set `errorLoadingVulnerabilitiesHistory` to `false`', () => {
+      expect(state.errorLoadingVulnerabilitiesHistory).toBeFalsy();
     });
   });
 
-  describe('RECEIVE_VULNERABILITIES_TIMELINE_SUCCESS', () => {
+  describe('RECEIVE_VULNERABILITIES_HISTORY_SUCCESS', () => {
     let payload;
     let state;
 
     beforeEach(() => {
       payload = mockData;
       state = createState();
-      mutations[types.RECEIVE_VULNERABILITIES_TIMELINE_SUCCESS](state, payload);
+      mutations[types.RECEIVE_VULNERABILITIES_HISTORY_SUCCESS](state, payload);
     });
 
-    it('should set `isLoadingVulnerabilitiesTimeline` to `false`', () => {
-      expect(state.isLoadingVulnerabilitiesTimeline).toBeFalsy();
+    it('should set `isLoadingVulnerabilitiesHistory` to `false`', () => {
+      expect(state.isLoadingVulnerabilitiesHistory).toBeFalsy();
     });
 
-    it('should set `vulnerabilitiesTimeline`', () => {
-      expect(state.vulnerabilitiesTimeline).toBe(payload);
+    it('should set `vulnerabilitiesHistory`', () => {
+      expect(state.vulnerabilitiesHistory).toBe(payload);
     });
   });
 
-  describe('RECEIVE_VULNERABILITIES_TIMELINE_ERROR', () => {
-    it('should set `isLoadingVulnerabilitiesTimeline` to `false`', () => {
+  describe('RECEIVE_VULNERABILITIES_HISTORY_ERROR', () => {
+    it('should set `isLoadingVulnerabilitiesHistory` to `false`', () => {
       const state = createState();
 
-      mutations[types.RECEIVE_VULNERABILITIES_TIMELINE_ERROR](state);
+      mutations[types.RECEIVE_VULNERABILITIES_HISTORY_ERROR](state);
 
-      expect(state.isLoadingVulnerabilitiesTimeline).toBeFalsy();
+      expect(state.isLoadingVulnerabilitiesHistory).toBeFalsy();
     });
   });
 
