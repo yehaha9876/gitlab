@@ -730,6 +730,11 @@
     display: none;
   }
 
+  &-lock {
+    height: 82px;
+    width: 92px;
+  }
+
   &-message {
     max-width: 600px;
     color: $theme-gray-700;

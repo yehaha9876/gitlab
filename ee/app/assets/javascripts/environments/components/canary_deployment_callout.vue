@@ -42,7 +42,7 @@ export default {
     :data-dismiss-endpoint="userCalloutsPath"
     :data-feature-id="canaryDeploymentFeatureId"
   >
-    <img class="pr-3" :src="lockPromotionSvgPath" />
+    <img class="canary-deployment-callout-lock pr-3" :src="lockPromotionSvgPath" />
 
     <div class="pl-3">
       <p class="font-weight-bold mb-1">
