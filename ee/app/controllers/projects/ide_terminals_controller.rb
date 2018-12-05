@@ -74,7 +74,6 @@ class Projects::IdeTerminalsController < Projects::ApplicationController
   end
 
   def build
-    binding.pry
     @build ||= project.builds.find(params[:id])
   end
 
