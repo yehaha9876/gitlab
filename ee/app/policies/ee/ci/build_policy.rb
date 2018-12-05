@@ -20,7 +20,7 @@ module EE
           enable :update_ide_terminal
         end
 
-        rule { ~can?(:update_ide_terminal) }.policy do
+        rule { is_webide_terminal & ~can?(:update_ide_terminal) }.policy do
           prevent :create_build_terminal
         end
 
