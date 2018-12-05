@@ -75,6 +75,9 @@ export default {
         html: true,
       };
     },
+    chartFlagEnabled() {
+      return gon.features && gon.features.groupSecurityDashboardHistory;
+    },
   },
   created() {
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
@@ -110,8 +113,10 @@ export default {
           </span>
         </template>
         <vulnerability-count-list />
-        <h4 class="my-4">{{ __('Vulnerability Chart') }}</h4>
-        <vulnerability-chart />
+        <template v-if="chartFlagEnabled">
+          <h4 class="my-4">{{ __('Vulnerability Chart') }}</h4>
+          <vulnerability-chart />
+        </template>
         <h4 class="my-4">{{ __('Vulnerability List') }}</h4>
         <security-dashboard-table
           :dashboard-documentation="dashboardDocumentation"
