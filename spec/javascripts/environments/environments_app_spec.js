@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import environmentsComponent from '~/environments/components/environments_app.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { environment, folder } from './mock_data';
+import { serverData, environment, folder } from './mock_data';
 
 describe('Environment', () => {
   const mockData = {
@@ -127,6 +127,75 @@ describe('Environment', () => {
             done();
           }, 0);
         });
+      });
+    });
+
+    describe('canary callout', () => {
+      it('should render banner underneath second environment', done => {
+        const environments = [...serverData];
+        environments[1].showCanaryCallout = true;
+        mock.onGet(mockData.endpoint).reply(
+          200,
+          {
+            environments,
+            stopped_count: 1,
+            available_count: 0,
+          },
+          {
+            'X-nExt-pAge': '2',
+            'x-page': '1',
+            'X-Per-Page': '1',
+            'X-Prev-Page': '',
+            'X-TOTAL': '37',
+            'X-Total-Pages': '2',
+          },
+        );
+
+        component = mountComponent(EnvironmentsComponent, mockData);
+
+        setTimeout(() => {
+          expect(
+            component.$el
+              .querySelector('.canary-deployment-callout')
+              .getAttribute('data-js-canary-promo-key'),
+          ).toBe('1');
+          done();
+        }, 0);
+      });
+
+      it('should render banner underneath first environment', done => {
+        mock.onGet(mockData.endpoint).reply(
+          200,
+          {
+            environments: [
+              {
+                ...environment,
+                showCanaryCallout: true,
+              },
+            ],
+            stopped_count: 1,
+            available_count: 0,
+          },
+          {
+            'X-nExt-pAge': '2',
+            'x-page': '1',
+            'X-Per-Page': '1',
+            'X-Prev-Page': '',
+            'X-TOTAL': '37',
+            'X-Total-Pages': '2',
+          },
+        );
+
+        component = mountComponent(EnvironmentsComponent, mockData);
+
+        setTimeout(() => {
+          expect(
+            component.$el
+              .querySelector('.canary-deployment-callout')
+              .getAttribute('data-js-canary-promo-key'),
+          ).toBe('0');
+          done();
+        }, 0);
       });
     });
   });

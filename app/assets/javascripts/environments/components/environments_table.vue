@@ -148,6 +148,7 @@ export default {
           :user-callouts-path="userCalloutsPath"
           :lock-promotion-svg-path="lockPromotionSvgPath"
           :help-canary-deployments-path="helpCanaryDeploymentsPath"
+          :data-js-canary-promo-key="i"
         />
       </template>
     </template>
