@@ -2,7 +2,7 @@ import Vue from 'vue';
 import environmentTableComp from '~/environments/components/environments_table.vue';
 import eventHub from '~/environments/event_hub';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { deployBoardMockData } from './mock_data';
+import { serverData, deployBoardMockData } from './mock_data';
 
 describe('Environment table', () => {
   let Component;
@@ -101,5 +101,22 @@ describe('Environment table', () => {
     });
 
     vm.$el.querySelector('.deploy-board-icon').click();
+  });
+
+  it('should render canary callout', () => {
+    serverData[1].showCanaryCallout = true;
+
+    vm = mountComponent(Component, {
+      environments: serverData,
+      canCreateDeployment: false,
+      canReadEnvironment: true,
+      canaryDeploymentFeatureId: 'canary_deployment',
+      showCanaryDeploymentCallout: true,
+      userCalloutsPath: '/callouts',
+      lockPromotionSvgPath: '/assets/illustrations/lock-promotion.svg',
+      helpCanaryDeploymentsPath: 'help/canary-deployments',
+    });
+
+    expect(vm.$el.querySelector('.canary-deployment-callout')).toBeDefined();
   });
 });

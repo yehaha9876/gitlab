@@ -1,5 +1,5 @@
 import Store from '~/environments/stores/environments_store';
-import { serverData, deployBoardMockData } from './mock_data';
+import { serverData, environment as singleEnvironment, deployBoardMockData } from './mock_data';
 
 describe('Store', () => {
   let store;
@@ -243,6 +243,20 @@ describe('Store', () => {
       store.toggleFolder(store.state.environments[1]);
 
       expect(store.getOpenFolders()[0]).toEqual(store.state.environments[1]);
+    });
+  });
+
+  describe('canaryCallout', () => {
+    it('should add banner underneath the second environment', () => {
+      store.storeEnvironments(serverData);
+
+      expect(store.state.environments[1].showCanaryCallout).toEqual(true);
+    });
+
+    it('should add banner underneath first environment when only one environment', () => {
+      store.storeEnvironments([singleEnvironment]);
+
+      expect(store.state.environments[0].showCanaryCallout).toEqual(true);
     });
   });
 });
