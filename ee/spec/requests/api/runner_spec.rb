@@ -14,7 +14,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
     describe 'POST /api/v4/jobs/request' do
       context 'for web-ide job' do
         let(:user) { create(:user) }
-        let(:service) { Ci::CreateWebideTerminalService.new(project, user, ref: 'master').execute }
+        let(:service) { Ci::CreateIdeTerminalService.new(project, user, ref: 'master').execute }
         let(:pipeline) { service[:pipeline] }
         let(:build) { pipeline.builds.first }
 

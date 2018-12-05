@@ -3,8 +3,6 @@
 class IdeTerminal
   include ::Gitlab::Routing
 
-  DEFAULT_ROUTE = 'project_ide_terminal_path'.freeze
-
   attr_reader :build, :project
 
   delegate :id, :status, to: :build
@@ -15,15 +13,15 @@ class IdeTerminal
   end
 
   def show_path
-    route_generator
+    ide_terminal_route_generator(:show)
   end
 
   def retry_path
-    route_generator(:retry)
+    ide_terminal_route_generator(:retry)
   end
 
   def cancel_path
-    route_generator(:cancel)
+    ide_terminal_route_generator(:cancel)
   end
 
   def terminal_path
@@ -32,9 +30,12 @@ class IdeTerminal
 
   private
 
-  def route_generator(prefix = nil)
-    route = [prefix, DEFAULT_ROUTE].compact.join('_')
-
-    public_send(route, project, build) # rubocop:disable GitlabSecurity/PublicSend
+  def ide_terminal_route_generator(action)
+    url_for(action: action,
+            controller: 'projects/ide_terminals',
+            namespace_id: project.namespace.to_param,
+            project_id: project.to_param,
+            id: build.id,
+            only_path: true)
   end
 end

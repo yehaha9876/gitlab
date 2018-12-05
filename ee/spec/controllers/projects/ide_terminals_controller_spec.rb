@@ -131,7 +131,7 @@ describe Projects::IdeTerminalsController do
     let(:branch) { 'master' }
 
     before do
-      allow_any_instance_of(::Ci::CreateWebideTerminalService)
+      allow_any_instance_of(::Ci::CreateIdeTerminalService)
         .to receive(:execute).and_return(pipeline)
 
       post :create, namespace_id: project.namespace.to_param,
@@ -150,8 +150,8 @@ describe Projects::IdeTerminalsController do
       let(:user) { admin }
       let(:branch) { 'foobar' }
 
-      it 'returns 422' do
-        expect(response).to have_gitlab_http_status(422)
+      it 'returns 400' do
+        expect(response).to have_gitlab_http_status(400)
       end
     end
 

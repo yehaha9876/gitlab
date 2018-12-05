@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::CreateWebideTerminalService do
+describe Ci::CreateIdeTerminalService do
   set(:project) { create(:project, :repository) }
   set(:user) { create(:user) }
   let(:ref) { 'master' }

@@ -138,7 +138,9 @@ describe Ci::BuildPolicy do
     end
 
     def expect_disallowed(*permissions)
-      permissions.each { |p| is_expected.not_to be_allowed(p) }
+      permissions.each do |p|
+        is_expected.not_to be_allowed(p)
+      end
     end
   end
 end

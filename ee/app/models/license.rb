@@ -302,6 +302,7 @@ class License < ActiveRecord::Base
   end
 
   def feature_available?(feature)
+    return true
     return false if trial? && expired?
 
     # This feature might not be behind a feature flag at all, so default to true

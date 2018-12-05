@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Ci
-  class CreateWebideTerminalService < ::BaseService
+  class CreateIdeTerminalService < ::BaseService
     include ::Gitlab::Utils::StrongMemoize
 
     TerminalCreationError = Class.new(StandardError)

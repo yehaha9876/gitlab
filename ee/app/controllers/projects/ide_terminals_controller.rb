@@ -25,9 +25,7 @@ class Projects::IdeTerminalsController < Projects::ApplicationController
   end
 
   def create
-    return respond_422 unless project.repository.branch_exists?(params[:branch])
-
-    pipeline = ::Ci::CreateWebideTerminalService.new(project,
+    pipeline = ::Ci::CreateIdeTerminalService.new(project,
                                                      current_user,
                                                      ref: params[:branch])
                                                 .execute
@@ -76,6 +74,7 @@ class Projects::IdeTerminalsController < Projects::ApplicationController
   end
 
   def build
+    binding.pry
     @build ||= project.builds.find(params[:id])
   end
 
