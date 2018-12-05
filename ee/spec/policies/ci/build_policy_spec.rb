@@ -18,7 +18,7 @@ describe Ci::BuildPolicy do
   end
 
   describe 'manage a web ide terminal' do
-    let(:build_permissions) { %i[read_ide_terminal create_build_terminal update_ide_terminal] }
+    let(:build_permissions) { %i[read_web_ide_terminal create_build_terminal update_web_ide_terminal] }
     set(:maintainer) { create(:user) }
     let(:owner) { create(:owner) }
     let(:admin) { create(:admin) }
@@ -31,7 +31,7 @@ describe Ci::BuildPolicy do
     let(:build) { create(:ci_build, pipeline: pipeline) }
 
     before do
-      stub_licensed_features(ide_terminal: true)
+      stub_licensed_features(web_ide_terminal: true)
       allow(build).to receive(:has_terminal?).and_return(true)
 
       project.add_maintainer(maintainer)
@@ -42,19 +42,19 @@ describe Ci::BuildPolicy do
 
     subject { described_class.new(current_user, build) }
 
-    context 'when ide_terminal_enabled access disabled' do
+    context 'when web_ide_terminal_enabled access disabled' do
       let(:current_user) { admin }
 
       before do
-        stub_licensed_features(ide_terminal: false)
+        stub_licensed_features(web_ide_terminal: false)
 
-        expect(current_user.can?(:ide_terminal_enabled, project)).to eq false
+        expect(current_user.can?(:web_ide_terminal_enabled, project)).to eq false
       end
 
       it { expect_disallowed(*build_permissions) }
     end
 
-    context 'when ide_terminal_enabled access enabled' do
+    context 'when web_ide_terminal_enabled access enabled' do
       context 'with admin' do
         let(:current_user) { admin }
 
@@ -63,7 +63,7 @@ describe Ci::BuildPolicy do
         context 'when build is not from a webide pipeline' do
           let(:pipeline) { create(:ci_empty_pipeline, project: project, source: :chat) }
 
-          it { expect_disallowed(:read_ide_terminal, :update_ide_terminal) }
+          it { expect_disallowed(:read_web_ide_terminal, :update_web_ide_terminal) }
         end
 
         context 'when build has no runner terminal' do
@@ -71,7 +71,7 @@ describe Ci::BuildPolicy do
             allow(build).to receive(:has_terminal?).and_return(false)
           end
 
-          it { expect_allowed(:read_ide_terminal, :update_ide_terminal) }
+          it { expect_allowed(:read_web_ide_terminal, :update_web_ide_terminal) }
           it { expect_disallowed(:create_build_terminal) }
         end
       end

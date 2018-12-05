@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Ci
-  class CreateIdeTerminalService < ::BaseService
+  class CreateWebIdeTerminalService < ::BaseService
     include ::Gitlab::Utils::StrongMemoize
 
     TerminalCreationError = Class.new(StandardError)
@@ -62,7 +62,7 @@ module Ci
     end
 
     def load_terminal_config!
-      result = ::Ci::WebideConfigService.new(project, current_user, sha: sha).execute
+      result = ::Ci::WebIdeConfigService.new(project, current_user, sha: sha).execute
       raise TerminalCreationError, result[:message] if result[:status] != :success
 
       @terminal = result[:terminal]
@@ -80,7 +80,7 @@ module Ci
     end
 
     def check_access!
-      unless can?(current_user, :ide_terminal_enabled, project)
+      unless can?(current_user, :web_ide_terminal_enabled, project)
         raise TerminalCreationError, 'Insufficient permissions to create a terminal'
       end
 

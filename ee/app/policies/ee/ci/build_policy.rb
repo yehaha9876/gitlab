@@ -11,20 +11,20 @@ module EE
           prevent :update_build
         end
 
-        condition(:is_webide_terminal, scope: :subject) do
+        condition(:is_web_ide_terminal, scope: :subject) do
           @subject.pipeline.webide?
         end
 
-        rule { is_webide_terminal & can?(:ide_terminal_enabled) & (admin | owner_of_job) }.policy do
-          enable :read_ide_terminal
-          enable :update_ide_terminal
+        rule { is_web_ide_terminal & can?(:web_ide_terminal_enabled) & (admin | owner_of_job) }.policy do
+          enable :read_web_ide_terminal
+          enable :update_web_ide_terminal
         end
 
-        rule { is_webide_terminal & ~can?(:update_ide_terminal) }.policy do
+        rule { is_web_ide_terminal & ~can?(:update_web_ide_terminal) }.policy do
           prevent :create_build_terminal
         end
 
-        rule { can?(:update_ide_terminal) & terminal }.policy do
+        rule { can?(:update_web_ide_terminal) & terminal }.policy do
           enable :create_build_terminal
         end
 

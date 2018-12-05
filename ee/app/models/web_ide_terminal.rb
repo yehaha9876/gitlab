@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class IdeTerminal
+class WebIdeTerminal
   include ::Gitlab::Routing
 
   attr_reader :build, :project
@@ -13,15 +13,15 @@ class IdeTerminal
   end
 
   def show_path
-    ide_terminal_route_generator(:show)
+    web_ide_terminal_route_generator(:show)
   end
 
   def retry_path
-    ide_terminal_route_generator(:retry)
+    web_ide_terminal_route_generator(:retry)
   end
 
   def cancel_path
-    ide_terminal_route_generator(:cancel)
+    web_ide_terminal_route_generator(:cancel)
   end
 
   def terminal_path
@@ -30,9 +30,9 @@ class IdeTerminal
 
   private
 
-  def ide_terminal_route_generator(action)
+  def web_ide_terminal_route_generator(action)
     url_for(action: action,
-            controller: 'projects/ide_terminals',
+            controller: 'projects/web_ide_terminals',
             namespace_id: project.namespace.to_param,
             project_id: project.to_param,
             id: build.id,

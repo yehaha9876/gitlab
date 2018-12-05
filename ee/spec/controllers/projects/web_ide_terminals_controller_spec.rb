@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::IdeTerminalsController do
+describe Projects::WebIdeTerminalsController do
   let(:owner) { create(:owner) }
   let(:admin) { create(:admin) }
   let(:maintainer) { create(:user) }
@@ -15,7 +15,7 @@ describe Projects::IdeTerminalsController do
   let(:user) { maintainer }
 
   before do
-    stub_licensed_features(ide_terminal: true)
+    stub_licensed_features(web_ide_terminal: true)
 
     project.add_maintainer(maintainer)
     project.add_developer(developer)
@@ -107,7 +107,7 @@ describe Projects::IdeTerminalsController do
     let(:result) { { status: :success } }
 
     before do
-      allow_any_instance_of(::Ci::WebideConfigService)
+      allow_any_instance_of(::Ci::WebIdeConfigService)
         .to receive(:execute).and_return(result)
 
       post :check_config, namespace_id: project.namespace.to_param,
@@ -131,7 +131,7 @@ describe Projects::IdeTerminalsController do
     let(:branch) { 'master' }
 
     before do
-      allow_any_instance_of(::Ci::CreateIdeTerminalService)
+      allow_any_instance_of(::Ci::CreateWebIdeTerminalService)
         .to receive(:execute).and_return(pipeline)
 
       post :create, namespace_id: project.namespace.to_param,

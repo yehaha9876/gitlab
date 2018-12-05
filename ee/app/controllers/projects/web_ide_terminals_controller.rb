@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-class Projects::IdeTerminalsController < Projects::ApplicationController
+class Projects::WebIdeTerminalsController < Projects::ApplicationController
   before_action :authenticate_user!
 
   before_action :build, except: [:check_config, :create]
-  before_action :authorize_ide_terminal_enabled!
-  before_action :authorize_read_ide_terminal!, except: [:check_config, :create]
-  before_action :authorize_update_ide_terminal!, only: [:cancel, :retry]
+  before_action :authorize_web_ide_terminal_enabled!
+  before_action :authorize_read_web_ide_terminal!, except: [:check_config, :create]
+  before_action :authorize_update_web_ide_terminal!, only: [:cancel, :retry]
 
   def check_config
     return respond_422 unless branch_sha
 
-    result = ::Ci::WebideConfigService.new(project, current_user, sha: branch_sha).execute
+    result = ::Ci::WebIdeConfigService.new(project, current_user, sha: branch_sha).execute
 
     if result[:status] == :success
       head :ok
@@ -25,7 +25,7 @@ class Projects::IdeTerminalsController < Projects::ApplicationController
   end
 
   def create
-    pipeline = ::Ci::CreateIdeTerminalService.new(project,
+    pipeline = ::Ci::CreateWebIdeTerminalService.new(project,
                                                      current_user,
                                                      ref: params[:branch])
                                                 .execute
@@ -57,16 +57,16 @@ class Projects::IdeTerminalsController < Projects::ApplicationController
 
   private
 
-  def authorize_ide_terminal_enabled!
-    return access_denied! unless can?(current_user, :ide_terminal_enabled, project)
+  def authorize_web_ide_terminal_enabled!
+    return access_denied! unless can?(current_user, :web_ide_terminal_enabled, project)
   end
 
-  def authorize_read_ide_terminal!
-    authorize_build_ability!(:read_ide_terminal)
+  def authorize_read_web_ide_terminal!
+    authorize_build_ability!(:read_web_ide_terminal)
   end
 
-  def authorize_update_ide_terminal!
-    authorize_build_ability!(:update_ide_terminal)
+  def authorize_update_web_ide_terminal!
+    authorize_build_ability!(:update_web_ide_terminal)
   end
 
   def authorize_build_ability!(ability)
@@ -84,7 +84,7 @@ class Projects::IdeTerminalsController < Projects::ApplicationController
   end
 
   def render_terminal(current_build)
-    render json: IdeTerminalSerializer
+    render json: WebIdeTerminalSerializer
       .new(project: project, current_user: current_user)
       .represent(current_build)
   end

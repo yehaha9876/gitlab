@@ -19,7 +19,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
         let(:build) { pipeline.builds.first }
 
         before do
-          stub_licensed_features(ide_terminal: true)
+          stub_licensed_features(web_ide_terminal: true)
           stub_webide_config_file(config_content)
           project.add_maintainer(user)
 

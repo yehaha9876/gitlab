@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class IdeTerminalEntity < Grape::Entity
+class WebIdeTerminalEntity < Grape::Entity
   expose :id
   expose :status
   expose :show_path

@@ -2,13 +2,13 @@
 
 require 'spec_helper'
 
-describe Ci::CreateIdeTerminalService do
+describe Ci::CreateWebIdeTerminalService do
   set(:project) { create(:project, :repository) }
   set(:user) { create(:user) }
   let(:ref) { 'master' }
 
   before do
-    stub_licensed_features(ide_terminal: true)
+    stub_licensed_features(web_ide_terminal: true)
   end
 
   describe '#execute' do

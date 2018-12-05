@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe IdeTerminal do
+describe WebIdeTerminal do
   let(:build) { create(:ci_build) }
 
   subject { described_class.new(build) }

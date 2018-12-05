@@ -92,7 +92,7 @@ class License < ActiveRecord::Base
     prometheus_alerts
     operations_dashboard
     tracing
-    ide_terminal
+    web_ide_terminal
   ].freeze
 
   # List all features available for early adopters,
@@ -302,6 +302,7 @@ class License < ActiveRecord::Base
   end
 
   def feature_available?(feature)
+    return true
     return false if trial? && expired?
 
     # This feature might not be behind a feature flag at all, so default to true

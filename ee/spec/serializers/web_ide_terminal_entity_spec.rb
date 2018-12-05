@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-describe IdeTerminalEntity do
+describe WebIdeTerminalEntity do
   let(:build) { create(:ci_build) }
-  let(:entity) { described_class.new(IdeTerminal.new(build)) }
+  let(:entity) { described_class.new(WebIdeTerminal.new(build)) }
 
   subject { entity.as_json }
 
