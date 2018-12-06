@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples 'diff file base entity' do
   it 'exposes essential attributes' do
     expect(subject).to include(:content_sha, :submodule, :submodule_link,
