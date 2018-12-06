@@ -132,12 +132,10 @@ describe('Environment', () => {
 
     describe('canary callout', () => {
       it('should render banner underneath second environment', done => {
-        const environments = [...serverData];
-        environments[1].showCanaryCallout = true;
         mock.onGet(mockData.endpoint).reply(
           200,
           {
-            environments,
+            environments: serverData,
             stopped_count: 1,
             available_count: 0,
           },
@@ -167,12 +165,7 @@ describe('Environment', () => {
         mock.onGet(mockData.endpoint).reply(
           200,
           {
-            environments: [
-              {
-                ...environment,
-                showCanaryCallout: true,
-              },
-            ],
+            environments: [environment],
             stopped_count: 1,
             available_count: 0,
           },

@@ -117,6 +117,6 @@ describe('Environment table', () => {
       helpCanaryDeploymentsPath: 'help/canary-deployments',
     });
 
-    expect(vm.$el.querySelector('.canary-deployment-callout')).toBeDefined();
+    expect(vm.$el.querySelector('.canary-deployment-callout')).not.toBeNull();
   });
 });
