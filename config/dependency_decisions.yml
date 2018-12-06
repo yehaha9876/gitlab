@@ -594,7 +594,6 @@
     :when: 2018-10-02 19:23:54.840151000 Z
 - - :license
   - echarts
-  - apache
   - :who: Mike Greiling
     :why: Apache 2.0 license
     :versions: []
