@@ -11,7 +11,7 @@ See the documentation below for details on how to configure these services.
 
 - [Akismet](akismet.md) Configure Akismet to stop spam
 - [Auth0 OmniAuth](auth0.md) Enable the Auth0 OmniAuth provider
-- [Bitbucket](bitbucket.md) Import projects from Bitbucket.org and login to your GitLab instance with your
+- [Bitbucket](bitbucket.md) Import projects from Bitbucket.org and login to your GitLab instance with your Bitbucket.org account
 - [CAS](cas.md) Configure GitLab to sign in using CAS
 - [Elasticsearch](elasticsearch.md) Enable [Advanced Global Search](/user/search/advanced_global_search.md),
     [Advanced System Search](/user/search/advanced_search_syntax.md), and faster searching.
@@ -28,7 +28,6 @@ See the documentation below for details on how to configure these services.
 - [reCAPTCHA](recaptcha.md) Configure GitLab to use Google reCAPTCHA for new users
 - [SAML](saml.md) Configure GitLab as a SAML 2.0 Service Provider
 - [Trello](trello_power_up.md) Integrate Trello with GitLab
-Bitbucket.org account
 
 > GitLab Enterprise Edition contains [advanced Jenkins support][jenkins].
 
