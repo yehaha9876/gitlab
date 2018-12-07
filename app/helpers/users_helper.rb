@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module UsersHelper
-  prepend EE::UsersHelper
-
   def user_link(user)
     link_to(user.name, user_path(user),
             title: user.email,
@@ -70,6 +68,10 @@ module UsersHelper
                 data: { html: true, placement: 'top' } do
       emoji_icon user.status.emoji
     end
+  end
+
+  def impersonation_enabled?
+    Gitlab.config.gitlab.impersonation_enabled
   end
 
   private

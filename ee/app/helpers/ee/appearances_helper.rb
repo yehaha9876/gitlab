@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 module EE
   module AppearancesHelper
+    extend ::Gitlab::Utils::Override
+
     def header_message
       return unless current_appearance&.show_header?
 
@@ -15,6 +19,11 @@ module EE
       render_message(:footer_message)
     end
 
+    override :default_brand_title
+    def default_brand_title
+      'GitLab Enterprise Edition'
+    end
+
     private
 
     def render_message(field_sym, class_names = [])
@@ -26,10 +35,10 @@ module EE
     end
 
     def message_style
-      style = ''
+      style = []
       style << "background-color: #{current_appearance.message_background_color};"
       style << "color: #{current_appearance.message_font_color}"
-      style
+      style.join
     end
   end
 end

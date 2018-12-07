@@ -15,9 +15,11 @@ export default () => {
       return createElement('group-security-dashboard-app', {
         props: {
           dashboardDocumentation: el.dataset.dashboardDocumentation,
+          emptyStateSvgPath: el.dataset.emptyStateSvgPath,
           vulnerabilityFeedbackHelpPath: el.dataset.vulnerabilityFeedbackHelpPath,
           vulnerabilitiesEndpoint: el.dataset.vulnerabilitiesEndpoint,
           vulnerabilitiesCountEndpoint: el.dataset.vulnerabilitiesSummaryEndpoint,
+          vulnerabilitiesHistoryEndpoint: el.dataset.vulnerabilitiesHistoryEndpoint,
         },
       });
     },

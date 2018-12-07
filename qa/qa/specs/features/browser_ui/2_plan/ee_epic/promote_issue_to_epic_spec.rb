@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan'
+  context 'Plan' do
     describe 'promote issue to epic' do
       let(:issue_title) { "My Awesome Issue #{SecureRandom.hex(8)}" }
 

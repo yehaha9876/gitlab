@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module ProjectsHelper
     extend ::Gitlab::Utils::Override
@@ -131,6 +133,12 @@ module EE
       else
         false
       end
+    end
+
+    def group_project_templates_count(group_id)
+      allowed_subgroups = current_user.available_subgroups_with_custom_project_templates(group_id)
+
+      ::Project.in_namespace(allowed_subgroups).count
     end
 
     def share_project_description

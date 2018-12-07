@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module Epic
     extend ActiveSupport::Concern
@@ -54,6 +56,14 @@ module EE
         reorder(::Gitlab::Database.nulls_last_order('end_date'), 'id DESC')
       end
 
+      scope :order_end_date_desc, -> do
+        reorder(::Gitlab::Database.nulls_last_order('end_date', 'DESC'), 'id DESC')
+      end
+
+      scope :order_start_date_desc, -> do
+        reorder(::Gitlab::Database.nulls_last_order('start_date', 'DESC'), 'id DESC')
+      end
+
       def etag_caching_enabled?
         true
       end
@@ -102,7 +112,9 @@ module EE
         case method.to_s
         when 'start_or_end_date' then order_start_or_end_date_asc
         when 'start_date_asc' then order_start_date_asc
+        when 'start_date_desc' then order_start_date_desc
         when 'end_date_asc' then order_end_date_asc
+        when 'end_date_desc' then order_end_date_desc
         else
           super
         end
