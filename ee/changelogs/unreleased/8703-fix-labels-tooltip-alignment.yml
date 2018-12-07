@@ -1,0 +1,5 @@
+---
+title: Fix labels tooltip in collapsed Epics sidebar
+merge_request: 8748
+author:
+type: fixed
