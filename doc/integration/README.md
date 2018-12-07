@@ -13,6 +13,8 @@ See the documentation below for details on how to configure these services.
 - [Auth0 OmniAuth](auth0.md) Enable the Auth0 OmniAuth provider
 - [Bitbucket](bitbucket.md) Import projects from Bitbucket.org and login to your GitLab instance with your
 - [CAS](cas.md) Configure GitLab to sign in using CAS
+- [Elasticsearch](elasticsearch.md) Enable [Advanced Global Search](/user/search/advanced_global_search.md),
+    [Advanced System Search](/user/search/advanced_search_syntax.md), and faster searching.
 - [External issue tracker](external-issue-tracker.md) Redmine, JIRA, etc.
 - [Gmail actions buttons](gmail_action_buttons_for_gitlab.md) Adds GitLab actions to messages
 - [Jenkins](jenkins.md) Integrate with the Jenkins CI
