@@ -5,8 +5,7 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
   before_action :check_group_security_dashboard_history_feature_flag!, only: [:history]
 
   def index
-    @vulnerabilities = group.latest_vulnerabilities
-      .sast # FIXME: workaround until https://gitlab.com/gitlab-org/gitlab-ee/issues/6240
+    @vulnerabilities = ::Security::VulnerabilitiesFinder.new(group: group).execute
       .ordered
       .page(params[:page])
 
