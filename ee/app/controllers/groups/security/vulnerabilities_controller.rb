@@ -5,8 +5,8 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
   before_action :check_group_security_dashboard_history_feature_flag!, only: [:history]
 
   def index
-    @vulnerabilities = group.latest_vulnerabilities
-      .sast # FIXME: workaround until https://gitlab.com/gitlab-org/gitlab-ee/issues/6240
+    @vulnerabilities = ::Security::VulnerabilitiesFinder.new(group: group, params: finder_params)
+      .execute
       .ordered
       .page(params[:page])
 
@@ -36,7 +36,20 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
     end
   end
 
+  private
+
   def check_group_security_dashboard_history_feature_flag!
     render_404 unless ::Feature.enabled?(:group_security_dashboard_history, group, default_enabled: true)
+  end
+
+  def finder_params
+    raw = params.permit(:hide_dismissed, report_type: [], project_id: [], severity: [])
+    raw.transform_values do |filter|
+      if filter.is_a?(Array)
+        filter.map { |value| value.to_i }
+      else
+        Gitlab::Utils.to_boolean(filter)
+      end
+    end
   end
 end
