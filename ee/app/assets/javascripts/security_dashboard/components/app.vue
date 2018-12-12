@@ -1,5 +1,6 @@
 <script>
 import { mapActions, mapState } from 'vuex';
+import Filters from './filters.vue';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityChart from './vulnerability_chart.vue';
@@ -8,6 +9,7 @@ import VulnerabilityCountList from './vulnerability_count_list.vue';
 export default {
   name: 'SecurityDashboardApp',
   components: {
+    Filters,
     IssueModal,
     SecurityDashboardTable,
     VulnerabilityChart,
@@ -67,6 +69,7 @@ export default {
 
 <template>
   <div>
+    <filters />
     <vulnerability-count-list />
     <template v-if="chartFlagEnabled">
       <h4 class="my-4">{{ __('Vulnerability Chart') }}</h4>
