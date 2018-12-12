@@ -18,7 +18,7 @@ module Security
     attr_accessor :params
     attr_reader :group
 
-    def initialize(params: {}, group: nil)
+    def initialize(group:, params: {})
       @group = group
       @params = params
     end
@@ -38,15 +38,15 @@ module Security
     end
 
     def by_report_type(collection)
-      collection.sast
+      params[:report_type].present? ? collection.where(report_type: params[:report_type]) : collection
     end
 
     def by_project(collection)
-      collection
+      params[:project_id].present? ? collection.where(project_id: params[:project_id]) : collection
     end
 
     def by_severity(collection)
-      collection
+      params[:severity].present? ? collection.where(severity: params[:severity]) :collection
     end
   end
 end

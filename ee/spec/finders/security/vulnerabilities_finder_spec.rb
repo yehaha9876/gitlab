@@ -10,6 +10,7 @@ describe Security::VulnerabilitiesFinder do
 
     set(:vulnerability1) { create(:vulnerabilities_occurrence, report_type: :sast, severity: :high, pipelines: [pipeline1], project: project1) }
     set(:vulnerability2) { create(:vulnerabilities_occurrence, report_type: :dependency_scanning, severity: :medium, pipelines: [pipeline2], project: project2) }
+    set(:vulnerability3) { create(:vulnerabilities_occurrence, report_type: :sast, severity: :low, pipelines: [pipeline2], project: project2) }
 
     subject { described_class.new(group: group, params: params).execute }
 
@@ -17,7 +18,7 @@ describe Security::VulnerabilitiesFinder do
       context 'when sast' do
         let(:params) { { report_type: 0 } }
         it 'include only sast' do
-          is_expected.to contain_exactly(vulnerability1)
+          is_expected.to contain_exactly(vulnerability1, vulnerability3)
         end
       end
       # FIXME: https://gitlab.com/gitlab-org/gitlab-ee/issues/8481
@@ -47,7 +48,7 @@ describe Security::VulnerabilitiesFinder do
     context 'by project' do
       let(:params) { { project_id: project2.id } }
       it 'include only vulnerabilities for one project' do
-        is_expected.to contain_exactly(vulnerability2)
+        is_expected.to contain_exactly(vulnerability2, vulnerability3)
       end
     end
 
@@ -59,7 +60,22 @@ describe Security::VulnerabilitiesFinder do
         end
       end
       context 'without search entity' do
-        let(:params) { { severity: 6, project_id: project1.id, report_type: 3 } }
+        let(:params) { { severity: 4, project_id: project1.id, report_type: 1 } }
+        it 'did not find anything' do
+          expect(subject.size).to eq 0
+        end
+      end
+    end
+
+    context 'by some filters' do
+      context 'with found entity' do
+        let(:params) { { project_id: project2.id, severity: 5 } }
+        it 'filter by all params' do
+          is_expected.to contain_exactly(vulnerability2)
+        end
+      end
+      context 'without search entity' do
+        let(:params) { { project_id: project1.id, severity: 5 } }
         it 'did not find anything' do
           expect(subject.size).to eq 0
         end
