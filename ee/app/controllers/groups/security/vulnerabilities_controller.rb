@@ -5,7 +5,8 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
   before_action :check_group_security_dashboard_history_feature_flag!, only: [:history]
 
   def index
-    @vulnerabilities = ::Security::VulnerabilitiesFinder.new(group: group).execute
+    @vulnerabilities = ::Security::VulnerabilitiesFinder.new(group: group, params: finder_params)
+      .execute
       .ordered
       .page(params[:page])
 
@@ -37,5 +38,11 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
 
   def check_group_security_dashboard_history_feature_flag!
     render_404 unless ::Feature.enabled?(:group_security_dashboard_history, group, default_enabled: true)
+  end
+
+  private
+
+  def finder_params
+    params.permit(:report_type, :project_id, :severity)
   end
 end
