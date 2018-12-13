@@ -350,4 +350,42 @@ describe Groups::Security::VulnerabilitiesController do
       end
     end
   end
+
+  describe 'GET severities.json' do
+    subject { get :severities, params: { group_id: group }, format: :json }
+
+    before do
+      stub_licensed_features(security_dashboard: true)
+      group.add_developer(user)
+    end
+
+    it 'return proper json' do
+      subject
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(json_response).to be_an(Hash)
+      expect(json_response['critical']).to eq(7)
+      expect(json_response['high']).to eq(6)
+      expect(json_response['medium']).to eq(5)
+      expect(json_response['low']).to eq(4)
+    end
+  end
+
+  describe 'GET report_types.json' do
+    subject { get :report_types, params: { group_id: group }, format: :json }
+
+    before do
+      stub_licensed_features(security_dashboard: true)
+      group.add_developer(user)
+    end
+
+    it 'return proper json' do
+      subject
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(json_response).to be_an(Hash)
+      expect(json_response['sast']).to eq(0)
+      expect(json_response.keys.size).to eq(1)
+    end
+  end
 end

@@ -36,11 +36,28 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
     end
   end
 
-  def check_group_security_dashboard_history_feature_flag!
-    render_404 unless ::Feature.enabled?(:group_security_dashboard_history, group, default_enabled: true)
+  def severities
+    respond_to do |format|
+      format.json do
+        render json: Vulnerabilities::Occurrence::LEVELS
+      end
+    end
+  end
+
+  def report_types
+    # FIXME: right now we have only only sast, fix with https://gitlab.com/gitlab-org/gitlab-ee/issues/8481
+    respond_to do |format|
+      format.json do
+        render json: { sast: 0 }
+      end
+    end
   end
 
   private
+
+  def check_group_security_dashboard_history_feature_flag!
+    render_404 unless ::Feature.enabled?(:group_security_dashboard_history, group, default_enabled: true)
+  end
 
   def finder_params
     raw = params.permit(:hide_dismissed, report_type: [], project_id: [], severity: [])

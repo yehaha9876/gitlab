@@ -72,6 +72,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         collection do
           get :summary
           get :history
+          get :severities
+          get :report_types
         end
       end
     end
