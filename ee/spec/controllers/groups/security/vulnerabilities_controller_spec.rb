@@ -121,7 +121,7 @@ describe Groups::Security::VulnerabilitiesController do
             expect(response).to match_response_schema('vulnerabilities/occurrence_list', dir: 'ee')
           end
 
-          it "returns a list of vulnerabilities for sast only if fiter is enabled" do
+          it "returns a list of vulnerabilities for sast only if filter is enabled" do
             get :index, params: {group_id: group, report_type: [0]}, format: :json
 
             expect(response).to have_gitlab_http_status(200)
@@ -131,8 +131,9 @@ describe Groups::Security::VulnerabilitiesController do
             expect(response).to match_response_schema('vulnerabilities/occurrence_list', dir: 'ee')
           end
 
-          it "returns a list of vulnerabilities of all types with multile filter" do
+          it "returns a list of vulnerabilities of all types with multi filter" do
             get :index, params: {group_id: group, report_type: [0, 1]}, format: :json
+
             expect(json_response.length).to eq 3
             expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast', 'dependency_scanning')
           end
