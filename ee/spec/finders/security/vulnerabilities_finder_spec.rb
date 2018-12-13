@@ -24,7 +24,6 @@ describe Security::VulnerabilitiesFinder do
           is_expected.to contain_exactly(vulnerability1, vulnerability3)
         end
       end
-      # FIXME: https://gitlab.com/gitlab-org/gitlab-ee/issues/8481
       context 'when dependency_scanning' do
         let(:params) { { report_type: [1] } }
         it 'include only depscan' do
