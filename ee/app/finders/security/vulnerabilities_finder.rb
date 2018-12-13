@@ -7,9 +7,9 @@
 # Arguments:
 #   group - object for filter vulnerabilities
 #   params:
-#     severity: int
-#     project: int
-#     report_type: int
+#     severity: Array of Integer
+#     project: Array of Integer
+#     report_type: Array of Integer
 #
 
 module Security
