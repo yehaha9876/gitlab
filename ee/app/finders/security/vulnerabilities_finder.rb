@@ -2,7 +2,7 @@
 
 # Security::VulnerabilitiesFinder
 #
-# Used to filter Vulnerabilities::Occurrences  by set of params
+# Used to filter Vulnerabilities::Occurrences  by set of params for Security Dashboard
 #
 # Arguments:
 #   group - object for filter vulnerabilities
