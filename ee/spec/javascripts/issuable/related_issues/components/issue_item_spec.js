@@ -15,7 +15,7 @@ describe('issueItem', () => {
     confidential: true,
     dueDate: '2018-12-31',
     weight: 10,
-    createdAt: '2018-12-01T00:00:00.00Z',
+    createdAt: '2018-12-01 00:00:00.00 UTC',
     milestone: defaultMilestone,
     assignees: defaultAssignees,
   };

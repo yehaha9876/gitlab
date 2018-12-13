@@ -1,4 +1,3 @@
-import { formatDate } from '~/lib/utils/datetime_utility';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
@@ -126,13 +125,13 @@ const mixins = {
       return this.createdAt ? this.timeFormated(this.createdAt) : '';
     },
     createdAtTimestamp() {
-      return this.createdAt ? formatDate(new Date(this.createdAt)) : '';
+      return this.createdAt ? this.createdAt : '';
     },
     closedAtInWords() {
       return this.closedAt ? this.timeFormated(this.closedAt) : '';
     },
     closedAtTimestamp() {
-      return this.closedAt ? formatDate(new Date(this.closedAt)) : '';
+      return this.closedAt ? this.closedAt : '';
     },
   },
   methods: {
