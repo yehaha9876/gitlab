@@ -49,15 +49,17 @@ export default {
           />
         </div>
         <div v-else>
-          <gl-button
-            class="float-right m-2"
-            variant="primary"
-            :href="externalUrl"
-            target="_blank"
-          >
-            View in Sentry
-            <icon name="external-link" />
-          </gl-button>
+          <div class="d-flex justify-content-end">
+            <gl-button
+              class="my-3 ml-auto"
+              variant="primary"
+              :href="externalUrl"
+              target="_blank"
+            >
+              View in Sentry
+              <icon name="external-link" />
+            </gl-button>
+          </div>
           <gl-error-list :errors="errors" />
         </div>
       </div>
@@ -73,3 +75,36 @@ export default {
     </div>
   </div>
 </template>
+<style>
+  .sentry-description,
+  .sentry-description-header {
+    flex: 1 1 0%;
+    width: 50%;
+    margin: 0 8px;
+  }
+
+  .sentry-culprit {
+    color: #999;
+    font-weight: 400;
+  }
+
+  .sentry-events,
+  .sentry-events-header,
+  .sentry-users,
+  .sentry-users-header,
+  .sentry-lastseen,
+  .sentry-last-seen-header {
+    width: 96px;
+    margin: 0 8px;
+    text-align: right;
+    text-overflow: ellipsis;
+  }
+
+  .sentry-header-box {
+    display: flex;
+    margin-right: 10px;
+    padding: 10px 10px 10px 16px;
+    border-bottom: 1px solid #eee;
+  }
+</style>
+
