@@ -3,8 +3,10 @@ module QA
     module Project
       class New < Page::Base
         include Page::Component::Select2
+        prepend EE::Page::Project::New
 
         view 'app/views/projects/new.html.haml' do
+          element :project_create_from_template_tab
           element :import_project_tab, "Import project" # rubocop:disable QA/ElementWithPattern
         end
 
@@ -22,10 +24,10 @@ module QA
           element :import_github, "icon('github', text: 'GitHub')" # rubocop:disable QA/ElementWithPattern
         end
 
-        def choose_test_namespace
+        def choose_test_namespace(path)
           click_element :project_namespace_select
 
-          select_item(Runtime::Namespace.path)
+          select_item(path)
         end
 
         def go_to_import_project
@@ -42,6 +44,10 @@ module QA
 
         def create_new_project
           click_on 'Create project'
+        end
+
+        def go_to_create_from_template
+          click_element(:project_create_from_template_tab)
         end
 
         def set_visibility(visibility)
