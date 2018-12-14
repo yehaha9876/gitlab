@@ -1,5 +1,6 @@
 <script>
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { mapGetters, mapMutations } from 'vuex';
 
 export default {
   components: {
@@ -7,30 +8,24 @@ export default {
     GlDropdownItem,
   },
   data: () => ({
-    selected: 0,
-    scannerTypes: [
-      {
-        id: 0,
-        name: 'All',
-      },
-      {
-        id: 1,
-        name: 'SAST',
-      },
-      {
-        id: 2,
-        name: 'DAST',
-      },
-    ],
+    filterId: 'type',
   }),
   computed: {
-    selectedItem() {
-      return this.scannerTypes[this.selected];
-    }
+    ...mapGetters('filters', ['getFilter', 'getSelectedOption']),
+    filter() {
+      return this.getFilter(this.filterId);
+    },
+    selectedOptionText() {
+      const selectedOption = this.getSelectedOption(this.filterId);
+      return (selectedOption && selectedOption.name) || '-';
+    },
   },
   methods: {
-    clickFilter(item) {
-      this.selected = item.id
+    ...mapMutations('filters', ['SET_FILTER']),
+    clickFilter(option) {
+      const { filterId } = this;
+      const optionId = option.id;
+      this.SET_FILTER({ filterId, optionId });
     },
   },
 };
@@ -38,18 +33,16 @@ export default {
 
 <template>
   <div class="dashboard-filters">
-      <div class="dashboard-filter">
-        <strong>Report type</strong>
-        <gl-dropdown :text="selectedItem.name">
-          <gl-dropdown-item
-            v-for="item in scannerTypes"
-            :key="item.id"
-            @click="clickFilter(item)"
-          >{{
-            item.name
-          }}</gl-dropdown-item>
-        </gl-dropdown>
-      </div>
+    <div class="dashboard-filter">
+      <strong>{{ filter.name }}</strong>
+      <gl-dropdown :text="selectedOptionText">
+        <gl-dropdown-item
+          v-for="option in filter.options"
+          :key="option.id"
+          @click="clickFilter(option);"
+          >{{ option.name }}</gl-dropdown-item
+        >
+      </gl-dropdown>
     </div>
   </div>
 </template>
