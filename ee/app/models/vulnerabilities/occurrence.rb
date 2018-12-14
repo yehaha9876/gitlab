@@ -81,6 +81,21 @@ module Vulnerabilities
         .order('day')
     end
 
+    # @param [Array<Integer>||Integer] value
+    def self.by_report_type(value)
+      where(report_type: value)
+    end
+
+    # @param [Array<Integer>||Integer] value
+    def self.by_project(value)
+      where(project_id: value)
+    end
+
+    # @param [Array<Integer>||Integer] value
+    def self.by_severity(value)
+      where(severity: value)
+    end
+
     def feedback(feedback_type:)
       params = {
         project_id: project_id,

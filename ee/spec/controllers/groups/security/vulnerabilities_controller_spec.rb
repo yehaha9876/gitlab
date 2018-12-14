@@ -124,7 +124,7 @@ describe Groups::Security::VulnerabilitiesController do
           end
 
           it "returns a list of vulnerabilities for sast only if filter is enabled" do
-            get :index, params: {group_id: group, report_type: [0]}, format: :json
+            get :index, params: { group_id: group, report_type: [0] }, format: :json
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response).to be_an(Array)
@@ -134,7 +134,7 @@ describe Groups::Security::VulnerabilitiesController do
           end
 
           it "returns a list of vulnerabilities of all types with multi filter" do
-            get :index, params: {group_id: group, report_type: [0, 1]}, format: :json
+            get :index, params: { group_id: group, report_type: [0, 1] }, format: :json
 
             expect(json_response.length).to eq 3
             expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast', 'dependency_scanning')

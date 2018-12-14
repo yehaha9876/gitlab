@@ -34,7 +34,7 @@ describe Security::VulnerabilitiesFinder do
 
     context 'by severity' do
       context 'when high' do
-        let(:params) { { severity: [6, 4]} }
+        let(:params) { { severity: [6, 4] } }
         it 'include only high' do
           is_expected.to contain_exactly(vulnerability1, vulnerability3)
         end
@@ -71,7 +71,7 @@ describe Security::VulnerabilitiesFinder do
 
     context 'by some filters' do
       context 'with found entity' do
-        let(:params) { { project_id: [project2.id], severity: [5,4] } }
+        let(:params) { { project_id: [project2.id], severity: [5, 4] } }
         it 'filter by all params' do
           is_expected.to contain_exactly(vulnerability2, vulnerability3)
         end

@@ -7,14 +7,13 @@
 # Arguments:
 #   group - object for filter vulnerabilities
 #   params:
-#     severity: Array of Integer
-#     project: Array of Integer
-#     report_type: Array of Integer
+#     severity: Array<Integer>
+#     project: Array<Integer>
+#     report_type: Array<Integer>
 #
 
 module Security
   class VulnerabilitiesFinder
-
     attr_accessor :params
     attr_reader :group
 
@@ -38,15 +37,15 @@ module Security
     end
 
     def by_report_type(collection)
-      params[:report_type].present? ? collection.where(report_type: params[:report_type]) : collection
+      params[:report_type].present? ? collection.by_report_type(params[:report_type]) : collection
     end
 
     def by_project(collection)
-      params[:project_id].present? ? collection.where(project_id: params[:project_id]) : collection
+      params[:project_id].present? ? collection.by_project(params[:project_id]) : collection
     end
 
     def by_severity(collection)
-      params[:severity].present? ? collection.where(severity: params[:severity]) :collection
+      params[:severity].present? ? collection.by_severity(params[:severity]) : collection
     end
   end
 end
