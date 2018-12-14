@@ -54,6 +54,19 @@ describe Security::VulnerabilitiesFinder do
       end
     end
 
+    context 'by dismissals' do
+      let!(:dismissal) do
+        create(:vulnerability_feedback, :sast, :dismissal,
+               pipeline: pipeline1,
+               project: project1,
+               project_fingerprint: vulnerability1.project_fingerprint)
+      end
+      let(:params) { { hide_dismissed: true } }
+      it 'exclude dismissal' do
+        is_expected.to contain_exactly(vulnerability2, vulnerability3, vulnerability4)
+      end
+    end
+
     context 'by all filters' do
       context 'with found entity' do
         let(:params) { { severity: [6, 5, 4], project_id: [project1.id, project2.id], report_type: [0, 3] } }

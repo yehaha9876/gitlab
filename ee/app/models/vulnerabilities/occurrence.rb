@@ -96,6 +96,10 @@ module Vulnerabilities
       where(severity: value)
     end
 
+    def self.not_dismissed
+      where.not(project_fingerprint: Vulnerabilities::Feedback.dismissal.pluck(:project_fingerprint))
+    end
+
     def feedback(feedback_type:)
       params = {
         project_id: project_id,
