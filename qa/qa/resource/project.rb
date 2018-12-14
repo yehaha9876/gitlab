@@ -7,6 +7,7 @@ module QA
     class Project < Base
       attribute :name
       attribute :description
+      attribute :group_path
 
       attribute :group do
         Group.fabricate! do |group|
