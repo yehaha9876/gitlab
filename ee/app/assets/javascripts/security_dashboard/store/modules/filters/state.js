@@ -6,17 +6,17 @@ export default () => ({
       options: [
         {
           name: 'All',
-          id: '',
+          id: 'all',
           selected: true,
         },
         {
           name: 'SAST',
-          id: '0',
+          id: 'sast',
           selected: false,
         },
         {
           name: 'DAST',
-          id: '1',
+          id: 'dast',
           selected: false,
         },
       ],
