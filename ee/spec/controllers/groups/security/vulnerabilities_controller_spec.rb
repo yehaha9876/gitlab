@@ -18,7 +18,7 @@ describe Groups::Security::VulnerabilitiesController do
   end
 
   describe 'GET index.json' do
-    subject { get :index, params: { group_id: group }, format: :json }
+    subject { get :index, params: { group_id: group.id }, format: :json }
 
     context 'when security dashboard feature is disabled' do
       before do
