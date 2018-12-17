@@ -18,11 +18,13 @@ export default {
       <gl-filter
         v-for="filter in filters"
         :key="filter.id"
-        class="col-sm p-2"
         :filter-id="filter.id"
+        class="col-sm p-2"
+        @change="$emit('change');"
       />
-      <div class="col-sm p-2"></div>
-      <div class="col-sm p-2"></div>
+      <div class="col-sm p-2 d-md-block d-none"></div>
+      <div class="col-sm p-2 d-md-block d-none"></div>
+      <div class="col-sm p-2 d-md-block d-none"></div>
     </div>
   </div>
 </template>
