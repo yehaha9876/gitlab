@@ -22,15 +22,15 @@ export default {
     <gl-popover
       target="reports-info"
       placement="right"
-      :title="s__('Security Reports|At this time, the security dashboard only supports SAST.')"
       triggers="click"
+      :title="s__('Security Reports|At this time, the security dashboard only supports SAST.')"
     >
       <a
         v-if="dashboardDocumentation"
-        :title="s__('Security Reports|Security dashboard documentation')"
-        :href="dashboardDocumentation"
         target="_blank"
         rel="noopener noreferrer"
+        :title="s__('Security Reports|Security dashboard documentation')"
+        :href="dashboardDocumentation"
       >
         <span class="vertical-align-middle">{{
           s__('Security Reports|Security dashboard documentation')
