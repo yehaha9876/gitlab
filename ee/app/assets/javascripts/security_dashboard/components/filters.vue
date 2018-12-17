@@ -19,13 +19,13 @@ export default {
 </script>
 
 <template>
-  <div class="dashboard-filters">
+  <div class="dashboard-filters border-bottom bg-light">
     <div class="row mx-0 p-2">
       <gl-filter
         v-for="filter in filters"
         :key="filter.id"
-        :filter-id="filter.id"
         class="col-sm p-2 js-filter"
+        :filter-id="filter.id"
         :dashboard-documentation="dashboardDocumentation"
         @change="$emit('change');"
       />
@@ -35,10 +35,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style>
-.dashboard-filters {
-  background-color: #fafafa;
-  border-bottom: 1px solid #e5e5e5;
-}
-</style>
