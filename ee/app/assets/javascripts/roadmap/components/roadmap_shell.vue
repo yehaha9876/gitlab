@@ -87,14 +87,14 @@ export default {
       :preset-type="presetType"
       :epics="epics"
       :timeframe="timeframe"
-      :shell-width="shellWidth"
+      :shell-width="4000"
       :list-scrollable="!noScroll"
     />
     <epics-list-section
       :preset-type="presetType"
       :epics="epics"
       :timeframe="timeframe"
-      :shell-width="shellWidth"
+      :shell-width="4000"
       :current-group-id="currentGroupId"
       :list-scrollable="!noScroll"
     />

@@ -38,7 +38,7 @@ export default {
   computed: {
     itemStyles() {
       return {
-        width: `${this.itemWidth}px`,
+        width: `135px`,
       };
     },
     timelineHeaderLabel() {

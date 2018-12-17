@@ -53,7 +53,7 @@ export default {
     },
     emptyRowCellStyles() {
       return {
-        width: `${this.sectionItemWidth}px`,
+        width: `135px`,
       };
     },
     shadowCellStyles() {
@@ -75,6 +75,32 @@ export default {
     this.$nextTick(() => {
       this.initMounted();
     });
+
+    const epicsListItem = $('.epics-list-item');
+    const first = epicsListItem.eq(1);
+    const second = epicsListItem.eq(4);
+    const third = epicsListItem.eq(6);
+
+    first.hide();
+    second.hide();
+    third.hide();
+
+    $('.roadmap-shell').scroll(() => {
+      if ($('.roadmap-timeline-section').offset().left < -600) {
+        first.fadeIn(700, "linear");
+        second.fadeIn(700, "linear");
+      } else {
+        first.fadeOut(700, "linear");
+        second.fadeOut(700, "linear");
+      }
+
+    if ($('.roadmap-timeline-section').offset().left < -1200) {
+        third.fadeIn(700, "linear");
+      } else {
+        third.fadeOut(700, "linear");
+      }
+    })
+
   },
   beforeDestroy() {
     eventHub.$off('epicsListScrolled', this.handleEpicsListScroll);

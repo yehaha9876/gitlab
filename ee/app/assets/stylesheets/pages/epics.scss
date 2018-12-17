@@ -50,3 +50,40 @@
 .tooltip .tooltip-inner .milestone-date-range {
   color: $gl-text-color-tertiary;
 }
+
+
+
+
+.surprise-epic {
+  height: 50px;
+  opacity: 1;
+  transition: height 5s, opacity 5s;
+  overflow: hidden;
+
+  * {
+    display: initial !important;
+
+  }
+
+  .epic-timeline-cell {
+    // overflow: hidden !important;
+  }
+}
+
+
+.hidden-epic {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: height 1s, opacity 1s;
+
+  .epic-details-cell {
+    height: 0 !important;
+    padding: 0 !important;
+  }
+
+  * {
+    display: none !important;
+  }
+}
+

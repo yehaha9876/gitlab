@@ -52,7 +52,20 @@ export default {
       return this.store.getEpics();
     },
     timeframe() {
-      return this.store.getTimeframe();
+      return this.store.getTimeframe().concat([
+        new Date('11-01-2018'),
+        new Date('12-01-2018'),
+        new Date('01-01-2019'),
+        new Date('02-01-2019'),
+        new Date('03-01-2019'),
+        new Date('04-01-2019'),
+        new Date('05-01-2019'),
+        new Date('06-01-2019'),
+        new Date('07-01-2019'),
+        new Date('08-01-2019'),
+        new Date('09-01-2019'),
+
+      ])
     },
     timeframeStart() {
       return this.timeframe[0];
