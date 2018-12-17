@@ -33,7 +33,6 @@ module Security
       collection = by_report_type(collection)
       collection = by_project(collection)
       collection = by_severity(collection)
-      collection = hide_dismissed(collection)
       collection
     end
 
@@ -47,10 +46,6 @@ module Security
 
     def by_severity(collection)
       params[:severity].present? ? collection.by_severity(params[:severity]) : collection
-    end
-
-    def hide_dismissed(collection)
-      params[:hide_dismissed] ? collection.not_dismissed : collection
     end
   end
 end
