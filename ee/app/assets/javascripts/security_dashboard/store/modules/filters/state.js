@@ -1,27 +1,6 @@
 export default () => ({
   filters: [
     {
-      name: 'Report type',
-      id: 'type',
-      options: [
-        {
-          name: 'All',
-          id: 'all',
-          selected: true,
-        },
-        {
-          name: 'SAST',
-          id: 'sast',
-          selected: false,
-        },
-        {
-          name: 'DAST',
-          id: 'dast',
-          selected: false,
-        },
-      ],
-    },
-    {
       name: 'Severity',
       id: 'severity',
       options: [
@@ -32,24 +11,54 @@ export default () => ({
         },
         {
           name: 'Critical',
-          id: 'critical',
+          id: 7,
+          selected: false,
+        },
+        {
+          name: 'High',
+          id: 6,
+          selected: false,
+        },
+        {
+          name: 'Medium',
+          id: 5,
+          selected: false,
+        },
+        {
+          name: 'Low',
+          id: 4,
+          selected: false,
+        },
+        {
+          name: 'Unknown',
+          id: 2,
+          selected: false,
+        },
+        {
+          name: 'Experimental',
+          id: 3,
+          selected: false,
+        },
+        {
+          name: 'Ignore',
+          id: 1,
+          selected: false,
+        },
+        {
+          name: 'Undefined',
+          id: 0,
           selected: false,
         },
       ],
     },
     {
-      name: 'Project',
-      id: 'project',
+      name: 'Report type',
+      id: 'type',
       options: [
         {
-          name: 'All',
-          id: 'all',
+          name: 'SAST',
+          id: 'sast',
           selected: true,
-        },
-        {
-          name: 'Project One',
-          id: 'projectOne',
-          selected: false,
         },
       ],
     },

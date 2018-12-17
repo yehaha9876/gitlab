@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import Filters from './filters.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
@@ -43,6 +43,7 @@ export default {
   },
   computed: {
     ...mapState('vulnerabilities', ['modal']),
+    ...mapGetters('filters', ['activeFilters']),
     chartFlagEnabled() {
       return gon.features && gon.features.groupSecurityDashboardHistory;
     },
@@ -59,17 +60,21 @@ export default {
       'setVulnerabilitiesHistoryEndpoint',
       'setVulnerabilitiesEndpoint',
       'fetchVulnerabilitiesCount',
+      'fetchVulnerabilities',
       'createIssue',
       'dismissVulnerability',
       'revertDismissal',
     ]),
+    filterChange() {
+      this.fetchVulnerabilities(this.activeFilters);
+    },
   },
 };
 </script>
 
 <template>
   <div>
-    <filters />
+    <filters @change="filterChange" />
     <vulnerability-count-list />
     <template v-if="chartFlagEnabled">
       <h4 class="my-4">{{ __('Vulnerability Chart') }}</h4>

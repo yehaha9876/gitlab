@@ -16,12 +16,12 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('filters', ['getFilter', 'getSelectedOption']),
+    ...mapGetters('filters', ['getFilter', 'getSelectedOptions']),
     filter() {
       return this.getFilter(this.filterId);
     },
     selectedOptionText() {
-      const selectedOption = this.getSelectedOption(this.filterId);
+      const selectedOption = this.getSelectedOptions(this.filterId)[0];
       return (selectedOption && selectedOption.name) || '-';
     },
   },
@@ -31,6 +31,7 @@ export default {
       const { filterId } = this;
       const optionId = option.id;
       this.SET_FILTER({ filterId, optionId });
+      this.$emit('change');
     },
   },
 };
