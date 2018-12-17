@@ -21,5 +21,37 @@ export default () => ({
         },
       ],
     },
+    {
+      name: 'Severity',
+      id: 'severity',
+      options: [
+        {
+          name: 'All',
+          id: 'all',
+          selected: true,
+        },
+        {
+          name: 'Critical',
+          id: 'critical',
+          selected: false,
+        },
+      ],
+    },
+    {
+      name: 'Project',
+      id: 'project',
+      options: [
+        {
+          name: 'All',
+          id: 'all',
+          selected: true,
+        },
+        {
+          name: 'Project One',
+          id: 'projectOne',
+          selected: false,
+        },
+      ],
+    },
   ],
 });
