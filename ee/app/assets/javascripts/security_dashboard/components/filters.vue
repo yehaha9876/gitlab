@@ -12,6 +12,12 @@ export default {
       required: true,
     },
   },
+  props: {
+    dashboardDocumentation: {
+      type: String,
+      required: true,
+    },
+  },
   computed: {
     ...mapState('filters', ['filters']),
   },
