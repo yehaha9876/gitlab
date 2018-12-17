@@ -41,15 +41,13 @@ export const receiveVulnerabilitiesCountError = ({ commit }) => {
   commit(types.RECEIVE_VULNERABILITIES_COUNT_ERROR);
 };
 
-export const fetchVulnerabilities = ({ state, dispatch }, pageNumber) => {
+export const fetchVulnerabilities = ({ state, dispatch }, params = {}) => {
   dispatch('requestVulnerabilities');
-
-  const page = pageNumber || (state.pageInfo && state.pageInfo.page) || 1;
 
   axios({
     method: 'GET',
     url: state.vulnerabilitiesEndpoint,
-    params: { page },
+    params,
   })
     .then(response => {
       const { headers, data } = response;

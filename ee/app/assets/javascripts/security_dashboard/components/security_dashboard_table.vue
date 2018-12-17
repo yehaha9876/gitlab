@@ -33,6 +33,9 @@ export default {
   },
   methods: {
     ...mapActions('vulnerabilities', ['fetchVulnerabilities', 'openModal']),
+    fetchPage(page) {
+      this.fetchVulnerabilities({ page });
+    },
   },
 };
 </script>
@@ -79,7 +82,7 @@ export default {
 
       <pagination
         v-if="showPagination"
-        :change="fetchVulnerabilities"
+        :change="fetchPage"
         :page-info="pageInfo"
         class="justify-content-center prepend-top-default"
       />
