@@ -70,7 +70,7 @@ export default {
 
 <template>
   <div>
-    <filters @change="filterChange" />
+    <filters :dashboard-documentation="dashboardDocumentation" @change="filterChange" />
     <vulnerability-count-list />
     <h4 class="my-4">{{ __('Vulnerability Chart') }}</h4>
     <vulnerability-chart />

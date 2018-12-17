@@ -6,6 +6,12 @@ export default {
   components: {
     GlFilter,
   },
+  props: {
+    dashboardDocumentation: {
+      type: String,
+      required: true,
+    },
+  },
   computed: {
     ...mapState('filters', ['filters']),
   },
@@ -19,7 +25,8 @@ export default {
         v-for="filter in filters"
         :key="filter.id"
         :filter-id="filter.id"
-        class="col-sm p-2"
+        class="col-sm p-2 js-filter"
+        :dashboard-documentation="dashboardDocumentation"
         @change="$emit('change');"
       />
       <div class="col-sm p-2 d-md-block d-none"></div>
