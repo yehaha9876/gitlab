@@ -1,6 +1,6 @@
 .issues-filters
   .issues-details-filters.row-content-block.second-block
-    = form_tag page_filter_path(without: [:assignee_id, :author_id, :milestone_title, :label_name, :search]), method: :get, class: 'filter-form js-filter-form' do
+    = form_tag page_filter_path(without: [:assignee_id, :approver_id, :author_id, :milestone_title, :label_name, :search]), method: :get, class: 'filter-form js-filter-form' do
       - if params[:search].present?
         = hidden_field_tag :search, params[:search]
       .issues-other-filters
@@ -15,6 +15,13 @@
             = hidden_field_tag(:assignee_id, params[:assignee_id])
           = dropdown_tag(user_dropdown_label(params[:assignee_id], "Assignee"), options: { toggle_class: "js-user-search js-filter-submit js-assignee-search", title: "Filter by assignee", filter: true, dropdown_class: "dropdown-menu-user dropdown-menu-selectable dropdown-menu-assignee js-filter-submit",
             placeholder: "Search assignee", data: { any_user: "Any Assignee", first_user: current_user&.username, null_user: true, current_user: true, project_id: @project&.id, group_id: @group&.id, selected: params[:assignee_id], field_name: "assignee_id", default_label: "Assignee" } })
+
+        - if controller.controller_name == 'merge_requests' || controller.action_name == 'merge_requests'
+          .filter-item.inline
+            - if params[:approver_id].present?
+              = hidden_field_tag(:approver_id, params[:approver_id])
+            = dropdown_tag(user_dropdown_label(params[:approver_id], "Approver"), options: { toggle_class: "js-user-search js-filter-submit js-approvers-search", title: "Filter by approvers", filter: true, dropdown_class: "dropdown-menu-user dropdown-menu-selectable dropdown-menu-approver js-filter-submit",
+              placeholder: "Search approver", data: { any_user: "Any Approver", first_user: current_user&.username, null_user: true, current_user: true, project_id: @project&.id, group_id: @group&.id, selected: params[:approver_id], field_name: "approver_id", default_label: "Approver" } })
 
         .filter-item.inline.milestone-filter
           = render "shared/issuable/milestone_dropdown", selected: finder.milestones.try(:first), name: :milestone_title, show_any: true, show_upcoming: true, show_started: true

@@ -6,6 +6,15 @@ class DashboardController < Dashboard::ApplicationController
 
   prepend_before_action(only: [:issues]) { authenticate_sessionless_user!(:rss) }
   prepend_before_action(only: [:issues_calendar]) { authenticate_sessionless_user!(:ics) }
+  
+  FILTER_PARAMS = [
+    :author_id,
+    :assignee_id,
+    :approver_id,
+    :milestone_title,
+    :weight,
+    :label_name
+  ].freeze
 
   before_action :event_filter, only: :activity
   before_action :projects, only: [:issues, :merge_requests]

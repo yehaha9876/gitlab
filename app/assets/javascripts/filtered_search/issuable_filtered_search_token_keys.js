@@ -103,6 +103,11 @@ export const conditions = [
     value: 'none',
   },
   {
+    url: 'approver_id=0',
+    tokenKey: 'approver',
+    value: 'none',
+  },
+  {
     url: 'my_reaction_emoji=Any',
     tokenKey: 'my-reaction',
     value: 'any',

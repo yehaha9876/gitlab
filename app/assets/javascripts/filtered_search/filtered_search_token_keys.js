@@ -83,7 +83,16 @@ export default class FilteredSearchTokenKeys {
       capitalizeTokenValue: true,
     };
 
-    this.tokenKeys.push(wipToken);
-    this.tokenKeysWithAlternative.push(wipToken);
+    const authorToken = {
+      key: 'approver',
+      type: 'string',
+      param: 'username',
+      symbol: '@',
+      icon: 'approval',
+      tag: '@approver',
+    };
+
+    this.tokenKeys.push(wipToken, authorToken);
+    this.tokenKeysWithAlternative.push(wipToken, authorToken);
   }
 }
