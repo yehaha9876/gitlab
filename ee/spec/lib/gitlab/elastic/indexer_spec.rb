@@ -45,7 +45,7 @@ describe Gitlab::Elastic::Indexer do
     it 'runs the indexing command' do
       expect_popen.with(
         [
-          File.join(Rails.root, 'bin/elastic_repo_indexer'),
+          'gitlab-elasticsearch-indexer',
           project.id.to_s,
           Gitlab::GitalyClient::StorageSettings.allow_disk_access { project.repository.path_to_repo }
         ],
@@ -83,26 +83,6 @@ describe Gitlab::Elastic::Indexer do
       expect { indexer.run }.to raise_error(Gitlab::Elastic::Indexer::Error)
 
       expect(project.index_status).to be_nil
-    end
-  end
-
-  context 'experimental indexer enabled' do
-    before do
-      stub_ee_application_setting(elasticsearch_experimental_indexer: true)
-    end
-
-    it 'uses the normal indexer when not present' do
-      expect(described_class).to receive(:experimental_indexer_present?).and_return(false)
-      expect_popen.with([Rails.root.join('bin/elastic_repo_indexer').to_s, anything, anything], anything, anything).and_return(popen_success)
-
-      indexer.run
-    end
-
-    it 'uses the experimental indexer when present' do
-      expect(described_class).to receive(:experimental_indexer_present?).and_return(true)
-      expect_popen.with(['gitlab-elasticsearch-indexer', anything, anything], anything, anything).and_return(popen_success)
-
-      indexer.run
     end
   end
 

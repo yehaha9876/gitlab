@@ -1,16 +1,12 @@
+# frozen_string_literal: true
+
 # Create a separate process, which does not load the Rails environment, to index
 # each repository. This prevents memory leaks in the indexer from affecting the
 # rest of the application.
 module Gitlab
   module Elastic
     class Indexer
-      EXPERIMENTAL_INDEXER = 'gitlab-elasticsearch-indexer'.freeze
-
       Error = Class.new(StandardError)
-
-      def self.experimental_indexer_present?
-        Gitlab::Utils.which(EXPERIMENTAL_INDEXER).present?
-      end
 
       attr_reader :project
 
@@ -48,11 +44,7 @@ module Gitlab
       end
 
       def path_to_indexer
-        if Gitlab::CurrentSettings.elasticsearch_experimental_indexer? && self.class.experimental_indexer_present?
-          EXPERIMENTAL_INDEXER
-        else
-          Rails.root.join('bin', 'elastic_repo_indexer').to_s
-        end
+        'gitlab-elasticsearch-indexer'
       end
 
       def run_indexer!(from_sha, to_sha)
