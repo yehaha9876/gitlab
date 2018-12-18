@@ -2,12 +2,15 @@
 import FeatureFlagsTable from './feature_flags_table.vue';
 import FeatureFlagsService from '../services/feature_flags_service';
 import featureFlagsMixin from '../mixins/feature_flags';
+import { __ } from '../../../../../../app/assets/javascripts/locale';
+import NavigationTabs from '../../../../../../app/assets/javascripts/vue_shared/components/navigation_tabs.vue';
 import { getParameterByName } from '../../../../../../app/assets/javascripts/lib/utils/common_utils';
 import CIPaginationMixin from '../../../../../../app/assets/javascripts/vue_shared/mixins/ci_pagination_api_mixin';
 
 export default {
   components: {
     FeatureFlagsTable,
+    NavigationTabs,
   },
   mixins: [featureFlagsMixin, CIPaginationMixin],
   props: {
@@ -50,12 +53,42 @@ export default {
       requestData: {},
     };
   },
+  scopes: {
+    all: 'all',
+    enabled: 'enabled',
+    disabled: 'disabled',
+  },
   computed: {
     shouldRenderTable() {
       return !this.isLoading && this.state.featureFlags.length > 0 && !this.hasError;
     },
     shouldRenderErrorState() {
       return this.hasError && !this.isLoading;
+    },
+    tabs() {
+      const { count } = this.state;
+      const { scopes } = this.$options;
+
+      return [
+        {
+          name: __('All'),
+          scope: scopes.all,
+          count: count.all,
+          isActive: this.scope === 'all',
+        },
+        {
+          name: __('Enabled'),
+          scope: scopes.enabled,
+          count: count.enabled,
+          isActive: this.scope === 'enabled',
+        },
+        {
+          name: __('Disabled'),
+          scope: scopes.disabled,
+          count: count.disabled,
+          isActive: this.scope === 'disabled',
+        },
+      ];
     },
   },
   created() {
@@ -66,6 +99,10 @@ export default {
 </script>
 <template>
   <div>
+    <div class="top-area scrolling-tabs-container inner-page-scroll-tabs">
+      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab"/>
+    </div>
+
     <gl-loading-icon
       v-if="isLoading"
       :label="s__('Pipelines|Loading Pipelines')"

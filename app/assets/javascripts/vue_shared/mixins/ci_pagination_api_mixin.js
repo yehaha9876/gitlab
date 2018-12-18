@@ -4,12 +4,18 @@
  *
  * Components need to have `scope`, `page` and `requestData`
  */
-import { historyPushState, buildUrlWithCurrentLocation } from '../../lib/utils/common_utils';
+import {
+  historyPushState,
+  buildUrlWithCurrentLocation
+} from '../../lib/utils/common_utils';
 
 export default {
   methods: {
     onChangeTab(scope) {
-      this.updateContent({ scope, page: '1' });
+      this.updateContent({
+        scope,
+        page: '1'
+      });
     },
 
     onChangePage(page) {
@@ -26,7 +32,9 @@ export default {
 
     updateInternalState(parameters) {
       // stop polling
-      this.poll.stop();
+      if (this.poll) {
+        this.poll.stop();
+      }
 
       const queryString = Object.keys(parameters)
         .map(parameter => {

@@ -32,7 +32,9 @@ export default {
      *  - Update the internal state
      */
     updateContent(parameters) {
-      this.updateInternalState(parameters);
+      this.updateInternalState({ ...parameters,
+        instance_id: this.instanceId
+      });
 
       // fetch new data
       return this.getFeatureFlags();
