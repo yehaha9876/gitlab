@@ -12,4 +12,12 @@
       = render 'configure_feature_flags_button'
       = render 'new_feature_flag_button'
 
-  = render 'table'
+  -# = render 'table'
+
+%div
+  #feature-flags-vue{ data: { endpoint: unleash_api_url(@project),
+    "test": "so cooooool",
+    "can-delete-feature-flag" => can?(current_user, :destroy_feature_flag, @project),
+    "can-update-feature-flag" => can?(current_user, :update_feature_flag, @project),
+    "project-id" => @project.id,
+    "instance-id" => unleash_api_instance_id(@project) } }
