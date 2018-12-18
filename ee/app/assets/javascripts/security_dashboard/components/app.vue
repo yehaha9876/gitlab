@@ -52,17 +52,20 @@ export default {
   },
   methods: {
     ...mapActions('vulnerabilities', [
-      'setVulnerabilitiesCountEndpoint',
-      'setVulnerabilitiesHistoryEndpoint',
-      'setVulnerabilitiesEndpoint',
-      'fetchVulnerabilitiesCount',
-      'fetchVulnerabilities',
       'createIssue',
       'dismissVulnerability',
+      'fetchVulnerabilities',
+      'fetchVulnerabilitiesCount',
+      'fetchVulnerabilitiesHistory',
       'revertDismissal',
+      'setVulnerabilitiesCountEndpoint',
+      'setVulnerabilitiesEndpoint',
+      'setVulnerabilitiesHistoryEndpoint',
     ]),
     filterChange() {
       this.fetchVulnerabilities(this.activeFilters);
+      this.fetchVulnerabilitiesCount(this.activeFilters);
+      this.fetchVulnerabilitiesHistory(this.activeFilters);
     },
   },
 };

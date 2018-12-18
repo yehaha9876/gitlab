@@ -13,12 +13,13 @@ export const setVulnerabilitiesCountEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_VULNERABILITIES_COUNT_ENDPOINT, endpoint);
 };
 
-export const fetchVulnerabilitiesCount = ({ state, dispatch }) => {
+export const fetchVulnerabilitiesCount = ({ state, dispatch }, params = {}) => {
   dispatch('requestVulnerabilitiesCount');
 
   axios({
     method: 'GET',
     url: state.vulnerabilitiesCountEndpoint,
+    params,
   })
     .then(response => {
       const { data } = response;
@@ -206,12 +207,13 @@ export const setVulnerabilitiesHistoryEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_VULNERABILITIES_HISTORY_ENDPOINT, endpoint);
 };
 
-export const fetchVulnerabilitiesHistory = ({ state, dispatch }) => {
+export const fetchVulnerabilitiesHistory = ({ state, dispatch }, params = {}) => {
   dispatch('requestVulnerabilitiesHistory');
 
   axios({
     method: 'GET',
     url: state.vulnerabilitiesHistoryEndpoint,
+    params,
   })
     .then(response => {
       const { data } = response;
