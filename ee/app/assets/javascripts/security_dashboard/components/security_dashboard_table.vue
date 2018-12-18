@@ -24,6 +24,7 @@ export default {
   computed: {
     ...mapState('vulnerabilities', ['vulnerabilities', 'pageInfo', 'isLoadingVulnerabilities']),
     ...mapGetters('vulnerabilities', ['dashboardListError']),
+    ...mapGetters('filters', ['activeFilters']),
     showPagination() {
       return this.pageInfo && this.pageInfo.total;
     },
@@ -34,7 +35,7 @@ export default {
   methods: {
     ...mapActions('vulnerabilities', ['fetchVulnerabilities', 'openModal']),
     fetchPage(page) {
-      this.fetchVulnerabilities({ page });
+      this.fetchVulnerabilities({ ...this.activeFilters, page });
     },
   },
 };
