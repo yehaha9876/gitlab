@@ -138,4 +138,24 @@ describe('Filtered Search Token Keys', () => {
       expect(result).toEqual(conditions[0]);
     });
   });
+
+  describe('addExtraTokensForMergeRequests', () => {
+    let filteredSearchTokenKeys;
+
+    beforeAll(() => {
+      filteredSearchTokenKeys = new FilteredSearchTokenKeys([], [], conditions);
+
+      filteredSearchTokenKeys.addExtraTokensForMergeRequests();
+    });
+
+    it('adds two tokens to this.tokens and this.tokenKeysWithAlternative', () => {
+      expect(filteredSearchTokenKeys.tokenKeys).toHaveLength(2);
+      expect(filteredSearchTokenKeys.tokenKeysWithAlternative).toHaveLength(2);
+    });
+
+    it('adds proper tokens', () => {
+      expect(filteredSearchTokenKeys.tokenKeys.findIndex(tokenKey => tokenKey.key === 'wip')).not.toBe(-1);
+      expect(filteredSearchTokenKeys.tokenKeys.findIndex(tokenKey => tokenKey.key === 'approver')).not.toBe(-1);
+    })
+  });
 });
