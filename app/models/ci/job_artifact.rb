@@ -25,7 +25,7 @@ module Ci
     }.freeze
 
     TYPE_AND_FORMAT_PAIRS = {
-      archive: :zip,
+      archive: :zip_file,
       metadata: :gzip,
       trace: :raw,
       junit: :gzip,
@@ -91,7 +91,7 @@ module Ci
 
     enum file_format: {
       raw: 1,
-      zip: 2,
+      zip_file: 2, # FIXME
       gzip: 3
     }
 

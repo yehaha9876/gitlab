@@ -18,7 +18,7 @@ module EE
         after_save :stick_build_if_status_changed
 
         has_many :sourced_pipelines,
-          class_name: ::Ci::Sources::Pipeline,
+          class_name: '::Ci::Sources::Pipeline',
           foreign_key: :source_job_id
 
         scope :with_security_reports, -> do
