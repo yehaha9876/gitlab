@@ -1,14 +1,16 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import vulnerabilities from './modules/vulnerabilities/index';
 import filters from './modules/filters/index';
+import projects from './modules/projects/index';
+import vulnerabilities from './modules/vulnerabilities/index';
 
 Vue.use(Vuex);
 
 export default () =>
   new Vuex.Store({
     modules: {
-      vulnerabilities,
       filters,
+      projects,
+      vulnerabilities,
     },
   });
