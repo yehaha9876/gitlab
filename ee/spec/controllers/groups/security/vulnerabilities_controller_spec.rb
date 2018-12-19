@@ -18,7 +18,7 @@ describe Groups::Security::VulnerabilitiesController do
   end
 
   describe 'GET index.json' do
-    subject { get :index, params: { group_id: group.id }, format: :json }
+    subject { get :index, group_id: group, format: :json }
 
     context 'when security dashboard feature is disabled' do
       before do
@@ -105,7 +105,7 @@ describe Groups::Security::VulnerabilitiesController do
           end
         end
 
-        context 'whith multiple report types' do
+        context 'with multiple report types' do
           before do
             projects.each do |project|
               create_vulnerabilities(2, project_guest, { report_type: :sast })
@@ -124,7 +124,7 @@ describe Groups::Security::VulnerabilitiesController do
           end
 
           it "returns a list of vulnerabilities for sast only if filter is enabled" do
-            get :index, params: { group_id: group, report_type: [0] }, format: :json
+            get :index, group_id: group, report_type: [0], format: :json
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response).to be_an(Array)
@@ -134,7 +134,7 @@ describe Groups::Security::VulnerabilitiesController do
           end
 
           it "returns a list of vulnerabilities of all types with multi filter" do
-            get :index, params: { group_id: group, report_type: [0, 1] }, format: :json
+            get :index, group_id: group, report_type: [0, 1], format: :json
 
             expect(json_response.length).to eq 3
             expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast', 'dependency_scanning')

@@ -20,13 +20,13 @@ describe Security::VulnerabilitiesFinder do
     context 'by report type' do
       context 'when sast' do
         let(:params) { { report_type: [0] } }
-        it 'include only sast' do
+        it 'includes only sast' do
           is_expected.to contain_exactly(vulnerability1, vulnerability3)
         end
       end
       context 'when dependency_scanning' do
         let(:params) { { report_type: [1] } }
-        it 'include only depscan' do
+        it 'includes only depscan' do
           is_expected.to contain_exactly(vulnerability2)
         end
       end
@@ -35,13 +35,13 @@ describe Security::VulnerabilitiesFinder do
     context 'by severity' do
       context 'when high' do
         let(:params) { { severity: [6, 4] } }
-        it 'include only high' do
+        it 'includes only high' do
           is_expected.to contain_exactly(vulnerability1, vulnerability3)
         end
       end
       context 'when medium' do
         let(:params) { { severity: [5] } }
-        it 'include only medium' do
+        it 'includes only medium' do
           is_expected.to contain_exactly(vulnerability2, vulnerability4)
         end
       end
@@ -49,7 +49,7 @@ describe Security::VulnerabilitiesFinder do
 
     context 'by project' do
       let(:params) { { project_id: [project2.id] } }
-      it 'include only vulnerabilities for one project' do
+      it 'includes only vulnerabilities for one project' do
         is_expected.to contain_exactly(vulnerability2, vulnerability3)
       end
     end
@@ -71,11 +71,11 @@ describe Security::VulnerabilitiesFinder do
     context 'by all filters' do
       context 'with found entity' do
         let(:params) { { severity: [6, 5, 4], project_id: [project1.id, project2.id], report_type: [0, 3] } }
-        it 'filter by all params' do
+        it 'filters by all params' do
           is_expected.to contain_exactly(vulnerability1, vulnerability3, vulnerability4)
         end
       end
-      context 'without search entity' do
+      context 'without found entity' do
         let(:params) { { severity: [4], project_id: [project1.id], report_type: [0] } }
         it 'did not find anything' do
           expect(subject.size).to eq 0
@@ -86,11 +86,11 @@ describe Security::VulnerabilitiesFinder do
     context 'by some filters' do
       context 'with found entity' do
         let(:params) { { project_id: [project2.id], severity: [5, 4] } }
-        it 'filter by all params' do
+        it 'filters by all params' do
           is_expected.to contain_exactly(vulnerability2, vulnerability3)
         end
       end
-      context 'without search entity' do
+      context 'without found entity' do
         let(:params) { { project_id: project1.id, severity: 4 } }
         it 'did not find anything' do
           expect(subject.size).to eq 0
