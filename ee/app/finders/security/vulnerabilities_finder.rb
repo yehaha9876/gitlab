@@ -5,7 +5,7 @@
 # Used to filter Vulnerabilities::Occurrences  by set of params for Security Dashboard
 #
 # Arguments:
-#   group - object for filter vulnerabilities
+#   group - object to filter vulnerabilities
 #   params:
 #     severity: Array<Integer>
 #     project: Array<Integer>
