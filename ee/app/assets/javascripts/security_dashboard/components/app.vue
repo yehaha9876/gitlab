@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapState, mapGetters } from 'vuex';
+import { mapActions, mapState, mapGetters, mapMutations } from 'vuex';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import Filters from './filters.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
@@ -50,6 +50,23 @@ export default {
     ...mapState('projects', ['projects']),
     ...mapGetters('filters', ['activeFilters']),
   },
+  watch: {
+    projects(projects) {
+      const options = [
+        {
+          name: 'All',
+          id: 'all',
+          selected: true,
+        },
+        ...projects.map(project => ({
+          name: project.name,
+          id: project.id.toString(),
+          selected: false,
+        })),
+      ];
+      this.ADD_FILTER_OPTIONS({ filterId: 'project', options });
+    },
+  },
   created() {
     this.setProjectsEndpoint(this.projectsEndpoint);
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
@@ -71,6 +88,7 @@ export default {
       'setVulnerabilitiesHistoryEndpoint',
     ]),
     ...mapActions('projects', ['setProjectsEndpoint', 'fetchProjects']),
+    ...mapMutations('filters', ['ADD_FILTER_OPTIONS']),
     filterChange() {
       this.fetchVulnerabilities(this.activeFilters);
       this.fetchVulnerabilitiesCount(this.activeFilters);
