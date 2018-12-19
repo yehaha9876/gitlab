@@ -48,16 +48,16 @@ describe('filters module getters', () => {
       expect(activeFilters.type[0]).toEqual('sast');
     });
 
-    it('should return multiple project filters"', () => {
+    it('should return multiple dummy filters"', () => {
       const state = createState();
-      const projectFilter = {
-        id: 'project',
+      const dummyFilter = {
+        id: 'dummy',
         options: [{ id: 'one', selected: true }, { id: 'anotherone', selected: true }],
       };
-      state.filters.push(projectFilter);
+      state.filters.push(dummyFilter);
       const activeFilters = getters.activeFilters(state, mockedGetters(state));
 
-      expect(activeFilters.project).toHaveLength(2);
+      expect(activeFilters.dummy).toHaveLength(2);
     });
   });
 });

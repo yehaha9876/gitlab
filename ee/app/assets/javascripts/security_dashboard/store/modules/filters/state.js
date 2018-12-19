@@ -62,5 +62,10 @@ export default () => ({
         },
       ],
     },
+    {
+      name: 'Project',
+      id: 'project',
+      options: [],
+    },
   ],
 });

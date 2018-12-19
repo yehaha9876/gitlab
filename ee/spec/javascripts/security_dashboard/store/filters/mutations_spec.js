@@ -5,27 +5,45 @@ import mutations from 'ee/security_dashboard/store/modules/filters/mutations';
 describe('filters module mutations', () => {
   describe('SET_FILTER', () => {
     let state;
-    let typeFilter;
-    let sastOption;
-    let allOption;
+    let firstFilter;
+    let firstOption;
+    let secondOption;
 
     beforeEach(() => {
       state = createState();
-      [typeFilter] = state.filters;
-      [allOption, sastOption] = typeFilter.options;
+      [firstFilter] = state.filters;
+      [firstOption, secondOption] = firstFilter.options;
 
-      const filterId = typeFilter.id;
-      const optionId = sastOption.id;
+      const filterId = firstFilter.id;
+      const optionId = secondOption.id;
 
       mutations[types.SET_FILTER](state, { filterId, optionId });
     });
 
-    it('should make SAST the selected option', () => {
-      expect(sastOption.selected).toEqual(true);
+    it('should select the second option', () => {
+      expect(secondOption.selected).toEqual(true);
     });
 
-    it('should remove ALL as the selected option', () => {
-      expect(allOption.selected).toEqual(false);
+    it('should deselect the first option', () => {
+      expect(firstOption.selected).toEqual(false);
+    });
+  });
+
+  describe('ADD_FILTER_OPTIONS', () => {
+    let state;
+    let firstFilter;
+    const options = [{ id: 0, name: 'c' }, { id: 3, name: 'c' }];
+
+    beforeEach(() => {
+      state = createState();
+      [firstFilter] = state.filters;
+      const filterId = firstFilter.id;
+
+      mutations[types.ADD_FILTER_OPTIONS](state, { filterId, options });
+    });
+
+    it('should add all the options to the type filter', () => {
+      expect(firstFilter.options).toEqual(options);
     });
   });
 });
