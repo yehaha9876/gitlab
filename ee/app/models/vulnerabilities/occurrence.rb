@@ -64,6 +64,10 @@ module Vulnerabilities
     scope :ordered, -> { order("severity desc", :id) }
     scope :counted_by_report_and_severity, -> { group(:report_type, :severity).count }
 
+    scope :by_report_types, -> (values) { where(report_type: values) if values.present? }
+    scope :by_projects, -> (values) { where(project_id: values) if values.present? }
+    scope :by_severities, -> (values) { where(severity: values) if values.present? }
+
     scope :all_preloaded, -> do
       preload(:scanner, :identifiers, :project)
     end
@@ -79,21 +83,6 @@ module Vulnerabilities
         .where(['vulnerability_occurrence_pipelines.created_at >= ?', Date.today - period])
         .group(:day, :severity)
         .order('day')
-    end
-
-    # @param [Array<Integer>||Integer] value
-    def self.by_report_type(value)
-      where(report_type: value)
-    end
-
-    # @param [Array<Integer>||Integer] value
-    def self.by_project(value)
-      where(project_id: value)
-    end
-
-    # @param [Array<Integer>||Integer] value
-    def self.by_severity(value)
-      where(severity: value)
     end
 
     def feedback(feedback_type:)
