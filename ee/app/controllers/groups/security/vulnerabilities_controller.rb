@@ -38,10 +38,7 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
 
   def finder_params
     raw = params.permit(:hide_dismissed, report_type: [], project_id: [], severity: [])
-    raw.each_pair do |filter, fvalue|
-      if filter == :hide_dismissed
-        raw[filter] = Gitlab::Utils.to_boolean(fvalue)
-      end
-    end
+    raw[:hide_dismissed] = Gitlab::Utils.to_boolean(raw[:hide_dismissed]) if raw[:hide_dismissed]
+    raw
   end
 end
