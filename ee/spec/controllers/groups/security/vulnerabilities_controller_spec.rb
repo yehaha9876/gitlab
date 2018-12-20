@@ -134,7 +134,7 @@ describe Groups::Security::VulnerabilitiesController do
           end
 
           it "returns a list of vulnerabilities of all types with multi filter" do
-            get :index, group_id: group, report_type: ['sast', 'dependency_scanning'], format: :json
+            get :index, group_id: group, report_type: %w[sast dependency_scanning], format: :json
 
             expect(json_response.length).to eq 3
             expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast', 'dependency_scanning')
