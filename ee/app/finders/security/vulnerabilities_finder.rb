@@ -33,7 +33,7 @@ module Security
 
     def cast_params(raw_params)
       raw_params.each_pair do |filter, values|
-        casted_values = case filter
+        casted_values = case filter.to_sym
                         when :report_type
                           Vulnerabilities::Occurrence::REPORT_TYPES.values_at(*values).compact
                         when :severity
