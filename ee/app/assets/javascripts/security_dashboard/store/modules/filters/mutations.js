@@ -7,4 +7,8 @@ export default {
     activeFilter.options.find(option => option.selected).selected = false;
     activeFilter.options.find(option => option.id === optionId).selected = true;
   },
+  [types.ADD_FILTER_OPTIONS](state, payload) {
+    const { filterId, options } = payload;
+    state.filters.find(filter => filter.id === filterId).options = options;
+  },
 };

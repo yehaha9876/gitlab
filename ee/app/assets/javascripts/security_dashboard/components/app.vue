@@ -1,5 +1,9 @@
 <script>
+<<<<<<< HEAD
 import { mapActions, mapState, mapGetters } from 'vuex';
+=======
+import { mapActions, mapState, mapGetters, mapMutations } from 'vuex';
+>>>>>>> 6240-project-filter-for-gsd
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import Filters from './filters.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
@@ -24,6 +28,10 @@ export default {
       type: String,
       required: true,
     },
+    projectsEndpoint: {
+      type: String,
+      required: true,
+    },
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
@@ -43,13 +51,33 @@ export default {
   },
   computed: {
     ...mapState('vulnerabilities', ['modal']),
+    ...mapState('projects', ['projects']),
     ...mapGetters('filters', ['activeFilters']),
   },
+  watch: {
+    projects(projects) {
+      const options = [
+        {
+          name: 'All',
+          id: 'all',
+          selected: true,
+        },
+        ...projects.map(project => ({
+          name: project.name,
+          id: project.id.toString(),
+          selected: false,
+        })),
+      ];
+      this.ADD_FILTER_OPTIONS({ filterId: 'project', options });
+    },
+  },
   created() {
+    this.setProjectsEndpoint(this.projectsEndpoint);
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
     this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
     this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
     this.fetchVulnerabilitiesCount();
+    this.fetchProjects();
   },
   methods: {
     ...mapActions('vulnerabilities', [
@@ -63,6 +91,8 @@ export default {
       'setVulnerabilitiesEndpoint',
       'setVulnerabilitiesHistoryEndpoint',
     ]),
+    ...mapActions('projects', ['setProjectsEndpoint', 'fetchProjects']),
+    ...mapMutations('filters', ['ADD_FILTER_OPTIONS']),
     filterChange() {
       this.fetchVulnerabilities(this.activeFilters);
       this.fetchVulnerabilitiesCount(this.activeFilters);

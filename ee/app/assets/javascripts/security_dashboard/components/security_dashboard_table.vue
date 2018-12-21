@@ -29,6 +29,7 @@ export default {
       'pageInfo',
       'vulnerabilities',
     ]),
+    ...mapGetters('filters', ['activeFilters']),
     ...mapGetters('vulnerabilities', ['dashboardListError']),
     ...mapGetters('filters', ['activeFilters']),
     showEmptyState() {
