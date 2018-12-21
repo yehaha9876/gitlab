@@ -44,9 +44,6 @@ export default {
   computed: {
     ...mapState('vulnerabilities', ['modal']),
     ...mapGetters('filters', ['activeFilters']),
-    chartFlagEnabled() {
-      return gon.features && gon.features.groupSecurityDashboardHistory;
-    },
   },
   created() {
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
@@ -79,10 +76,8 @@ export default {
   <div>
     <filters :dashboard-documentation="dashboardDocumentation" @change="filterChange" />
     <vulnerability-count-list />
-    <template v-if="chartFlagEnabled">
-      <h4 class="my-4">{{ __('Vulnerability Chart') }}</h4>
-      <vulnerability-chart />
-    </template>
+    <h4 class="my-4">{{ __('Vulnerability Chart') }}</h4>
+    <vulnerability-chart />
     <h4 class="my-4">{{ __('Vulnerability List') }}</h4>
     <security-dashboard-table
       :dashboard-documentation="dashboardDocumentation"

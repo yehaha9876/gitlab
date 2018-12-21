@@ -64,6 +64,10 @@ module Vulnerabilities
     scope :ordered, -> { order("severity desc", :id) }
     scope :counted_by_report_and_severity, -> { group(:report_type, :severity).count }
 
+    scope :by_report_types, -> (values) { where(report_type: values) if values.present? }
+    scope :by_projects, -> (values) { where(project_id: values) if values.present? }
+    scope :by_severities, -> (values) { where(severity: values) if values.present? }
+
     scope :all_preloaded, -> do
       preload(:scanner, :identifiers, :project)
     end

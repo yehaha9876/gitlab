@@ -22,9 +22,23 @@ export default {
     },
   },
   computed: {
-    ...mapState('vulnerabilities', ['vulnerabilities', 'pageInfo', 'isLoadingVulnerabilities']),
+    ...mapState('vulnerabilities', [
+      'errorLoadingVulnerabilities',
+      'errorLoadingVulnerabilitiesCount',
+      'isLoadingVulnerabilities',
+      'pageInfo',
+      'vulnerabilities',
+    ]),
     ...mapGetters('vulnerabilities', ['dashboardListError']),
     ...mapGetters('filters', ['activeFilters']),
+    showEmptyState() {
+      return (
+        this.vulnerabilities &&
+        !this.vulnerabilities.length &&
+        !this.errorLoadingVulnerabilities &&
+        !this.errorLoadingVulnerabilitiesCount
+      );
+    },
     showPagination() {
       return this.pageInfo && this.pageInfo.total;
     },
@@ -76,7 +90,7 @@ export default {
       />
 
       <empty-state
-        v-if="!vulnerabilities.length"
+        v-if="showEmptyState"
         :svg-path="emptyStateSvgPath"
         :link="dashboardDocumentation"
       />

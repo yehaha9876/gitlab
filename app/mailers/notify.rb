@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 class Notify < BaseMailer
-  prepend ::EE::Notify
-
   include ActionDispatch::Routing::PolymorphicRoutes
   include GitlabRoutingHelper
+  include EmailsHelper
 
   include Emails::Issues
   include Emails::MergeRequests
@@ -15,6 +14,7 @@ class Notify < BaseMailer
   include Emails::Pipelines
   include Emails::Members
   include Emails::AutoDevops
+  include Emails::RemoteMirrors
 
   helper MergeRequestsHelper
   helper DiffHelper
@@ -195,6 +195,7 @@ class Notify < BaseMailer
     headers['X-GitLab-Project'] = @project.name
     headers['X-GitLab-Project-Id'] = @project.id
     headers['X-GitLab-Project-Path'] = @project.full_path
+    headers['List-Id'] = "#{@project.full_path} <#{create_list_id_string(@project)}>"
   end
 
   def add_unsubscription_headers_and_links
@@ -209,3 +210,5 @@ class Notify < BaseMailer
     @unsubscribe_url = unsubscribe_sent_notification_url(@sent_notification)
   end
 end
+
+Notify.prepend(EE::Notify)

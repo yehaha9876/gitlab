@@ -5,11 +5,11 @@
 # Used to filter Vulnerabilities::Occurrences  by set of params for Security Dashboard
 #
 # Arguments:
-#   group - object for filter vulnerabilities
+#   group - object to filter vulnerabilities
 #   params:
-#     severity: Array<Integer>
-#     project: Array<Integer>
-#     report_type: Array<Integer>
+#     severity: Array<String>
+#     project: Array<String>
+#     report_type: Array<String>
 #     hide_dismissed: Boolean
 
 module Security
@@ -19,38 +19,30 @@ module Security
 
     def initialize(group:, params: {})
       @group = group
-      @params = params
+      @params = cast_params(params)
     end
 
     def execute
-      collection = group.latest_vulnerabilities
-      filter(collection)
+      group.latest_vulnerabilities
+        .by_report_types(params[:report_type])
+        .by_projects(params[:project_id])
+        .by_severities(params[:severity])
     end
 
     private
 
-    def filter(collection)
-      collection = by_report_type(collection)
-      collection = by_project(collection)
-      collection = by_severity(collection)
-      collection = hide_dismissed(collection)
-      collection
-    end
-
-    def by_report_type(collection)
-      params[:report_type].present? ? collection.by_report_type(params[:report_type]) : collection
-    end
-
-    def by_project(collection)
-      params[:project_id].present? ? collection.by_project(params[:project_id]) : collection
-    end
-
-    def by_severity(collection)
-      params[:severity].present? ? collection.by_severity(params[:severity]) : collection
-    end
-
-    def hide_dismissed(collection)
-      params[:hide_dismissed] ? collection.not_dismissed : collection
+    def cast_params(raw_params)
+      raw_params.each_pair do |filter, values|
+        casted_values = case filter.to_sym
+                        when :report_type
+                          Vulnerabilities::Occurrence::REPORT_TYPES.values_at(*values).compact
+                        when :severity
+                          Vulnerabilities::Occurrence::LEVELS.values_at(*values).compact
+                        else
+                          values
+                        end
+        raw_params[filter] = casted_values
+      end
     end
   end
 end

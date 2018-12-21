@@ -137,48 +137,10 @@ describe Project do
     end
 
     describe 'ci_pipelines association' do
-      context 'when feature flag pipeline_ci_sources_only is enabled' do
-        it 'returns only pipelines from ci_sources' do
-          stub_feature_flags(pipeline_ci_sources_only: true)
+      it 'returns only pipelines from ci_sources' do
+        expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
 
-          expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
-
-          subject.ci_pipelines
-        end
-      end
-
-      context 'when feature flag pipeline_ci_sources_only is disabled' do
-        it 'returns all pipelines' do
-          stub_feature_flags(pipeline_ci_sources_only: false)
-
-          expect(Ci::Pipeline).not_to receive(:ci_sources).and_call_original
-          expect(Ci::Pipeline).to receive(:all).and_call_original.at_least(:once)
-
-          subject.ci_pipelines
-        end
-      end
-    end
-
-    describe 'ci_pipelines association' do
-      context 'when feature flag pipeline_ci_sources_only is enabled' do
-        it 'returns only pipelines from ci_sources' do
-          stub_feature_flags(pipeline_ci_sources_only: true)
-
-          expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
-
-          subject.ci_pipelines
-        end
-      end
-
-      context 'when feature flag pipeline_ci_sources_only is disabled' do
-        it 'returns all pipelines' do
-          stub_feature_flags(pipeline_ci_sources_only: false)
-
-          expect(Ci::Pipeline).not_to receive(:ci_sources).and_call_original
-          expect(Ci::Pipeline).to receive(:all).and_call_original.at_least(:once)
-
-          subject.ci_pipelines
-        end
+        subject.ci_pipelines
       end
     end
   end
@@ -3994,7 +3956,7 @@ describe Project do
       expect(project.badges.count).to eq 3
     end
 
-    if Group.supports_nested_groups?
+    if Group.supports_nested_objects?
       context 'with nested_groups' do
         let(:parent_group) { create(:group) }
 
@@ -4402,6 +4364,29 @@ describe Project do
 
       it 'returns clusters for groups of this project' do
         expect(subject).to contain_exactly(cluster, group_cluster)
+      end
+    end
+  end
+
+  describe '#object_pool_params' do
+    let(:project) { create(:project, :repository, :public) }
+
+    subject { project.object_pool_params }
+
+    before do
+      stub_application_setting(hashed_storage_enabled: true)
+    end
+
+    context 'when the objects cannot be pooled' do
+      let(:project) { create(:project, :repository, :private) }
+
+      it { is_expected.to be_empty }
+    end
+
+    context 'when a pool is created' do
+      it 'returns that pool repository' do
+        expect(subject).not_to be_empty
+        expect(subject[:pool_repository]).to be_persisted
       end
     end
   end

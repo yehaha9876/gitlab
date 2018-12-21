@@ -169,6 +169,21 @@ describe EpicsFinder do
             expect(epics(params)).to contain_exactly(epic3)
           end
         end
+
+        context 'by parent' do
+          before do
+            epic2.update(parent: epic1)
+            epic3.update(parent: epic2)
+          end
+
+          it 'returns direct children of the parent' do
+            params = {
+              parent_id: epic1.id
+            }
+
+            expect(epics(params)).to contain_exactly(epic2)
+          end
+        end
       end
     end
   end
@@ -201,6 +216,23 @@ describe EpicsFinder do
       results = described_class.new(search_user, group_id: group.id).count_by_state
 
       expect(results).to eq('opened' => 2, 'closed' => 1, 'all' => 3)
+    end
+
+    context 'when using group cte for search' do
+      before do
+        stub_feature_flags(use_subquery_for_group_issues_search: false)
+      end
+
+      it 'returns correct counts when search string is used' do
+        results = described_class.new(
+          search_user,
+          group_id: group.id,
+          search: 'awesome',
+          attempt_group_search_optimizations: true
+        ).count_by_state
+
+        expect(results).to eq('opened' => 1, 'closed' => 1, 'all' => 2)
+      end
     end
   end
 end

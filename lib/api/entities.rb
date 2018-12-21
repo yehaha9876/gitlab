@@ -323,7 +323,7 @@ module API
       expose :request_access_enabled
       expose :full_name, :full_path
 
-      if ::Group.supports_nested_groups?
+      if ::Group.supports_nested_objects?
         expose :parent_id
       end
 
@@ -1543,6 +1543,18 @@ module API
       end
       expose :label, using: Entities::LabelBasic
       expose :action
+    end
+
+    class Suggestion < Grape::Entity
+      expose :id
+      expose :from_original_line
+      expose :to_original_line
+      expose :from_line
+      expose :to_line
+      expose :appliable?, as: :appliable
+      expose :applied
+      expose :from_content
+      expose :to_content
     end
   end
 end

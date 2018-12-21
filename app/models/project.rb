@@ -33,7 +33,6 @@ class Project < ActiveRecord::Base
   include IgnorableColumn
   extend Gitlab::Cache::RequestCache
 
-  # EE specific modules
   extend Gitlab::ConfigHelper
 
   BoardLimitExceeded = Class.new(StandardError)
@@ -257,7 +256,7 @@ class Project < ActiveRecord::Base
   # other pipelines, like webide ones, that we won't retrieve
   # if we use this relation.
   has_many :ci_pipelines,
-          -> { Feature.enabled?(:pipeline_ci_sources_only, default_enabled: true) ? ci_sources : all },
+          -> { ci_sources },
           class_name: 'Ci::Pipeline',
           inverse_of: :project
   has_many :stages, class_name: 'Ci::Stage', inverse_of: :project
@@ -571,7 +570,7 @@ class Project < ActiveRecord::Base
   # returns all ancestor-groups upto but excluding the given namespace
   # when no namespace is given, all ancestors upto the top are returned
   def ancestors_upto(top = nil, hierarchy_order: nil)
-    Gitlab::GroupHierarchy.new(Group.where(id: namespace_id))
+    Gitlab::ObjectHierarchy.new(Group.where(id: namespace_id))
       .base_and_ancestors(upto: top, hierarchy_order: hierarchy_order)
   end
 
@@ -750,15 +749,9 @@ class Project < ActiveRecord::Base
     return if data.nil? && credentials.nil?
 
     project_import_data = import_data || build_import_data
-    if data
-      project_import_data.data ||= {}
-      project_import_data.data = project_import_data.data.merge(data)
-    end
 
-    if credentials
-      project_import_data.credentials ||= {}
-      project_import_data.credentials = project_import_data.credentials.merge(credentials)
-    end
+    project_import_data.merge_data(data.to_h)
+    project_import_data.merge_credentials(credentials.to_h)
 
     project_import_data
   end
@@ -2011,16 +2004,20 @@ class Project < ActiveRecord::Base
       Feature.enabled?(:object_pools, self)
   end
 
+  def leave_pool_repository
+    pool_repository&.unlink_repository(repository)
+  end
+
   private
 
   def create_new_pool_repository
     pool = begin
-             create_or_find_pool_repository!(shard: Shard.by_name(repository_storage), source_project: self)
+             create_pool_repository!(shard: Shard.by_name(repository_storage), source_project: self)
            rescue ActiveRecord::RecordNotUnique
-             retry
+             pool_repository(true)
            end
 
-    pool.schedule
+    pool.schedule unless pool.scheduled?
     pool
   end
 
