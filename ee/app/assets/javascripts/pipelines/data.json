@@ -1,0 +1,299 @@
+{
+	"id": 6,
+	"user": {
+		"id": 1,
+		"name": "Administrator",
+		"username": "root",
+		"state": "active",
+		"avatar_url": "https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon",
+		"web_url": "http://192.168.88.233:3000/root",
+		"status_tooltip_html": null,
+		"path": "/root"
+	},
+	"active": false,
+	"coverage": null,
+	"source": "push",
+	"created_at": "2018-11-27T16:05:43.667Z",
+	"updated_at": "2018-12-06T12:23:43.733Z",
+	"path": "/root/artifacts-test/pipelines/6",
+	"flags": {
+		"latest": true,
+		"stuck": false,
+		"auto_devops": false,
+		"merge_request": false,
+		"yaml_errors": false,
+		"retryable": true,
+		"cancelable": false,
+		"failure_reason": false
+	},
+	"details": {
+		"status": {
+			"icon": "status_canceled",
+			"text": "canceled",
+			"label": "canceled",
+			"group": "canceled",
+			"tooltip": "canceled",
+			"has_details": true,
+			"details_path": "/root/artifacts-test/pipelines/6",
+			"illustration": null,
+			"favicon": "/assets/ci_favicons/favicon_status_canceled-ca35321a6cda9943ebdf6631c8057ffd54064f3ba20cfe0ebc4b0b992041c430.png"
+		},
+		"duration": 26,
+		"finished_at": "2018-12-06T12:23:43.727Z",
+		"stages": [{
+			"name": "build",
+			"title": "build: passed",
+			"status": {
+				"icon": "status_success",
+				"text": "passed",
+				"label": "passed",
+				"group": "success",
+				"tooltip": "passed",
+				"has_details": true,
+				"details_path": "/root/artifacts-test/pipelines/6#build",
+				"illustration": null,
+				"favicon": "/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png"
+			},
+			"path": "/root/artifacts-test/pipelines/6#build",
+			"dropdown_path": "/root/artifacts-test/pipelines/6/stage.json?stage=build"
+		}, {
+			"name": "test",
+			"title": "test: canceled",
+			"status": {
+				"icon": "status_canceled",
+				"text": "canceled",
+				"label": "canceled",
+				"group": "canceled",
+				"tooltip": "canceled",
+				"has_details": true,
+				"details_path": "/root/artifacts-test/pipelines/6#test",
+				"illustration": null,
+				"favicon": "/assets/ci_favicons/favicon_status_canceled-ca35321a6cda9943ebdf6631c8057ffd54064f3ba20cfe0ebc4b0b992041c430.png"
+			},
+			"path": "/root/artifacts-test/pipelines/6#test",
+			"dropdown_path": "/root/artifacts-test/pipelines/6/stage.json?stage=test"
+		}, {
+			"name": "deploy",
+			"title": "deploy: passed",
+			"status": {
+				"icon": "status_success",
+				"text": "passed",
+				"label": "passed",
+				"group": "success",
+				"tooltip": "passed",
+				"has_details": true,
+				"details_path": "/root/artifacts-test/pipelines/6#deploy",
+				"illustration": null,
+				"favicon": "/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png"
+			},
+			"path": "/root/artifacts-test/pipelines/6#deploy",
+			"dropdown_path": "/root/artifacts-test/pipelines/6/stage.json?stage=deploy"
+		}],
+		"artifacts": [{
+			"name": "build",
+			"expired": false,
+			"expire_at": "2018-12-27T16:06:00.492Z",
+			"path": "/root/artifacts-test/-/jobs/32/artifacts/download",
+			"keep_path": "/root/artifacts-test/-/jobs/32/artifacts/keep",
+			"browse_path": "/root/artifacts-test/-/jobs/32/artifacts/browse"
+		}],
+		"manual_actions": [],
+		"scheduled_actions": []
+	},
+	"ref": {
+		"name": "master",
+		"path": "/root/artifacts-test/commits/master",
+		"tag": false,
+		"branch": true,
+		"merge_request": false
+	},
+	"commit": {
+		"id": "803cad494646269b714ec317317cb4f96ba89301",
+		"short_id": "803cad49",
+		"title": "Update .gitlab-ci.yml",
+		"created_at": "2018-11-27T16:05:42.000Z",
+		"parent_ids": ["a60be1b7dc81ebdd8f80bf34aa85b4fefe7e5128"],
+		"message": "Update .gitlab-ci.yml",
+		"author_name": "Administrator",
+		"author_email": "admin@example.com",
+		"authored_date": "2018-11-27T16:05:42.000Z",
+		"committer_name": "Administrator",
+		"committer_email": "admin@example.com",
+		"committed_date": "2018-11-27T16:05:42.000Z",
+		"author": null,
+		"author_gravatar_url": "https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon",
+		"commit_url": "http://192.168.88.233:3000/root/artifacts-test/commit/803cad494646269b714ec317317cb4f96ba89301",
+		"commit_path": "/root/artifacts-test/commit/803cad494646269b714ec317317cb4f96ba89301"
+	},
+	"retry_path": "/root/artifacts-test/pipelines/6/retry",
+	"triggered_by": {
+		"id": 6,
+		"user": {
+			"id": 1,
+			"name": "Administrator",
+			"username": "root",
+			"state": "active",
+			"avatar_url": "https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon",
+			"web_url": "http://192.168.88.233:3000/root",
+			"status_tooltip_html": null,
+			"path": "/root"
+		},
+		"active": false,
+		"coverage": null,
+		"source": "push",
+		"path": "/root/artifacts-test/pipelines/6",
+		"details": {
+			"status": {
+				"icon": "status_canceled",
+				"text": "canceled",
+				"label": "canceled",
+				"group": "canceled",
+				"tooltip": "canceled",
+				"has_details": true,
+				"details_path": "/root/artifacts-test/pipelines/6",
+				"illustration": null,
+				"favicon": "/assets/ci_favicons/favicon_status_canceled-ca35321a6cda9943ebdf6631c8057ffd54064f3ba20cfe0ebc4b0b992041c430.png"
+			},
+			"stages": [{
+				"name": "build",
+				"title": "build: passed",
+				"status": {
+					"icon": "status_success",
+					"text": "passed",
+					"label": "passed",
+					"group": "success",
+					"tooltip": "passed",
+					"has_details": true,
+					"details_path": "/root/artifacts-test/pipelines/6#build",
+					"illustration": null,
+					"favicon": "/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png"
+				},
+				"path": "/root/artifacts-test/pipelines/6#build",
+				"dropdown_path": "/root/artifacts-test/pipelines/6/stage.json?stage=build"
+			}, {
+				"name": "test",
+				"title": "test: canceled",
+				"status": {
+					"icon": "status_canceled",
+					"text": "canceled",
+					"label": "canceled",
+					"group": "canceled",
+					"tooltip": "canceled",
+					"has_details": true,
+					"details_path": "/root/artifacts-test/pipelines/6#test",
+					"illustration": null,
+					"favicon": "/assets/ci_favicons/favicon_status_canceled-ca35321a6cda9943ebdf6631c8057ffd54064f3ba20cfe0ebc4b0b992041c430.png"
+				},
+				"path": "/root/artifacts-test/pipelines/6#test",
+				"dropdown_path": "/root/artifacts-test/pipelines/6/stage.json?stage=test"
+			}, {
+				"name": "deploy",
+				"title": "deploy: passed",
+				"status": {
+					"icon": "status_success",
+					"text": "passed",
+					"label": "passed",
+					"group": "success",
+					"tooltip": "passed",
+					"has_details": true,
+					"details_path": "/root/artifacts-test/pipelines/6#deploy",
+					"illustration": null,
+					"favicon": "/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png"
+				},
+				"path": "/root/artifacts-test/pipelines/6#deploy",
+				"dropdown_path": "/root/artifacts-test/pipelines/6/stage.json?stage=deploy"
+			}]
+		},
+		"project": {
+			"id": 11,
+			"name": "artifacts-test",
+			"full_path": "/root/artifacts-test",
+			"full_name": "Administrator / artifacts-test"
+		}
+	},
+	"triggered": [{
+		"id": 2,
+		"user": {
+			"id": 1,
+			"name": "Administrator",
+			"username": "root",
+			"state": "active",
+			"avatar_url": "https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon",
+			"web_url": "http://192.168.88.233:3000/root",
+			"status_tooltip_html": null,
+			"path": "/root"
+		},
+		"active": false,
+		"coverage": null,
+		"source": "push",
+		"path": "/root/artifacts-test/pipelines/6",
+		"details": {
+			"status": {
+				"icon": "status_canceled",
+				"text": "canceled",
+				"label": "canceled",
+				"group": "canceled",
+				"tooltip": "canceled",
+				"has_details": true,
+				"details_path": "/root/artifacts-test/pipelines/6",
+				"illustration": null,
+				"favicon": "/assets/ci_favicons/favicon_status_canceled-ca35321a6cda9943ebdf6631c8057ffd54064f3ba20cfe0ebc4b0b992041c430.png"
+			},
+			"stages": [{
+				"name": "build",
+				"title": "build: passed",
+				"status": {
+					"icon": "status_success",
+					"text": "passed",
+					"label": "passed",
+					"group": "success",
+					"tooltip": "passed",
+					"has_details": true,
+					"details_path": "/root/artifacts-test/pipelines/6#build",
+					"illustration": null,
+					"favicon": "/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png"
+				},
+				"path": "/root/artifacts-test/pipelines/6#build",
+				"dropdown_path": "/root/artifacts-test/pipelines/6/stage.json?stage=build"
+			}, {
+				"name": "test",
+				"title": "test: canceled",
+				"status": {
+					"icon": "status_canceled",
+					"text": "canceled",
+					"label": "canceled",
+					"group": "canceled",
+					"tooltip": "canceled",
+					"has_details": true,
+					"details_path": "/root/artifacts-test/pipelines/6#test",
+					"illustration": null,
+					"favicon": "/assets/ci_favicons/favicon_status_canceled-ca35321a6cda9943ebdf6631c8057ffd54064f3ba20cfe0ebc4b0b992041c430.png"
+				},
+				"path": "/root/artifacts-test/pipelines/6#test",
+				"dropdown_path": "/root/artifacts-test/pipelines/6/stage.json?stage=test"
+			}, {
+				"name": "deploy",
+				"title": "deploy: passed",
+				"status": {
+					"icon": "status_success",
+					"text": "passed",
+					"label": "passed",
+					"group": "success",
+					"tooltip": "passed",
+					"has_details": true,
+					"details_path": "/root/artifacts-test/pipelines/6#deploy",
+					"illustration": null,
+					"favicon": "/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png"
+				},
+				"path": "/root/artifacts-test/pipelines/6#deploy",
+				"dropdown_path": "/root/artifacts-test/pipelines/6/stage.json?stage=deploy"
+			}]
+		},
+		"project": {
+			"id": 11,
+			"name": "artifacts-test",
+			"full_path": "/root/artifacts-test",
+			"full_name": "Administrator / artifacts-test"
+		}
+	}]
+}

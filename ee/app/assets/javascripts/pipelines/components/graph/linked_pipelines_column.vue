@@ -40,7 +40,7 @@ export default {
           active: !pipeline.isCollapsed || pipeline.isLoading,
           'left-connector': !pipeline.isCollapsed && graphPosition === 'left',
         }"
-        :pipeline-id="pipeline.id"
+        :pipeline="pipeline"
         :project-name="pipeline.project.name"
         :pipeline-status="pipeline.details.status"
         :pipeline-path="pipeline.path"

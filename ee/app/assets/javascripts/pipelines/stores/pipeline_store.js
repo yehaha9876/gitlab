@@ -5,22 +5,6 @@ import pipelinesKeys from '../constants';
  * Extends CE store with the logic to handle the upstream/downstream pipelines
  */
 export default class PipelineStore extends CePipelineStore {
-  constructor() {
-    super();
-
-    // Stores the dowsntream collapsed pipelines
-    // with basic info sent in the main request
-    this.state.triggeredPipelines = [];
-    // Stores the upstream collapsed pipelines
-    // with basic info sent in the main request
-    this.state.triggeredByPipelines = [];
-
-    // Visible downstream pipeline
-    this.state.triggered = {};
-    // Visible upstream pipeline
-    this.state.triggeredBy = {};
-  }
-
   /**
    * For the triggered pipelines, parses them to add `isLoading` and `isCollapsed` keys
    *
@@ -33,28 +17,25 @@ export default class PipelineStore extends CePipelineStore {
     super.storePipeline(pipeline);
 
     if (pipeline.triggered && pipeline.triggered.length) {
-      this.state.triggeredPipelines = pipeline.triggered.map(triggered => {
+      Object.assign(pipeline.triggered, pipeline.triggered.map(triggered => {
         // because we are polling we need to make sure we do not hijack user's clicks.
-        const oldPipeline = this.state.triggeredPipelines.find(
+        const oldPipeline = this.state.pipeline.find(
           oldValue => oldValue.id === triggered.id,
         );
 
         return Object.assign({}, triggered, {
           isCollapsed: oldPipeline ? oldPipeline.isCollapsed : true,
-          isLoading: oldPipeline ? oldPipeline.isLoading : false,
         });
-      });
+      }));
     }
 
     if (pipeline.triggered_by) {
       this.state.triggeredByPipelines = [
         Object.assign({}, pipeline.triggered_by, {
-          isCollapsed: this.state.triggeredByPipelines.length
+          isCollapsed: this.state.pipeline..length
             ? this.state.triggeredByPipelines[0].isCollapsed
             : true,
-          isLoading: this.state.triggeredByPipelines.length
-            ? this.state.triggeredByPipelines[0].isLoading
-            : false,
+
         }),
       ];
     }
@@ -198,7 +179,7 @@ export default class PipelineStore extends CePipelineStore {
   updateStoreOnRequest(storeKey, pipeline) {
     this.state[storeKey] = this.state[storeKey].map(triggered => {
       if (triggered.id === pipeline.id) {
-        return Object.assign({}, triggered, { isLoading: true, isCollapsed: false });
+        return Object.assign({}, triggered, { isCollapsed: false });
       }
       // reset the others, in case another was one opened
       return PipelineStore.parsePipeline(triggered);

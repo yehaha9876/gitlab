@@ -10,32 +10,26 @@ export default {
     CiStatus,
     GlLoadingIcon,
     GlButton,
+    PipelineGraph: () => import('~/pipelines/components/graph/graph_component.vue')
   },
   props: {
-    pipelineId: {
-      type: Number,
-      required: true,
-    },
-    pipelineStatus: {
+    pipeline: {
       type: Object,
       required: true,
     },
-    projectName: {
-      type: String,
-      required: true,
-    },
-    isLoading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
   computed: {
+    pipelineStatus() {
+      return this.pipeline.details.status
+    },
+    projectName() {
+      return this.pipeline.project.name;
+    },
     tooltipText() {
       return `${this.projectName} - ${this.pipelineStatus.label}`;
     },
     buttonId() {
-      return `js-linked-pipeline-${this.pipelineId}`;
+      return `js-linked-pipeline-${this.pipeline.id}`;
     },
   },
   methods: {
@@ -62,5 +56,9 @@ export default {
 
       <span class="str-truncated align-bottom"> {{ projectName }} &#8226; #{{ pipelineId }} </span>
     </gl-button>
+    <pipeline-graph
+      v-if="!pipeline.isCollapsed"
+      :pipeline="pipeline.details"
+    />
   </li>
 </template>
