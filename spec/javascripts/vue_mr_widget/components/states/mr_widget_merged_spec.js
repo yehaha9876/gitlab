@@ -18,13 +18,13 @@ describe('MRWidgetMerged', () => {
   beforeEach(() => {
     const Component = Vue.extend(mergedComponent);
     const mr = {
-      isRemovingSourceBranch: false,
+      isDeletingSourceBranch: false,
       cherryPickInForkPath: false,
       canCherryPickInCurrentMR: true,
       revertInForkPath: false,
       canRevertInCurrentMR: true,
-      canRemoveSourceBranch: true,
-      sourceBranchRemoved: true,
+      canDeleteSourceBranch: true,
+      sourceBranchDeleted: true,
       metrics: {
         mergedBy: {
           name: 'Administrator',
@@ -49,7 +49,7 @@ describe('MRWidgetMerged', () => {
     };
 
     const service = {
-      removeSourceBranch() {},
+      deleteSourceBranch() {},
     };
 
     spyOn(eventHub, '$emit');
@@ -62,79 +62,79 @@ describe('MRWidgetMerged', () => {
   });
 
   describe('computed', () => {
-    describe('shouldShowRemoveSourceBranch', () => {
-      it('returns true when sourceBranchRemoved is false', () => {
-        vm.mr.sourceBranchRemoved = false;
+    describe('shouldShowDeleteSourceBranch', () => {
+      it('returns true when sourceBranchDeleted is false', () => {
+        vm.mr.sourceBranchDeleted = false;
 
-        expect(vm.shouldShowRemoveSourceBranch).toEqual(true);
+        expect(vm.shouldShowDeleteSourceBranch).toEqual(true);
       });
 
-      it('returns false when sourceBranchRemoved is true', () => {
-        vm.mr.sourceBranchRemoved = true;
+      it('returns false when sourceBranchDeleted is true', () => {
+        vm.mr.sourceBranchDeleted = true;
 
-        expect(vm.shouldShowRemoveSourceBranch).toEqual(false);
+        expect(vm.shouldShowDeleteSourceBranch).toEqual(false);
       });
 
-      it('returns false when canRemoveSourceBranch is false', () => {
-        vm.mr.sourceBranchRemoved = false;
-        vm.mr.canRemoveSourceBranch = false;
+      it('returns false when canDeleteSourceBranch is false', () => {
+        vm.mr.sourceBranchDeleted = false;
+        vm.mr.canDeleteSourceBranch = false;
 
-        expect(vm.shouldShowRemoveSourceBranch).toEqual(false);
+        expect(vm.shouldShowDeleteSourceBranch).toEqual(false);
       });
 
       it('returns false when is making request', () => {
-        vm.mr.canRemoveSourceBranch = true;
+        vm.mr.canDeleteSourceBranch = true;
         vm.isMakingRequest = true;
 
-        expect(vm.shouldShowRemoveSourceBranch).toEqual(false);
+        expect(vm.shouldShowDeleteSourceBranch).toEqual(false);
       });
 
       it('returns true when all are true', () => {
-        vm.mr.isRemovingSourceBranch = true;
-        vm.mr.canRemoveSourceBranch = true;
+        vm.mr.isDeletingSourceBranch = true;
+        vm.mr.canDeleteSourceBranch = true;
         vm.isMakingRequest = true;
 
-        expect(vm.shouldShowRemoveSourceBranch).toEqual(false);
+        expect(vm.shouldShowDeleteSourceBranch).toEqual(false);
       });
     });
 
-    describe('shouldShowSourceBranchRemoving', () => {
+    describe('shouldShowSourceBranchDeleting', () => {
       it('should correct value when fields changed', () => {
-        vm.mr.sourceBranchRemoved = false;
+        vm.mr.sourceBranchDeleted = false;
 
-        expect(vm.shouldShowSourceBranchRemoving).toEqual(false);
+        expect(vm.shouldShowSourceBranchDeleting).toEqual(false);
 
-        vm.mr.sourceBranchRemoved = true;
+        vm.mr.sourceBranchDeleted = true;
 
-        expect(vm.shouldShowRemoveSourceBranch).toEqual(false);
+        expect(vm.shouldShowDeleteSourceBranch).toEqual(false);
 
-        vm.mr.sourceBranchRemoved = false;
+        vm.mr.sourceBranchDeleted = false;
         vm.isMakingRequest = true;
 
-        expect(vm.shouldShowSourceBranchRemoving).toEqual(true);
+        expect(vm.shouldShowSourceBranchDeleting).toEqual(true);
 
         vm.isMakingRequest = false;
-        vm.mr.isRemovingSourceBranch = true;
+        vm.mr.isDeletingSourceBranch = true;
 
-        expect(vm.shouldShowSourceBranchRemoving).toEqual(true);
+        expect(vm.shouldShowSourceBranchDeleting).toEqual(true);
       });
     });
   });
 
   describe('methods', () => {
-    describe('removeSourceBranch', () => {
+    describe('deleteSourceBranch', () => {
       it('should set flag and call service then request main component to update the widget', done => {
-        spyOn(vm.service, 'removeSourceBranch').and.returnValue(
+        spyOn(vm.service, 'deleteSourceBranch').and.returnValue(
           new Promise(resolve => {
             resolve({
               data: {
-                message: 'Branch was removed',
+                message: 'Branch was deleted',
               },
             });
           }),
         );
 
-        vm.removeSourceBranch();
+        vm.deleteSourceBranch();
         setTimeout(() => {
           const args = eventHub.$emit.calls.argsFor(0);
 
@@ -157,8 +157,8 @@ describe('MRWidgetMerged', () => {
     expect(vm.$el.textContent).toContain(targetBranch);
   });
 
-  it('renders information about branch being removed', () => {
-    expect(vm.$el.textContent).toContain('The source branch has been removed');
+  it('renders information about branch being deleted', () => {
+    expect(vm.$el.textContent).toContain('The source branch has been deleted');
   });
 
   it('shows revert and cherry-pick buttons', () => {
@@ -189,24 +189,24 @@ describe('MRWidgetMerged', () => {
     expect(selectors.mergeCommitShaLink.href).toBe(vm.mr.mergeCommitPath);
   });
 
-  it('should not show source branch removed text', done => {
-    vm.mr.sourceBranchRemoved = false;
+  it('should not show source branch deleted text', done => {
+    vm.mr.sourceBranchDeleted = false;
 
     Vue.nextTick(() => {
-      expect(vm.$el.innerText).toContain('You can remove source branch now');
-      expect(vm.$el.innerText).not.toContain('The source branch has been removed');
+      expect(vm.$el.innerText).toContain('You can delete source branch now');
+      expect(vm.$el.innerText).not.toContain('The source branch has been deleted');
       done();
     });
   });
 
-  it('should show source branch removing text', done => {
-    vm.mr.isRemovingSourceBranch = true;
-    vm.mr.sourceBranchRemoved = false;
+  it('should show source branch deleting text', done => {
+    vm.mr.isDeletingSourceBranch = true;
+    vm.mr.sourceBranchDeleted = false;
 
     Vue.nextTick(() => {
-      expect(vm.$el.innerText).toContain('The source branch is being removed');
-      expect(vm.$el.innerText).not.toContain('You can remove source branch now');
-      expect(vm.$el.innerText).not.toContain('The source branch has been removed');
+      expect(vm.$el.innerText).toContain('The source branch is being deleted');
+      expect(vm.$el.innerText).not.toContain('You can delete source branch now');
+      expect(vm.$el.innerText).not.toContain('The source branch has been deleted');
       done();
     });
   });

@@ -25,11 +25,11 @@ describe 'User accepts a merge request', :js do
     end
 
     it 'accepts a merge request' do
-      check('Remove source branch')
+      check('Delete source branch')
       click_button('Merge')
 
       expect(page).to have_content('The changes were merged into')
-      expect(page).not_to have_selector('.js-remove-branch-button')
+      expect(page).not_to have_selector('.js-delete-branch-button')
 
       # Wait for View Resource requests to complete so they don't blow up if they are
       # only handled after `DatabaseCleaner` has already run.
@@ -46,7 +46,7 @@ describe 'User accepts a merge request', :js do
       click_button('Merge')
 
       expect(page).to have_content('The changes were merged into')
-      expect(page).to have_selector('.js-remove-branch-button')
+      expect(page).to have_selector('.js-delete-branch-button')
 
       # Wait for View Resource requests to complete so they don't blow up if they are
       # only handled after `DatabaseCleaner` has already run
@@ -60,11 +60,11 @@ describe 'User accepts a merge request', :js do
     end
 
     it 'accepts a merge request' do
-      check('Remove source branch')
+      check('Delete source branch')
       click_button('Merge')
 
       expect(page).to have_content('The changes were merged into')
-      expect(page).not_to have_selector('.js-remove-branch-button')
+      expect(page).not_to have_selector('.js-delete-branch-button')
 
       # Wait for View Resource requests to complete so they don't blow up if they are
       # only handled after `DatabaseCleaner` has already run

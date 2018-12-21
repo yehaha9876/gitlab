@@ -293,8 +293,8 @@ describe 'Merge request > User sees merge widget', :js do
       expect(page).to have_button('Merge', disabled: false)
     end
 
-    it 'user cannot remove source branch' do
-      expect(page).not_to have_field('remove-source-branch-input')
+    it 'user cannot delete source branch' do
+      expect(page).not_to have_field('delete-source-branch-input')
     end
   end
 
@@ -314,9 +314,9 @@ describe 'Merge request > User sees merge widget', :js do
       visit project_merge_request_path(project, merge_request)
     end
 
-    it 'user cannot remove source branch' do
-      expect(page).not_to have_field('remove-source-branch-input')
-      expect(page).to have_content('Removes source branch')
+    it 'user cannot delete source branch' do
+      expect(page).not_to have_field('delete-source-branch-input')
+      expect(page).to have_content('Deletes source branch')
     end
   end
 

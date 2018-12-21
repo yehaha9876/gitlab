@@ -18,8 +18,8 @@ const createComponent = (customConfig = {}) => {
     sha: '12345678',
     commitMessage,
     commitMessageWithDescription,
-    shouldRemoveSourceBranch: true,
-    canRemoveSourceBranch: false,
+    shouldDeleteSourceBranch: true,
+    canDeleteSourceBranch: false,
   };
 
   Object.assign(mr, customConfig.mr);
@@ -330,7 +330,7 @@ describe('ReadyToMerge', () => {
       it('should handle merge when pipeline succeeds', done => {
         spyOn(eventHub, '$emit');
         spyOn(vm.service, 'merge').and.returnValue(returnPromise('merge_when_pipeline_succeeds'));
-        vm.removeSourceBranch = false;
+        vm.deleteSourceBranch = false;
         vm.handleMergeButtonClick(true);
 
         setTimeout(() => {
@@ -412,7 +412,7 @@ describe('ReadyToMerge', () => {
       it('should call start and stop polling when MR merged', done => {
         spyOn(eventHub, '$emit');
         spyOn(vm.service, 'poll').and.returnValue(returnPromise('merged'));
-        spyOn(vm, 'initiateRemoveSourceBranchPolling');
+        spyOn(vm, 'initiateDeleteSourceBranchPolling');
 
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
@@ -429,7 +429,7 @@ describe('ReadyToMerge', () => {
           expect(vm.service.poll).toHaveBeenCalled();
           expect(eventHub.$emit).toHaveBeenCalledWith('MRWidgetUpdateRequested');
           expect(eventHub.$emit).toHaveBeenCalledWith('FetchActionsContent');
-          expect(vm.initiateRemoveSourceBranchPolling).toHaveBeenCalled();
+          expect(vm.initiateDeleteSourceBranchPolling).toHaveBeenCalled();
           expect(cpc).toBeFalsy();
           expect(spc).toBeTruthy();
 
@@ -439,7 +439,7 @@ describe('ReadyToMerge', () => {
 
       it('updates status box', done => {
         spyOn(vm.service, 'poll').and.returnValue(returnPromise('merged'));
-        spyOn(vm, 'initiateRemoveSourceBranchPolling');
+        spyOn(vm, 'initiateDeleteSourceBranchPolling');
 
         vm.handleMergePolling(() => {}, () => {});
 
@@ -455,7 +455,7 @@ describe('ReadyToMerge', () => {
 
       it('hides close button', done => {
         spyOn(vm.service, 'poll').and.returnValue(returnPromise('merged'));
-        spyOn(vm, 'initiateRemoveSourceBranchPolling');
+        spyOn(vm, 'initiateDeleteSourceBranchPolling');
 
         vm.handleMergePolling(() => {}, () => {});
 
@@ -468,7 +468,7 @@ describe('ReadyToMerge', () => {
 
       it('updates merge request count badge', done => {
         spyOn(vm.service, 'poll').and.returnValue(returnPromise('merged'));
-        spyOn(vm, 'initiateRemoveSourceBranchPolling');
+        spyOn(vm, 'initiateDeleteSourceBranchPolling');
 
         vm.handleMergePolling(() => {}, () => {});
 
@@ -481,7 +481,7 @@ describe('ReadyToMerge', () => {
 
       it('should continue polling until MR is merged', done => {
         spyOn(vm.service, 'poll').and.returnValue(returnPromise('some_other_state'));
-        spyOn(vm, 'initiateRemoveSourceBranchPolling');
+        spyOn(vm, 'initiateDeleteSourceBranchPolling');
 
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
@@ -503,19 +503,19 @@ describe('ReadyToMerge', () => {
       });
     });
 
-    describe('initiateRemoveSourceBranchPolling', () => {
+    describe('initiateDeleteSourceBranchPolling', () => {
       it('should emit event and call simplePoll', () => {
         spyOn(eventHub, '$emit');
         const simplePoll = spyOnDependency(ReadyToMerge, 'simplePoll');
 
-        vm.initiateRemoveSourceBranchPolling();
+        vm.initiateDeleteSourceBranchPolling();
 
-        expect(eventHub.$emit).toHaveBeenCalledWith('SetBranchRemoveFlag', [true]);
+        expect(eventHub.$emit).toHaveBeenCalledWith('SetBranchDeleteFlag', [true]);
         expect(simplePoll).toHaveBeenCalled();
       });
     });
 
-    describe('handleRemoveBranchPolling', () => {
+    describe('handleDeleteBranchPolling', () => {
       const returnPromise = state =>
         new Promise(resolve => {
           resolve({
@@ -532,7 +532,7 @@ describe('ReadyToMerge', () => {
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
 
-        vm.handleRemoveBranchPolling(
+        vm.handleDeleteBranchPolling(
           () => {
             cpc = true;
           },
@@ -549,7 +549,7 @@ describe('ReadyToMerge', () => {
           expect(args[1]).toBeDefined();
           args[1]();
 
-          expect(eventHub.$emit).toHaveBeenCalledWith('SetBranchRemoveFlag', [false]);
+          expect(eventHub.$emit).toHaveBeenCalledWith('SetBranchDeleteFlag', [false]);
 
           expect(cpc).toBeFalsy();
           expect(spc).toBeTruthy();
@@ -564,7 +564,7 @@ describe('ReadyToMerge', () => {
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
 
-        vm.handleRemoveBranchPolling(
+        vm.handleDeleteBranchPolling(
           () => {
             cpc = true;
           },
@@ -582,10 +582,10 @@ describe('ReadyToMerge', () => {
     });
   });
 
-  describe('Remove source branch checkbox', () => {
+  describe('Delete source branch checkbox', () => {
     describe('when user can merge but cannot delete branch', () => {
       it('should be disabled in the rendered output', () => {
-        const checkboxElement = vm.$el.querySelector('#remove-source-branch-input');
+        const checkboxElement = vm.$el.querySelector('#delete-source-branch-input');
 
         expect(checkboxElement).toBeNull();
       });
@@ -596,16 +596,16 @@ describe('ReadyToMerge', () => {
 
       beforeEach(() => {
         customVm = createComponent({
-          mr: { canRemoveSourceBranch: true },
+          mr: { canDeleteSourceBranch: true },
         });
       });
 
-      it('isRemoveSourceBranchButtonDisabled should be false', () => {
-        expect(customVm.isRemoveSourceBranchButtonDisabled).toBe(false);
+      it('isDeleteSourceBranchButtonDisabled should be false', () => {
+        expect(customVm.isDeleteSourceBranchButtonDisabled).toBe(false);
       });
 
       it('should be enabled in rendered output', () => {
-        const checkboxElement = customVm.$el.querySelector('#remove-source-branch-input');
+        const checkboxElement = customVm.$el.querySelector('#delete-source-branch-input');
 
         expect(checkboxElement).not.toBeNull();
       });
@@ -616,12 +616,12 @@ describe('ReadyToMerge', () => {
     describe('when allowed to merge', () => {
       beforeEach(() => {
         vm = createComponent({
-          mr: { isMergeAllowed: true, canRemoveSourceBranch: true },
+          mr: { isMergeAllowed: true, canDeleteSourceBranch: true },
         });
       });
 
-      it('shows remove source branch checkbox', () => {
-        expect(vm.$el.querySelector('.js-remove-source-branch-checkbox')).not.toBeNull();
+      it('shows delete source branch checkbox', () => {
+        expect(vm.$el.querySelector('.js-delete-source-branch-checkbox')).not.toBeNull();
       });
 
       it('shows modify commit message button', () => {
@@ -640,8 +640,8 @@ describe('ReadyToMerge', () => {
         });
       });
 
-      it('does not show remove source branch checkbox', () => {
-        expect(vm.$el.querySelector('.js-remove-source-branch-checkbox')).toBeNull();
+      it('does not show delete source branch checkbox', () => {
+        expect(vm.$el.querySelector('.js-delete-source-branch-checkbox')).toBeNull();
       });
 
       it('does not show  modify commit message button', () => {

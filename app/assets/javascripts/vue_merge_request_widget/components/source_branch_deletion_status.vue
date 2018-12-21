@@ -7,15 +7,15 @@ export default {
     tooltip,
   },
   created() {
-    this.removesBranchText = __('<strong>Removes</strong> source branch');
+    this.deletes = __('<strong>Deletes</strong> source branch');
     this.tooltipTitle = __('A user with write access to the source branch selected this option');
   },
 };
 </script>
 
 <template>
-  <p v-once class="mr-info-list mr-links source-branch-removal-status append-bottom-0">
-    <span class="status-text" v-html="removesBranchText"> </span>
+  <p v-once class="mr-info-list mr-links source-branch-deletion-status append-bottom-0">
+    <span class="status-text" v-html="deletes"> </span>
     <i v-tooltip :title="tooltipTitle" :aria-label="tooltipTitle" class="fa fa-question-circle">
     </i>
   </p>

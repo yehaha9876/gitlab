@@ -37,19 +37,19 @@ export default {
     };
   },
   computed: {
-    shouldShowRemoveSourceBranch() {
-      const { sourceBranchRemoved, isRemovingSourceBranch, canRemoveSourceBranch } = this.mr;
+    shouldShowDeleteSourceBranch() {
+      const { sourceBranchDeleted, isDeletingSourceBranch, canDeleteSourceBranch } = this.mr;
 
       return (
-        !sourceBranchRemoved &&
-        canRemoveSourceBranch &&
+        !sourceBranchDeleted &&
+        canDeleteSourceBranch &&
         !this.isMakingRequest &&
-        !isRemovingSourceBranch
+        !isDeletingSourceBranch
       );
     },
-    shouldShowSourceBranchRemoving() {
-      const { sourceBranchRemoved, isRemovingSourceBranch } = this.mr;
-      return !sourceBranchRemoved && (isRemovingSourceBranch || this.isMakingRequest);
+    shouldShowSourceBranchDeleting() {
+      const { sourceBranchDeleted, isDeletingSourceBranch } = this.mr;
+      return !sourceBranchDeleted && (isDeletingSourceBranch || this.isMakingRequest);
     },
     shouldShowMergedButtons() {
       const {
@@ -77,14 +77,14 @@ export default {
     },
   },
   methods: {
-    removeSourceBranch() {
+    deleteSourceBranch() {
       this.isMakingRequest = true;
 
       this.service
-        .removeSourceBranch()
+        .deleteSourceBranch()
         .then(res => res.data)
         .then(data => {
-          if (data.message === 'Branch was removed') {
+          if (data.message === 'Branch was deleted') {
             eventHub.$emit('MRWidgetUpdateRequested', () => {
               this.isMakingRequest = false;
             });
@@ -173,23 +173,23 @@ export default {
             />
           </template>
         </p>
-        <p v-if="mr.sourceBranchRemoved">
-          {{ s__('mrWidget|The source branch has been removed') }}
+        <p v-if="mr.sourceBranchDeleted">
+          {{ s__('mrWidget|The source branch has been deleted') }}
         </p>
-        <p v-if="shouldShowRemoveSourceBranch" class="space-children">
-          <span>{{ s__('mrWidget|You can remove source branch now') }}</span>
+        <p v-if="shouldShowDeleteSourceBranch" class="space-children">
+          <span>{{ s__('mrWidget|You can delete source branch now') }}</span>
           <button
             :disabled="isMakingRequest"
             type="button"
-            class="btn btn-sm btn-default js-remove-branch-button"
-            @click="removeSourceBranch"
+            class="btn btn-sm btn-default js-delete-branch-button"
+            @click="deleteSourceBranch"
           >
-            {{ s__('mrWidget|Remove Source Branch') }}
+            {{ s__('mrWidget|Delete Source Branch') }}
           </button>
         </p>
-        <p v-if="shouldShowSourceBranchRemoving">
+        <p v-if="shouldShowSourceBranchDeleting">
           <gl-loading-icon :inline="true" />
-          <span> {{ s__('mrWidget|The source branch is being removed') }} </span>
+          <span> {{ s__('mrWidget|The source branch is being deleted') }} </span>
         </p>
       </section>
     </div>

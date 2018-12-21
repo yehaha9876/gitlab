@@ -7,7 +7,7 @@ describe('MRWidgetMissingBranch', () => {
 
   beforeEach(() => {
     const Component = Vue.extend(missingBranchComponent);
-    vm = mountComponent(Component, { mr: { sourceBranchRemoved: true } });
+    vm = mountComponent(Component, { mr: { sourceBranchDeleted: true } });
   });
 
   afterEach(() => {
@@ -19,7 +19,7 @@ describe('MRWidgetMissingBranch', () => {
       it('should return proper branch name', () => {
         expect(vm.missingBranchName).toEqual('source');
 
-        vm.mr.sourceBranchRemoved = false;
+        vm.mr.sourceBranchDeleted = false;
 
         expect(vm.missingBranchName).toEqual('target');
       });

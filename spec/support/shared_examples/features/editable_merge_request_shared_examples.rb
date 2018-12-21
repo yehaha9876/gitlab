@@ -120,21 +120,21 @@ RSpec.shared_examples 'an editable merge request' do
     expect(height).to eq(new_height)
   end
 
-  context 'when "Remove source branch" is set' do
+  context 'when "Delete source branch" is set' do
     before do
       merge_request.update!(merge_params: { 'force_remove_source_branch' => '1' })
     end
 
-    it 'allows to unselect "Remove source branch"', :js do
+    it 'allows to unselect "Delete source branch"', :js do
       expect(merge_request.merge_params['force_remove_source_branch']).to be_truthy
 
       visit edit_project_merge_request_path(target_project, merge_request)
-      uncheck 'Remove source branch when merge request is accepted'
+      uncheck 'Delete source branch when merge request is accepted'
 
       click_button 'Save changes'
 
-      expect(page).to have_unchecked_field 'remove-source-branch-input'
-      expect(page).to have_content 'Remove source branch'
+      expect(page).to have_unchecked_field 'delete-source-branch-input'
+      expect(page).to have_content 'Delete source branch'
     end
   end
 end
