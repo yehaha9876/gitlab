@@ -6,7 +6,7 @@ import EEGraphMixin from 'ee/pipelines/mixins/graph_component_mixin';
 import StageColumnComponent from './stage_column_component.vue';
 
 export default {
-  name: 'graph-component',
+  name: 'pipeline-graph',
   components: {
     LinkedPipelinesColumn,
     StageColumnComponent,
@@ -64,11 +64,11 @@ export default {
       <div class="text-center"><gl-loading-icon v-if="isLoading" :size="3" /></div>
 
       <linked-pipelines-column
-        v-if="hasTriggeredBy"
-        :linked-pipelines="triggeredByPipelines"
+        v-if="pipeline.triggered_by.length"
+        :linked-pipelines="pipeline.triggered_by"
         :column-title="__('Upstream')"
         graph-position="left"
-        @linkedPipelineClick="pipeline => $emit('onClickTriggeredBy', pipeline)"
+        @linkedPipelineClick="pipeline => $emit('onClickPipeline', 'triggered_by', pipeline)"
       />
 
       <ul

@@ -1,5 +1,6 @@
 import CePipelineStore from '~/pipelines/stores/pipeline_store';
 import pipelinesKeys from '../constants';
+import mock from '../data.json';
 
 /**
  * Extends CE store with the logic to handle the upstream/downstream pipelines
@@ -14,7 +15,8 @@ export default class PipelineStore extends CePipelineStore {
    * @param {Object} pipeline
    */
   storePipeline(pipeline = {}) {
-    super.storePipeline(pipeline);
+    pipeline = Object.assign({}, mock);
+    debugger;
 
     if (pipeline.triggered && pipeline.triggered.length) {
       Object.assign(pipeline.triggered, pipeline.triggered.map(triggered => {
@@ -29,15 +31,30 @@ export default class PipelineStore extends CePipelineStore {
       }));
     }
 
+    // transform this into an array here
+
     if (pipeline.triggered_by) {
       this.state.triggeredByPipelines = [
         Object.assign({}, pipeline.triggered_by, {
-          isCollapsed: this.state.pipeline..length
+          isCollapsed: this.state.pipeline.length
             ? this.state.triggeredByPipelines[0].isCollapsed
             : true,
 
         }),
       ];
+    }
+
+    super.storePipeline(pipeline);
+
+  }
+
+  expandPipeline(key, parentId, pipeline) {
+    // first level pipeline
+    if (this.state.pipeline.id === parentId) {
+      // find pipeline
+      const pipelineToUpdate = this.state.pipeline[key].find((el) => el.id === pipeline.id);
+      // splice it
+      debugger;
     }
   }
 
@@ -155,7 +172,6 @@ export default class PipelineStore extends CePipelineStore {
   static parsePipeline(pipeline) {
     return Object.assign({}, pipeline, {
       isCollapsed: true,
-      isLoading: false,
     });
   }
 

@@ -42,7 +42,6 @@ export default {
         }"
         :pipeline="pipeline"
         :project-name="pipeline.project.name"
-        :pipeline-status="pipeline.details.status"
         :pipeline-path="pipeline.path"
         :is-loading="pipeline.isLoading"
         @pipelineClicked="$emit('linkedPipelineClick', pipeline, index);"
