@@ -10,7 +10,7 @@ export default {
     CiStatus,
     GlLoadingIcon,
     GlButton,
-    PipelineGraph: () => import('~/pipelines/components/graph/graph_component.vue')
+
   },
   props: {
     pipeline: {
@@ -51,14 +51,9 @@ export default {
       class="js-linked-pipeline-content linked-pipeline-content"
       @click="onClickLinkedPipeline"
     >
-      <gl-loading-icon v-if="isLoading" class="js-linked-pipeline-loading d-inline" />
-      <ci-status v-else :status="pipelineStatus" class="js-linked-pipeline-status" />
+      <ci-status :status="pipelineStatus" class="js-linked-pipeline-status" />
 
-      <span class="str-truncated align-bottom"> {{ projectName }} &#8226; #{{ pipelineId }} </span>
+      <span class="str-truncated align-bottom"> {{ projectName }} &#8226; #{{ pipeline.id }} </span>
     </gl-button>
-    <pipeline-graph
-      v-if="!pipeline.isCollapsed"
-      :pipeline="pipeline.details"
-    />
   </li>
 </template>

@@ -34,16 +34,13 @@ export default {
     <ul>
       <linked-pipeline
         v-for="(pipeline, index) in linkedPipelines"
-        :key="pipeline.id"
+        :key="index"
         :class="{
           'flat-connector-before': index === 0 && graphPosition === 'right',
-          active: !pipeline.isCollapsed || pipeline.isLoading,
+          active: !pipeline.isCollapsed,
           'left-connector': !pipeline.isCollapsed && graphPosition === 'left',
         }"
         :pipeline="pipeline"
-        :project-name="pipeline.project.name"
-        :pipeline-path="pipeline.path"
-        :is-loading="pipeline.isLoading"
         @pipelineClicked="$emit('linkedPipelineClick', pipeline, index);"
       />
     </ul>

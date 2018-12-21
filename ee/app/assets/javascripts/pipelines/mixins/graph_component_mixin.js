@@ -1,51 +1,15 @@
-import _ from 'underscore';
-
 export default {
-  props: {
-    triggered: {
-      type: Object,
-      required: false,
-      default: () => ({}),
-    },
-    triggeredBy: {
-      type: Object,
-      required: false,
-      default: () => ({}),
-    },
-    triggeredByPipelines: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-    triggeredPipelines: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-  },
   data() {
     return {
       triggeredTopIndex: 1,
     };
   },
   computed: {
-    triggeredGraph() {
-      return this.triggered && this.triggered.details && this.triggered.details.stages;
-    },
-    triggeredByGraph() {
-      return this.triggeredBy && this.triggeredBy.details && this.triggeredBy.details.stages;
+    hasTriggeredBy() {
+      return this.pipeline.triggered_by && this.pipeline.triggered_by.length > 0;
     },
     hasTriggered() {
-      return this.triggeredPipelines.length > 0;
-    },
-    hasTriggeredBy() {
-      return this.triggeredByPipelines.length > 0;
-    },
-    shouldRenderTriggeredPipeline() {
-      return !this.isLoading && !_.isEmpty(this.triggered);
-    },
-    shouldRenderTriggeredByPipeline() {
-      return !this.isLoading && !_.isEmpty(this.triggeredBy);
+      return this.pipeline.triggered && this.pipeline.triggered.length > 0
     },
     /**
      * Calculates the margin top of the clicked downstream pipeline by
@@ -62,9 +26,9 @@ export default {
     refreshTriggeredByPipelineGraph() {
       this.$emit('refreshTriggeredByPipelineGraph');
     },
-    handleClickedDownstream(pipeline, clickedIndex) {
+    handleClickedDownstream(clickedPipeline, clickedIndex) {
       this.triggeredTopIndex = clickedIndex;
-      this.$emit('onClickTriggered', pipeline);
+      this.$emit('onClickPipeline', 'triggered', this.pipeline.id, clickedPipeline);
     },
   },
 };

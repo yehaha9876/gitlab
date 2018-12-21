@@ -6,7 +6,6 @@ import PipelinesMediator from 'ee/pipelines/pipeline_details_mediator';
 import pipelineGraph from './components/graph/graph_component.vue';
 import pipelineHeader from './components/header_component.vue';
 import eventHub from './event_hub';
-import GraphEEMixin from 'ee/pipelines/mixins/graph_pipeline_bundle_mixin'; // eslint-disable-line import/order
 
 Vue.use(Translate);
 
@@ -23,7 +22,6 @@ export default () => {
     components: {
       pipelineGraph,
     },
-    mixins: [GraphEEMixin],
     data() {
       return {
         mediator,
@@ -47,7 +45,7 @@ export default () => {
         on: {
           refreshPipelineGraph: this.requestRefreshPipelineGraph,
           // EE-only start
-          onClickPipeline: (key, parentId, pipeline) => this.clickPipeline(key, pipeline),
+          onClickPipeline: (key, parentId, pipeline) => this.mediator.store.togglePipeline(key, parentId, pipeline),
           // EE-only end
         },
       });
