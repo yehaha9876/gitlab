@@ -3,8 +3,6 @@
 class ProjectMember < Member
   SOURCE_TYPE = 'Project'.freeze
 
-  include Gitlab::ShellAdapter
-
   belongs_to :project, foreign_key: 'source_id'
 
   # Make sure project member points only to project as it source
@@ -14,8 +12,6 @@ class ProjectMember < Member
   default_scope { where(source_type: SOURCE_TYPE) }
 
   scope :in_project, ->(project) { where(source_id: project.id) }
-
-  before_destroy :delete_member_branch_protection
 
   class << self
     # Add users to projects with passed access option
@@ -95,15 +91,8 @@ class ProjectMember < Member
 
   private
 
-  def delete_member_branch_protection
-    if user.present? && project.present?
-      project.protected_branches.merge_access_by_user(user).destroy_all # rubocop: disable DestroyAll
-      project.protected_branches.push_access_by_user(user).destroy_all # rubocop: disable DestroyAll
-    end
-  end
-
   def send_invite
-    run_after_commit_or_now { notification_service.invite_project_member(self, @raw_invite_token) } unless @skip_notification
+    run_after_commit_or_now { notification_service.invite_project_member(self, @raw_invite_token) }
 
     super
   end
@@ -111,7 +100,7 @@ class ProjectMember < Member
   def post_create_hook
     unless owner?
       event_service.join_project(self.project, self.user)
-      run_after_commit_or_now { notification_service.new_project_member(self) } unless @skip_notification
+      run_after_commit_or_now { notification_service.new_project_member(self) }
     end
 
     super
@@ -119,7 +108,7 @@ class ProjectMember < Member
 
   def post_update_hook
     if access_level_changed?
-      run_after_commit { notification_service.update_project_member(self) } unless @skip_notification
+      run_after_commit { notification_service.update_project_member(self) }
     end
 
     super
@@ -136,13 +125,13 @@ class ProjectMember < Member
   end
 
   def after_accept_invite
-    notification_service.accept_project_invite(self) unless @skip_notification
+    notification_service.accept_project_invite(self)
 
     super
   end
 
   def after_decline_invite
-    notification_service.decline_project_invite(self) unless @skip_notification
+    notification_service.decline_project_invite(self)
 
     super
   end
@@ -153,3 +142,5 @@ class ProjectMember < Member
   end
   # rubocop: enable CodeReuse/ServiceClass
 end
+
+ProjectMember.prepend(EE::ProjectMember)

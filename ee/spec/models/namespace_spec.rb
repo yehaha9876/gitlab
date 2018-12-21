@@ -8,7 +8,7 @@ describe Namespace do
   let!(:gold_plan) { create(:gold_plan) }
 
   it { is_expected.to have_one(:namespace_statistics) }
-  it { is_expected.to have_one(:gitlab_subscription) }
+  it { is_expected.to have_one(:gitlab_subscription).dependent(:destroy) }
   it { is_expected.to belong_to(:plan) }
 
   it { is_expected.to delegate_method(:shared_runners_minutes).to(:namespace_statistics) }
@@ -188,7 +188,7 @@ describe Namespace do
           end
         end
 
-        if Group.supports_nested_groups?
+        if Group.supports_nested_objects?
           context 'when license is applied to parent group' do
             let(:child_group) { create :group, parent: group }
 

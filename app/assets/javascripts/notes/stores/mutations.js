@@ -197,6 +197,17 @@ export default {
     }
   },
 
+  [types.APPLY_SUGGESTION](state, { noteId, discussionId, suggestionId }) {
+    const noteObj = utils.findNoteObjectById(state.discussions, discussionId);
+    const comment = utils.findNoteObjectById(noteObj.notes, noteId);
+
+    comment.suggestions = comment.suggestions.map(suggestion => ({
+      ...suggestion,
+      applied: suggestion.applied || suggestion.id === suggestionId,
+      appliable: false,
+    }));
+  },
+
   [types.UPDATE_DISCUSSION](state, noteData) {
     const note = noteData;
     const selectedDiscussion = state.discussions.find(disc => disc.id === note.id);
@@ -246,7 +257,7 @@ export default {
       discussion =>
         !discussion.individual_note &&
         discussion.resolvable &&
-        discussion.notes.some(note => !note.resolved),
+        discussion.notes.some(note => note.resolvable && !note.resolved),
     ).length;
     state.hasUnresolvedDiscussions = state.unresolvedDiscussionsCount > 1;
   },

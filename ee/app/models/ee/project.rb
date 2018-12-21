@@ -10,13 +10,13 @@ module EE
     extend ::Gitlab::Utils::Override
     extend ::Gitlab::Cache::RequestCache
     include ::Gitlab::Utils::StrongMemoize
-    include ::EE::GitlabRoutingHelper
+    include ::EE::GitlabRoutingHelper # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     GIT_LFS_DOWNLOAD_OPERATION = 'download'.freeze
 
     prepended do
       include Elastic::ProjectsSearch
-      include EE::DeploymentPlatform
+      include EE::DeploymentPlatform # rubocop: disable Cop/InjectEnterpriseEditionModule
       include EachBatch
 
       ignore_column :mirror_last_update_at,
@@ -41,6 +41,7 @@ module EE
       has_one :gitlab_slack_application_service
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
 
+      has_many :reviews, inverse_of: :project
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :audit_events, as: :entity
@@ -53,6 +54,7 @@ module EE
       has_many :software_license_policies, inverse_of: :project, class_name: 'SoftwareLicensePolicy'
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true
       has_many :packages, class_name: 'Packages::Package'
+      has_many :package_files, through: :packages, class_name: 'Packages::PackageFile'
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
 
@@ -188,7 +190,7 @@ module EE
     end
 
     def feature_available?(feature, user = nil)
-      if ProjectFeature::FEATURES.include?(feature)
+      if ::ProjectFeature::FEATURES.include?(feature)
         super
       else
         licensed_feature_available?(feature, user)

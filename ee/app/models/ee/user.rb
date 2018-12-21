@@ -27,6 +27,7 @@ module EE
       delegate :shared_runners_minutes_limit, :shared_runners_minutes_limit=,
                to: :namespace
 
+      has_many :reviews,                  foreign_key: :author_id, inverse_of: :author
       has_many :epics,                    foreign_key: :author_id
       has_many :assigned_epics,           foreign_key: :assignee_id, class_name: "Epic"
       has_many :path_locks,               dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
@@ -185,7 +186,7 @@ module EE
         project_creation_levels << nil
       end
 
-      developer_groups_hierarchy = ::Gitlab::GroupHierarchy.new(developer_groups).base_and_descendants
+      developer_groups_hierarchy = ::Gitlab::ObjectHierarchy.new(developer_groups).base_and_descendants
       ::Group.where(id: developer_groups_hierarchy.select(:id),
                     project_creation_level: project_creation_levels)
     end

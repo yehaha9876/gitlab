@@ -2,8 +2,6 @@
 class Groups::Security::VulnerabilitiesController < Groups::Security::ApplicationController
   HISTORY_RANGE = 3.months
 
-  before_action :check_group_security_dashboard_history_feature_flag!, only: [:history]
-
   def index
     @vulnerabilities = ::Security::VulnerabilitiesFinder.new(group: group, params: finder_params)
       .execute
@@ -38,8 +36,10 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
 
   private
 
-  def check_group_security_dashboard_history_feature_flag!
-    render_404 unless ::Feature.enabled?(:group_security_dashboard_history, group, default_enabled: true)
+  def finder_params
+    raw = params.permit(:hide_dismissed, report_type: [], project_id: [], severity: [])
+    raw[:hide_dismissed] = Gitlab::Utils.to_boolean(raw[:hide_dismissed]) if raw[:hide_dismissed]
+    raw
   end
 
   def finder_params

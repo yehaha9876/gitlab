@@ -8,6 +8,11 @@ module DraftNotes
       else
         publish_draft_notes
       end
+
+      success
+    rescue ActiveRecord::RecordInvalid => e
+      message = "Unable to save #{e.record.class.name}: #{e.record.errors.full_messages.join(", ")} "
+      error(message)
     end
 
     private
@@ -20,9 +25,17 @@ module DraftNotes
     end
 
     def publish_draft_notes
-      draft_notes.each(&method(:create_note_from_draft))
+      return if draft_notes.empty?
+
+      review = Review.create!(author: current_user, merge_request: merge_request, project: project)
+
+      draft_notes.map do |draft_note|
+        draft_note.review = review
+        create_note_from_draft(draft_note)
+      end
       draft_notes.delete_all
 
+      notification_service.async.new_review(review)
       MergeRequests::ResolvedDiscussionNotificationService.new(project, current_user).execute(merge_request)
     end
 
@@ -33,6 +46,8 @@ module DraftNotes
 
       note = Notes::CreateService.new(draft.project, draft.author, draft.publish_params).execute
       set_discussion_resolve_status(note, draft)
+
+      note
     end
 
     def set_discussion_resolve_status(note, draft_note)

@@ -26,11 +26,13 @@ const Api = {
   userStatusPath: '/api/:version/users/:id/status',
   userPostStatusPath: '/api/:version/user/status',
   commitPath: '/api/:version/projects/:id/repository/commits',
+  applySuggestionPath: '/api/:version/suggestions/:id/apply',
   commitPipelinesPath: '/:project_id/commit/:sha/pipelines',
   branchSinglePath: '/api/:version/projects/:id/repository/branches/:branch',
   createBranchPath: '/api/:version/projects/:id/repository/branches',
   geoNodesPath: '/api/:version/geo_nodes',
   subscriptionPath: '/api/:version/namespaces/:id/gitlab_subscription',
+  releasesPath: '/api/:version/project/:id/releases',
 
   group(groupId, callback) {
     const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
@@ -188,6 +190,12 @@ const Api = {
     });
   },
 
+  applySuggestion(id) {
+    const url = Api.buildUrl(Api.applySuggestionPath).replace(':id', encodeURIComponent(id));
+
+    return axios.put(url);
+  },
+
   commitPipelines(projectId, sha) {
     const encodedProjectId = projectId
       .split('/')
@@ -341,6 +349,12 @@ const Api = {
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
+
+    return axios.get(url);
+  },
+
+  releases(id) {
+    const url = Api.buildUrl(this.releasesPath).replace(':id', encodeURIComponent(id));
 
     return axios.get(url);
   },

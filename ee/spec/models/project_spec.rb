@@ -17,6 +17,7 @@ describe Project do
     it { is_expected.to have_one(:import_state).class_name('ProjectImportState') }
     it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState').inverse_of(:project) }
 
+    it { is_expected.to have_many(:reviews).inverse_of(:project) }
     it { is_expected.to have_many(:path_locks) }
     it { is_expected.to have_many(:vulnerability_feedback) }
     it { is_expected.to have_many(:sourced_pipelines) }
@@ -24,6 +25,8 @@ describe Project do
     it { is_expected.to have_many(:audit_events).dependent(false) }
     it { is_expected.to have_many(:protected_environments) }
     it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
+    it { is_expected.to have_many(:packages).class_name('Packages::Package') }
+    it { is_expected.to have_many(:package_files).class_name('Packages::PackageFile') }
   end
 
   describe 'validations' do

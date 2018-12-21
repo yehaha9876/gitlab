@@ -42,12 +42,14 @@ describe('noteable_discussion component', () => {
     const discussion = { ...discussionMock };
     discussion.diff_file = mockDiffFile;
     discussion.diff_discussion = true;
-    const diffDiscussionVm = new Component({
+
+    vm.$destroy();
+    vm = new Component({
       store,
       propsData: { discussion },
     }).$mount();
 
-    expect(diffDiscussionVm.$el.querySelector('.discussion-header')).not.toBeNull();
+    expect(vm.$el.querySelector('.discussion-header')).not.toBeNull();
   });
 
   describe('actions', () => {
@@ -128,6 +130,103 @@ describe('noteable_discussion component', () => {
       const note = vm.componentData(data);
 
       expect(note).toEqual(data);
+    });
+  });
+
+  describe('action text', () => {
+    const commitId = 'razupaltuff';
+    const truncatedCommitId = commitId.substr(0, 8);
+    let commitElement;
+
+    beforeEach(() => {
+      vm.$destroy();
+
+      store.state.diffs = {
+        projectPath: 'something',
+      };
+
+      vm = new Component({
+        propsData: {
+          discussion: {
+            ...discussionMock,
+            for_commit: true,
+            commit_id: commitId,
+            diff_discussion: true,
+            diff_file: {
+              ...mockDiffFile,
+            },
+          },
+          renderDiffFile: true,
+        },
+        store,
+      }).$mount();
+
+      commitElement = vm.$el.querySelector('.commit-sha');
+    });
+
+    describe('for commit discussions', () => {
+      it('should display a monospace started a discussion on commit', () => {
+        expect(vm.$el).toContainText(`started a discussion on commit ${truncatedCommitId}`);
+        expect(commitElement).not.toBe(null);
+        expect(commitElement).toHaveText(truncatedCommitId);
+      });
+    });
+
+    describe('for diff discussion with a commit id', () => {
+      it('should display started discussion on commit header', done => {
+        vm.discussion.for_commit = false;
+
+        vm.$nextTick(() => {
+          expect(vm.$el).toContainText(`started a discussion on commit ${truncatedCommitId}`);
+          expect(commitElement).not.toBe(null);
+
+          done();
+        });
+      });
+
+      it('should display outdated change on commit header', done => {
+        vm.discussion.for_commit = false;
+        vm.discussion.active = false;
+
+        vm.$nextTick(() => {
+          expect(vm.$el).toContainText(
+            `started a discussion on an outdated change in commit ${truncatedCommitId}`,
+          );
+
+          expect(commitElement).not.toBe(null);
+
+          done();
+        });
+      });
+    });
+
+    describe('for diff discussions without a commit id', () => {
+      it('should show started a discussion on the diff text', done => {
+        Object.assign(vm.discussion, {
+          for_commit: false,
+          commit_id: null,
+        });
+
+        vm.$nextTick(() => {
+          expect(vm.$el).toContainText('started a discussion on the diff');
+
+          done();
+        });
+      });
+
+      it('should show discussion on older version text', done => {
+        Object.assign(vm.discussion, {
+          for_commit: false,
+          commit_id: null,
+          active: false,
+        });
+
+        vm.$nextTick(() => {
+          expect(vm.$el).toContainText('started a discussion on an old version of the diff');
+
+          done();
+        });
+      });
     });
   });
 });

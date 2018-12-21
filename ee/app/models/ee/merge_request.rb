@@ -11,6 +11,7 @@ module EE
     prepended do
       include Elastic::MergeRequestsSearch
 
+      has_many :reviews, inverse_of: :merge_request
       has_many :approvals, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approved_by_users, through: :approvals, source: :user
       has_many :approvers, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
@@ -66,6 +67,18 @@ module EE
       strong_memoize(:code_owners) do
         ::Gitlab::CodeOwners.for_merge_request(self).freeze
       end
+    end
+
+    def has_license_management_reports?
+      actual_head_pipeline&.has_license_management_reports?
+    end
+
+    def compare_license_management_reports
+      unless has_license_management_reports?
+        return { status: :error, status_reason: 'This merge request does not have license management reports' }
+      end
+
+      compare_reports(::Ci::CompareLicenseManagementReportsService)
     end
   end
 end

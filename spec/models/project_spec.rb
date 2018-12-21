@@ -137,48 +137,10 @@ describe Project do
     end
 
     describe 'ci_pipelines association' do
-      context 'when feature flag pipeline_ci_sources_only is enabled' do
-        it 'returns only pipelines from ci_sources' do
-          stub_feature_flags(pipeline_ci_sources_only: true)
+      it 'returns only pipelines from ci_sources' do
+        expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
 
-          expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
-
-          subject.ci_pipelines
-        end
-      end
-
-      context 'when feature flag pipeline_ci_sources_only is disabled' do
-        it 'returns all pipelines' do
-          stub_feature_flags(pipeline_ci_sources_only: false)
-
-          expect(Ci::Pipeline).not_to receive(:ci_sources).and_call_original
-          expect(Ci::Pipeline).to receive(:all).and_call_original.at_least(:once)
-
-          subject.ci_pipelines
-        end
-      end
-    end
-
-    describe 'ci_pipelines association' do
-      context 'when feature flag pipeline_ci_sources_only is enabled' do
-        it 'returns only pipelines from ci_sources' do
-          stub_feature_flags(pipeline_ci_sources_only: true)
-
-          expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
-
-          subject.ci_pipelines
-        end
-      end
-
-      context 'when feature flag pipeline_ci_sources_only is disabled' do
-        it 'returns all pipelines' do
-          stub_feature_flags(pipeline_ci_sources_only: false)
-
-          expect(Ci::Pipeline).not_to receive(:ci_sources).and_call_original
-          expect(Ci::Pipeline).to receive(:all).and_call_original.at_least(:once)
-
-          subject.ci_pipelines
-        end
+        subject.ci_pipelines
       end
     end
   end
@@ -2060,7 +2022,7 @@ describe Project do
     end
   end
 
-  describe '#latest_successful_builds_for' do
+  describe '#latest_successful_builds_for and #latest_successful_build_for' do
     def create_pipeline(status = 'success')
       create(:ci_pipeline, project: project,
                            sha: project.commit.sha,
@@ -2082,14 +2044,16 @@ describe Project do
       it 'gives the latest builds from latest pipeline' do
         pipeline1 = create_pipeline
         pipeline2 = create_pipeline
-        build1_p2 = create_build(pipeline2, 'test')
         create_build(pipeline1, 'test')
         create_build(pipeline1, 'test2')
+        build1_p2 = create_build(pipeline2, 'test')
         build2_p2 = create_build(pipeline2, 'test2')
 
         latest_builds = project.latest_successful_builds_for
+        single_build = project.latest_successful_build_for(build1_p2.name)
 
         expect(latest_builds).to contain_exactly(build2_p2, build1_p2)
+        expect(single_build).to eq(build1_p2)
       end
     end
 
@@ -2099,15 +2063,21 @@ describe Project do
       context 'standalone pipeline' do
         it 'returns builds for ref for default_branch' do
           builds = project.latest_successful_builds_for
+          single_build = project.latest_successful_build_for(build.name)
 
           expect(builds).to contain_exactly(build)
+          expect(single_build).to eq(build)
         end
 
-        it 'returns empty relation if the build cannot be found' do
+        it 'returns empty relation if the build cannot be found for #latest_successful_builds_for' do
           builds = project.latest_successful_builds_for('TAIL')
 
           expect(builds).to be_kind_of(ActiveRecord::Relation)
           expect(builds).to be_empty
+        end
+
+        it 'returns exception if the build cannot be found for #latest_successful_build_for' do
+          expect { project.latest_successful_build_for(build.name, 'TAIL') }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
 
@@ -2117,9 +2087,11 @@ describe Project do
         end
 
         it 'gives the latest build from latest pipeline' do
-          latest_build = project.latest_successful_builds_for
+          latest_builds = project.latest_successful_builds_for
+          last_single_build = project.latest_successful_build_for(build.name)
 
-          expect(latest_build).to contain_exactly(build)
+          expect(latest_builds).to contain_exactly(build)
+          expect(last_single_build).to eq(build)
         end
       end
     end
@@ -3984,7 +3956,7 @@ describe Project do
       expect(project.badges.count).to eq 3
     end
 
-    if Group.supports_nested_groups?
+    if Group.supports_nested_objects?
       context 'with nested_groups' do
         let(:parent_group) { create(:group) }
 
@@ -4392,6 +4364,29 @@ describe Project do
 
       it 'returns clusters for groups of this project' do
         expect(subject).to contain_exactly(cluster, group_cluster)
+      end
+    end
+  end
+
+  describe '#object_pool_params' do
+    let(:project) { create(:project, :repository, :public) }
+
+    subject { project.object_pool_params }
+
+    before do
+      stub_application_setting(hashed_storage_enabled: true)
+    end
+
+    context 'when the objects cannot be pooled' do
+      let(:project) { create(:project, :repository, :private) }
+
+      it { is_expected.to be_empty }
+    end
+
+    context 'when a pool is created' do
+      it 'returns that pool repository' do
+        expect(subject).not_to be_empty
+        expect(subject[:pool_repository]).to be_persisted
       end
     end
   end

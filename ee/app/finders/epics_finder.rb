@@ -30,6 +30,7 @@ class EpicsFinder < IssuableFinder
     items = by_timeframe(items)
     items = by_state(items)
     items = by_label(items)
+    items = by_parent(items)
 
     sort(items)
   end
@@ -55,10 +56,12 @@ class EpicsFinder < IssuableFinder
   private
 
   def count_key(value)
-    if Gitlab.rails5?
-      Array(value).last.to_sym
+    last_value = Array(value).last
+
+    if last_value.is_a?(Integer)
+      Epic.states.invert[last_value].to_sym
     else
-      Epic.states.invert[Array(value).last].to_sym
+      last_value.to_sym
     end
   end
 
@@ -85,6 +88,18 @@ class EpicsFinder < IssuableFinder
       .where('epics.end_date is NULL or epics.end_date >= ?', start_date)
   rescue ArgumentError
     items
+  end
+  # rubocop: enable CodeReuse/ActiveRecord
+
+  def parent_id?
+    params[:parent_id].present?
+  end
+
+  # rubocop: disable CodeReuse/ActiveRecord
+  def by_parent(items)
+    return items unless parent_id?
+
+    items.where(parent_id: params[:parent_id])
   end
   # rubocop: enable CodeReuse/ActiveRecord
 end
