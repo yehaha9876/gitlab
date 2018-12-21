@@ -1,9 +1,5 @@
 <script>
-<<<<<<< HEAD
-import { mapActions, mapState, mapGetters } from 'vuex';
-=======
 import { mapActions, mapState, mapGetters, mapMutations } from 'vuex';
->>>>>>> 6240-project-filter-for-gsd
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import Filters from './filters.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
@@ -68,7 +64,7 @@ export default {
           selected: false,
         })),
       ];
-      this.ADD_FILTER_OPTIONS({ filterId: 'project', options });
+      this.ADD_FILTER_OPTIONS({ filterId: 'project_id', options });
     },
   },
   created() {

@@ -53,7 +53,7 @@ export default () => ({
     },
     {
       name: 'Report type',
-      id: 'type',
+      id: 'report_type',
       options: [
         {
           name: 'SAST',
@@ -64,7 +64,7 @@ export default () => ({
     },
     {
       name: 'Project',
-      id: 'project',
+      id: 'project_id',
       options: [
         {
           name: 'All',
