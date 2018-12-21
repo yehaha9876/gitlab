@@ -1,5 +1,4 @@
 import CePipelineStore from '~/pipelines/stores/pipeline_store';
-import pipelinesKeys from '../constants';
 import mock from '../data.json';
 
 /**
@@ -41,11 +40,12 @@ export default class PipelineStore extends CePipelineStore {
 
           return Object.assign({}, triggered, {
             isCollapsed: oldPipeline ? oldPipeline.isCollapsed : true,
-
           });
         }),
       });
     }
+
+    // todo - handle polling & formatting in nested upstreams & downstreams
 
     super.storePipeline(pipeline);
   }
@@ -58,124 +58,17 @@ export default class PipelineStore extends CePipelineStore {
           return Object.assign({}, pipeline, { isCollapsed: !pipeline.isCollapsed });
         }
 
-        return Object.assign({}, pipeline, { isCollapsed: true });
+        return PipelineStore.parsePipeline(pipeline);
       });
     } else {
       // we need to recursively find the pipeline
     }
   }
 
-  static findPipeline(object, key, pipeline) {
-    return object[key].find(el => el.id === pipeline.id);
-  }
-
-  //
-  // Downstream pipeline's methods
-  //
-
   /**
-   * Called when the user clicks on a pipeline that was triggered by the main one.
+   * Adds isCollpased keys to the given pipeline
    *
-   * Resets isCollapsed and isLoading props for all triggered (downstream) pipelines
-   * Sets isLoading to true for the requested one.
-   *
-   * @param {Object} pipeline
-   */
-  requestTriggeredPipeline(pipeline) {
-    this.updateStoreOnRequest(pipelinesKeys.triggeredPipelines, pipeline);
-  }
-
-  /**
-   * Called when we receive success callback for the downstream pipeline requested.
-   *
-   * Updates loading state for the request pipeline
-   * Updates the visible pipeline with the response
-   *
-   * @param {Object} pipeline
-   * @param {Object} response
-   */
-  receiveTriggeredPipelineSuccess(pipeline, response) {
-    this.updatePipeline(
-      pipelinesKeys.triggeredPipelines,
-      pipeline,
-      { isLoading: false, isCollapsed: false },
-      pipelinesKeys.triggered,
-      response,
-    );
-  }
-
-  /**
-   * Called when we receive an error callback for the downstream pipeline requested
-   * Resets the loading state + collpased state
-   * Resets triggered pipeline
-   *
-   * @param {Object} pipeline
-   */
-  receiveTriggeredPipelineError(pipeline) {
-    this.updatePipeline(
-      pipelinesKeys.triggeredPipelines,
-      pipeline,
-      { isLoading: false, isCollapsed: true },
-      pipelinesKeys.triggered,
-      {},
-    );
-  }
-
-  //
-  // Upstream pipeline's methods
-  //
-
-  /**
-   * Called when the user clicks on the pipeline that triggered the main one.
-   *
-   * Handle the request for the upstream pipeline
-   * Updates the given pipeline with isLoading: true and iscollapsed: false
-   *
-   * @param {Object} pipeline
-   */
-  requestTriggeredByPipeline(pipeline) {
-    this.updateStoreOnRequest(pipelinesKeys.triggeredByPipelines, pipeline);
-  }
-
-  /**
-   * Success callback for the upstream pipeline received
-   *
-   * @param {Object} pipeline
-   * @param {Object} response
-   */
-  receiveTriggeredByPipelineSuccess(pipeline, response) {
-    this.updatePipeline(
-      pipelinesKeys.triggeredByPipelines,
-      pipeline,
-      { isLoading: false, isCollapsed: false },
-      pipelinesKeys.triggeredBy,
-      response,
-    );
-  }
-
-  /**
-   * Error callback for the upstream callback
-   * @param {Object} pipeline
-   */
-  receiveTriggeredByPipelineError(pipeline) {
-    this.updatePipeline(
-      pipelinesKeys.triggeredByPipelines,
-      pipeline,
-      { isLoading: false, isCollapsed: true },
-      pipelinesKeys.triggeredBy,
-      {},
-    );
-  }
-
-  //
-  // Common utils between upstream & dowsntream pipelines
-  //
-
-  /**
-   * Adds isLoading and isCollpased keys to the given pipeline
-   *
-   * Used to know when to render the spinning icon
-   * and the blue background when the pipeline is expanded.
+   * Used to know when to render the blue background and when the pipeline is expanded.
    *
    * @param {Object} pipeline
    * @returns {Object}
@@ -184,72 +77,5 @@ export default class PipelineStore extends CePipelineStore {
     return Object.assign({}, pipeline, {
       isCollapsed: true,
     });
-  }
-
-  /**
-   * Returns the index of the upstream/downstream that matches the given ID
-   *
-   * @param {Object} pipeline
-   * @returns {Number}
-   */
-  getPipelineIndex(storeKey, pipelineId) {
-    return this.state[storeKey].findIndex(triggered => triggered.id === pipelineId);
-  }
-
-  /**
-   * Updates the pipelines to reflect which one was requested.
-   * It sets isLoading to true and isCollapsed to false
-   *
-   * @param {String} storeKey which property to update: `triggeredPipelines|triggeredByPipelines`
-   * @param {Object} pipeline the requested pipeline
-   */
-  updateStoreOnRequest(storeKey, pipeline) {
-    this.state[storeKey] = this.state[storeKey].map(triggered => {
-      if (triggered.id === pipeline.id) {
-        return Object.assign({}, triggered, { isCollapsed: false });
-      }
-      // reset the others, in case another was one opened
-      return PipelineStore.parsePipeline(triggered);
-    });
-  }
-
-  /**
-   * Updates a single pipeline with the new props and the visible pipeline
-   * Used for success and error callbacks for both upstream and downstream requests.
-   *
-   * @param {String} storeKey Which array needs to be updated: `triggeredPipelines|triggeredByPipelines`
-   * @param {Object} pipeline Which pipeline should be updated
-   * @param {Object} props The new properties to be updated for the given pipeline
-   * @param {String} visiblePipelineKey Which visible pipeline needs to be updated: `triggered|triggeredBy`
-   * @param {Object} visiblePipeline The new visible pipeline value
-   */
-  updatePipeline(storeKey, pipeline, props, visiblePipelineKey, visiblePipeline = {}) {
-    this.state[storeKey].splice(
-      this.getPipelineIndex(storeKey, pipeline.id),
-      1,
-      Object.assign({}, pipeline, props),
-    );
-
-    this.state[visiblePipelineKey] = visiblePipeline;
-  }
-
-  /**
-   * When the user clicks on a non collapsed pipeline we need to close it
-   *
-   * @param {String} storeKey  Which array needs to be updated: `triggeredPipelines|triggeredByPipelines`
-   * @param {Object} pipeline Which pipeline should be updated
-   * @param {String} visiblePipelineKey Which visible pipeline needs to be updated: `triggered|triggeredBy`
-   */
-  closePipeline(storeKey, pipeline, visiblePipelineKey) {
-    this.updatePipeline(
-      storeKey,
-      pipeline,
-      {
-        isLoading: false,
-        isCollapsed: true,
-      },
-      visiblePipelineKey,
-      {},
-    );
   }
 }
