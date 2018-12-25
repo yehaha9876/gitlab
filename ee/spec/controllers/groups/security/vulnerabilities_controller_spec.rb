@@ -223,10 +223,23 @@ describe Groups::Security::VulnerabilitiesController do
 
           expect(response).to have_gitlab_http_status(200)
           expect(json_response).to be_an(Hash)
-          expect(json_response.dig('sast', 'high')).to eq(3)
-          expect(json_response.dig('dependency_scanning', 'low')).to eq(3)
-          expect(json_response.dig('dast', 'medium')).to eq(1)
+          expect(json_response['high']).to eq(3)
+          expect(json_response['low']).to eq(4)
+          expect(json_response['medium']).to eq(1)
           expect(response).to match_response_schema('vulnerabilities/summary', dir: 'ee')
+        end
+
+        context 'with enabled filters' do
+          it 'returns counts for filtered vulnerabilities' do
+            get :summary, group_id: group, report_type: %w[sast dast], severity: %[high low], format: :json
+
+            expect(response).to have_gitlab_http_status(200)
+            expect(json_response).to be_an(Hash)
+            expect(json_response['high']).to eq(3)
+            expect(json_response['low']).to eq(1)
+            expect(json_response['medium']).to eq(1)
+            expect(response).to match_response_schema('vulnerabilities/summary', dir: 'ee')
+          end
         end
       end
     end

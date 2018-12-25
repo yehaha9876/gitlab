@@ -3,25 +3,24 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
   HISTORY_RANGE = 3.months
 
   def index
-    @vulnerabilities = ::Security::VulnerabilitiesFinder.new(group: group, params: finder_params)
-      .execute
-      .ordered
-      .page(params[:page])
+    vulnerabilities = found_vulnerabilities.ordered.page(params[:page])
 
     respond_to do |format|
       format.json do
         render json: Vulnerabilities::OccurrenceSerializer
           .new(current_user: @current_user)
           .with_pagination(request, response)
-          .represent(@vulnerabilities, preload: true)
+          .represent(vulnerabilities, preload: true)
       end
     end
   end
 
   def summary
+    vulnerabilities = found_vulnerabilities.counted_by_severity
+
     respond_to do |format|
       format.json do
-        render json: VulnerabilitySummarySerializer.new.represent(group)
+        render json: VulnerabilitySummarySerializer.new.represent(vulnerabilities)
       end
     end
   end
@@ -40,5 +39,9 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
     raw = params.permit(:hide_dismissed, report_type: [], project_id: [], severity: [])
     raw[:hide_dismissed] = Gitlab::Utils.to_boolean(raw[:hide_dismissed]) if raw[:hide_dismissed]
     raw
+  end
+
+  def found_vulnerabilities
+    ::Security::VulnerabilitiesFinder.new(group: group, params: finder_params).execute
   end
 end
