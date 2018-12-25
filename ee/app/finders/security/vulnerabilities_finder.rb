@@ -10,7 +10,6 @@
 #     severity: Array<String>
 #     project: Array<String>
 #     report_type: Array<String>
-#     hide_dismissed: Boolean
 
 module Security
   class VulnerabilitiesFinder

@@ -135,6 +135,7 @@ describe Vulnerabilities::Occurrence do
 
     context 'with one param' do
       let(:param) { 0 }
+
       it 'returns found record' do
         is_expected.to contain_exactly(vulnerability_sast)
       end
@@ -142,6 +143,7 @@ describe Vulnerabilities::Occurrence do
 
     context 'with array of params' do
       let(:param) { [1, 3] }
+
       it 'returns found records' do
         is_expected.to contain_exactly(vulnerability_dast, vulnerability_depscan)
       end
@@ -149,8 +151,9 @@ describe Vulnerabilities::Occurrence do
 
     context 'without found record' do
       let(:param) { 2 }
+
       it 'returns empty collection' do
-        expect(subject.size).to eq(0)
+        is_expected.to be_empty
       end
     end
   end
@@ -163,6 +166,7 @@ describe Vulnerabilities::Occurrence do
 
     context 'with found record' do
       let(:param) { vulnerability1.project_id }
+
       it 'returns found record' do
         is_expected.to contain_exactly(vulnerability1)
       end
@@ -170,8 +174,8 @@ describe Vulnerabilities::Occurrence do
 
     context 'with empty param' do
       let(:param) { [] }
+
       it 'returns all records' do
-        expect(subject.size).to eq(2)
         is_expected.to contain_exactly(vulnerability1, vulnerability2)
       end
     end
@@ -185,6 +189,7 @@ describe Vulnerabilities::Occurrence do
 
     context 'with one param' do
       let(:param) { 4 }
+
       it 'returns found record' do
         is_expected.to contain_exactly(vulnerability_low)
       end
@@ -192,8 +197,9 @@ describe Vulnerabilities::Occurrence do
 
     context 'without found record' do
       let(:param) { 7 }
+
       it 'returns empty collection' do
-        expect(subject.size).to eq(0)
+        is_expected.to be_empty
       end
     end
   end
