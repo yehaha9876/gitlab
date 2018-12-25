@@ -1,18 +1,21 @@
 import Vue from 'vue';
 import issueItem from 'ee/related_issues/components/issue_item.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { dateInWords } from '~/lib/utils/datetime_utility'
 import { defaultMilestone, defaultAssignees } from '../mock_data';
 
 describe('issueItem', () => {
   let vm;
+  const dueDate = new Date();
+  dueDate.setFullYear(dueDate.getFullYear() + 1);
   const props = {
+    dueDate,
     idKey: 1,
     displayReference: 'gitlab-org/gitlab-test#1',
     pathIdSeparator: '#',
     path: `${gl.TEST_HOST}/path`,
     title: 'title',
     confidential: true,
-    dueDate: '2018-12-31',
     weight: 10,
     createdAt: '2018-12-01T00:00:00.00Z',
     milestone: defaultMilestone,
@@ -127,15 +130,16 @@ describe('issueItem', () => {
       const dueDateEl = tokenMetadata.querySelector('.item-due-date time');
 
       expect(dueDateIconEl.getAttribute('xlink:href')).toContain('calendar');
-      expect(dueDateEl.innerText.trim()).toContain('Dec 31');
+      expect(dueDateEl.innerText.trim()).toContain(dateInWords(dueDate, true, false));
+
     });
 
     it('renders weight icon and value', () => {
-      const dueDateIconEl = tokenMetadata.querySelector('.item-weight svg use');
-      const dueDateEl = tokenMetadata.querySelector('.item-weight span');
+      const weightIconEl = tokenMetadata.querySelector('.item-weight svg use');
+      const weightEl = tokenMetadata.querySelector('.item-weight span');
 
-      expect(dueDateIconEl.getAttribute('xlink:href')).toContain('weight');
-      expect(dueDateEl.innerText.trim()).toContain('10');
+      expect(weightIconEl.getAttribute('xlink:href')).toContain('weight');
+      expect(weightEl.innerText.trim()).toContain('10');
     });
   });
 
