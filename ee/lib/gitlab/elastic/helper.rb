@@ -3,42 +3,46 @@
 module Gitlab
   module Elastic
     class Helper
+      RESOURCES = [
+        Project,
+        Issue,
+        MergeRequest,
+        Snippet,
+        Note,
+        Milestone,
+        ProjectWiki,
+        Repository
+      ]
+
       # rubocop: disable CodeReuse/ActiveRecord
       def self.create_empty_index
-        index_name = Project.index_name
-        settings = {}
-        mappings = {}
 
-        [
-          Project,
-          Issue,
-          MergeRequest,
-          Snippet,
-          Note,
-          Milestone,
-          ProjectWiki,
-          Repository
-        ].each do |klass|
+        settings = {}
+
+        RESOURCES.each do |klass|
           settings.deep_merge!(klass.settings.to_hash)
-          mappings.deep_merge!(klass.mappings.to_hash)
         end
 
         client = Project.__elasticsearch__.client
 
-        # ES5.6 needs a setting enabled to support JOIN datatypes that ES6 does not support...
-        if Gitlab::VersionInfo.parse(client.info['version']['number']) < Gitlab::VersionInfo.new(6)
-          settings['index.mapping.single_type'] = true
-        end
+        RESOURCES.each do |klass|
+          index_name = klass.index_name
 
-        if client.indices.exists? index: index_name
-          client.indices.delete index: index_name
-        end
+          # ES5.6 needs a setting enabled to support JOIN datatypes that ES6 does not support...
+          if Gitlab::VersionInfo.parse(client.info['version']['number']) < Gitlab::VersionInfo.new(6)
+            settings['index.mapping.single_type'] = true
+          end
 
-        client.indices.create index: index_name,
-                              body: {
-                                settings: settings.to_hash,
-                                mappings: mappings.to_hash
-                              }
+          if client.indices.exists? index: index_name
+            client.indices.delete index: index_name
+          end
+
+          client.indices.create index: index_name,
+                                body: {
+                                  settings: settings.to_hash,
+                                  mappings: klass.mappings.to_hash
+                                }
+        end
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
@@ -47,7 +51,22 @@ module Gitlab
       end
 
       def self.refresh_index
-        Project.__elasticsearch__.refresh_index!
+        RESOURCES.each do |cls|
+          cls.__elasticsearch__.refresh_index!
+        end
+      end
+
+      def self.index_size
+        sum = 0
+
+        RESOURCES.each do |r|
+          index = r.__elasticsearch__.index_name
+          size_bytes = r.__elasticsearch__.client.indices.stats['indices'][index]['total']['store']['size_in_bytes']
+          pp [index, size_bytes]
+          sum += size_bytes
+        end
+
+        pp sum
       end
 
       def self.index_size

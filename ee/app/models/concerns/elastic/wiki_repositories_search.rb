@@ -7,7 +7,7 @@ module Elastic
     included do
       include Elasticsearch::Git::Repository
 
-      index_name [Rails.application.class.parent_name.downcase, Rails.env].join('-')
+      index_name [Rails.application.class.parent_name.downcase, self.name.downcase, Rails.env].join('-')
 
       def repository_id
         "wiki_#{project.id}"

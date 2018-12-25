@@ -7,6 +7,38 @@ module Elastic
     included do
       include ApplicationSearch
 
+      # Since we can't have multiple types in ES6, but want to be able to use JOINs, we must declare all our
+      # fields together instead of per model
+      mappings do
+        ### Shared fields
+        indexes :id, type: :integer
+        indexes :created_at, type: :date
+        indexes :updated_at, type: :date
+
+        # ES6 requires a single type per index, so we implement our own "type"
+        indexes :type, type: :keyword
+
+        indexes :iid, type: :integer
+
+        indexes :title, type: :text,
+                        index_options: 'offsets'
+        indexes :description, type: :text,
+                              index_options: 'offsets'
+        indexes :state, type: :text
+        indexes :project_id, type: :integer
+        indexes :author_id, type: :integer
+
+        ### ISSUES
+        indexes :confidential, type: :boolean
+
+        # The field assignee_id does not exist in issues table anymore.
+        # Nevertheless we'll keep this field as is because we don't want users to rebuild index
+        # + the ES treats arrays transparently so
+        # to any integer field you can write any array of integers and you don't have to change mapping.
+        # More over you can query those items just like a single integer value.
+        indexes :assignee_id, type: :integer
+      end
+
       def as_indexed_json(options = {})
         data = {}
 

@@ -61,7 +61,7 @@ module Gitlab
         command = ::Gitlab::GitalyClient::StorageSettings.allow_disk_access do
           [path_to_indexer, project.id.to_s, repository.path_to_repo]
         end
-        vars = @vars.merge('FROM_SHA' => from_sha, 'TO_SHA' => to_sha)
+        vars = @vars.merge('FROM_SHA' => from_sha, 'TO_SHA' => to_sha, 'INDEX_NAME' => 'project')
 
         output, status = Gitlab::Popen.popen(command, nil, vars)
 

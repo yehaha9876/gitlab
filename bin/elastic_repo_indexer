@@ -34,6 +34,7 @@ REPO_PATH = ARGV.shift
 FROM_SHA = ENV['FROM_SHA']
 TO_SHA = ENV['TO_SHA']
 RAILS_ENV = ENV['RAILS_ENV']
+INDEX_NAME = ENV['INDEX_NAME']
 
 # Symbols get stringified when passed through JSON
 elastic = {}
@@ -45,7 +46,7 @@ LOGGER.info("Has been scheduled for project #{REPO_PATH} with SHA range #{FROM_S
 class Repository
   include Elasticsearch::Git::Repository
 
-  index_name ['gitlab', RAILS_ENV].compact.join('-')
+  index_name ['gitlab', INDEX_NAME, RAILS_ENV].compact.join('-')
 
   def initialize
     self.__elasticsearch__.client = ::Gitlab::Elastic::Client.build(ELASTIC_CONFIG)

@@ -7,7 +7,77 @@ module Elastic
     included do
       include Elasticsearch::Git::Repository
 
-      index_name [Rails.application.class.parent_name.downcase, Rails.env].join('-')
+      index_name [Rails.application.class.parent_name.downcase, self.name.downcase, Rails.env].join('-')
+
+      # Since we can't have multiple types in ES6, but want to be able to use JOINs, we must declare all our
+      # fields together instead of per model
+      mappings do
+        ### Shared fields
+        indexes :id, type: :integer
+        indexes :created_at, type: :date
+        indexes :updated_at, type: :date
+
+        # ES6 requires a single type per index, so we implement our own "type"
+        indexes :type, type: :keyword
+
+        indexes :iid, type: :integer
+
+        indexes :title, type: :text,
+                        index_options: 'offsets'
+        indexes :description, type: :text,
+                              index_options: 'offsets'
+        indexes :state, type: :text
+        indexes :project_id, type: :integer
+        indexes :author_id, type: :integer
+
+        ### REPOSITORIES
+        indexes :blob do
+          indexes :id, type: :text,
+                       index_options: 'offsets',
+                       analyzer: :sha_analyzer
+          indexes :rid, type: :keyword
+          indexes :oid, type: :text,
+                        index_options: 'offsets',
+                        analyzer: :sha_analyzer
+          indexes :commit_sha, type: :text,
+                               index_options: 'offsets',
+                               analyzer: :sha_analyzer
+          indexes :path, type: :text,
+                         analyzer: :path_analyzer
+          indexes :file_name, type: :text,
+                              analyzer: :code_analyzer,
+                              search_analyzer: :code_search_analyzer
+          indexes :content, type: :text,
+                            index_options: 'offsets',
+                            analyzer: :code_analyzer,
+                            search_analyzer: :code_search_analyzer
+          indexes :language, type: :keyword
+        end
+
+        indexes :commit do
+          indexes :id, type: :text,
+                       index_options: 'offsets',
+                       analyzer: :sha_analyzer
+          indexes :rid, type: :keyword
+          indexes :sha, type: :text,
+                        index_options: 'offsets',
+                        analyzer: :sha_analyzer
+
+          indexes :author do
+            indexes :name, type: :text, index_options: 'offsets'
+            indexes :email, type: :text, index_options: 'offsets'
+            indexes :time, type: :date, format: :basic_date_time_no_millis
+          end
+
+          indexes :commiter do
+            indexes :name, type: :text, index_options: 'offsets'
+            indexes :email, type: :text, index_options: 'offsets'
+            indexes :time, type: :date, format: :basic_date_time_no_millis
+          end
+
+          indexes :message, type: :text, index_options: 'offsets'
+        end
+      end
 
       def repository_id
         project.id

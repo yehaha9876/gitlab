@@ -15,6 +15,53 @@ module Elastic
     included do
       include ApplicationSearch
 
+      # Since we can't have multiple types in ES6, but want to be able to use JOINs, we must declare all our
+      # fields together instead of per model
+      mappings do
+        ### Shared fields
+        indexes :id, type: :integer
+        indexes :created_at, type: :date
+        indexes :updated_at, type: :date
+
+        # ES6 requires a single type per index, so we implement our own "type"
+        indexes :type, type: :keyword
+
+        indexes :iid, type: :integer
+
+        indexes :title, type: :text,
+                        index_options: 'offsets'
+        indexes :description, type: :text,
+                              index_options: 'offsets'
+        indexes :state, type: :text
+        indexes :project_id, type: :integer
+        indexes :author_id, type: :integer
+
+        ## Projects and Snippets
+        indexes :visibility_level, type: :integer
+
+        ### PROJECTS
+        indexes :name, type: :text,
+                       index_options: 'offsets'
+        indexes :path, type: :text,
+                       index_options: 'offsets'
+        indexes :name_with_namespace, type: :text,
+                                      index_options: 'offsets',
+                                      analyzer: :my_ngram_analyzer
+        indexes :path_with_namespace, type: :text,
+                                      index_options: 'offsets'
+        indexes :namespace_id, type: :integer
+        indexes :archived, type: :boolean
+
+        indexes :issues_access_level, type: :integer
+        indexes :merge_requests_access_level, type: :integer
+        indexes :snippets_access_level, type: :integer
+        indexes :wiki_access_level, type: :integer
+        indexes :repository_access_level, type: :integer
+
+        indexes :last_activity_at, type: :date
+        indexes :last_pushed_at, type: :date
+      end
+
       def as_indexed_json(options = {})
         # We don't use as_json(only: ...) because it calls all virtual and serialized attributtes
         # https://gitlab.com/gitlab-org/gitlab-ee/issues/349
@@ -36,9 +83,6 @@ module Elastic
         ].each do |attr|
           data[attr.to_s] = safely_read_attribute_for_elasticsearch(attr)
         end
-
-        # Set it as a parent in our `project => child` JOIN field
-        data['join_field'] = es_type
 
         # ES6 is now single-type per index, so we implement our own typing
         data['type'] = 'project'

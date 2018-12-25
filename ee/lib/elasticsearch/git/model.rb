@@ -18,8 +18,6 @@ module Elasticsearch
 
         index_name [self.name.downcase, 'index', env].compact.join('-')
 
-        document_type 'doc'
-
         settings \
           index: {
           analysis: {

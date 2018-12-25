@@ -78,10 +78,9 @@ module Elasticsearch
 
           {
             delete: {
-              _index: "#{self.class.index_name}",
-              _type: 'doc',
+              _index: "gitlab-repository-development", # FIXME
+              _type: self.class.name.underscore,
               _id: "#{repository_id}_#{blob.path}",
-              routing: es_parent
             }
           }
         end
@@ -91,10 +90,9 @@ module Elasticsearch
 
           {
             index:  {
-              _index: "#{self.class.index_name}",
-              _type: 'doc',
+              _index: "gitlab-repository-development", # FIXME  
+              _type: self.class.name.underscore,
               _id: "#{repository_id}_#{blob.path}",
-              routing: es_parent,
               data: {
                 blob: {
                   oid: blob.id,
@@ -114,12 +112,7 @@ module Elasticsearch
                   # fill in the right language.
                   language: nil
                 },
-                type: es_type,
-                join_field: {
-                  'name' => es_type,
-                  'parent' => es_parent
-
-                }
+                type: es_type
               }
             }
           }
@@ -176,15 +169,15 @@ module Elasticsearch
         end
 
         def index_commit(commit)
+          pp "repo:commit: type: #{self.class.name.underscore}"
           author    = commit.author
           committer = commit.committer
 
           {
             index:  {
-              _index: "#{self.class.index_name}",
-              _type: 'doc',
+              _index: "gitlab-repository-development", # FIXME
+              _type: self.class.name.underscore,
               _id: "#{repository_id}_#{commit.oid}",
-              routing: es_parent,
               data: {
                 commit: {
                   rid: repository_id,
@@ -201,11 +194,7 @@ module Elasticsearch
                   },
                   message: encode!(commit.message)
                 },
-                type: 'commit',
-                join_field: {
-                  'name' => 'commit',
-                  'parent' => es_parent
-                }
+                type: 'commit'
               }
             }
           }

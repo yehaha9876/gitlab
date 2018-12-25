@@ -7,6 +7,43 @@ module Elastic
     included do
       include ApplicationSearch
 
+      # Since we can't have multiple types in ES6, but want to be able to use JOINs, we must declare all our
+      # fields together instead of per model
+      mappings do
+        ### Shared fields
+        indexes :id, type: :integer
+        indexes :created_at, type: :date
+        indexes :updated_at, type: :date
+
+        # ES6 requires a single type per index, so we implement our own "type"
+        indexes :type, type: :keyword
+
+        indexes :iid, type: :integer
+
+        indexes :title, type: :text,
+                        index_options: 'offsets'
+        indexes :description, type: :text,
+                              index_options: 'offsets'
+        indexes :state, type: :text
+        indexes :project_id, type: :integer
+        indexes :author_id, type: :integer
+
+        ### NOTES
+        indexes :note, type: :text,
+                       index_options: 'offsets'
+
+        indexes :issue do
+          indexes :assignee_id, type: :integer
+          indexes :author_id, type: :integer
+          indexes :confidential, type: :boolean
+        end
+
+        # ES6 gets rid of "index: :not_analyzed" option, but a keyword type behaves the same
+        # as it is not analyzed and is only searchable by its exact value.
+        indexes :noteable_type, type: :keyword
+        indexes :noteable_id, type: :keyword
+      end
+
       def self.inherited(subclass)
         super
 
