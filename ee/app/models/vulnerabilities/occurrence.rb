@@ -85,6 +85,12 @@ module Vulnerabilities
         .order('day')
     end
 
+    def self.not_dismissed(project_ids:, report_types:)
+      where.not(project_fingerprint: Vulnerabilities::Feedback.dismissal
+                                       .where(project_id: project_ids, category: report_types)
+                                       .pluck(:project_fingerprint))
+    end
+
     def feedback(feedback_type:)
       params = {
         project_id: project_id,

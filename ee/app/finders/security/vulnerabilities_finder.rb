@@ -10,6 +10,7 @@
 #     severity: Array<String>
 #     project: Array<String>
 #     report_type: Array<String>
+#     hide_dismissed: Boolean
 
 module Security
   class VulnerabilitiesFinder
@@ -26,6 +27,7 @@ module Security
       collection = by_report_type(collection)
       collection = by_project(collection)
       collection = by_severity(collection)
+      collection = by_dismissed(collection)
       collection
     end
 
@@ -52,5 +54,14 @@ module Security
         Vulnerabilities::Occurrence::LEVELS.values_at(
           *params[:severity]).compact)
     end
+
+    def by_dismissed(items)
+      return items unless params[:hide_dismissed].present?
+
+      projects = params[:project_id].present? ? params[:project_id] : items.pluck(:project_id)
+      report_types = params[:report_type].present? ? params[:report_type] : items.pluck(:report_type)
+      items.not_dismissed(project_ids: projects, report_types: report_types)
+    end
+
   end
 end
