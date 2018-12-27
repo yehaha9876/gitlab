@@ -38,7 +38,11 @@ export default class FeatureFlagsService {
       ...resp,
       data: {
         ...resp.data,
-        features,
+        features: features.map(feature => ({
+          ...feature,
+          editUrl: `feature_flags/${feature.id}/edit`,
+          deleteUrl: `feature_flags/${feature.id}`
+        })),
         count: {
           'all': '26',
           'enabled': '7',

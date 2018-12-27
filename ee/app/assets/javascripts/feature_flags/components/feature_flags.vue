@@ -18,14 +18,6 @@ export default {
       type: Object,
       required: true,
     },
-    canDeleteFeatureFlag: {
-      type: Boolean,
-      required: true,
-    },
-    canUpdateFeatureFlag: {
-      type: Boolean,
-      required: true,
-    },
     endpoint: {
       type: String,
       required: true,
@@ -34,11 +26,7 @@ export default {
       type: String,
       required: true,
     },
-    projectId: {
-      type: String,
-      required: true,
-    },
-    test: {
+    csrfToken: {
       type: String,
       required: true,
     },
@@ -120,11 +108,7 @@ export default {
     />
 
     <div v-else-if="shouldRenderTable" class="table-holder">
-      <feature-flags-table
-        :can-delete-feature-flag="canDeleteFeatureFlag"
-        :can-update-feature-flag="canUpdateFeatureFlag"
-        :feature-flags="state.featureFlags"
-      />
+      <feature-flags-table :csrf-token="csrfToken" :feature-flags="state.featureFlags"/>
     </div>
 
     <table-pagination

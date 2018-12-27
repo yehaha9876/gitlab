@@ -2,6 +2,7 @@ import Vue from 'vue';
 import FeatureFlagsStore from '../../../feature_flags/store/feature_flags_store';
 import FeatureFlagsComponent from '../../../feature_flags/components/feature_flags.vue';
 import Translate from '../../../../../../../app/assets/javascripts/vue_shared/translate';
+import csrf from '~/lib/utils/csrf';
 
 Vue.use(Translate);
 
@@ -25,12 +26,9 @@ document.addEventListener(
       return createElement('feature-flags-component', {
         props: {
           store: this.store,
-          canDeleteFeatureFlag: this.dataset.canDeleteFeatureFlag,
-          canUpdateFeatureFlag: this.dataset.canUpdateFeatureFlag,
           endpoint: this.dataset.endpoint,
           instanceId: this.dataset.instanceId,
-          projectId: this.dataset.projectId,
-          test: this.dataset.test,
+          csrfToken: csrf.token,
         },
       });
     },

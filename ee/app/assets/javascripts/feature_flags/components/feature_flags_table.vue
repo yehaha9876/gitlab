@@ -1,9 +1,11 @@
 <script>
+import DeleteFeatureFlag from './delete_feature_flag.vue';
 import { GlButton, GlLink, GlTooltipDirective } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 export default {
   components: {
+    DeleteFeatureFlag,
     GlButton,
     GlLink,
     Icon,
@@ -12,12 +14,8 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   props: {
-    canDeleteFeatureFlag: {
-      type: Boolean,
-      required: true,
-    },
-    canUpdateFeatureFlag: {
-      type: Boolean,
+    csrfToken: {
+      type: String,
       required: true,
     },
     featureFlags: {
@@ -28,7 +26,7 @@ export default {
 };
 </script>
 <template>
-  <div class="table-holder border-top">
+  <div class="table-holder">
     <div class="gl-responsive-table-row table-row-header" role="row">
       <div class="table-section section-10" role="columnheader">{{ s__('FeatureFlags|Status') }}</div>
       <div
@@ -61,19 +59,22 @@ export default {
 
         <div class="table-section section-40 table-button-footer" role="gridcell">
           <div class="table-action-buttons btn-group">
-            <template v-if="canUpdateFeatureFlag">
+            <template v-if="featureFlag.editUrl">
               <gl-button
-                :href="`feature_flags/${featureFlag.id}/edit`"
+                :href="featureFlag.editUrl"
                 variant="outline-primary"
                 v-gl-tooltip.hover.bottom="__('Edit')"
               >
                 <icon name="pencil" :size="16"/>
               </gl-button>
             </template>
-            <template v-if="canDeleteFeatureFlag">
-              <gl-button variant="danger" v-gl-tooltip.hover.bottom="__('Delete')">
-                <icon name="remove" :size="16"/>
-              </gl-button>
+            <template v-if="featureFlag.deleteUrl">
+              <delete-feature-flag
+                :delete-feature-flag-url="featureFlag.deleteUrl"
+                :feature-flag-name="featureFlag.name"
+                :modal-id="`delete-feature-flag-${i}`"
+                :csrf-token="csrfToken"
+              />
             </template>
           </div>
         </div>
