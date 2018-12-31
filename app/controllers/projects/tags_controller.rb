@@ -43,22 +43,9 @@ class Projects::TagsController < Projects::ApplicationController
 
   def create
     result = ::Tags::CreateService.new(@project, current_user)
-      .execute(params[:tag_name], params[:ref], params[:message])
+      .execute(params[:tag_name], params[:ref], params[:message], params[:release_description])
 
     if result[:status] == :success
-      # Release creation with Tags was deprecated in GitLab 11.7
-      if params[:release_description].present?
-        release_params = {
-          tag: params[:tag_name],
-          name: params[:tag_name],
-          description: params[:release_description]
-        }
-
-        Releases::CreateService
-          .new(@project, current_user, release_params)
-          .execute
-      end
-
       @tag = result[:tag]
 
       redirect_to project_tag_path(@project, @tag.name)

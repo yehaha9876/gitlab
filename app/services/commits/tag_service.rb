@@ -9,10 +9,11 @@ module Commits
 
       tag_name = params[:tag_name]
       message = params[:tag_message]
+      release_description = nil
 
       result = Tags::CreateService
         .new(commit.project, current_user)
-        .execute(tag_name, commit.sha, message)
+        .execute(tag_name, commit.sha, message, release_description)
 
       if result[:status] == :success
         tag = result[:tag]

@@ -1,9 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Release do
-  let(:user)    { create(:user) }
-  let(:project) { create(:project, :public, :repository) }
-  let(:release) { create(:release, project: project, author: user) }
+  let(:release) { create(:release) }
 
   it { expect(release).to be_valid }
 
