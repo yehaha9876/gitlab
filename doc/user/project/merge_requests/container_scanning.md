@@ -13,7 +13,7 @@ a Vulnerability Static Analysis tool for containers.
 
 You can take advantage of Container Scanning by either [including the CI job](../../../ci/examples/container_scanning.md) in
 your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto Container Scanning](../../../topics/autodevops/index.md#auto-container-scanning)
+[Auto Container Scanning](../../../topics/autodevops/index.md#auto-container-scanning-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 Going a step further, GitLab can show the vulnerability list right in the merge
