@@ -4,6 +4,7 @@ import FeatureFlagsService from '../services/feature_flags_service';
 import featureFlagsMixin from '../mixins/feature_flags';
 import { __ } from '../../../../../../app/assets/javascripts/locale';
 import NavigationTabs from '../../../../../../app/assets/javascripts/vue_shared/components/navigation_tabs.vue';
+import TablePagination from '../../../../../../app/assets/javascripts/vue_shared/components/table_pagination.vue';
 import { getParameterByName } from '../../../../../../app/assets/javascripts/lib/utils/common_utils';
 import CIPaginationMixin from '../../../../../../app/assets/javascripts/vue_shared/mixins/ci_pagination_api_mixin';
 
@@ -11,6 +12,7 @@ export default {
   components: {
     FeatureFlagsTable,
     NavigationTabs,
+    TablePagination,
   },
   mixins: [featureFlagsMixin, CIPaginationMixin],
   props: {
@@ -19,10 +21,6 @@ export default {
       required: true,
     },
     endpoint: {
-      type: String,
-      required: true,
-    },
-    instanceId: {
       type: String,
       required: true,
     },
@@ -47,6 +45,13 @@ export default {
     disabled: 'disabled',
   },
   computed: {
+    shouldRenderPagination() {
+      return (
+        !this.isLoading &&
+        this.state.featureFlags.length &&
+        this.state.pageInfo.total > this.state.pageInfo.perPage
+      );
+    },
     shouldRenderTable() {
       return !this.isLoading && this.state.featureFlags.length > 0 && !this.hasError;
     },
@@ -81,7 +86,7 @@ export default {
   },
   created() {
     this.service = new FeatureFlagsService(this.endpoint);
-    this.requestData = { scope: this.scope, page: this.page, instance_id: this.instanceId };
+    this.requestData = { scope: this.scope, page: this.page };
   },
 };
 </script>

@@ -11,24 +11,20 @@ export default class FeatureFlagsService {
   }
 
   getFeatureFlags(data = {}) {
-    const {
-      CancelToken
-    } = axios;
+    const { CancelToken } = axios;
 
     this.cancelationSource = CancelToken.source();
 
-    return axios.get(`${this.endpoint}/features`, {
+    return axios.get(this.endpoint, {
       params: data,
       cancelToken: this.cancelationSource.token,
-    }).then(resp => this.temporary(resp, data));
+    });
   }
 
   // Using this to stub out some extra response data
   // eslint-disable-next-line class-methods-use-this
   temporary(resp, params) {
-    let {
-      features
-    } = resp.data;
+    let { features } = resp.data;
     if (params.scope === 'enabled') {
       features = features.filter(feature => feature.enabled);
     } else if (params.scope === 'disabled') {
@@ -41,12 +37,12 @@ export default class FeatureFlagsService {
         features: features.map(feature => ({
           ...feature,
           editUrl: `feature_flags/${feature.id}/edit`,
-          deleteUrl: `feature_flags/${feature.id}`
+          deleteUrl: `feature_flags/${feature.id}`,
         })),
         count: {
-          'all': '26',
-          'enabled': '7',
-          'disabled': '19',
+          all: '26',
+          enabled: '7',
+          disabled: '19',
         },
       },
       headers: {

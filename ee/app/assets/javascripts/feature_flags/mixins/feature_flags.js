@@ -32,9 +32,7 @@ export default {
      *  - Update the internal state
      */
     updateContent(parameters) {
-      this.updateInternalState({ ...parameters,
-        instance_id: this.instanceId
-      });
+      this.updateInternalState(parameters);
 
       // fetch new data
       return this.getFeatureFlags();
@@ -53,7 +51,7 @@ export default {
     successCallback(resp) {
       this.store.storeCount(resp.data.count);
       this.store.storePagination(resp.headers);
-      this.setCommonData(resp.data.features);
+      this.setCommonData(resp.data);
     },
     errorCallback() {
       this.isLoading = false;

@@ -40,7 +40,7 @@ export default {
         <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
           <div class="table-mobile-content">
-            <template v-if="featureFlag.enabled">
+            <template v-if="featureFlag.active">
               <span class="badge badge-success">{{ s__('FeatureFlags|Active') }}</span>
             </template>
             <template v-else>
@@ -59,18 +59,18 @@ export default {
 
         <div class="table-section section-40 table-button-footer" role="gridcell">
           <div class="table-action-buttons btn-group">
-            <template v-if="featureFlag.editUrl">
+            <template v-if="featureFlag.edit_path">
               <gl-button
-                :href="featureFlag.editUrl"
+                :href="featureFlag.edit_path"
                 variant="outline-primary"
                 v-gl-tooltip.hover.bottom="__('Edit')"
               >
                 <icon name="pencil" :size="16"/>
               </gl-button>
             </template>
-            <template v-if="featureFlag.deleteUrl">
+            <template v-if="featureFlag.destroy_path">
               <delete-feature-flag
-                :delete-feature-flag-url="featureFlag.deleteUrl"
+                :delete-feature-flag-url="featureFlag.destroy_path"
                 :feature-flag-name="featureFlag.name"
                 :modal-id="`delete-feature-flag-${i}`"
                 :csrf-token="csrfToken"

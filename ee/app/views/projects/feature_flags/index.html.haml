@@ -15,5 +15,4 @@
   -# = render 'table'
 
 %div
-  #feature-flags-vue{ data: { endpoint: unleash_api_url(@project),
-    "instance-id" => unleash_api_instance_id(@project) } }
+  #feature-flags-vue{ data: { endpoint: project_feature_flags_path(@project, format: :json) } }

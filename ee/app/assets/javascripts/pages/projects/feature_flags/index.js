@@ -27,7 +27,6 @@ document.addEventListener(
         props: {
           store: this.store,
           endpoint: this.dataset.endpoint,
-          instanceId: this.dataset.instanceId,
           csrfToken: csrf.token,
         },
       });
