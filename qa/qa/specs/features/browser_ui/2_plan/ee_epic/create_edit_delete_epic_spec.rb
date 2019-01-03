@@ -54,8 +54,8 @@ module QA
 
         epic.visit!
 
-        expect(page).to have_content("added issue", count: 2, wait: 5)
-        expect(page).to have_content("removed issue", count: 2, wait: 5)
+        expect(page).to have_content("added issue", count: 2, wait: 15)
+        expect(page).to have_content("removed issue", count: 2, wait: 15)
 
         # Close Epic
         EE::Page::Group::Epic::Show.act { close_reopen_epic }
