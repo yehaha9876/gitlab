@@ -58,8 +58,8 @@ module Security
     def by_dismissed(items)
       return items unless params[:hide_dismissed].present?
 
-      projects = params[:project_id].present? ? params[:project_id] : items.pluck(:project_id)
-      report_types = params[:report_type].present? ? params[:report_type] : items.pluck(:report_type)
+      projects = params[:project_id].present? ? params[:project_id] : items.pluck(:project_id).uniq
+      report_types = params[:report_type].present? ? params[:report_type] : items.pluck(:report_type).uniq
       items.not_dismissed(project_ids: projects, report_types: report_types)
     end
 
