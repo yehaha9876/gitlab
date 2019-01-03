@@ -30,19 +30,6 @@ describe Projects::MergeRequestsController do
     end
   end
 
-  shared_examples "loads labels" do |action|
-    it "loads labels into the @labels variable" do
-      get action,
-          params: {
-            namespace_id: project.namespace.to_param,
-            project_id: project,
-            id: merge_request.iid
-          },
-          format: 'html'
-      expect(assigns(:labels)).not_to be_nil
-    end
-  end
-
   describe "GET show" do
     def go(extra_params = {})
       params = {
@@ -53,8 +40,6 @@ describe Projects::MergeRequestsController do
 
       get :show, params: params.merge(extra_params)
     end
-
-    it_behaves_like "loads labels", :show
 
     describe 'as html' do
       context 'when diff files were cleaned' do
@@ -952,6 +937,70 @@ describe Projects::MergeRequestsController do
           post_rebase
 
           expect(response.status).to eq(200)
+        end
+      end
+    end
+  end
+
+  describe 'GET discussions' do
+    context 'when authenticated' do
+      before do
+        project.add_developer(user)
+        sign_in(user)
+      end
+
+      it 'returns 200' do
+        get :discussions, namespace_id: project.namespace, project_id: project, id: merge_request.iid
+
+        expect(response.status).to eq(200)
+      end
+
+      context 'highlight preloading' do
+        context 'with commit diff notes' do
+          let!(:commit_diff_note) do
+            create(:diff_note_on_commit, project: merge_request.project)
+          end
+
+          it 'preloads notes diffs highlights' do
+            expect_next_instance_of(Gitlab::DiscussionsDiff::FileCollection) do |collection|
+              note_diff_file = commit_diff_note.note_diff_file
+
+              expect(collection).to receive(:load_highlight).with([note_diff_file.id]).and_call_original
+              expect(collection).to receive(:find_by_id).with(note_diff_file.id).and_call_original
+            end
+
+            get :discussions, namespace_id: project.namespace, project_id: project, id: merge_request.iid
+          end
+        end
+
+        context 'with diff notes' do
+          let!(:diff_note) do
+            create(:diff_note_on_merge_request, noteable: merge_request, project: merge_request.project)
+          end
+
+          it 'preloads notes diffs highlights' do
+            expect_next_instance_of(Gitlab::DiscussionsDiff::FileCollection) do |collection|
+              note_diff_file = diff_note.note_diff_file
+
+              expect(collection).to receive(:load_highlight).with([note_diff_file.id]).and_call_original
+              expect(collection).to receive(:find_by_id).with(note_diff_file.id).and_call_original
+            end
+
+            get :discussions, namespace_id: project.namespace, project_id: project, id: merge_request.iid
+          end
+
+          it 'does not preload highlights when diff note is resolved' do
+            Notes::ResolveService.new(diff_note.project, user).execute(diff_note)
+
+            expect_next_instance_of(Gitlab::DiscussionsDiff::FileCollection) do |collection|
+              note_diff_file = diff_note.note_diff_file
+
+              expect(collection).to receive(:load_highlight).with([]).and_call_original
+              expect(collection).to receive(:find_by_id).with(note_diff_file.id).and_call_original
+            end
+
+            get :discussions, namespace_id: project.namespace, project_id: project, id: merge_request.iid
+          end
         end
       end
     end

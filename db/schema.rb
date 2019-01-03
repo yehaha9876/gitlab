@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181218192239) do
+ActiveRecord::Schema.define(version: 20181220165848) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -212,6 +212,7 @@ ActiveRecord::Schema.define(version: 20181218192239) do
     t.integer "diff_max_patch_bytes", default: 102400, null: false
     t.integer "archive_builds_in_seconds"
     t.string "commit_email_hostname"
+    t.boolean "protected_ci_variables", default: false, null: false
     t.string "runners_registration_token_encrypted"
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
@@ -833,6 +834,8 @@ ActiveRecord::Schema.define(version: 20181218192239) do
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
     t.datetime_with_timezone "last_update_started_at"
+    t.string "encrypted_alert_manager_token"
+    t.string "encrypted_alert_manager_token_iv"
     t.index ["cluster_id"], name: "index_clusters_applications_prometheus_on_cluster_id", unique: true, using: :btree
   end
 
@@ -2014,6 +2017,7 @@ ActiveRecord::Schema.define(version: 20181218192239) do
     t.datetime_with_timezone "updated_at", null: false
     t.string "name", null: false
     t.string "version"
+    t.integer "package_type", limit: 2, null: false
     t.index ["project_id"], name: "index_packages_packages_on_project_id", using: :btree
   end
 
