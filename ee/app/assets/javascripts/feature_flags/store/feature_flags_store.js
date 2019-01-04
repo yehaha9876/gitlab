@@ -1,7 +1,4 @@
-import {
-  parseIntPagination,
-  normalizeHeaders
-} from '../../../../../../app/assets/javascripts/lib/utils/common_utils';
+import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 
 export default class FeatureFlagsStore {
   constructor() {

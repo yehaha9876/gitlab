@@ -1,9 +1,7 @@
 import Vue from 'vue';
 import featureFlagsTableComponent from 'ee/feature_flags/components/feature_flags_table.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import {
-  featureFlag
-} from './mock_data';
+import { featureFlag } from './mock_data';
 
 describe('Feature Flag table', () => {
   let Component;
@@ -40,13 +38,17 @@ describe('Feature Flag table', () => {
   it('Should render a feature flag column', () => {
     expect(vm.$el.querySelector('.js-feature-flag-title')).not.toBeNull();
     expect(vm.$el.querySelector('.feature-flag-name').textContent).toEqual(featureFlag.name);
-    expect(vm.$el.querySelector('.feature-flag-description').textContent).toEqual(featureFlag.description);
+    expect(vm.$el.querySelector('.feature-flag-description').textContent).toEqual(
+      featureFlag.description,
+    );
   });
 
   it('Should render an actions column', () => {
     expect(vm.$el.querySelector('.table-action-buttons')).not.toBeNull();
     expect(vm.$el.querySelector('.js-feature-flag-delete-button')).not.toBeNull();
     expect(vm.$el.querySelector('.js-feature-flag-edit-button')).not.toBeNull();
-    expect(vm.$el.querySelector('.js-feature-flag-edit-button').getAttribute('href')).toEqual(featureFlag.edit_path);
+    expect(vm.$el.querySelector('.js-feature-flag-edit-button').getAttribute('href')).toEqual(
+      featureFlag.edit_path,
+    );
   });
 });

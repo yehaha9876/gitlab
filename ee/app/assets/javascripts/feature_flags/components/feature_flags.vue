@@ -2,11 +2,11 @@
 import FeatureFlagsTable from './feature_flags_table.vue';
 import FeatureFlagsService from '../services/feature_flags_service';
 import featureFlagsMixin from '../mixins/feature_flags';
-import { __ } from '../../../../../../app/assets/javascripts/locale';
-import NavigationTabs from '../../../../../../app/assets/javascripts/vue_shared/components/navigation_tabs.vue';
-import TablePagination from '../../../../../../app/assets/javascripts/vue_shared/components/table_pagination.vue';
-import { getParameterByName } from '../../../../../../app/assets/javascripts/lib/utils/common_utils';
-import CIPaginationMixin from '../../../../../../app/assets/javascripts/vue_shared/mixins/ci_pagination_api_mixin';
+import { __ } from '~/locale';
+import NavigationTabs from '~/vue_shared/components/navigation_tabs.vue';
+import TablePagination from '~/vue_shared/components/table_pagination.vue';
+import { getParameterByName } from '~/lib/utils/common_utils';
+import CIPaginationMixin from '~/vue_shared/mixins/ci_pagination_api_mixin';
 
 export default {
   components: {
@@ -35,8 +35,6 @@ export default {
   },
   data() {
     return {
-      // Start with loading state to avoid a glitch when the empty state will be rendered
-      isLoading: true,
       state: this.store.state,
       scope: getParameterByName('scope') || 'all',
       page: getParameterByName('page') || '1',
@@ -98,7 +96,7 @@ export default {
 <template>
   <div>
     <div class="top-area scrolling-tabs-container inner-page-scroll-tabs">
-      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab"/>
+      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab" />
     </div>
 
     <gl-loading-icon
@@ -118,7 +116,7 @@ export default {
     />
 
     <template v-else-if="shouldRenderTable">
-      <feature-flags-table :csrf-token="csrfToken" :feature-flags="state.featureFlags"/>
+      <feature-flags-table :csrf-token="csrfToken" :feature-flags="state.featureFlags" />
     </template>
 
     <table-pagination

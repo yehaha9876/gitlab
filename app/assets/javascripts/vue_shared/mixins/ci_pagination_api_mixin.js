@@ -4,17 +4,14 @@
  *
  * Components need to have `scope`, `page` and `requestData`
  */
-import {
-  historyPushState,
-  buildUrlWithCurrentLocation
-} from '../../lib/utils/common_utils';
+import { historyPushState, buildUrlWithCurrentLocation } from '../../lib/utils/common_utils';
 
 export default {
   methods: {
     onChangeTab(scope) {
       this.updateContent({
         scope,
-        page: '1'
+        page: '1',
       });
     },
 

@@ -19,6 +19,7 @@ export default {
       type: String,
       required: true,
     },
+
     featureFlagName: {
       type: String,
       required: true,
@@ -68,7 +69,7 @@ export default {
       v-gl-tooltip.hover.bottom="__('Delete')"
       v-gl-modal="modalId"
     >
-      <icon name="remove" :size="16"/>
+      <icon name="remove" :size="16" />
     </gl-button>
     <gl-modal
       :title="title"
@@ -80,8 +81,8 @@ export default {
     >
       {{ message }}
       <form ref="form" :action="deleteFeatureFlagUrl" method="post" class="js-requires-input">
-        <input ref="method" type="hidden" name="_method" value="delete">
-        <input :value="csrfToken" type="hidden" name="authenticity_token">
+        <input ref="method" type="hidden" name="_method" value="delete" />
+        <input :value="csrfToken" type="hidden" name="authenticity_token" />
       </form>
     </gl-modal>
   </div>

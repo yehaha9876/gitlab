@@ -1,6 +1,4 @@
-import {
-  GlLoadingIcon
-} from '@gitlab/ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import SvgBlankState from '../components/blank_state.vue';
 
 export default {
@@ -10,33 +8,17 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       hasError: false,
     };
-  },
-  computed: {
-    shouldRenderPagination() {
-      return (
-        !this.isLoading &&
-        this.state.featureFlags.length &&
-        this.state.pageInfo.total > this.state.pageInfo.perPage
-      );
-    },
   },
   beforeMount() {
     this.getFeatureFlags();
   },
   methods: {
-    /**
-     * Handles URL and query parameter changes.
-     * When the user uses the pagination or the tabs,
-     *  - update URL
-     *  - Make API request to the server with new parameters
-     *  - Update the internal state
-     */
     updateContent(parameters) {
       this.updateInternalState(parameters);
 
-      // fetch new data
       return this.getFeatureFlags();
     },
     getFeatureFlags() {
@@ -59,5 +41,5 @@ export default {
       this.isLoading = false;
       this.hasError = true;
     },
-  }
-}
+  },
+};

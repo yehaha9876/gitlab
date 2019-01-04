@@ -4,9 +4,7 @@ import axios from '~/lib/utils/axios_utils';
 import featureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
 import Store from 'ee/feature_flags/store/feature_flags_store';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import {
-  featureFlag
-} from './mock_data';
+import { featureFlag } from './mock_data';
 
 describe('Feature Flags', () => {
   const mockData = {
@@ -35,14 +33,16 @@ describe('Feature Flags', () => {
     describe('with paginated feature flags', () => {
       beforeEach(done => {
         mock.onGet(mockData.endpoint).reply(
-          200, {
+          200,
+          {
             feature_flags: [featureFlag],
             count: {
               all: 37,
               enabled: 5,
               disabled: 32,
             },
-          }, {
+          },
+          {
             'X-nExt-pAge': '2',
             'x-page': '1',
             'X-Per-Page': '1',
@@ -82,7 +82,7 @@ describe('Feature Flags', () => {
 
             expect(component.updateContent).toHaveBeenCalledWith({
               scope: 'all',
-              page: '2'
+              page: '2',
             });
             done();
           }, 0);
@@ -95,7 +95,7 @@ describe('Feature Flags', () => {
 
             expect(component.updateContent).toHaveBeenCalledWith({
               scope: 'enabled',
-              page: '1'
+              page: '1',
             });
             done();
           }, 0);
@@ -119,6 +119,6 @@ describe('Feature Flags', () => {
       expect(component.$el.querySelector('.empty-state').textContent.trim()).toContain(
         'There was an error fetching the feature flags. Try again in a few moments or contact your support team.',
       );
-    })
+    });
   });
-})
+});

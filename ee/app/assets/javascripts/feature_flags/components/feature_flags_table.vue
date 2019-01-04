@@ -18,6 +18,7 @@ export default {
       type: String,
       required: true,
     },
+
     featureFlags: {
       type: Array,
       required: true,
@@ -28,11 +29,12 @@ export default {
 <template>
   <div class="table-holder">
     <div class="gl-responsive-table-row table-row-header" role="row">
-      <div class="table-section section-10" role="columnheader">{{ s__('FeatureFlags|Status') }}</div>
-      <div
-        class="table-section section-50"
-        role="columnheader"
-      >{{ s__('FeatureFlags|Feature flag') }}</div>
+      <div class="table-section section-10" role="columnheader">
+        {{ s__('FeatureFlags|Status') }}
+      </div>
+      <div class="table-section section-50" role="columnheader">
+        {{ s__('FeatureFlags|Feature flag') }}
+      </div>
     </div>
 
     <template v-for="(featureFlag, i) in featureFlags">
@@ -50,12 +52,14 @@ export default {
         </div>
 
         <div class="table-section section-50" role="gridcell">
-          <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Feature Flag') }}</div>
+          <div class="table-mobile-header" role="rowheader">
+            {{ s__('FeatureFlags|Feature Flag') }}
+          </div>
           <div class="table-mobile-content d-flex flex-column js-feature-flag-title">
             <div class="feature-flag-name text-monospace text-truncate">{{ featureFlag.name }}</div>
-            <div
-              class="feature-flag-description text-secondary text-truncate"
-            >{{ featureFlag.description }}</div>
+            <div class="feature-flag-description text-secondary text-truncate">
+              {{ featureFlag.description }}
+            </div>
           </div>
         </div>
 
@@ -68,7 +72,7 @@ export default {
                 variant="outline-primary"
                 v-gl-tooltip.hover.bottom="__('Edit')"
               >
-                <icon name="pencil" :size="16"/>
+                <icon name="pencil" :size="16" />
               </gl-button>
             </template>
             <template v-if="featureFlag.destroy_path">
