@@ -86,9 +86,11 @@ module Vulnerabilities
     end
 
     def self.not_dismissed(project_ids:, report_types:)
-      where.not(project_fingerprint: Vulnerabilities::Feedback.dismissal
+      where.not(project_fingerprint: Vulnerabilities::Feedback
+                                       .dismissal
                                        .where(project_id: project_ids, category: report_types)
-                                       .pluck(:project_fingerprint))
+                                       .select('cast(project_fingerprint as bytea)'))
+      # .dismissed_fingerprints(projects: project_ids, categories: report_types))
     end
 
     def feedback(feedback_type:)
