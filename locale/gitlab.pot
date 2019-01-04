@@ -3692,6 +3692,12 @@ msgstr ""
 msgid "FeatureFlags|Delete %{feature_flag_name}?"
 msgstr ""
 
+msgid "FeatureFlags|Delete %{name}?"
+msgstr ""
+
+msgid "FeatureFlags|Delete feature flag"
+msgstr ""
+
 msgid "FeatureFlags|Description"
 msgstr ""
 
@@ -3708,6 +3714,9 @@ msgid "FeatureFlags|Feature flag"
 msgstr ""
 
 msgid "FeatureFlags|Feature flag %{feature_flag_name} will be removed. Are you sure?"
+msgstr ""
+
+msgid "FeatureFlags|Feature flag %{name} will be removed. Are you sure?"
 msgstr ""
 
 msgid "FeatureFlags|Feature flags allow you to configure your code into different flavors by dynamically toggling certain functionality."
@@ -3741,6 +3750,9 @@ msgid "FeatureFlags|Save changes"
 msgstr ""
 
 msgid "FeatureFlags|Status"
+msgstr ""
+
+msgid "FeatureFlags|There was an error fetching the feature flags. Try again in a few moments or contact your support team."
 msgstr ""
 
 msgid "Feb"

@@ -28,6 +28,10 @@ export default {
       type: String,
       required: true,
     },
+    errorStateSvgPath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -48,6 +52,7 @@ export default {
     shouldRenderPagination() {
       return (
         !this.isLoading &&
+        !this.hasError &&
         this.state.featureFlags.length &&
         this.state.pageInfo.total > this.state.pageInfo.perPage
       );
@@ -112,9 +117,9 @@ export default {
       "
     />
 
-    <div v-else-if="shouldRenderTable" class="table-holder">
+    <template v-else-if="shouldRenderTable">
       <feature-flags-table :csrf-token="csrfToken" :feature-flags="state.featureFlags"/>
-    </div>
+    </template>
 
     <table-pagination
       v-if="shouldRenderPagination"

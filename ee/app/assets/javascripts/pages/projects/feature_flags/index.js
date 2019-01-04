@@ -27,6 +27,7 @@ document.addEventListener(
         props: {
           store: this.store,
           endpoint: this.dataset.endpoint,
+          errorStateSvgPath: this.dataset.errorStateSvgPath,
           csrfToken: csrf.token,
         },
       });

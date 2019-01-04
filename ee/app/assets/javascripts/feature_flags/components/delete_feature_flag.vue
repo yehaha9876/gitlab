@@ -62,7 +62,12 @@ export default {
 
 <template>
   <div class="d-inline-block">
-    <gl-button variant="danger" v-gl-tooltip.hover.bottom="__('Delete')" v-gl-modal="modalId">
+    <gl-button
+      class="js-feature-flag-delete-button"
+      variant="danger"
+      v-gl-tooltip.hover.bottom="__('Delete')"
+      v-gl-modal="modalId"
+    >
       <icon name="remove" :size="16"/>
     </gl-button>
     <gl-modal

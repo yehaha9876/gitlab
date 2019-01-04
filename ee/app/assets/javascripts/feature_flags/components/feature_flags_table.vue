@@ -39,7 +39,7 @@ export default {
       <div class="gl-responsive-table-row" role="row" :key="`feature-flag-item-${i}`">
         <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
-          <div class="table-mobile-content">
+          <div class="table-mobile-content js-feature-flag-status">
             <template v-if="featureFlag.active">
               <span class="badge badge-success">{{ s__('FeatureFlags|Active') }}</span>
             </template>
@@ -51,9 +51,11 @@ export default {
 
         <div class="table-section section-50" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Feature Flag') }}</div>
-          <div class="table-mobile-content d-flex flex-column">
-            <div class="text-monospace text-truncate">{{ featureFlag.name }}</div>
-            <div class="text-secondary text-truncate">{{ featureFlag.description }}</div>
+          <div class="table-mobile-content d-flex flex-column js-feature-flag-title">
+            <div class="feature-flag-name text-monospace text-truncate">{{ featureFlag.name }}</div>
+            <div
+              class="feature-flag-description text-secondary text-truncate"
+            >{{ featureFlag.description }}</div>
           </div>
         </div>
 
@@ -61,6 +63,7 @@ export default {
           <div class="table-action-buttons btn-group">
             <template v-if="featureFlag.edit_path">
               <gl-button
+                class="js-feature-flag-edit-button"
                 :href="featureFlag.edit_path"
                 variant="outline-primary"
                 v-gl-tooltip.hover.bottom="__('Edit')"
