@@ -1,12 +1,7 @@
-import {
-  parseIntPagination,
-  normalizeHeaders
-} from '~/lib/utils/common_utils';
+import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 
 // ee-only
-import {
-  CLUSTER_TYPE
-} from '~/clusters/constants';
+import { CLUSTER_TYPE } from '~/clusters/constants';
 /**
  * Environments Store.
  *
@@ -85,9 +80,12 @@ export default class EnvironmentsStore {
       ) {
         filtered = Object.assign({}, filtered, {
           hasDeployBoard: true,
-          isDeployBoardVisible: oldEnvironmentState.isDeployBoardVisible === false ?
-            oldEnvironmentState.isDeployBoardVisible : true,
-          deployBoardData: filtered.rollout_status.status === 'found' ? filtered.rollout_status : {},
+          isDeployBoardVisible:
+            oldEnvironmentState.isDeployBoardVisible === false
+              ? oldEnvironmentState.isDeployBoardVisible
+              : true,
+          deployBoardData:
+            filtered.rollout_status.status === 'found' ? filtered.rollout_status : {},
           isLoadingDeployBoard: filtered.rollout_status.status === 'loading',
           isEmptyDeployBoard: filtered.rollout_status.status === 'not_found',
         });
@@ -201,9 +199,7 @@ export default class EnvironmentsStore {
    * @return {Array}
    */
   updateEnvironmentProp(environment, prop, newValue) {
-    const {
-      environments
-    } = this.state;
+    const { environments } = this.state;
 
     const updatedEnvironments = environments.map(env => {
       const updateEnv = Object.assign({}, env);
@@ -218,9 +214,7 @@ export default class EnvironmentsStore {
   }
 
   getOpenFolders() {
-    const {
-      environments
-    } = this.state;
+    const { environments } = this.state;
 
     return environments.filter(env => env.isFolder && env.isOpen);
   }
