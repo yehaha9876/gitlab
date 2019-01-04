@@ -73,7 +73,7 @@ class Admin::LicensesController < Admin::ApplicationController
   end
 
   def license_params
-    license_params = params.require(:license).permit(:data_file, :data)
+    license_params = params.require(:license).permit(:data, data_file: [".path"])
     license_params.delete(:data) if license_params[:data_file]
     license_params
   end

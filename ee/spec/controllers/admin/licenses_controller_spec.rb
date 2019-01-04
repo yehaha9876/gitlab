@@ -8,6 +8,37 @@ describe Admin::LicensesController do
   end
 
   describe 'Upload license' do
+    let(:gitlab_license) {
+      build(:gitlab_license)
+    }
+
+    it 'uploads license key successfully' do
+      post :create, params: {
+        license: {
+          data: gitlab_license.export
+        }
+      }
+
+      expect(response).to redirect_to admin_license_path
+    end
+
+    it 'uploads license file successfully' do
+      license_file = Tempfile.open do |file|
+        file.write(gitlab_license.export)
+        file
+      end
+
+      post :create, params: {
+        license: {
+          data_file: {
+            ".path" => license_file.path
+          }
+        }
+      }
+
+      expect(response).to redirect_to admin_license_path
+    end
+
     it 'redirects back when no license is entered/uploaded' do
       post :create, params: { license: { data: '' } }
 

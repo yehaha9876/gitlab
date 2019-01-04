@@ -243,7 +243,7 @@ class License < ActiveRecord::Base
   end
 
   def data_file=(file)
-    self.data = file.read
+    self.data = File.read(file[".path"])
   end
 
   def md5
