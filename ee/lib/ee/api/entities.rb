@@ -453,7 +453,6 @@ module EE
       end
 
       class UnleashFeature < Grape::Entity
-        expose :id
         expose :name
         expose :description, unless: ->(feature) { feature.description.nil? }
         expose :active, as: :enabled

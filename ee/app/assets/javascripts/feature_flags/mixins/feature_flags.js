@@ -51,7 +51,7 @@ export default {
     successCallback(resp) {
       this.store.storeCount(resp.data.count);
       this.store.storePagination(resp.headers);
-      this.setCommonData(resp.data);
+      this.setCommonData(resp.data.feature_flags);
     },
     errorCallback() {
       this.isLoading = false;
