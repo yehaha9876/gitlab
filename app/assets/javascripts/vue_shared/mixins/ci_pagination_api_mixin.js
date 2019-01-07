@@ -9,10 +9,7 @@ import { historyPushState, buildUrlWithCurrentLocation } from '../../lib/utils/c
 export default {
   methods: {
     onChangeTab(scope) {
-      this.updateContent({
-        scope,
-        page: '1',
-      });
+      this.updateContent({ scope, page: '1' });
     },
 
     onChangePage(page) {
@@ -29,9 +26,7 @@ export default {
 
     updateInternalState(parameters) {
       // stop polling
-      if (this.poll) {
-        this.poll.stop();
-      }
+      this.poll.stop();
 
       const queryString = Object.keys(parameters)
         .map(parameter => {

@@ -1,27 +1,27 @@
 <script>
-import { GlEmptyState } from '@gitlab/ui';
+import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import { mapState, mapActions } from 'vuex';
 import FeatureFlagsTable from './feature_flags_table.vue';
-import FeatureFlagsService from '../services/feature_flags_service';
-import featureFlagsMixin from '../mixins/feature_flags';
+import store from '../store';
 import { __ } from '~/locale';
 import NavigationTabs from '~/vue_shared/components/navigation_tabs.vue';
 import TablePagination from '~/vue_shared/components/table_pagination.vue';
-import { getParameterByName } from '~/lib/utils/common_utils';
-import CIPaginationMixin from '~/vue_shared/mixins/ci_pagination_api_mixin';
+import {
+  getParameterByName,
+  historyPushState,
+  buildUrlWithCurrentLocation,
+} from '~/lib/utils/common_utils';
 
 export default {
+  store,
   components: {
     FeatureFlagsTable,
     NavigationTabs,
     TablePagination,
     GlEmptyState,
+    GlLoadingIcon,
   },
-  mixins: [featureFlagsMixin, CIPaginationMixin],
   props: {
-    store: {
-      type: Object,
-      required: true,
-    },
     endpoint: {
       type: String,
       required: true,
@@ -37,10 +37,8 @@ export default {
   },
   data() {
     return {
-      state: this.store.state,
-      scope: getParameterByName('scope') || 'all',
+      scope: getParameterByName('scope') || this.$options.scopes.all,
       page: getParameterByName('page') || '1',
-      requestData: {},
     };
   },
   scopes: {
@@ -49,56 +47,90 @@ export default {
     disabled: 'disabled',
   },
   computed: {
+    ...mapState(['featureFlags', 'count', 'pageInfo', 'isLoading', 'hasError', 'options']),
+    shouldRenderTabs() {
+      /* Do not show tabs until after the first request to get the count */
+      return this.count.all !== undefined;
+    },
     shouldRenderPagination() {
       return (
         !this.isLoading &&
         !this.hasError &&
-        this.state.featureFlags.length &&
-        this.state.pageInfo.total > this.state.pageInfo.perPage
+        this.featureFlags.length &&
+        this.pageInfo.total > this.pageInfo.perPage
       );
     },
     shouldRenderTable() {
-      return !this.isLoading && this.state.featureFlags.length > 0 && !this.hasError;
+      return !this.isLoading && this.featureFlags.length > 0 && !this.hasError;
     },
     shouldRenderErrorState() {
       return this.hasError && !this.isLoading;
     },
     tabs() {
-      const { count } = this.state;
       const { scopes } = this.$options;
 
       return [
         {
           name: __('All'),
           scope: scopes.all,
-          count: count.all,
+          count: this.count.all,
           isActive: this.scope === scopes.all,
         },
         {
           name: __('Enabled'),
           scope: scopes.enabled,
-          count: count.enabled,
+          count: this.count.enabled,
           isActive: this.scope === scopes.enabled,
         },
         {
           name: __('Disabled'),
           scope: scopes.disabled,
-          count: count.disabled,
+          count: this.count.disabled,
           isActive: this.scope === scopes.disabled,
         },
       ];
     },
   },
+  methods: {
+    ...mapActions(['setFeatureFlagsEndpoint', 'setFeatureFlagsOptions', 'fetchFeatureFlags']),
+    onChangeTab(scope) {
+      this.scope = scope;
+      this.updateFeatureFlagOptions({
+        scope,
+        page: '1',
+      });
+    },
+    onChangePage(page) {
+      this.updateFeatureFlagOptions({
+        scope: this.scope,
+        /* URLS parameters are strings, we need to parse to match types */
+        page: Number(page).toString(),
+      });
+    },
+    updateFeatureFlagOptions(parameters) {
+      const queryString = Object.keys(parameters)
+        .map(parameter => {
+          const value = parameters[parameter];
+          return `${parameter}=${encodeURIComponent(value)}`;
+        })
+        .join('&');
+
+      historyPushState(buildUrlWithCurrentLocation(`?${queryString}`));
+      this.setFeatureFlagsOptions(parameters);
+      this.fetchFeatureFlags();
+    },
+  },
   created() {
-    this.service = new FeatureFlagsService(this.endpoint);
-    this.requestData = { scope: this.scope, page: this.page };
+    this.setFeatureFlagsEndpoint(this.endpoint);
+    this.setFeatureFlagsOptions({ scope: this.scope, page: this.page });
+    this.fetchFeatureFlags();
   },
 };
 </script>
 <template>
   <div>
-    <div class="top-area scrolling-tabs-container inner-page-scroll-tabs">
-      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab"/>
+    <div class="top-area scrolling-tabs-container inner-page-scroll-tabs" v-if="shouldRenderTabs">
+      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab" />
     </div>
 
     <gl-loading-icon
@@ -117,13 +149,9 @@ export default {
     </template>
 
     <template v-else-if="shouldRenderTable">
-      <feature-flags-table :csrf-token="csrfToken" :feature-flags="state.featureFlags"/>
+      <feature-flags-table :csrf-token="csrfToken" :feature-flags="featureFlags" />
     </template>
 
-    <table-pagination
-      v-if="shouldRenderPagination"
-      :change="onChangePage"
-      :page-info="state.pageInfo"
-    />
+    <table-pagination v-if="shouldRenderPagination" :change="onChangePage" :page-info="pageInfo" />
   </div>
 </template>

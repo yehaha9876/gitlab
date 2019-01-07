@@ -2,18 +2,18 @@ import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import featureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
-import Store from 'ee/feature_flags/store/feature_flags_store';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { createStore } from 'ee/feature_flags/store';
+import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { featureFlag } from './mock_data';
 
 describe('Feature Flags', () => {
   const mockData = {
     endpoint: 'feature_flags.json',
-    store: new Store(),
     csrfToken: 'testToken',
     errorStateSvgPath: '/assets/illustrations/feature_flag.svg',
   };
 
+  let store;
   let FeatureFlagsComponent;
   let component;
   let mock;
@@ -52,7 +52,12 @@ describe('Feature Flags', () => {
           },
         );
 
-        component = mountComponent(FeatureFlagsComponent, mockData);
+        store = createStore();
+
+        component = mountComponentWithStore(FeatureFlagsComponent, {
+          store,
+          props: mockData,
+        });
 
         setTimeout(() => {
           done();
@@ -76,11 +81,11 @@ describe('Feature Flags', () => {
         });
 
         it('should make an API request when page is clicked', done => {
-          spyOn(component, 'updateContent');
+          spyOn(component, 'updateFeatureFlagOptions');
           setTimeout(() => {
             component.$el.querySelector('.gl-pagination li:nth-child(5) a').click();
 
-            expect(component.updateContent).toHaveBeenCalledWith({
+            expect(component.updateFeatureFlagOptions).toHaveBeenCalledWith({
               scope: 'all',
               page: '2',
             });
@@ -90,10 +95,10 @@ describe('Feature Flags', () => {
 
         it('should make an API request when using tabs', done => {
           setTimeout(() => {
-            spyOn(component, 'updateContent');
+            spyOn(component, 'updateFeatureFlagOptions');
             component.$el.querySelector('.js-featureflags-tab-enabled').click();
 
-            expect(component.updateContent).toHaveBeenCalledWith({
+            expect(component.updateFeatureFlagOptions).toHaveBeenCalledWith({
               scope: 'enabled',
               page: '1',
             });
@@ -108,7 +113,11 @@ describe('Feature Flags', () => {
     beforeEach(done => {
       mock.onGet(mockData.endpoint).reply(500, {});
 
-      component = mountComponent(FeatureFlagsComponent, mockData);
+      store = createStore();
+      component = mountComponentWithStore(FeatureFlagsComponent, {
+        store,
+        props: mockData,
+      });
 
       setTimeout(() => {
         done();
