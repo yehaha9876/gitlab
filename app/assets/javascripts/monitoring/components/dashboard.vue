@@ -176,6 +176,9 @@ export default {
     }
   },
   methods: {
+    getGraphAlerts(graphId) {
+      return this.alertData ? this.alertData[graphId] || {} : {};
+    },
     getGraphsData() {
       this.state = 'loading';
       Promise.all(this.servicePromises)
@@ -234,10 +237,6 @@ export default {
       :name="groupData.group"
       :show-panels="showPanels"
     >
-      <!--
-        EE-specific props (should not be backported to CE):
-        * alert-data
-      -->
       <component
         :is="graphComponent"
         v-for="(graphData, graphIndex) in groupData.metrics"
@@ -249,7 +248,7 @@ export default {
         :tags-path="tagsPath"
         :show-legend="showLegend"
         :small-graph="forceSmallGraph"
-        :alert-data="alertData[graphData.id]"
+        :alert-data="getGraphAlerts(graphData.id)"
         group-id="monitor-area-chart"
       >
         <!-- EE content -->

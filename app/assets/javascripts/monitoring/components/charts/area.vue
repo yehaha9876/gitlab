@@ -26,13 +26,11 @@ export default {
         );
       },
     },
-    // EE-specific start
     alertData: {
       type: Object,
       required: false,
       default: () => ({}),
     },
-    // EE-specific end
   },
   computed: {
     chartData() {
@@ -92,10 +90,6 @@ export default {
       <h5 class="prometheus-graph-title">{{ graphData.title }}</h5>
       <div class="prometheus-graph-widgets"><slot></slot></div>
     </div>
-    <!--
-      EE-specific props (should not be backported to CE):
-      * thresholds
-    -->
     <gl-area-chart
       v-bind="$attrs"
       :data="chartData"
