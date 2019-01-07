@@ -91,6 +91,11 @@ export default {
       ];
     },
   },
+  created() {
+    this.setFeatureFlagsEndpoint(this.endpoint);
+    this.setFeatureFlagsOptions({ scope: this.scope, page: this.page });
+    this.fetchFeatureFlags();
+  },
   methods: {
     ...mapActions(['setFeatureFlagsEndpoint', 'setFeatureFlagsOptions', 'fetchFeatureFlags']),
     onChangeTab(scope) {
@@ -120,16 +125,11 @@ export default {
       this.fetchFeatureFlags();
     },
   },
-  created() {
-    this.setFeatureFlagsEndpoint(this.endpoint);
-    this.setFeatureFlagsOptions({ scope: this.scope, page: this.page });
-    this.fetchFeatureFlags();
-  },
 };
 </script>
 <template>
   <div>
-    <div class="top-area scrolling-tabs-container inner-page-scroll-tabs" v-if="shouldRenderTabs">
+    <div v-if="shouldRenderTabs" class="top-area scrolling-tabs-container inner-page-scroll-tabs">
       <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab" />
     </div>
 

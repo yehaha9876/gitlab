@@ -1,8 +1,8 @@
 <script>
 import { GlButton, GlLink, GlTooltipDirective } from '@gitlab/ui';
 import DeleteFeatureFlag from './delete_feature_flag.vue';
-import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
+
 export default {
   components: {
     DeleteFeatureFlag,
@@ -37,7 +37,7 @@ export default {
     </div>
 
     <template v-for="featureFlag in featureFlags">
-      <div class="gl-responsive-table-row" role="row" :key="featureFlag.id">
+      <div :key="featureFlag.id" class="gl-responsive-table-row" role="row">
         <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
           <div class="table-mobile-content js-feature-flag-status">
@@ -66,10 +66,10 @@ export default {
           <div class="table-action-buttons btn-group">
             <template v-if="featureFlag.edit_path">
               <gl-button
+                v-gl-tooltip.hover.bottom="__('Edit')"
                 class="js-feature-flag-edit-button"
                 :href="featureFlag.edit_path"
                 variant="outline-primary"
-                v-gl-tooltip.hover.bottom="__('Edit')"
               >
                 <icon name="pencil" :size="16" />
               </gl-button>
