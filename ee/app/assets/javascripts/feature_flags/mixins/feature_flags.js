@@ -1,10 +1,8 @@
 import { GlLoadingIcon } from '@gitlab/ui';
-import SvgBlankState from '../components/blank_state.vue';
 
 export default {
   components: {
     GlLoadingIcon,
-    SvgBlankState,
   },
   data() {
     return {

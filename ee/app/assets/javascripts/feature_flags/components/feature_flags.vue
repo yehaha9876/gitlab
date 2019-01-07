@@ -1,4 +1,5 @@
 <script>
+import { GlEmptyState } from '@gitlab/ui';
 import FeatureFlagsTable from './feature_flags_table.vue';
 import FeatureFlagsService from '../services/feature_flags_service';
 import featureFlagsMixin from '../mixins/feature_flags';
@@ -13,6 +14,7 @@ export default {
     FeatureFlagsTable,
     NavigationTabs,
     TablePagination,
+    GlEmptyState,
   },
   mixins: [featureFlagsMixin, CIPaginationMixin],
   props: {
@@ -70,19 +72,19 @@ export default {
           name: __('All'),
           scope: scopes.all,
           count: count.all,
-          isActive: this.scope === 'all',
+          isActive: this.scope === scopes.all,
         },
         {
           name: __('Enabled'),
           scope: scopes.enabled,
           count: count.enabled,
-          isActive: this.scope === 'enabled',
+          isActive: this.scope === scopes.enabled,
         },
         {
           name: __('Disabled'),
           scope: scopes.disabled,
           count: count.disabled,
-          isActive: this.scope === 'disabled',
+          isActive: this.scope === scopes.disabled,
         },
       ];
     },
@@ -96,7 +98,7 @@ export default {
 <template>
   <div>
     <div class="top-area scrolling-tabs-container inner-page-scroll-tabs">
-      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab" />
+      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab"/>
     </div>
 
     <gl-loading-icon
@@ -106,17 +108,16 @@ export default {
       class="prepend-top-20"
     />
 
-    <svg-blank-state
-      v-else-if="shouldRenderErrorState"
-      :svg-path="errorStateSvgPath"
-      :message="
-        s__(`FeatureFlags|There was an error fetching the feature flags.
-      Try again in a few moments or contact your support team.`)
-      "
-    />
+    <template v-else-if="shouldRenderErrorState">
+      <gl-empty-state
+        :title="s__(`FeatureFlags|There was an error fetching the feature flags.`)"
+        :description="s__(`FeatureFlags|Try again in a few moments or contact your support team.`)"
+        :svg-path="errorStateSvgPath"
+      />
+    </template>
 
     <template v-else-if="shouldRenderTable">
-      <feature-flags-table :csrf-token="csrfToken" :feature-flags="state.featureFlags" />
+      <feature-flags-table :csrf-token="csrfToken" :feature-flags="state.featureFlags"/>
     </template>
 
     <table-pagination

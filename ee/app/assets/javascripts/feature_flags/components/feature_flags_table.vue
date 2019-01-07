@@ -1,6 +1,6 @@
 <script>
-import DeleteFeatureFlag from './delete_feature_flag.vue';
 import { GlButton, GlLink, GlTooltipDirective } from '@gitlab/ui';
+import DeleteFeatureFlag from './delete_feature_flag.vue';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 export default {
@@ -18,7 +18,6 @@ export default {
       type: String,
       required: true,
     },
-
     featureFlags: {
       type: Array,
       required: true,
@@ -27,7 +26,7 @@ export default {
 };
 </script>
 <template>
-  <div class="table-holder">
+  <div class="table-holder js-feature-flag-table">
     <div class="gl-responsive-table-row table-row-header" role="row">
       <div class="table-section section-10" role="columnheader">
         {{ s__('FeatureFlags|Status') }}
@@ -37,8 +36,8 @@ export default {
       </div>
     </div>
 
-    <template v-for="(featureFlag, i) in featureFlags">
-      <div class="gl-responsive-table-row" role="row" :key="`feature-flag-item-${i}`">
+    <template v-for="featureFlag in featureFlags">
+      <div class="gl-responsive-table-row" role="row" :key="featureFlag.id">
         <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
           <div class="table-mobile-content js-feature-flag-status">
@@ -79,7 +78,7 @@ export default {
               <delete-feature-flag
                 :delete-feature-flag-url="featureFlag.destroy_path"
                 :feature-flag-name="featureFlag.name"
-                :modal-id="`delete-feature-flag-${i}`"
+                :modal-id="`delete-feature-flag-${featureFlag.id}`"
                 :csrf-token="csrfToken"
               />
             </template>

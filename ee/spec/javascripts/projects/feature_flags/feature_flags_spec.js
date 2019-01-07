@@ -60,7 +60,7 @@ describe('Feature Flags', () => {
       });
 
       it('should render a table with feature flags', () => {
-        expect(component.$el.querySelectorAll('table-holder')).not.toBeNull();
+        expect(component.$el.querySelectorAll('.js-feature-flag-table')).not.toBeNull();
         expect(component.$el.querySelector('.feature-flag-name').textContent.trim()).toEqual(
           featureFlag.name,
         );

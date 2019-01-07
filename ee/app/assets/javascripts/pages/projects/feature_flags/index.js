@@ -20,14 +20,16 @@ document.addEventListener(
         };
       },
       created() {
-        this.dataset = document.querySelector(this.$options.el).dataset;
+        const data = document.querySelector(this.$options.el).dataset;
+        this.endpoint = data.endpoint;
+        this.errorStateSvgPath = data.errorStateSvgPath;
       },
       render(createElement) {
         return createElement('feature-flags-component', {
           props: {
             store: this.store,
-            endpoint: this.dataset.endpoint,
-            errorStateSvgPath: this.dataset.errorStateSvgPath,
+            endpoint: this.endpoint,
+            errorStateSvgPath: this.errorStateSvgPath,
             csrfToken: csrf.token,
           },
         });

@@ -11,7 +11,7 @@ export default {
     Icon,
   },
   directives: {
-    'gl-modal': GlModalDirective,
+    GlModal: GlModalDirective,
     GlTooltip: GlTooltipDirective,
   },
   props: {
@@ -19,7 +19,6 @@ export default {
       type: String,
       required: true,
     },
-
     featureFlagName: {
       type: String,
       required: true,
