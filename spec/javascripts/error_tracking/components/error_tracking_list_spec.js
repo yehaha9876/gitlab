@@ -61,7 +61,7 @@ describe('ErrorTrackingList', () => {
       expect(wrapper.find(GlTable).exists()).toBeFalsy();
       expect(wrapper.find(GlButton).exists()).toBeFalsy();
     });
-  })
+  });
 
   describe('results', () => {
     beforeEach(() => {

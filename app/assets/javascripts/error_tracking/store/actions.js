@@ -5,14 +5,14 @@ import { __ } from '~/locale';
 
 export function getErrorList({ commit }, url) {
   Service.getErrorList(url)
-    .then(( { data }) => {
+    .then(({ data }) => {
       commit(types.SET_ERRORS, data.errors);
       commit(types.SET_EXTERNAL_URL, data.external_url);
       commit(types.SET_LOADING, false);
     })
     .catch(() => {
       commit(types.SET_LOADING, false);
-      createFlash(__('Failed to load errors from Sentry'))
+      createFlash(__('Failed to load errors from Sentry'));
     });
 }
 

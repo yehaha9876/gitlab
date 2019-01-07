@@ -7,10 +7,10 @@ import { __ } from '~/locale';
 
 export default {
   fields: [
-    { key: 'error', label: __('Open errors'), },
-    { key: 'events', label: __('Events'), },
-    { key: 'users', label: __('Users'), },
-    { key: 'lastSeen', label: __('Last seen'), },
+    { key: 'error', label: __('Open errors') },
+    { key: 'events', label: __('Events') },
+    { key: 'users', label: __('Users') },
+    { key: 'lastSeen', label: __('Last seen') },
   ],
   components: {
     GlEmptyState,
@@ -43,25 +43,17 @@ export default {
   methods: {
     ...mapActions(['getErrorList']),
   },
-}
+};
 </script>
 
 <template>
   <div>
     <div v-if="featureEnabled">
-      <div v-if="loadingErrors" class="py-3">
-        <gl-loading-icon :size="3" />
-      </div>
+      <div v-if="loadingErrors" class="py-3"><gl-loading-icon :size="3" /></div>
       <div v-else>
         <div class="d-flex justify-content-end">
-          <gl-button
-            class="my-3 ml-auto"
-            variant="primary"
-            :href="externalUrl"
-            target="_blank"
-          >
-            View in Sentry
-            <icon name="external-link" />
+          <gl-button class="my-3 ml-auto" variant="primary" :href="externalUrl" target="_blank"
+            >View in Sentry <icon name="external-link" />
           </gl-button>
         </div>
         <gl-table
@@ -71,10 +63,10 @@ export default {
           :empty-text="__('No errors to display')"
         >
           <template slot="HEAD_events" slot-scope="data">
-             <div class="text-right">{{data.label}}</div>
+            <div class="text-right">{{ data.label }}</div>
           </template>
           <template slot="HEAD_users" slot-scope="data">
-             <div class="text-right">{{data.label}}</div>
+            <div class="text-right">{{ data.label }}</div>
           </template>
           <template slot="error" slot-scope="errors">
             <div class="d-flex flex-column">
