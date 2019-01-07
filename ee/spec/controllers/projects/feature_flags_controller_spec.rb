@@ -41,6 +41,7 @@ describe Projects::FeatureFlagsController do
 
       it 'shows an list of feature flags with buttons' do
         expect(response).to be_ok
+        expect(response).to render_template('_table')
         expect(response).to render_template('_configure_feature_flags_button')
         expect(response).to render_template('_new_feature_flag_button')
       end
@@ -81,8 +82,8 @@ describe Projects::FeatureFlagsController do
     it 'returns edit path and destroy path' do
       subject
 
-      expect(json_response['feature_flags'].first['edit_path']).not_to be_nil
-      expect(json_response['feature_flags'].first['destroy_path']).not_to be_nil
+      expect(json_response.first['edit_path']).not_to be_nil
+      expect(json_response.first['destroy_path']).not_to be_nil
     end
 
     it 'returns the summary of feature flags' do
@@ -110,7 +111,7 @@ describe Projects::FeatureFlagsController do
         it 'returns all feature flags' do
           subject
 
-          expect(json_response['feature_flags'].count).to eq(2)
+          expect(json_response.count).to eq(2)
         end
       end
 
@@ -120,8 +121,8 @@ describe Projects::FeatureFlagsController do
         it 'returns enabled feature flags' do
           subject
 
-          expect(json_response['feature_flags'].count).to eq(1)
-          expect(json_response['feature_flags'].first['active']).to be_truthy
+          expect(json_response.count).to eq(1)
+          expect(json_response.first['active']).to be_truthy
         end
       end
 
@@ -131,8 +132,8 @@ describe Projects::FeatureFlagsController do
         it 'returns disabled feature flags' do
           subject
 
-          expect(json_response['feature_flags'].count).to eq(1)
-          expect(json_response['feature_flags'].first['active']).to be_falsy
+          expect(json_response.count).to eq(1)
+          expect(json_response.first['active']).to be_falsy
         end
       end
     end

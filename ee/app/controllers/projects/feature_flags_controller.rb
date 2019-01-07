@@ -15,10 +15,6 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
       .execute
       .page(params[:page])
       .per(30)
-    
-    @feature_flags_count = limited_feature_flags_count(project)
-    @enabled_count = limited_feature_flags_count(project, 'enabled')
-    @disabled_count = limited_feature_flags_count(project, 'disabled')
 
     respond_to do |format|
       format.html
