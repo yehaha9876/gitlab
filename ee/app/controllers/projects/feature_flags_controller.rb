@@ -10,22 +10,32 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   before_action :feature_flag, only: [:edit, :update, :destroy]
 
   def index
-    @feature_flags = FeatureFlagsFinder
-      .new(project, current_user, scope: params[:scope])
-      .execute
-      .page(params[:page])
-      .per(30)
+    push_frontend_feature_flag(:operations_feature_flags_index_tab, @project)
 
-    respond_to do |format|
-      format.html
-      format.json do
-        Gitlab::PollingInterval.set_header(response, interval: 10_000)
+    ##
+    # Issue: https://gitlab.com/gitlab-org/gitlab-ee/issues/7731
+    if Feature.enabled?(:operations_feature_flags_index_tab, @project, default_enabled: true)
+      @feature_flags = FeatureFlagsFinder
+        .new(project, current_user, scope: params[:scope])
+        .execute
+        .page(params[:page])
+        .per(30)
 
-        render json: FeatureFlagSerializer
-          .new(project: @project, current_user: @current_user)
-          .with_pagination(request, response)
-          .represent(@feature_flags)
+      respond_to do |format|
+        format.html
+        format.json do
+          Gitlab::PollingInterval.set_header(response, interval: 10_000)
+
+          render json: FeatureFlagSerializer
+            .new(project: @project, current_user: @current_user)
+            .with_pagination(request, response)
+            .represent(@feature_flags)
+        end
       end
+    else
+      @feature_flags = project.operations_feature_flags
+        .ordered
+        .page(params[:page]).per(30)
     end
   end
 
