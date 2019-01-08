@@ -3689,9 +3689,6 @@ msgstr ""
 msgid "FeatureFlags|Create feature flag"
 msgstr ""
 
-msgid "FeatureFlags|Delete %{feature_flag_name}?"
-msgstr ""
-
 msgid "FeatureFlags|Delete %{name}?"
 msgstr ""
 
@@ -3713,13 +3710,10 @@ msgstr ""
 msgid "FeatureFlags|Feature flag"
 msgstr ""
 
-msgid "FeatureFlags|Feature flag %{feature_flag_name} will be removed. Are you sure?"
-msgstr ""
-
 msgid "FeatureFlags|Feature flag %{name} will be removed. Are you sure?"
 msgstr ""
 
-msgid "FeatureFlags|Feature flags allow you to configure your code into different flavors by dynamically toggling certain functionality."
+msgid "FeatureFlags|Feature flags all you to configure your code into different flavors by dynamically toggling certain functionality."
 msgstr ""
 
 msgid "FeatureFlags|Get started with feature flags"
@@ -3732,6 +3726,9 @@ msgid "FeatureFlags|Install a %{docs_link_start}compatible client library%{docs_
 msgstr ""
 
 msgid "FeatureFlags|Instance ID"
+msgstr ""
+
+msgid "FeatureFlags|More Information"
 msgstr ""
 
 msgid "FeatureFlags|More information"

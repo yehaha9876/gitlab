@@ -11,6 +11,7 @@ describe('Feature Flags', () => {
     endpoint: 'feature_flags.json',
     csrfToken: 'testToken',
     errorStateSvgPath: '/assets/illustrations/feature_flag.svg',
+    featureFlagsHelpPagePath: '/help/feature-flags',
   };
 
   let store;

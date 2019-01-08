@@ -12,20 +12,18 @@ document.addEventListener(
       },
       data() {
         return {
-          endpoint: '',
-          errorStateSvgPath: '',
+          endpoint: document.querySelector(this.$options.el).dataset.endpoint,
+          errorStateSvgPath: document.querySelector(this.$options.el).dataset.errorStateSvgPath,
+          featureFlagsHelpPagePath: document.querySelector(this.$options.el).dataset
+            .featureFlagsHelpPagePath,
         };
-      },
-      created() {
-        const data = document.querySelector(this.$options.el).dataset;
-        this.endpoint = data.endpoint;
-        this.errorStateSvgPath = data.errorStateSvgPath;
       },
       render(createElement) {
         return createElement('feature-flags-component', {
           props: {
             endpoint: this.endpoint,
             errorStateSvgPath: this.errorStateSvgPath,
+            featureFlagsHelpPagePath: this.featureFlagsHelpPagePath,
             csrfToken: csrf.token,
           },
         });

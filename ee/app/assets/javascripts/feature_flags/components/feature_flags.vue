@@ -34,6 +34,10 @@ export default {
       type: String,
       required: true,
     },
+    featureFlagsHelpPagePath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -59,6 +63,9 @@ export default {
         this.featureFlags.length &&
         this.pageInfo.total > this.pageInfo.perPage
       );
+    },
+    shouldShowEmptyState() {
+      return !this.isLoading && !this.hasError && this.featureFlags.length === 0;
     },
     shouldRenderTable() {
       return !this.isLoading && this.featureFlags.length > 0 && !this.hasError;
@@ -145,6 +152,20 @@ export default {
         :title="s__(`FeatureFlags|There was an error fetching the feature flags.`)"
         :description="s__(`FeatureFlags|Try again in a few moments or contact your support team.`)"
         :svg-path="errorStateSvgPath"
+      />
+    </template>
+
+    <template v-else-if="shouldShowEmptyState">
+      <gl-empty-state
+        :title="s__(`FeatureFlags|Get started with feature flags`)"
+        :description="
+          s__(
+            `FeatureFlags|Feature flags all you to configure your code into different flavors by dynamically toggling certain functionality.`,
+          )
+        "
+        :svg-path="errorStateSvgPath"
+        :primary-button-link="featureFlagsHelpPagePath"
+        :primary-button-text="s__(`FeatureFlags|More Information`)"
       />
     </template>
 
