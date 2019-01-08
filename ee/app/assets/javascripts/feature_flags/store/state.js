@@ -1,4 +1,4 @@
-export default {
+export default () => ({
   featureFlags: [],
   count: {},
   pageInfo: {},
@@ -6,4 +6,4 @@ export default {
   hasError: false,
   endpoint: null,
   options: {},
-};
+});

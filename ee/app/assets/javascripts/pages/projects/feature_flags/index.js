@@ -1,9 +1,6 @@
 import Vue from 'vue';
-import FeatureFlagsComponent from '../../../feature_flags/components/feature_flags.vue';
-import Translate from '../../../../../../../app/assets/javascripts/vue_shared/translate';
+import FeatureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
 import csrf from '~/lib/utils/csrf';
-
-Vue.use(Translate);
 
 document.addEventListener(
   'DOMContentLoaded',
@@ -12,6 +9,12 @@ document.addEventListener(
       el: '#feature-flags-vue',
       components: {
         FeatureFlagsComponent,
+      },
+      data() {
+        return {
+          endpoint: '',
+          errorStateSvgPath: '',
+        };
       },
       created() {
         const data = document.querySelector(this.$options.el).dataset;
