@@ -41,7 +41,6 @@ describe Projects::FeatureFlagsController do
 
       it 'shows an list of feature flags with buttons' do
         expect(response).to be_ok
-        expect(response).to render_template('_table')
         expect(response).to render_template('_configure_feature_flags_button')
         expect(response).to render_template('_new_feature_flag_button')
       end

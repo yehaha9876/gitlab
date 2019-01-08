@@ -198,11 +198,13 @@ describe 'Feature Flags', :js do
   end
 
   def delete_feature_flag(name, confirm = true)
-    if Feature.enabled?(:operations_feature_flag_index_tab)
-      delete_button = find('.gl-responsive-table-row', text: name).find('.js-feature-flag-delete-button')
-    else
-      delete_button = find('.gl-responsive-table-row', text: name).find('.btn-danger[title="Delete"]')
-    end
+    delete_button =
+      if Feature.enabled?(:operations_feature_flag_index_tab)
+        find('.gl-responsive-table-row', text: name).find('.js-feature-flag-delete-button')
+      else
+        find('.gl-responsive-table-row', text: name).find('.btn-danger[title="Delete"]')
+      end
+
     delete_button.click
 
     within '.modal' do
@@ -218,11 +220,14 @@ describe 'Feature Flags', :js do
 
   def edit_feature_flag(old_name, new_name, new_description, new_status)
     visit(project_feature_flags_path(project))
-    if Feature.enabled?(:operations_feature_flag_index_tab)
-      edit_button = find('.gl-responsive-table-row', text: old_name).find('.js-feature-flag-edit-button')
-    else
-      edit_button = find('.gl-responsive-table-row', text: old_name).find('.btn-default[title="Edit"]')
-    end
+
+    edit_button =
+      if Feature.enabled?(:operations_feature_flag_index_tab)
+        find('.gl-responsive-table-row', text: old_name).find('.js-feature-flag-edit-button')
+      else
+        find('.gl-responsive-table-row', text: old_name).find('.btn-default[title="Edit"]')
+      end
+
     edit_button.click
 
     fill_in 'Name', with: new_name
