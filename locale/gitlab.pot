@@ -3689,6 +3689,9 @@ msgstr ""
 msgid "FeatureFlags|Create feature flag"
 msgstr ""
 
+msgid "FeatureFlags|Delete %{feature_flag_name}?"
+msgstr ""
+
 msgid "FeatureFlags|Delete %{name}?"
 msgstr ""
 
@@ -3708,6 +3711,9 @@ msgid "FeatureFlags|Feature Flag"
 msgstr ""
 
 msgid "FeatureFlags|Feature flag"
+msgstr ""
+
+msgid "FeatureFlags|Feature flag %{feature_flag_name} will be removed. Are you sure?"
 msgstr ""
 
 msgid "FeatureFlags|Feature flag %{name} will be removed. Are you sure?"
