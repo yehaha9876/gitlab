@@ -12,6 +12,9 @@
       = render 'configure_feature_flags_button'
       = render 'new_feature_flag_button'
 
-  %div
-    #feature-flags-vue{ data: { endpoint: project_feature_flags_path(@project, format: :json),
-      "error-state-svg-path" => image_path('illustrations/feature_flag.svg') } }
+  - if Feature.enabled?(:operations_feature_flag_index_tab, default_enabled: true)
+    %div
+      #feature-flags-vue{ data: { endpoint: project_feature_flags_path(@project, format: :json),
+        "error-state-svg-path" => image_path('illustrations/feature_flag.svg') } }
+  - else
+    = render 'table'
