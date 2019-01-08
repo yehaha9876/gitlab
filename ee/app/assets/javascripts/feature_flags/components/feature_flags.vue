@@ -157,10 +157,11 @@ export default {
 
     <template v-else-if="shouldShowEmptyState">
       <gl-empty-state
+        class="js-feature-flags-empty-state"
         :title="s__(`FeatureFlags|Get started with feature flags`)"
         :description="
           s__(
-            `FeatureFlags|Feature flags all you to configure your code into different flavors by dynamically toggling certain functionality.`,
+            `FeatureFlags|Feature flags allow you to configure your code into different flavors by dynamically toggling certain functionality.`,
           )
         "
         :svg-path="errorStateSvgPath"

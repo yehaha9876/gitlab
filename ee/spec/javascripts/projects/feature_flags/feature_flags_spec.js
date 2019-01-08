@@ -31,6 +31,32 @@ describe('Feature Flags', () => {
   });
 
   describe('successful request', () => {
+    describe('without feature flags', () => {
+      beforeEach(done => {
+        mock.onGet(mockData.endpoint).reply(200, {
+          feature_flags: [],
+          count: {
+            all: 0,
+            enabled: 0,
+            disabled: 0,
+          },
+        });
+
+        component = mountComponentWithStore(FeatureFlagsComponent, {
+          store,
+          props: mockData,
+        });
+
+        setTimeout(() => {
+          done();
+        }, 0);
+      });
+
+      it('should render the empty state', () => {
+        expect(component.$el.querySelectorAll('.js-feature-flags-empty-state')).not.toBeNull();
+      });
+    });
+
     describe('with paginated feature flags', () => {
       beforeEach(done => {
         mock.onGet(mockData.endpoint).reply(
