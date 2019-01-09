@@ -30,15 +30,21 @@ export default {
       type: String,
       required: true,
     },
+    errorTrackingEnabled: {
+      type: Boolean,
+      required: true,
+    },
   },
   computed: {
     ...mapState(['errors', 'externalUrl', 'loadingErrors']),
     featureEnabled() {
-      return gon.features.errorTracking;
+      return gon.features.errorTracking && this.errorTrackingEnabled;
     },
   },
   created() {
-    this.startPolling(this.indexPath);
+    if(this.featureEnabled) {
+      this.startPolling(this.indexPath);
+    }
   },
   methods: {
     ...mapActions(['startPolling']),

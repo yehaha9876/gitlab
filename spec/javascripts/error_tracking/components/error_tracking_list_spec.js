@@ -11,13 +11,14 @@ describe('ErrorTrackingList', () => {
   let wrapper;
   const originalGon = window.gon;
 
-  function mountComponent() {
+  function mountComponent({ errorTrackingEnabled = true } = {}) {
     wrapper = shallowMount(ErrorTrackingList, {
       localVue,
       store,
       propsData: {
         indexPath: '/path',
         enableErrorTrackingLink: '/link',
+        errorTrackingEnabled,
       },
     });
   }
@@ -95,7 +96,7 @@ describe('ErrorTrackingList', () => {
     beforeEach(() => {
       window.gon.features.errorTracking = false;
 
-      mountComponent();
+      mountComponent({ errorTrackingEnabled: false });
     });
 
     it('shows empty state', () => {

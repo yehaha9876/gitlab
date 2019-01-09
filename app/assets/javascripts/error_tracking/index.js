@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import store from './store';
 import ErrorTrackingList from './components/error_tracking_list.vue';
 
@@ -10,14 +11,17 @@ export default () =>
     },
     store,
     render(createElement) {
-      const { indexPath, enableErrorTrackingLink } = document.querySelector(
-        this.$options.el,
-      ).dataset;
+      const domEl = document.querySelector(this.$options.el);
+      const { indexPath, enableErrorTrackingLink } = domEl.dataset;
+      let { errorTrackingEnabled } = domEl.dataset;
+
+      errorTrackingEnabled = parseBoolean(errorTrackingEnabled);
 
       return createElement('error-tracking-list', {
         props: {
           indexPath,
           enableErrorTrackingLink,
+          errorTrackingEnabled,
         },
       });
     },
