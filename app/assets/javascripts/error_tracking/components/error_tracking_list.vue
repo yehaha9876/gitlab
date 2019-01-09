@@ -38,10 +38,10 @@ export default {
     },
   },
   created() {
-    this.getErrorList(this.indexPath);
+    this.startPolling(this.indexPath);
   },
   methods: {
-    ...mapActions(['getErrorList']),
+    ...mapActions(['startPolling']),
   },
 };
 </script>

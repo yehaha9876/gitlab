@@ -1,7 +1,7 @@
 import axios from '~/lib/utils/axios_utils';
 
 export default {
-  getErrorList(endpoint) {
+  getErrorList({ endpoint }) {
     return axios.get(endpoint, {
       params: { format: 'json' },
     });
