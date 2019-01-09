@@ -42,7 +42,7 @@ export default {
     },
   },
   created() {
-    if(this.featureEnabled) {
+    if (this.featureEnabled) {
       this.startPolling(this.indexPath);
     }
   },
@@ -55,11 +55,18 @@ export default {
 <template>
   <div>
     <div v-if="featureEnabled">
-      <div v-if="loadingErrors" class="py-3"><gl-loading-icon :size="3" /></div>
+      <div v-if="loadingErrors" class="py-3">
+        <gl-loading-icon :size="3"/>
+      </div>
       <div v-else>
         <div class="d-flex justify-content-end">
-          <gl-button class="my-3 ml-auto" variant="primary" :href="externalUrl" target="_blank"
-            >View in Sentry <icon name="external-link" />
+          <gl-button
+            class="my-3 ml-auto"
+            variant="primary"
+            :href="externalUrl"
+            target="_blank"
+          >View in Sentry
+            <icon name="external-link"/>
           </gl-button>
         </div>
         <gl-table
@@ -79,7 +86,7 @@ export default {
               <div class="d-flex">
                 <gl-link :href="errors.item.externalUrl" class="d-flex text-dark" target="_blank">
                   <strong>{{ errors.item.title.trim() }}</strong>
-                  <icon name="external-link" class="ml-1" />
+                  <icon name="external-link" class="ml-1"/>
                 </gl-link>
                 <span class="text-secondary ml-2">{{ errors.item.culprit }}</span>
               </div>
@@ -97,8 +104,8 @@ export default {
 
           <template slot="lastSeen" slot-scope="errors">
             <div class="d-flex align-items-center">
-              <icon name="calendar" css-classes="text-secondary mr-1" />
-              <time-ago :time="errors.item.lastSeen" class="text-secondary" />
+              <icon name="calendar" css-classes="text-secondary mr-1"/>
+              <time-ago :time="errors.item.lastSeen" class="text-secondary"/>
             </div>
           </template>
         </gl-table>
