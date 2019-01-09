@@ -11,7 +11,9 @@ module Gitlab
         Note,
         Milestone,
         ProjectWiki,
-        Repository
+        Repository,
+        Blob,
+        Commit
       ]
 
       # rubocop: disable CodeReuse/ActiveRecord

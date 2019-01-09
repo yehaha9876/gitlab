@@ -78,7 +78,7 @@ module Elasticsearch
 
           {
             delete: {
-              _index: "gitlab-repository-development", # FIXME
+              _index: "gitlab-blob-development", # FIXME
               _type: self.class.name.underscore,
               _id: "#{repository_id}_#{blob.path}",
             }
@@ -90,8 +90,8 @@ module Elasticsearch
 
           {
             index:  {
-              _index: "gitlab-repository-development", # FIXME  
-              _type: self.class.name.underscore,
+              _index: "gitlab-blob-development", # FIXME
+              _type: 'blob',
               _id: "#{repository_id}_#{blob.path}",
               data: {
                 blob: {
@@ -169,14 +169,13 @@ module Elasticsearch
         end
 
         def index_commit(commit)
-          pp "repo:commit: type: #{self.class.name.underscore}"
           author    = commit.author
           committer = commit.committer
 
           {
             index:  {
-              _index: "gitlab-repository-development", # FIXME
-              _type: self.class.name.underscore,
+              _index: "gitlab-commit-development", # FIXME
+              _type: 'commit',
               _id: "#{repository_id}_#{commit.oid}",
               data: {
                 commit: {

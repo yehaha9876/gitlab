@@ -36,6 +36,7 @@ class Commit
   # Used by GFM to match and present link extensions on node texts and hrefs.
   LINK_EXTENSION_PATTERN = /(patch)/.freeze
 
+
   def banzai_render_context(field)
     pipeline = field == :description ? :commit_description : :single_line
     context = { pipeline: pipeline, project: self.project }
@@ -505,3 +506,5 @@ class Commit
     MergeRequestsFinder.new(user, project_id: project.id).find_by(merge_commit_sha: id) if merge_commit?
   end
 end
+
+Commit.prepend(EE::Commit)
