@@ -12,14 +12,14 @@ export function startPolling({ commit }, endpoint) {
     method: 'getErrorList',
     data: { endpoint },
     successCallback: ({ data }) => {
-      console.log(arguments);
-      if (!data) return
-      console.log(data)
+      if (!data) {
+        return;
+      }
       commit(types.SET_ERRORS, data.errors);
       commit(types.SET_EXTERNAL_URL, data.external_url);
       commit(types.SET_LOADING, false);
     },
-    errorCallback: (err) => {
+    errorCallback: () => {
       commit(types.SET_LOADING, false);
       createFlash(__('Failed to load errors from Sentry'));
     },
