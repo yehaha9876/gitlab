@@ -2042,7 +2042,8 @@ ActiveRecord::Schema.define(version: 20190103140724) do
     t.datetime_with_timezone "updated_at", null: false
     t.string "name", null: false
     t.text "description"
-    t.index ["project_id", "name"], name: "index_operations_feature_flags_on_project_id_and_name", unique: true, using: :btree
+    t.string "environment_scope", default: "*", null: false
+    t.index ["project_id", "environment_scope", "name"], name: "index_operations_feature_flags_on_project_id_and_environment_scope_and_name", unique: true, using: :btree
   end
 
   create_table "operations_feature_flags_clients", id: :bigserial, force: :cascade do |t|
