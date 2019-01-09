@@ -71,7 +71,7 @@ export default {
           <template slot="error" slot-scope="errors">
             <div class="d-flex flex-column">
               <div class="d-flex">
-                <gl-link :href="errors.item.externalUrl" class="d-flex text-dark">
+                <gl-link :href="errors.item.externalUrl" class="d-flex text-dark" target="_blank">
                   <strong>{{ errors.item.title.trim() }}</strong>
                   <icon name="external-link" class="ml-1" />
                 </gl-link>
