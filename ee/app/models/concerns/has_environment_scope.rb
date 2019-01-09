@@ -11,7 +11,7 @@ module HasEnvironmentScope
                 message: ::Gitlab::Regex.environment_scope_regex_message }
     )
 
-    scope :on_environment, -> (environment_name) do
+    scope :on_environment, -> (environment_name, unique_column: nil) do
       where = <<~SQL
         environment_scope IN (:wildcard, :environment_name) OR
           :environment_name LIKE
@@ -55,8 +55,20 @@ module HasEnvironmentScope
       # In this case, B, C, and D would match. We also want to prioritize
       # the exact matched name, and put * last, and everything else in the
       # middle. So the order should be: D < C < B
-      where(where, values)
+      relation = where(where, values)
         .order(order % quoted_values) # `order` cannot escape for us!
+
+      if unique_column
+        ##
+        # If unique_column option is provided, then return the most relevant scoped rows
+        # which grouped by the given column
+        #
+        # TODO: Optimize
+        relation = relation.reverse_order
+          .to_a.uniq { |model| model.public_send(unique_column) }
+      else
+
+      relation
     end
   end
 

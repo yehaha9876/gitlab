@@ -2,6 +2,8 @@
 
 module Operations
   class FeatureFlag < ActiveRecord::Base
+    include HasEnvironmentScope
+
     self.table_name = 'operations_feature_flags'
 
     belongs_to :project
@@ -14,7 +16,7 @@ module Operations
         with: Gitlab::Regex.feature_flag_regex,
         message: Gitlab::Regex.feature_flag_regex_message
       }
-    validates :name, uniqueness: { scope: :project_id }
+    validates :name, uniqueness: { scope: [:project_id, :environment_scope] }
     validates :description, allow_blank: true, length: 0..255
 
     scope :ordered, -> { order(:name) }

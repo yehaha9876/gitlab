@@ -70,6 +70,10 @@ class Environment < ActiveRecord::Base
     end
   end
 
+  def feature_flags
+    project.operations_feature_flags.on_environment(name).ordered
+  end
+
   def predefined_variables
     Gitlab::Ci::Variables::Collection.new
       .append(key: 'CI_ENVIRONMENT_NAME', value: name)

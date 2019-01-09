@@ -53,6 +53,10 @@ module API
         params[:instance_id] || env['HTTP_UNLEASH_INSTANCEID']
       end
 
+      def unleash_app_name
+        params[:app_name] || env['HTTP_UNLEASH_APPNAME']
+      end
+
       def authorize_by_unleash_instance_id!
         unauthorized! unless Operations::FeatureFlagsClient
           .find_for_project_and_token(project, unleash_instance_id)

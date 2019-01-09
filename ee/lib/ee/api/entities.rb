@@ -470,7 +470,8 @@ module EE
         end
 
         def features
-          object.operations_feature_flags.ordered
+          object.operations_feature_flags
+            .on_environment_unique(unleash_app_name, unique_column: :name)
         end
       end
 
