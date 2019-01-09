@@ -71,7 +71,7 @@ class Environment < ActiveRecord::Base
   end
 
   def feature_flags
-    project.operations_feature_flags.on_environment(name).ordered
+    project.operations_feature_flags.on_environment(name, unique_column: :name).ordered
   end
 
   def predefined_variables
