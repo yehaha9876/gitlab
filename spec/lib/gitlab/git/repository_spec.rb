@@ -281,6 +281,92 @@ describe Gitlab::Git::Repository, :seed_helper do
     end
   end
 
+  describe '#diverging_commit_count' do
+    it 'counts 0 for the same branch' do
+      expect(repository.diverging_commit_count('master', 'master', max_count: 1000)).to eq([0, 0])
+    end
+
+    context 'max count does not truncate results' do
+      where(:left, :right, :expected) do
+        1 | 1 | [1, 1]
+        4 | 4 | [4, 4]
+        2 | 2 | [2, 2]
+        2 | 4 | [2, 4]
+        4 | 2 | [4, 2]
+        10 | 10 | [10, 10]
+      end
+
+      with_them do
+        before do
+          repository.create_branch('left-branch', 'master')
+          repository.create_branch('right-branch', 'master')
+          left.times do
+            new_commit_edit_new_file_on_branch(repository_rugged, 'left-branch', 'some more content for a')
+          end
+
+          right.times do
+            new_commit_edit_new_file_on_branch(repository_rugged, 'right-branch', 'some more content for b')
+          end
+        end
+
+        after do
+          repository.delete_branch('left-branch')
+          repository.delete_branch('right-branch')
+        end
+
+        it 'returns the correct count bounding at max_count' do
+          branch_a_sha = repository_rugged.branches['left-branch'].target.oid
+          branch_b_sha = repository_rugged.branches['right-branch'].target.oid
+          expect(
+            repository.diverging_commit_count(
+              branch_a_sha, branch_b_sha, max_count: 1000)
+          ).to eq(expected)
+        end
+      end
+    end
+
+    context 'max count truncates results' do
+      where(:left, :right, :max_count) do
+        1 | 1 | 1
+        4 | 4 | 4
+        2 | 2 | 3
+        2 | 4 | 3
+        4 | 2 | 5
+        10 | 10 | 10
+      end
+
+      with_them do
+        before do
+          repository.create_branch('left-branch', 'master')
+          repository.create_branch('right-branch', 'master')
+          left.times do
+            new_commit_edit_new_file_on_branch(repository_rugged, 'left-branch', 'some more content for a')
+          end
+
+          right.times do
+            new_commit_edit_new_file_on_branch(repository_rugged, 'right-branch', 'some more content for b')
+          end
+        end
+
+        after do
+          repository.delete_branch('left-branch')
+          repository.delete_branch('right-branch')
+        end
+
+        it 'returns the correct count bounding at max_count' do
+          branch_a_sha = repository_rugged.branches['left-branch'].target.oid
+          branch_b_sha = repository_rugged.branches['right-branch'].target.oid
+          results = repository.diverging_commit_count(branch_a_sha, branch_b_sha, max_count: max_count)
+          expect(results[0] + results[1]).to eq(max_count)
+        end
+      end
+    end
+
+    it_behaves_like 'wrapping gRPC errors', Gitlab::GitalyClient::CommitService, :diverging_commit_count do
+      subject { repository.diverging_commit_count('master', 'master', max_count: 1000) }
+    end
+  end
+
   describe '#has_local_branches?' do
     context 'check for local branches' do
       it { expect(repository.has_local_branches?).to eq(true) }
@@ -544,7 +630,7 @@ describe Gitlab::Git::Repository, :seed_helper do
         # Add new commits so that there's a renamed file in the commit history
         @commit_with_old_name_id = new_commit_edit_old_file(repository_rugged).oid
         @rename_commit_id = new_commit_move_file(repository_rugged).oid
-        @commit_with_new_name_id = new_commit_edit_new_file(repository_rugged).oid
+        @commit_with_new_name_id = new_commit_edit_new_file(repository_rugged, "Edit encoding/CHANGELOG").oid
       end
 
       after do
@@ -1964,7 +2050,7 @@ describe Gitlab::Git::Repository, :seed_helper do
   end
 
   # Build the options hash that's passed to Rugged::Commit#create
-  def commit_options(repo, index, message)
+  def commit_options(repo, index, target, ref, message)
     options = {}
     options[:tree] = index.write_tree(repo)
     options[:author] = {
@@ -1978,8 +2064,8 @@ describe Gitlab::Git::Repository, :seed_helper do
       time: Time.gm(2014, "mar", 3, 20, 15, 1)
     }
     options[:message] ||= message
-    options[:parents] = repo.empty? ? [] : [repo.head.target].compact
-    options[:update_ref] = "HEAD"
+    options[:parents] = repo.empty? ? [] : [target].compact
+    options[:update_ref] = ref
 
     options
   end
@@ -1995,6 +2081,8 @@ describe Gitlab::Git::Repository, :seed_helper do
     options = commit_options(
       repo,
       index,
+      repo.head.target,
+      "HEAD",
       "Edit CHANGELOG in its original location"
     )
 
@@ -2004,16 +2092,21 @@ describe Gitlab::Git::Repository, :seed_helper do
 
   # Writes a new commit to the repo and returns a Rugged::Commit.  Replaces the
   # contents of encoding/CHANGELOG with new text.
-  def new_commit_edit_new_file(repo)
+  def new_commit_edit_new_file(repo, commit_message, branch = repo.head)
     oid = repo.write("I'm a new changelog with different text", :blob)
     index = repo.index
-    index.read_tree(repo.head.target.tree)
+    index.read_tree(branch.target.tree)
     index.add(path: "encoding/CHANGELOG", oid: oid, mode: 0100644)
-
-    options = commit_options(repo, index, "Edit encoding/CHANGELOG")
-
+    options = commit_options(repo, index, branch.target, branch.canonical_name, commit_message)
     sha = Rugged::Commit.create(repo, options)
     repo.lookup(sha)
+  end
+
+  # Writes a new commit to the repo and returns a Rugged::Commit.  Replaces the
+  # contents of encoding/CHANGELOG with new text.
+  def new_commit_edit_new_file_on_branch(repo, branch_name, commit_message)
+    branch = repo.branches[branch_name]
+    new_commit_edit_new_file(repo, commit_message, branch)
   end
 
   # Writes a new commit to the repo and returns a Rugged::Commit.  Moves the
@@ -2027,7 +2120,7 @@ describe Gitlab::Git::Repository, :seed_helper do
     index.add(path: "encoding/CHANGELOG", oid: oid, mode: 0100644)
     index.remove("CHANGELOG")
 
-    options = commit_options(repo, index, "Move CHANGELOG to encoding/")
+    options = commit_options(repo, index, repo.head.target, "HEAD", "Move CHANGELOG to encoding/")
 
     sha = Rugged::Commit.create(repo, options)
     repo.lookup(sha)
