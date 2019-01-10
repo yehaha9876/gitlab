@@ -2,11 +2,14 @@
 
 - setting = tracing_setting
 - has_jaeger_url = setting.external_url.present?
+- expanded = !Feature.enabled?(:error_tracking, @project)
 
-%section.settings.expanded.border-0.no-animate
+%section.settings.border-0.no-animate{ class: ('expanded' if expanded) }
   .settings-header{ :class => ("border-top" unless not Feature.enabled?(:error_tracking, @project)) }
     %h4
       = _("Jaeger tracing")
+    %button.btn.btn-default.js-settings-toggle{ type: 'button' }
+      = expanded ? _('Collapse') : _('Expand')
     %p
       - if has_jaeger_url
         - tracing_link = link_to sanitize(@project.tracing_external_url, tags: []), target: "_blank", rel: 'noopener noreferrer' do
