@@ -1,7 +1,8 @@
 .table-holder.border-top
   .gl-responsive-table-row.table-row-header{ role: 'row' }
     .table-section.section-10{ role: 'columnheader' }= s_('FeatureFlags|Status')
-    .table-section.section-50{ role: 'columnheader' }= s_('FeatureFlags|Feature flag')
+    .table-section.section-30{ role: 'columnheader' }= s_('FeatureFlags|Feature flag')
+    .table-section.section-10{ role: 'columnheader' }= s_('FeatureFlags|Environment scope')
   - @feature_flags.each do |feature_flag|
     = render 'delete_feature_flag_modal', { feature_flag: feature_flag }
 
@@ -16,11 +17,16 @@
             %span.badge.badge-danger
               = s_('FeatureFlags|Inactive')
 
-      .table-section.section-50{ role: 'gridcell' }
+      .table-section.section-30{ role: 'gridcell' }
         .table-mobile-header{ role: "rowheader" }= s_('FeatureFlags|Feature Flag')
         .table-mobile-content.d-flex.flex-column
           .text-monospace.text-truncate= feature_flag.name
           .text-secondary.text-truncate= feature_flag.description
+
+      .table-section.section-10{ role: 'gridcell' }
+        .table-mobile-header{ role: "rowheader" }= s_('FeatureFlags|Environment scope')
+        .table-mobile-content
+          "review/*"
 
       .table-section.section-40.table-button-footer{ role: 'gridcell' }
         .table-action-buttons.btn-group

@@ -46,13 +46,4 @@
           .form-group
             = label_tag :application_name, s_('FeatureFlags|Application name'), class: 'label-bold'
             .input-group
-              = text_field_tag :application_name,
-                "production",
-                readonly: true,
-                class: "form-control js-select-on-focus"
-              %span.input-group-append
-                = clipboard_button(target: '#application_name',
-                  title: _("Copy name to clipboard"),
-                  placement: "left",
-                  container: '#configure-feature-flags-modal',
-                  class: "input-group-text btn btn-default")
+              Please set an environment name that the application instance should respect. For instance, if the application runs on staging environment, the application name would be "staging". Available environment names can be looked up in environment page

@@ -66,7 +66,7 @@ module HasEnvironmentScope
         # TODO: Optimize
         relation = relation.reverse_order
           .to_a.uniq { |model| model.public_send(unique_column) }
-      else
+      end
 
       relation
     end

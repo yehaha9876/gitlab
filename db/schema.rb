@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190103140724) do
+ActiveRecord::Schema.define(version: 20190109174024) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -212,8 +212,8 @@ ActiveRecord::Schema.define(version: 20190103140724) do
     t.integer "diff_max_patch_bytes", default: 102400, null: false
     t.integer "archive_builds_in_seconds"
     t.string "commit_email_hostname"
-    t.boolean "protected_ci_variables", default: false, null: false
     t.string "runners_registration_token_encrypted"
+    t.boolean "protected_ci_variables", default: false, null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
     t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree
@@ -647,7 +647,7 @@ ActiveRecord::Schema.define(version: 20190103140724) do
     t.integer "iid"
     t.integer "merge_request_id"
     t.index ["auto_canceled_by_id"], name: "index_ci_pipelines_on_auto_canceled_by_id", using: :btree
-    t.index ["merge_request_id"], name: "index_ci_pipelines_on_merge_request_id", where: "(merge_request_id IS NOT NULL)", using: :btree
+    t.index ["merge_request_id"], name: "index_ci_pipelines_on_merge_request_id", using: :btree
     t.index ["pipeline_schedule_id"], name: "index_ci_pipelines_on_pipeline_schedule_id", using: :btree
     t.index ["project_id", "iid"], name: "index_ci_pipelines_on_project_id_and_iid", unique: true, where: "(iid IS NOT NULL)", using: :btree
     t.index ["project_id", "ref", "id"], name: "index_ci_pipelines_on_project_idandrefandiddesc", order: { id: :desc }, using: :btree
@@ -2043,7 +2043,7 @@ ActiveRecord::Schema.define(version: 20190103140724) do
     t.string "name", null: false
     t.text "description"
     t.string "environment_scope", default: "*", null: false
-    t.index ["project_id", "environment_scope", "name"], name: "index_operations_feature_flags_on_project_id_and_environment_scope_and_name", unique: true, using: :btree
+    t.index ["project_id", "name"], name: "index_operations_feature_flags_on_project_id_and_name", unique: true, using: :btree
   end
 
   create_table "operations_feature_flags_clients", id: :bigserial, force: :cascade do |t|
@@ -2577,6 +2577,7 @@ ActiveRecord::Schema.define(version: 20190103140724) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["path"], name: "index_redirect_routes_on_path", unique: true, using: :btree
+    t.index ["path"], name: "index_redirect_routes_on_path_text_pattern_ops", using: :btree, opclasses: {"path"=>"varchar_pattern_ops"}
     t.index ["source_type", "source_id"], name: "index_redirect_routes_on_source_type_and_source_id", using: :btree
   end
 
@@ -2816,6 +2817,7 @@ ActiveRecord::Schema.define(version: 20190103140724) do
     t.text "from_content", null: false
     t.text "to_content", null: false
     t.index ["note_id", "relative_order"], name: "index_suggestions_on_note_id_and_relative_order", unique: true, using: :btree
+    t.index ["note_id"], name: "index_suggestions_on_note_id", using: :btree
   end
 
   create_table "system_note_metadata", force: :cascade do |t|
