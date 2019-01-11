@@ -47,6 +47,9 @@ class SessionsController < Devise::SessionsController
   def destroy
     Gitlab::AppLogger.info("User Logout: username=#{current_user.username} ip=#{request.remote_ip}")
     super
+
+    #TODO-EE: clear stored saml last sign in from session
+
     # hide the signed_out notice
     flash[:notice] = nil
   end

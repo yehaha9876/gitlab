@@ -614,6 +614,18 @@ class User < ActiveRecord::Base
     end
   end
 
+  def current_actor=(actor)
+    @current_actor = actor
+  end
+
+  def current_actor
+    @current_actor ||= DefaultActor.new
+  end
+
+  class DefaultActor
+    # def active_saml_session?
+  end
+
   def namespace_move_dir_allowed
     if namespace&.any_project_has_container_registry_tags?
       errors.add(:username, 'cannot be changed if a personal project has container registry tags.')

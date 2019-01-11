@@ -22,6 +22,8 @@ module RoutableActions
   def routable_authorized?(routable, extra_authorization_proc)
     return false unless routable
 
+    set_current_actor!
+
     action = :"read_#{routable.class.to_s.underscore}"
     return false unless can?(current_user, action, routable)
 

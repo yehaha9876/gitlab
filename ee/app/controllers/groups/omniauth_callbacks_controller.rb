@@ -39,9 +39,17 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
 
   override :sign_in_and_redirect
   def sign_in_and_redirect(user)
+    store_that_we_have_signed_in_in_session
+
     flash[:notice] = "Signed in with SAML for #{@unauthenticated_group.name}"
 
     super
+  end
+
+  def store_that_we_have_signed_in_in_session
+    #TODO: consider using session['saml_session_index'] instead of storing this
+    session[:group_saml_sign_ins] ||= {}
+    session[:group_saml_sign_ins][@saml_provider.id] = DateTime.now
   end
 
   override :after_sign_in_path_for

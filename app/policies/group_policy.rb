@@ -117,7 +117,37 @@ class GroupPolicy < BasePolicy
   def access_level
     return GroupMember::NO_ACCESS if @user.nil?
 
-    @access_level ||= @subject.max_member_access_for_user(@user)
+    @access_level ||= lookup_access_level!
+  end
+
+  def lookup_access_level!
+    return GroupMember::NO_ACCESS if sso_enforcement_prevents_access?
+
+    basic = @subject.max_member_access_for_user(@user)
+  end
+
+  def sso_enforcement_prevents_access?
+    #TODO: SsoEnforcementChecker.new(subject, @user.current_actor).something
+    requires_active_saml_session? && !saml_login_active?
+  end
+
+  def saml_login_active?
+    #@subject.valid_actor?(@user.current_actor)
+    # @user.current_actor.saml_provider == saml_provider
+    @user.current_actor.session[:group_saml_sign_ins].try(:[],saml_provider.id)
+  end
+
+  def requires_active_saml_session?
+    #TODO: instance_configured && enabled_for_group && licensed_for_group && group_saml_requires_active_session
+    saml_provider&.enabled?
+  end
+
+  def saml_provider
+    root_group.saml_provider
+  end
+
+  def root_group
+    subject.root_ancestor
   end
 end
 

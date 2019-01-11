@@ -91,6 +91,43 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def authenticate_user!
+    super.tap do
+      set_current_actor!
+    end
+  end
+
+  def set_current_actor!
+    return unless current_user
+
+    current_user.current_actor=(WebActor.new(current_user, session))
+  end
+
+
+  # User knows about the user as an individual
+  # RequestContext knows about the current request, can be Web/SSH/CI
+  # Actor has required context/user to respond to questions about permissions
+  class WebActor# < User::NullActor #Name: SessionContext ? RequestContext
+    attr_reader :session #TODO: temporary
+    def initialize(user, session) #TODO: session, params or context
+      @user = user
+      @session = session
+    end
+
+    def saml_grant(provider_id)
+      # Valid because currently signed in / valid because recently signed in
+    end
+
+    class Context
+      def initialize(session, params)
+      end
+
+      def saml_data(provider_id)
+      end
+    end
+  end
+
+
   # By default, all sessions are given the same expiration time configured in
   # the session store (e.g. 1 week). However, unauthenticated users can
   # generate a lot of sessions, primarily for CSRF verification. It makes
