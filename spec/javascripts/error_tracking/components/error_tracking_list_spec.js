@@ -9,7 +9,6 @@ localVue.use(Vuex);
 describe('ErrorTrackingList', () => {
   let store;
   let wrapper;
-  const originalGon = window.gon;
 
   function mountComponent({ errorTrackingEnabled = true } = {}) {
     wrapper = shallowMount(ErrorTrackingList, {
@@ -30,26 +29,19 @@ describe('ErrorTrackingList', () => {
 
     const state = {
       errors: [],
-      loadingErrors: true,
+      loading: true,
     };
 
     store = new Vuex.Store({
       actions,
       state,
     });
-
-    window.gon = {
-      features: {
-        errorTracking: true,
-      },
-    };
   });
 
   afterEach(() => {
     if (wrapper) {
       wrapper.destroy();
     }
-    window.gon = originalGon;
   });
 
   describe('loading', () => {
@@ -66,7 +58,7 @@ describe('ErrorTrackingList', () => {
 
   describe('results', () => {
     beforeEach(() => {
-      store.state.loadingErrors = false;
+      store.state.loading = false;
 
       mountComponent();
     });
@@ -80,7 +72,7 @@ describe('ErrorTrackingList', () => {
 
   describe('no results', () => {
     beforeEach(() => {
-      store.state.loadingErrors = false;
+      store.state.loading = false;
 
       mountComponent();
     });
@@ -94,8 +86,6 @@ describe('ErrorTrackingList', () => {
 
   describe('error tracking feature disabled', () => {
     beforeEach(() => {
-      window.gon.features.errorTracking = false;
-
       mountComponent({ errorTrackingEnabled: false });
     });
 

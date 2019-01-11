@@ -10,7 +10,7 @@ export const createStore = () =>
     state: {
       errors: [],
       externalUrl: '',
-      loadingErrors: true,
+      loading: true,
     },
     actions,
     mutations,

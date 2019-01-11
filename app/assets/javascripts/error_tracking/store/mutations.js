@@ -9,6 +9,6 @@ export default {
     state.externalUrl = url;
   },
   [types.SET_LOADING](state, loading) {
-    state.loadingErrors = loading;
+    state.loading = loading;
   },
 };

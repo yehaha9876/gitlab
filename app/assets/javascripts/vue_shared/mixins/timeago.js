@@ -8,7 +8,7 @@ export default {
     timeFormated(time) {
       const timeago = getTimeago();
 
-      return timeago.format(new Date(time));
+      return timeago.format(time);
     },
 
     tooltipTitle(time) {
