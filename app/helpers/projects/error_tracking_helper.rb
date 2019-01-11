@@ -8,7 +8,8 @@ module Projects::ErrorTrackingHelper
       'index-path' => project_error_tracking_index_path(project,
                                                         format: :json),
       'enable-error-tracking-link' => project_settings_operations_path(project),
-      'error-tracking-enabled' => error_tracking_enabled.to_s
+      'error-tracking-enabled' => error_tracking_enabled.to_s,
+      'illustration-path' => image_path('illustrations/cluster_popover.svg')
     }
   end
 end

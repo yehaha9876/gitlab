@@ -18,6 +18,7 @@ describe('ErrorTrackingList', () => {
         indexPath: '/path',
         enableErrorTrackingLink: '/link',
         errorTrackingEnabled,
+        illustrationPath: 'illustration/path',
       },
     });
   }

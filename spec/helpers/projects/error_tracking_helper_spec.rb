@@ -19,7 +19,8 @@ describe Projects::ErrorTrackingHelper do
         expect(error_tracking_data(project)).to eq(
           'index-path' => index_path,
           'enable-error-tracking-link' => setting_path,
-          'error-tracking-enabled' => 'false'
+          'error-tracking-enabled' => 'false',
+          "illustration-path" => "/images/illustrations/cluster_popover.svg"
         )
       end
     end

@@ -34,6 +34,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    illustrationPath: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapState(['errors', 'externalUrl', 'loading']),
@@ -107,7 +111,7 @@ export default {
         :description="__('Monitor your errors by integrating with Sentry')"
         :primary-button-text="__('Enable error tracking')"
         :primary-button-link="enableErrorTrackingLink"
-        svg-path="https://gitlab.com/gitlab-org/gitlab-svgs/raw/master/illustrations/cluster_popover.svg"
+        :svg-path="illustrationPath"
       />
     </div>
   </div>
