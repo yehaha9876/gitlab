@@ -3251,6 +3251,9 @@ msgstr ""
 msgid "Enable classification control using an external service"
 msgstr ""
 
+msgid "Enable error tracking"
+msgstr ""
+
 msgid "Enable for this project"
 msgstr ""
 
@@ -4305,6 +4308,9 @@ msgid "Geo|secondary"
 msgstr ""
 
 msgid "Get a free instance review"
+msgstr ""
+
+msgid "Get started with error tracking"
 msgstr ""
 
 msgid "Getting started with releases"
@@ -5792,6 +5798,9 @@ msgid "Modal|Cancel"
 msgstr ""
 
 msgid "Modal|Close"
+msgstr ""
+
+msgid "Monitor your errors by integrating with Sentry"
 msgstr ""
 
 msgid "Monitoring"
