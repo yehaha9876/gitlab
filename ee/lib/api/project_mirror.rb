@@ -58,5 +58,24 @@ module API
         status 200
       end
     end
+
+    params do
+      requires :id, type: String, desc: 'The ID of a project'
+    end
+    resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
+      desc "Deletes a project's pull mirror"
+      delete ':id/mirror' do
+        authenticate!
+        authorize_admin_project
+
+        if project.mirror?
+          ::Projects::ImportDataDestroyService.new(project, current_user).execute
+
+          status 200
+        else
+          render_api_error!({ error: 'The project is not mirrored' }, 400)
+        end
+      end
+    end
   end
 end

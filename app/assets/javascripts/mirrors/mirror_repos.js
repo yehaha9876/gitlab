@@ -64,7 +64,9 @@ export default class MirrorRepos {
     this.debouncedUpdateUrl = _.debounce(() => this.updateUrl(), 200);
     this.$urlInput.on('input', () => this.debouncedUpdateUrl());
     this.$protectedBranchesInput.on('change', () => this.updateProtectedBranches());
-    this.$table.on('click', '.js-delete-mirror', event => this.deleteMirror(event));
+    this.$table.on('click', '.js-delete-mirror', event =>
+      this.deleteMirror($(event.currentTarget)),
+    );
   }
 
   togglePassword() {
@@ -77,9 +79,7 @@ export default class MirrorRepos {
     this.$passwordGroup.collapse(isPassword ? 'show' : 'hide');
   }
 
-  deleteMirror(event) {
-    const $target = $(event.currentTarget);
-
+  deleteMirror($target) {
     return Api.deleteProjectRemoteMirror(this.$form.data('projectId'), $target.data('mirrorId'))
       .then(() => this.removeRow($target))
       .catch(({ response }) => {

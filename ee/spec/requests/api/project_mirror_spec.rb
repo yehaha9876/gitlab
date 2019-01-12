@@ -220,4 +220,67 @@ describe API::ProjectMirror do
       end
     end
   end
+
+  describe 'DELETE /projects/:project_id/mirror' do
+    let(:project) { create(:project, :mirror) }
+    let(:endpoint) { endpoint_path(project.id) }
+
+    case_name = lambda {|user_type| "like a project #{user_type}"}
+
+    context 'as an authorized user' do
+      let(:owner) { project.owner }
+      let(:maintainer) { project.add_maintainer(create(:user)).user }
+      let(:authorized_users) { { owner: owner, maintainer: maintainer } }
+
+      where(case_names: case_name, user_type: [:owner, :maintainer])
+
+      with_them do
+        let(:user) { authorized_users[user_type] }
+
+        it 'deletes mirror' do
+          delete api(endpoint, user)
+
+          project.reload
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(project.import_data).to be_nil
+          expect(project).not_to be_mirror
+        end
+
+        context 'for an invalid project id' do
+          it_behaves_like '404 response' do
+            let(:message) { '404 Project Not Found' }
+            let(:request) { delete api(endpoint_path('4321'), user) }
+          end
+        end
+      end
+    end
+
+    context 'as an unauthorized user' do
+      let(:developer) { project.add_developer(create(:user)).user }
+      let(:reporter) { project.add_reporter(create(:user)).user }
+      let(:guest) { project.add_guest(create(:user)).user }
+      let(:unauthorized_users) { { developer: developer, reporter: reporter, guest: guest } }
+
+      where(case_names: case_name, user_type: [:developer, :reporter, :guest])
+
+      with_them do
+        let(:user) { unauthorized_users[user_type] }
+
+        it_behaves_like '403 response' do
+          let(:request) { delete api(endpoint, user) }
+        end
+      end
+
+      context 'as an anonymous user' do
+        it_behaves_like '401 response' do
+          let(:request) { delete api(endpoint, nil) }
+        end
+      end
+    end
+
+    def endpoint_path(project_id)
+      "/projects/#{project_id}/mirror"
+    end
+  end
 end

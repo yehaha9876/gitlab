@@ -143,7 +143,7 @@ describe 'Project mirror', :js do
         wait_for_requests
 
         expect(page).not_to have_content(first_key)
-        expect(page).to have_content(import_data.reload.ssh_public_key)
+        expect(page).to have_content(project.reload_import_data.ssh_public_key)
       end
     end
 

@@ -28,12 +28,12 @@ describe 'Project settings > [EE] repository' do
     end
   end
 
-  context 'licensed' do
+  context 'licensed', :js do
     before do
       stub_licensed_features(repository_mirrors: true)
     end
 
-    it 'shows pull mirror settings', :js do
+    it 'shows pull mirror settings' do
       visit project_settings_repository_path(project)
 
       page.within('.project-mirror-settings') do
@@ -64,6 +64,21 @@ describe 'Project settings > [EE] repository' do
 
         expect(mirror_url).not_to include(personal_access_token)
         expect(mirror_url).to include('https://*****@github.com/')
+      end
+    end
+
+    context 'with an existing pull mirror' do
+      let(:mirrored_project) { create(:project, :repository, :mirror, namespace: user.namespace) }
+
+      it 'deletes the mirror' do
+        visit project_settings_repository_path(mirrored_project)
+
+        find('.js-delete-mirror').click
+        wait_for_requests
+        mirrored_project.reload
+
+        expect(mirrored_project.import_data).to be_nil
+        expect(mirrored_project).not_to be_mirror
       end
     end
   end

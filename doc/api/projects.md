@@ -1674,21 +1674,9 @@ Read more in the [Project import/export](project_import_export.md) documentation
 
 Read more in the [Project members](members.md) documentation.
 
-## Start the pull mirroring process for a Project **[STARTER]**
+## Project mirror
 
-> Introduced in [GitLab Starter](https://about.gitlab.com/pricing) 10.3.
-
-```
-POST /projects/:id/mirror/pull
-```
-
-| Attribute | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
-
-```bash
-curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/mirror/pull
-```
+Read more in the [Project mirror](project_mirror.md) documentation.
 
 ## Project badges
 

@@ -1,0 +1,5 @@
+---
+title: Fix deleting pull mirror in project repo settings
+merge_request: 25225
+author:
+type: security
