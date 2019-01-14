@@ -101,16 +101,29 @@ describe Gitlab::Middleware::ReadOnly do
         expect(subject).not_to disallow_request
       end
 
-      it 'expects requests to sidekiq admin to be allowed' do
-        response = request.post('/admin/sidekiq')
+      context 'sidekiq admin requests' do
+        shared_examples_for 'valid sidekiq admin requests' do |mounted_at|
+          it 'allows requests' do
+            path = File.join(mounted_at, 'admin/sidekiq')
+            response = request.post(path)
 
-        expect(response).not_to be_redirect
-        expect(subject).not_to disallow_request
+            expect(response).not_to be_redirect
+            expect(subject).not_to disallow_request
 
-        response = request.get('/admin/sidekiq')
+            response = request.get(path)
 
-        expect(response).not_to be_redirect
-        expect(subject).not_to disallow_request
+            expect(response).not_to be_redirect
+            expect(subject).not_to disallow_request
+          end
+        end
+
+        context 'when GitLab is installed at /' do
+          it_behaves_like 'valid sidekiq admin requests', '/'
+        end
+
+        context 'when GitLab is installed at /gitlab' do
+          it_behaves_like 'valid sidekiq admin requests', '/gitlab'
+        end
       end
 
       where(:description, :path) do

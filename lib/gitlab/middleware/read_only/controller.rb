@@ -75,7 +75,7 @@ module Gitlab
 
         # Overridden in EE module
         def whitelisted_routes
-          grack_route || ReadOnly.internal_routes.any? { |path| request.path.include?(path) } || lfs_route || sidekiq_route
+          grack_route || ReadOnly.internal_routes.any? { |path| request.path.include?(path) } || lfs_route || sidekiq_route?
         end
 
         def grack_route
@@ -97,8 +97,8 @@ module Gitlab
           WHITELISTED_GIT_LFS_ROUTES[route_hash[:controller]]&.include?(route_hash[:action])
         end
 
-        def sidekiq_route
-          request.path.start_with?('/admin/sidekiq')
+        def sidekiq_route?
+          request.path.match?(%r{(/.*)?/admin/sidekiq})
         end
       end
     end
