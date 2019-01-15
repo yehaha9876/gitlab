@@ -1,7 +1,4 @@
 <script>
-// ee-only
-import DashboardMixin from 'ee/monitoring/components/dashboard_mixin';
-
 import _ from 'underscore';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -22,9 +19,6 @@ export default {
     EmptyState,
     Icon,
   },
-
-  // ee-only
-  mixins: [DashboardMixin],
 
   props: {
     hasMetrics: {
@@ -146,7 +140,9 @@ export default {
     this.servicePromises = [
       this.service
         .getGraphsData()
-        .then(data => this.store.storeMetrics(data))
+        .then(data => {
+          this.store.storeMetrics(data)
+        })
         .catch(() => Flash(s__('Metrics|There was an error while retrieving metrics'))),
       this.service
         .getDeploymentData()
@@ -237,8 +233,7 @@ export default {
       :name="groupData.group"
       :show-panels="showPanels"
     >
-      <component
-        :is="graphComponent"
+      <graph
         v-for="(graphData, graphIndex) in groupData.metrics"
         :key="graphIndex"
         :graph-data="graphData"
@@ -251,26 +246,7 @@ export default {
         :alert-data="getGraphAlerts(graphData.id)"
         group-id="monitor-area-chart"
       >
-        <!-- EE content -->
-        <template slot="additionalSvgContent" scope="{ graphDrawData }">
-          <threshold-lines
-            v-for="(alert, alertName) in alertData[graphData.id]"
-            :key="alertName"
-            :operator="alert.operator"
-            :threshold="alert.threshold"
-            :graph-draw-data="graphDrawData"
-          />
-        </template>
-        <alert-widget
-          v-if="alertsEndpoint && graphData.id"
-          :alerts-endpoint="alertsEndpoint"
-          :label="getGraphLabel(graphData)"
-          :current-alerts="getQueryAlerts(graphData)"
-          :custom-metric-id="graphData.id"
-          :alert-data="alertData[graphData.id]"
-          @setAlerts="setAlerts"
-        />
-      </component>
+      </graph>
     </graph-group>
   </div>
   <empty-state
