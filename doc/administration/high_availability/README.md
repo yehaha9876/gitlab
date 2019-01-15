@@ -72,6 +72,13 @@ larger one.
 - 2 or more GitLab application nodes (Unicorn, Workhorse, Sidekiq)
 - 1 NFS/Gitaly storage server
 
+#### Installation Instructions
+
+1. [PostgreSQL]()
+1. [Redis](./redis.md#redis-in-a-scaled-environment)
+1. [Gitaly]() (recommended) or [NFS]()
+1. [GitLab application nodes]()
+
 ### Full Scaling
 
 For very large installations it may be necessary to further split components
@@ -85,6 +92,8 @@ in size, indicating that there is contention or not enough resources.
 - 2 or more GitLab application nodes (Unicorn, Workhorse)
 - 2 or more Sidekiq nodes
 - 2 or more NFS/Gitaly storage servers
+
+
 
 ## High Availability Architecture Examples
 

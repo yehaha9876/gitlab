@@ -52,7 +52,22 @@ failure.
 Make sure that you read this document once as a whole before configuring the
 components below.
 
-### High Availability with Sentinel
+### Redis in a Scaled Environment **[CORE ONLY]**
+
+#### Provide your own Redis instance
+
+Redis version X+
+AWS Elasticache, etc. Redis from source.
+
+#### Standalone Redis using GitLab Omnibus
+
+```
+Example config
+```
+
+[Back to Scaled Architectures](./README.md#scalable-architecture-examples)
+
+### High Availability with Sentinel **[PREMIUM]**
 
 > **Notes:**
 > - Starting with GitLab `8.11`, you can configure a list of Redis Sentinel
