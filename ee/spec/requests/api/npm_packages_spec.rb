@@ -89,6 +89,52 @@ describe API::NpmPackages do
     end
   end
 
+  describe 'GET /api/v4/projects/:id/packages/npm/:package_name' do
+    let(:package) { create(:npm_package, project: project) }
+
+    context 'a public project' do
+      it 'returns the package info without oauth token' do
+        get_package(package)
+
+        expect_a_valid_package_response
+      end
+    end
+
+    context 'internal project' do
+      before do
+        project.team.truncate
+        project.update!(visibility_level: Gitlab::VisibilityLevel::INTERNAL)
+      end
+
+      it_behaves_like 'a package that requires auth'
+    end
+
+    context 'private project' do
+      before do
+        project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+      end
+
+      it_behaves_like 'a package that requires auth'
+
+      it 'denies request when not enough permissions' do
+        project.add_guest(user)
+
+        get_package_with_token(package)
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    def get_package(package, params = {})
+      get api("/projects/#{project.id}/packages/npm/" \
+              "#{package.name}"), params: params
+    end
+
+    def get_package_with_token(package, params = {})
+      get_package(package, params.merge(access_token: token.token))
+    end
+  end
+
   describe 'GET /api/v4/projects/:id/packages/npm/*package_name/-/*file_name' do
     let(:package) { create(:npm_package, project: project, name: "@#{project.full_path}") }
     let(:package_file) { package.package_files.first }

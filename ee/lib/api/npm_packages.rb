@@ -16,14 +16,6 @@ module API
       def find_project_by_package_name(name)
         Project.find_by_full_path(name.sub('@', ''))
       end
-
-      def project_package_name_match?
-        "@#{user_project.full_path}" == params[:package_name]
-      end
-
-      def ensure_project_package_match!
-        bad_request!(:package_name) unless project_package_name_match?
-      end
     end
 
     desc 'NPM registry endpoint at instance level' do
@@ -54,7 +46,22 @@ module API
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
         authorize_packages_feature!
-        ensure_project_package_match!
+      end
+
+      desc 'NPM registry endpoint at project level' do
+        detail 'This feature was introduced in GitLab 11.8'
+      end
+      params do
+        requires :package_name, type: String, desc: 'Package name'
+      end
+      get ':id/packages/npm/:package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
+        authorize_download_package!
+
+        packages = ::Packages::NpmPackagesFinder
+          .new(user_project, params[:package_name]).execute
+
+        present NpmPackagePresenter.new(user_project, params[:package_name], packages),
+          with: EE::API::Entities::NpmPackage
       end
 
       desc 'Download the NPM tarball' do
