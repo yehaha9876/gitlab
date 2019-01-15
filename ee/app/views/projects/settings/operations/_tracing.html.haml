@@ -2,7 +2,6 @@
 
 - setting = tracing_setting
 - has_jaeger_url = setting.external_url.present?
-- expanded = !Feature.enabled?(:error_tracking, @project)
 
 %section.settings.no-animate{ class: ('expanded' if expanded) }
   .settings-header
