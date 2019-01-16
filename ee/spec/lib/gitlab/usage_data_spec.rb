@@ -69,6 +69,7 @@ describe Gitlab::UsageData do
         projects_with_tracing_enabled
         projects_jira_dvcs_cloud_active
         projects_jira_dvcs_server_active
+        operations_dashboard
       ))
 
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
@@ -166,6 +167,32 @@ describe Gitlab::UsageData do
         expect(subject).to eq(service_desk_enabled_projects: 3,
                               service_desk_issues: 3)
       end
+    end
+  end
+
+  describe '#operations_dashboard_usage' do
+    subject { described_class.operations_dashboard_usage }
+
+    before do
+      blocked_user = create(:user, :blocked, dashboard: 'operations')
+      user_with_ops_dashboard = create(:user, dashboard: 'operations')
+
+      create(:users_ops_dashboard_project, user: blocked_user)
+      create(:users_ops_dashboard_project)
+      create(:users_ops_dashboard_project)
+      create(:users_ops_dashboard_project)
+    end
+
+    it 'gathers data on operations dashboard' do
+      expect(subject.keys).to include(*%i(
+        default_dashboard,
+        users_with_projects_added
+      ))
+    end
+
+    it 'bases counts on active users' do
+      expect(subject[:default_dashboard]).to eq(1)
+      expect(subject[:users_with_projects_added]).to eq(3)
     end
   end
 end

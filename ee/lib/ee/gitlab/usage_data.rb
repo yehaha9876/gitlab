@@ -88,6 +88,18 @@ module EE
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
+      def operations_dashboard_usage
+
+        users_with_ops_dashboard_as_default = count(::User.active.where(dashboard: 'operations'))
+        #users_with_projects_added = count(UsersOpsDashboardProject.select('distinct user_id').includes(:user).merge(::User.active))
+        users_with_projects_added = count(UsersOpsDashboardProject.select('distinct user_id'))
+
+        {
+          default_dashboard: users_with_ops_dashboard_as_default,
+          users_with_projects_added: users_with_projects_added
+        }
+      end
+
       override :system_usage_data
       def system_usage_data
         usage_data = super
@@ -102,7 +114,8 @@ module EE
           projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled,
           projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
           projects_with_packages: count(::Packages::Package.select('distinct project_id')),
-          projects_with_tracing_enabled: count(ProjectTracingSetting)
+          projects_with_tracing_enabled: count(ProjectTracingSetting),
+          operations_dashboard: operations_dashboard_usage
         }).merge(service_desk_counts).merge(security_products_usage)
 
         # MySql does not support recursive queries so we can't retrieve epics relationship depth
