@@ -88,11 +88,9 @@ module EE
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
+      # rubocop: disable CodeReuse/ActiveRecord
       def operations_dashboard_usage
-
         users_with_ops_dashboard_as_default = count(::User.active.where(dashboard: 'operations'))
-        #users_with_projects_added = count(UsersOpsDashboardProject.select('distinct user_id').includes(:user).merge(::User.active))
-        #users_with_projects_added = count(UsersOpsDashboardProject.select('distinct user_id'))
         users_with_projects_added = count(UsersOpsDashboardProject.select('distinct user_id').joins(:user).merge(::User.active))
 
         {
@@ -100,6 +98,7 @@ module EE
           users_with_projects_added: users_with_projects_added
         }
       end
+      # rubocop: enable CodeReuse/ActiveRecord
 
       override :system_usage_data
       def system_usage_data
