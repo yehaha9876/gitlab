@@ -16,8 +16,14 @@ module EE
       def authenticate_by_gitlab_geo_node_token!
         auth_header = headers['Authorization']
 
+        unless auth_header
+          unauthorized! && return
+        end
+
         begin
-          unless auth_header && ::Gitlab::Geo::JwtRequestDecoder.new(auth_header).decode
+          scope = ::Gitlab::Geo::JwtRequestDecoder.new(auth_header).decode.try { |x| x[:scope]}
+
+          unless scope == ::Gitlab::Geo::API_SCOPE
             unauthorized!
           end
         rescue ::Gitlab::Geo::InvalidDecryptionKeyError, ::Gitlab::Geo::InvalidSignatureTimeError => e

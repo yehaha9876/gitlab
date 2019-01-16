@@ -265,6 +265,7 @@ questions from [owasp.org](https://www.owasp.org).
 ### What session management requirements have been defined?
 
 - Geo JWTs are defined to last for only two minutes before needing to be regenerated.
+- Geo JWTs are generated for a specific scope: Geo API access, Git access, LFS + File ID, Upload + File ID, Job Artifact + File ID
 
 ### What access requirements have been defined for URI and Service calls?
 

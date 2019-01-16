@@ -48,7 +48,7 @@ module EE
         return super unless geo_request?
 
         payload = ::Gitlab::Geo::JwtRequestDecoder.new(request.headers['Authorization']).decode
-        if payload
+        if jwt_scope_valid?(payload)
           @authentication_result = ::Gitlab::Auth::Result.new(nil, project, :geo, [:download_code, :push_code]) # rubocop:disable Gitlab/ModuleWithInstanceVariables
           return # grant access
         end
@@ -58,6 +58,12 @@ module EE
         render_bad_geo_auth("Invalid decryption key")
       rescue ::Gitlab::Geo::InvalidSignatureTimeError
         render_bad_geo_auth("Invalid signature time ")
+      end
+
+      def jwt_scope_valid?(payload)
+        return false unless payload
+
+        payload[:scope] =~ Regexp.new("\\A(repository|wiki)-#{project.id}\\z")
       end
 
       def render_bad_geo_auth(message)

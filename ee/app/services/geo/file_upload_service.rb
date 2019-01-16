@@ -14,13 +14,17 @@ module Geo
 
     def execute
       # Returns { code: :ok, file: CarrierWave File object } upon success
-      data = ::Gitlab::Geo::JwtRequestDecoder.new(auth_header).decode
-      return unless data.present?
+      payload = ::Gitlab::Geo::JwtRequestDecoder.new(auth_header).decode
+      return unless payload.present? && jwt_scope_valid?(payload)
 
-      uploader_klass.new(object_db_id, data).execute
+      uploader_klass.new(object_db_id, payload).execute
     end
 
     private
+
+    def jwt_scope_valid?(payload)
+      (payload[:file_type] == object_type.to_s) && (payload[:file_id] == object_db_id)
+    end
 
     def uploader_klass
       "Gitlab::Geo::#{service_klass_name}Uploader".constantize
