@@ -311,15 +311,19 @@ export const filterByKey = (firstArray = [], secondArray = [], key = '') =>
 export const getUnapprovedVulnerabilities = (issues = [], unapproved = []) =>
   issues.filter(item => unapproved.find(el => el === item.vulnerability));
 
-export const groupedTextBuilder = (
+export const groupedTextBuilder = ({
   reportType = '',
   paths = {},
   newIssues = 0,
   resolvedIssues = 0,
   allIssues = 0,
   status = '',
-) => {
+}) => {
   let baseString = '';
+
+  // TODO: This should be the point where we can start updating things
+  // debugger;
+  // Security scanning detected X new, Y dismissed and Z fixed vulnerabilities.
 
   if (!paths.base) {
     if (newIssues > 0) {

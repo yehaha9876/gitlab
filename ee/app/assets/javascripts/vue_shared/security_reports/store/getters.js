@@ -12,13 +12,13 @@ const groupedReportText = (report, name, errorMessage, loadingMessage) => {
     return loadingMessage;
   }
 
-  return groupedTextBuilder(
-    name,
-    report.paths,
-    (report.newIssues || []).length,
-    (report.resolvedIssues || []).length,
-    (report.allIssues || []).length,
-  );
+  return groupedTextBuilder({
+    reportType: name,
+    paths: report.paths,
+    newIssues: (report.newIssues || []).length,
+    resolvedIssues: (report.resolvedIssues || []).length,
+    allIssues: (report.allIssues || []).length,
+  });
 };
 
 export const groupedSastText = ({ sast }) =>
@@ -74,7 +74,14 @@ export const groupedSummaryText = (state, getters) => {
    */
   const paths = { head: true, base: !getters.noBaseInAllReports };
 
-  return groupedTextBuilder(reportType, paths, added, fixed, existing, status);
+  return groupedTextBuilder({
+    reportType,
+    paths,
+    newIssues: added,
+    resolvedIssues: fixed,
+    allIssues: existing,
+    status,
+  });
 };
 
 export const summaryStatus = (state, getters) => {
