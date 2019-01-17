@@ -38,7 +38,7 @@ describe 'User squashes a merge request', :js do
   def accept_mr
     expect(page).to have_button('Merge')
 
-    uncheck 'Delete source branch'
+    uncheck 'Remove source branch'
     click_on 'Merge'
   end
 

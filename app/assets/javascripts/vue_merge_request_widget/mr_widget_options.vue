@@ -34,7 +34,7 @@ import eventHub from './event_hub';
 import stateMaps from './stores/ee_switch_state_maps';
 import SquashBeforeMerge from './components/states/squash_before_merge.vue';
 import notify from '~/lib/utils/notify';
-import SourceBranchDeletionStatus from './components/source_branch_deletion_status.vue';
+import SourceBranchRemovalStatus from './components/source_branch_removal_status.vue';
 import GroupedTestReportsApp from '../reports/components/grouped_test_reports_app.vue';
 import { setFaviconOverlay } from '../lib/utils/common_utils';
 
@@ -67,7 +67,7 @@ export default {
     'mr-widget-merge-when-pipeline-succeeds': MergeWhenPipelineSucceedsState,
     'mr-widget-auto-merge-failed': AutoMergeFailed,
     'mr-widget-rebase': RebaseState,
-    SourceBranchDeletionStatus,
+    SourceBranchRemovalStatus,
     GroupedTestReportsApp,
   },
   props: {
@@ -99,10 +99,10 @@ export default {
     shouldRenderRelatedLinks() {
       return !!this.mr.relatedLinks && !this.mr.isNothingToMergeState;
     },
-    shouldRenderSourceBranchDeletionStatus() {
+    shouldRenderSourceBranchRemovalStatus() {
       return (
-        !this.mr.canDeleteSourceBranch &&
-        this.mr.shouldDeleteSourceBranch &&
+        !this.mr.canRemoveSourceBranch &&
+        this.mr.shouldRemoveSourceBranch &&
         (!this.mr.isNothingToMergeState && !this.mr.isMergedState)
       );
     },
@@ -273,8 +273,8 @@ export default {
 
       // `params` should be an Array contains a Boolean, like `[true]`
       // Passing parameter as Boolean didn't work.
-      eventHub.$on('SetBranchDeleteFlag', params => {
-        [this.mr.isDeletingSourceBranch] = params;
+      eventHub.$on('SetBranchRemoveFlag', params => {
+        [this.mr.isRemovingSourceBranch] = params;
       });
 
       eventHub.$on('FailedToMerge', mergeError => {
@@ -329,7 +329,7 @@ export default {
           :related-links="mr.relatedLinks"
         />
 
-        <source-branch-deletion-status v-if="shouldRenderSourceBranchDeletionStatus" />
+        <source-branch-removal-status v-if="shouldRenderSourceBranchRemovalStatus" />
       </div>
       <div v-if="shouldRenderMergeHelp" class="mr-widget-footer"><mr-widget-merge-help /></div>
     </div>

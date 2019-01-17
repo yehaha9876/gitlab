@@ -17,7 +17,7 @@ export default class MRWidgetService {
     return axios.post(this.endpoints.removeWIPPath);
   }
 
-  deleteSourceBranch() {
+  removeSourceBranch() {
     return axios.delete(this.endpoints.sourceBranchPath);
   }
 

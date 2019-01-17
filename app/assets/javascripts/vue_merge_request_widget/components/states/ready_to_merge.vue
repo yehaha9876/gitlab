@@ -20,7 +20,7 @@ export default {
   },
   data() {
     return {
-      deleteSourceBranch: this.mr.shouldDeleteSourceBranch,
+      removeSourceBranch: this.mr.shouldRemoveSourceBranch,
       mergeWhenBuildSucceeds: false,
       useCommitMessageWithDescription: false,
       setToMergeWhenPipelineSucceeds: false,
@@ -103,7 +103,7 @@ export default {
           this.mr.preventMerge,
       );
     },
-    isDeleteSourceBranchButtonDisabled() {
+    isRemoveSourceBranchButtonDisabled() {
       return this.isMergeButtonDisabled;
     },
     shouldShowSquashBeforeMerge() {
@@ -146,7 +146,7 @@ export default {
         sha: this.mr.sha,
         commit_message: this.commitMessage,
         merge_when_pipeline_succeeds: this.setToMergeWhenPipelineSucceeds,
-        should_remove_source_branch: this.deleteSourceBranch === true,
+        should_remove_source_branch: this.removeSourceBranch === true,
         squash: this.mr.squash,
       };
 
@@ -192,10 +192,10 @@ export default {
             MergeRequest.decreaseCounter();
             stopPolling();
 
-            // If user checked dlete source branch and we didn't delete the branch yet
-            // we should start another polling for source branch delete process
-            if (this.deleteSourceBranch && data.source_branch_exists) {
-              this.initiateDeleteSourceBranchPolling();
+            // If user checked remove source branch and we didn't remove the branch yet
+            // we should start another polling for source branch remove process
+            if (this.removeSourceBranch && data.source_branch_exists) {
+              this.initiateRemoveSourceBranchPolling();
             }
           } else if (data.merge_error) {
             eventHub.$emit('FailedToMerge', data.merge_error);
@@ -209,33 +209,33 @@ export default {
           new Flash('Something went wrong while merging this merge request. Please try again.'); // eslint-disable-line
         });
     },
-    initiateDeleteSourceBranchPolling() {
-      // We need to show source branch is being deleted spinner in another component
-      eventHub.$emit('SetBranchDeleteFlag', [true]);
+    initiateRemoveSourceBranchPolling() {
+      // We need to show source branch is being removed spinner in another component
+      eventHub.$emit('SetBranchRemoveFlag', [true]);
 
       simplePoll((continuePolling, stopPolling) => {
-        this.handleDeleteBranchPolling(continuePolling, stopPolling);
+        this.handleRemoveBranchPolling(continuePolling, stopPolling);
       });
     },
-    handleDeleteBranchPolling(continuePolling, stopPolling) {
+    handleRemoveBranchPolling(continuePolling, stopPolling) {
       this.service
         .poll()
         .then(res => res.data)
         .then(data => {
           // If source branch exists then we should continue polling
-          // because deleting a source branch is a background task and takes time
+          // because removing a source branch is a background task and takes time
           if (data.source_branch_exists) {
             continuePolling();
           } else {
-            // Branch is deleted. Update widget, stop polling and hide the spinner
+            // Branch is removed. Update widget, stop polling and hide the spinner
             eventHub.$emit('MRWidgetUpdateRequested', () => {
-              eventHub.$emit('SetBranchDeleteFlag', [false]);
+              eventHub.$emit('SetBranchRemoveFlag', [false]);
             });
             stopPolling();
           }
         })
         .catch(() => {
-          new Flash('Something went wrong while deleting the source branch. Please try again.'); // eslint-disable-line
+          new Flash('Something went wrong while removing the source branch. Please try again.'); // eslint-disable-line
         });
     },
   },
@@ -301,15 +301,15 @@ export default {
         </span>
         <div class="media-body-wrap space-children">
           <template v-if="shouldShowMergeControls()">
-            <label v-if="mr.canDeleteSourceBranch">
+            <label v-if="mr.canRemoveSourceBranch">
               <input
-                id="delete-source-branch-input"
-                v-model="deleteSourceBranch"
-                :disabled="isDeleteSourceBranchButtonDisabled"
-                class="js-delete-source-branch-checkbox"
+                id="remove-source-branch-input"
+                v-model="removeSourceBranch"
+                :disabled="isRemoveSourceBranchButtonDisabled"
+                class="js-remove-source-branch-checkbox"
                 type="checkbox"
               />
-              Delete source branch
+              Remove source branch
             </label>
 
             <!-- Placeholder for EE extension of this component -->

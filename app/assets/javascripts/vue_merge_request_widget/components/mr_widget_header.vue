@@ -111,7 +111,7 @@ export default {
 
       <div v-if="mr.isOpen" class="branch-actions d-flex">
         <a
-          v-if="!mr.sourceBranchDeleted"
+          v-if="!mr.sourceBranchRemoved"
           v-tooltip
           :href="webIdePath"
           :title="ideButtonTitle"
@@ -124,7 +124,7 @@ export default {
           {{ s__('mrWidget|Open in Web IDE') }}
         </a>
         <button
-          :disabled="mr.sourceBranchDeleted"
+          :disabled="mr.sourceBranchRemoved"
           data-target="#modal_merge_info"
           data-toggle="modal"
           class="btn btn-default js-check-out-branch append-right-default"

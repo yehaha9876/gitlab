@@ -25,19 +25,19 @@ export default {
   data() {
     return {
       isCancellingAutoMerge: false,
-      isDeletingSourceBranch: false,
+      isRemovingSourceBranch: false,
     };
   },
   computed: {
-    canDeleteSourceBranch() {
+    canRemoveSourceBranch() {
       const {
-        shouldDeleteSourceBranch,
-        canDeleteSourceBranch,
+        shouldRemoveSourceBranch,
+        canRemoveSourceBranch,
         mergeUserId,
         currentUserId,
       } = this.mr;
 
-      return !shouldDeleteSourceBranch && canDeleteSourceBranch && mergeUserId === currentUserId;
+      return !shouldRemoveSourceBranch && canRemoveSourceBranch && mergeUserId === currentUserId;
     },
   },
   methods: {
@@ -54,14 +54,14 @@ export default {
           Flash('Something went wrong. Please try again.');
         });
     },
-    deleteSourceBranch() {
+    removeSourceBranch() {
       const options = {
         sha: this.mr.sha,
         merge_when_pipeline_succeeds: true,
         should_remove_source_branch: true,
       };
 
-      this.isDeletingSourceBranch = true;
+      this.isRemovingSourceBranch = true;
       this.service
         .merge(options)
         .then(res => res.data)
@@ -71,7 +71,7 @@ export default {
           }
         })
         .catch(() => {
-          this.isDeletingSourceBranch = false;
+          this.isRemovingSourceBranch = false;
           Flash('Something went wrong. Please try again.');
         });
     },
@@ -105,23 +105,23 @@ export default {
           {{ s__('mrWidget|The changes will be merged into') }}
           <a :href="mr.targetBranchPath" class="label-branch"> {{ mr.targetBranch }} </a>
         </p>
-        <p v-if="mr.shouldDeleteSourceBranch">
-          {{ s__('mrWidget|The source branch will be deleted') }}
+        <p v-if="mr.shouldRemoveSourceBranch">
+          {{ s__('mrWidget|The source branch will be removed') }}
         </p>
         <p v-else class="d-flex align-items-start">
           <span class="append-right-10">
-            {{ s__('mrWidget|The source branch will not be deleted') }}
+            {{ s__('mrWidget|The source branch will not be removed') }}
           </span>
           <a
-            v-if="canDeleteSourceBranch"
-            :disabled="isDeletingSourceBranch"
+            v-if="canRemoveSourceBranch"
+            :disabled="isRemovingSourceBranch"
             role="button"
-            class="btn btn-sm btn-default js-delete-source-branch"
+            class="btn btn-sm btn-default js-remove-source-branch"
             href="#"
-            @click.prevent="deleteSourceBranch"
+            @click.prevent="removeSourceBranch"
           >
-            <i v-if="isDeletingSourceBranch" class="fa fa-spinner fa-spin" aria-hidden="true"> </i>
-            {{ s__('mrWidget|Delete source branch') }}
+            <i v-if="isRemovingSourceBranch" class="fa fa-spinner fa-spin" aria-hidden="true"> </i>
+            {{ s__('mrWidget|Remove source branch') }}
           </a>
         </p>
       </section>

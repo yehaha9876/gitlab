@@ -21,7 +21,7 @@ export default {
   },
   computed: {
     missingBranchName() {
-      return this.mr.sourceBranchDeleted ? 'source' : 'target';
+      return this.mr.sourceBranchRemoved ? 'source' : 'target';
     },
     missingBranchNameMessage() {
       return sprintf(

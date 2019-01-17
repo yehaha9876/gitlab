@@ -16,8 +16,8 @@ describe('MRWidgetMergeWhenPipelineSucceeds', () => {
 
     vm = mountComponent(Component, {
       mr: {
-        shouldDeleteSourceBranch: false,
-        canDeleteSourceBranch: true,
+        shouldRemoveSourceBranch: false,
+        canRemoveSourceBranch: true,
         canCancelAutomaticMerge: true,
         mergeUserId: 1,
         currentUserId: 1,
@@ -35,35 +35,35 @@ describe('MRWidgetMergeWhenPipelineSucceeds', () => {
   });
 
   describe('computed', () => {
-    describe('canDeleteSourceBranch', () => {
-      it('should return true when user is able to delete source branch', () => {
-        expect(vm.canDeleteSourceBranch).toBeTruthy();
+    describe('canRemoveSourceBranch', () => {
+      it('should return true when user is able to remove source branch', () => {
+        expect(vm.canRemoveSourceBranch).toBeTruthy();
       });
 
       it('should return false when user id is not the same with who set the MWPS', () => {
         vm.mr.mergeUserId = 2;
 
-        expect(vm.canDeleteSourceBranch).toBeFalsy();
+        expect(vm.canRemoveSourceBranch).toBeFalsy();
 
         vm.mr.currentUserId = 2;
 
-        expect(vm.canDeleteSourceBranch).toBeTruthy();
+        expect(vm.canRemoveSourceBranch).toBeTruthy();
 
         vm.mr.currentUserId = 3;
 
-        expect(vm.canDeleteSourceBranch).toBeFalsy();
+        expect(vm.canRemoveSourceBranch).toBeFalsy();
       });
 
-      it('should return false when shouldDeleteSourceBranch set to false', () => {
-        vm.mr.shouldDeleteSourceBranch = true;
+      it('should return false when shouldRemoveSourceBranch set to false', () => {
+        vm.mr.shouldRemoveSourceBranch = true;
 
-        expect(vm.canDeleteSourceBranch).toBeFalsy();
+        expect(vm.canRemoveSourceBranch).toBeFalsy();
       });
 
-      it('should return false if user is not able to delete the source branch', () => {
-        vm.mr.canDeleteSourceBranch = false;
+      it('should return false if user is not able to remove the source branch', () => {
+        vm.mr.canRemoveSourceBranch = false;
 
-        expect(vm.canDeleteSourceBranch).toBeFalsy();
+        expect(vm.canRemoveSourceBranch).toBeFalsy();
       });
     });
   });
@@ -91,7 +91,7 @@ describe('MRWidgetMergeWhenPipelineSucceeds', () => {
       });
     });
 
-    describe('deleteSourceBranch', () => {
+    describe('removeSourceBranch', () => {
       it('should set flag and call service then request main component to update the widget', done => {
         spyOn(vm.service, 'merge').and.returnValue(
           Promise.resolve({
@@ -101,7 +101,7 @@ describe('MRWidgetMergeWhenPipelineSucceeds', () => {
           }),
         );
 
-        vm.deleteSourceBranch();
+        vm.removeSourceBranch();
         setTimeout(() => {
           expect(eventHub.$emit).toHaveBeenCalledWith('MRWidgetUpdateRequested');
           expect(vm.service.merge).toHaveBeenCalledWith({
@@ -121,17 +121,17 @@ describe('MRWidgetMergeWhenPipelineSucceeds', () => {
       expect(vm.$el.innerText).toContain('to be merged automatically when the pipeline succeeds');
       expect(vm.$el.innerText).toContain('The changes will be merged into');
       expect(vm.$el.innerText).toContain(targetBranch);
-      expect(vm.$el.innerText).toContain('The source branch will not be deleted');
+      expect(vm.$el.innerText).toContain('The source branch will not be removed');
       expect(vm.$el.querySelector('.js-cancel-auto-merge').innerText).toContain(
         'Cancel automatic merge',
       );
 
       expect(vm.$el.querySelector('.js-cancel-auto-merge').getAttribute('disabled')).toBeFalsy();
-      expect(vm.$el.querySelector('.js-delete-source-branch').innerText).toContain(
-        'Delete source branch',
+      expect(vm.$el.querySelector('.js-remove-source-branch').innerText).toContain(
+        'Remove source branch',
       );
 
-      expect(vm.$el.querySelector('.js-delete-source-branch').getAttribute('disabled')).toBeFalsy();
+      expect(vm.$el.querySelector('.js-remove-source-branch').getAttribute('disabled')).toBeFalsy();
     });
 
     it('should disable cancel auto merge button when the action is in progress', done => {
@@ -143,33 +143,33 @@ describe('MRWidgetMergeWhenPipelineSucceeds', () => {
       });
     });
 
-    it('should show source branch will be deleted text when it source branch set to delete', done => {
-      vm.mr.shouldDeleteSourceBranch = true;
+    it('should show source branch will be removed text when it source branch set to remove', done => {
+      vm.mr.shouldRemoveSourceBranch = true;
 
       Vue.nextTick(() => {
         const normalizedText = vm.$el.innerText.replace(/\s+/g, ' ');
 
-        expect(normalizedText).toContain('The source branch will be deleted');
-        expect(normalizedText).not.toContain('The source branch will not be deleted');
+        expect(normalizedText).toContain('The source branch will be removed');
+        expect(normalizedText).not.toContain('The source branch will not be removed');
         done();
       });
     });
 
-    it('should not show delete source branch button when user not able to delete source branch', done => {
+    it('should not show remove source branch button when user not able to remove source branch', done => {
       vm.mr.currentUserId = 4;
 
       Vue.nextTick(() => {
-        expect(vm.$el.querySelector('.js-delete-source-branch')).toEqual(null);
+        expect(vm.$el.querySelector('.js-remove-source-branch')).toEqual(null);
         done();
       });
     });
 
-    it('should disable delete source branch button when the action is in progress', done => {
-      vm.isDeletingSourceBranch = true;
+    it('should disable remove source branch button when the action is in progress', done => {
+      vm.isRemovingSourceBranch = true;
 
       Vue.nextTick(() => {
         expect(
-          vm.$el.querySelector('.js-delete-source-branch').getAttribute('disabled'),
+          vm.$el.querySelector('.js-remove-source-branch').getAttribute('disabled'),
         ).toBeTruthy();
         done();
       });

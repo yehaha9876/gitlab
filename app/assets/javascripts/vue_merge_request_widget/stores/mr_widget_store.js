@@ -68,9 +68,8 @@ export default class MergeRequestStore {
     this.conflictResolutionPath = data.conflict_resolution_path;
     this.cancelAutoMergePath = data.cancel_merge_when_pipeline_succeeds_path;
     this.removeWIPPath = data.remove_wip_path;
-    this.sourceBranchDeleted = !data.source_branch_exists;
-    // Should favor `delete` instead of `remove`: rename once backend provides renamed variable
-    this.shouldDeleteSourceBranch = data.delete_source_branch || data.remove_source_branch || false;
+    this.sourceBranchRemoved = !data.source_branch_exists;
+    this.shouldRemoveSourceBranch = data.remove_source_branch || false;
     this.onlyAllowMergeIfPipelineSucceeds = data.only_allow_merge_if_pipeline_succeeds || false;
     this.mergeWhenPipelineSucceeds = data.merge_when_pipeline_succeeds || false;
     this.mergePath = data.merge_path;
@@ -84,16 +83,10 @@ export default class MergeRequestStore {
     this.mergeCheckPath = data.merge_check_path;
     this.mergeActionsContentPath = data.commit_change_content_path;
     this.mergeCommitPath = data.merge_commit_path;
-    // Should favor `delete` instead of `remove`: rename once backend provides renamed variable
-    // TODO:[SAM(us)] what does this do?
-    this.isDeletingSourceBranch =
-      this.isDeletingSourceBranch || this.isRemovingSourceBranch || false;
+    this.isRemovingSourceBranch = this.isRemovingSourceBranch || false;
     this.isOpen = data.state === 'opened';
     this.hasMergeableDiscussionsState = data.mergeable_discussions_state === false;
-    // Should favor `delete` instead of `remove` for branches
-    // rename once backend provides renamed variable
-    this.canDeleteSourceBranch =
-      currentUser.can_delete_source_branch || currentUser.can_remove_source_branch || false;
+    this.canRemoveSourceBranch = currentUser.can_remove_source_branch || false;
     this.canMerge = !!data.merge_path;
     this.canCreateIssue = currentUser.can_create_issue || false;
     this.canCancelAutomaticMerge = !!data.cancel_merge_when_pipeline_succeeds_path;
