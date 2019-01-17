@@ -344,11 +344,6 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
     ##
     postgresql['sql_user_password'] = 'fca0b89a972d69f00eb3ec98a5838484'
     gitlab_rails['db_password'] = 'mypassword'
-
-    ##
-    ## Enable FDW support for the Geo Tracking Database (improves performance)
-    ##
-    geo_secondary['db_fdw'] = true
     ```
 
     For external PostgreSQL instances, see [additional instructions](external_database.md).
