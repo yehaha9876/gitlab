@@ -74,11 +74,7 @@ export default {
     </div>
     <div class="prepend-top-default">
       <div v-if="projects.length" class="row m-0 prepend-top-default">
-        <div
-          v-for="project in projects"
-          :key="project.id"
-          class="col-12 col-md-6 odds-md-pad-right evens-md-pad-left"
-        >
+        <div v-for="project in projects" :key="project.id" class="col-12 col-md-4">
           <dashboard-project :project="project" />
         </div>
       </div>
