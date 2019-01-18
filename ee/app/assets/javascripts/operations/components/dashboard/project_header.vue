@@ -27,10 +27,11 @@ export default {
 
 <template>
   <div class="project-header d-flex align-items-center">
-    <project-avatar :project="project" :size="20" class="flex-shrink-0" />
+    <project-avatar :project="project" :size="24" class="flex-shrink-0" />
     <div class="flex-grow-1">
       <a class="js-project-link cgray" :href="project.web_url">
-        <span class="js-name-with-namespace bold"> {{ project.name_with_namespace }} </span>
+        <span class="js-project-namespace">{{ project.namespace.name }} /&nbsp;</span>
+        <span class="js-project-name bold"> {{ project.name }} </span>
       </a>
     </div>
     <div class="dropdown js-more-actions">

@@ -15,21 +15,55 @@
 }
 
 .operations-dashboard {
-  .branch-commit {
-    * {
-      vertical-align: middle;
+  .card {
+    background-color: $gray-50;
+    border-color: transparent;
+
+    .card-header {
+      background-color: $gray-100;
+      border-color: transparent;
+
+      .avatar-container {
+        border: 1px solid $issue-boards-card-shadow;
+        border-radius: 4px;
+      }
     }
+  }
+
+  .operations-dashboard-project-commit {
+    height: 40px;
 
     .icon-container,
     .commit-icon {
       display: inline;
+      vertical-align: middle;
+    }
+
+    .commit-icon {
       color: $gl-text-color-tertiary;
+    }
+
+    .commit-title {
+      margin-top: -3px;
     }
 
     .ref-name {
       font-weight: $gl-font-weight-bold;
       color: $gl-text-color;
     }
+  }
+
+  .project-alert-icon {
+    vertical-align: middle;
+  }
+
+  .operations-dashboard-project-pipeline {
+    background-color: $gray-100;
+    border-radius: 20.5px;
+    line-height: $gl-line-height;
+    padding: $gl-padding-8;
+    margin-top: $gl-padding;
+    text-align: center;
   }
 }
 
