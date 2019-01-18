@@ -37,15 +37,15 @@ export default {
         :key="pipeline.id"
         :class="{
           'flat-connector-before': index === 0 && graphPosition === 'right',
-          active: !pipeline.isCollapsed || pipeline.isLoading,
-          'left-connector': !pipeline.isCollapsed && graphPosition === 'left',
+          active: pipeline.isExpanded || pipeline.isLoading,
+          'left-connector': pipeline.isExpanded && graphPosition === 'left',
         }"
         :pipeline-id="pipeline.id"
         :project-name="pipeline.project.name"
         :pipeline-status="pipeline.details.status"
         :pipeline-path="pipeline.path"
         :is-loading="pipeline.isLoading"
-        @pipelineClicked="$emit('linkedPipelineClick', pipeline, index);"
+        @pipelineClicked="$emit('linkedPipelineClick', pipeline, index)"
       />
     </ul>
   </div>

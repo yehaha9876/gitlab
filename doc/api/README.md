@@ -56,6 +56,7 @@ The following API resources are available:
   - [Projects](projects.md) including setting Webhooks
   - [Project access requests](access_requests.md)
   - [Project badges](project_badges.md)
+  - [Project clusters](project_clusters.md)
   - [Project-level variables](project_level_variables.md)
   - [Project import/export](project_import_export.md)
   - [Project members](members.md)
@@ -75,6 +76,9 @@ The following API resources are available:
 - [Sidekiq metrics](sidekiq_metrics.md)
 - [System hooks](system_hooks.md)
 - [Tags](tags.md)
+- [Releases](releases/index.md)
+- Release Assets
+  - [Links](releases/links.md)
 - [Todos](todos.md)
 - [Users](users.md)
 - [Validate CI configuration](lint.md) (linting)

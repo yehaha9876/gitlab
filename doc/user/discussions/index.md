@@ -343,10 +343,6 @@ merge request with all the comments associated to it.
 
 Replying to this email will, consequentially, create a new comment on the associated merge request.
 
-The review email is currently hidden behind the `batch_review_notification` feature flag,
-and can be enabled by contacting your GitLab instance administrator and having them
-run `Feature.enable(:batch_review_notification)` using the `gitlab-rails console`.
-
 ## Filtering notes
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/26723) in GitLab 11.5. 
@@ -354,7 +350,7 @@ run `Feature.enable(:batch_review_notification)` using the `gitlab-rails console
 For issues with many comments like activity notes and user comments, sometimes 
 finding useful information can be hard. There is a way to filter comments from single notes and discussions for merge requests and issues.  
 
-From a merge request's **Discussion** tab, or from an issue overview, find the filter's dropdown menu on the right side of the page, from which you can choose one of the following options:
+From a merge request's **Discussion** tab, or from an epic/issue overview, find the filter's dropdown menu on the right side of the page, from which you can choose one of the following options:
 
 - **Show all activity**: displays all user comments and system notes
 (issue updates, mentions from other issues, changes to the description, etc).

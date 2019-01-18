@@ -59,29 +59,33 @@ describe 'Feature Flags', :js do
       add_feature_flag('feature-flag-to-edit', 'with some description', false)
     end
 
-    context 'and input is valid' do
-      it 'updates the feature flag' do
-        name = 'new-name'
-        description = 'new description'
+    shared_examples_for 'correct edit behavior' do
+      context 'and input is valid' do
+        it 'updates the feature flag' do
+          name = 'new-name'
+          description = 'new description'
 
-        edit_feature_flag('feature-flag-to-edit', name, description, true)
+          edit_feature_flag('feature-flag-to-edit', name, description, true)
 
-        expect_feature_flag(name, description, true)
-        expect(page).to have_selector '.flash-container', text: 'successfully updated'
+          expect_feature_flag(name, description, true)
+          expect(page).to have_selector '.flash-container', text: 'successfully updated'
+        end
       end
-    end
 
-    context 'and input is invalid' do
-      where(:name, :description, :error_message, &invalid_input_table)
+      context 'and input is invalid' do
+        where(:name, :description, :error_message, &invalid_input_table)
 
-      with_them do
-        it 'displays an error message' do
-          edit_feature_flag('feature-flag-to-edit', name, description, false)
+        with_them do
+          it 'displays an error message' do
+            edit_feature_flag('feature-flag-to-edit', name, description, false)
 
-          expect(page).to have_selector '.alert-danger', text: error_message
+            expect(page).to have_selector '.alert-danger', text: error_message
+          end
         end
       end
     end
+
+    it_behaves_like 'correct edit behavior'
   end
 
   context 'when deleting a feature flag' do
@@ -89,36 +93,92 @@ describe 'Feature Flags', :js do
       add_feature_flag('feature-flag-to-delete', 'with some description', false)
     end
 
-    context 'and no feature flags are left' do
-      it 'shows empty state' do
+    shared_examples_for 'correct delete behavior' do
+      context 'and no feature flags are left' do
+        it 'shows empty state' do
+          visit(project_feature_flags_path(project))
+
+          delete_feature_flag('feature-flag-to-delete')
+
+          expect_empty_state
+        end
+      end
+
+      context 'and there is a feature flag left' do
+        before do
+          add_feature_flag('another-feature-flag', '', true)
+        end
+
+        it 'shows feature flag table without deleted feature flag' do
+          visit(project_feature_flags_path(project))
+
+          delete_feature_flag('feature-flag-to-delete')
+
+          expect_feature_flag('another-feature-flag', '', true)
+        end
+      end
+
+      it 'does not delete if modal is cancelled' do
         visit(project_feature_flags_path(project))
 
-        delete_feature_flag('feature-flag-to-delete')
+        delete_feature_flag('feature-flag-to-delete', false)
 
-        expect_empty_state
+        expect_feature_flag('feature-flag-to-delete', 'with some description', false)
       end
     end
 
-    context 'and there is a feature flag left' do
-      before do
-        add_feature_flag('another-feature-flag', '', true)
-      end
+    it_behaves_like 'correct delete behavior'
+  end
 
-      it 'shows feature flag table without deleted feature flag' do
-        visit(project_feature_flags_path(project))
-
-        delete_feature_flag('feature-flag-to-delete')
-
-        expect_feature_flag('another-feature-flag', '', true)
-      end
-    end
-
-    it 'does not delete if modal is cancelled' do
+  context 'when user sees empty index page' do
+    before do
       visit(project_feature_flags_path(project))
+    end
 
-      delete_feature_flag('feature-flag-to-delete', false)
+    shared_examples_for 'correct empty index behavior' do
+      it 'shows empty state' do
+        expect(page).to have_content('Get started with feature flags')
+        expect(page).to have_link('New Feature Flag')
+        expect(page).to have_button('Configure')
+      end
+    end
 
-      expect_feature_flag('feature-flag-to-delete', 'with some description', false)
+    it_behaves_like 'correct empty index behavior'
+  end
+
+  context 'when user sees index page' do
+    let!(:feature_flag_enabled) { create(:operations_feature_flag, project: project, active: true) }
+    let!(:feature_flag_disabled) { create(:operations_feature_flag, project: project, active: false) }
+
+    before do
+      visit(project_feature_flags_path(project))
+    end
+
+    context 'when user sees all tab' do
+      it 'shows all feature flags' do
+        expect(page).to have_content(feature_flag_enabled.name)
+        expect(page).to have_content(feature_flag_disabled.name)
+        expect(page).to have_link('New Feature Flag')
+        expect(page).to have_button('Configure')
+      end
+    end
+
+    context 'when user sees enabled tab' do
+      it 'shows only active feature flags' do
+        find('.js-featureflags-tab-enabled').click
+
+        expect(page).to have_content(feature_flag_enabled.name)
+        expect(page).not_to have_content(feature_flag_disabled.name)
+      end
+    end
+
+    context 'when user sees disabled tab' do
+      it 'shows only inactive feature flags' do
+        find('.js-featureflags-tab-disabled').click
+
+        expect(page).not_to have_content(feature_flag_enabled.name)
+        expect(page).to have_content(feature_flag_disabled.name)
+      end
     end
   end
 
@@ -140,7 +200,8 @@ describe 'Feature Flags', :js do
   end
 
   def delete_feature_flag(name, confirm = true)
-    delete_button = find('.gl-responsive-table-row', text: name).find('.btn-danger[title="Delete"]')
+    delete_button = find('.gl-responsive-table-row', text: name).find('.js-feature-flag-delete-button')
+
     delete_button.click
 
     within '.modal' do
@@ -154,7 +215,9 @@ describe 'Feature Flags', :js do
 
   def edit_feature_flag(old_name, new_name, new_description, new_status)
     visit(project_feature_flags_path(project))
-    edit_button = find('.gl-responsive-table-row', text: old_name).find('.btn-default[title="Edit"]')
+
+    edit_button = find('.gl-responsive-table-row', text: old_name).find('.js-feature-flag-edit-button')
+
     edit_button.click
 
     fill_in 'Name', with: new_name

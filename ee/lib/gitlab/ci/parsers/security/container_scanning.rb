@@ -5,23 +5,9 @@ module Gitlab
     module Parsers
       module Security
         class ContainerScanning < Common
-          extend ::Gitlab::Utils::Override
+          include Security::Concerns::DeprecatedSyntax
 
           DEPRECATED_REPORT_VERSION = "1.3".freeze
-
-          override :parse_report
-          def parse_report(json_data)
-            report = super
-
-            if report.is_a?(Array)
-              report = {
-                  "version" => DEPRECATED_REPORT_VERSION,
-                  "vulnerabilities" => report
-              }
-            end
-
-            report
-          end
 
           def parse!(json_data, report)
             vulnerabilities = format_report(JSON.parse!(json_data))
@@ -51,26 +37,35 @@ module Gitlab
 
           def format_vulnerability(vulnerability)
             {
-                'category' => 'container_scanning',
-                'message' => name(vulnerability),
-                'description' => vulnerability['description'],
-                'cve' => vulnerability['vulnerability'],
-                'severity' => translate_severity(vulnerability['severity']),
-                'solution' => solution(vulnerability),
-                'confidence' => 'Medium',
-                'scanner' => { 'id' => 'clair', 'name' => 'Clair' },
-                'identifiers' => [
-                  {
-                      'type' => 'cve',
-                      'name' => vulnerability['vulnerability'],
-                      'value' => vulnerability['vulnerability'],
-                      'url' => vulnerability['link']
-                  }
-                ],
-                'links' => [{ 'url' => vulnerability['link'] }],
-                'priority' => 'Unknown',
-                'url' => vulnerability['link'],
-                'tool' => 'clair'
+              'category' => 'container_scanning',
+              'message' => name(vulnerability),
+              'description' => vulnerability['description'],
+              'cve' => vulnerability['vulnerability'],
+              'severity' => translate_severity(vulnerability['severity']),
+              'solution' => solution(vulnerability),
+              'confidence' => 'Medium',
+              'location' => {
+                'operating_system' => vulnerability["namespace"],
+                'dependency' => {
+                  'package' => {
+                    'name' => vulnerability["featurename"]
+                  },
+                  'version' => vulnerability["featureversion"]
+                }
+              },
+              'scanner' => { 'id' => 'clair', 'name' => 'Clair' },
+              'identifiers' => [
+                {
+                  'type' => 'cve',
+                  'name' => vulnerability['vulnerability'],
+                  'value' => vulnerability['vulnerability'],
+                  'url' => vulnerability['link']
+                }
+              ],
+              'links' => [{ 'url' => vulnerability['link'] }],
+              'priority' => 'Unknown',
+              'url' => vulnerability['link'],
+              'tool' => 'clair'
             }
           end
 
@@ -99,14 +94,8 @@ module Gitlab
             "#{vulnerability['featurename']} - #{vulnerability['vulnerability']}"
           end
 
-          def metadata_version(vulnerability)
-            '1.3'
-          end
-
           def generate_location_fingerprint(location)
-            # Location is irrelevant for Clair vulnerabilities.
-            # SHA1 value for 'clair'
-            'cb750fa5a7a31c527d5c15388a432c4ba3338457'
+            Digest::SHA1.hexdigest("#{location['operating_system']}:#{location.dig('dependency', 'package', 'name')}")
           end
         end
       end

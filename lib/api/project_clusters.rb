@@ -16,7 +16,7 @@ module API
       end
     end
 
-    prepend EE::API::ProjectClusters
+    prepend EE::API::ProjectClusters # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     params do
       requires :id, type: String, desc: 'The ID of the project'
@@ -65,7 +65,7 @@ module API
         use :create_params_ee
       end
       post ':id/clusters/user' do
-        authorize! :create_cluster, user_project
+        authorize! :add_cluster, user_project, 'Instance does not support multiple Kubernetes clusters'
 
         user_cluster = ::Clusters::CreateService
           .new(current_user, create_cluster_user_params)

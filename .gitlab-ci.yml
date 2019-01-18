@@ -406,6 +406,7 @@ cloud-native-image:
   variables:
     GIT_DEPTH: "1"
   cache: {}
+  when: always
   script:
     - gem install gitlab --no-document
     - CNG_PROJECT_PATH="gitlab-org/build/CNG" BUILD_TRIGGER_TOKEN=$CI_JOB_TOKEN ./scripts/trigger-build cng
@@ -554,12 +555,12 @@ setup-test-env:
   cache: {}
   dependencies: []
   environment: &review-environment
-    name: review/${CI_COMMIT_REF_NAME}
-    url: https://gitlab-${CI_ENVIRONMENT_SLUG}.${REVIEW_APPS_DOMAIN}
+    name: review/mr-${CI_MERGE_REQUEST_IID}
+    url: https://gitlab-mr-${CI_MERGE_REQUEST_IID}.${REVIEW_APPS_DOMAIN}
   only:
     refs:
-      - branches@gitlab-org/gitlab-ce
-      - branches@gitlab-org/gitlab-ee
+      - merge_requests@gitlab-org/gitlab-ce
+      - merge_requests@gitlab-org/gitlab-ee
     kubernetes: active
   except:
     refs:
@@ -619,6 +620,22 @@ rspec-mysql:
   <<: *rspec-metadata-mysql
   parallel: 50
 
+.rspec-quarantine: &rspec-quarantine
+  script:
+    - export CACHE_CLASSES=true
+    - scripts/gitaly-test-spawn
+    - bin/rspec --color --format documentation --tag quarantine spec/
+
+rspec-pg-quarantine:
+  <<: *rspec-metadata-pg
+  <<: *rspec-quarantine
+  allow_failure: true
+
+rspec-mysql-quarantine:
+  <<: *rspec-metadata-mysql
+  <<: *rspec-quarantine
+  allow_failure: true
+
 # EE jobs START
 rspec-pg-ee:
   <<: *rspec-ee-pg
@@ -630,6 +647,23 @@ rspec-mysql-ee:
 
 rspec-pg geo: *rspec-metadata-pg-geo-9-6
 rspec-pg-10 geo: *rspec-metadata-pg-geo-10-2
+
+
+.rspec-quarantine-ee: &rspec-quarantine-ee
+  script:
+    - export CACHE_CLASSES=true
+    - scripts/gitaly-test-spawn
+    - bin/rspec --color --format documentation --tag quarantine ee/spec/
+
+rspec-pg-quarantine-ee:
+  <<: *rspec-metadata-pg
+  <<: *rspec-quarantine-ee
+  allow_failure: true
+
+rspec-mysql-quarantine-ee:
+  <<: *rspec-metadata-mysql
+  <<: *rspec-quarantine-ee
+  allow_failure: true
 # EE jobs END
 
 static-analysis:
@@ -938,6 +972,7 @@ qa:selectors:
     - bundle exec bin/qa Test::Sanity::Selectors
 
 .qa-frontend-node: &qa-frontend-node
+  <<: *dedicated-no-docs-no-db-pull-cache-job
   stage: test
   variables:
     NODE_OPTIONS: --max_old_space_size=3584
@@ -952,11 +987,6 @@ qa:selectors:
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - date
     - yarn run webpack-prod
-  <<: *except-docs
-
-qa-frontend-node:6:
-  <<: *qa-frontend-node
-  image: node:6-alpine
 
 qa-frontend-node:8:
   <<: *qa-frontend-node
@@ -1004,6 +1034,21 @@ lint:javascript:report:
     paths:
       - eslint-report.html
 
+jsdoc:
+  <<: *dedicated-no-docs-pull-cache-job
+  stage: post-test
+  dependencies:
+    - compile-assets
+  before_script: []
+  script:
+    - date
+    - yarn run jsdoc || true # ignore exit code
+  artifacts:
+    name: jsdoc
+    expire_in: 31d
+    paths:
+      - jsdoc/
+
 pages:
   <<: *dedicated-no-docs-no-db-pull-cache-job
   before_script: []
@@ -1013,6 +1058,7 @@ pages:
     - karma
     - gitlab:assets:compile
     - lint:javascript:report
+    - jsdoc
   script:
     - mv public/ .public/
     - mkdir public/
@@ -1022,6 +1068,7 @@ pages:
     - mv webpack-report/ public/webpack-report/ || true
     - cp .public/assets/application-*.css public/application.css || true
     - cp .public/assets/application-*.css.gz public/application.css.gz || true
+    - mv jsdoc/ public/jsdoc/ || true
   artifacts:
     paths:
       - public
@@ -1074,8 +1121,8 @@ review-deploy:
   allow_failure: true
   variables:
     GIT_DEPTH: "1"
-    HOST_SUFFIX: "${CI_ENVIRONMENT_SLUG}"
-    DOMAIN: "-${CI_ENVIRONMENT_SLUG}.${REVIEW_APPS_DOMAIN}"
+    HOST_SUFFIX: "mr-${CI_MERGE_REQUEST_IID}"
+    DOMAIN: "-mr-${CI_MERGE_REQUEST_IID}.${REVIEW_APPS_DOMAIN}"
     GITLAB_HELM_CHART_REF: "master"
     API_TOKEN: "${GITLAB_BOT_MULTI_PROJECT_PIPELINE_POLLING_TOKEN}"
   environment:

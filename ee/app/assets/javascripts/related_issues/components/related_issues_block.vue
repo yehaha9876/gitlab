@@ -6,6 +6,7 @@ import sortableConfig from 'ee/sortable/sortable_config';
 import { GlLoadingIcon } from '@gitlab/ui';
 import issueItem from './issue_item.vue';
 import addIssuableForm from './add_issuable_form.vue';
+import { issuableIconMap, issuableQaClassMap } from '../constants';
 
 export default {
   name: 'RelatedIssuesBlock',
@@ -78,6 +79,10 @@ export default {
       required: false,
       default: 'Related issues',
     },
+    issuableType: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     hasRelatedIssues() {
@@ -94,6 +99,12 @@ export default {
     },
     hasHelpPath() {
       return this.helpPath.length > 0;
+    },
+    issuableTypeIcon() {
+      return issuableIconMap[this.issuableType];
+    },
+    qaClass() {
+      return issuableQaClassMap[this.issuableType];
     },
   },
   mounted() {
@@ -157,17 +168,18 @@ export default {
               class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge mx-1"
             >
               <span class="issue-count-badge-count">
-                <icon name="issues" class="mr-1 text-secondary" /> {{ badgeLabel }}
+                <icon :name="issuableTypeIcon" class="mr-1 text-secondary" /> {{ badgeLabel }}
               </span>
             </div>
             <button
               v-if="canAdmin"
               ref="issueCountBadgeAddButton"
               type="button"
-              class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
+              :class="qaClass"
+              class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-sm btn-default"
               aria-label="Add an issue"
               data-placement="top"
-              @click="$emit('toggleAddRelatedIssuesForm', $event);"
+              @click="$emit('toggleAddRelatedIssuesForm', $event)"
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
             </button>
@@ -183,15 +195,16 @@ export default {
       >
         <add-issuable-form
           :is-submitting="isSubmitting"
+          :issuable-type="issuableType"
           :input-value="inputValue"
           :pending-references="pendingReferences"
           :auto-complete-sources="autoCompleteSources"
           :path-id-separator="pathIdSeparator"
-          @pendingIssuableRemoveRequest="$emit('pendingIssuableRemoveRequest', $event);"
-          @addIssuableFormInput="$emit('addIssuableFormInput', $event);"
-          @addIssuableFormBlur="$emit('addIssuableFormBlur', $event);"
-          @addIssuableFormSubmit="$emit('addIssuableFormSubmit', $event);"
-          @addIssuableFormCancel="$emit('addIssuableFormCancel', $event);"
+          @pendingIssuableRemoveRequest="$emit('pendingIssuableRemoveRequest', $event)"
+          @addIssuableFormInput="$emit('addIssuableFormInput', $event)"
+          @addIssuableFormBlur="$emit('addIssuableFormBlur', $event)"
+          @addIssuableFormSubmit="$emit('addIssuableFormSubmit', $event)"
+          @addIssuableFormCancel="$emit('addIssuableFormCancel', $event)"
         />
       </div>
       <div
@@ -238,7 +251,7 @@ export default {
               :can-reorder="canReorder"
               :path-id-separator="pathIdSeparator"
               event-namespace="relatedIssue"
-              @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event);"
+              @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
             />
           </li>
         </ul>

@@ -115,6 +115,9 @@ module API
       expose :group_name do |group_link, options|
         group_link.group.name
       end
+      expose :group_full_path do |group_link, options|
+        group_link.group.full_path
+      end
       expose :group_access, as: :group_access_level
       expose :expires_at
     end
@@ -277,7 +280,7 @@ module API
         # N+1 is solved then by using `subject.tags.map(&:name)`
         # MR describing the solution: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/20555
         super(projects_relation).preload(:group)
-                                .preload(project_group_links: :group,
+                                .preload(project_group_links: { group: :route },
                                          fork_network: :root_project,
                                          fork_network_member: :forked_from_project,
                                          forked_from_project: [:route, :forks, :tags, namespace: :route])
@@ -989,7 +992,7 @@ module API
             if options[:group_members]
               options[:group_members].find { |member| member.source_id == project.namespace_id }
             else
-              project.group.group_member(options[:current_user])
+              project.group.highest_group_member(options[:current_user])
             end
           end
         end

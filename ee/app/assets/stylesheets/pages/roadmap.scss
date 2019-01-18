@@ -20,6 +20,36 @@ $column-right-gradient: linear-gradient(
   $roadmap-gradient-gray 100%
 );
 
+@keyframes colorTransitionDetailsCell {
+  from {
+    background-color: $blue-100;
+  }
+
+  to {
+    background-color: $white-light;
+  }
+}
+
+@keyframes fadeInDetails {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeinTimelineBar {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 0.75;
+  }
+}
+
 @mixin roadmap-scroll-mixin {
   height: $grid-size;
   width: $details-cell-width;
@@ -141,11 +171,11 @@ $column-right-gradient: linear-gradient(
 
     .item-label,
     .item-sublabel .sublabel-value {
-      color: $theme-gray-600;
+      color: $gray-600;
       font-weight: 400;
 
       &.label-dark {
-        color: $theme-gray-900;
+        color: $gray-900;
       }
 
       &.label-bold {
@@ -209,7 +239,7 @@ $column-right-gradient: linear-gradient(
     &:hover {
       .epic-details-cell,
       .epic-timeline-cell {
-        background-color: $theme-gray-100;
+        background-color: $gray-100;
       }
     }
 
@@ -226,6 +256,12 @@ $column-right-gradient: linear-gradient(
       .epic-details-cell::after,
       .epic-timeline-cell {
         height: 100%;
+      }
+    }
+
+    &.newly-added-epic {
+      .epic-details-cell {
+        animation: colorTransitionDetailsCell 3s;
       }
     }
 
@@ -251,6 +287,11 @@ $column-right-gradient: linear-gradient(
         height: $item-height;
       }
 
+      .epic-title,
+      .epic-group-timeframe {
+        animation: fadeInDetails 1s;
+      }
+
       .epic-title {
         display: table;
         table-layout: fixed;
@@ -258,7 +299,7 @@ $column-right-gradient: linear-gradient(
 
         .epic-url {
           display: table-cell;
-          color: $theme-gray-900;
+          color: $gray-900;
           font-weight: 600;
           white-space: nowrap;
           overflow: hidden;
@@ -267,7 +308,7 @@ $column-right-gradient: linear-gradient(
       }
 
       .epic-group-timeframe {
-        color: $theme-gray-700;
+        color: $gray-700;
         width: 100%;
         white-space: nowrap;
         overflow: hidden;
@@ -294,23 +335,10 @@ $column-right-gradient: linear-gradient(
         background-color: $blue-500;
         border-radius: $border-radius-default;
         opacity: 0.75;
+        animation: fadeinTimelineBar 1s;
 
         &:hover {
           opacity: 1;
-        }
-
-        &.start-date-outside::before,
-        &.end-date-outside::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          height: 100%;
-        }
-
-        &.start-date-outside::before,
-        &.end-date-outside::after {
-          border-top: 12px solid transparent;
-          border-bottom: 12px solid transparent;
         }
 
         &.start-date-undefined {
@@ -329,31 +357,6 @@ $column-right-gradient: linear-gradient(
             $blue-200 50%,
             $roadmap-gradient-gray 100%
           );
-        }
-
-        &.start-date-outside {
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
-
-          &::before {
-            left: -$grid-size;
-            border-right: $grid-size solid $blue-500;
-          }
-        }
-
-        &.end-date-outside {
-          border-top-right-radius: 0;
-          border-bottom-right-radius: 0;
-
-          &::after {
-            right: -$grid-size;
-            border-left: $grid-size solid $blue-500;
-          }
-        }
-
-        &.start-date-outside,
-        &.start-date-undefined.end-date-outside {
-          left: $grid-size;
         }
       }
 

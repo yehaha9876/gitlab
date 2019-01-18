@@ -22,6 +22,7 @@ describe('RelatedIssuesBlock', () => {
       vm = new RelatedIssuesBlock({
         propsData: {
           pathIdSeparator: '#',
+          issuableType: 'issue',
         },
       }).$mount();
     });
@@ -45,6 +46,7 @@ describe('RelatedIssuesBlock', () => {
         propsData: {
           pathIdSeparator: '#',
           isFetching: true,
+          issuableType: 'issue',
         },
       }).$mount();
     });
@@ -64,6 +66,7 @@ describe('RelatedIssuesBlock', () => {
         propsData: {
           pathIdSeparator: '#',
           canAdmin: true,
+          issuableType: 'issue',
         },
       }).$mount();
     });
@@ -79,6 +82,7 @@ describe('RelatedIssuesBlock', () => {
         propsData: {
           pathIdSeparator: '#',
           isFormVisible: true,
+          issuableType: 'issue',
         },
       }).$mount();
     });
@@ -94,6 +98,7 @@ describe('RelatedIssuesBlock', () => {
         propsData: {
           pathIdSeparator: '#',
           relatedIssues: [issuable1, issuable2],
+          issuableType: 'issue',
         },
       }).$mount();
     });
@@ -109,6 +114,7 @@ describe('RelatedIssuesBlock', () => {
         propsData: {
           pathIdSeparator: '#',
           relatedIssues: [issuable1, issuable2, issuable3, issuable4, issuable5],
+          issuableType: 'issue',
         },
       }).$mount();
     });
@@ -139,6 +145,32 @@ describe('RelatedIssuesBlock', () => {
 
       expect(beforeAfterIds.beforeId).toBe(3);
       expect(beforeAfterIds.afterId).toBe(5);
+    });
+  });
+
+  describe('renders correct icon when', () => {
+    [
+      {
+        icon: 'issues',
+        issuableType: 'issue',
+      },
+      {
+        icon: 'epic',
+        issuableType: 'epic',
+      },
+    ].forEach(({ issuableType, icon }) => {
+      it(`issuableType=${issuableType} is passed`, () => {
+        vm = new RelatedIssuesBlock({
+          propsData: {
+            pathIdSeparator: '#',
+            issuableType,
+          },
+        }).$mount();
+
+        const el = vm.$el.querySelector(`.issue-count-badge-count .ic-${icon}`);
+
+        expect(el).not.toBeNull();
+      });
     });
   });
 });

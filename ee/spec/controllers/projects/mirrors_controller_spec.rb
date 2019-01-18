@@ -115,6 +115,51 @@ describe Projects::MirrorsController do
     end
   end
 
+  describe 'recreating a pull mirror' do
+    let(:import_url) { 'http://username:password@local.dev' }
+    let(:project) { create(:project, :mirror, import_url: import_url) }
+
+    before do
+      sign_in(project.owner)
+    end
+
+    it 'retains the right credentials' do
+      expect(project.mirror).to eq(true)
+      expect(project.import_url).to eq(import_url)
+      expect(project.import_data.auth_method).to eq('password')
+      expect(project.import_data.user).to eq('username')
+      expect(project.import_data.password).to eq('password')
+
+      do_put(project,
+             mirror: true,
+             mirror_user_id: project.owner.id,
+             import_data_attributes: {
+               auth_method: 'ssh_public_key'
+             })
+
+      project.reload
+      expect(project.mirror).to eq(true)
+      expect(project.import_data.auth_method).to eq('ssh_public_key')
+      expect(project.import_data.ssh_public_key).to be_present
+      expect(project.import_data.ssh_private_key).to be_present
+
+      do_put(project,
+             mirror: true,
+             import_url: 'http://newuser@local.dev',
+             import_data_attributes: {
+               password: 'newpassword'
+             })
+
+      project.reload
+      expect(project.mirror).to eq(true)
+      expect(project.import_data.auth_method).to eq('password')
+      expect(project.import_data.user).to eq('newuser')
+      expect(project.import_data.password).to eq('newpassword')
+      expect(project.import_data.ssh_public_key).to be_nil
+      expect(project.import_data.ssh_private_key).to be_nil
+    end
+  end
+
   describe 'forcing an update on a pull mirror' do
     it 'forces update' do
       project = create(:project, :mirror)
@@ -159,7 +204,7 @@ describe Projects::MirrorsController do
         do_put(project, { import_data_attributes: { password: 'update' } }, format: :json)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(project.import_data(true).id).to eq(import_data_id)
+        expect(project.reload_import_data.id).to eq(import_data_id)
       end
 
       it 'sets ssh_known_hosts_verified_at and verified_by when the update sets known hosts' do
@@ -167,7 +212,7 @@ describe Projects::MirrorsController do
 
         expect(response).to have_gitlab_http_status(200)
 
-        import_data = project.import_data(true)
+        import_data = project.reload_import_data
         expect(import_data.ssh_known_hosts_verified_at).to be_within(1.minute).of(Time.now)
         expect(import_data.ssh_known_hosts_verified_by).to eq(project.owner)
       end
@@ -179,7 +224,7 @@ describe Projects::MirrorsController do
 
         expect(response).to have_gitlab_http_status(200)
 
-        import_data = project.import_data(true)
+        import_data = project.reload_import_data
         expect(import_data.ssh_known_hosts_verified_at).to be_nil
         expect(import_data.ssh_known_hosts_verified_by).to be_nil
       end

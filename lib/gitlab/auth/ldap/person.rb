@@ -4,7 +4,7 @@ module Gitlab
   module Auth
     module LDAP
       class Person
-        prepend ::EE::Gitlab::Auth::LDAP::Person
+        prepend ::EE::Gitlab::Auth::LDAP::Person # rubocop: disable Cop/InjectEnterpriseEditionModule
 
         # Active Directory-specific LDAP filter that checks if bit 2 of the
         # userAccountControl attribute is set.
@@ -100,9 +100,7 @@ module Gitlab
 
         private
 
-        def entry
-          @entry
-        end
+        attr_reader :entry
 
         def config
           @config ||= Gitlab::Auth::LDAP::Config.new(provider)
