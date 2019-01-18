@@ -8118,9 +8118,6 @@ msgstr ""
 msgid "mrWidget|Create an issue to resolve them later"
 msgstr ""
 
-msgid "mrWidget|Delete Source Branch"
-msgstr ""
-
 msgid "mrWidget|Delete source branch"
 msgstr ""
 
@@ -8253,7 +8250,7 @@ msgstr ""
 msgid "mrWidget|You are not allowed to edit this project directly. Please fork to make changes."
 msgstr ""
 
-msgid "mrWidget|You can delete source branch now"
+msgid "mrWidget|You can delete the source branch now"
 msgstr ""
 
 msgid "mrWidget|You can merge this merge request manually using the"

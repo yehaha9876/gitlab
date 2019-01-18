@@ -309,7 +309,7 @@ export default {
                 class="js-remove-source-branch-checkbox"
                 type="checkbox"
               />
-              Remove source branch
+              Delete source branch
             </label>
 
             <!-- Placeholder for EE extension of this component -->
