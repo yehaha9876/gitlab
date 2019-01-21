@@ -135,6 +135,12 @@ module IssuesHelper
     can?(current_user, :create_issue, project)
   end
 
+  def issue_closed_label(issue)
+    return _("Closed (moved)") if issue.moved?
+
+    _("Closed")
+  end
+
   # Required for Banzai::Filter::IssueReferenceFilter
   module_function :url_for_issue
   module_function :url_for_internal_issue
