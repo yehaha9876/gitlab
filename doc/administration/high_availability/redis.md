@@ -23,6 +23,13 @@ for details.
 ### Standalone Redis using GitLab Omnibus **[CORE ONLY]**
 
 The GitLab Omnibus package can be used to configure a standalone Redis server.
+In this configuration Redis is not highly available, and represents a single
+point of failure. However, in a scaled environment the objective is to allow
+the environment to handle more users or to increase throughput. Redis itself
+is generally stable and can handle many requests so it is an acceptable
+trade off to have only a single instance. See [Scaling and High Availability](./README.md)
+for an overview of GitLab scaling and high availability options.
+
 The steps below are the minimum necessary to configure a Redis server with
 Omnibus.
 
