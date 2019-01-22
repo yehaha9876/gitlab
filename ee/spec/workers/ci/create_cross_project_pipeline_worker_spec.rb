@@ -21,14 +21,5 @@ describe Ci::CreateCrossProjectPipelineWorker do
         described_class.new.perform(bridge.id)
       end
     end
-
-    context 'when bridge does not exist' do
-      it 'does nothing' do
-        expect(Ci::CreateCrossProjectPipelineService)
-          .not_to receive(:new)
-
-        described_class.new.perform(123)
-      end
-    end
   end
 end
