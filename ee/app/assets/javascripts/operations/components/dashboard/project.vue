@@ -46,8 +46,8 @@ export default {
 </script>
 
 <template>
-  <div class="card">
-    <project-header :project="project" class="card-header" @remove="removeProject" />
+  <div class="operations-dashboard-project card">
+    <project-header :project="project" @remove="removeProject" />
     <div class="card-body">
       <div class="row">
         <div class="col-1 align-self-center">

@@ -55,9 +55,9 @@ export default {
 </script>
 
 <template>
-  <div class="row">
+  <div class="operations-dashboard-project-alert row">
     <div class="col-12">
-      <icon :class="alertClasses" class="project-alert-icon" name="warning" />
+      <icon :class="alertClasses" class="operations-dashboard-project-alert-icon" name="warning" />
       <span class="js-alert-count text-secondary prepend-left-4"> {{ alertCount }} </span>
     </div>
     <div class="js-last-alert col-12">

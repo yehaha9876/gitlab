@@ -15,11 +15,11 @@
 }
 
 .operations-dashboard {
-  .card {
+  &-project {
     background-color: $gray-50;
     border-color: transparent;
 
-    .card-header {
+    &-header {
       background-color: $gray-100;
       border-color: transparent;
 
@@ -28,45 +28,45 @@
         border-radius: 4px;
       }
     }
-  }
 
-  .operations-dashboard-project-commit {
-    height: 43px;
+    &-commit {
+      height: 43px;
 
-    .icon-container,
-    .commit-icon {
-      display: inline;
-      vertical-align: middle;
+      .icon-container,
+      .commit-icon {
+        display: inline;
+        vertical-align: middle;
+      }
+
+      .commit-icon {
+        color: $gl-text-color-tertiary;
+      }
+
+      .ref-name {
+        font-weight: $gl-font-weight-bold;
+        color: $gl-text-color;
+      }
     }
 
-    .commit-icon {
-      color: $gl-text-color-tertiary;
+    &-time-ago {
+      color: $gray-700;
+
+      &-icon {
+        color: $gray-500;
+        vertical-align: text-bottom;
+      }
     }
 
-    .ref-name {
-      font-weight: $gl-font-weight-bold;
-      color: $gl-text-color;
+    &-pipeline {
+      background-color: $gray-100;
+      border-radius: 20.5px;
+      line-height: $gl-line-height;
+      padding: $gl-padding-8;
+      margin-top: $gl-padding;
+      text-align: center;
     }
-  }
 
-  .project-alert-icon {
-    vertical-align: middle;
-  }
-
-  .operations-dashboard-project-pipeline {
-    background-color: $gray-100;
-    border-radius: 20.5px;
-    line-height: $gl-line-height;
-    padding: $gl-padding-8;
-    margin-top: $gl-padding;
-    text-align: center;
-  }
-
-  .operations-dashboard-project-time-ago {
-    color: $gray-700;
-
-    &-icon {
-      color: $gray-500;
+    &-alert-icon {
       vertical-align: text-bottom;
     }
   }
