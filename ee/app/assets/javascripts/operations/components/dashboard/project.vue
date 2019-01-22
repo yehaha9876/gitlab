@@ -46,7 +46,7 @@ export default {
 </script>
 
 <template>
-  <div class="operations-dashboard-project card">
+  <div class="ops-dashboard-project card">
     <project-header :project="project" @remove="removeProject" />
     <div class="card-body">
       <div class="row">
@@ -59,10 +59,11 @@ export default {
           />
         </div>
 
-        <div class="col-6 align-self-center operations-dashboard-project-commit">
-          <template v-if="project.last_deployment">
-            <project-commit :last-deployment="project.last_deployment" />
-          </template>
+        <div class="col-6 align-self-center ops-dashboard-project-commit">
+          <project-commit
+            v-if="project.last_deployment"
+            :last-deployment="project.last_deployment"
+          />
         </div>
 
         <div class="col-5 text-right align-self-center">

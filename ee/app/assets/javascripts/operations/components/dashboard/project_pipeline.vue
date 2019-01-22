@@ -10,5 +10,5 @@ export default {
 </script>
 
 <template>
-  <div class="operations-dashboard-project-pipeline">pipeline info</div>
+  <div class="ops-dashboard-project-pipeline">pipeline info</div>
 </template>

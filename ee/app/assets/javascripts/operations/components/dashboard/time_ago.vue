@@ -26,8 +26,8 @@ export default {
 };
 </script>
 <template>
-  <div v-if="hasFinishedTime" class="operations-dashboard-project-time-ago">
-    <icon name="clock" class="operations-dashboard-project-time-ago-icon" />
+  <div v-if="hasFinishedTime" class="ops-dashboard-project-time-ago">
+    <icon name="clock" class="ops-dashboard-project-time-ago-icon" />
 
     <time v-tooltip :title="tooltipTitle(finishedTime)" data-placement="top" data-container="body">
       {{ timeFormated(finishedTime) }}

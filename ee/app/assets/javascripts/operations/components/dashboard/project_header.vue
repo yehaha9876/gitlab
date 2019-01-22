@@ -26,7 +26,7 @@ export default {
 </script>
 
 <template>
-  <div class="operations-dashboard-project-header card-header d-flex align-items-center">
+  <div class="ops-dashboard-project-header card-header d-flex align-items-center">
     <project-avatar :project="project" :size="24" class="flex-shrink-0" />
     <div class="flex-grow-1">
       <a class="js-project-link cgray" :href="project.web_url">

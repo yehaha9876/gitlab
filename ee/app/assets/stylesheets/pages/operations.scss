@@ -14,61 +14,59 @@
   }
 }
 
-.operations-dashboard {
-  &-project {
-    background-color: $gray-50;
+.ops-dashboard-project {
+  background-color: $gray-50;
+  border-color: transparent;
+
+  &-header {
+    background-color: $gray-100;
     border-color: transparent;
 
-    &-header {
-      background-color: $gray-100;
-      border-color: transparent;
+    .avatar-container {
+      border: 1px solid $issue-boards-card-shadow;
+      border-radius: 4px;
+    }
+  }
 
-      .avatar-container {
-        border: 1px solid $issue-boards-card-shadow;
-        border-radius: 4px;
-      }
+  &-commit {
+    height: 43px;
+
+    .icon-container,
+    .commit-icon {
+      display: inline;
+      vertical-align: middle;
     }
 
-    &-commit {
-      height: 43px;
-
-      .icon-container,
-      .commit-icon {
-        display: inline;
-        vertical-align: middle;
-      }
-
-      .commit-icon {
-        color: $gl-text-color-tertiary;
-      }
-
-      .ref-name {
-        font-weight: $gl-font-weight-bold;
-        color: $gl-text-color;
-      }
+    .commit-icon {
+      color: $gl-text-color-tertiary;
     }
 
-    &-time-ago {
-      color: $gray-700;
-
-      &-icon {
-        color: $gray-500;
-        vertical-align: text-bottom;
-      }
+    .ref-name {
+      font-weight: $gl-font-weight-bold;
+      color: $gl-text-color;
     }
+  }
 
-    &-pipeline {
-      background-color: $gray-100;
-      border-radius: 20.5px;
-      line-height: $gl-line-height;
-      padding: $gl-padding-8;
-      margin-top: $gl-padding;
-      text-align: center;
-    }
+  &-time-ago {
+    color: $gray-700;
 
-    &-alert-icon {
+    &-icon {
+      color: $gray-500;
       vertical-align: text-bottom;
     }
+  }
+
+  &-pipeline {
+    background-color: $gray-100;
+    border-radius: 20.5px;
+    line-height: $gl-line-height;
+    padding: $gl-padding-8;
+    margin-top: $gl-padding;
+    text-align: center;
+  }
+
+  &-alert-icon {
+    vertical-align: text-bottom;
   }
 }
 
