@@ -31,7 +31,7 @@
   }
 
   .operations-dashboard-project-commit {
-    height: 40px;
+    height: 43px;
 
     .icon-container,
     .commit-icon {
@@ -41,10 +41,6 @@
 
     .commit-icon {
       color: $gl-text-color-tertiary;
-    }
-
-    .commit-title {
-      margin-top: -3px;
     }
 
     .ref-name {
@@ -64,6 +60,15 @@
     padding: $gl-padding-8;
     margin-top: $gl-padding;
     text-align: center;
+  }
+
+  .operations-dashboard-project-time-ago {
+    color: $gray-700;
+
+    &-icon {
+      color: $gray-500;
+      vertical-align: text-bottom;
+    }
   }
 }
 

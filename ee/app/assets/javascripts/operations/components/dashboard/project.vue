@@ -3,6 +3,7 @@ import { mapActions } from 'vuex';
 import timeago from '~/vue_shared/mixins/timeago';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
+import TimeAgo from './time_ago.vue';
 import DashboardAlerts from './alerts.vue';
 import ProjectHeader from './project_header.vue';
 import ProjectCommit from './project_commit.vue';
@@ -15,6 +16,7 @@ export default {
     ProjectHeader,
     ProjectCommit,
     ProjectPipeline,
+    TimeAgo,
     UserAvatarLink,
   },
   mixins: [timeago],
@@ -57,13 +59,14 @@ export default {
           />
         </div>
 
-        <div class="col-7 align-self-center operations-dashboard-project-commit">
+        <div class="col-6 align-self-center operations-dashboard-project-commit">
           <template v-if="project.last_deployment">
             <project-commit :last-deployment="project.last_deployment" />
           </template>
         </div>
 
-        <div class="col-4 text-right align-self-center">
+        <div class="col-5 text-right align-self-center">
+          <time-ago finished-time="2018-11-09T20:04:05.392Z" />
           <dashboard-alerts
             :count="project.alert_count"
             :last-alert="project.last_alert"
