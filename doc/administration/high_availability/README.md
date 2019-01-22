@@ -93,8 +93,6 @@ in size, indicating that there is contention or not enough resources.
 - 2 or more Sidekiq nodes
 - 2 or more NFS/Gitaly storage servers
 
-
-
 ## High Availability Architecture Examples
 
 When organizations require scaling *and* high availability the following
