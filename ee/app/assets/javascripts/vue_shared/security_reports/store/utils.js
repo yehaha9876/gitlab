@@ -380,3 +380,35 @@ export const statusIcon = (loading = false, failed = false, newIssues = 0, neutr
 
   return 'success';
 };
+
+// TODO: JSDOC
+export const isDismissed = issue =>
+  'dismissalFeedback' in issue && issue.dismissalFeedback !== null;
+
+export const moveLists = ({ vulnerability, origin, destination }) => {
+  const vulnerabilityIndex = findIssueIndex(origin, vulnerability);
+
+  return {
+    newOrigin: [...origin.slice(0, vulnerabilityIndex), ...origin.slice(vulnerabilityIndex + 1)],
+    newDestination: [vulnerability, ...destination],
+  };
+};
+
+export const getOrigin = (vulnerability, scanner) => {
+  const issueTypes = ['newIssues', 'dismissedIssues', 'resolvedIssues', 'allIssues'];
+  return issueTypes.find(
+    type => scanner[type] && findIssueIndex(scanner[type], vulnerability) !== -1,
+  );
+};
+
+export const getDestination = (vulnerability, scanner) => {
+  const origin = getOrigin(vulnerability, scanner);
+
+  if (isDismissed(vulnerability)) {
+    return 'dismissedIssues';
+  } else if (origin === 'dismissedIssues') {
+    return 'newIssues';
+  }
+
+  return origin;
+};
