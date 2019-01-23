@@ -162,29 +162,20 @@ side.
 
 Learn more about [importing issues from CSV](csv_import.md)
 
-### Import Issues from CSV
-
-You can import a CSV file containing issue titles and descriptions to create
-a batch of issues simultaneously.
-
-When you navigate to the Issues list page, an import button is displayed.
-
-For further details, see [Importing issues from CSV](csv_import.md)
-
 ### External Issue Tracker
 
 Alternatively to GitLab's built-in Issue Tracker, you can also use an [external
 tracker](../../../integration/external-issue-tracker.md) such as Jira, Redmine,
 or Bugzilla.
 
-### Issue API
+### Issue's API
 
-See the [API documentation](../../../api/issues.md).
+Read through the [API documentation](../../../api/issues.md).
 
 ### Bulk editing issues
 
-See the [bulk editing issues](../../project/bulk_editing.md) page.
+Find out about [bulk editing issues](../../project/bulk_editing.md).
 
 ### Similar issues
 
-See the [similar issues](similar_issues.md) page.
+Find out about [similar issues](similar_issues.md).
