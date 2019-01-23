@@ -21,12 +21,6 @@ module EE
           end
         end
 
-        def updated_since?(timestamp)
-          last_update_started_at &&
-            last_update_started_at > timestamp &&
-            !update_errored?
-        end
-
         def generate_alert_manager_token!
           unless alert_manager_token.present?
             update!(alert_manager_token: generate_token)
