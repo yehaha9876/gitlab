@@ -26,5 +26,21 @@ module Operations
         { name: 'default' }
       ]
     end
+
+    Scope = Struct.new(:id, :environment_scope, :active)
+
+    # dummy data
+    def scopes
+      [Scope.new(
+        id: 1,
+        environment_scope: '*',
+        active: true
+      ),
+      Scope.new(
+        id: 2,
+        environment_scope: 'production',
+        active: false
+      )]
+    end
   end
 end
