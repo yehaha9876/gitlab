@@ -2,12 +2,17 @@
 
 ## Provide your own Redis instance **[CORE ONLY]**
 
-TODO:
+### Requirements
 
-- What version is required? What version is recommended?
-- Download/install on your own
-- Managed services such as AWS Elasticache.
-  - Mention not to use 'cluster' option. Redis Cluster != Redis Sentinel
+- Redis version 2.8 or higher. Version 3.2 or higher is recommend as this is
+  what ships with the GitLab Omnibus package.
+- Standalone Redis or Redis high availability with Sentinel are supported. Redis
+  Cluster is not supported.
+- Managed Redis from cloud providers such as AWS Elasticache will work. If these
+  services support high availability, be sure it is not the Redis Cluster type.
+
+Note the Redis node's IP address or hostname, port, and password (if required).
+These will be necessary when configuring the GitLab application servers later.
 
 ## Redis in a Scaled Environment
 
@@ -31,7 +36,7 @@ trade off to have only a single instance. See [Scaling and High Availability](./
 for an overview of GitLab scaling and high availability options.
 
 The steps below are the minimum necessary to configure a Redis server with
-Omnibus.
+Omnibus:
 
 1. SSH into the Redis server.
 1. [Download/install](https://about.gitlab.com/installation) the Omnibus GitLab
@@ -43,6 +48,8 @@ Omnibus.
 1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
 
     ```ruby
+    gitlab_rails['auto_migrate'] = false
+
     ## Enable Redis
     redis['enable'] = true
 
@@ -60,13 +67,14 @@ Omnibus.
     ```
 
 1. [Reconfigure Omnibus GitLab][reconfigure] for the changes to take effect.
+1. Note the Redis node's IP address or hostname, port, and password (if required).
+   These will be necessary when configuring the GitLab application servers later.
 
-Advanced configuration options are supported and can be added when
+Advanced configuration options are supported and can be added if
 needed.
 
-TODO: Link to Redis Omnibus docs with advanced config options?
-
-[Back to Scaled Architectures](./README.md#scalable-architecture-examples)
+Continue configuration of other components by going
+[back to Scaled Architectures](./README.md#scalable-architecture-examples)
 
 ## Redis with High Availability
 
