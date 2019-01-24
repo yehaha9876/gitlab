@@ -20,7 +20,7 @@ This section is relevant for [Scaled Architecture](./README.md#scalable-architec
 environments including [Basic Scaling](./README.md#basic-scaling) and
 [Full Scaling](./README.md#full-scaling).
 
-### Provide your own Redis instance **[CORE ONLY]**
+### Provide your own Redis instance for Scaled Environments **[CORE ONLY]**
 
 See [Provide your own Redis instance](#provide-your-own-redis-instance) above
 for details.
@@ -83,12 +83,12 @@ environments including [Horizontal](./README.md#horizontal),
 [Hybrid](./README.md#hybrid), and
 [Fully Distributed](./README.md#fully-distributed).
 
-### Provide your own Redis instance **[CORE ONLY]**
+### Provide your own Redis instance for HA Environments **[CORE ONLY]**
 
 See [Provide your own Redis instance](#provide-your-own-redis-instance) above
 for details.
 
-### High Availability with Sentinel **[PREMIUM ONLY]**
+### High Availability with GitLab Omnibus **[PREMIUM ONLY]**
 
 > Experimental Redis Sentinel support was [introduced in GitLab 8.11][ce-1877].
 Starting with 8.14, Redis Sentinel is no longer experimental.

@@ -74,7 +74,7 @@ larger one.
 
 #### Installation Instructions
 
-1. [PostgreSQL]()
+1. [PostgreSQL](./database.md#postgresql-in-a-scaled-environment)
 1. [Redis](./redis.md#redis-in-a-scaled-environment)
 1. [Gitaly]() (recommended) or [NFS]()
 1. [GitLab application nodes]()
