@@ -89,6 +89,7 @@ describe Projects::Prometheus::AlertsController do
     let(:payload) { {} }
 
     before do
+      sign_out(user)
       allow(Projects::Prometheus::Alerts::NotifyService).to receive(:new).and_return(notify_service)
     end
 
