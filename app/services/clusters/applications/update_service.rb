@@ -36,3 +36,5 @@ module Clusters
     end
   end
 end
+
+Clusters::Applications::UpdateService.prepend(EE::Clusters::Applications::UpdateService)
