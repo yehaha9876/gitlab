@@ -127,40 +127,45 @@ describe GroupsController do
     end
   end
 
-  describe 'GET #show' do
-    subject { get :show, id: group.to_param, format: format }
+  describe '"group overview default" preference behaviour' do
+    describe 'GET #show' do
+      subject { get :show, id: group.to_param, format: format }
 
-    let(:format) { :html }
+      let(:format) { :html }
 
-    context 'with group view set as default' do
-      before do
-        group.add_developer(user)
-      end
+      context 'with user having proper permissions and feature enabled' do
+        before do
+          stub_licensed_features(security_dashboard: true)
+          group.add_developer(user)
+        end
 
-      it 'should render the show template' do
-        expect(subject).to render_template('groups/show')
-      end
-    end
+        context 'with group view set as default' do
+          it 'should render the show template' do
+            expect(subject).to render_template('groups/show')
+          end
+        end
 
-    context 'with group view set to security dashboard' do
-      let(:user) do
-        super().tap { |u| u.update!(group_view: :security_dashboard) }
-      end
+        context 'with group view set to security dashboard' do
+          let(:user) { super().tap { |u| u.update!(group_view: :security_dashboard) } }
 
-      it_behaves_like 'ensures security dashboard permissions'
+          context 'in HTML format' do
+            it 'should render the security dashboard' do
+              expect(subject).to render_template('groups/security/dashboard/show')
+            end
+          end
 
-      context 'in HTML format' do
-        it 'should render the security dashboard' do
-          expect(subject).to render_template('groups/security/dashboard')
+          context 'in Atom format' do
+            let(:format) { :atom }
+
+            it 'should not render the security dashboard' do
+              expect(subject).not_to render_template('groups/security/dashboard/show')
+            end
+          end
         end
       end
 
-      context 'in Atom format' do
-        let(:format) { :atom }
-
-        it 'should not render the security dashboard' do
-          expect(subject).not_to render_template('groups/security/dashboard')
-        end
+      it_behaves_like 'ensures security dashboard permissions' do
+        let(:user) { create(:user, group_view: :security_dashboard) } # not a member of a group
       end
     end
   end
