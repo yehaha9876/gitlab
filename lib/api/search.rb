@@ -17,7 +17,8 @@ module API
         blobs: Entities::Blob,
         wiki_blobs: Entities::Blob,
         snippet_titles: Entities::Snippet,
-        snippet_blobs: Entities::Snippet
+        snippet_blobs: Entities::Snippet,
+        users: Entities::UserBasic
       }.freeze
 
       ELASTICSEARCH_SCOPES = %w(wiki_blobs blobs commits).freeze
@@ -63,6 +64,12 @@ module API
       def elasticsearch?
         Gitlab::CurrentSettings.elasticsearch_search?
       end
+
+      def check_users_search_allowed!
+        if Feature.disabled?(:users_search, default_enabled: true) && params[:scope].to_sym == :users
+          render_api_error!({ error: _("Scope not supported with disabled 'users_search' feature!") }, 400)
+        end
+      end
     end
 
     resource :search do
@@ -74,14 +81,15 @@ module API
         requires :scope,
           type: String,
           desc: 'The scope of search, available scopes:
-            projects, issues, merge_requests, milestones, snippet_titles, snippet_blobs,
+            projects, issues, merge_requests, milestones, snippet_titles, snippet_blobs, users,
             if Elasticsearch enabled: wiki_blobs, blobs, commits',
-          values: %w(projects issues merge_requests milestones snippet_titles snippet_blobs
+          values: %w(projects issues merge_requests milestones snippet_titles snippet_blobs users
                      wiki_blobs blobs commits)
         use :pagination
       end
       get do
         check_elasticsearch_scope!
+        check_users_search_allowed!
 
         present search, with: entity
       end
@@ -97,13 +105,14 @@ module API
         requires :scope,
           type: String,
           desc: 'The scope of search, available scopes:
-            projects, issues, merge_requests, milestones,
+            projects, issues, merge_requests, milestones, users,
             if Elasticsearch enabled: wiki_blobs, blobs, commits',
-          values: %w(projects issues merge_requests milestones wiki_blobs blobs commits)
+          values: %w(projects issues merge_requests milestones users wiki_blobs blobs commits)
         use :pagination
       end
       get ':id/(-/)search' do
         check_elasticsearch_scope!
+        check_users_search_allowed!
 
         present search(group_id: user_group.id), with: entity
       end
@@ -119,11 +128,12 @@ module API
         requires :scope,
           type: String,
           desc: 'The scope of search, available scopes:
-            issues, merge_requests, milestones, notes, wiki_blobs, commits, blobs',
-          values: %w(issues merge_requests milestones notes wiki_blobs commits blobs)
+            issues, merge_requests, milestones, notes, wiki_blobs, commits, blobs, users',
+          values: %w(issues merge_requests milestones notes wiki_blobs commits blobs users)
         use :pagination
       end
       get ':id/(-/)search' do
+        check_users_search_allowed!
         present search(project_id: user_project.id), with: entity
       end
     end

@@ -43,6 +43,7 @@ module Search
     def scope
       @scope ||= begin
         allowed_scopes = %w[issues merge_requests milestones]
+        allowed_scopes << 'users' if Feature.enabled?(:users_search, default_enabled: true)
         allowed_scopes += %w[wiki_blobs blobs commits] if Gitlab::CurrentSettings.elasticsearch_search?
 
         allowed_scopes.delete(params[:scope]) { 'projects' }
