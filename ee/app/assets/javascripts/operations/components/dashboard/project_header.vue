@@ -17,6 +17,14 @@ export default {
       required: true,
     },
   },
+  computed: {
+    headerClasses() {
+      return {
+        'ops-dashboard-project-header-warning': false,
+        'ops-dashboard-project-header-failed': false,
+      };
+    },
+  },
   methods: {
     onRemove() {
       this.$emit('remove', this.project.remove_path);
@@ -26,7 +34,10 @@ export default {
 </script>
 
 <template>
-  <div class="ops-dashboard-project-header card-header d-flex align-items-center">
+  <div
+    :class="headerClasses"
+    class="ops-dashboard-project-header card-header d-flex align-items-center"
+  >
     <project-avatar :project="project" :size="24" class="flex-shrink-0" />
     <div class="flex-grow-1">
       <a class="js-project-link cgray" :href="project.web_url">

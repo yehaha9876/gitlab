@@ -22,9 +22,27 @@
     background-color: $gray-100;
     border-color: transparent;
 
+    &-warning {
+      background-color: $orange-100;
+    }
+
+    &-failed {
+      background-color: $red-100;
+    }
+
     .avatar-container {
       border: 1px solid $issue-boards-card-shadow;
       border-radius: 4px;
+    }
+  }
+
+  &-card {
+    &-warning {
+      background-color: $orange-50;
+    }
+
+    &-failed {
+      background-color: $red-50;
     }
   }
 
@@ -62,7 +80,10 @@
     line-height: $gl-line-height;
     padding: $gl-padding-8;
     margin-top: $gl-padding;
-    text-align: center;
+
+    &-failed {
+      background-color: $red-100;
+    }
   }
 
   &-alert-icon {

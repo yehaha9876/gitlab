@@ -38,6 +38,12 @@ export default {
     lastDeployed() {
       return this.hasDeployment ? this.timeFormated(this.project.last_deployment.created_at) : null;
     },
+    cardClasses() {
+      return {
+        'ops-dashboard-project-card-warning': false,
+        'ops-dashboard-project-card-failed': false,
+      };
+    },
   },
   methods: {
     ...mapActions(['removeProject']),
@@ -48,7 +54,7 @@ export default {
 <template>
   <div class="ops-dashboard-project card">
     <project-header :project="project" @remove="removeProject" />
-    <div class="card-body">
+    <div :class="cardClasses" class="card-body">
       <div class="row">
         <div class="col-1 align-self-center">
           <user-avatar-link
