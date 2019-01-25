@@ -38,10 +38,16 @@ export default {
     lastDeployed() {
       return this.hasDeployment ? this.timeFormated(this.project.last_deployment.created_at) : null;
     },
+    hasErrors() {
+      return this.project.alert_count > 0;
+    },
+    hasPipelineFailed() {
+      return this.project.pipeline_status.group === 'failed';
+    },
     cardClasses() {
       return {
-        'ops-dashboard-project-card-warning': false,
-        'ops-dashboard-project-card-failed': false,
+        'ops-dashboard-project-card-warning': !this.hasFailed && this.hasErrors,
+        'ops-dashboard-project-card-failed': this.hasFailed,
       };
     },
   },
@@ -53,7 +59,12 @@ export default {
 
 <template>
   <div class="ops-dashboard-project card">
-    <project-header :project="project" @remove="removeProject" />
+    <project-header
+      :project="project"
+      :has-pipeline-failed="hasPipelineFailed"
+      :has-errors="hasErrors"
+      @remove="removeProject"
+    />
     <div :class="cardClasses" class="card-body">
       <div class="row">
         <div class="col-1 align-self-center">
@@ -82,7 +93,7 @@ export default {
         </div>
       </div>
 
-      <project-pipeline :project="project" />
+      <project-pipeline :project="project" :has-pipeline-failed="hasPipelineFailed" />
     </div>
   </div>
 </template>

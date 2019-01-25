@@ -14,17 +14,28 @@ export default {
       type: Object,
       required: true,
     },
+    hasPipelineFailed: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     hasUpstreamPipeline() {
-      return this.project.upstream_pipeline_status !== null;
+      return (
+        this.project.upstream_pipeline_status && this.project.upstream_pipeline_status !== null
+      );
     },
     hasDownstreamPipelines() {
       return this.project.downstream_pipelines && this.project.downstream_pipelines.length > 0;
     },
+    downstreamPipelinesHaveFailed() {
+      return this.project.downstream_pipelines.some(status => status.group === 'failed');
+    },
     pipelineClasses() {
       return {
-        'ops-dashboard-project-pipeline-failed': false,
+        'ops-dashboard-project-pipeline-failed':
+          this.hasPipelineFailed || this.downstreamPipelinesHaveFailed,
       };
     },
   },
@@ -33,11 +44,13 @@ export default {
 
 <template>
   <div :class="pipelineClasses" class="ops-dashboard-project-pipeline">
-    <ci-icon v-if="hasUpstreamPipeline" :status="project.upstream_pipeline_status" />
-    <icon name="arrow-right" />
+    <template v-if="hasUpstreamPipeline">
+      <ci-icon :status="project.upstream_pipeline_status" />
+      <icon name="arrow-right" />
+    </template>
     <ci-badge :status="project.pipeline_status" />
-    <icon name="arrow-right" />
     <template v-if="hasDownstreamPipelines">
+      <icon name="arrow-right" />
       <span v-for="pipeline in project.downstream_pipelines" :key="pipeline.id">
         <ci-icon :status="pipeline" />
       </span>

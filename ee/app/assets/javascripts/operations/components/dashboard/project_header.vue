@@ -16,12 +16,22 @@ export default {
       type: Object,
       required: true,
     },
+    hasPipelineFailed: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    hasErrors: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     headerClasses() {
       return {
-        'ops-dashboard-project-header-warning': false,
-        'ops-dashboard-project-header-failed': false,
+        'ops-dashboard-project-header-warning': this.hasPipelineFailed,
+        'ops-dashboard-project-header-failed': this.hasErrors,
       };
     },
   },
