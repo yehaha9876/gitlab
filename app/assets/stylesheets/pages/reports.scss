@@ -114,9 +114,20 @@
   align-content: flex-start;
 }
 
-.is-dismissed .report-block-list-issue-description,
-.is-dismissed .vulnerability-name-button {
-  text-decoration: line-through;
+.is-dismissed {
+  opacity: .5;
+}
+
+.report-block-list-issue ~ .is-dismissed {
+  border-top: 1px solid $gray-dark;
+  margin-top: $gl-padding-top;
+  padding-top: $gl-padding-top;
+}
+
+.is-dismissed + .is-dismissed {
+  border: none;
+  margin: inherit;
+  padding: inherit;
 }
 
 .report-block-list-issue-description-text::after {
