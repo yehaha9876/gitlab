@@ -12,7 +12,8 @@ module Search
 
     def execute
       if Gitlab::CurrentSettings.elasticsearch_search?
-        Gitlab::Elastic::SearchResults.new(current_user, params[:search], elastic_projects, elastic_global)
+        Gitlab::Elastic::SearchResults.new(current_user, params[:search],
+                                           elastic_projects, projects, elastic_global)
       else
         Gitlab::SearchResults.new(current_user, projects, params[:search],
                                   default_project_filter: default_project_filter)

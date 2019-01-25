@@ -35,3 +35,5 @@ module Search
     end
   end
 end
+
+Search::GroupService.prepend(EE::Search::GroupService)

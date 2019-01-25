@@ -7860,10 +7860,10 @@ msgstr ""
 msgid "Scope"
 msgstr ""
 
-msgid "Scoped issue boards"
+msgid "Scope not supported with disabled 'users_search' feature!"
 msgstr ""
 
-msgid "Scope not supported with disabled 'users_search' feature!"
+msgid "Scoped issue boards"
 msgstr ""
 
 msgid "Scroll down to <strong>Google Code Project Hosting</strong> and enable the switch on the right."
