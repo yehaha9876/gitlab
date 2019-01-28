@@ -117,12 +117,18 @@ describe QA::Git::Repository do
     end
 
     describe '#use_ssh_key' do
+      let(:key) { Struct.new(:private_key).new('foo') }
+
       it 'does not add credentials to .netrc' do
-        key = Struct.new(:private_key).new('foo')
+        expect(repository).not_to receive(:try_add_credentials_to_netrc)
 
-        expect(repository).to receive(:try_add_credentials_to_netrc).and_call_original
-        expect(repository).not_to receive(:save_netrc_content)
+        repository.use_ssh_key(key)
+      end
 
+      it 'with lfs it does not add credentials to .netrc' do
+        expect(repository).not_to receive(:try_add_credentials_to_netrc)
+
+        repository.use_lfs = true
         repository.use_ssh_key(key)
       end
     end
