@@ -362,7 +362,6 @@ describe('Security reports getters', () => {
       const newState = state();
       newState.summaryCounts = {
         added: 2,
-        fixed: 0,
         existing: 5,
       };
 
@@ -378,7 +377,6 @@ describe('Security reports getters', () => {
     it('returns fixed text', () => {
       const newState = state();
       newState.summaryCounts = {
-        added: 0,
         fixed: 4,
         existing: 5,
       };
@@ -390,6 +388,21 @@ describe('Security reports getters', () => {
           areReportsLoading: false,
         }),
       ).toEqual('Security scanning detected 4 fixed vulnerabilities');
+    });
+
+    it('returns dismissed text', () => {
+      const newState = state();
+      newState.summaryCounts = {
+        dismissed: 4,
+      };
+
+      expect(
+        groupedSummaryText(newState, {
+          allReportsHaveError: false,
+          noBaseInAllReports: false,
+          areReportsLoading: false,
+        }),
+      ).toEqual('Security scanning detected 4 dismissed vulnerabilities');
     });
 
     it('returns added and fixed while loading text', () => {
@@ -412,8 +425,6 @@ describe('Security reports getters', () => {
     it('returns no new text if there are existing ones', () => {
       const newState = state();
       newState.summaryCounts = {
-        added: 0,
-        fixed: 0,
         existing: 5,
       };
 
@@ -428,11 +439,7 @@ describe('Security reports getters', () => {
 
     it('returns no text if there are existing ones', () => {
       const newState = state();
-      newState.summaryCounts = {
-        added: 0,
-        fixed: 0,
-        existing: 0,
-      };
+      newState.summaryCounts = {};
 
       expect(
         groupedSummaryText(newState, {

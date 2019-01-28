@@ -5,6 +5,7 @@ export default () => ({
     added: 0,
     fixed: 0,
     existing: 0,
+    dismissed: 0,
   },
 
   blobPath: {
@@ -70,7 +71,6 @@ export default () => ({
 
     newIssues: [],
     resolvedIssues: [],
-    // TODO: Do we still need allIssues?
     allIssues: [],
     dismissedIssues: [],
   },

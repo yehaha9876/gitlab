@@ -3,7 +3,9 @@ import { groupedTextBuilder, statusIcon } from './utils';
 import { LOADING, ERROR, SUCCESS } from './constants';
 import messages from './messages';
 
-const groupedReportText = (report, name, errorMessage, loadingMessage) => {
+const groupedReportText = (report, reportType, errorMessage, loadingMessage) => {
+  const { paths, newIssues, resolvedIssues, allIssues, dismissedIssues } = report;
+
   if (report.hasError) {
     return errorMessage;
   }
@@ -12,13 +14,14 @@ const groupedReportText = (report, name, errorMessage, loadingMessage) => {
     return loadingMessage;
   }
 
-  return groupedTextBuilder(
-    name,
-    report.paths,
-    (report.newIssues || []).length,
-    (report.resolvedIssues || []).length,
-    (report.allIssues || []).length,
-  );
+  return groupedTextBuilder({
+    reportType,
+    paths,
+    added: (newIssues || []).length,
+    fixed: (resolvedIssues || []).length,
+    existing: (allIssues || []).length,
+    dismissed: (dismissedIssues || []).length,
+  });
 };
 
 export const groupedSastText = ({ sast }) =>
@@ -56,7 +59,7 @@ export const groupedSummaryText = (state, getters) => {
     return s__('ciReport|Security scanning failed loading any results');
   }
 
-  const { added, fixed, existing } = state.summaryCounts;
+  const { added, fixed, existing, dismissed } = state.summaryCounts;
 
   let status = '';
 
@@ -74,7 +77,7 @@ export const groupedSummaryText = (state, getters) => {
    */
   const paths = { head: true, base: !getters.noBaseInAllReports };
 
-  return groupedTextBuilder(reportType, paths, added, fixed, existing, status);
+  return groupedTextBuilder({ reportType, paths, added, fixed, existing, dismissed, status });
 };
 
 export const summaryStatus = (state, getters) => {

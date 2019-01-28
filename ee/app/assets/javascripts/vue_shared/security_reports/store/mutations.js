@@ -104,9 +104,10 @@ export default {
       Vue.set(state.sast, 'dismissedIssues', dismissedIssues);
       Vue.set(state.sast, 'isLoading', false);
 
-      state.summaryCounts.added += newIssues.length;
+      state.summaryCounts.added += newAndUnresolvedIssues.length;
       state.summaryCounts.fixed += resolvedIssues.length;
       state.summaryCounts.existing += allIssues.length;
+      state.summaryCounts.dismissed += dismissedIssues.length;
     } else if (reports.head && !reports.base) {
       const newIssues = parseSastIssues(reports.head, reports.enrichData, state.blobPath.head);
       const newAndUnresolvedIssues = newIssues.filter(issue => !isDismissed(issue));
@@ -116,7 +117,8 @@ export default {
       Vue.set(state.sast, 'dismissedIssues', dismissedIssues);
       Vue.set(state.sast, 'isLoading', false);
 
-      state.summaryCounts.added += newIssues.length;
+      state.summaryCounts.added += newAndUnresolvedIssues.length;
+      state.summaryCounts.dismissed += dismissedIssues.length;
     }
   },
 
@@ -163,8 +165,9 @@ export default {
       Vue.set(state.sastContainer, 'dismissedIssues', dismissedIssues);
       Vue.set(state.sastContainer, 'isLoading', false);
 
-      state.summaryCounts.added += newIssues.length;
+      state.summaryCounts.added += newAndUnresolvedIssues.length;
       state.summaryCounts.fixed += resolvedIssues.length;
+      state.summaryCounts.dismissed += dismissedIssues.length;
     } else if (reports.head && !reports.base) {
       const newIssues = getUnapprovedVulnerabilities(
         parseSastContainer(reports.head.vulnerabilities, reports.enrichData),
@@ -177,7 +180,8 @@ export default {
       Vue.set(state.sastContainer, 'dismissedIssues', dismissedIssues);
       Vue.set(state.sastContainer, 'isLoading', false);
 
-      state.summaryCounts.added += newIssues.length;
+      state.summaryCounts.added += newAndUnresolvedIssues.length;
+      state.summaryCounts.dismissed += dismissedIssues.length;
     }
   },
 
@@ -215,8 +219,9 @@ export default {
       Vue.set(state.dast, 'dismissedIssues', dismissedIssues);
       Vue.set(state.dast, 'isLoading', false);
 
-      state.summaryCounts.added += newIssues.length;
+      state.summaryCounts.added += newAndUnresolvedIssues.length;
       state.summaryCounts.fixed += resolvedIssues.length;
+      state.summaryCounts.dismissed += dismissedIssues.length;
     } else if (reports.head && reports.head.site && !reports.base) {
       const newIssues = parseDastIssues(reports.head.site.alerts, reports.enrichData);
       const newAndUnresolvedIssues = newIssues.filter(issue => !isDismissed(issue));
@@ -226,7 +231,8 @@ export default {
       Vue.set(state.dast, 'dismissedIssues', dismissedIssues);
       Vue.set(state.dast, 'isLoading', false);
 
-      state.summaryCounts.added += newIssues.length;
+      state.summaryCounts.added += newAndUnresolvedIssues.length;
+      state.summaryCounts.dismissed += dismissedIssues.length;
     }
   },
 
@@ -290,9 +296,10 @@ export default {
       Vue.set(state.dependencyScanning, 'dismissedIssues', dismissedIssues);
       Vue.set(state.dependencyScanning, 'isLoading', false);
 
-      state.summaryCounts.added += newIssues.length;
+      state.summaryCounts.added += newAndUnresolvedIssues.length;
       state.summaryCounts.fixed += resolvedIssues.length;
       state.summaryCounts.existing += allIssues.length;
+      state.summaryCounts.dismissed += dismissedIssues.length;
     }
 
     if (reports.head && !reports.base) {
@@ -308,7 +315,8 @@ export default {
       Vue.set(state.dependencyScanning, 'dismissedIssues', dismissedIssues);
       Vue.set(state.dependencyScanning, 'isLoading', false);
 
-      state.summaryCounts.added += newIssues.length;
+      state.summaryCounts.added += newAndUnresolvedIssues.length;
+      state.summaryCounts.dismissed += dismissedIssues.length;
     }
   },
 

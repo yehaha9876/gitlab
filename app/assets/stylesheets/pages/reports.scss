@@ -112,22 +112,22 @@
   display: flex;
   align-items: flex-start;
   align-content: flex-start;
+
+  ~ .is-dismissed {
+    border-top: 1px solid $gray-dark;
+    margin-top: $gl-padding-top;
+    padding-top: $gl-padding-top;
+  }
 }
 
 .is-dismissed {
   opacity: .5;
-}
 
-.report-block-list-issue ~ .is-dismissed {
-  border-top: 1px solid $gray-dark;
-  margin-top: $gl-padding-top;
-  padding-top: $gl-padding-top;
-}
-
-.is-dismissed + .is-dismissed {
-  border: none;
-  margin: inherit;
-  padding: inherit;
+  + .is-dismissed {
+    border: 0;
+    margin: inherit;
+    padding: inherit;
+  }
 }
 
 .report-block-list-issue-description-text::after {

@@ -311,46 +311,86 @@ export const filterByKey = (firstArray = [], secondArray = [], key = '') =>
 export const getUnapprovedVulnerabilities = (issues = [], unapproved = []) =>
   issues.filter(item => unapproved.find(el => el === item.vulnerability));
 
-export const groupedTextBuilder = (
+export const groupedTextBuilder = ({
   reportType = '',
   paths = {},
-  newIssues = 0,
-  resolvedIssues = 0,
-  allIssues = 0,
+  added = 0,
+  fixed = 0,
+  existing = 0,
+  dismissed = 0,
   status = '',
-) => {
+}) => {
   let baseString = '';
 
   if (!paths.base) {
-    if (newIssues > 0) {
+    if (added && !dismissed) {
+      // added
       baseString = n__(
         'ciReport|%{reportType} %{status} detected %{newCount} vulnerability for the source branch only',
         'ciReport|%{reportType} %{status} detected %{newCount} vulnerabilities for the source branch only',
-        newIssues,
+        added,
+      );
+    } else if (!added && dismissed) {
+      // dismissed
+      baseString = n__(
+        'ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerability for the source branch only',
+        'ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerabilities for the source branch only',
+        added,
+      );
+    } else if (added && dismissed) {
+      // added & dismissed
+      baseString = s__(
+        'ciReport|%{reportType} %{status} detected %{newCount} new, and %{dismissedCount} dismissed vulnerabilities for the source branch only',
       );
     } else {
+      // no vulnerabilities
       baseString = s__(
         'ciReport|%{reportType} %{status} detected no vulnerabilities for the source branch only',
       );
     }
-  } else if (paths.base && paths.head) {
-    if (newIssues > 0 && resolvedIssues > 0) {
-      baseString = s__(
-        'ciReport|%{reportType} %{status} detected %{newCount} new, and %{fixedCount} fixed vulnerabilities',
-      );
-    } else if (newIssues > 0 && resolvedIssues === 0) {
+  } else if (paths.head) {
+    if (added && !fixed && !dismissed) {
+      // added
       baseString = n__(
         'ciReport|%{reportType} %{status} detected %{newCount} new vulnerability',
         'ciReport|%{reportType} %{status} detected %{newCount} new vulnerabilities',
-        newIssues,
+        added,
       );
-    } else if (newIssues === 0 && resolvedIssues > 0) {
+    } else if (!added && fixed && !dismissed) {
+      // fixed
       baseString = n__(
         'ciReport|%{reportType} %{status} detected %{fixedCount} fixed vulnerability',
         'ciReport|%{reportType} %{status} detected %{fixedCount} fixed vulnerabilities',
-        resolvedIssues,
+        fixed,
       );
-    } else if (allIssues > 0) {
+    } else if (!added && !fixed && dismissed) {
+      // dismissed
+      baseString = n__(
+        'ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerability',
+        'ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerabilities',
+        fixed,
+      );
+    } else if (added && fixed && !dismissed) {
+      // added & fixed
+      baseString = s__(
+        'ciReport|%{reportType} %{status} detected %{newCount} new, and %{fixedCount} fixed vulnerabilities',
+      );
+    } else if (added && !fixed && dismissed) {
+      // added & dismissed
+      baseString = s__(
+        'ciReport|%{reportType} %{status} detected %{newCount} new, and %{dismissedCount} dismissed vulnerabilities',
+      );
+    } else if (!added && fixed && dismissed) {
+      // fixed & dismissed
+      baseString = s__(
+        'ciReport|%{reportType} %{status} detected %{fixedCount} fixed, and %{dismissedCount} dismissed vulnerabilities',
+      );
+    } else if (added && fixed && dismissed) {
+      // added & fixed & dismissed
+      baseString = s__(
+        'ciReport|%{reportType} %{status} detected %{newCount} new, %{fixedCount} fixed, and %{dismissedCount} dismissed vulnerabilities',
+      );
+    } else if (existing) {
       baseString = s__('ciReport|%{reportType} %{status} detected no new vulnerabilities');
     } else {
       baseString = s__('ciReport|%{reportType} %{status} detected no vulnerabilities');
@@ -364,8 +404,9 @@ export const groupedTextBuilder = (
   return sprintf(baseString, {
     status,
     reportType,
-    newCount: newIssues,
-    fixedCount: resolvedIssues,
+    newCount: added,
+    fixedCount: fixed,
+    dismissedCount: dismissed,
   });
 };
 
@@ -381,10 +422,24 @@ export const statusIcon = (loading = false, failed = false, newIssues = 0, neutr
   return 'success';
 };
 
-// TODO: JSDOC
+/**
+ * Checks if the passed issue has dismissal feedback and has therefore been dismissed
+ *
+ * @param {Object} issue
+ * @returns {Boolean}
+ */
 export const isDismissed = issue =>
   'dismissalFeedback' in issue && issue.dismissalFeedback !== null;
 
+/**
+ * Moves a vulnerability from one list to another, returning the new lists for immutability
+ *
+ * @param {Object} options
+ * @param {} options.vulnerability the vulnerability that needs moving
+ * @param {Array} options.origin the array the vulnerability is currently a part of
+ * @param {Array} options.destination the array the vulnerability is to move to
+ * @returns {{newOrigin:Array, newDestination:Array}} An object with the new arrays inside.
+ */
 export const moveLists = ({ vulnerability, origin, destination }) => {
   const vulnerabilityIndex = findIssueIndex(origin, vulnerability);
 
@@ -394,6 +449,14 @@ export const moveLists = ({ vulnerability, origin, destination }) => {
   };
 };
 
+/**
+ * Checks the different vulnerability types sequentially to see if the vulnerabiltiy is inside it
+ * Once there's a match, it returns it.
+ *
+ * @param {Object} vulnerability
+ * @param {Object} scanner
+ * @returns {String} the origin
+ */
 export const getOrigin = (vulnerability, scanner) => {
   const issueTypes = ['newIssues', 'dismissedIssues', 'resolvedIssues', 'allIssues'];
   return issueTypes.find(
@@ -401,6 +464,13 @@ export const getOrigin = (vulnerability, scanner) => {
   );
 };
 
+/**
+ * Sets the vulnerability destination depending on its origin and type
+ *
+ * @param {Object} vulnerability
+ * @param {Object} scanner
+ * @returns {String} the destination
+ */
 export const getDestination = (vulnerability, scanner) => {
   const origin = getOrigin(vulnerability, scanner);
 
