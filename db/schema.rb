@@ -1112,6 +1112,7 @@ ActiveRecord::Schema.define(version: 20190204115450) do
     t.integer "closed_by_id"
     t.datetime "closed_at"
     t.integer "parent_id"
+    t.integer "relative_position", default: 1073741823, null: false
     t.index ["assignee_id"], name: "index_epics_on_assignee_id", using: :btree
     t.index ["author_id"], name: "index_epics_on_author_id", using: :btree
     t.index ["closed_by_id"], name: "index_epics_on_closed_by_id", using: :btree
