@@ -221,7 +221,18 @@ export default {
         :graph-data="graphData"
         :alert-data="getGraphAlerts(graphData.id)"
         group-id="monitor-area-chart"
-      />
+      >
+        <!-- EE content -->
+        <alert-widget
+          v-if="alertsEndpoint && graphData.id"
+          :alerts-endpoint="alertsEndpoint"
+          :label="getGraphLabel(graphData)"
+          :current-alerts="getQueryAlerts(graphData)"
+          :custom-metric-id="graphData.id"
+          :alert-data="alertData[graphData.id]"
+          @setAlerts="setAlerts"
+        />
+      </monitor-area-chart>
     </graph-group>
   </div>
   <empty-state
