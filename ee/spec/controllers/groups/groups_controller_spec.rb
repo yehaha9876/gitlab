@@ -141,7 +141,7 @@ describe GroupsController do
 
         context 'with group view set as default' do
           it 'should render the show template' do
-            expect(subject).to render_template('groups/show')
+            expect(subject).to render_template('groups/details') # 'show' action renders the 'details' action by default
           end
         end
 
