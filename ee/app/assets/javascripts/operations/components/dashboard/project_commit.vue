@@ -69,7 +69,7 @@ export default {
      * @returns {Object}
      */
     author() {
-      return this.lastDeployment && this.lastDeployment.user;
+      return this.lastDeployment && this.lastDeployment.commit && this.lastDeployment.commit.author;
     },
     /**
      * Used to verify if all the properties needed to render the commit

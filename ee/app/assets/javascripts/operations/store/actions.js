@@ -81,13 +81,79 @@ export const clearProjectSearchResults = ({ commit }) => {
   commit(types.SET_PROJECT_SEARCH_RESULTS, []);
 };
 
+const getRandomPipelineStatus = () => {
+  const max = 3;
+  const min = 1;
+  const choice = Math.floor(Math.random() * (max - min + 1) + min);
+
+  switch (choice) {
+    case 1:
+      return {
+        group: 'running',
+        icon: 'status_running',
+        text: 'running',
+        details_path: '/h5bp/html5-boilerplate/pipelines/50',
+      };
+    case 2:
+      return {
+        group: 'failed',
+        icon: 'status_failed',
+        text: 'failed',
+        details_path: '/h5bp/html5-boilerplate/pipelines/50',
+      };
+    case 3:
+      return {
+        group: 'success',
+        icon: 'status_success',
+        text: 'success',
+        details_path: '/h5bp/html5-boilerplate/pipelines/50',
+      };
+    default:
+      return {
+        group: 'running',
+        icon: 'status_running',
+        text: 'running',
+        details_path: '/h5bp/html5-boilerplate/pipelines/50',
+      };
+  }
+}
+
+const tempDashboardApiAdditions = response => {
+  const projects = response.data.projects.map(project => {
+    const newProject = { ...project };
+    if (newProject.last_deployment) {
+      newProject.last_deployment.user = {"id":1786152,"name":"🤖 GitLab Bot 🤖","username":"gitlab-bot","state":"active","avatar_url":"https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=46&d=identicon","web_url":"https://gitlab.com/gitlab-bot","status_tooltip_html":null,"path":"/gitlab-bot"};
+      newProject.last_deployment.commit.author = {"id":1786152,"name":"🤖 GitLab Bot 🤖","username":"gitlab-bot","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/1786152/avatar.png","web_url":"https://gitlab.com/gitlab-bot","status_tooltip_html":null,"path":"/gitlab-bot"};
+      newProject.last_deployment.finished_time = '2018-11-09T20:04:05.392Z';
+    }
+
+    newProject.upstream_pipeline_status = getRandomPipelineStatus();
+    newProject.pipeline_status = getRandomPipelineStatus();
+    newProject.downstream_pipelines = [
+      getRandomPipelineStatus(),
+      getRandomPipelineStatus(),
+      getRandomPipelineStatus(),
+    ];
+    return newProject;
+  });
+  return {
+    data: {
+      projects,
+    },
+  };
+};
+
 export const fetchProjects = ({ state, dispatch }) => {
   dispatch('requestProjects');
   axios
     .get(state.projectEndpoints.list)
+    .then(response => tempDashboardApiAdditions(response))
     .then(response => dispatch('receiveProjectsSuccess', response.data))
     .catch(() => dispatch('receiveProjectsError'))
     .then(() => dispatch('requestProjects'))
+    .then(() => {
+      setTimeout(() => fetchProjects({ state, dispatch }), 120000);
+    })
     .catch(() => {});
 };
 

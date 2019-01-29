@@ -30,8 +30,8 @@ export default {
   computed: {
     headerClasses() {
       return {
-        'ops-dashboard-project-header-warning': this.hasPipelineFailed,
-        'ops-dashboard-project-header-failed': this.hasErrors,
+        'ops-dashboard-project-header-warning': this.hasErrors,
+        'ops-dashboard-project-header-failed': this.hasPipelineFailed,
       };
     },
   },
@@ -50,9 +50,14 @@ export default {
   >
     <project-avatar :project="project" :size="24" class="flex-shrink-0" />
     <div class="flex-grow-1">
-      <a class="js-project-link cgray" :href="project.web_url">
-        <span class="js-project-namespace">{{ project.namespace.name }} /&nbsp;</span>
-        <span class="js-project-name bold"> {{ project.name }} </span>
+      <a
+        v-gl-tooltip
+        class="js-project-link cgray"
+        :href="project.web_url"
+        :title="project.name_with_namespace"
+      >
+        <span class="js-project-namespace">{{ project.namespace.name }} /</span>
+        <span class="js-project-name bold"> {{ project.name }}</span>
       </a>
     </div>
     <div class="dropdown js-more-actions">

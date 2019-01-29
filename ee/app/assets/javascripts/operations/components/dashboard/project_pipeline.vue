@@ -1,12 +1,10 @@
 <script>
-import CiBadge from '~/vue_shared/components/ci_badge_link.vue';
 import CiIcon from '~/vue_shared/components/ci_icon.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
     CiIcon,
-    CiBadge,
     Icon,
   },
   props: {
@@ -46,12 +44,19 @@ export default {
   <div :class="pipelineClasses" class="ops-dashboard-project-pipeline">
     <template v-if="hasUpstreamPipeline">
       <ci-icon :status="project.upstream_pipeline_status" />
-      <icon name="arrow-right" />
+      <icon name="arrow-right" class="ops-dashboard-project-pipeline-arrow mx-1" />
     </template>
-    <ci-badge :status="project.pipeline_status" />
+
+    <ci-icon :status="project.pipeline_status" />
+
     <template v-if="hasDownstreamPipelines">
-      <icon name="arrow-right" />
-      <span v-for="pipeline in project.downstream_pipelines" :key="pipeline.id">
+      <icon name="arrow-right" class="ops-dashboard-project-pipeline-arrow mx-1" />
+      <span
+        v-for="(pipeline, index) in project.downstream_pipelines"
+        :key="pipeline.id"
+        :style="`z-index: ${project.downstream_pipelines.length - index}`"
+        class="ops-dashboard-project-pipeline-downstream"
+      >
         <ci-icon :status="pipeline" />
       </span>
     </template>

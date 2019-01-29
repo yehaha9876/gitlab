@@ -3,12 +3,14 @@ import { mapState, mapActions } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 import DashboardProject from './project.vue';
 import ProjectSearch from './project_search.vue';
+import Skeleton from './skeleton.vue';
 
 export default {
   components: {
     DashboardProject,
     ProjectSearch,
     GlLoadingIcon,
+    Skeleton,
   },
   props: {
     addPath: {
@@ -102,7 +104,8 @@ export default {
           </a>
         </div>
       </div>
-      <gl-loading-icon v-else :size="2" class="prepend-top-20" />
+      <!-- <gl-loading-icon v-else :size="2" class="prepend-top-20" /> -->
+      <skeleton v-else />
     </div>
   </div>
 </template>

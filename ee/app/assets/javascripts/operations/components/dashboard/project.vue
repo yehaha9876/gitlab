@@ -32,11 +32,11 @@ export default {
         ? this.project.last_deployment.user
         : null;
     },
-    hasDeployment() {
-      return this.project.last_deployment !== null;
+    finishedTime() {
+      return this.project.last_deployment && this.project.last_deployment.finished_time;
     },
-    lastDeployed() {
-      return this.hasDeployment ? this.timeFormated(this.project.last_deployment.created_at) : null;
+    isPipelineRunning() {
+      return this.project.pipeline_status.group === 'running';
     },
     hasErrors() {
       return this.project.alert_count > 0;
@@ -46,8 +46,8 @@ export default {
     },
     cardClasses() {
       return {
-        'ops-dashboard-project-card-warning': !this.hasFailed && this.hasErrors,
-        'ops-dashboard-project-card-failed': this.hasFailed,
+        'ops-dashboard-project-card-warning': !this.hasPipelineFailed && this.hasErrors,
+        'ops-dashboard-project-card-failed': this.hasPipelineFailed,
       };
     },
   },
@@ -84,7 +84,7 @@ export default {
         </div>
 
         <div class="col-5 text-right align-self-center">
-          <time-ago finished-time="2018-11-09T20:04:05.392Z" />
+          <time-ago v-if="!isPipelineRunning" :finished-time="finishedTime" />
           <dashboard-alerts
             :count="project.alert_count"
             :last-alert="project.last_alert"

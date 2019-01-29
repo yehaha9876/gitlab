@@ -21,6 +21,7 @@
   &-header {
     background-color: $gray-100;
     border-color: transparent;
+    height: 50px;
 
     &-warning {
       background-color: $orange-100;
@@ -77,17 +78,48 @@
   &-pipeline {
     background-color: $gray-100;
     border-radius: 20.5px;
-    line-height: $gl-line-height;
+    height: 32px;
     padding: $gl-padding-8;
     margin-top: $gl-padding;
 
     &-failed {
       background-color: $red-100;
     }
+
+    &-arrow {
+      color: $gray-300;
+    }
+
+    &-downstream {
+      margin-right: -4px;
+      position: relative;
+    }
   }
 
   &-alert-icon {
     vertical-align: text-bottom;
+  }
+
+  &-skeleton {
+    &-avatar {
+      background-color: $gray-100;
+      border-radius: 50%;
+      height: 24px;
+      width: 24px;
+    }
+
+    &-info {
+      background-color: $gray-100;
+      border-radius: 16px;
+      height: 16px;
+      width: 134px;
+    }
+
+    &-pipeline {
+      background-color: $gray-100;
+      border-radius: 20.5px;
+      height: 32px;
+    }
   }
 }
 

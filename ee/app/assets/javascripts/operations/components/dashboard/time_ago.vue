@@ -15,12 +15,12 @@ export default {
     finishedTime: {
       type: String,
       required: false,
-      default: '',
+      default: null,
     },
   },
   computed: {
     hasFinishedTime() {
-      return this.finishedTime !== '';
+      return this.finishedTime !== null;
     },
   },
 };
