@@ -3157,8 +3157,10 @@ ActiveRecord::Schema.define(version: 20190204115450) do
     t.integer "pipeline_id"
     t.integer "issue_id"
     t.string "project_fingerprint", limit: 40, null: false
+    t.integer "merge_request_id"
     t.index ["author_id"], name: "index_vulnerability_feedback_on_author_id", using: :btree
     t.index ["issue_id"], name: "index_vulnerability_feedback_on_issue_id", using: :btree
+    t.index ["merge_request_id"], name: "index_vulnerability_feedback_on_merge_request_id", using: :btree
     t.index ["pipeline_id"], name: "index_vulnerability_feedback_on_pipeline_id", using: :btree
     t.index ["project_id", "category", "feedback_type", "project_fingerprint"], name: "vulnerability_feedback_unique_idx", unique: true, using: :btree
   end
@@ -3573,6 +3575,7 @@ ActiveRecord::Schema.define(version: 20190204115450) do
   add_foreign_key "users_star_projects", "projects", name: "fk_22cd27ddfc", on_delete: :cascade
   add_foreign_key "vulnerability_feedback", "ci_pipelines", column: "pipeline_id", on_delete: :nullify
   add_foreign_key "vulnerability_feedback", "issues", on_delete: :nullify
+  add_foreign_key "vulnerability_feedback", "merge_requests", on_delete: :cascade
   add_foreign_key "vulnerability_feedback", "projects", on_delete: :cascade
   add_foreign_key "vulnerability_feedback", "users", column: "author_id", on_delete: :cascade
   add_foreign_key "vulnerability_identifiers", "projects", on_delete: :cascade
