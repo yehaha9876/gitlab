@@ -67,12 +67,13 @@ module Geo
     def load_pending_resources
       resources = find_project_ids_not_synced(batch_size: db_retrieve_batch_size)
       remaining_capacity = db_retrieve_batch_size - resources.size
+      return resources if remaining_capacity.zero?
 
-      if remaining_capacity.zero?
-        resources
-      else
-        resources + find_project_ids_updated_recently(batch_size: remaining_capacity)
-      end
+      resources += find_project_ids_updated_recently(batch_size: remaining_capacity)
+      remaining_capacity = db_retrieve_batch_size - resources.size
+      return resources if remaining_capacity.zero?
+
+      resources + find_project_ids_to_resync(batch_size: remaining_capacity)
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
@@ -92,6 +93,13 @@ module Geo
         .pluck(:id)
     end
     # rubocop: enable CodeReuse/ActiveRecord
+
+    def find_project_ids_to_resync
+      shard_restriction(finder.find_projects_updated_recently(batch_size: batch_size))
+      .where.not(id: scheduled_project_ids)
+      .order('project_registry.projects.repository_retry_at ASC')
+      .pluck(:id)
+    end
 
     # rubocop: disable CodeReuse/ActiveRecord
     def shard_restriction(relation)
