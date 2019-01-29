@@ -158,7 +158,7 @@ module Geo
     def reschedule_sync
       log_info("Reschedule #{type} sync because a RepositoryUpdateEvent was processed during the sync")
 
-      ::Geo::ProjectSyncWorker.perform_async(project.id, Time.now)
+      "::Geo::#{type.to_s.capitalize}SyncWorker".constantize.perform_async(project.id, Time.now)
     end
 
     def fail_registry!(message, error, attrs = {})

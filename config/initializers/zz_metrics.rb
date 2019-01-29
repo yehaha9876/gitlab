@@ -113,7 +113,8 @@ def instrument_classes(instrumentation)
   instrumentation.instrument_instance_methods(Gitlab::BitbucketImport::Importer)
   instrumentation.instrument_instance_methods(Bitbucket::Connection)
 
-  instrumentation.instrument_instance_methods(Geo::RepositorySyncWorker)
+  instrumentation.instrument_instance_methods(Geo::RepositorySyncDispatchWorker)
+  instrumentation.instrument_instance_methods(Geo::WikiSyncDispatchWorker)
 
   # This is a Rails scope so we have to instrument it manually.
   instrumentation.instrument_method(Project, :visible_to_user)

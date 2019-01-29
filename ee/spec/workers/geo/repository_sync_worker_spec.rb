@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
+describe Geo::RepositorySyncDispatchWorker, :geo, :clean_gitlab_redis_cache do
   include ::EE::GeoHelpers
 
   let!(:primary) { create(:geo_node, :primary) }

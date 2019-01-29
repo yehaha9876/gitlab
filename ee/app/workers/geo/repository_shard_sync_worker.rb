@@ -33,7 +33,7 @@ module Geo
       healthy_count = Gitlab::ShardHealthCache.healthy_shard_count
 
       # If we don't have a count, that means that for some reason
-      # RepositorySyncWorker stopped running/updating the cache. We might
+      # RepositorySyncDispatchWorker stopped running/updating the cache. We might
       # be trying to shut down Geo while this job may still be running.
       return 0 unless healthy_count.to_i > 0
 
@@ -43,7 +43,7 @@ module Geo
     end
 
     def schedule_job(project_id)
-      job_id = Geo::ProjectSyncWorker.perform_async(project_id, Time.now)
+      job_id = Geo::RepositorySyncWorker.perform_async(project_id, Time.now)
 
       { project_id: project_id, job_id: job_id } if job_id
     end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class ProjectSyncWorker
+  class WikiSyncWorker
     include ApplicationWorker
     include GeoQueue
     include Gitlab::Geo::LogHelpers
@@ -30,7 +30,6 @@ module Geo
         return
       end
 
-      Geo::RepositorySyncService.new(project).execute if registry.repository_sync_due?(scheduled_time)
       Geo::WikiSyncService.new(project).execute if registry.wiki_sync_due?(scheduled_time)
     end
     # rubocop: enable CodeReuse/ActiveRecord

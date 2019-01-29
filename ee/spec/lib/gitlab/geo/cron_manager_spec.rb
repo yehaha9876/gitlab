@@ -30,7 +30,8 @@ describe Gitlab::Geo::CronManager, :geo do
     JOBS = %w[
       ldap_test
       geo_repository_verification_primary_batch_worker
-      geo_repository_sync_worker
+      geo_repository_sync_dispatch_worker
+      geo_wiki_sync_dispatch_worker
       geo_file_download_dispatch_worker
       geo_repository_verification_secondary_scheduler_worker
       geo_metrics_update_worker
@@ -53,7 +54,8 @@ describe Gitlab::Geo::CronManager, :geo do
     let(:secondary_jobs) do
       [
         job('geo_file_download_dispatch_worker'),
-        job('geo_repository_sync_worker'),
+        job('geo_repository_sync_dispatch_worker'),
+        job('geo_wiki_sync_dispatch_worker'),
         job('geo_repository_verification_secondary_scheduler_worker'),
         job('geo_migrated_local_files_clean_up_worker')
       ]
