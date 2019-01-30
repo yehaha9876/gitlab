@@ -75,6 +75,10 @@ class ApplicationController < ActionController::Base
     render_503
   end
 
+  def for_database
+    yield
+  end
+
   def redirect_back_or_default(default: root_path, options: {})
     redirect_back(fallback_location: default, **options)
   end

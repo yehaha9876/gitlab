@@ -2,12 +2,15 @@
 
 module EE
   module ApplicationController
+    include ForDatabase
     extend ActiveSupport::Concern
     extend ::Gitlab::Utils::Override
 
     def verify_namespace_plan_check_enabled
       render_404 unless ::Gitlab::CurrentSettings.should_check_namespace_plan?
     end
+
+    override :for_database
 
     override :after_sign_out_path_for
     def after_sign_out_path_for(resource)
