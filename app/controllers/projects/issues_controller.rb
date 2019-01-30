@@ -89,8 +89,12 @@ class Projects::IssuesController < Projects::ApplicationController
       discussion_to_resolve: params[:discussion_to_resolve]
     )
 
-    service = Issues::CreateService.new(project, current_user, create_params)
-    @issue = service.execute
+    service = nil
+    @issue = nil
+    for_database do
+      service = Issues::CreateService.new(project, current_user, create_params)
+      @issue = service.execute
+    end
 
     if service.discussions_to_resolve.count(&:resolved?) > 0
       flash[:notice] = if service.discussion_to_resolve_id

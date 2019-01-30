@@ -46,7 +46,11 @@ class ProjectsController < Projects::ApplicationController
   end
 
   def create
-    @project = ::Projects::CreateService.new(current_user, project_params).execute
+    @project = nil
+
+    for_database do
+      @project = ::Projects::CreateService.new(current_user, project_params).execute
+    end
 
     if @project.saved?
       cookies[:issue_board_welcome_hidden] = { path: project_path(@project), value: nil, expires: Time.at(0) }

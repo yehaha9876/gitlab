@@ -26,18 +26,20 @@ module Gitlab
         end
 
         def call
-          if disallowed_request? && Gitlab::Database.read_only?
-            Rails.logger.debug('GitLab ReadOnly: preventing possible non read-only operation')
+          # TODO: Re-instate this
 
-            if json_request?
-              return [403, { 'Content-Type' => APPLICATION_JSON }, [{ 'message' => ERROR_MESSAGE }.to_json]]
-            else
-              rack_flash.alert = ERROR_MESSAGE
-              rack_session['flash'] = rack_flash.to_session_value
+          # if disallowed_request? #&& Gitlab::Database.read_only?
+          #   Rails.logger.debug('GitLab ReadOnly: preventing possible non read-only operation')
 
-              return [301, { 'Location' => last_visited_url }, []]
-            end
-          end
+          #   if json_request?
+          #     return [403, { 'Content-Type' => APPLICATION_JSON }, [{ 'message' => ERROR_MESSAGE }.to_json]]
+          #   else
+          #     rack_flash.alert = ERROR_MESSAGE
+          #     rack_session['flash'] = rack_flash.to_session_value
+
+          #     return [301, { 'Location' => last_visited_url }, []]
+          #   end
+          # end
 
           @app.call(@env)
         end

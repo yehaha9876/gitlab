@@ -49,7 +49,10 @@ module NotesActions
       in_reply_to_discussion_id: params[:in_reply_to_discussion_id]
     )
 
-    @note = Notes::CreateService.new(note_project, current_user, create_params).execute
+    @note = nil
+    for_database do
+      @note = Notes::CreateService.new(note_project, current_user, create_params).execute
+    end
 
     respond_to do |format|
       format.json do
