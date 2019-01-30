@@ -268,6 +268,11 @@ msgid_plural "%{count} %{type} modifications"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "1 Day"
+msgid_plural "%d Days"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "1 closed issue"
 msgid_plural "%d closed issues"
 msgstr[0] ""
@@ -8534,6 +8539,15 @@ msgid "Security Reports|No Vulnerabilities"
 msgstr ""
 
 msgid "Security Reports|Security dashboard documentation"
+msgstr ""
+
+msgid "Security Reports|Show Last 30 Days"
+msgstr ""
+
+msgid "Security Reports|Show Last 60 Days"
+msgstr ""
+
+msgid "Security Reports|Show Last 90 Days"
 msgstr ""
 
 msgid "Security Reports|There was an error creating the issue."

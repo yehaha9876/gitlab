@@ -2,6 +2,7 @@ import createState from 'ee/security_dashboard/store/modules/vulnerabilities/sta
 import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/mutation_types';
 import mutations from 'ee/security_dashboard/store/modules/vulnerabilities/mutations';
 import mockData from './data/mock_data_vulnerabilities.json';
+import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
 
 describe('vulnerabilities module mutations', () => {
   describe('SET_VULNERABILITIES_ENDPOINT', () => {
@@ -188,6 +189,52 @@ describe('vulnerabilities module mutations', () => {
       mutations[types.RECEIVE_VULNERABILITIES_HISTORY_ERROR](state);
 
       expect(state.isLoadingVulnerabilitiesHistory).toBeFalsy();
+    });
+  });
+
+  describe('SET_VULNERABILITIES_HISTORY_DAY_RANGE', () => {
+    it('should set the vulnerabilitiesHistoryDayRange to number of days', () => {
+      const state = createState();
+      mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.THIRTY);
+
+      expect(state.vulnerabilitiesHistoryDayRange).toEqual(DAYS.THIRTY);
+    });
+
+    it('should set the vulnerabilitiesHistoryShowSplitLine to true if 30 days or under', () => {
+      const state = createState();
+      mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.THIRTY);
+
+      expect(state.vulnerabilitiesHistoryShowSplitLine).toBeTruthy();
+    });
+
+    it('should set the vulnerabilitiesHistoryShowSplitLine to false if 30 days or over', () => {
+      const state = createState();
+      mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.SIXTY);
+
+      expect(state.vulnerabilitiesHistoryShowSplitLine).toBeFalsy();
+    });
+
+    it('should set the vulnerabilitiesHistoryMaxDayInterval to 1 if days are 30 and under', () => {
+      const state = createState();
+      mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.THIRTY);
+
+      expect(state.vulnerabilitiesHistoryMaxDayInterval).toEqual(1);
+    });
+
+    it('should set the vulnerabilitiesHistoryMaxDayInterval to 7 if between 30 and 60', () => {
+      const state = createState();
+      const days = 45;
+
+      mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, days);
+
+      expect(state.vulnerabilitiesHistoryMaxDayInterval).toEqual(7);
+    });
+
+    it('should set the vulnerabilitiesHistoryMaxDayInterval to 14 if over 60', () => {
+      const state = createState();
+      mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.NINETY);
+
+      expect(state.vulnerabilitiesHistoryMaxDayInterval).toEqual(14);
     });
   });
 

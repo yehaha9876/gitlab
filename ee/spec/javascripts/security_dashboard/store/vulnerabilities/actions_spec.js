@@ -11,6 +11,8 @@ import mockDataVulnerabilities from './data/mock_data_vulnerabilities.json';
 import mockDataVulnerabilitiesCount from './data/mock_data_vulnerabilities_count.json';
 import mockDataVulnerabilitiesHistory from './data/mock_data_vulnerabilities_history.json';
 
+import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
+
 describe('vulnerabilities count actions', () => {
   const data = mockDataVulnerabilitiesCount;
   const params = { filters: { type: ['sast'] } };
@@ -700,6 +702,26 @@ describe('vulnerabilities history actions', () => {
           {
             type: types.SET_VULNERABILITIES_HISTORY_ENDPOINT,
             payload: endpoint,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setVulnerabilitiesHistoryDayRange', () => {
+    it('should commit the correct day range', done => {
+      const state = initialState;
+      const days = DAYS.THIRTY;
+      testAction(
+        actions.setVulnerabilitiesHistoryDayRange,
+        days,
+        state,
+        [
+          {
+            type: types.SET_VULNERABILITIES_HISTORY_DAY_RANGE,
+            payload: days,
           },
         ],
         [],
