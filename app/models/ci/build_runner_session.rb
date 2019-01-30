@@ -23,5 +23,15 @@ module Ci
         ca_pem: certificate.presence
       }
     end
+
+    def service_specification(service: build.id, requested_url: '', port:)
+      return {} unless url.present? || port.present?
+
+      {
+        url: "#{url}/proxy/#{build.id}/#{port}/#{requested_url}",
+        headers: { Authorization: [authorization.presence] }.compact,
+        ca_pem: certificate.presence
+      }
+    end
   end
 end

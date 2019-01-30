@@ -1,4 +1,6 @@
 <script>
+import $ from 'jquery';
+import axios from '~/lib/utils/axios_utils';
 import { mapActions, mapState } from 'vuex';
 import { __ } from '~/locale';
 import Terminal from './terminal.vue';
@@ -28,6 +30,9 @@ export default {
   },
   methods: {
     ...mapActions('terminal', ['restartSession', 'stopSession']),
+    test() {
+      axios.get(this.session.retryPath.replace("retry", "service"), { params: { requested_uri: $("input.requesteduri").val() }});
+    }
   },
 };
 </script>
@@ -37,6 +42,10 @@ export default {
     <header class="ide-job-header d-flex align-items-center">
       <h5>{{ __('Web Terminal') }}</h5>
       <div class="ml-auto align-self-center">
+        <input class="requesteduri" id="requesteduri" v-if="session.status == 'running'"></input>
+        <button @click="test" v-if="session.status == 'running'">
+          Test
+        </button>
         <button
           v-if="actionButton"
           type="button"

@@ -1379,7 +1379,7 @@ module API
       end
 
       class Service < Image
-        expose :alias, :command
+        expose :alias, :command, :ports
       end
 
       class Artifacts < Grape::Entity

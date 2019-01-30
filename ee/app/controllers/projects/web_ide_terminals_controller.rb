@@ -7,6 +7,7 @@ class Projects::WebIdeTerminalsController < Projects::ApplicationController
   before_action :authorize_create_web_ide_terminal!
   before_action :authorize_read_web_ide_terminal!, except: [:check_config, :create]
   before_action :authorize_update_web_ide_terminal!, only: [:cancel, :retry]
+  before_action :verify_api_request!, only: :service_authorize
 
   def check_config
     return respond_422 unless branch_sha
@@ -60,6 +61,11 @@ class Projects::WebIdeTerminalsController < Projects::ApplicationController
     render_terminal(new_build)
   end
 
+  def service_authorize
+    set_workhorse_internal_api_content_type
+    render json: webide_service(@build.service_specification(port: 8080))
+  end
+
   private
 
   def authorize_create_web_ide_terminal!
@@ -92,5 +98,23 @@ class Projects::WebIdeTerminalsController < Projects::ApplicationController
     render json: WebIdeTerminalSerializer
       .new(project: project, current_user: current_user)
       .represent(current_build)
+  end
+
+  def webide_service(service)
+    details = {
+      'WebIdeService' => {
+        'Url' => service[:url],
+        'Header' => service[:headers]
+
+      }
+    }
+
+    details['WebIdeService']['CAPem'] = service[:ca_pem] if service.key?(:ca_pem)
+
+    details
+  end
+
+  def verify_api_request!
+    Gitlab::Workhorse.verify_api_request!(request.headers)
   end
 end

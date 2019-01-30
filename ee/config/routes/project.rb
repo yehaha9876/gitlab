@@ -21,6 +21,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         member do
           post :cancel
           post :retry
+          get '/service/authorize', to: 'web_ide_services#service_authorize', constraints: { format: nil }
+          # get '/service/authorize', to: 'web_ide_terminals#service_authorize', constraints: { format: nil }
         end
 
         collection do

@@ -43,7 +43,7 @@ module Ci
     accepts_nested_attributes_for :runner_session
 
     delegate :url, to: :runner_session, prefix: true, allow_nil: true
-    delegate :terminal_specification, to: :runner_session, allow_nil: true
+    delegate :terminal_specification, :service_specification, to: :runner_session, allow_nil: true
     delegate :gitlab_deploy_token, to: :project
     delegate :trigger_short_token, to: :trigger_request, allow_nil: true
 
