@@ -31,7 +31,13 @@ export default {
   methods: {
     ...mapActions('terminal', ['restartSession', 'stopSession']),
     test() {
-      axios.get(this.session.retryPath.replace("retry", "service"), { params: { requested_uri: $("input.requesteduri").val() }});
+      axios({
+        method: $('#request_method').val(),
+        url: this.session.retryPath.replace("retry", "service"),
+        params: {
+          requested_uri: $("input.requesteduri").val(),
+        }
+      });
     }
   },
 };
@@ -42,10 +48,7 @@ export default {
     <header class="ide-job-header d-flex align-items-center">
       <h5>{{ __('Web Terminal') }}</h5>
       <div class="ml-auto align-self-center">
-        <input class="requesteduri" id="requesteduri" v-if="session.status == 'running'"></input>
-        <button @click="test" v-if="session.status == 'running'">
-          Test
-        </button>
+        <select
         <button
           v-if="actionButton"
           type="button"
@@ -57,6 +60,26 @@ export default {
         </button>
       </div>
     </header>
+    <div v-if="session.status == 'running'">
+      <input class="requesteduri" id="requesteduri"></input>
+      <select id="request_method">
+        <option value="get">
+          GET
+        </option>
+        <option value="post">
+          POST
+        </option>
+        <option value="put">
+          PUT
+        </option>
+        <option value="delete">
+          DELETE
+        </option>
+      </select>
+      <button @click="test">
+        Test
+      </button>
+    </div>
     <terminal :terminal-path="session.terminalPath" :status="session.status" />
   </div>
 </template>

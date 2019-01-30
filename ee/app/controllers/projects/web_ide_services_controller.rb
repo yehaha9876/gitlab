@@ -9,7 +9,6 @@ class Projects::WebIdeServicesController < Projects::ApplicationController
   before_action :verify_api_request!, only: :service_authorize
 
   def service_authorize
-    puts params
     set_workhorse_internal_api_content_type
     render json: webide_service(build.service_specification(port: service_port, requested_url: params["requested_uri"]))
   end
