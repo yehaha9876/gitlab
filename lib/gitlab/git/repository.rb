@@ -101,7 +101,6 @@ module Gitlab
         relative_object_directories.map { |d| File.join(path, d) }
       end
 
-      # Hack
       ALLOWED_OBJECT_RELATIVE_DIRECTORIES_VARIABLES = %w[
         GIT_OBJECT_DIRECTORY_RELATIVE
         GIT_ALTERNATE_OBJECT_DIRECTORIES_RELATIVE
