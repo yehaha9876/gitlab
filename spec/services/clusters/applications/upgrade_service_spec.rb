@@ -16,7 +16,7 @@ describe Clusters::Applications::UpgradeService do
 
     context 'when there are no errors' do
       before do
-        expect(helm_client).to receive(:install).with(install_command)
+        expect(helm_client).to receive(:update).with(install_command)
         allow(ClusterWaitForAppInstallationWorker).to receive(:perform_in).and_return(nil)
       end
 
@@ -38,7 +38,7 @@ describe Clusters::Applications::UpgradeService do
       let(:error) { Kubeclient::HttpError.new(500, 'system failure', nil) }
 
       before do
-        expect(helm_client).to receive(:install).with(install_command).and_raise(error)
+        expect(helm_client).to receive(:update).with(install_command).and_raise(error)
       end
 
       it 'make the application errored' do
@@ -87,7 +87,7 @@ describe Clusters::Applications::UpgradeService do
       end
 
       it 'make the application errored' do
-        expect(helm_client).not_to receive(:install)
+        expect(helm_client).not_to receive(:update)
 
         service.execute
 

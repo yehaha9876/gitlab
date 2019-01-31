@@ -11,7 +11,7 @@ module Clusters
 
           # install_command works with upgrades too
           # as it basically does `helm upgrade --install`
-          helm_api.install(install_command)
+          helm_api.update(install_command)
 
           ClusterWaitForAppInstallationWorker.perform_in(
             ClusterWaitForAppInstallationWorker::INTERVAL, app.name, app.id)
