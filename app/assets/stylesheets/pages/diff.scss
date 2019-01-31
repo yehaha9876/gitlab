@@ -501,6 +501,26 @@
   }
 }
 
+.DiffStats {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 .25rem;
+
+  .DiffStats-group {
+    padding: 0 .25rem;
+  }
+
+  svg.DiffStats-icon {
+    vertical-align: text-bottom;
+  }
+
+  &.isCompareVersionsHeader {
+    .DiffStats-group {
+      padding: 0 .5rem;
+    }
+  }
+}
+
 .file-content .diff-file {
   margin: 0;
   border: 0;
