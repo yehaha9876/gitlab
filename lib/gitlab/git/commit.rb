@@ -60,13 +60,24 @@ module Gitlab
           # This saves us an RPC round trip.
           return nil if commit_id.include?(':')
 
-          commit = wrapped_gitaly_errors do
-            repo.gitaly_commit_client.find_commit(commit_id)
-          end
+          commit =
+            if ENV['GITALY_FIND_COMMIT_ENABLED']
+              wrapped_gitaly_errors do
+                repo.gitaly_commit_client.find_commit(commit_id)
+              end
+            else
+              rugged_find(repo, commit_id)
+            end
 
           decorate(repo, commit) if commit
-        rescue Gitlab::Git::CommandError, Gitlab::Git::Repository::NoRepository, ArgumentError
+        rescue Gitlab::Git::CommandError, Gitlab::Git::Repository::NoRepository, ArgumentError, Rugged::ReferenceError
           nil
+        end
+
+        def rugged_find(repo, commit_id)
+          obj = repo.rev_parse_target(commit_id)
+
+          obj.is_a?(Rugged::Commit) ? obj : nil
         end
 
         # Get last commit for HEAD
@@ -202,6 +213,8 @@ module Gitlab
         case raw_commit
         when Hash
           init_from_hash(raw_commit)
+        when Rugged::Commit
+          init_from_rugged(raw_commit)
         when Gitaly::GitCommit
           init_from_gitaly(raw_commit)
         else
@@ -354,6 +367,22 @@ module Gitlab
         serialize_keys.each do |key|
           send("#{key}=", raw_commit[key]) # rubocop:disable GitlabSecurity/PublicSend
         end
+      end
+
+      def init_from_rugged(commit)
+        author = commit.author
+        committer = commit.committer
+
+        @raw_commit = commit
+        @id = commit.oid
+        @message = commit.message
+        @authored_date = author[:time]
+        @committed_date = committer[:time]
+        @author_name = author[:name]
+        @author_email = author[:email]
+        @committer_name = committer[:name]
+        @committer_email = committer[:email]
+        @parent_ids = commit.parents.map(&:oid)
       end
 
       def init_from_gitaly(commit)

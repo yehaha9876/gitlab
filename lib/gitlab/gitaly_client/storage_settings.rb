@@ -51,7 +51,7 @@ module Gitlab
       end
 
       def legacy_disk_path
-        if self.class.disk_access_denied?
+        if false # self.class.disk_access_denied?
           raise DirectPathAccessError, "git disk access denied via the gitaly_#{DISK_ACCESS_DENIED_FLAG} feature"
         end
 

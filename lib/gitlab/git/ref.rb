@@ -16,6 +16,13 @@ module Gitlab
       # Commit object to which the Ref points to
       attr_reader :dereferenced_target
 
+      # Gitaly: this method will probably be migrated indirectly via its call sites.
+      def self.dereference_object(object)
+        object = object.target while object.is_a?(Rugged::Tag::Annotation)
+
+        object
+      end
+
       # Extract branch name from full ref path
       #
       # Ex.

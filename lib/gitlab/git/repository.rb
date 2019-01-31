@@ -97,6 +97,37 @@ module Gitlab
         raise Gitlab::Git::CommandError.new(e.message)
       end
 
+      def alternate_object_directories
+        relative_object_directories.map { |d| File.join(path, d) }
+      end
+
+      # Hack
+      ALLOWED_OBJECT_RELATIVE_DIRECTORIES_VARIABLES = %w[
+        GIT_OBJECT_DIRECTORY_RELATIVE
+        GIT_ALTERNATE_OBJECT_DIRECTORIES_RELATIVE
+      ].freeze
+
+      def relative_object_directories
+        Gitlab::Git::HookEnv.all(gl_repository).values_at(*ALLOWED_OBJECT_RELATIVE_DIRECTORIES_VARIABLES).flatten.compact
+      end
+
+      def rugged
+        @rugged ||= Rugged::Repository.new(path, alternates: alternate_object_directories)
+      rescue Rugged::RepositoryError, Rugged::OSError
+        raise NoRepository.new('no repository for such path')
+      end
+
+      def cleanup
+        @rugged&.close
+      end
+
+      # Return the object that +revspec+ points to.  If +revspec+ is an
+      # annotated tag, then return the tag's target instead.
+      def rev_parse_target(revspec)
+        obj = rugged.rev_parse(revspec)
+        Ref.dereference_object(obj)
+      end
+
       def exists?
         gitaly_repository_client.exists?
       end
