@@ -70,7 +70,7 @@ module Gitlab
             end
 
           decorate(repo, commit) if commit
-        rescue Gitlab::Git::CommandError, Gitlab::Git::Repository::NoRepository, ArgumentError, Rugged::ReferenceError
+        rescue Gitlab::Git::CommandError, Gitlab::Git::Repository::NoRepository, ArgumentError, Rugged::Error
           nil
         end
 
