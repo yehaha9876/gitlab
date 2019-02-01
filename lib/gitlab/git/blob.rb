@@ -22,7 +22,15 @@ module Gitlab
       attr_accessor :name, :path, :size, :data, :mode, :id, :commit_id, :loaded_size, :binary
 
       class << self
-        def find(repository, sha, path, limit: MAX_DATA_DISPLAY_SIZE)
+        def find(repository, sha, path)
+          if ENV['GITALY_TREE_ENTRY']
+            find_by_gitaly(repository, sha, path)
+          else
+            find_by_rugged(repository, sha, path, limit: MAX_DATA_DISPLAY_SIZE)
+          end
+        end
+
+        def find_by_gitaly(repository, sha, path, limit: MAX_DATA_DISPLAY_SIZE)
           return unless path
 
           path = path.sub(%r{\A/*}, '')
@@ -48,6 +56,55 @@ module Gitlab
             new(id: entry.oid, name: name, size: entry.size, data: entry.data.dup, mode: entry.mode.to_s(8),
                 path: path, commit_id: sha, binary: binary?(entry.data))
           end
+        end
+
+        def find_by_rugged(repository, sha, path, limit:)
+          return unless path
+
+          # Strip any leading / characters from the path
+          path = path.sub(%r{\A/*}, '')
+
+          rugged_commit = repository.lookup(sha)
+          root_tree = rugged_commit.tree
+
+          blob_entry = find_entry_by_path(repository, root_tree.oid, *path.split('/'))
+
+          return nil unless blob_entry
+
+          if blob_entry[:type] == :commit
+            submodule_blob(blob_entry, path, sha)
+          else
+            blob = repository.lookup(blob_entry[:oid])
+
+            if blob
+              new(
+                id: blob.oid,
+                name: blob_entry[:name],
+                size: blob.size,
+                # Rugged::Blob#content is expensive; don't call it if we don't have to.
+                data: limit.zero? ? '' : blob.content(limit),
+                mode: blob_entry[:filemode].to_s(8),
+                path: path,
+                commit_id: sha,
+                binary: blob.binary?
+              )
+            end
+          end
+        rescue Rugged::ReferenceError
+          nil
+        end
+
+        def rugged_raw(repository, sha, limit:)
+          blob = repository.lookup(sha)
+
+          return unless blob.is_a?(Rugged::Blob)
+
+          new(
+            id: blob.oid,
+            size: blob.size,
+            data: blob.content(limit),
+            binary: blob.binary?
+          )
         end
 
         def raw(repository, sha)
@@ -87,6 +144,49 @@ module Gitlab
 
         def size_could_be_lfs?(size)
           size.between?(LFS_POINTER_MIN_SIZE, LFS_POINTER_MAX_SIZE)
+        end
+
+        private
+
+        # Recursive search of blob id by path
+        #
+        # Ex.
+        #   blog/            # oid: 1a
+        #     app/           # oid: 2a
+        #       models/      # oid: 3a
+        #       file.rb      # oid: 4a
+        #
+        #
+        # Blob.find_entry_by_path(repo, '1a', 'blog', 'app', 'file.rb') # => '4a'
+        #
+        def find_entry_by_path(repository, root_id, *path_parts)
+          root_tree = repository.lookup(root_id)
+
+          entry = root_tree.find do |entry|
+            entry[:name] == path_parts[0]
+          end
+
+          return nil unless entry
+
+          if path_parts.size > 1
+            return nil unless entry[:type] == :tree
+
+            path_parts.shift
+            find_entry_by_path(repository, entry[:oid], *path_parts)
+          else
+            [:blob, :commit].include?(entry[:type]) ? entry : nil
+          end
+        end
+
+        def submodule_blob(blob_entry, path, sha)
+          new(
+            id: blob_entry[:oid],
+            name: blob_entry[:name],
+            size: 0,
+            data: '',
+            path: path,
+            commit_id: sha
+          )
         end
       end
 
