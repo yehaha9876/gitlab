@@ -419,9 +419,22 @@ module Gitlab
         end
       end
 
+      # Gitaly note: JV: check gitlab-ee before removing this method.
+      def rugged_is_ancestor?(ancestor_id, descendant_id)
+        return false if ancestor_id.nil? || descendant_id.nil?
+
+        rugged_merge_base(ancestor_id, descendant_id) == ancestor_id
+      rescue Rugged::OdbError
+        false
+      end
+
       # Returns true is +from+ is direct ancestor to +to+, otherwise false
       def ancestor?(from, to)
-        gitaly_commit_client.ancestor?(from, to)
+        if ENV['GITALY_COMMIT_IS_ANCESTOR']
+          gitaly_commit_client.ancestor?(from, to)
+        else
+          rugged_is_ancestor?(from, to)
+        end
       end
 
       def merged_branch_names(branch_names = [])
@@ -984,6 +997,12 @@ module Gitlab
         wrapped_gitaly_errors do
           gitaly_commit_client.last_commit_for_path(sha, path)
         end
+      end
+
+      def rugged_merge_base(from, to)
+        rugged.merge_base(from, to)
+      rescue Rugged::ReferenceError
+        nil
       end
 
       def checksum
