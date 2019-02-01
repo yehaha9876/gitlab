@@ -20,7 +20,7 @@ This section is relevant for [Scaled Architecture](./README.md#scalable-architec
 environments including [Basic Scaling](./README.md#basic-scaling) and
 [Full Scaling](./README.md#full-scaling).
 
-### Provide your own Redis instance for Scaled Environments **[CORE ONLY]**
+### Provide your own Redis instance **[CORE ONLY]**
 
 See [Provide your own Redis instance](#provide-your-own-redis-instance) above
 for details.
@@ -41,15 +41,11 @@ Omnibus:
 1. SSH into the Redis server.
 1. [Download/install](https://about.gitlab.com/installation) the Omnibus GitLab
    package you want using **steps 1 and 2** from the GitLab downloads page.
-     - Make sure you select the correct Omnibus package, with the same version
-       and type (Community, Enterprise editions) of your current install.
      - Do not complete any other steps on the download page.
 
 1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
 
     ```ruby
-    gitlab_rails['auto_migrate'] = false
-
     ## Enable Redis
     redis['enable'] = true
 
@@ -64,11 +60,18 @@ Omnibus:
     pgbouncer_exporter['enable'] = false
     gitlab_monitor['enable'] = false
     gitaly['enable'] = false
+ 
+    redis['bind'] = '0.0.0.0'
+    redis['port'] = '6379'
+    redis['password'] = 'SECRET_PASSWORD_HERE'
+ 
+    gitlab_rails['auto_migrate'] = false
     ```
 
 1. [Reconfigure Omnibus GitLab][reconfigure] for the changes to take effect.
-1. Note the Redis node's IP address or hostname, port, and password (if required).
-   These will be necessary when configuring the GitLab application servers later.
+1. Note the Redis node's IP address or hostname, port, and
+   Redis password. These will be necessary when configuring the GitLab
+   application servers later.
 
 Advanced configuration options are supported and can be added if
 needed.
@@ -83,7 +86,7 @@ environments including [Horizontal](./README.md#horizontal),
 [Hybrid](./README.md#hybrid), and
 [Fully Distributed](./README.md#fully-distributed).
 
-### Provide your own Redis instance for HA Environments **[CORE ONLY]**
+### Provide your own Redis instance **[CORE ONLY]**
 
 See [Provide your own Redis instance](#provide-your-own-redis-instance) above
 for details.

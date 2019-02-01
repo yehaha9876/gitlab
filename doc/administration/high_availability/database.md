@@ -15,24 +15,69 @@ If you use a cloud-managed service, or provide your own PostgreSQL:
 1. Configure the GitLab application servers with the appropriate details.
    This step is covered in [Configuring GitLab for HA](gitlab.md).
 
-## PostgreSQL in a Scaled Environments
+## PostgreSQL in a Scaled Environment
 
 This section is relevant for [Scaled Architecture](./README.md#scalable-architecture-examples)
 environments including [Basic Scaling](./README.md#basic-scaling) and
 [Full Scaling](./README.md#full-scaling).
 
-### Provide your own PostgreSQL instance for Scaled Environments
+### Provide your own PostgreSQL instance **[CORE ONLY]**
 
 See [Provide your own PostgreSQL instance](#provide-your-own-postgresql-instance)
 above for details.
 
 ### Standalone PostgreSQL using GitLab Omnibus **[CORE ONLY]**
 
+1. SSH into the PostgreSQL server.
+1. [Download/install](https://about.gitlab.com/installation) the Omnibus GitLab
+   package you want using **steps 1 and 2** from the GitLab downloads page.
+     - Do not complete any other steps on the download page.
+1. Generate a password hash for PostgreSQL. This assumes you will use the default
+   username of `gitlab` (recommended). The command will request a password
+   and confirmation. Use the value that is output by this command in the next 
+   step as the value of `POSTGRESQL_PASSWORD_HASH`.
 
+    ```sh
+    sudo gitlab-ctl pg-password-md5 gitlab
+    ```
+    
+1. Edit `/etc/gitlab/gitlab.rb` and add the contents below, updating placeholder
+   values appropriately. 
+   
+   - `POSTGRESQL_PASSWORD_HASH` - The value output from the previous step
+   - `APPLICATION_SERVER_IP_BLOCKS` - A space delimited list of IP subnets or IP
+     addresses of the GitLab application servers that will connect to the 
+     database. Example: `%w(123.123.123.123/32 123.123.123.234/32)`
 
+    ```ruby
+    # Disable all components except PostgreSQL
+    roles ['postgres_role']
+    repmgr['enable'] = false
+    consul['enable'] = false
 
+    postgresql['listen_address'] = '0.0.0.0'
+    postgresql['port'] = 5432
 
+    # Replace POSTGRESQL_PASSWORD_HASH with a generated md5 value 
+    postgresql['sql_user_password'] = 'POSTGRESQL_PASSWORD_HASH'
 
+    # Replace XXX.XXX.XXX.XXX/YY with Network Address
+    # ????  
+    postgresql['trust_auth_cidr_addresses'] = %w(APPLICATION_SERVER_IP_BLOCKS)
+
+    # Disable automatic database migrations
+    gitlab_rails['auto_migrate'] = false
+    ```
+
+    NOTE: **Note:** The role `postgres_role` was introduced with GitLab 10.3
+    
+1. [Reconfigure GitLab] for the changes to take effect.
+1. Note the PostgreSQL node's IP address or hostname, port, and
+   plain text password. These will be necessary when configuring the GitLab
+   application servers later.
+   
+Advanced configuration options are supported and can be added if
+needed.
 
 Continue configuration of other components by going
 [back to Scaled Architectures](./README.md#scalable-architecture-examples)
@@ -44,17 +89,12 @@ environments including [Horizontal](./README.md#horizontal),
 [Hybrid](./README.md#hybrid), and
 [Fully Distributed](./README.md#fully-distributed).
 
-### Provide your own PostgreSQL instance for Scaled Environments
+### Provide your own PostgreSQL instance **[CORE ONLY]**
 
 See [Provide your own PostgreSQL instance](#provide-your-own-postgresql-instance)
 above for details.
 
 ### High Availability with GitLab Omnibus **[PREMIUM ONLY]**
-
-You can choose to install and manage a database server (PostgreSQL/MySQL)
-yourself, or you can use GitLab Omnibus packages to help. GitLab recommends
-PostgreSQL. This is the database that will be installed if you use the
-Omnibus package to manage your database.
 
 > Important notes:
 > - This document will focus only on configuration supported with [GitLab Premium](https://about.gitlab.com/pricing/), using the Omnibus GitLab package.
@@ -87,17 +127,15 @@ otherwise the networks will become a single point of failure.
 
 ![PG HA Architecture](pg_ha_architecture.png)
 
-Database nodes run two services besides PostgreSQL
-1. Repmgrd -- monitors the cluster and handles failover in case of an issue with the master
+Database nodes run two services with PostgreSQL:
 
-    The failover consists of
-    * Selecting a new master for the cluster
-    * Promoting the new node to master
-    * Instructing remaining servers to follow the new master node
-
-    On failure, the old master node is automatically evicted from the cluster, and should be rejoined manually once recovered.
-
-1. Consul -- Monitors the status of each node in the database cluster, and tracks its health in a service definiton on the consul cluster.
+- Repmgrd. Monitors the cluster and handles failover when issues with the master occur. The failover consists of:
+  - Selecting a new master for the cluster.
+  - Promoting the new node to master.
+  - Instructing remaining servers to follow the new master node.
+  
+  On failure, the old master node is automatically evicted from the cluster, and should be rejoined manually once recovered.
+- Consul. Monitors the status of each node in the database cluster and tracks its health in a service definition on the consul cluster.
 
 Alongside pgbouncer, there is a consul agent that watches the status of the PostgreSQL service. If that status changes, consul runs a script which updates the configuration and reloads pgbouncer
 
@@ -354,7 +392,7 @@ check the [Troubleshooting section](#troubleshooting) before proceeding.
    repmgr['master_on_initialization'] = false
    ```
 
-1. [Reconfigure GitLab] for the changes to take effect.
+1. [Reconfigure GitLab] for te changes to take effect.
 
 > Please note:
 > - If you want your database to listen on a specific interface, change the config:
