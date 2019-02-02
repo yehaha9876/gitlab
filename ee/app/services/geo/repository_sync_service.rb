@@ -9,6 +9,7 @@ module Geo
     def sync_repository
       fetch_repository
       update_root_ref
+      sync_pool_repository
       mark_sync_as_successful
     rescue Gitlab::Shell::Error, Gitlab::Git::BaseError => e
       # In some cases repository does not exist, the only way to know about this is to parse the error text.
@@ -41,6 +42,15 @@ module Geo
 
     def repository
       project.repository
+    end
+
+    def sync_pool_repository
+      if !project.pool_repository.nil?
+        if !project.pool_repository.object_pool.exists?
+          project.pool_repository.object_pool.create
+        end
+        project.join_pool_repository
+      end
     end
 
     def ensure_repository
