@@ -41,6 +41,7 @@
 - geo:geo_scheduler_scheduler
 - geo:geo_scheduler_primary_scheduler
 - geo:geo_scheduler_secondary_scheduler
+- geo:geo_create_object_pool
 
 - pipeline_default:store_security_reports
 - pipeline_default:ci_create_cross_project_pipeline

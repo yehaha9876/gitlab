@@ -2,6 +2,12 @@
 
 module Geo
   class RepositorySyncService < BaseSyncService
+    class ObjectPoolNotFoundError < StandardError
+      def initialize(msg = "Object pool not found")
+        super
+      end
+    end
+
     self.type = :repository
 
     private
@@ -9,6 +15,8 @@ module Geo
     def sync_repository
       fetch_repository
       update_root_ref
+      create_object_pool && mark_no_object_pool! && return if need_to_create_object_pool?
+
       mark_sync_as_successful
     rescue Gitlab::Shell::Error, Gitlab::Git::BaseError => e
       # In some cases repository does not exist, the only way to know about this is to parse the error text.
@@ -41,6 +49,18 @@ module Geo
 
     def repository
       project.repository
+    end
+
+    def need_to_create_object_pool?
+      project.has_pool_repository? && !project.pool_repository.object_pool.exists?
+    end
+
+    def create_object_pool
+      ::Geo::CreateObjectPoolWorker.perform_async(project.pool_repository.id)
+    end
+
+    def mark_no_object_pool!
+      registry.fail_sync!(type, 'Error syncing repository', ObjectPoolNotFoundError.new)
     end
 
     def ensure_repository

@@ -339,6 +339,10 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     :synced
   end
 
+  def never_successfully_synced_repository?
+    !last_repository_successful_sync_at.nil?
+  end
+
   private
 
   # Whether any operation has ever been attempted
