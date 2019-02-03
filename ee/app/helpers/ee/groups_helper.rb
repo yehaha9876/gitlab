@@ -24,6 +24,13 @@ module EE
       "Repositories within this group #{show_lfs} will be restricted to this maximum size. Can be overridden inside each project. 0 for unlimited. Leave empty to inherit the global value."
     end
 
+    override :group_view_nav_link_active?
+    def group_view_nav_link_active?(group_view)
+      current_user&.group_view == group_view.to_s &&
+        controller.controller_name == 'groups' &&
+        controller.action_name == 'show'
+    end
+
     private
 
     def get_group_sidebar_links

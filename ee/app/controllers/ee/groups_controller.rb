@@ -8,17 +8,30 @@ module EE
     prepended do
       include ::Groups::Security::DashboardPermissions
 
-      delegate :group_view_security_dashboard?, to: :current_user, allow_nil: true
-
-      with_options only: :show, if: :group_view_security_dashboard? do
+      with_options only: :show, if: -> { current_user&.group_view_security_dashboard? } do
         before_action :ensure_security_dashboard_feature_enabled
         before_action :authorize_read_group_security_dashboard!
       end
 
-      add_controller_action_override 'groups/security/dashboard', 'show', initial_action: 'show' do
-        current_user&.group_view_security_dashboard?
+      delegate :default_view, :default_view_supports_request_format?, to: :presenter
+    end
+
+    override :show
+    def show
+      respond_to do |format|
+        format.html do
+          render default_view
+        end
+
+        format.atom do
+          # rubocop:disable Cop/AvoidReturnFromBlocks
+          render :nothing && return unless default_view_supports_request_format?
+          # rubocop:enable Cop/AvoidReturnFromBlocks
+
+          load_events
+          render layout: 'xml.atom', template: default_view
+        end
       end
-      set_controller_action_override
     end
 
     def group_params_attributes
@@ -42,13 +55,11 @@ module EE
       @group
     end
 
-    override :show
-    def show
-      if request.format == Mime[:html] && current_user&.group_view_security_dashboard?
-        # TODO: improve ControllerActionOverride to support template selection for render
-        render 'groups/security/dashboard/show'
-      else
-        super
+    # NOTE: currently unable to wrap a group in presenter and re-assign @group: SimpleDelegator doesn't substitute
+    # the class of a wrapped object
+    def presenter
+      strong_memoize(:presenter) do
+        group.present(current_user: current_user, request: request)
       end
     end
   end

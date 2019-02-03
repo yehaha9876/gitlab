@@ -3,6 +3,7 @@
 module EE
   module PreferencesHelper
     extend ::Gitlab::Utils::Override
+    include ::Groups::Security::DashboardPermissions::HelperMethods
 
     override :excluded_dashboard_choices
     def excluded_dashboard_choices

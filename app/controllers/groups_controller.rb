@@ -30,9 +30,6 @@ class GroupsController < Groups::ApplicationController
   # project information
   skip_cross_project_access_check :show, if: -> { request.format.html? }
 
-  add_controller_action_override 'groups', 'details', initial_action: 'show'
-  set_controller_action_override
-
   layout :determine_layout
 
   def index
@@ -60,17 +57,7 @@ class GroupsController < Groups::ApplicationController
   end
 
   def show
-    # TODO: improve ControllerActionOverride to support template selection for render
-    respond_to do |format|
-      format.html do
-        render :details
-      end
-
-      format.atom do
-        load_events
-        render layout: 'xml.atom', action: :details
-      end
-    end
+    render :details
   end
 
   def details

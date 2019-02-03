@@ -127,7 +127,7 @@ describe GroupsController do
     end
   end
 
-  describe '"group overview default" preference behaviour' do
+  describe '"group overview content" preference behaviour' do
     describe 'GET #show' do
       subject { get :show, id: group.to_param, format: format }
 

@@ -3,6 +3,7 @@
 module Gitlab
   module View
     module Presenter
+      # TODO: find a way to delegate calls to `class` methods to the subject's class
       class Delegated < SimpleDelegator
         include Gitlab::View::Presenter::Base
 
