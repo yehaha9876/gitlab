@@ -78,6 +78,8 @@ describe Geo::RepositorySyncService do
       end
 
       context "when project is part of a pool repository and object pool doesn't exist" do
+        let(:registry) { create(:geo_project_registry, project: project) }
+
         before do
           allow(project).to receive(:has_pool_repository?).and_return(true)
           allow(project.pool_repository.object_pool).to receive(:exists?).and_return(false)
@@ -91,6 +93,8 @@ describe Geo::RepositorySyncService do
       end
 
       context "when project is part of a pool repository and object pool exists" do
+        let(:registry) { create(:geo_project_registry, project: project) }
+
         before do
           allow(project).to receive(:has_pool_repository?).and_return(true)
           allow(project.pool_repository.object_pool).to receive(:exists?).and_return(true)
