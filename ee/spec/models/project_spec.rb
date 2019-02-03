@@ -1582,6 +1582,51 @@ describe Project do
     end
   end
 
+  describe '#has_pool_repository?' do
+    context "when pool repository doesn't exist" do
+      let(:project) { create(:project) }
+
+      subject { project }
+
+      it 'returns true' do
+        expect(subject.has_pool_repository?).to be false
+      end
+    end
+
+    context "when pool repository exists" do
+      let(:pool) { create(:pool_repository, :ready) }
+      let(:project) { create(:project, pool_repository: pool) }
+
+      subject { project }
+
+      it 'returns false' do
+        expect(subject.has_pool_repository?).to be true
+      end
+    end
+  end
+
+  describe '#ensure_object_pool' do
+    let(:project) { create(:project) }
+
+    subject { project.ensure_object_pool }
+
+    it 'creates the object pool' do
+      allow(project).to receive(:need_to_create_object_pool?).and_return(true)
+
+      expect_any_instance_of(Geo::CreateObjectPoolService).to receive(:execute)
+
+      subject
+    end
+
+    it "doesnt't create the object pool" do
+      allow(project).to receive(:need_to_create_object_pool?).and_return(false)
+
+      expect_any_instance_of(Geo::CreateObjectPoolService).no_to receive(:execute)
+
+      subject
+    end
+  end
+
   # Despite stubbing the current node as the primary or secondary, the
   # behaviour for EE::Project#lfs_http_url_to_repo() is to call
   # Project#lfs_http_url_to_repo() which does not have a Geo context.

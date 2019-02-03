@@ -53,13 +53,13 @@ module Geo
 
       if redownload?
         redownload_repository
-        schedule_repack
+        @new_repository = true
       elsif repository.exists?
         fetch_geo_mirror(repository)
       else
         ensure_repository
         fetch_geo_mirror(repository)
-        schedule_repack
+        @new_repository = true
       end
     end
 
@@ -263,6 +263,10 @@ module Geo
         project.repository_storage,
         File.dirname(disk_path)
       )
+    end
+
+    def new_repository?
+      @new_repository
     end
   end
 end

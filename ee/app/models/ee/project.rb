@@ -156,6 +156,12 @@ module EE
       self.external_webhook_token = Devise.friendly_token
     end
 
+    def ensure_object_pool
+      return unless need_to_create_object_pool?
+
+      Geo::CreateObjectPoolService.new(pool_repository).execute
+    end
+
     def shared_runners_limit_namespace
       if ::Feature.enabled?(:shared_runner_minutes_on_root_namespace)
         root_namespace
@@ -193,6 +199,10 @@ module EE
 
     def shared_runners_available?
       super && !shared_runners_limit_namespace.shared_runners_minutes_used?
+    end
+
+    def link_pool_repository
+      super && repository.log_geo_updated_event
     end
 
     def shared_runners_minutes_limit_enabled?
@@ -553,6 +563,10 @@ module EE
 
     def validate_board_limit(board)
       # Board limits are disabled in EE, so this method is just a no-op.
+    end
+
+    def need_to_create_object_pool?
+      has_pool_repository? && !pool_repository.object_pool.exists?
     end
   end
 end

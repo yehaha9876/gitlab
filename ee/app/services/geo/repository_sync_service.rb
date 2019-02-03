@@ -59,7 +59,7 @@ module Geo
     end
 
     def execute_housekeeping
-      Geo::ProjectHousekeepingService.new(project).execute
+      Geo::ProjectHousekeepingService.new(project, new_repository: new_repository?).execute
     end
   end
 end

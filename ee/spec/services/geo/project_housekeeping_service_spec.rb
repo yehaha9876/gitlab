@@ -62,6 +62,16 @@ describe Geo::ProjectHousekeepingService do
         expect(registry.syncs_since_gc).to eq(1)
       end
     end
+
+    context 'new repository' do
+      it 'runs gc for a new repository' do
+        allow(service).to receive(:new_repository?).and_return(true)
+
+        expect(GitGarbageCollectWorker).to receive(:perform_async).with(project.id, :gc, :the_lease_key, :the_uuid).once
+
+        service.execute
+      end
+    end
   end
 
   describe 'do_housekeeping' do

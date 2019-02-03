@@ -12,8 +12,9 @@ module Geo
     LEASE_TIMEOUT = 24.hours
     attr_reader :project
 
-    def initialize(project)
+    def initialize(project, new_repository: false)
       @project = project
+      @new_repository = new_repository
     end
 
     def execute
@@ -22,7 +23,7 @@ module Geo
     end
 
     def needed?
-      syncs_since_gc > 0 && period_match? && housekeeping_enabled?
+      new_repository? || (period_match? && housekeeping_enabled?)
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
@@ -42,7 +43,7 @@ module Geo
     def do_housekeeping
       lease_uuid = try_obtain_lease
       return false unless lease_uuid.present?
-
+      project.ensure_object_pool
       execute_gitlab_shell_gc(lease_uuid)
     end
 
@@ -75,14 +76,26 @@ module Geo
       registry.syncs_since_gc
     end
 
+    def new_repository?
+      @new_repository
+    end
+
+    def should_repack?
+      syncs_since_gc % full_repack_period
+    end
+
+    def should_gc?
+      new_repository? || (syncs_since_gc % gc_period) == 0
+    end
+
+    def should_incremental_repack?
+      syncs_since_gc % repack_period == 0
+    end
+
     def task
-      if syncs_since_gc % gc_period == 0
-        :gc
-      elsif syncs_since_gc % full_repack_period == 0
-        :full_repack
-      elsif syncs_since_gc % repack_period == 0
-        :incremental_repack
-      end
+      return :gc                 if should_gc?
+      return :full_repack        if should_repack?
+      return :incremental_repack if should_incremental_repack?
     end
 
     def period_match?

@@ -59,6 +59,12 @@ describe Geo::RepositorySyncService do
       subject.execute
     end
 
+    it 'ensures object pool' do
+      expect(project).to receive(:ensure_object_pool).once
+
+      subject.execute
+    end
+
     it 'returns the lease when succeed' do
       expect_to_cancel_exclusive_lease(lease_key, lease_uuid)
 
