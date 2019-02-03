@@ -57,18 +57,11 @@ class GroupsController < Groups::ApplicationController
   end
 
   def show
-    render :details
+    render_details_view
   end
 
   def details
-    respond_to do |format|
-      format.html
-
-      format.atom do
-        load_events
-        render layout: 'xml.atom'
-      end
-    end
+    render_details_view
   end
 
   def activity
@@ -122,6 +115,19 @@ class GroupsController < Groups::ApplicationController
   # rubocop: enable CodeReuse/ActiveRecord
 
   protected
+
+  def render_details_view
+    respond_to do |format|
+      format.html do
+        render 'groups/details'
+      end
+
+      format.atom do
+        load_events
+        render layout: 'xml.atom', template: 'groups/details'
+      end
+    end
+  end
 
   # rubocop: disable CodeReuse/ActiveRecord
   def authorize_create_group!

@@ -18,6 +18,18 @@ module EE
 
     override :show
     def show
+      super && return unless ::Feature.enabled?(:group_overview_security_dashboard)
+
+      render_show_action
+    end
+
+    def group_params_attributes
+      super + group_params_ee
+    end
+
+    private
+
+    def render_show_action
       respond_to do |format|
         format.html do
           render default_view
@@ -33,12 +45,6 @@ module EE
         end
       end
     end
-
-    def group_params_attributes
-      super + group_params_ee
-    end
-
-    private
 
     def group_params_ee
       [
