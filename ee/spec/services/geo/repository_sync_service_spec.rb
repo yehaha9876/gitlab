@@ -59,6 +59,51 @@ describe Geo::RepositorySyncService do
       subject.execute
     end
 
+    describe 'create object pool' do
+      let(:pool) { create(:pool_repository, :ready) }
+      let(:project) { create(:project, :repository, pool_repository: pool) }
+      let(:registry) { create(:geo_project_registry, project: project) }
+
+      context "when project is not part of a pool repository" do
+        before do
+          allow(project).to receive(:has_pool_repository?).and_return(false)
+        end
+
+        it 'does not call create object pool' do
+          expect( subject ).not_to receive(:create_object_pool)
+          expect( subject ).not_to receive(:mark_no_object_pool?)
+
+          subject.execute
+        end
+      end
+
+      context "when project is part of a pool repository and object pool doesn't exist" do
+        before do
+          allow(project).to receive(:has_pool_repository?).and_return(true)
+          allow(project.pool_repository.object_pool).to receive(:exists?).and_return(false)
+        end
+
+        it 'calls create object pool' do
+          expect( subject ).to receive(:create_object_pool)
+
+          subject.execute
+        end
+      end
+
+      context "when project is part of a pool repository and object pool exists" do
+        before do
+          allow(project).to receive(:has_pool_repository?).and_return(true)
+          allow(project.pool_repository.object_pool).to receive(:exists?).and_return(true)
+        end
+
+        it 'calls create object pool' do
+          expect( subject ).not_to receive(:create_object_pool)
+
+          subject.execute
+        end
+      end
+    end
+
     it 'returns the lease when succeed' do
       expect_to_cancel_exclusive_lease(lease_key, lease_uuid)
 
