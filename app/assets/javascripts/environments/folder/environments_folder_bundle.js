@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import store from '../stores/index';
 import environmentsFolderApp from './environments_folder_view.vue';
 import { parseBoolean } from '../../lib/utils/common_utils';
 import Translate from '../../vue_shared/translate';
@@ -12,6 +13,9 @@ Vue.use(Translate);
 export default () =>
   new Vue({
     el: '#environments-folder-list-view',
+    store() {
+      return store(document.querySelector(this.el).dataset);
+    },
     components: {
       environmentsFolderApp,
     },
