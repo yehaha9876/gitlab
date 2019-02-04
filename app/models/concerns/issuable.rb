@@ -277,6 +277,7 @@ module Issuable
 
       if old_labels != labels
         changes[:labels] = [old_labels.map(&:hook_attrs), labels.map(&:hook_attrs)]
+<<<<<<< HEAD
       end
 
       if old_assignees != assignees
@@ -287,6 +288,18 @@ module Issuable
         end
       end
 
+=======
+      end
+
+      if old_assignees != assignees
+        if self.is_a?(Issue)
+          changes[:assignees] = [old_assignees.map(&:hook_attrs), assignees.map(&:hook_attrs)]
+        else
+          changes[:assignee] = [old_assignees&.first&.hook_attrs, assignee&.hook_attrs]
+        end
+      end
+
+>>>>>>> upstream/master
       if self.respond_to?(:total_time_spent)
         old_total_time_spent = old_associations.fetch(:total_time_spent, nil)
 
