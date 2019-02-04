@@ -1,3 +1,5 @@
+- return unless security_dashboard_feature_available?
+
 .form-group
   = f.label :group_view, class: 'label-bold' do
     = _('Group overview content')
