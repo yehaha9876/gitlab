@@ -66,24 +66,18 @@ describe 'layouts/nav/sidebar/_group' do
   end
 
   describe 'security dashboard tab' do
-    it 'is visible when user has enough permission' do
-      allow(view).to receive(:can?)
-        .with(anything, :read_group_security_dashboard, anything)
-        .and_return(true)
+    it 'is visible when security dashboard feature is enabled' do
+      stub_licensed_features(security_dashboard: true)
 
       render
 
-      expect(rendered).to have_text 'Security Dashboard'
+      expect(rendered).to have_link 'Security Dashboard'
     end
 
-    it 'is not visible when user does not have enough permission' do
-      allow(view).to receive(:can?)
-        .with(anything, :read_group_security_dashboard, anything)
-        .and_return(false)
-
+    it 'is not visible when security dashboard feature is disabled' do
       render
 
-      expect(rendered).not_to have_text 'Security Dashboard'
+      expect(rendered).not_to have_link 'Security Dashboard'
     end
   end
 end
