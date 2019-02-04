@@ -225,7 +225,7 @@ export default {
       </user-avatar-link>
     </div>
     <div class="timeline-content">
-      <div class="note-header">
+      <div class="d-flex flex-column justify-content-between flex-md-row note-header">
         <note-header v-once :author="author" :created-at="note.created_at" :note-id="note.id">
           <slot slot="note-header-info" name="note-header-info"></slot>
           <span v-if="commit" v-html="actionText"></span>
