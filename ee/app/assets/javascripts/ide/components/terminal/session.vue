@@ -38,6 +38,10 @@ export default {
           requested_uri: $("input.requesteduri").val(),
         }
       });
+    },
+    testws() {
+      axios.get(this.session.retryPath.replace("retry", "serviceaws"))
+      // new WebSocket($('#wssurl').val());
     }
   },
 };
@@ -78,6 +82,12 @@ export default {
       </select>
       <button @click="test">
         Test
+      </button>
+    </div>
+    <div v-if="session.status == 'running'">
+      <input id="wssurl"></input>
+      <button @click="testws">
+        TestWSS
       </button>
     </div>
     <terminal :terminal-path="session.terminalPath" :status="session.status" />
