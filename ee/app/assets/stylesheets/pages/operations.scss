@@ -43,7 +43,7 @@
 
     .avatar-container {
       border: 1px solid $issue-boards-card-shadow;
-      border-radius: 4px;
+      border-radius: $border-radius-default;
     }
   }
 
@@ -62,7 +62,7 @@
   }
 
   &-empty-state {
-    font-size: 12px;
+    font-size: $gl-font-size-small;
   }
 
   &-commit {
@@ -107,7 +107,7 @@
     }
 
     &-downstream {
-      margin-right: -4px;
+      margin-right: -$gl-padding-4;
       position: relative;
     }
   }
@@ -119,22 +119,22 @@
   &-skeleton {
     &-avatar {
       background-color: $gray-100;
-      border-radius: 50%;
-      height: 24px;
-      width: 24px;
+      border-radius: $avatar-radius;
+      height: $project-avatar-mobile-size;
+      width: $project-avatar-mobile-size;
     }
 
     &-info {
       background-color: $gray-100;
-      border-radius: 16px;
-      height: 16px;
+      border-radius: $gl-padding;
+      height: $gl-padding;
       width: 134px;
     }
 
     &-pipeline {
       background-color: $gray-100;
       border-radius: 20.5px;
-      height: 32px;
+      height: $gl-padding-32;
     }
   }
 }
