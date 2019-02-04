@@ -48,23 +48,13 @@ export default {
 
   created() {
     eventHub.$on('toggleFolder', this.toggleFolder);
-    eventHub.$on('toggleDeployBoard', this.toggleDeployBoard);
   },
 
   beforeDestroy() {
     eventHub.$off('toggleFolder');
-    eventHub.$off('toggleDeployBoard');
   },
 
   methods: {
-    /**
-     * Toggles the visibility of the deploy boards of the clicked environment.
-     * @param {Object} model
-     */
-    toggleDeployBoard(model) {
-      this.store.toggleDeployBoard(model.id);
-    },
-
     toggleFolder(folder) {
       this.store.toggleFolder(folder);
 

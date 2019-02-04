@@ -76,16 +76,6 @@ export default {
     },
 
     /**
-     * Checkes whether the environment is protected.
-     * (`is_protected` currently only set in EE)
-     *
-     * @returns {Boolean}
-     */
-    isProtected() {
-      return this.model && this.model.is_protected;
-    },
-
-    /**
      * Hide group cluster features which are not currently implemented.
      *
      * @returns {Boolean}
@@ -447,18 +437,11 @@ export default {
     folderIconName() {
       return this.model.isOpen ? 'chevron-down' : 'chevron-right';
     },
-
-    deployIconName() {
-      return this.model.isDeployBoardVisible ? 'chevron-down' : 'chevron-right';
-    },
   },
 
   methods: {
     onClickFolder() {
       eventHub.$emit('toggleFolder', this.model);
-    },
-    toggleDeployBoard() {
-      eventHub.$emit('toggleDeployBoard', this.model);
     },
   },
 };
@@ -482,15 +465,11 @@ export default {
         {{ s__('Environments|Environment') }}
       </div>
 
-      <span v-if="model.hasDeployBoard" class="deploy-board-icon" @click="toggleDeployBoard">
-        <icon :name="deployIconName" />
-      </span>
+      <slot name="eeDeployBoardIcon"></slot>
 
       <span v-if="!model.isFolder" class="environment-name table-mobile-content">
         <a class="qa-environment-link" :href="environmentPath"> {{ model.name }} </a>
-        <span v-if="isProtected" class="badge badge-success">
-          {{ s__('Environments|protected') }}
-        </span>
+        <slot name="eeIsProtected"></slot>
       </span>
       <span v-else class="folder-name" role="button" @click="onClickFolder">
         <icon :name="folderIconName" class="folder-icon" />

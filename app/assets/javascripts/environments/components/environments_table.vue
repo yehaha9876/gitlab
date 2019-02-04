@@ -3,16 +3,11 @@
  * Render environments table.
  */
 import { GlLoadingIcon } from '@gitlab/ui';
-import environmentItem from './environment_item.vue';
-
-// ee-only start
-import deployBoard from 'ee/environments/components/deploy_board_component.vue'; // eslint-disable-line import/order
-// ee-only end
+import environmentItem from 'ee_else_ce/environments/components/environment_item.vue';
 
 export default {
   components: {
     environmentItem,
-    deployBoard,
     GlLoadingIcon,
   },
 
@@ -73,20 +68,11 @@ export default {
         :can-read-environment="canReadEnvironment"
       />
 
-      <div
-        v-if="model.hasDeployBoard && model.isDeployBoardVisible"
-        :key="`deploy-board-row-${i}`"
-        class="js-deploy-board-row"
-      >
-        <div class="deploy-board-container">
-          <deploy-board
-            :deploy-board-data="model.deployBoardData"
-            :is-loading="model.isLoadingDeployBoard"
-            :is-empty="model.isEmptyDeployBoard"
-            :logs-path="model.logs_path"
-          />
-        </div>
-      </div>
+      <slot
+        name="eeDeployBoard"
+        :model="model"
+        :index="i"
+      ></slot>
 
       <template v-if="shouldRenderFolderContent(model)">
         <div v-if="model.isLoadingFolderContent" :key="`loading-item-${i}`">
