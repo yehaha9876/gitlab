@@ -14,6 +14,16 @@
   }
 }
 
+.ops-dashboard-projects {
+  margin-right: -$gl-padding-8;
+  margin-left: -$gl-padding-8;
+
+  &-card {
+    padding-left: $gl-padding-8;
+    padding-right: $gl-padding-8;
+  }
+}
+
 .ops-dashboard-project {
   background-color: $gray-50;
   border-color: transparent;
@@ -38,6 +48,10 @@
   }
 
   &-card {
+    &-body {
+      height: 119px;
+    }
+
     &-warning {
       background-color: $orange-50;
     }
@@ -47,9 +61,11 @@
     }
   }
 
-  &-commit {
-    height: 43px;
+  &-empty-state {
+    font-size: 12px;
+  }
 
+  &-commit {
     .icon-container,
     .commit-icon {
       display: inline;

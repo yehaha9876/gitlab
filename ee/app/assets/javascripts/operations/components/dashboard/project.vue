@@ -6,18 +6,18 @@ import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link
 import TimeAgo from './time_ago.vue';
 import DashboardAlerts from './alerts.vue';
 import ProjectHeader from './project_header.vue';
-import ProjectCommit from './project_commit.vue';
 import ProjectPipeline from './project_pipeline.vue';
+import CommitComponent from '~/vue_shared/components/commit.vue';
 
 export default {
   components: {
     Icon,
     DashboardAlerts,
     ProjectHeader,
-    ProjectCommit,
     ProjectPipeline,
     TimeAgo,
     UserAvatarLink,
+    CommitComponent,
   },
   mixins: [timeago],
   props: {
@@ -50,6 +50,25 @@ export default {
         'ops-dashboard-project-card-failed': this.hasPipelineFailed,
       };
     },
+    hasPipelineStatus() {
+      return this.project.pipeline_status !== null && this.project.pipeline_status !== undefined;
+    },
+    hasLastDeployment() {
+      return this.project.last_deployment !== null && this.project.last_deployment !== undefined;
+    },
+    hasCommit() {
+      return (
+        this.hasLastDeployment &&
+        this.project.last_deployment.commit !== null &&
+        this.project.last_deployment.commit !== undefined
+      );
+    },
+    commitRef() {
+      return {
+        ...this.project.last_deployment.ref,
+        ref_url: this.project.last_deployment.ref.ref_path,
+      };
+    },
   },
   methods: {
     ...mapActions(['removeProject']),
@@ -65,35 +84,58 @@ export default {
       :has-errors="hasErrors"
       @remove="removeProject"
     />
-    <div :class="cardClasses" class="card-body">
-      <div class="row">
-        <div class="col-1 align-self-center">
-          <user-avatar-link
-            v-if="user"
-            :link-href="user.path"
-            :img-src="user.avatar_url"
-            :tooltip-text="user.name"
-          />
-        </div>
-
-        <div class="col-6 align-self-center ops-dashboard-project-commit">
-          <project-commit
-            v-if="project.last_deployment"
-            :last-deployment="project.last_deployment"
-          />
-        </div>
-
-        <div class="col-5 text-right align-self-center">
-          <time-ago v-if="!isPipelineRunning" :finished-time="finishedTime" />
-          <dashboard-alerts
-            :count="project.alert_count"
-            :last-alert="project.last_alert"
-            :alert-path="project.alert_path"
-          />
+    <div :class="cardClasses" class="ops-dashboard-project-card-body card-body">
+      <div v-if="!hasLastDeployment" class="h-100 d-flex justify-content-center align-items-center">
+        <div class="text-plain text-center bold w-75 ops-dashboard-project-empty-state">
+          The branch for this project has no active pipeline configuration.
         </div>
       </div>
+      <div v-else-if="!hasCommit" class="h-100 d-flex justify-content-center align-items-center">
+        <div class="text-plain text-center bold w-75 ops-dashboard-project-empty-state">
+          The branch for this project is empty
+        </div>
+      </div>
+      <div v-else>
+        <div class="row">
+          <div class="col-1 align-self-center">
+            <user-avatar-link
+              v-if="user"
+              :link-href="user.path"
+              :img-src="user.avatar_url"
+              :tooltip-text="user.name"
+              :img-size="24"
+            />
+          </div>
 
-      <project-pipeline :project="project" :has-pipeline-failed="hasPipelineFailed" />
+          <div class="col-6 pr-0 align-self-center ops-dashboard-project-commit">
+            <commit-component
+              v-if="project.last_deployment"
+              :tag="project.last_deployment.tag"
+              :commit-ref="commitRef"
+              :commit-url="project.last_deployment.commit.commit_url"
+              :short-sha="project.last_deployment.commit.short_id"
+              :title="project.last_deployment.commit.title"
+              :author="project.last_deployment.commit.author"
+              :show-branch="true"
+            />
+          </div>
+
+          <div class="col-5 pl-0 text-right align-self-center">
+            <time-ago v-if="!isPipelineRunning" :finished-time="finishedTime" />
+            <dashboard-alerts
+              :count="project.alert_count"
+              :last-alert="project.last_alert"
+              :alert-path="project.alert_path"
+            />
+          </div>
+        </div>
+
+        <project-pipeline
+          v-if="hasPipelineStatus"
+          :project="project"
+          :has-pipeline-failed="hasPipelineFailed"
+        />
+      </div>
     </div>
   </div>
 </template>

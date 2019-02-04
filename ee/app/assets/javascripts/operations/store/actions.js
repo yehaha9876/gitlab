@@ -92,6 +92,7 @@ const getRandomPipelineStatus = () => {
         group: 'running',
         icon: 'status_running',
         text: 'running',
+        name_with_namespace: 'Namespace / Name',
         details_path: '/h5bp/html5-boilerplate/pipelines/50',
       };
     case 2:
@@ -99,6 +100,7 @@ const getRandomPipelineStatus = () => {
         group: 'failed',
         icon: 'status_failed',
         text: 'failed',
+        name_with_namespace: 'Namespace / Name',
         details_path: '/h5bp/html5-boilerplate/pipelines/50',
       };
     case 3:
@@ -106,6 +108,7 @@ const getRandomPipelineStatus = () => {
         group: 'success',
         icon: 'status_success',
         text: 'success',
+        name_with_namespace: 'Namespace / Name',
         details_path: '/h5bp/html5-boilerplate/pipelines/50',
       };
     default:
@@ -113,6 +116,7 @@ const getRandomPipelineStatus = () => {
         group: 'running',
         icon: 'status_running',
         text: 'running',
+        name_with_namespace: 'Namespace / Name',
         details_path: '/h5bp/html5-boilerplate/pipelines/50',
       };
   }

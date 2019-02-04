@@ -1,14 +1,15 @@
 <script>
 import Icon from '~/vue_shared/components/icon.vue';
-import tooltip from '~/vue_shared/directives/tooltip';
+import Tooltip from '~/vue_shared/directives/tooltip';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
+import { __, sprintf } from '~/locale';
 
 export default {
   components: {
     Icon,
   },
   directives: {
-    tooltip,
+    Tooltip,
   },
   mixins: [timeagoMixin],
   props: {
@@ -22,6 +23,12 @@ export default {
     hasFinishedTime() {
       return this.finishedTime !== null;
     },
+    finishedTimeTitle() {
+      return sprintf('<span class="bold">%{title}</span><br/><span>%{date}</span>', {
+        title: __('Finished'),
+        date: this.tooltipTitle(this.finishedTime),
+      });
+    },
   },
 };
 </script>
@@ -29,7 +36,13 @@ export default {
   <div v-if="hasFinishedTime" class="ops-dashboard-project-time-ago">
     <icon name="clock" class="ops-dashboard-project-time-ago-icon" />
 
-    <time v-tooltip :title="tooltipTitle(finishedTime)" data-placement="top" data-container="body">
+    <time
+      v-tooltip
+      :title="finishedTimeTitle"
+      data-html="true"
+      data-placement="top"
+      data-container="body"
+    >
       {{ timeFormated(finishedTime) }}
     </time>
   </div>
