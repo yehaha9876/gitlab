@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import Flash from '../../flash';
 import { s__ } from '../../locale';
 import emptyState from './empty_state.vue';
@@ -15,57 +16,14 @@ export default {
 
   mixins: [CIPaginationMixin, environmentsMixin],
 
-  props: {
-    endpoint: {
-      type: String,
-      required: true,
-    },
-    canCreateEnvironment: {
-      type: Boolean,
-      required: true,
-    },
-    canCreateDeployment: {
-      type: Boolean,
-      required: true,
-    },
-    canReadEnvironment: {
-      type: Boolean,
-      required: true,
-    },
-    cssContainerClass: {
-      type: String,
-      required: true,
-    },
-    newEnvironmentPath: {
-      type: String,
-      required: true,
-    },
-    helpPagePath: {
-      type: String,
-      required: true,
-    },
-    // ee-only start
-    canaryDeploymentFeatureId: {
-      type: String,
-      required: true,
-    },
-    showCanaryDeploymentCallout: {
-      type: Boolean,
-      required: true,
-    },
-    userCalloutsPath: {
-      type: String,
-      required: true,
-    },
-    lockPromotionSvgPath: {
-      type: String,
-      required: true,
-    },
-    helpCanaryDeploymentsPath: {
-      type: String,
-      required: true,
-    },
-    // ee-only end
+  computed: {
+    ...mapState([
+      'endpoint',
+      'canCreateEnvironment',
+      'cssContainerClass',
+      'newEnvironmentPath',
+      'helpPagePath',
+    ]),
   },
 
   created() {
@@ -138,13 +96,6 @@ export default {
       :is-loading="isLoading"
       :environments="state.environments"
       :pagination="state.paginationInformation"
-      :can-create-deployment="canCreateDeployment"
-      :can-read-environment="canReadEnvironment"
-      :canary-deployment-feature-id="canaryDeploymentFeatureId"
-      :show-canary-deployment-callout="showCanaryDeploymentCallout"
-      :user-callouts-path="userCalloutsPath"
-      :lock-promotion-svg-path="lockPromotionSvgPath"
-      :help-canary-deployments-path="helpCanaryDeploymentsPath"
       @onChangePage="onChangePage"
     >
       <empty-state

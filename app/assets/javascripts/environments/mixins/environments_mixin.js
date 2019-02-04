@@ -3,6 +3,7 @@
  */
 import _ from 'underscore';
 import Visibility from 'visibilityjs';
+import container from 'ee_else_ce/environments/components/container.vue';
 import Poll from '../../lib/utils/poll';
 import { getParameterByName } from '../../lib/utils/common_utils';
 import { s__ } from '../../locale';
@@ -14,7 +15,6 @@ import EnvironmentsService from '../services/environments_service';
 import tablePagination from '../../vue_shared/components/table_pagination.vue';
 import environmentTable from '../components/environments_table.vue';
 import tabs from '../../vue_shared/components/navigation_tabs.vue';
-import container from '../components/container.vue';
 
 export default {
   components: {

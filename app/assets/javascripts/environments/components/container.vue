@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 import tablePagination from '../../vue_shared/components/table_pagination.vue';
 import environmentTable from '../components/environments_table.vue';
@@ -22,36 +23,9 @@ export default {
       type: Object,
       required: true,
     },
-    canCreateDeployment: {
-      type: Boolean,
-      required: true,
-    },
-    canReadEnvironment: {
-      type: Boolean,
-      required: true,
-    },
-    // ee-only start
-    canaryDeploymentFeatureId: {
-      type: String,
-      required: true,
-    },
-    showCanaryDeploymentCallout: {
-      type: Boolean,
-      required: true,
-    },
-    userCalloutsPath: {
-      type: String,
-      required: true,
-    },
-    lockPromotionSvgPath: {
-      type: String,
-      required: true,
-    },
-    helpCanaryDeploymentsPath: {
-      type: String,
-      required: true,
-    },
-    // ee-only end
+  },
+  computed: {
+    ...mapState(['canCreateDeployment', 'canReadEnvironment']),
   },
   methods: {
     onChangePage(page) {
