@@ -13,3 +13,5 @@ module EE::Admin::LogsController
     end
   end
 end
+
+Admin::LogsController.prepend(EE::Admin::LogsController)

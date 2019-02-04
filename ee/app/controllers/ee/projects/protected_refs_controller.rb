@@ -14,3 +14,5 @@ module EE
     end
   end
 end
+
+Projects::ProtectedRefsController.prepend(EE::Projects::ProtectedRefsController)

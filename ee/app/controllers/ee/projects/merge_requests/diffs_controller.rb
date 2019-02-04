@@ -20,3 +20,5 @@ module EE
     end
   end
 end
+
+Projects::MergeRequests::DiffsController.prepend(EE::Projects::MergeRequests::DiffsController)

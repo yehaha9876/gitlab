@@ -85,3 +85,6 @@ module EE
     end
   end
 end
+
+Groups::BoardsController.prepend(EE::Boards::BoardsController) # rubocop:disable Cop/InjectEnterpriseEditionModule
+Projects::BoardsController.prepend(EE::Boards::BoardsController)

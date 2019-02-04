@@ -23,3 +23,5 @@ module EE
     end
   end
 end
+
+UsersController.prepend(EE::UsersController)

@@ -19,3 +19,5 @@ module EE
     end
   end
 end
+
+ServiceParams.prepend(EE::ServiceParams)

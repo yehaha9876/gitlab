@@ -50,5 +50,3 @@ class Groups::BoardsController < Groups::ApplicationController
     end
   end
 end
-
-Groups::BoardsController.prepend(EE::Boards::BoardsController)

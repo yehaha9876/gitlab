@@ -34,3 +34,5 @@ module EE
     end
   end
 end
+
+OmniauthCallbacksController.prepend(EE::OmniauthCallbacksController)

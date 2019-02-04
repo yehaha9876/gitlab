@@ -19,3 +19,5 @@ module EE
     end
   end
 end
+
+ApplicationController.prepend(EE::ApplicationController)

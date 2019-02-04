@@ -86,3 +86,5 @@ module EE
     end
   end
 end
+
+Projects::MergeRequestsController.prepend(EE::Projects::MergeRequestsController)

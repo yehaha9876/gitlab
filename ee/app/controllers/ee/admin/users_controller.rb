@@ -30,3 +30,5 @@ module EE
     end
   end
 end
+
+Admin::UsersController.prepend(EE::Admin::UsersController)

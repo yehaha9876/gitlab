@@ -24,3 +24,5 @@ module EE
     end
   end
 end
+
+Projects::Settings::IntegrationsController.prepend(EE::Projects::Settings::IntegrationsController)

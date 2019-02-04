@@ -16,3 +16,5 @@ module EE
     end
   end
 end
+
+IssuableCollections.prepend(EE::IssuableCollections)

@@ -77,5 +77,3 @@ class Admin::AppearancesController < Admin::ApplicationController
     ]
   end
 end
-
-Admin::AppearancesController.prepend(EE::Admin::AppearancesController)

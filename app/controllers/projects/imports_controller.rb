@@ -74,5 +74,3 @@ class Projects::ImportsController < Projects::ApplicationController
     params.require(:project).permit(import_params_attributes)
   end
 end
-
-Projects::ImportsController.prepend(EE::Projects::ImportsController)

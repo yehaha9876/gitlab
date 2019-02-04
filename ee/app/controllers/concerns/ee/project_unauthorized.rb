@@ -24,3 +24,5 @@ module EE
     end
   end
 end
+
+ProjectUnauthorized.prepend(EE::ProjectUnauthorized)

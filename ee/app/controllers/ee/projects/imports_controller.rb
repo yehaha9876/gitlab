@@ -27,3 +27,5 @@ module EE
     end
   end
 end
+
+Projects::ImportsController.prepend(EE::Projects::ImportsController)

@@ -11,3 +11,5 @@ module EE
     end
   end
 end
+
+AutocompleteController.prepend(EE::AutocompleteController)

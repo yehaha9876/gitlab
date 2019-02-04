@@ -89,5 +89,3 @@ class Projects::MirrorsController < Projects::ApplicationController
     params.require(:project).permit(mirror_params_attributes)
   end
 end
-
-Projects::MirrorsController.prepend(EE::Projects::MirrorsController)

@@ -12,3 +12,5 @@ module EE
     end
   end
 end
+
+Groups::MilestonesController.prepend(EE::Groups::MilestonesController)

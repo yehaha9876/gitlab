@@ -12,3 +12,5 @@ module EE
     end
   end
 end
+
+Admin::ApplicationController.prepend(EE::Admin::ApplicationController)

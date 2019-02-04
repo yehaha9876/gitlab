@@ -31,3 +31,5 @@ module EE
     end
   end
 end
+
+Projects::ClustersController.prepend(EE::Projects::ClustersController)

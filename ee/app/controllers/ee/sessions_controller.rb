@@ -58,3 +58,5 @@ module EE
     end
   end
 end
+
+SessionsController.prepend(EE::SessionsController)

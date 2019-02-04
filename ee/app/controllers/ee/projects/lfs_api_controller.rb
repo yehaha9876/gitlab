@@ -30,3 +30,5 @@ module EE
     end
   end
 end
+
+Projects::LfsApiController.prepend(EE::Projects::LfsApiController)

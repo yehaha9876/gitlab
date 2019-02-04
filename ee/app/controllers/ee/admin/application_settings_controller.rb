@@ -39,3 +39,5 @@ module EE
     end
   end
 end
+
+Admin::ApplicationSettingsController.prepend(EE::Admin::ApplicationSettingsController)

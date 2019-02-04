@@ -351,5 +351,3 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42438')
   end
 end
-
-Projects::MergeRequestsController.prepend(EE::Projects::MergeRequestsController)

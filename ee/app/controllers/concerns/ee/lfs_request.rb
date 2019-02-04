@@ -44,3 +44,5 @@ module EE
     # rubocop: enable CodeReuse/ActiveRecord
   end
 end
+
+LfsRequest.prepend(EE::LfsRequest)

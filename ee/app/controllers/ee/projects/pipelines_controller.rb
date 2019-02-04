@@ -28,3 +28,5 @@ module EE
     end
   end
 end
+
+Projects::PipelinesController.prepend(EE::Projects::PipelinesController)

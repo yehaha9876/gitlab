@@ -11,3 +11,5 @@ module EE
     end
   end
 end
+
+Admin::ProjectsController.prepend(EE::Admin::ProjectsController)

@@ -14,3 +14,5 @@ module EE
     end
   end
 end
+
+SentNotificationsController.prepend(EE::SentNotificationsController)

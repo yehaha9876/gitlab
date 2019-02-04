@@ -21,3 +21,5 @@ module EE
     end
   end
 end
+
+Admin::DashboardController.prepend(EE::Admin::DashboardController)

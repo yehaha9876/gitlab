@@ -41,3 +41,5 @@ module EE
     end
   end
 end
+
+Projects::EnvironmentsController.prepend(EE::Projects::EnvironmentsController)

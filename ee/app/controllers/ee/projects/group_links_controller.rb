@@ -17,3 +17,5 @@ module EE
     end
   end
 end
+
+Projects::GroupLinksController.prepend(EE::Projects::GroupLinksController)

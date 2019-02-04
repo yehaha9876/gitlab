@@ -20,3 +20,5 @@ module EE
     end
   end
 end
+
+Groups::ApplicationController.prepend(EE::Groups::ApplicationController)

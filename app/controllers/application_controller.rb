@@ -495,5 +495,3 @@ class ApplicationController < ActionController::Base
     Gitlab::Sentry.context(current_user)
   end
 end
-
-ApplicationController.prepend(EE::ApplicationController)

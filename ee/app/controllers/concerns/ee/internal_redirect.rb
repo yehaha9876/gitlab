@@ -16,3 +16,5 @@ module EE
     end
   end
 end
+
+InternalRedirect.prepend(EE::InternalRedirect)

@@ -52,5 +52,3 @@ class Projects::GroupLinksController < Projects::ApplicationController
     params.permit(:link_group_access, :expires_at)
   end
 end
-
-Projects::GroupLinksController.prepend(EE::Projects::GroupLinksController)

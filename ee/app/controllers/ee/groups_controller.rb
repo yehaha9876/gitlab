@@ -26,3 +26,5 @@ module EE
     end
   end
 end
+
+GroupsController.prepend(EE::GroupsController)

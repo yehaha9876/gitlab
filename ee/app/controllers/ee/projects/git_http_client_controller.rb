@@ -185,3 +185,5 @@ module EE
     end
   end
 end
+
+Projects::GitHttpClientController.prepend(EE::Projects::GitHttpClientController)

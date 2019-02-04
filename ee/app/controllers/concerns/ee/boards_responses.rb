@@ -13,3 +13,5 @@ module EE
     end
   end
 end
+
+BoardsResponses.prepend(EE::BoardsResponses)

@@ -29,3 +29,5 @@ module EE
     end
   end
 end
+
+Admin::GroupsController.prepend(EE::Admin::GroupsController)

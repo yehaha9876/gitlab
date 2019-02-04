@@ -11,5 +11,3 @@ class Admin::ApplicationController < ApplicationController
     render_404 unless current_user.admin?
   end
 end
-
-Admin::ApplicationController.prepend(EE::Admin::ApplicationController)

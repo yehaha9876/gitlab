@@ -21,3 +21,5 @@ module EE
     end
   end
 end
+
+Import::GithubController.prepend(EE::Import::GithubController)

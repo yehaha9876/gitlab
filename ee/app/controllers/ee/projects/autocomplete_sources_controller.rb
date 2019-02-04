@@ -13,3 +13,5 @@ module EE
     end
   end
 end
+
+Projects::AutocompleteSourcesController.prepend(EE::Projects::AutocompleteSourcesController)

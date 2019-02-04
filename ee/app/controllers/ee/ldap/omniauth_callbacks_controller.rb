@@ -22,3 +22,5 @@ module EE
     end
   end
 end
+
+Ldap::OmniauthCallbacksController.prepend(EE::Ldap::OmniauthCallbacksController)

@@ -71,3 +71,5 @@ module EE
     end
   end
 end
+
+Projects::IssuesController.prepend(EE::Projects::IssuesController)

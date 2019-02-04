@@ -17,3 +17,5 @@ module EE
     end
   end
 end
+
+RootController.prepend(EE::RootController)

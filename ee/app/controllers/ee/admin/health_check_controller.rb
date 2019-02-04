@@ -20,3 +20,5 @@ module EE
     end
   end
 end
+
+Admin::HealthCheckController.prepend(EE::Admin::HealthCheckController)

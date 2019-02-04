@@ -8,5 +8,3 @@ module ProjectUnauthorized
     # no-op
   end
 end
-
-ProjectUnauthorized.prepend(EE::ProjectUnauthorized)

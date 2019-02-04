@@ -16,3 +16,5 @@ module EE
     end
   end
 end
+
+Projects::VariablesController.prepend(EE::Projects::VariablesController)

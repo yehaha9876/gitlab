@@ -108,3 +108,5 @@ module EE
     end
   end
 end
+
+Projects::MirrorsController.prepend(EE::Projects::MirrorsController)

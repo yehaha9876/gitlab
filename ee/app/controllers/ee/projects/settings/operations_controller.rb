@@ -46,3 +46,5 @@ module EE
     end
   end
 end
+
+Projects::Settings::OperationsController.prepend(EE::Projects::Settings::OperationsController)

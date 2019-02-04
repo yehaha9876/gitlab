@@ -15,3 +15,5 @@ module EE
     end
   end
 end
+
+ConfirmationsController.prepend(EE::ConfirmationsController)

@@ -58,5 +58,3 @@ class Projects::BoardsController < Projects::ApplicationController
     end
   end
 end
-
-Projects::BoardsController.prepend(EE::Boards::BoardsController)

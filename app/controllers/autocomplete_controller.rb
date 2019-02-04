@@ -39,5 +39,3 @@ class AutocompleteController < ApplicationController
     render json: AwardedEmojiFinder.new(current_user).execute
   end
 end
-
-AutocompleteController.prepend(EE::AutocompleteController)

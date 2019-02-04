@@ -20,3 +20,5 @@ module EE
     end
   end
 end
+
+PasswordsController.prepend(EE::PasswordsController)

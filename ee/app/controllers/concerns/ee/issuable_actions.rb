@@ -15,3 +15,5 @@ module EE
     end
   end
 end
+
+IssuableActions.prepend(EE::IssuableActions)

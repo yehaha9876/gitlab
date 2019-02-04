@@ -24,3 +24,5 @@ module EE
     end
   end
 end
+
+Admin::AppearancesController.prepend(EE::Admin::AppearancesController)

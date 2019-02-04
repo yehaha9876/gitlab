@@ -14,3 +14,5 @@ module EE
     end
   end
 end
+
+Profiles::AccountsController.prepend(EE::Profiles::AccountsController)

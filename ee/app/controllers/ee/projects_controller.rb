@@ -69,3 +69,5 @@ module EE
     end
   end
 end
+
+ProjectsController.prepend(EE::ProjectsController)
