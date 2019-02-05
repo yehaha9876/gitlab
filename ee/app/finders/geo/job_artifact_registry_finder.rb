@@ -214,8 +214,7 @@ module Geo
 
       legacy_left_outer_join_registry_ids(
         syncable,
-        registry_artifact_ids,
-        Ci::JobArtifact
+        registry_artifact_ids
       )
     end
     # rubocop: enable CodeReuse/ActiveRecord

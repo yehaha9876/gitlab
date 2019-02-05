@@ -249,8 +249,7 @@ module Geo
     def legacy_find_unsynced_projects
       legacy_left_outer_join_registry_ids(
         current_node.projects,
-        Geo::ProjectRegistry.pluck(:project_id),
-        Project
+        Geo::ProjectRegistry.pluck(:project_id)
       )
     end
     # rubocop: enable CodeReuse/ActiveRecord

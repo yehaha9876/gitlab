@@ -220,8 +220,7 @@ module Geo
 
       legacy_left_outer_join_registry_ids(
         syncable,
-        registry_file_ids,
-        LfsObject
+        registry_file_ids
       )
     end
     # rubocop: enable CodeReuse/ActiveRecord

@@ -42,17 +42,17 @@ module Geo
     # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_left_outer_join_registry_ids(objects, registry_ids, klass)
-      return objects if registry_ids.empty?
+    def legacy_left_outer_join_registry_ids(relation, foreign_ids, foreign_key: :id)
+      return relation if foreign_ids.empty?
 
-      joined_relation = objects.joins(<<~SQL)
+      joined_relation = relation.joins(<<~SQL)
         LEFT OUTER JOIN
-        (VALUES #{registry_ids.map { |id| "(#{id}, 't')" }.join(',')})
-         registry(id, registry_present)
-         ON #{klass.table_name}.id = registry.id
+        (VALUES #{foreign_ids.map { |id| "(#{id}, 't')" }.join(',')})
+         foreigns(id, present)
+         ON #{relation.class.table_name}.#{foreign_key} = foreigns.id
       SQL
 
-      joined_relation.where(registry: { registry_present: [nil, false] })
+      joined_relation.where(foreigns: { present: [nil, false] })
     end
     # rubocop: enable CodeReuse/ActiveRecord
   end
