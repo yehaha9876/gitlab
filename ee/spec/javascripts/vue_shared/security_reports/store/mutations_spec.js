@@ -566,9 +566,9 @@ describe('security reports mutations', () => {
     });
 
     it('updates issue in the resolved issues list', () => {
-      stateCopy.sast.newIssues = [];
-      stateCopy.sast.resolvedIssues = parsedDependencyScanningIssuesHead;
-      stateCopy.sast.allIssues = [];
+      stateCopy.dependencyScanning.newIssues = [];
+      stateCopy.dependencyScanning.resolvedIssues = parsedDependencyScanningIssuesHead;
+      stateCopy.dependencyScanning.allIssues = [];
       const updatedIssue = {
         ...parsedDependencyScanningIssuesHead[0],
         foo: 'bar',
@@ -576,7 +576,7 @@ describe('security reports mutations', () => {
 
       mutations[types.UPDATE_DEPENDENCY_SCANNING_ISSUE](stateCopy, updatedIssue);
 
-      expect(stateCopy.sast.resolvedIssues[0]).toEqual(updatedIssue);
+      expect(stateCopy.dependencyScanning.resolvedIssues[0]).toEqual(updatedIssue);
     });
 
     it('updates issue in the all issues list', () => {

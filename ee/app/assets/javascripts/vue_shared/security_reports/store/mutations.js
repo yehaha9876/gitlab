@@ -1,14 +1,25 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
 import {
-  parseSastIssues,
-  parseDependencyScanningIssues,
   filterByKey,
-  parseSastContainer,
-  parseDastIssues,
   getUnapprovedVulnerabilities,
-  findIssueIndex,
+  getIssueTypeAndIndex,
+  parseDastIssues,
+  parseDependencyScanningIssues,
+  parseSastContainer,
+  parseSastIssues,
 } from './utils';
+
+const updateVulnerability = (vulnerability, scanner) => {
+  const { issueType, index } = getIssueTypeAndIndex(vulnerability, scanner);
+  const vulnerabilityList = [
+    ...scanner[issueType].slice(0, index),
+    vulnerability,
+    ...scanner[issueType].slice(index + 1),
+  ];
+
+  Vue.set(scanner, issueType, vulnerabilityList);
+};
 
 export default {
   [types.SET_HEAD_BLOB_PATH](state, path) {
@@ -320,75 +331,19 @@ export default {
   },
 
   [types.UPDATE_SAST_ISSUE](state, issue) {
-    // Find issue in the correct list and update it
-
-    const newIssuesIndex = findIssueIndex(state.sast.newIssues, issue);
-    if (newIssuesIndex !== -1) {
-      state.sast.newIssues.splice(newIssuesIndex, 1, issue);
-      return;
-    }
-
-    const resolvedIssuesIndex = findIssueIndex(state.sast.resolvedIssues, issue);
-    if (resolvedIssuesIndex !== -1) {
-      state.sast.resolvedIssues.splice(resolvedIssuesIndex, 1, issue);
-      return;
-    }
-
-    const allIssuesIndex = findIssueIndex(state.sast.allIssues, issue);
-    if (allIssuesIndex !== -1) {
-      state.sast.allIssues.splice(allIssuesIndex, 1, issue);
-    }
+    updateVulnerability(issue, state.sast);
   },
 
   [types.UPDATE_DEPENDENCY_SCANNING_ISSUE](state, issue) {
-    // Find issue in the correct list and update it
-
-    const newIssuesIndex = findIssueIndex(state.dependencyScanning.newIssues, issue);
-    if (newIssuesIndex !== -1) {
-      state.dependencyScanning.newIssues.splice(newIssuesIndex, 1, issue);
-      return;
-    }
-
-    const resolvedIssuesIndex = findIssueIndex(state.dependencyScanning.resolvedIssues, issue);
-    if (resolvedIssuesIndex !== -1) {
-      state.dependencyScanning.resolvedIssues.splice(resolvedIssuesIndex, 1, issue);
-      return;
-    }
-
-    const allIssuesIndex = findIssueIndex(state.dependencyScanning.allIssues, issue);
-    if (allIssuesIndex !== -1) {
-      state.dependencyScanning.allIssues.splice(allIssuesIndex, 1, issue);
-    }
+    updateVulnerability(issue, state.dependencyScanning);
   },
 
   [types.UPDATE_CONTAINER_SCANNING_ISSUE](state, issue) {
-    // Find issue in the correct list and update it
-
-    const newIssuesIndex = findIssueIndex(state.sastContainer.newIssues, issue);
-    if (newIssuesIndex !== -1) {
-      state.sastContainer.newIssues.splice(newIssuesIndex, 1, issue);
-      return;
-    }
-
-    const resolvedIssuesIndex = findIssueIndex(state.sastContainer.resolvedIssues, issue);
-    if (resolvedIssuesIndex !== -1) {
-      state.sastContainer.resolvedIssues.splice(resolvedIssuesIndex, 1, issue);
-    }
+    updateVulnerability(issue, state.sastContainer);
   },
 
   [types.UPDATE_DAST_ISSUE](state, issue) {
-    // Find issue in the correct list and update it
-
-    const newIssuesIndex = findIssueIndex(state.dast.newIssues, issue);
-    if (newIssuesIndex !== -1) {
-      state.dast.newIssues.splice(newIssuesIndex, 1, issue);
-      return;
-    }
-
-    const resolvedIssuesIndex = findIssueIndex(state.dast.resolvedIssues, issue);
-    if (resolvedIssuesIndex !== -1) {
-      state.dast.resolvedIssues.splice(resolvedIssuesIndex, 1, issue);
-    }
+    updateVulnerability(issue, state.dast);
   },
 
   [types.RECEIVE_DISMISS_ISSUE_ERROR](state, error) {
