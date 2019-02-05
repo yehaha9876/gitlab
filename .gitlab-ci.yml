@@ -1166,6 +1166,7 @@ review-deploy:
     - install_external_dns
     - time deploy
     - add_license
+    - add_secure_seeds
 
 .review-qa-base: &review-qa-base
   <<: *review-docker
