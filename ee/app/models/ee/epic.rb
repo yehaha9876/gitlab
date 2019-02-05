@@ -13,21 +13,29 @@ module EE
       include Awardable
       include LabelEventable
       include Descendant
-
-      enum state: { opened: 1, closed: 2 }
+      include IssuableStates
 
       belongs_to :closed_by, class_name: 'User'
 
-      def reopen
-        return if opened?
+      state_machine :state, initial: :opened do
+        event :close do
+          transition [:opened] => :closed
+        end
 
-        update(state: :opened, closed_at: nil, closed_by: nil)
-      end
+        event :reopen do
+          transition closed: :opened
+        end
 
-      def close
-        return if closed?
+        before_transition any => :closed do |epic|
+          epic.closed_at = Time.zone.now
+        end
 
-        update(state: :closed, closed_at: Time.zone.now)
+        before_transition closed: :opened do |epic|
+          epic.closed_at = nil
+        end
+
+        state :opened, value: 1
+        state :closed, value: 2
       end
 
       belongs_to :assignee, class_name: "User"

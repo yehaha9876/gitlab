@@ -15,7 +15,6 @@ class Issue < ActiveRecord::Base
   include ThrottledTouch
   include IgnorableColumn
   include LabelEventable
-  include IssuableStatuses
 
   ignore_column :assignee_id, :branch_name, :deleted_at
 

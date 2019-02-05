@@ -506,7 +506,7 @@ describe Epic do
   end
 
   describe '#close' do
-    subject(:epic) { create(:epic, state: 'opened') }
+    subject(:epic) { create(:epic, state: Epic.states.opened) }
 
     it 'sets closed_at to Time.now when an epic is closed' do
       expect { epic.close }.to change { epic.closed_at }.from(nil)

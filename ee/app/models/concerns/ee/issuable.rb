@@ -2,6 +2,7 @@
 
 module EE
   module Issuable
+    include ::IssuableStates
     extend ActiveSupport::Concern
 
     class_methods do
