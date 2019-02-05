@@ -29,7 +29,7 @@ export default {
         {
           relation: this.relation,
           status,
-          name: this.status.name_with_namespace,
+          name: this.status.name_with_namespace || '',
         },
       );
     },
@@ -38,7 +38,13 @@ export default {
 </script>
 
 <template>
-  <a v-tooltip :href="status.details_path" :title="statusTitle" data-html="true">
+  <a
+    v-tooltip
+    :href="status.details_path"
+    :title="statusTitle"
+    data-html="true"
+    class="ops-dashboard-project-pipeline-icon"
+  >
     <ci-icon :status="status" />
   </a>
 </template>

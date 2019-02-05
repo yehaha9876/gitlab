@@ -95,7 +95,7 @@
     background-color: $gray-100;
     border-radius: 20.5px;
     height: 32px;
-    padding: $gl-padding-8;
+    padding: $gl-padding-4 $gl-padding-8;
     margin-top: $gl-padding;
 
     &-failed {
@@ -104,11 +104,36 @@
 
     &-arrow {
       color: $gray-300;
+      vertical-align: text-top;
     }
 
     &-downstream {
       margin-right: -$gl-padding-4;
       position: relative;
+    }
+
+    &-icon {
+      vertical-align: middle;
+    }
+
+    &-extra {
+      background-color: $gray-400;
+      border-radius: $avatar-radius;
+      color: $white-light;
+      display: inline-block;
+      font-size: 10px;
+      font-weight: $gl-font-weight-bold;
+      height: $gl-padding;
+      line-height: $gl-line-height;
+      margin-left: -$gl-padding-4;
+      width: $gl-padding;
+      vertical-align: text-top;
+      z-index: 1;
+
+      &:hover {
+        color: $white-light;
+        text-decoration: none;
+      }
     }
   }
 

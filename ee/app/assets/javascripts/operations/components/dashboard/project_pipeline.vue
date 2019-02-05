@@ -1,13 +1,13 @@
 <script>
-import CiIcon from '~/vue_shared/components/ci_icon.vue';
+import { __, sprintf } from '~/locale';
+import CiBadgeLink from '~/vue_shared/components/ci_badge_link.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import Tooltip from '~/vue_shared/directives/tooltip';
-import { __ } from '~/locale';
 import ProjectPipelineStatus from './project_pipeline_status.vue';
 
 export default {
   components: {
-    CiIcon,
+    CiBadgeLink,
     Icon,
     ProjectPipelineStatus,
   },
@@ -15,9 +15,19 @@ export default {
     Tooltip,
   },
   props: {
-    project: {
+    currentStatus: {
       type: Object,
       required: true,
+    },
+    upstreamPipeline: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    downstreamPipelines: {
+      type: Array,
+      required: false,
+      default: null,
     },
     hasPipelineFailed: {
       type: Boolean,
@@ -26,16 +36,8 @@ export default {
     },
   },
   computed: {
-    hasUpstreamPipeline() {
-      return (
-        this.project.upstream_pipeline_status && this.project.upstream_pipeline_status !== null
-      );
-    },
-    hasDownstreamPipelines() {
-      return this.project.downstream_pipelines && this.project.downstream_pipelines.length > 0;
-    },
     downstreamPipelinesHaveFailed() {
-      return this.project.downstream_pipelines.some(status => status.group === 'failed');
+      return this.downstreamPipelines.some(pipeline => pipeline.details.status.group === 'failed');
     },
     pipelineClasses() {
       return {
@@ -43,28 +45,33 @@ export default {
           this.hasPipelineFailed || this.downstreamPipelinesHaveFailed,
       };
     },
+    hasDownstreamPipelines() {
+      return this.downstreamPipelines && this.downstreamPipelines.length > 0;
+    },
+    hasExtraDownstream() {
+      return this.downstreamCount > this.shownDownstreamCount;
+    },
     shownDownstreamPipelines() {
-      return this.project.downstream_pipelines.slice(0, 18);
+      return this.downstreamPipelines.slice(0, 14);
     },
     shownDownstreamCount() {
       return this.shownDownstreamPipelines.length;
     },
     downstreamCount() {
-      return this.project.downstream_pipelines.length;
+      return this.downstreamPipelines.length;
     },
-    moreDownstreamText() {
+    extraDownstreamText() {
       return `+${this.downstreamCount - this.shownDownstreamCount}`;
     },
     extraDownstreamTitle() {
       const extra = this.downstreamCount - this.shownDownstreamCount;
 
-      return `${extra} more downstream pipelines`;
+      return sprintf('%{extra} more downstream pipelines', {
+        extra,
+      });
     },
     upstreamRelation() {
       return __('Upstream');
-    },
-    currentRelation() {
-      return __('Current project');
     },
     downstreamRelation() {
       return __('Downstream');
@@ -72,36 +79,37 @@ export default {
   },
 };
 </script>
-
 <template>
   <div :class="pipelineClasses" class="ops-dashboard-project-pipeline">
-    <template v-if="hasUpstreamPipeline">
+    <template v-if="upstreamPipeline">
       <project-pipeline-status
-        :status="project.upstream_pipeline_status"
+        :status="upstreamPipeline.details.status"
         :relation="upstreamRelation"
       />
       <icon name="arrow-right" class="ops-dashboard-project-pipeline-arrow mx-1" />
     </template>
 
-    <project-pipeline-status :status="project.pipeline_status" :relation="currentRelation" />
+    <ci-badge-link :status="currentStatus" :show-text="true" />
 
     <template v-if="hasDownstreamPipelines">
       <icon name="arrow-right" class="ops-dashboard-project-pipeline-arrow mx-1" />
+
       <span
         v-for="(pipeline, index) in shownDownstreamPipelines"
         :key="pipeline.id"
-        :style="`z-index: ${shownDownstreamPipelines.length - index}`"
+        :style="`z-index: ${shownDownstreamPipelines.length + 1 - index}`"
         class="ops-dashboard-project-pipeline-downstream"
       >
-        <project-pipeline-status :status="pipeline" :relation="downstreamRelation" />
+        <project-pipeline-status :status="pipeline.details.status" :relation="downstreamRelation" />
       </span>
       <a
-        v-if="downstreamCount > shownDownstreamCount"
+        v-if="hasExtraDownstream"
         v-tooltip
-        :href="project.pipeline_status.details_path"
+        :href="currentStatus.details_path"
         :title="extraDownstreamTitle"
+        class="ops-dashboard-project-pipeline-extra"
       >
-        . . .
+        {{ extraDownstreamText }}
       </a>
     </template>
   </div>

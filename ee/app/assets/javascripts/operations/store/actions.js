@@ -3,6 +3,7 @@ import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { __, s__, n__, sprintf } from '~/locale';
 import * as types from './mutation_types';
+import mockData from './mock_data';
 
 export const addProjectsToDashboard = ({ state, dispatch }) => {
   axios
@@ -81,71 +82,9 @@ export const clearProjectSearchResults = ({ commit }) => {
   commit(types.SET_PROJECT_SEARCH_RESULTS, []);
 };
 
-const getRandomPipelineStatus = () => {
-  const max = 3;
-  const min = 1;
-  const choice = Math.floor(Math.random() * (max - min + 1) + min);
-
-  switch (choice) {
-    case 1:
-      return {
-        group: 'running',
-        icon: 'status_running',
-        text: 'running',
-        name_with_namespace: 'Namespace / Name',
-        details_path: '/h5bp/html5-boilerplate/pipelines/50',
-      };
-    case 2:
-      return {
-        group: 'failed',
-        icon: 'status_failed',
-        text: 'failed',
-        name_with_namespace: 'Namespace / Name',
-        details_path: '/h5bp/html5-boilerplate/pipelines/50',
-      };
-    case 3:
-      return {
-        group: 'success',
-        icon: 'status_success',
-        text: 'success',
-        name_with_namespace: 'Namespace / Name',
-        details_path: '/h5bp/html5-boilerplate/pipelines/50',
-      };
-    default:
-      return {
-        group: 'running',
-        icon: 'status_running',
-        text: 'running',
-        name_with_namespace: 'Namespace / Name',
-        details_path: '/h5bp/html5-boilerplate/pipelines/50',
-      };
-  }
-}
-
-const tempDashboardApiAdditions = response => {
-  const projects = response.data.projects.map(project => {
-    const newProject = { ...project };
-    if (newProject.last_deployment) {
-      newProject.last_deployment.user = {"id":1786152,"name":"🤖 GitLab Bot 🤖","username":"gitlab-bot","state":"active","avatar_url":"https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=46&d=identicon","web_url":"https://gitlab.com/gitlab-bot","status_tooltip_html":null,"path":"/gitlab-bot"};
-      newProject.last_deployment.commit.author = {"id":1786152,"name":"🤖 GitLab Bot 🤖","username":"gitlab-bot","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/1786152/avatar.png","web_url":"https://gitlab.com/gitlab-bot","status_tooltip_html":null,"path":"/gitlab-bot"};
-      newProject.last_deployment.finished_time = '2018-11-09T20:04:05.392Z';
-    }
-
-    newProject.upstream_pipeline_status = getRandomPipelineStatus();
-    newProject.pipeline_status = getRandomPipelineStatus();
-    newProject.downstream_pipelines = [
-      getRandomPipelineStatus(),
-      getRandomPipelineStatus(),
-      getRandomPipelineStatus(),
-    ];
-    return newProject;
-  });
-  return {
-    data: {
-      projects,
-    },
-  };
-};
+const tempDashboardApiAdditions = () => ({ 
+  data: mockData,
+});
 
 export const fetchProjects = ({ state, dispatch }) => {
   dispatch('requestProjects');
