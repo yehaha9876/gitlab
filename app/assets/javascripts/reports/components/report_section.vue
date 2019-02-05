@@ -59,11 +59,6 @@ export default {
       required: false,
       default: () => [],
     },
-    dismissedIssues: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
     infoText: {
       type: [String, Boolean],
       required: false,
@@ -170,7 +165,6 @@ export default {
           :unresolved-issues="unresolvedIssues"
           :resolved-issues="resolvedIssues"
           :neutral-issues="neutralIssues"
-          :dismissed-issues="dismissedIssues"
           :component="component"
         />
       </slot>

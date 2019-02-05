@@ -229,8 +229,7 @@ export default {
       :error-text="$options.messages.SAST_HAS_ERROR"
       :success-text="sastText"
       :unresolved-issues="sast.newIssues"
-      :dismissed-issues="sast.dismissedIssues"
-      :has-issues="sast.newIssues.length > 0 || sast.dismissedIssues.length > 0"
+      :has-issues="sast.newIssues.length > 0"
       :popover-options="sastPopover"
       class="js-sast-widget split-report-section"
     />
@@ -244,10 +243,7 @@ export default {
       :error-text="$options.messages.DEPENDENCY_SCANNING_HAS_ERROR"
       :success-text="dependencyScanningText"
       :unresolved-issues="dependencyScanning.newIssues"
-      :dismissed-issues="dependencyScanning.dismissedIssues"
-      :has-issues="
-        dependencyScanning.newIssues.length > 0 || dependencyScanning.dismissedIssues.length > 0
-      "
+      :has-issues="dependencyScanning.newIssues.length > 0"
       :popover-options="dependencyScanningPopover"
       class="js-dss-widget split-report-section"
     />
@@ -261,8 +257,7 @@ export default {
       :error-text="$options.messages.CONTAINER_SCANNING_HAS_ERROR"
       :success-text="sastContainerText"
       :unresolved-issues="sastContainer.newIssues"
-      :dismissed-issues="sastContainer.dismissedIssues"
-      :has-issues="sastContainer.newIssues.length > 0 || sastContainer.dismissedIssues.length > 0"
+      :has-issues="sastContainer.newIssues.length > 0"
       :popover-options="sastContainerPopover"
       class="js-dependency-scanning-widget split-report-section"
     />
@@ -276,8 +271,7 @@ export default {
       :error-text="$options.messages.DAST_HAS_ERROR"
       :success-text="dastText"
       :unresolved-issues="dast.newIssues"
-      :dismissed-issues="dast.dismissedIssues"
-      :has-issues="dast.newIssues.length > 0 || dast.dismissedIssues.length > 0"
+      :has-issues="dast.newIssues.length > 0"
       :popover-options="dastPopover"
       class="js-dast-widget split-report-section"
     />

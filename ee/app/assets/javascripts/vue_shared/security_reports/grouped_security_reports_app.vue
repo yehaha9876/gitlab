@@ -252,11 +252,10 @@ export default {
         />
 
         <issues-list
-          v-if="sast.newIssues.length || sast.resolvedIssues.length || sast.dismissedIssues.length"
+          v-if="sast.newIssues.length || sast.resolvedIssues.length"
           :unresolved-issues="sast.newIssues"
           :resolved-issues="sast.resolvedIssues"
           :all-issues="sast.allIssues"
-          :dismissed-issues="sast.dismissedIssues"
           :component="$options.componentNames.SastIssueBody"
           class="js-sast-issue-list report-block-group-list"
         />
@@ -271,14 +270,9 @@ export default {
         />
 
         <issues-list
-          v-if="
-            dependencyScanning.newIssues.length ||
-              dependencyScanning.resolvedIssues.length ||
-              dependencyScanning.dismissedIssues.length
-          "
+          v-if="dependencyScanning.newIssues.length || dependencyScanning.resolvedIssues.length"
           :unresolved-issues="dependencyScanning.newIssues"
           :resolved-issues="dependencyScanning.resolvedIssues"
-          :dismissed-issues="dependencyScanning.dismissedIssues"
           :component="$options.componentNames.SastIssueBody"
           class="js-dss-issue-list report-block-group-list"
         />
@@ -293,14 +287,9 @@ export default {
         />
 
         <issues-list
-          v-if="
-            sastContainer.newIssues.length ||
-              sastContainer.resolvedIssues.length ||
-              sastContainer.dismissedIssues.length
-          "
+          v-if="sastContainer.newIssues.length || sastContainer.resolvedIssues.length"
           :unresolved-issues="sastContainer.newIssues"
           :resolved-issues="sastContainer.resolvedIssues"
-          :dismissed-issues="sastContainer.dismissedIssues"
           :component="$options.componentNames.SastContainerIssueBody"
           class="report-block-group-list"
         />
@@ -315,10 +304,9 @@ export default {
         />
 
         <issues-list
-          v-if="dast.newIssues.length || dast.resolvedIssues.length || dast.dismissedIssues.length"
+          v-if="dast.newIssues.length || dast.resolvedIssues.length"
           :unresolved-issues="dast.newIssues"
           :resolved-issues="dast.resolvedIssues"
-          :dismissed-issues="dast.dismissedIssues"
           :component="$options.componentNames.DastIssueBody"
           class="report-block-group-list"
         />

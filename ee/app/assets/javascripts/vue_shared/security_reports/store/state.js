@@ -31,7 +31,6 @@ export default () => ({
     newIssues: [],
     resolvedIssues: [],
     allIssues: [],
-    dismissedIssues: [],
   },
   sastContainer: {
     paths: {
@@ -44,7 +43,6 @@ export default () => ({
 
     newIssues: [],
     resolvedIssues: [],
-    dismissedIssues: [],
   },
   dast: {
     paths: {
@@ -57,7 +55,6 @@ export default () => ({
 
     newIssues: [],
     resolvedIssues: [],
-    dismissedIssues: [],
   },
 
   dependencyScanning: {
@@ -72,7 +69,6 @@ export default () => ({
     newIssues: [],
     resolvedIssues: [],
     allIssues: [],
-    dismissedIssues: [],
   },
 
   modal: {

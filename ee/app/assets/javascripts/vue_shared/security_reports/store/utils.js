@@ -432,53 +432,19 @@ export const isDismissed = issue =>
   'dismissalFeedback' in issue && issue.dismissalFeedback !== null;
 
 /**
- * Moves a vulnerability from one list to another, returning the new lists for immutability
- *
- * @param {Object} options
- * @param {} options.vulnerability the vulnerability that needs moving
- * @param {Array} options.origin the array the vulnerability is currently a part of
- * @param {Array} options.destination the array the vulnerability is to move to
- * @returns {{newOrigin:Array, newDestination:Array}} An object with the new arrays inside.
- */
-export const moveLists = ({ vulnerability, origin, destination }) => {
-  const vulnerabilityIndex = findIssueIndex(origin, vulnerability);
-
-  return {
-    newOrigin: [...origin.slice(0, vulnerabilityIndex), ...origin.slice(vulnerabilityIndex + 1)],
-    newDestination: [vulnerability, ...destination],
-  };
-};
-
-/**
  * Checks the different vulnerability types sequentially to see if the vulnerabiltiy is inside it
  * Once there's a match, it returns it.
  *
  * @param {Object} vulnerability
  * @param {Object} scanner
- * @returns {String} the origin
+ * @returns {{issueType:String, index:Number}}
  */
-export const getOrigin = (vulnerability, scanner) => {
-  const issueTypes = ['newIssues', 'dismissedIssues', 'resolvedIssues', 'allIssues'];
-  return issueTypes.find(
+export const getIssueTypeAndIndex = (vulnerability, scanner) => {
+  const issueTypes = ['newIssues', 'resolvedIssues', 'allIssues'];
+  const issueType = issueTypes.find(
     type => scanner[type] && findIssueIndex(scanner[type], vulnerability) !== -1,
   );
-};
+  const index = findIssueIndex(scanner[issueType], vulnerability);
 
-/**
- * Sets the vulnerability destination depending on its origin and type
- *
- * @param {Object} vulnerability
- * @param {Object} scanner
- * @returns {String} the destination
- */
-export const getDestination = (vulnerability, scanner) => {
-  const origin = getOrigin(vulnerability, scanner);
-
-  if (isDismissed(vulnerability)) {
-    return 'dismissedIssues';
-  } else if (origin === 'dismissedIssues') {
-    return 'newIssues';
-  }
-
-  return origin;
+  return { issueType, index };
 };
