@@ -10,6 +10,7 @@ import {
   getUnapprovedVulnerabilities,
   groupedTextBuilder,
   statusIcon,
+  countIssues,
 } from 'ee/vue_shared/security_reports/store/utils';
 import {
   oldSastIssues,
@@ -421,6 +422,69 @@ describe('security reports utils', () => {
     describe('without new or neutal issues', () => {
       it('returns success', () => {
         expect(statusIcon()).toEqual('success');
+      });
+    });
+  });
+
+  describe('countIssues', () => {
+    const allIssues = [{}];
+    const resolvedIssues = [{}];
+    const dismissedIssues = [{ isDismissed: true }];
+    const addedIssues = [{ isDismissed: false }];
+
+    it('returns 0 for all counts if everything is empty', () => {
+      expect(countIssues()).toEqual({
+        added: 0,
+        dismissed: 0,
+        existing: 0,
+        fixed: 0,
+      });
+    });
+
+    it('counts `allIssues` as existing', () => {
+      expect(countIssues({ allIssues })).toEqual({
+        added: 0,
+        dismissed: 0,
+        existing: 1,
+        fixed: 0,
+      });
+    });
+
+    it('counts `resolvedIssues` as fixed', () => {
+      expect(countIssues({ resolvedIssues })).toEqual({
+        added: 0,
+        dismissed: 0,
+        existing: 0,
+        fixed: 1,
+      });
+    });
+
+    it('counts `newIssues` which are dismissed as dismissed', () => {
+      expect(countIssues({ newIssues: dismissedIssues })).toEqual({
+        added: 0,
+        dismissed: 1,
+        existing: 0,
+        fixed: 0,
+      });
+    });
+
+    it('counts `newIssues` which are not dismissed as added', () => {
+      expect(countIssues({ newIssues: addedIssues })).toEqual({
+        added: 1,
+        dismissed: 0,
+        existing: 0,
+        fixed: 0,
+      });
+    });
+
+    it('counts everything', () => {
+      expect(
+        countIssues({ newIssues: [...addedIssues, ...dismissedIssues], resolvedIssues, allIssues }),
+      ).toEqual({
+        added: 1,
+        dismissed: 1,
+        existing: 1,
+        fixed: 1,
       });
     });
   });

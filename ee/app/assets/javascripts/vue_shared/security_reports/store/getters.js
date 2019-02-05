@@ -4,7 +4,7 @@ import { LOADING, ERROR, SUCCESS } from './constants';
 import messages from './messages';
 
 const groupedReportText = (report, reportType, errorMessage, loadingMessage) => {
-  const { paths, newIssues, resolvedIssues, allIssues, dismissedIssues } = report;
+  const { paths } = report;
 
   if (report.hasError) {
     return errorMessage;
@@ -14,13 +14,12 @@ const groupedReportText = (report, reportType, errorMessage, loadingMessage) => 
     return loadingMessage;
   }
 
+  const count = countIssues(report);
+
   return groupedTextBuilder({
+    ...count,
     reportType,
     paths,
-    added: (newIssues || []).length,
-    fixed: (resolvedIssues || []).length,
-    existing: (allIssues || []).length,
-    dismissed: (dismissedIssues || []).length,
   });
 };
 

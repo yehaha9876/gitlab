@@ -13,6 +13,7 @@ import {
   dastStatusIcon,
   dependencyScanningStatusIcon,
   anyReportHasError,
+  summaryCounts,
 } from 'ee/vue_shared/security_reports/store/getters';
 
 describe('Security reports getters', () => {
@@ -63,6 +64,17 @@ describe('Security reports getters', () => {
           newState.sast.newIssues = [{}];
 
           expect(groupedSastText(newState)).toEqual('SAST detected 1 new vulnerability');
+        });
+      });
+
+      describe('with only dismissed issues', () => {
+        it('returns dismissed issues text', () => {
+          const newState = state();
+          newState.sast.paths.head = 'foo';
+          newState.sast.paths.base = 'bar';
+          newState.sast.newIssues = [{ isDismissed: true }];
+
+          expect(groupedSastText(newState)).toEqual('SAST detected 1 dismissed vulnerability');
         });
       });
 
@@ -150,6 +162,19 @@ describe('Security reports getters', () => {
         });
       });
 
+      describe('with only dismissed issues', () => {
+        it('returns dismissed issues text', () => {
+          const newState = state();
+          newState.sastContainer.paths.head = 'foo';
+          newState.sastContainer.paths.base = 'bar';
+          newState.sastContainer.newIssues = [{ isDismissed: true }];
+
+          expect(groupedSastText(newState)).toEqual(
+            'Container scanning detected 1 dismissed vulnerability',
+          );
+        });
+      });
+
       describe('with new and resolved issues', () => {
         it('returns new and fixed issues text', () => {
           const newState = state();
@@ -211,6 +236,17 @@ describe('Security reports getters', () => {
           newState.dast.newIssues = [{}];
 
           expect(groupedDastText(newState)).toEqual('DAST detected 1 new vulnerability');
+        });
+      });
+
+      describe('with only dismissed issues', () => {
+        it('returns dismissed issues text', () => {
+          const newState = state();
+          newState.dast.paths.head = 'foo';
+          newState.dast.paths.base = 'bar';
+          newState.dast.newIssues = [{ isDismissed: true }];
+
+          expect(groupedSastText(newState)).toEqual('DAST detected 1 dismissed vulnerability');
         });
       });
 
@@ -280,6 +316,19 @@ describe('Security reports getters', () => {
         });
       });
 
+      describe('with only dismissed issues', () => {
+        it('returns dismissed issues text', () => {
+          const newState = state();
+          newState.dependencyScanning.paths.head = 'foo';
+          newState.dependencyScanning.paths.base = 'bar';
+          newState.dependencyScanning.newIssues = [{ isDismissed: true }];
+
+          expect(groupedSastText(newState)).toEqual(
+            'Dependency scanning detected 1 dismissed vulnerability',
+          );
+        });
+      });
+
       describe('with new and resolved issues', () => {
         it('returns new and fixed issues text', () => {
           const newState = state();
@@ -305,6 +354,53 @@ describe('Security reports getters', () => {
           expect(groupedDependencyText(newState)).toEqual(
             'Dependency scanning detected 1 fixed vulnerability',
           );
+        });
+      });
+    });
+  });
+
+  describe('summaryCounts', () => {
+    it('returns 0 count for empty state', () => {
+      const newState = state();
+
+      expect(summaryCounts(newState)).toEqual({
+        added: 0,
+        dismissed: 0,
+        existing: 0,
+        fixed: 0,
+      });
+    });
+
+    describe('combines all reports', () => {
+      it('of the same type', () => {
+        const newState = state();
+
+        newState.sast.resolvedIssues = [{}];
+        newState.sastContainer.resolvedIssues = [{}];
+        newState.dast.resolvedIssues = [{}];
+        newState.dependencyScanning.resolvedIssues = [{}];
+
+        expect(summaryCounts(newState)).toEqual({
+          added: 0,
+          dismissed: 0,
+          existing: 0,
+          fixed: 4,
+        });
+      });
+
+      it('of the different types', () => {
+        const newState = state();
+
+        newState.sast.allIssues = [{}];
+        newState.sastContainer.resolvedIssues = [{}];
+        newState.dast.newIssues = [{ isDismissed: true }];
+        newState.dependencyScanning.newIssues = [{ isDismissed: false }];
+
+        expect(summaryCounts(newState)).toEqual({
+          added: 1,
+          dismissed: 1,
+          existing: 1,
+          fixed: 1,
         });
       });
     });

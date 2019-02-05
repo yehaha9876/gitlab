@@ -298,35 +298,6 @@ export const parseDastIssues = (issues = [], feedback = []) =>
   });
 
 /**
- * Counts issues. Simply returns the amount of existing and fixed Issues.
- * New Issues are divided into dismissed and added.
- *
- * @param newIssues
- * @param resolvedIssues
- * @param allIssues
- * @returns {{existing: number, added: number, dismissed: number, fixed: number}}
- */
-export const countIssues = ({ newIssues = [], resolvedIssues = [], allIssues = [] }) => {
-  let added = 0;
-  let dismissed = 0;
-
-  newIssues.forEach(issue => {
-    if (issue.isDismissed) {
-      dismissed += 1;
-    } else {
-      added += 1;
-    }
-  });
-
-  return {
-    added,
-    dismissed,
-    fixed: resolvedIssues.length,
-    existing: allIssues.length,
-  };
-};
-
-/**
  * Compares two arrays by the given key and returns the difference
  *
  * @param {Array} firstArray
@@ -364,7 +335,7 @@ export const groupedTextBuilder = ({
       baseString = n__(
         'ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerability for the source branch only',
         'ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerabilities for the source branch only',
-        added,
+        dismissed,
       );
     } else if (added && dismissed) {
       // added & dismissed
@@ -397,7 +368,7 @@ export const groupedTextBuilder = ({
       baseString = n__(
         'ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerability',
         'ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerabilities',
-        fixed,
+        dismissed,
       );
     } else if (added && fixed && !dismissed) {
       // added & fixed
@@ -449,4 +420,33 @@ export const statusIcon = (loading = false, failed = false, newIssues = 0, neutr
   }
 
   return 'success';
+};
+
+/**
+ * Counts issues. Simply returns the amount of existing and fixed Issues.
+ * New Issues are divided into dismissed and added.
+ *
+ * @param newIssues
+ * @param resolvedIssues
+ * @param allIssues
+ * @returns {{existing: number, added: number, dismissed: number, fixed: number}}
+ */
+export const countIssues = ({ newIssues = [], resolvedIssues = [], allIssues = [] } = {}) => {
+  let added = 0;
+  let dismissed = 0;
+
+  newIssues.forEach(issue => {
+    if (issue.isDismissed) {
+      dismissed += 1;
+    } else {
+      added += 1;
+    }
+  });
+
+  return {
+    added,
+    dismissed,
+    fixed: resolvedIssues.length,
+    existing: allIssues.length,
+  };
 };
