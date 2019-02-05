@@ -15,6 +15,7 @@ class Issue < ActiveRecord::Base
   include ThrottledTouch
   include IgnorableColumn
   include LabelEventable
+  include IssuableStatuses
 
   ignore_column :assignee_id, :branch_name, :deleted_at
 
@@ -84,9 +85,6 @@ class Issue < ActiveRecord::Base
       transition closed: :opened
     end
 
-    state :opened
-    state :closed
-
     before_transition any => :closed do |issue|
       issue.closed_at = Time.zone.now
     end
@@ -95,6 +93,9 @@ class Issue < ActiveRecord::Base
       issue.closed_at = nil
       issue.closed_by = nil
     end
+
+    state :opened#, value:
+    state :closed#, value:
   end
 
   class << self
