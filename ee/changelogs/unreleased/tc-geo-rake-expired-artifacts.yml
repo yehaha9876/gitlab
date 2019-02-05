@@ -1,0 +1,5 @@
+---
+title: Rake task to clean orphaned artifacts on Geo secondary
+merge_request: 9226
+author:
+type: added

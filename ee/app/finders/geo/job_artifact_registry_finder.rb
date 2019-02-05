@@ -92,6 +92,14 @@ module Geo
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
+    def find_orphaned_artifact_registries(batch_size:, except_artifact_ids: [])
+      if use_legacy_queries?
+        legacy_find_orphaned_artifact_registries(except_artifact_ids: except_artifact_ids).limit(batch_size)
+      else
+        fdw_find_orphaned_artifact_registries.limit(batch_size)
+      end
+    end
+
     private
 
     # rubocop: disable CodeReuse/ActiveRecord
@@ -171,6 +179,17 @@ module Geo
     # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
+    def fdw_find_orphaned_artifact_registries
+      join = Geo::JobArtifactRegistry.arel_table.join(Geo::Fdw::Ci::JobArtifact.arel_table, Arel::Nodes::OuterJoin)
+               .on(Geo::JobArtifactRegistry.arel_table[:artifact_id].eq(Geo::Fdw::Ci::JobArtifact.arel_table[:id]))
+               .join_sources.first
+
+      Geo::JobArtifactRegistry.joins(join)
+        .where(Geo::Fdw::Ci::JobArtifact.arel_table[:id].eq(nil))
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
+
+    # rubocop: disable CodeReuse/ActiveRecord
     def fdw_all
       if selective_sync?
         Geo::Fdw::Ci::JobArtifact.joins(:project).where(projects: { id: current_node.projects })
@@ -237,6 +256,18 @@ module Geo
         syncable,
         find_synced_missing_on_primary_registries.pluck(:artifact_id),
         Ci::JobArtifact
+      )
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
+
+    # rubocop: disable CodeReuse/ActiveRecord
+    def legacy_find_orphaned_artifact_registries(except_artifact_ids: [])
+      artifact_ids = Ci::JobArtifact.pluck(:id) | except_artifact_ids
+
+      legacy_left_outer_join_registry_ids(
+        Geo::JobArtifactRegistry.all,
+        artifact_ids,
+        foreign_key: :artifact_id
       )
     end
     # rubocop: enable CodeReuse/ActiveRecord

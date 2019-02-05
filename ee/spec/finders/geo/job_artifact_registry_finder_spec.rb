@@ -416,6 +416,17 @@ describe Geo::JobArtifactRegistryFinder, :geo do
         expect(job_artifacts).to match_ids(job_artifact)
       end
     end
+
+    describe '#find_orphaned_artifact_registries' do
+      it 'finds artifacts that no longer exist in database' do
+        job_registry = create(:geo_job_artifact_registry, artifact_id: 9999)
+        create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id)
+
+        job_registries = subject.find_orphaned_artifact_registries(batch_size: 10)
+
+        expect(job_registries).to match_ids(job_registry)
+      end
+    end
   end
 
   it_behaves_like 'a file registry finder'
