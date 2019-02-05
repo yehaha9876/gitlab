@@ -421,30 +421,3 @@ export const statusIcon = (loading = false, failed = false, newIssues = 0, neutr
 
   return 'success';
 };
-
-/**
- * Checks if the passed issue has dismissal feedback and has therefore been dismissed
- *
- * @param {Object} issue
- * @returns {Boolean}
- */
-export const isDismissed = issue =>
-  'dismissalFeedback' in issue && issue.dismissalFeedback !== null;
-
-/**
- * Checks the different vulnerability types sequentially to see if the vulnerabiltiy is inside it
- * Once there's a match, it returns it.
- *
- * @param {Object} vulnerability
- * @param {Object} scanner
- * @returns {{issueType:String, index:Number}}
- */
-export const getIssueTypeAndIndex = (vulnerability, scanner) => {
-  const issueTypes = ['newIssues', 'resolvedIssues', 'allIssues'];
-  const issueType = issueTypes.find(
-    type => scanner[type] && findIssueIndex(scanner[type], vulnerability) !== -1,
-  );
-  const index = findIssueIndex(scanner[issueType], vulnerability);
-
-  return { issueType, index };
-};
