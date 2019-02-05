@@ -1,13 +1,6 @@
 import { s__ } from '~/locale';
 
 export default () => ({
-  summaryCounts: {
-    added: 0,
-    fixed: 0,
-    existing: 0,
-    dismissed: 0,
-  },
-
   blobPath: {
     head: null,
     base: null,

@@ -317,6 +317,7 @@ describe('Security reports getters', () => {
           allReportsHaveError: true,
           noBaseInAllReports: false,
           areReportsLoading: false,
+          summaryCounts: {},
         }),
       ).toEqual('Security scanning failed loading any results');
     });
@@ -327,6 +328,7 @@ describe('Security reports getters', () => {
           allReportsHaveError: false,
           noBaseInAllReports: true,
           areReportsLoading: false,
+          summaryCounts: {},
         }),
       ).toEqual('Security scanning detected no vulnerabilities for the source branch only');
     });
@@ -337,13 +339,14 @@ describe('Security reports getters', () => {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: true,
+          summaryCounts: {},
         }),
       ).toContain('(is loading)');
     });
 
     it('returns added and fixed text', () => {
       const newState = state();
-      newState.summaryCounts = {
+      const summaryCounts = {
         added: 2,
         fixed: 4,
         existing: 5,
@@ -354,13 +357,14 @@ describe('Security reports getters', () => {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
+          summaryCounts,
         }),
       ).toEqual('Security scanning detected 2 new, and 4 fixed vulnerabilities');
     });
 
     it('returns added text', () => {
       const newState = state();
-      newState.summaryCounts = {
+      const summaryCounts = {
         added: 2,
         existing: 5,
       };
@@ -370,13 +374,14 @@ describe('Security reports getters', () => {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
+          summaryCounts,
         }),
       ).toEqual('Security scanning detected 2 new vulnerabilities');
     });
 
     it('returns fixed text', () => {
       const newState = state();
-      newState.summaryCounts = {
+      const summaryCounts = {
         fixed: 4,
         existing: 5,
       };
@@ -386,13 +391,14 @@ describe('Security reports getters', () => {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
+          summaryCounts,
         }),
       ).toEqual('Security scanning detected 4 fixed vulnerabilities');
     });
 
     it('returns dismissed text', () => {
       const newState = state();
-      newState.summaryCounts = {
+      const summaryCounts = {
         dismissed: 4,
       };
 
@@ -401,13 +407,14 @@ describe('Security reports getters', () => {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
+          summaryCounts,
         }),
       ).toEqual('Security scanning detected 4 dismissed vulnerabilities');
     });
 
     it('returns added and fixed while loading text', () => {
       const newState = state();
-      newState.summaryCounts = {
+      const summaryCounts = {
         added: 2,
         fixed: 4,
         existing: 5,
@@ -418,13 +425,14 @@ describe('Security reports getters', () => {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: true,
+          summaryCounts,
         }),
       ).toEqual('Security scanning (is loading) detected 2 new, and 4 fixed vulnerabilities');
     });
 
     it('returns no new text if there are existing ones', () => {
       const newState = state();
-      newState.summaryCounts = {
+      const summaryCounts = {
         existing: 5,
       };
 
@@ -433,19 +441,21 @@ describe('Security reports getters', () => {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
+          summaryCounts,
         }),
       ).toEqual('Security scanning detected no new vulnerabilities');
     });
 
     it('returns no text if there are existing ones', () => {
       const newState = state();
-      newState.summaryCounts = {};
+      const summaryCounts = {};
 
       expect(
         groupedSummaryText(newState, {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
+          summaryCounts,
         }),
       ).toEqual('Security scanning detected no vulnerabilities');
     });

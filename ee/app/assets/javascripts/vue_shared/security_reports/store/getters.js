@@ -1,5 +1,5 @@
 import { s__, sprintf } from '~/locale';
-import { groupedTextBuilder, statusIcon } from './utils';
+import { countIssues, groupedTextBuilder, statusIcon } from './utils';
 import { LOADING, ERROR, SUCCESS } from './constants';
 import messages from './messages';
 
@@ -46,6 +46,19 @@ export const groupedDependencyText = ({ dependencyScanning }) =>
     messages.DEPENDENCY_SCANNING_IS_LOADING,
   );
 
+export const summaryCounts = state =>
+  [state.sast, state.sastContainer, state.dast, state.dependencyScanning].reduce(
+    (acc, report) => {
+      const curr = countIssues(report);
+      acc.added += curr.added;
+      acc.dismissed += curr.dismissed;
+      acc.fixed += curr.fixed;
+      acc.existing += curr.existing;
+      return acc;
+    },
+    { added: 0, dismissed: 0, fixed: 0, existing: 0 },
+  );
+
 export const groupedSummaryText = (state, getters) => {
   const reportType = s__('ciReport|Security scanning');
 
@@ -59,7 +72,7 @@ export const groupedSummaryText = (state, getters) => {
     return s__('ciReport|Security scanning failed loading any results');
   }
 
-  const { added, fixed, existing, dismissed } = state.summaryCounts;
+  const { added, fixed, existing, dismissed } = getters.summaryCounts;
 
   let status = '';
 
