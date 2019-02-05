@@ -30,7 +30,7 @@ shared_examples 'unauthorized when external service denies access' do
     expect(response.status).to be_between(200, 302)
   end
 
-  it 'allows access when the authorization service denies it' do
+  it 'denies access when the authorization service denies it' do
     external_service_deny_access(user, project)
 
     subject

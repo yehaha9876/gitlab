@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class FileDownloadDispatchWorker
+  class FileDownloadDispatchWorker < Geo::Scheduler::Secondary::SchedulerWorker
     class AttachmentJobFinder < JobFinder
       EXCEPT_RESOURCE_IDS_KEY = :except_file_ids
 

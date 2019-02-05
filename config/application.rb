@@ -39,9 +39,7 @@ module Gitlab
                                      #{config.root}/app/models/hooks
                                      #{config.root}/app/models/members
                                      #{config.root}/app/models/project_services
-                                     #{config.root}/app/workers/concerns
                                      #{config.root}/app/policies/concerns
-                                     #{config.root}/app/services/concerns
                                      #{config.root}/app/serializers/concerns
                                      #{config.root}/app/finders/concerns
                                      #{config.root}/app/graphql/resolvers/concerns
@@ -249,6 +247,23 @@ module Gitlab
 
     config.generators do |g|
       g.factory_bot false
+    end
+
+    # We need to eager-load the EE-specific files before the non EE-specific
+    # ones since the EE-specific files prepend non EE-specific files.
+    config.before_eager_load do
+      sorted_eager_load_paths = Rails.application.config.eager_load_paths.sort { |a, b| b.size <=> a.size }
+      ee_ruby_files_sorted_by_nesting_depth = Dir.glob(Rails.root.join('ee/{app,config,lib}/**/*.rb')).sort { |a, b| (b.count('/') + b.size) <=> (a.count('/') + a.size) }
+
+      ee_ruby_files_sorted_by_nesting_depth.each do |path|
+        sorted_eager_load_paths.each do |eager_load_path|
+          if path.start_with?(eager_load_path)
+            p path
+            require_dependency(path)
+            break
+          end
+        end
+      end
     end
 
     config.after_initialize do

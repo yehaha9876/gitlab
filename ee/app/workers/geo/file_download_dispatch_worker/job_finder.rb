@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class FileDownloadDispatchWorker
+  class FileDownloadDispatchWorker < Geo::Scheduler::Secondary::SchedulerWorker
     # This class is meant to be inherited, and is responsible for generating
     # batches of job arguments for FileDownloadWorker.
     #
