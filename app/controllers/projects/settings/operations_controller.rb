@@ -22,15 +22,6 @@ module Projects
       # overridden in EE
       def render_update_response(result)
         respond_to do |format|
-          format.html do
-            if result[:status] == :success
-              flash[:notice] = _('Your changes have been saved')
-              redirect_to project_settings_operations_path(@project)
-            else
-              render 'show'
-            end
-          end
-
           format.json do
             render_update_json_response(result)
           end
