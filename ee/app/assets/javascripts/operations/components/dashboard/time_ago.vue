@@ -33,7 +33,7 @@ export default {
 };
 </script>
 <template>
-  <div v-if="hasFinishedTime" class="ops-dashboard-project-time-ago">
+  <div v-if="hasFinishedTime" class="ops-dashboard-project-time-ago js-dashboard-project-time-ago">
     <icon name="clock" class="ops-dashboard-project-time-ago-icon" />
 
     <time

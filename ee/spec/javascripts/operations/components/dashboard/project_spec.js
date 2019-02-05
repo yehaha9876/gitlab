@@ -45,10 +45,6 @@ describe('project component', () => {
       it('binds alert count to count', () => {
         expect(alert.count).toBe(mockOneProject.alert_count);
       });
-
-      it('binds last alert', () => {
-        expect(alert.lastAlert).toEqual(mockOneProject.last_alert);
-      });
     });
 
     describe('commit', () => {
@@ -69,34 +65,34 @@ describe('project component', () => {
       });
 
       it('binds short_id to shortSha', () => {
-        expect(commit.shortSha).toBe(vm.project.last_deployment.commit.short_id);
+        expect(commit.shortSha).toBe(vm.project.last_pipeline.commit.short_id);
       });
 
       it('binds commitUrl', () => {
-        expect(commit.commitUrl).toBe(vm.project.last_deployment.commit.commit_url);
+        expect(commit.commitUrl).toBe(vm.project.last_pipeline.commit.commit_url);
       });
 
       it('binds title', () => {
-        expect(commit.title).toBe(vm.project.last_deployment.commit.title);
+        expect(commit.title).toBe(vm.project.last_pipeline.commit.title);
       });
 
       it('binds author', () => {
-        expect(commit.author).toBe(vm.author);
+        expect(commit.author).toBe(vm.project.last_pipeline.commit.author);
       });
 
       it('binds tag', () => {
-        expect(commit.tag).toBe(vm.project.last_deployment.tag);
+        expect(commit.tag).toBe(vm.project.last_pipeline.ref.tag);
       });
     });
 
-    describe('last deploy', () => {
-      it('renders calendar icon', () => {
-        expect(vm.$el.querySelector('.ic-calendar')).not.toBe(null);
+    describe('deploy finished at', () => {
+      it('renders clock icon', () => {
+        expect(vm.$el.querySelector('.ic-clock')).not.toBe(null);
       });
 
-      it('renders time ago of last deploy', () => {
+      it('renders time ago of finished time', () => {
         const timeago = '1 day ago';
-        const container = vm.$el.querySelector('.js-project-container');
+        const container = vm.$el.querySelector('.js-dashboard-project-time-ago');
 
         expect(container.innerText.trim()).toBe(timeago);
       });

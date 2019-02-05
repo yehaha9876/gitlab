@@ -52,7 +52,9 @@ export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) 
         s__(
           'OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for public projects, and private projects in groups with a Gold plan.',
         ),
-        { invalidProjects },
+        {
+          invalidProjects,
+        },
       ),
     );
     dispatch('filterProjectTokensById', invalid);
@@ -82,7 +84,7 @@ export const clearProjectSearchResults = ({ commit }) => {
   commit(types.SET_PROJECT_SEARCH_RESULTS, []);
 };
 
-const tempDashboardApiAdditions = () => ({ 
+const tempDashboardApiAdditions = () => ({
   data: mockData,
 });
 
@@ -95,7 +97,14 @@ export const fetchProjects = ({ state, dispatch }) => {
     .catch(() => dispatch('receiveProjectsError'))
     .then(() => dispatch('requestProjects'))
     .then(() => {
-      setTimeout(() => fetchProjects({ state, dispatch }), 120000);
+      setTimeout(
+        () =>
+          fetchProjects({
+            state,
+            dispatch,
+          }),
+        120000,
+      );
     })
     .catch(() => {});
 };

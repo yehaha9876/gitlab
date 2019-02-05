@@ -28,9 +28,11 @@ describe('project header component', () => {
   });
 
   it('renders project name with namespace', () => {
-    const name = wrapper.find('.js-name-with-namespace').text();
+    const namespace = wrapper.$el.querySelector('.js-project-namespace').text();
+    const name = wrapper.$el.querySelector('.js-project-name').text();
 
-    expect(removeWhitespace(name).trim()).toBe(mockOneProject.name_with_namespace);
+    expect(removeWhitespace(namespace).trim()).toBe(`${mockOneProject.namespace.name} /`);
+    expect(removeWhitespace(name).trim()).toBe(mockOneProject.name);
   });
 
   it('links project name to project', () => {
