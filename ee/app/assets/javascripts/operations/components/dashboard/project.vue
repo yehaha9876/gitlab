@@ -93,7 +93,7 @@ export default {
             />
           </div>
 
-          <div class="col-6 pr-0 align-self-center ops-dashboard-project-commit">
+          <div class="col-10 col-sm-6 pr-0 align-self-center ops-dashboard-project-commit">
             <commit
               :tag="lastPipeline.ref.tag"
               :commit-ref="commitRef"
@@ -105,7 +105,7 @@ export default {
             />
           </div>
 
-          <div class="col-5 pl-0 text-right align-self-center">
+          <div class="col-sm-5 pl-0 text-right align-self-center d-none d-sm-block">
             <time-ago v-if="!isPipelineRunning" :finished-time="finishedTime" />
             <alerts :count="project.alert_count" />
           </div>

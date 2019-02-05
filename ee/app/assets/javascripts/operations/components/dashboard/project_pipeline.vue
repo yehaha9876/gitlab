@@ -52,7 +52,7 @@ export default {
       return this.downstreamCount > this.shownDownstreamCount;
     },
     shownDownstreamPipelines() {
-      return this.downstreamPipelines.slice(0, 14);
+      return this.downstreamPipelines.slice(0, 4);
     },
     shownDownstreamCount() {
       return this.shownDownstreamPipelines.length;
