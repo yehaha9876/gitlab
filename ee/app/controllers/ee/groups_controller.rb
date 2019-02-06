@@ -56,7 +56,7 @@ module EE
     end
 
     # NOTE: currently unable to wrap a group in presenter and re-assign @group: SimpleDelegator doesn't substitute
-    # the class of a wrapped object
+    # the class of a wrapped object; see gitlab-ce/#57299
     def presenter
       strong_memoize(:presenter) do
         group.present(current_user: current_user, request: request)
