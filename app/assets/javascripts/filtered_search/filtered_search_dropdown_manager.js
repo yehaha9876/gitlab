@@ -68,11 +68,6 @@ export default class FilteredSearchDropdownManager {
         gl: DropdownUser,
         element: this.container.querySelector('#js-dropdown-assignee'),
       },
-      approver: {
-        reference: null,
-        gl: DropdownUser,
-        element: this.container.querySelector('#js-dropdown-approver'),
-      },
       milestone: {
         reference: null,
         gl: DropdownNonUser,
@@ -114,6 +109,11 @@ export default class FilteredSearchDropdownManager {
       },
 
       // EE-only start
+      approver: {
+        reference: null,
+        gl: DropdownUser,
+        element: this.container.querySelector('#js-dropdown-approver'),
+      },
       weight: {
         reference: null,
         gl: DropdownWeight,

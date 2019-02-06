@@ -17,7 +17,7 @@ describe MergeRequests::ByApproversFinder do
   let(:id) { nil }
   let(:names) { nil }
 
-  let(:merge_requests) { described_class.call(MergeRequest.all, names, id) }
+  let(:merge_requests) { described_class.execute(MergeRequest.all, names, id) }
 
   context 'filter by no approvers' do
     context 'via api' do

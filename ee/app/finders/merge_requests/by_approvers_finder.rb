@@ -6,8 +6,8 @@
 
 module MergeRequests
   class ByApproversFinder
-    def self.call(items, usernames, id)
-      new(usernames.to_a, id).call(items)
+    def self.execute(items, usernames, id)
+      new(usernames.to_a, id).execute(items)
     end
 
     attr_reader :usernames, :id
@@ -17,7 +17,7 @@ module MergeRequests
       @id = id
     end
 
-    def call(items)
+    def execute(items)
       if by_no_approvers?
         without_approvers(items)
       elsif by_any_approvers?
@@ -45,6 +45,7 @@ module MergeRequests
       id.to_s.downcase == label || usernames.map(&:downcase).include?(label)
     end
 
+    # rubocop: disable CodeReuse/ActiveRecord
     def without_approvers(items)
       items
         .left_outer_joins(:approvers)
@@ -69,5 +70,6 @@ module MergeRequests
         .joins(:approver_users)
         .where(users: { id: id })
     end
+    # rubocop: enable CodeReuse/ActiveRecord
   end
 end

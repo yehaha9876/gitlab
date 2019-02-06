@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MergeRequestFinder
   extend ActiveSupport::Concern
   extend ::Gitlab::Utils::Override
@@ -9,7 +11,7 @@ module MergeRequestFinder
 
   def by_approvers(items)
     MergeRequests::ByApproversFinder
-      .call(items, params[:approver_usernames], params[:approver_id])
+      .execute(items, params[:approver_usernames], params[:approver_id])
   end
 
   class_methods do
