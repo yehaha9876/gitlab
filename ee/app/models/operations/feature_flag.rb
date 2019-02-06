@@ -53,12 +53,12 @@ module Operations
 
     scope :for_environment, -> (environment) do
       select("operations_feature_flags.*" \
-             ", (#{actual_active_sql(environment)}) AS active")
+             ", (#{actual_active_sql(environment)}) AS actual_active")
     end
 
     scope :for_list, -> do
       select("operations_feature_flags.*" \
-             ", COALESCE((#{join_enabled_scopes.to_sql}), FALSE) AS active")
+             ", COALESCE((#{join_enabled_scopes.to_sql}), FALSE) AS actual_active")
     end
 
     class << self
@@ -86,6 +86,20 @@ module Operations
       [
         { name: 'default' }
       ]
+    end
+
+    ##
+    # `actual_active` attribute is computed from `for_environment` or `for_list`.
+    # Since MySQL returns alias as Integer type, we need to check explicitly in
+    # application-level.
+    def actual_active
+      return self.active unless Feature.enabled?(:feature_flags_environment_scope)
+
+      if read_attribute(:actual_active).is_a?(Integer)
+        !read_attribute(:actual_active).zero?
+      else
+        read_attribute(:actual_active)
+      end
     end
 
     private

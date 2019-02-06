@@ -109,7 +109,7 @@ describe Operations::FeatureFlag do
         let(:environment_name) { 'production' }
 
         it 'returns actual active value' do
-          expect(subject.first.active).to be_falsy
+          expect(subject.first.actual_active).to be_falsy
         end
       end
 
@@ -117,7 +117,7 @@ describe Operations::FeatureFlag do
         let(:environment_name) { 'staging' }
 
         it 'returns actual active value' do
-          expect(subject.first.active).to be_truthy
+          expect(subject.first.actual_active).to be_truthy
         end
       end
     end
@@ -132,7 +132,7 @@ describe Operations::FeatureFlag do
         let(:environment_name) { 'review/patch-1' }
 
         it 'returns actual active value' do
-          expect(subject.first.active).to be_truthy
+          expect(subject.first.actual_active).to be_truthy
         end
       end
 
@@ -140,7 +140,7 @@ describe Operations::FeatureFlag do
         let(:environment_name) { 'production' }
 
         it 'returns actual active value' do
-          expect(subject.first.active).to be_falsy
+          expect(subject.first.actual_active).to be_falsy
         end
       end
     end
@@ -157,7 +157,7 @@ describe Operations::FeatureFlag do
         let(:environment_name) { 'production' }
 
         it 'returns multiple actual active values' do
-          expect(subject.ordered.map(&:active)).to eq([false, true])
+          expect(subject.ordered.map(&:actual_active)).to eq([false, true])
         end
       end
     end
@@ -175,7 +175,7 @@ describe Operations::FeatureFlag do
       let!(:scope) { create_scope(feature_flag, 'production', true) }
 
       it 'returns virtual active value' do
-        expect(subject.first.active).to be_truthy
+        expect(subject.first.actual_active).to be_truthy
       end
     end
 
@@ -184,7 +184,7 @@ describe Operations::FeatureFlag do
       let!(:scope) { create_scope(feature_flag, 'production', false) }
 
       it 'returns virtual active value' do
-        expect(subject.first.active).to be_falsy
+        expect(subject.first.actual_active).to be_falsy
       end
     end
 
@@ -193,7 +193,7 @@ describe Operations::FeatureFlag do
       let!(:scope) { create_scope(feature_flag, 'production', true) }
 
       it 'returns virtual active value' do
-        expect(subject.first.active).to be_truthy
+        expect(subject.first.actual_active).to be_truthy
       end
     end
   end

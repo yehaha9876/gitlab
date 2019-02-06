@@ -4,7 +4,7 @@ class FeatureFlagEntity < Grape::Entity
   include RequestAwareEntity
 
   expose :id
-  expose :active
+  expose :actual_active, as: :active
   expose :created_at
   expose :updated_at
   expose :name

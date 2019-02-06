@@ -601,7 +601,7 @@ module EE
       class UnleashFeature < Grape::Entity
         expose :name
         expose :description, unless: ->(feature) { feature.description.nil? }
-        expose :active, as: :enabled
+        expose :actual_active, as: :enabled
         expose :strategies
       end
 
