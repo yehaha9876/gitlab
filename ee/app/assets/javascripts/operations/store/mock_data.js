@@ -266,7 +266,7 @@ export default {
         parent_id: null,
       },
       remove_path: '/-/operations?project_id=1',
-      last_pipeline: passedPipeline,
+      // last_pipeline: passedPipeline,
       downstream_pipelines: [],
       alert_count: 1,
     },

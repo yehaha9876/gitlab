@@ -108,7 +108,6 @@ export default {
           </a>
         </div>
       </div>
-      <!-- <gl-loading-icon v-else :size="2" class="prepend-top-20" /> -->
       <skeleton v-else />
     </div>
   </div>

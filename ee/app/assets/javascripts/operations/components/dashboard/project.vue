@@ -25,7 +25,8 @@ export default {
   },
   computed: {
     hasPipelineFailed() {
-      return this.lastPipeline && this.lastPipeline.details.status.group === 'failed';
+      const failedStatus = 'failed';
+      return this.lastPipeline && this.lastPipeline.details.status.group === failedStatus;
     },
     hasPipelineErrors() {
       return this.project.alert_count > 0;
@@ -48,16 +49,20 @@ export default {
         : null;
     },
     commitRef() {
-      return {
-        ...this.lastPipeline.ref,
-        ref_url: this.lastPipeline.ref.path,
-      };
+      return this.lastPipeline.ref !== undefined
+        ? {
+            ...this.lastPipeline.ref,
+            ref_url: this.lastPipeline.ref.path,
+          }
+        : {};
     },
     finishedTime() {
       return this.lastPipeline.details.finished_at;
     },
-    isPipelineRunning() {
-      return this.lastPipeline.details.status.group === 'running';
+    shouldShowTimeAgo() {
+      // time ago should only show if the pipeline has finished
+      const runningStatus = 'running';
+      return this.lastPipeline.details.status.group !== runningStatus;
     },
   },
   methods: {
@@ -75,49 +80,47 @@ export default {
     />
 
     <div :class="cardClasses" class="ops-dashboard-project-card-body card-body">
-      <div v-if="!lastPipeline" class="h-100 d-flex justify-content-center align-items-center">
-        <div class="text-plain text-center bold w-75 ops-dashboard-project-empty-state">
-          {{ noPipelineMessage }}
+      <div v-if="lastPipeline" class="row">
+        <div class="col-1 align-self-center">
+          <user-avatar-link
+            v-if="user"
+            :link-href="user.path"
+            :img-src="user.avatar_url"
+            :tooltip-text="user.name"
+            :img-size="32"
+          />
+        </div>
+
+        <div class="col-10 col-sm-6 pr-0 pl-5 align-self-center ops-dashboard-project-commit">
+          <commit
+            :tag="commitRef.tag"
+            :commit-ref="commitRef"
+            :short-sha="lastPipeline.commit.short_id"
+            :commit-url="lastPipeline.commit.commit_url"
+            :title="lastPipeline.commit.title"
+            :author="lastPipeline.commit.author"
+            :show-branch="true"
+          />
+        </div>
+
+        <div class="col-sm-5 pl-0 text-right align-self-center d-none d-sm-block">
+          <time-ago v-if="shouldShowTimeAgo" :finished-time="finishedTime" />
+          <alerts :count="project.alert_count" />
+        </div>
+
+        <div class="col-12">
+          <project-pipeline
+            :status="lastPipeline.details.status"
+            :upstream-pipeline="project.upstream_pipeline"
+            :downstream-pipelines="project.downstream_pipelines"
+            :has-pipeline-failed="hasPipelineFailed"
+          />
         </div>
       </div>
 
-      <div v-else>
-        <div class="row">
-          <div class="col-1 align-self-center">
-            <user-avatar-link
-              v-if="user"
-              :link-href="user.path"
-              :img-src="user.avatar_url"
-              :tooltip-text="user.name"
-              :img-size="24"
-            />
-          </div>
-
-          <div class="col-10 col-sm-6 pr-0 align-self-center ops-dashboard-project-commit">
-            <commit
-              :tag="lastPipeline.ref.tag"
-              :commit-ref="commitRef"
-              :short-sha="lastPipeline.commit.short_id"
-              :commit-url="lastPipeline.commit.commit_url"
-              :title="lastPipeline.commit.title"
-              :author="lastPipeline.commit.author"
-              :show-branch="true"
-            />
-          </div>
-
-          <div class="col-sm-5 pl-0 text-right align-self-center d-none d-sm-block">
-            <time-ago v-if="!isPipelineRunning" :finished-time="finishedTime" />
-            <alerts :count="project.alert_count" />
-          </div>
-
-          <div class="col-12">
-            <project-pipeline
-              :current-status="lastPipeline.details.status"
-              :upstream-pipeline="project.upstream_pipeline"
-              :downstream-pipelines="project.downstream_pipelines"
-              :has-pipeline-failed="hasPipelineFailed"
-            />
-          </div>
+      <div v-else class="h-100 d-flex justify-content-center align-items-center">
+        <div class=" text-plain text-center bold w-75 ops-dashboard-project-empty-state">
+          {{ noPipelineMessage }}
         </div>
       </div>
     </div>
