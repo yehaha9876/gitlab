@@ -78,24 +78,36 @@ describe EE::ProtectedRefAccess do
           expect(access_level.errors[:user].first).to eq 'is not a member of the project with at least reporter access'
         end
 
-        it 'allows users with access through group' do
-          new_project = create(:project, group: group)
-          new_user = create(:user)
+        context 'with users who gain access through a group' do
+          let(:new_project) { create(:project, group: group) }
+          let(:new_user) { create(:user) }
 
-          group.add_developer(new_user)
-          access_level.user = new_user
+          it 'allows users with reporter or higher access' do
+            group.add_developer(new_user)
+            access_level.user = new_user
 
-          expect(access_level).to be_valid
-        end
+            expect(access_level).to be_valid
+          end
 
-        it 'does not allow users with only guest access through group' do
-          new_project = create(:project, group: group)
-          new_user = create(:user)
+          it 'does not allow users with only guest access' do
+            group.add_guest(new_user)
+            access_level.user = new_user
 
-          group.add_guest(new_user)
-          access_level.user = new_user
+            expect(access_level).not_to be_valid
+          end
 
-          expect(access_level).not_to be_valid
+          it 'user can no longer push after access is revoked' do
+            group.add_developer(new_user)
+            access_level.user = new_user
+            access_level.save
+
+            expect(access_level.check_access(new_user)).to be_truthy
+
+            # Demote user from developer to guest
+            group.add_guest(new_user)
+
+            expect(access_level.check_access(new_user)).to be_falsey
+          end
         end
       end
 

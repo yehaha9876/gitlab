@@ -71,7 +71,9 @@ module EE
     override :check_access
     def check_access(user)
       return true if user.admin?
-      return user.id == self.user_id if self.user.present?
+      # If we have a user match, we need to make sure we still
+      # have access to push code.
+      return super if self.user.present? && user.id == self.user_id
       return group.users.exists?(user.id) if self.group.present?
 
       super
