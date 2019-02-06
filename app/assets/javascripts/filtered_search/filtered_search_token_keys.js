@@ -92,7 +92,7 @@ export default class FilteredSearchTokenKeys {
       symbol: '@',
       icon: 'approval',
       tag: '@approver',
-    }
+    };
     const approversTokenPosition = 2;
 
     this.tokenKeys.push(wipToken);
