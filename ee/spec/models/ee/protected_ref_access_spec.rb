@@ -78,6 +78,25 @@ describe EE::ProtectedRefAccess do
           expect(access_level.errors[:user].first).to eq 'is not a member of the project with at least reporter access'
         end
 
+        context 'with users in member groups' do
+          let(:new_group) { create(:group) }
+          let(:new_user) { create(:user) }
+
+          it 'allows users with reporter or higher to access' do
+            new_group.add_developer(new_user)
+            access_level.group = new_group
+
+            expect(access_level.check_access(new_user)).to be_truthy
+          end
+
+          it 'does not allows users with guest access' do
+            new_group.add_guest(new_user)
+            access_level.group = new_group
+
+            expect(access_level.check_access(new_user)).to be_falsey
+          end
+        end
+
         context 'with users who gain access through a group' do
           let(:new_project) { create(:project, group: group) }
           let(:new_user) { create(:user) }

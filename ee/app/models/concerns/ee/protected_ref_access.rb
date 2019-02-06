@@ -74,7 +74,7 @@ module EE
       # If we have a user match, we need to make sure we still
       # have access to push code.
       return super if self.user.present? && user.id == self.user_id
-      return group.users.exists?(user.id) if self.group.present?
+      return group.member?(user, ::Gitlab::Access::REPORTER) if self.group.present?
 
       super
     end
