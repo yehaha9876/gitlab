@@ -14,8 +14,6 @@
 #     milestone_title: string
 #     author_id: integer
 #     assignee_id: integer
-#     approver_id: integer
-#     approver_usernames: string
 #     search: string
 #     in: 'title', 'description', or a string joining them with comma
 #     label_name: string
@@ -41,7 +39,6 @@ class MergeRequestsFinder < IssuableFinder
   def filter_items(_items)
     items = by_source_branch(super)
     items = by_wip(items)
-
     by_target_branch(items)
   end
 

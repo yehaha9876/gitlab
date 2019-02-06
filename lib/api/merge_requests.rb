@@ -12,6 +12,9 @@ module API
     helpers do
       params :optional_params_ee do
       end
+
+      params :optional_merge_requests_params do
+      end
     end
 
     def self.update_params_at_least_one_of
@@ -106,8 +109,6 @@ module API
         optional :author_id, type: Integer, desc: 'Return merge requests which are authored by the user with the given ID'
         optional :assignee_id, types: [Integer, String], integer_none_any: true,
                                desc: 'Return merge requests which are assigned to the user with the given ID'
-        optional :approver_id, types: [Integer, String], integer_none_any: true,
-                               desc: 'Return merge requests which have specified the user with the given ID as an individual approver'
         optional :scope, type: String, values: %w[created-by-me assigned-to-me created_by_me assigned_to_me all],
                          desc: 'Return merge requests for the given scope: `created_by_me`, `assigned_to_me` or `all`'
         optional :my_reaction_emoji, type: String, desc: 'Return issues reacted by the authenticated user by the given emoji'
@@ -116,6 +117,8 @@ module API
         optional :search, type: String, desc: 'Search merge requests for text present in the title, description, or any combination of these'
         optional :in, type: String, desc: '`title`, `description`, or a string joining them with comma'
         optional :wip, type: String, values: %w[yes no], desc: 'Search merge requests for WIP in the title'
+
+        use :optional_merge_requests_params
         use :pagination
       end
     end
