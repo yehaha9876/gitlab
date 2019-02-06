@@ -68,13 +68,11 @@ export default class FilteredSearchDropdownManager {
         gl: DropdownUser,
         element: this.container.querySelector('#js-dropdown-assignee'),
       },
-      // EE-only start
       approver: {
         reference: null,
         gl: DropdownUser,
         element: this.container.querySelector('#js-dropdown-approver'),
       },
-      // EE-only end
       milestone: {
         reference: null,
         gl: DropdownNonUser,
