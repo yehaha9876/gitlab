@@ -46,4 +46,20 @@ describe PreferencesHelper do
       it { is_expected.not_to include(['Security dashboard', :security_dashboard]) }
     end
   end
+
+  describe '#group_overview_content_preference?' do
+    subject { helper.group_overview_content_preference? }
+
+    context 'when security dashboard feature is enabled' do
+      before do
+        stub_licensed_features(security_dashboard: true)
+      end
+
+      it { is_expected.to eq(true) }
+    end
+
+    context 'when security dashboard feature is disabled' do
+      it { is_expected.to eq(false) }
+    end
+  end
 end

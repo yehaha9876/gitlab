@@ -3,7 +3,6 @@
 module EE
   module PreferencesHelper
     extend ::Gitlab::Utils::Override
-    include ::Groups::Security::DashboardPermissions::HelperMethods
 
     override :excluded_dashboard_choices
     def excluded_dashboard_choices
@@ -13,15 +12,15 @@ module EE
     end
 
     def group_view_choices
-      choices = [
-        [_('Details (default)'), :details]
-      ]
-
-      if License.feature_available?(:security_dashboard)
-        choices << [_('Security dashboard'), :security_dashboard]
+      strong_memoize(:group_view_choices) do
+        [[_('Details (default)'), :details]].tap do |choices|
+          choices << [_('Security dashboard'), :security_dashboard] if License.feature_available?(:security_dashboard)
+        end
       end
+    end
 
-      choices
+    def group_overview_content_preference?
+      group_view_choices.size > 1
     end
   end
 end
