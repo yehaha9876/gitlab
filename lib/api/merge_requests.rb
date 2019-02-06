@@ -106,6 +106,8 @@ module API
         optional :author_id, type: Integer, desc: 'Return merge requests which are authored by the user with the given ID'
         optional :assignee_id, types: [Integer, String], integer_none_any: true,
                                desc: 'Return merge requests which are assigned to the user with the given ID'
+        optional :approver_id, types: [Integer, String], integer_none_any: true,
+                               desc: 'Return merge requests which have specified the user with the given ID as an individual approver'
         optional :scope, type: String, values: %w[created-by-me assigned-to-me created_by_me assigned_to_me all],
                          desc: 'Return merge requests for the given scope: `created_by_me`, `assigned_to_me` or `all`'
         optional :my_reaction_emoji, type: String, desc: 'Return issues reacted by the authenticated user by the given emoji'

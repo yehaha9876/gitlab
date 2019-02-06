@@ -201,3 +201,10 @@ request itself. It belongs to the target branch's project.
 ## Approver suggestions
 
 Approvers are suggested for merge requests based on the previous authors of the files affected by the merge request.
+
+## Filtering merge requests by approvers
+
+To filter merge requests by an individual approver, you can type (or select from
+the dropdown) `approver` and select the user.
+
+![Filter WIP MRs](img/filter_approver_merge_requests.png)

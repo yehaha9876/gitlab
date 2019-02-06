@@ -85,7 +85,20 @@ export default class FilteredSearchTokenKeys {
       capitalizeTokenValue: true,
     };
 
+    const approversToken = {
+      key: 'approver',
+      type: 'array',
+      param: 'usernames[]',
+      symbol: '@',
+      icon: 'approval',
+      tag: '@approver',
+    }
+    const approversTokenPosition = 2;
+
     this.tokenKeys.push(wipToken);
     this.tokenKeysWithAlternative.push(wipToken);
+
+    this.tokenKeys.splice(approversTokenPosition, 0, approversToken);
+    this.tokenKeysWithAlternative.splice(approversTokenPosition, 0, approversToken);
   }
 }
