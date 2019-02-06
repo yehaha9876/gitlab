@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190131122559) do
+ActiveRecord::Schema.define(version: 20190206144959) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1526,7 +1526,6 @@ ActiveRecord::Schema.define(version: 20190131122559) do
     t.datetime "updated_at"
     t.text "description"
     t.integer "milestone_id"
-    t.string "state"
     t.integer "iid"
     t.integer "updated_by_id"
     t.integer "weight"
@@ -1545,18 +1544,15 @@ ActiveRecord::Schema.define(version: 20190131122559) do
     t.boolean "discussion_locked"
     t.datetime_with_timezone "closed_at"
     t.integer "closed_by_id"
+    t.integer "state", limit: 2
     t.index ["author_id"], name: "index_issues_on_author_id", using: :btree
     t.index ["closed_by_id"], name: "index_issues_on_closed_by_id", using: :btree
     t.index ["confidential"], name: "index_issues_on_confidential", using: :btree
     t.index ["description"], name: "index_issues_on_description_trigram", using: :gin, opclasses: {"description"=>"gin_trgm_ops"}
     t.index ["milestone_id"], name: "index_issues_on_milestone_id", using: :btree
     t.index ["moved_to_id"], name: "index_issues_on_moved_to_id", where: "(moved_to_id IS NOT NULL)", using: :btree
-    t.index ["project_id", "created_at", "id", "state"], name: "index_issues_on_project_id_and_created_at_and_id_and_state", using: :btree
-    t.index ["project_id", "due_date", "id", "state"], name: "idx_issues_on_project_id_and_due_date_and_id_and_state_partial", where: "(due_date IS NOT NULL)", using: :btree
     t.index ["project_id", "iid"], name: "index_issues_on_project_id_and_iid", unique: true, using: :btree
-    t.index ["project_id", "updated_at", "id", "state"], name: "index_issues_on_project_id_and_updated_at_and_id_and_state", using: :btree
     t.index ["relative_position"], name: "index_issues_on_relative_position", using: :btree
-    t.index ["state"], name: "index_issues_on_state", using: :btree
     t.index ["title"], name: "index_issues_on_title_trigram", using: :gin, opclasses: {"title"=>"gin_trgm_ops"}
     t.index ["updated_at"], name: "index_issues_on_updated_at", using: :btree
     t.index ["updated_by_id"], name: "index_issues_on_updated_by_id", where: "(updated_by_id IS NOT NULL)", using: :btree
