@@ -96,7 +96,9 @@ module EE
     def validate_user_membership
       return unless user
 
-      unless project.members.where(user: user).exists?
+      # Guest users can't see code, so we limit access to reporters and
+      # higher to ensure protected branch names aren't leaked.
+      unless project.team.member?(user, ::Gitlab::Access::REPORTER)
         self.errors.add(:user, 'is not a member of the project')
       end
     end
