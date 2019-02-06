@@ -13,11 +13,6 @@ export default {
       required: false,
       default: false,
     },
-    isDraft: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
   computed: {
     ...mapGetters(['isDiscussionResolved']),
