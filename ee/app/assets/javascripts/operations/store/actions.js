@@ -90,22 +90,27 @@ const tempDashboardApiAdditions = () => ({
 
 export const fetchProjects = ({ state, dispatch }) => {
   dispatch('requestProjects');
-  axios
-    .get(state.projectEndpoints.list)
-    .then(response => tempDashboardApiAdditions(response))
+  // axios
+  //   .get(state.projectEndpoints.list)
+  //   .then(response => tempDashboardApiAdditions(response))
+  //   .then(response => dispatch('receiveProjectsSuccess', response.data))
+  //   .catch(() => dispatch('receiveProjectsError'))
+  //   .then(() => dispatch('requestProjects'))
+  //   .then(() => {
+  //     setTimeout(
+  //       () =>
+  //         fetchProjects({
+  //           state,
+  //           dispatch,
+  //         }),
+  //       120000,
+  //     );
+  //   })
+  new Promise(resolve => resolve())
+    .then(tempDashboardApiAdditions)
     .then(response => dispatch('receiveProjectsSuccess', response.data))
     .catch(() => dispatch('receiveProjectsError'))
     .then(() => dispatch('requestProjects'))
-    .then(() => {
-      setTimeout(
-        () =>
-          fetchProjects({
-            state,
-            dispatch,
-          }),
-        120000,
-      );
-    })
     .catch(() => {});
 };
 

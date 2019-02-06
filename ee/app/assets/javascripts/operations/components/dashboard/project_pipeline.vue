@@ -52,7 +52,7 @@ export default {
       return this.downstreamCount > this.shownDownstreamCount;
     },
     shownDownstreamPipelines() {
-      return this.downstreamPipelines.slice(0, 4);
+      return this.downstreamPipelines.slice(0, 14);
     },
     shownDownstreamCount() {
       return this.shownDownstreamPipelines.length;
@@ -61,7 +61,9 @@ export default {
       return this.downstreamPipelines.length;
     },
     extraDownstreamText() {
-      return `+${this.downstreamCount - this.shownDownstreamCount}`;
+      const extra = this.downstreamCount - this.shownDownstreamCount;
+      const plus = extra < 10 ? '+' : '';
+      return `${plus}${extra}`;
     },
     extraDownstreamTitle() {
       const extra = this.downstreamCount - this.shownDownstreamCount;
@@ -107,7 +109,7 @@ export default {
         v-tooltip
         :href="currentStatus.details_path"
         :title="extraDownstreamTitle"
-        class="ops-dashboard-project-pipeline-extra"
+        class="ops-dashboard-project-pipeline-extra text-center"
       >
         {{ extraDownstreamText }}
       </a>

@@ -145,8 +145,8 @@
     &-avatar {
       background-color: $gray-100;
       border-radius: $avatar-radius;
-      height: $project-avatar-mobile-size;
-      width: $project-avatar-mobile-size;
+      height: $gl-padding-24;
+      width: $gl-padding-24;
     }
 
     &-info {

@@ -6,7 +6,7 @@ const failedPipeline = {
     username: 'test',
     state: 'active',
     avatar_url:
-      'https://www.gravatar.com/avatar/395842744c8d57c80f8e5fbeffe0a50b?s=80\u0026d=identicon',
+      'https://gl-canary.global.ssl.fastly.net/uploads/-/system/user/avatar/3029776/avatar.png?width=23',
     web_url: 'http://localhost:3000/test',
     status_tooltip_html: null,
     path: '/test',
@@ -44,7 +44,7 @@ const failedPipeline = {
       username: 'test',
       state: 'active',
       avatar_url:
-        'https://www.gravatar.com/avatar/395842744c8d57c80f8e5fbeffe0a50b?s=80\u0026d=identicon',
+        'https://gl-canary.global.ssl.fastly.net/uploads/-/system/user/avatar/3029776/avatar.png?width=23',
       status_tooltip_html: null,
       path: '/test',
     },
@@ -62,7 +62,7 @@ const passedPipeline = {
     username: 'test',
     state: 'active',
     avatar_url:
-      'https://www.gravatar.com/avatar/395842744c8d57c80f8e5fbeffe0a50b?s=80\u0026d=identicon',
+      'https://gl-canary.global.ssl.fastly.net/uploads/-/system/user/avatar/3029776/avatar.png?width=23',
     web_url: 'http://localhost:3000/test',
     status_tooltip_html: null,
     path: '/test',
@@ -100,7 +100,7 @@ const passedPipeline = {
       username: 'test',
       state: 'active',
       avatar_url:
-        'https://www.gravatar.com/avatar/395842744c8d57c80f8e5fbeffe0a50b?s=80\u0026d=identicon',
+        'https://gl-canary.global.ssl.fastly.net/uploads/-/system/user/avatar/3029776/avatar.png?width=23',
       status_tooltip_html: null,
       path: '/test',
     },
@@ -118,7 +118,7 @@ const runningPipeline = {
     username: 'test',
     state: 'active',
     avatar_url:
-      'https://www.gravatar.com/avatar/395842744c8d57c80f8e5fbeffe0a50b?s=80\u0026d=identicon',
+      'https://gl-canary.global.ssl.fastly.net/uploads/-/system/user/avatar/3029776/avatar.png?width=23',
     web_url: 'http://localhost:3000/test',
     status_tooltip_html: null,
     path: '/test',
@@ -156,7 +156,7 @@ const runningPipeline = {
       username: 'test',
       state: 'active',
       avatar_url:
-        'https://www.gravatar.com/avatar/395842744c8d57c80f8e5fbeffe0a50b?s=80\u0026d=identicon',
+        'https://gl-canary.global.ssl.fastly.net/uploads/-/system/user/avatar/3029776/avatar.png?width=23',
       status_tooltip_html: null,
       path: '/test',
     },
@@ -423,10 +423,6 @@ export default {
       last_pipeline: passedPipeline,
       upstream_pipeline: passedPipeline,
       downstream_pipelines: [
-        passedPipeline,
-        passedPipeline,
-        passedPipeline,
-        passedPipeline,
         passedPipeline,
         passedPipeline,
         passedPipeline,
