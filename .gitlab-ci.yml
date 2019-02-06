@@ -285,6 +285,7 @@ stages:
     - sed -i "s/gem 'oj', '~> 2.17.4'//" Gemfile
     - echo "gem 'grpc', '~> 1.18.0'" >> Gemfile
     - echo "gem 'google-protobuf', '~> 3.7.0.rc.2'" >> Gemfile
+    - bundle update google-protobuf grpc
     - bundle install $BUNDLE_INSTALL_FLAGS
     - date
     - cp config/gitlab.yml.example config/gitlab.yml
