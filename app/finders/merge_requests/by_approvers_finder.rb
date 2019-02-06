@@ -52,13 +52,16 @@ module MergeRequests
     end
 
     def with_any_approvers(items)
-      items.joins(:approvers)
+      items.joins(:approvers).distinct
     end
 
     def find_approvers_by_names(items)
       items
         .joins(:approver_users)
         .where(users: { username: usernames })
+        .group('merge_requests.id')
+        .having("COUNT(users.id) = ?", usernames.size)
+        .distinct
     end
 
     def find_approvers_by_id(items)
