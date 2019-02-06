@@ -241,14 +241,5 @@ describe 'Dropdown hint', :js do
       expect_tokens([{ name: 'wip' }])
       expect_filtered_search_input_empty
     end
-
-    it 'shows the approval menu item and opens the users dropdown' do
-      click_hint('approver')
-
-      expect(page).to have_css(js_dropdown_hint, visible: false)
-      expect(page).to have_css('#js-dropdown-approver', visible: true)
-      expect_tokens([{ name: 'approver' }])
-      expect_filtered_search_input_empty
-    end
   end
 end

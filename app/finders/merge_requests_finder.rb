@@ -31,11 +31,7 @@
 #
 class MergeRequestsFinder < IssuableFinder
   def self.scalar_params
-    @scalar_params ||= super + [:wip, :approver_id]
-  end
-
-  def self.array_params
-    @array_params ||= super.merge(approver_usernames: [])
+    @scalar_params ||= super + [:wip]
   end
 
   def klass
@@ -45,7 +41,6 @@ class MergeRequestsFinder < IssuableFinder
   def filter_items(_items)
     items = by_source_branch(super)
     items = by_wip(items)
-    items = by_approvers(items)
 
     by_target_branch(items)
   end
@@ -90,9 +85,6 @@ class MergeRequestsFinder < IssuableFinder
         .or(table[:title].matches('WIP %'))
         .or(table[:title].matches('[WIP]%'))
   end
-
-  def by_approvers(items)
-    MergeRequests::ByApproversFinder
-      .call(items, params[:approver_usernames], params[:approver_id])
-  end
 end
+
+MergeRequestsFinder.prepend(EE::MergeRequestFinder)

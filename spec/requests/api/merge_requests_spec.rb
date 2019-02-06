@@ -160,32 +160,6 @@ describe API::MergeRequests do
         expect_response_contain_exactly(merge_request, merge_request2, merge_request_closed, merge_request_merged, merge_request_locked)
       end
 
-      it 'returns an array of merge requests which have specified the user as an approver' do
-        merge_request3 = create(:merge_request_with_approver, :simple, author: user, source_project: project2, target_project: project2, source_branch: 'other-branch')
-        user2 = merge_request3.approvers.first.user
-
-        get api('/merge_requests', user), params: { approver_id: user2.id, scope: :all }
-
-        expect_response_ordered_exactly(merge_request3)
-      end
-
-      it 'returns an array of merge requests with no approvers' do
-        merge_request3 = create(:merge_request_with_approver, :simple, author: user, source_project: project2, target_project: project2, source_branch: 'other-branch')
-
-        get api('/merge_requests', user), params: { approver_id: 'None', scope: :all }
-
-        expect_response_contain_exactly(merge_request, merge_request2, merge_request_closed, merge_request_merged, merge_request_locked)
-      end
-
-      it 'returns an array of merge requests with any approver' do
-        merge_request3 = create(:merge_request_with_approver, :simple, author: user, source_project: project2, target_project: project2, source_branch: 'other-branch')
-
-        get api('/merge_requests', user), params: { approver_id: 'Any', scope: :all }
-
-        expect_response_contain_exactly(merge_request3)
-      end
-
-
       it 'returns an array of merge requests assigned to me' do
         merge_request3 = create(:merge_request, :simple, author: user, assignee: user2, source_project: project2, target_project: project2, source_branch: 'other-branch')
 
