@@ -81,6 +81,7 @@ export function mockPipelineData(
 export function mockProjectData(
   projectCount = 1,
   currentPipelineStatus = 'success',
+  upstreamStatus = 'success',
   alertCount = 0,
 ) {
   return Array(projectCount)
@@ -107,6 +108,7 @@ export function mockProjectData(
       },
       remove_path: '/-/operations?project_id=1',
       last_pipeline: mockPipelineData(currentPipelineStatus),
+      upstream_pipeline: mockPipelineData(upstreamStatus),
       downstream_pipelines: [],
       alert_count: alertCount,
     }));

@@ -15,10 +15,6 @@ export default {
     Tooltip,
   },
   props: {
-    projectName: {
-      type: String,
-      required: true,
-    },
     status: {
       type: Object,
       required: true,
@@ -46,7 +42,10 @@ export default {
   },
   computed: {
     downstreamPipelinesHaveFailed() {
-      return this.downstreamPipelines.some(pipeline => pipeline.details.status.group === 'failed');
+      return (
+        this.downstreamPipelines &&
+        this.downstreamPipelines.some(pipeline => pipeline.details.status.group === 'failed')
+      );
     },
     pipelineClasses() {
       const hasFailures = this.hasPipelineFailed || this.downstreamPipelinesHaveFailed;
@@ -102,7 +101,10 @@ export default {
         data-html="true"
         class="d-inline-block align-middle"
       >
-        <ci-icon class="d-flex" :status="upstreamPipeline.details.status" />
+        <ci-icon
+          class="d-flex js-upstream-pipeline-status"
+          :status="upstreamPipeline.details.status"
+        />
       </a>
       <icon name="arrow-right" class="ops-dashboard-project-pipeline-arrow align-middle mx-1" />
     </template>
@@ -138,7 +140,7 @@ export default {
           data-html="true"
           class="d-inline-block align-middle"
         >
-          <ci-icon class="d-flex" :status="pipeline.details.status" />
+          <ci-icon class="d-flex js-downstream-pipeline-status" :status="pipeline.details.status" />
         </a>
       </span>
       <a
@@ -146,7 +148,7 @@ export default {
         v-tooltip
         :href="status.details_path"
         :title="extraDownstreamTitle"
-        class="ops-dashboard-project-pipeline-extra rounded-circle d-inline-block bold align-middle text-white text-center"
+        class="ops-dashboard-project-pipeline-extra rounded-circle d-inline-block bold align-middle text-white text-center js-downstream-extra-icon"
       >
         {{ extraDownstreamText }}
       </a>
