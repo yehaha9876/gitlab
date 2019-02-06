@@ -1966,8 +1966,12 @@ Example response:
 [ce-13060]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/13060
 [ce-14016]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/14016
 [ce-15454]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/15454
+<<<<<<< HEAD
 [ce-18935]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/18935
 
 ## Approvals
 
 For approvals, please see [Merge Request Approvals](merge_request_approvals.md)
+=======
+[ce-18935]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/18935
+>>>>>>> 42f3db82008... Adapt that diverging commits could be just one bar
