@@ -25,13 +25,8 @@
 }
 
 .ops-dashboard-project {
-  background-color: $gray-50;
-  border-color: transparent;
-
   &-header {
     background-color: $gray-100;
-    border-color: transparent;
-    height: 50px;
 
     &-warning {
       background-color: $orange-100;
@@ -40,17 +35,11 @@
     &-failed {
       background-color: $red-100;
     }
-
-    .avatar-container {
-      border: 1px solid $issue-boards-card-shadow;
-      border-radius: $border-radius-default;
-    }
   }
 
   &-card {
-    &-body {
-      height: 119px;
-    }
+    background-color: $gray-50;
+    height: 120px;
 
     &-warning {
       background-color: $orange-50;
@@ -61,33 +50,11 @@
     }
   }
 
-  &-empty-state {
-    font-size: $gl-font-size-small;
-  }
-
-  &-commit {
-    .icon-container,
-    .commit-icon {
-      display: inline;
-      vertical-align: middle;
-    }
-
-    .commit-icon {
-      color: $gl-text-color-tertiary;
-    }
-
-    .ref-name {
-      font-weight: $gl-font-weight-bold;
-      color: $gl-text-color;
-    }
-  }
-
   &-time-ago {
     color: $gray-700;
 
     &-icon {
       color: $gray-500;
-      vertical-align: text-bottom;
     }
   }
 
@@ -95,8 +62,6 @@
     background-color: $gray-100;
     border-radius: 20.5px;
     height: 32px;
-    padding: $gl-padding-4 $gl-padding-8;
-    margin-top: $gl-padding;
 
     &-failed {
       background-color: $red-100;
@@ -104,62 +69,29 @@
 
     &-arrow {
       color: $gray-300;
-      vertical-align: text-top;
     }
 
     &-downstream {
       margin-right: -$gl-padding-4;
-      position: relative;
-    }
-
-    &-icon {
-      vertical-align: middle;
     }
 
     &-extra {
       background-color: $gray-400;
-      border-radius: $avatar-radius;
-      color: $white-light;
-      display: inline-block;
       font-size: 10px;
-      font-weight: $gl-font-weight-bold;
-      height: $gl-padding;
       line-height: $gl-line-height;
       margin-left: -$gl-padding-4;
       width: $gl-padding;
-      vertical-align: text-top;
-      z-index: 1;
-
-      &:hover {
-        color: $white-light;
-        text-decoration: none;
-      }
     }
-  }
-
-  &-alert-icon {
-    vertical-align: text-bottom;
   }
 
   &-skeleton {
     &-avatar {
       background-color: $gray-100;
-      border-radius: $avatar-radius;
-      height: $gl-padding-24;
-      width: $gl-padding-24;
     }
 
     &-info {
       background-color: $gray-100;
       border-radius: $gl-padding;
-      height: $gl-padding;
-      width: 134px;
-    }
-
-    &-pipeline {
-      background-color: $gray-100;
-      border-radius: 20.5px;
-      height: $gl-padding-32;
     }
   }
 }

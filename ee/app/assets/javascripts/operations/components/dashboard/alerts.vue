@@ -36,7 +36,7 @@ export default {
 <template>
   <div class="ops-dashboard-project-alert row">
     <div class="col-12">
-      <icon :class="alertClasses" class="ops-dashboard-project-alert-icon" name="warning" />
+      <icon :class="alertClasses" class="align-text-bottom" name="warning" />
       <span class="js-alert-count text-secondary prepend-left-4"> {{ alertCount }} </span>
     </div>
   </div>

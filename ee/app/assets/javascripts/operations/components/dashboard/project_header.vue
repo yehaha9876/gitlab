@@ -46,10 +46,10 @@ export default {
 <template>
   <div
     :class="headerClasses"
-    class="ops-dashboard-project-header card-header d-flex align-items-center"
+    class="ops-dashboard-project-header card-header border-0 py-2 d-flex align-items-center"
   >
-    <project-avatar :project="project" :size="24" class="flex-shrink-0" />
-    <div class="flex-grow-1">
+    <project-avatar :project="project" :size="24" class="flex-shrink-0 border rounded" />
+    <div class="flex-grow-1 block-truncated">
       <a
         v-gl-tooltip
         class="js-project-link cgray"

@@ -171,8 +171,8 @@ export default {
     {
       id: 1,
       description: '',
-      name: 'test-project',
-      name_with_namespace: 'Test / test-project',
+      name: 'test-project this is so cool what an awesom name!!!!',
+      name_with_namespace: 'Test / test-project this is so cool what an awesome name!!!!',
       path: 'test-project',
       path_with_namespace: 'test/test-project',
       created_at: '2019-02-01T15:40:27.522Z',

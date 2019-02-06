@@ -15,6 +15,10 @@ export default {
     Tooltip,
   },
   props: {
+    projectName: {
+      type: String,
+      required: true,
+    },
     status: {
       type: Object,
       required: true,
@@ -36,6 +40,7 @@ export default {
     },
   },
   relations: {
+    current: __('Current Project'),
     downstream: __('Downstream'),
     upstream: __('Upstream'),
   },
@@ -82,7 +87,7 @@ export default {
 };
 </script>
 <template>
-  <div :class="pipelineClasses" class="ops-dashboard-project-pipeline">
+  <div :class="pipelineClasses" class="ops-dashboard-project-pipeline py-1 px-2 mt-3">
     <template v-if="upstreamPipeline">
       <a
         v-tooltip
@@ -94,23 +99,31 @@ export default {
             ''}</span>`
         "
         data-html="true"
-        class="ops-dashboard-project-pipeline-icon"
+        class="d-inline-block align-middle"
       >
-        <ci-icon :status="upstreamPipeline.details.status" />
+        <ci-icon class="d-flex" :status="upstreamPipeline.details.status" />
       </a>
-      <icon name="arrow-right" class="ops-dashboard-project-pipeline-arrow mx-1" />
+      <icon name="arrow-right" class="ops-dashboard-project-pipeline-arrow align-middle mx-1" />
     </template>
 
-    <ci-badge-link :status="status" :show-text="true" />
+    <span
+      v-tooltip
+      data-html="true"
+      :title="
+        `<span class='bold'>${$options.relations.current}</span><br/><span>${status.tooltip}</span>`
+      "
+    >
+      <ci-badge-link class="bg-white" :status="status" :show-text="true" />
+    </span>
 
     <template v-if="hasDownstreamPipelines">
-      <icon name="arrow-right" class="ops-dashboard-project-pipeline-arrow mx-1" />
+      <icon name="arrow-right" class="ops-dashboard-project-pipeline-arrow align-middle mx-1" />
 
       <span
         v-for="(pipeline, index) in shownDownstreamPipelines"
         :key="pipeline.id"
         :style="`z-index: ${shownDownstreamPipelines.length + 1 - index}`"
-        class="ops-dashboard-project-pipeline-downstream"
+        class="ops-dashboard-project-pipeline-downstream position-relative"
       >
         <a
           v-tooltip
@@ -122,9 +135,9 @@ export default {
               ''}</span>`
           "
           data-html="true"
-          class="ops-dashboard-project-pipeline-icon"
+          class="d-inline-block align-middle"
         >
-          <ci-icon :status="pipeline.details.status" />
+          <ci-icon class="d-flex" :status="pipeline.details.status" />
         </a>
       </span>
       <a
@@ -132,7 +145,7 @@ export default {
         v-tooltip
         :href="status.details_path"
         :title="extraDownstreamTitle"
-        class="ops-dashboard-project-pipeline-extra text-center"
+        class="ops-dashboard-project-pipeline-extra rounded-circle d-inline-block bold align-middle text-white text-center"
       >
         {{ extraDownstreamText }}
       </a>

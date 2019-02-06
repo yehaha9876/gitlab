@@ -71,7 +71,7 @@ export default {
 };
 </script>
 <template>
-  <div class="ops-dashboard-project card">
+  <div class="ops-dashboard-project card border-0">
     <project-header
       :project="project"
       :has-pipeline-failed="hasPipelineFailed"
@@ -91,7 +91,7 @@ export default {
           />
         </div>
 
-        <div class="col-10 col-sm-6 pr-0 pl-5 align-self-center ops-dashboard-project-commit">
+        <div class="col-10 col-sm-6 pr-0 pl-5 align-self-center align-middle ci-table">
           <commit
             :tag="commitRef.tag"
             :commit-ref="commitRef"
@@ -110,6 +110,7 @@ export default {
 
         <div class="col-12">
           <project-pipeline
+            :project-name="project.name_with_namespace"
             :status="lastPipeline.details.status"
             :upstream-pipeline="project.upstream_pipeline"
             :downstream-pipelines="project.downstream_pipelines"
@@ -119,7 +120,7 @@ export default {
       </div>
 
       <div v-else class="h-100 d-flex justify-content-center align-items-center">
-        <div class=" text-plain text-center bold w-75 ops-dashboard-project-empty-state">
+        <div class=" text-plain text-metric text-center bold w-75">
           {{ noPipelineMessage }}
         </div>
       </div>
