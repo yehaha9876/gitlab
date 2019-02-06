@@ -10,7 +10,6 @@ module EE
 
       with_options only: :show, if: :security_dashboard_access_authorized? do
         before_action :ensure_security_dashboard_feature_enabled
-        before_action :authorize_read_group_security_dashboard!
       end
 
       delegate :default_view, :default_view_supports_request_format?, to: :presenter

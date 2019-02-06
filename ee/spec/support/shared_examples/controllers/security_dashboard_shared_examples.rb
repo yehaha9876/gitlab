@@ -15,7 +15,7 @@ shared_examples 'ensures security dashboard permissions' do
     end
 
     context 'when user is not allowed to access group security dashboard' do
-      it { is_expected.to have_gitlab_http_status(403) }
+      it { is_expected.to have_gitlab_http_status(200) } # still renders the response but with different contents
     end
   end
 
