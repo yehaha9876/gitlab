@@ -75,7 +75,7 @@ describe EE::ProtectedRefAccess do
 
           expect(access_level).not_to be_valid
           expect(access_level.errors.count).to eq 1
-          expect(access_level.errors[:user].first).to eq 'is not a member of the project'
+          expect(access_level.errors[:user].first).to eq 'is not a member of the project with at least reporter access'
         end
 
         it 'allows users with access through group' do

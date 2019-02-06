@@ -99,7 +99,7 @@ module EE
       # Guest users can't see code, so we limit access to reporters and
       # higher to ensure protected branch names aren't leaked.
       unless project.team.member?(user, ::Gitlab::Access::REPORTER)
-        self.errors.add(:user, 'is not a member of the project')
+        self.errors.add(:user, 'is not a member of the project with at least reporter access')
       end
     end
   end
