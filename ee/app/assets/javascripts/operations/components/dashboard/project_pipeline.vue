@@ -49,9 +49,10 @@ export default {
       return this.downstreamPipelines.some(pipeline => pipeline.details.status.group === 'failed');
     },
     pipelineClasses() {
+      const hasFailures = this.hasPipelineFailed || this.downstreamPipelinesHaveFailed;
       return {
-        'ops-dashboard-project-pipeline-failed':
-          this.hasPipelineFailed || this.downstreamPipelinesHaveFailed,
+        'ops-dashboard-project-pipeline-failed': hasFailures,
+        'bg-light': !hasFailures,
       };
     },
     hasDownstreamPipelines() {

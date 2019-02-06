@@ -28,8 +28,8 @@ describe('project header component', () => {
   });
 
   it('renders project name with namespace', () => {
-    const namespace = wrapper.$el.querySelector('.js-project-namespace').text();
-    const name = wrapper.$el.querySelector('.js-project-name').text();
+    const namespace = wrapper.find('.js-project-namespace').text();
+    const name = wrapper.find('.js-project-name').text();
 
     expect(removeWhitespace(namespace).trim()).toBe(`${mockOneProject.namespace.name} /`);
     expect(removeWhitespace(name).trim()).toBe(mockOneProject.name);

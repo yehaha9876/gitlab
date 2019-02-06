@@ -2808,6 +2808,9 @@ msgstr ""
 msgid "Current Branch"
 msgstr ""
 
+msgid "Current Project"
+msgstr ""
+
 msgid "Current node"
 msgstr ""
 
@@ -9146,6 +9149,9 @@ msgstr ""
 msgid "The X509 Certificate to use when mutual TLS is required to communicate with the external authorization service. If left blank, the server certificate is still validated when accessing over HTTPS."
 msgstr ""
 
+msgid "The branch for this project has no active pipeline configuration."
+msgstr ""
+
 msgid "The character highlighter helps you keep the subject line to %{titleLength} characters and wrap the body at %{bodyLength} so they are readable in git."
 msgstr ""
 
@@ -10186,9 +10192,6 @@ msgid "Verified"
 msgstr ""
 
 msgid "Version"
-msgstr ""
-
-msgid "View %{alerts}"
 msgstr ""
 
 msgid "View app"

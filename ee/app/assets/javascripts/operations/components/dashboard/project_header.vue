@@ -32,6 +32,7 @@ export default {
       return {
         'ops-dashboard-project-header-warning': this.hasErrors,
         'ops-dashboard-project-header-failed': this.hasPipelineFailed,
+        'bg-light': !this.hasErrors && !this.hasPipelineFailed,
       };
     },
   },
@@ -44,10 +45,7 @@ export default {
 </script>
 
 <template>
-  <div
-    :class="headerClasses"
-    class="ops-dashboard-project-header card-header border-0 py-2 d-flex align-items-center"
-  >
+  <div :class="headerClasses" class="card-header border-0 py-2 d-flex align-items-center">
     <project-avatar :project="project" :size="24" class="flex-shrink-0 border rounded" />
     <div class="flex-grow-1 block-truncated">
       <a

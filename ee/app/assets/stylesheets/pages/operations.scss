@@ -26,8 +26,6 @@
 
 .ops-dashboard-project {
   &-header {
-    background-color: $gray-100;
-
     &-warning {
       background-color: $orange-100;
     }
@@ -38,7 +36,6 @@
   }
 
   &-card {
-    background-color: $gray-50;
     height: 120px;
 
     &-warning {
@@ -51,15 +48,12 @@
   }
 
   &-time-ago {
-    color: $gray-700;
-
     &-icon {
       color: $gray-500;
     }
   }
 
   &-pipeline {
-    background-color: $gray-100;
     border-radius: 20.5px;
     height: 32px;
 
@@ -85,12 +79,7 @@
   }
 
   &-skeleton {
-    &-avatar {
-      background-color: $gray-100;
-    }
-
     &-info {
-      background-color: $gray-100;
       border-radius: $gl-padding;
     }
   }

@@ -79,7 +79,7 @@ export default {
       @remove="removeProject"
     />
 
-    <div :class="cardClasses" class="ops-dashboard-project-card-body card-body">
+    <div :class="cardClasses" class="ops-dashboard-project-card-body bg-secondary card-body">
       <div v-if="lastPipeline" class="row">
         <div class="col-1 align-self-center">
           <user-avatar-link
