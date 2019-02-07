@@ -1,8 +1,6 @@
 import addExtraTokensForMergeRequests from '~/filtered_search/add_extra_tokens_for_merge_requests';
 
-export default (
-  IssuableTokenKeys
-) => {
+export default IssuableTokenKeys => {
   addExtraTokensForMergeRequests(IssuableTokenKeys);
 
   const approversToken = {
