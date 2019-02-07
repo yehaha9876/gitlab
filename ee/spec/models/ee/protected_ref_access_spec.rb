@@ -128,6 +128,15 @@ describe EE::ProtectedRefAccess do
             expect(access_level.check_access(new_user)).to be_falsey
           end
         end
+
+        it 'allows users with access through group' do
+          new_user = create(:user)
+
+          group.add_developer(new_user)
+          access_level.user = new_user
+
+          expect(access_level).to be_valid
+        end
       end
 
       it 'requires access_level if no user or group is specified' do
