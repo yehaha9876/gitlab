@@ -11,7 +11,7 @@ module EE
     end
 
     def by_approvers(items)
-      MergeRequests::ByApproversFinder
+      ::EE::MergeRequests::ByApproversFinder
         .execute(items, params[:approver_usernames], params[:approver_id])
     end
 
