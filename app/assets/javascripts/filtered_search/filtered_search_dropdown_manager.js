@@ -108,14 +108,12 @@ export default class FilteredSearchDropdownManager {
         element: this.container.querySelector('#js-dropdown-admin-runner-type'),
       },
 
-      // EE-specific start
+      // EE-only start
       approver: {
         reference: null,
         gl: DropdownUser,
         element: this.container.querySelector('#js-dropdown-approver'),
       },
-      // EE-specific end
-      // EE-only start
       weight: {
         reference: null,
         gl: DropdownWeight,
