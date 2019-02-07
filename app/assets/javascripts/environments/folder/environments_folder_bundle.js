@@ -1,7 +1,8 @@
 import Vue from 'vue';
+import { mapState } from 'vuex';
 import environmentsFolderApp from './environments_folder_view.vue';
-import { parseBoolean } from '../../lib/utils/common_utils';
 import Translate from '../../vue_shared/translate';
+import store from '../stores';
 
 // ee-only start
 import CanaryCalloutMixin from 'ee/environments/mixins/canary_callout_mixin'; // eslint-disable-line import/order
@@ -12,22 +13,23 @@ Vue.use(Translate);
 export default () =>
   new Vue({
     el: '#environments-folder-list-view',
+    store() {
+      return store(document.querySelector(this.el).dataset);
+    },
     components: {
       environmentsFolderApp,
     },
     // ee-only start
     mixins: [CanaryCalloutMixin],
     // ee-only end
-    data() {
-      const environmentsData = document.querySelector(this.$options.el).dataset;
-
-      return {
-        endpoint: environmentsData.environmentsDataEndpoint,
-        folderName: environmentsData.environmentsDataFolderName,
-        cssContainerClass: environmentsData.cssClass,
-        canCreateDeployment: parseBoolean(environmentsData.environmentsDataCanCreateDeployment),
-        canReadEnvironment: parseBoolean(environmentsData.environmentsDataCanReadEnvironment),
-      };
+    computed: {
+      ...mapState([
+        'endpoint',
+        'folderName',
+        'cssContainerClass',
+        'canCreateDeployment',
+        'canReadEnvironment',
+      ]),
     },
     render(createElement) {
       return createElement('environments-folder-app', {
