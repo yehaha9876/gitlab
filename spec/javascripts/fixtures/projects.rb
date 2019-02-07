@@ -10,6 +10,7 @@ describe 'Projects (JavaScript fixtures)', type: :controller do
   let(:project_variable_populated) { create(:project, namespace: namespace, path: 'builds-project2') }
   let!(:variable1) { create(:ci_variable, project: project_variable_populated) }
   let!(:variable2) { create(:ci_variable, project: project_variable_populated) }
+  let(:environment) { create(:environment, project: project, id: 'build-environment') }
 
   render_views
 
@@ -76,6 +77,30 @@ describe 'Projects (JavaScript fixtures)', type: :controller do
       get :show, params: {
         namespace_id: project_variable_populated.namespace.to_param,
         project_id: project_variable_populated
+      }
+
+      expect(response).to be_success
+      store_frontend_fixture(response, example.description)
+    end
+  end
+
+  describe Projects::EnvironmentsController, '(JavaScript fixtures)', type: :controller do
+    it 'projects/environments/app.html.raw' do |example|
+      get :index, params: {
+        namespace_id: environment.project.namespace.to_param,
+        project_id: environment.project
+      }
+
+      expect(response).to be_success
+      store_frontend_fixture(response, example.description)
+    end
+
+    it 'projects/environments/folder.html.raw' do |example|
+      get :folder, params: {
+        namespace_id: environment.project.namespace.to_param,
+        project_id: environment.project,
+        id: environment.id,
+        format: 'html'
       }
 
       expect(response).to be_success
