@@ -70,6 +70,13 @@ describe EE::ProtectedRefAccess do
           expect(access_level).to be_valid
         end
 
+        it "does not allow to create an #{included_in_class} with users with guest access" do
+          project.add_guest(user)
+          access_level.user = user
+
+          expect(access_level).not_to be_valid
+        end
+
         it 'does not allow to add non member users' do
           access_level.user = create(:user)
 
@@ -82,7 +89,7 @@ describe EE::ProtectedRefAccess do
           let(:new_group) { create(:group) }
           let(:new_user) { create(:user) }
 
-          it 'allows users with reporter or higher to access' do
+          it 'allows users with reporter or higher access' do
             new_group.add_developer(new_user)
             access_level.group = new_group
 
@@ -98,7 +105,6 @@ describe EE::ProtectedRefAccess do
         end
 
         context 'with users who gain access through a group' do
-          let(:new_project) { create(:project, group: group) }
           let(:new_user) { create(:user) }
 
           it 'allows users with reporter or higher access' do
@@ -127,15 +133,6 @@ describe EE::ProtectedRefAccess do
 
             expect(access_level.check_access(new_user)).to be_falsey
           end
-        end
-
-        it 'allows users with access through group' do
-          new_user = create(:user)
-
-          group.add_developer(new_user)
-          access_level.user = new_user
-
-          expect(access_level).to be_valid
         end
       end
 

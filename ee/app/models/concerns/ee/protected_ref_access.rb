@@ -73,7 +73,7 @@ module EE
       return true if user.admin?
       # If we have a user match, we need to make sure we still
       # have access to push code.
-      return super if self.user.present? && user.id == self.user_id
+      return user.id == self.user_id && user.can?(:push_code, project) if self.user.present?
       return group.member?(user, ::Gitlab::Access::REPORTER) if self.group.present?
 
       super
