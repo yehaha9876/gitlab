@@ -14,10 +14,8 @@ const groupedReportText = (report, reportType, errorMessage, loadingMessage) => 
     return loadingMessage;
   }
 
-  const count = countIssues(report);
-
   return groupedTextBuilder({
-    ...count,
+    ...countIssues(report),
     reportType,
     paths,
   });

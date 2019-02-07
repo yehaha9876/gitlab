@@ -293,7 +293,7 @@ describe('security reports utils', () => {
   });
 
   describe('textBuilder', () => {
-    describe('with only the base', () => {
+    describe('with only the head', () => {
       const paths = { head: 'foo' };
 
       it('should return unable to compare text', () => {
