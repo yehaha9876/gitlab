@@ -117,10 +117,10 @@ class MergeRequest < ActiveRecord::Base
       end
     end
 
-    state :opened
-    state :closed
-    state :merged
-    state :locked
+    state :opened, value: MergeRequest.states.opened
+    state :closed, value: MergeRequest.states.closed
+    state :merged, value: MergeRequest.states.merged
+    state :locked, value: MergeRequest.states.locked
   end
 
   state_machine :merge_status, initial: :unchecked do

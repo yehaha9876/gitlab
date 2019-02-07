@@ -93,8 +93,8 @@ class Issue < ActiveRecord::Base
       issue.closed_by = nil
     end
 
-    state :opened#, value:
-    state :closed#, value:
+    state :opened, value: Issue.states.opened
+    state :closed, value: Issue.states.closed
   end
 
   class << self
