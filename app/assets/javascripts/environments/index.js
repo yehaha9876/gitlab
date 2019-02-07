@@ -1,7 +1,8 @@
 import Vue from 'vue';
+import { mapState } from 'vuex';
 import environmentsComponent from './components/environments_app.vue';
-import { parseBoolean } from '../lib/utils/common_utils';
 import Translate from '../vue_shared/translate';
+import store from './stores/index';
 
 // ee-only start
 import CanaryCalloutMixin from 'ee/environments/mixins/canary_callout_mixin'; // eslint-disable-line import/order
@@ -12,24 +13,25 @@ Vue.use(Translate);
 export default () =>
   new Vue({
     el: '#environments-list-view',
+    store() {
+      return store(document.querySelector(this.el).dataset);
+    },
     components: {
       environmentsComponent,
     },
     // ee-only start
     mixins: [CanaryCalloutMixin],
     // ee-only end
-    data() {
-      const environmentsData = document.querySelector(this.$options.el).dataset;
-
-      return {
-        endpoint: environmentsData.environmentsDataEndpoint,
-        newEnvironmentPath: environmentsData.newEnvironmentPath,
-        helpPagePath: environmentsData.helpPagePath,
-        cssContainerClass: environmentsData.cssClass,
-        canCreateEnvironment: parseBoolean(environmentsData.canCreateEnvironment),
-        canCreateDeployment: parseBoolean(environmentsData.canCreateDeployment),
-        canReadEnvironment: parseBoolean(environmentsData.canReadEnvironment),
-      };
+    computed: {
+      ...mapState([
+        'endpoint',
+        'newEnvironmentPath',
+        'helpPagePath',
+        'cssContainerClass',
+        'canCreateEnvironment',
+        'canCreateDeployment',
+        'canReadEnvironment',
+      ]),
     },
     render(createElement) {
       return createElement('environments-component', {
