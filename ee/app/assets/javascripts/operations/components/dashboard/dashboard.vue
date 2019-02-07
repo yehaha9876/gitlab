@@ -3,7 +3,7 @@ import { mapState, mapActions } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 import DashboardProject from './project.vue';
 import ProjectSearch from './project_search.vue';
-import Skeleton from './skeleton.vue';
+import Skeleton from '~/vue_shared/components/dashboard_skeleton.vue';
 
 export default {
   components: {
@@ -108,7 +108,7 @@ export default {
           </a>
         </div>
       </div>
-      <skeleton v-else />
+      <skeleton />
     </div>
   </div>
 </template>

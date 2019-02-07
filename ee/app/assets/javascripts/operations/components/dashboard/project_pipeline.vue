@@ -3,16 +3,15 @@ import { __, sprintf } from '~/locale';
 import CiBadgeLink from '~/vue_shared/components/ci_badge_link.vue';
 import CiIcon from '~/vue_shared/components/ci_icon.vue';
 import Icon from '~/vue_shared/components/icon.vue';
-import Tooltip from '~/vue_shared/directives/tooltip';
+import { GlTooltip } from '@gitlab/ui';
+import { STATUS_FAILED } from '../../constants';
 
 export default {
   components: {
     CiBadgeLink,
     CiIcon,
     Icon,
-  },
-  directives: {
-    Tooltip,
+    GlTooltip,
   },
   props: {
     status: {
@@ -44,7 +43,12 @@ export default {
     downstreamPipelinesHaveFailed() {
       return (
         this.downstreamPipelines &&
-        this.downstreamPipelines.some(pipeline => pipeline.details.status.group === 'failed')
+        this.downstreamPipelines.some(
+          pipeline =>
+            pipeline.details &&
+            pipeline.details.status &&
+            pipeline.details.status.group === STATUS_FAILED,
+        )
       );
     },
     pipelineClasses() {
@@ -61,8 +65,8 @@ export default {
       return this.downstreamCount > this.shownDownstreamCount;
     },
     shownDownstreamPipelines() {
-      // We can only fit 14 statuses in the pipeline section before we have to truncate
-      return this.downstreamPipelines.slice(0, 14);
+      // We can only fit 5 statuses in the pipeline section on mobile before we have to truncate
+      return this.downstreamPipelines.slice(0, 5);
     },
     shownDownstreamCount() {
       return this.shownDownstreamPipelines.length;
@@ -90,15 +94,8 @@ export default {
   <div :class="pipelineClasses" class="ops-dashboard-project-pipeline py-1 px-2 mt-3">
     <template v-if="upstreamPipeline">
       <a
-        v-tooltip
+        ref="upstreamStatus"
         :href="upstreamPipeline.details.status.details_path"
-        :title="
-          `<span class='bold'>${$options.relations.upstream}</span><br/><span>${
-            upstreamPipeline.details.status.tooltip
-          }</span><br/><span class='text-tertiary'>${upstreamPipeline.details.name_with_namespace ||
-            ''}</span>`
-        "
-        data-html="true"
         class="d-inline-block align-middle"
       >
         <ci-icon
@@ -106,52 +103,55 @@ export default {
           :status="upstreamPipeline.details.status"
         />
       </a>
+      <gl-tooltip :target="() => $refs.upstreamStatus">
+        <div class="bold">{{ $options.relations.upstream }}</div>
+        <div>{{ upstreamPipeline.details.status.tooltip }}</div>
+        <div class="text-tertiary">{{ upstreamPipeline.details.name_with_namespace || '' }}</div>
+      </gl-tooltip>
+
       <icon name="arrow-right" class="ops-dashboard-project-pipeline-arrow align-middle mx-1" />
     </template>
 
-    <span
-      v-tooltip
-      data-html="true"
-      :title="
-        `<span class='bold'>${$options.relations.current}</span><br/><span>${status.tooltip}</span>`
-      "
-    >
-      <ci-badge-link class="bg-white" :status="status" :show-text="true" />
-    </span>
+    <ci-badge-link ref="status" class="bg-white" :status="status" :show-text="true" />
+    <gl-tooltip :target="() => $refs.status">
+      <div class="bold">{{ $options.relations.current }}</div>
+      <div>{{ status.tooltip }}</div>
+    </gl-tooltip>
 
     <template v-if="hasDownstreamPipelines">
       <icon name="arrow-right" class="ops-dashboard-project-pipeline-arrow align-middle mx-1" />
 
-      <span
+      <div
         v-for="(pipeline, index) in shownDownstreamPipelines"
         :key="pipeline.id"
         :style="`z-index: ${shownDownstreamPipelines.length + 1 - index}`"
-        class="ops-dashboard-project-pipeline-downstream position-relative"
+        class="ops-dashboard-project-pipeline-downstream position-relative d-inline"
       >
         <a
-          v-tooltip
+          ref="downstreamStatus"
           :href="pipeline.details.status.details_path"
-          :title="
-            `<span class='bold'>${$options.relations.downstream}</span><br/><span>${
-              pipeline.details.status.tooltip
-            }</span><br/><span class='text-tertiary'>${pipeline.details.name_with_namespace ||
-              ''}</span>`
-          "
-          data-html="true"
           class="d-inline-block align-middle"
         >
           <ci-icon class="d-flex js-downstream-pipeline-status" :status="pipeline.details.status" />
         </a>
-      </span>
-      <a
-        v-if="hasExtraDownstream"
-        v-tooltip
-        :href="status.details_path"
-        :title="extraDownstreamTitle"
-        class="ops-dashboard-project-pipeline-extra rounded-circle d-inline-block bold align-middle text-white text-center js-downstream-extra-icon"
-      >
-        {{ extraDownstreamText }}
-      </a>
+        <gl-tooltip :target="() => $refs.downstreamStatus[index]">
+          <div class="bold">{{ $options.relations.downstream }}</div>
+          <div>{{ pipeline.details.status.tooltip }}</div>
+          <div class="text-tertiary">{{ pipeline.details.name_with_namespace || '' }}</div>
+        </gl-tooltip>
+      </div>
+      <div v-if="hasExtraDownstream" class="d-inline">
+        <a
+          ref="extraDownstream"
+          :href="status.details_path"
+          class="ops-dashboard-project-pipeline-extra rounded-circle d-inline-block bold align-middle text-white text-center js-downstream-extra-icon"
+        >
+          {{ extraDownstreamText }}
+        </a>
+        <gl-tooltip :target="() => $refs.extraDownstream">
+          {{ extraDownstreamTitle }}
+        </gl-tooltip>
+      </div>
     </template>
   </div>
 </template>

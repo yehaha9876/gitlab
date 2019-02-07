@@ -46,7 +46,7 @@ export function mockPipelineData(
         group: status,
         tooltip: status,
         has_details: true,
-        details_path: 'test/test-project/pipelines/1',
+        details_path: '/test/test-project/pipelines/1',
         illustration: null,
       },
       finished_at: finishedTimeStamp,

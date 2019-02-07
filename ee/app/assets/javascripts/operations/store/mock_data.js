@@ -133,7 +133,7 @@ const runningPipeline = {
       group: 'running',
       tooltip: 'running',
       has_details: true,
-      details_path: 'test/test-project/pipelines/1',
+      details_path: '/test/test-project/pipelines/1',
       illustration: null,
     },
     finished_at: '2019-02-02T08:00:03.970Z',
