@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MergeRequests::ByApproversFinder do
+describe EE::MergeRequests::ByApproversFinder do
   let!(:merge_request) { create(:merge_request) }
   let!(:merge_request_with_approver) { create(:merge_request_with_approver) }
 
