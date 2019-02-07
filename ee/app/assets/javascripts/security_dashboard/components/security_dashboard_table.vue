@@ -2,12 +2,12 @@
 import { mapActions, mapState, mapGetters } from 'vuex';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import SecurityDashboardTableRow from './security_dashboard_table_row.vue';
-import EmptyState from './empty_state.vue';
+import NoVulnerabilitiesState from './no_vulnerabilities_state.vue';
 
 export default {
   name: 'SecurityDashboardTable',
   components: {
-    EmptyState,
+    NoVulnerabilitiesState,
     Pagination,
     SecurityDashboardTableRow,
   },
@@ -92,7 +92,7 @@ export default {
         @openModal="openModal({ vulnerability })"
       />
 
-      <empty-state
+      <no-vulnerabilities-state
         v-if="showEmptyState"
         :svg-path="emptyStateSvgPath"
         :link="dashboardDocumentation"

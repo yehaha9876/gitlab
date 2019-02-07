@@ -11,7 +11,23 @@ export default {
       type: String,
       required: true,
     },
+    svgAlt: {
+      type: String,
+      required: true,
+    },
     link: {
+      type: String,
+      required: true,
+    },
+    heading: {
+      type: String,
+      required: true,
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    linkText: {
       type: String,
       required: true,
     },
@@ -23,21 +39,15 @@ export default {
   <div class="empty-state row">
     <div class="col-12">
       <div class="svg-content svg-250">
-        <img :src="svgPath" :alt="s__('Security Reports|No Vulnerabilities')" />
+        <img :src="svgPath" :alt="svgAlt" />
       </div>
       <div class="text-content">
-        <h4>{{ s__("Security Reports|We've found no vulnerabilities for your group") }}</h4>
+        <h4>{{ heading }}</h4>
         <p>
-          {{
-            s__(
-              "Security Reports|While it's rare to have no vulnerabilities for your group, it can happen. In any event, we ask that you please double check your settings to make sure you've set up your dashboard correctly.",
-            )
-          }}
+          {{ message }}
         </p>
         <div class="text-center">
-          <gl-button variant="success" :href="link">{{
-            s__('Security Reports|Learn more about setting up your dashboard')
-          }}</gl-button>
+          <gl-button variant="success" :href="link"> {{ linkText }}</gl-button>
         </div>
       </div>
     </div>

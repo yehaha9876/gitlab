@@ -23,7 +23,7 @@ describe 'groups/security/dashboard/show' do
       allow(view).to receive(:can_read_group_security_dashboard?).with(group).and_return(false)
       render
 
-      expect(rendered).to include('id="js-group-security-dashboard-missing"')
+      expect(rendered).to include('id="js-group-security-dashboard-unavailable"')
     end
   end
 end

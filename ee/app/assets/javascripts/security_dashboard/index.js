@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import GroupSecurityDashboardApp from './components/app.vue';
-import EmptyState from './components/empty_state.vue';
+import UnavailableState from './components/unavailable_state.vue';
 import createStore from './store';
 import router from './store/router';
 
@@ -19,14 +19,14 @@ function createInstance({ el, components, name, props }) {
 }
 
 export default () => {
-  let el = document.getElementById('js-group-security-dashboard-missing');
+  let el = document.getElementById('js-group-security-dashboard-unavailable');
   let components;
   let props;
   let name;
 
   if (el) {
-    components = { EmptyState };
-    name = 'empty-state';
+    components = { UnavailableState };
+    name = 'unavailable-state';
     props = {
       link: el.dataset.dashboardDocumentation,
       svgPath: el.dataset.emptyStateSvgPath,
