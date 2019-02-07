@@ -161,3 +161,43 @@ export const deployBoardMockData = {
   completion: 100,
   status: 'found',
 };
+
+export const environmentsAppDataset = {
+  environmentsDataEndpoint: 'environments.json',
+  canCreateEnvironment: true,
+  canCreateDeployment: true,
+  canReadEnvironment: true,
+  cssClass: 'container',
+  newEnvironmentPath: 'environments/new',
+  helpPagePath: 'help',
+};
+
+export const environmentsAppData = {
+  endpoint: 'environments.json',
+  canCreateEnvironment: true,
+  canCreateDeployment: true,
+  canReadEnvironment: true,
+  cssContainerClass: 'container',
+  newEnvironmentPath: 'environments/new',
+  helpPagePath: 'help',
+  folderName: undefined,
+};
+
+export const environmentsFolderDataset = {
+  environmentsDataEndpoint: 'environments.json',
+  environmentsDataFolderName: 'review',
+  environmentsDataCanCreateDeployment: true,
+  environmentsDataCanReadEnvironment: true,
+  cssClass: 'container',
+};
+
+export const environmentsFolderData = {
+  endpoint: 'environments.json',
+  folderName: 'review',
+  canCreateDeployment: true,
+  canReadEnvironment: true,
+  cssContainerClass: 'container',
+  canCreateEnvironment: false,
+  helpPagePath: undefined,
+  newEnvironmentPath: undefined,
+};
