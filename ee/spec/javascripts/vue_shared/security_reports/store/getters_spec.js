@@ -169,7 +169,7 @@ describe('Security reports getters', () => {
           newState.sastContainer.paths.base = 'bar';
           newState.sastContainer.newIssues = [{ isDismissed: true }];
 
-          expect(groupedSastText(newState)).toEqual(
+          expect(groupedSastContainerText(newState)).toEqual(
             'Container scanning detected 1 dismissed vulnerability',
           );
         });
@@ -246,7 +246,7 @@ describe('Security reports getters', () => {
           newState.dast.paths.base = 'bar';
           newState.dast.newIssues = [{ isDismissed: true }];
 
-          expect(groupedSastText(newState)).toEqual('DAST detected 1 dismissed vulnerability');
+          expect(groupedDastText(newState)).toEqual('DAST detected 1 dismissed vulnerability');
         });
       });
 
@@ -323,7 +323,7 @@ describe('Security reports getters', () => {
           newState.dependencyScanning.paths.base = 'bar';
           newState.dependencyScanning.newIssues = [{ isDismissed: true }];
 
-          expect(groupedSastText(newState)).toEqual(
+          expect(groupedDependencyText(newState)).toEqual(
             'Dependency scanning detected 1 dismissed vulnerability',
           );
         });
