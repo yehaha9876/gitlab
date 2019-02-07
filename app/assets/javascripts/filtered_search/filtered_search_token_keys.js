@@ -71,34 +71,4 @@ export default class FilteredSearchTokenKeys {
       ) || null
     );
   }
-
-  addExtraTokensForMergeRequests() {
-    const wipToken = {
-      key: 'wip',
-      type: 'string',
-      param: '',
-      symbol: '',
-      icon: 'admin',
-      tag: 'Yes or No',
-      lowercaseValueOnSubmit: true,
-      uppercaseTokenName: true,
-      capitalizeTokenValue: true,
-    };
-
-    const approversToken = {
-      key: 'approver',
-      type: 'array',
-      param: 'usernames[]',
-      symbol: '@',
-      icon: 'approval',
-      tag: '@approver',
-    };
-    const approversTokenPosition = 2;
-
-    this.tokenKeys.push(wipToken);
-    this.tokenKeysWithAlternative.push(wipToken);
-
-    this.tokenKeys.splice(approversTokenPosition, 0, approversToken);
-    this.tokenKeysWithAlternative.splice(approversTokenPosition, 0, approversToken);
-  }
 }
