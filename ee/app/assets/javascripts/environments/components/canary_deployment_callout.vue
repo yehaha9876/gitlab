@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import { GlButton, GlLink } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import PersistentUserCallout from '~/persistent_user_callout';
@@ -9,23 +10,13 @@ export default {
     GlLink,
     Icon,
   },
-  props: {
-    canaryDeploymentFeatureId: {
-      type: String,
-      required: true,
-    },
-    userCalloutsPath: {
-      type: String,
-      required: true,
-    },
-    lockPromotionSvgPath: {
-      type: String,
-      required: true,
-    },
-    helpCanaryDeploymentsPath: {
-      type: String,
-      required: true,
-    },
+  computed: {
+    ...mapState([
+      'canaryDeploymentFeatureId',
+      'userCalloutsPath',
+      'lockPromotionSvgPath',
+      'helpCanaryDeploymentsPath',
+    ]),
   },
   mounted() {
     const callout = this.$refs['canary-deployment-callout'];

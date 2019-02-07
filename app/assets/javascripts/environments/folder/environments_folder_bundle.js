@@ -4,10 +4,6 @@ import environmentsFolderApp from './environments_folder_view.vue';
 import Translate from '../../vue_shared/translate';
 import store from '../stores/index';
 
-// ee-only start
-import CanaryCalloutMixin from 'ee/environments/mixins/canary_callout_mixin'; // eslint-disable-line import/order
-// ee-only end
-
 Vue.use(Translate);
 
 export default () =>
@@ -19,9 +15,6 @@ export default () =>
     components: {
       environmentsFolderApp,
     },
-    // ee-only start
-    mixins: [CanaryCalloutMixin],
-    // ee-only end
     computed: {
       ...mapState([
         'endpoint',
@@ -39,13 +32,6 @@ export default () =>
           cssContainerClass: this.cssContainerClass,
           canCreateDeployment: this.canCreateDeployment,
           canReadEnvironment: this.canReadEnvironment,
-          // ee-only start
-          canaryDeploymentFeatureId: this.canaryDeploymentFeatureId,
-          showCanaryDeploymentCallout: this.showCanaryDeploymentCallout,
-          userCalloutsPath: this.userCalloutsPath,
-          lockPromotionSvgPath: this.lockPromotionSvgPath,
-          helpCanaryDeploymentsPath: this.helpCanaryDeploymentsPath,
-          // ee-only end
         },
       });
     },
