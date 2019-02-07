@@ -190,4 +190,35 @@ describe ApprovalMergeRequestRule do
       end
     end
   end
+
+  describe '#remove_all_rules_if_only_single_allowed' do
+    let!(:other_rule) { create(:approval_merge_request_rule, merge_request: subject.merge_request) }
+    let!(:code_owner_rule) { create(:approval_merge_request_rule, merge_request: subject.merge_request, code_owner: true) }
+
+    context 'when single rule' do
+      before do
+        allow(License).to receive(:feature_available?).with(:multiple_approval_rules).and_return(false)
+      end
+
+      it 'removes other regular rules' do
+        subject.destroy
+
+        expect(subject.merge_request.approval_rules.regular.exists?).to eq(false)
+        expect(subject.merge_request.approval_rules.code_owner).to contain_exactly(code_owner_rule)
+      end
+    end
+
+    context 'when multiple rules' do
+      before do
+        allow(License).to receive(:feature_available?).with(:multiple_approval_rules).and_return(true)
+      end
+
+      it 'does not remove other rules' do
+        subject.destroy
+
+        expect(subject.merge_request.approval_rules.regular.exists?).to eq(true)
+        expect(subject.merge_request.approval_rules.code_owner).to contain_exactly(code_owner_rule)
+      end
+    end
+  end
 end

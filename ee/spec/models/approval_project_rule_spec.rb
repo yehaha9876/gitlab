@@ -34,4 +34,32 @@ describe ApprovalProjectRule do
       expect(subject.code_owner?).to eq(false)
     end
   end
+
+  describe '#remove_all_rules_if_only_single_allowed' do
+    let!(:other_rule) { create(:approval_project_rule, project: subject.project) }
+
+    context 'when single rule' do
+      before do
+        allow(License).to receive(:feature_available?).with(:multiple_approval_rules).and_return(false)
+      end
+
+      it 'removes other regular rules' do
+        subject.destroy
+
+        expect(subject.project.approval_rules.regular.exists?).to eq(false)
+      end
+    end
+
+    context 'when multiple rules' do
+      before do
+        allow(License).to receive(:feature_available?).with(:multiple_approval_rules).and_return(true)
+      end
+
+      it 'does not remove other rules' do
+        subject.destroy
+
+        expect(subject.project.approval_rules.regular.exists?).to eq(true)
+      end
+    end
+  end
 end

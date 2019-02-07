@@ -14,6 +14,8 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   belongs_to :merge_request
 
+  after_commit :remove_all_rules_if_only_single_allowed, on: :destroy
+
   # approved_approvers is only populated after MR is merged
   has_and_belongs_to_many :approved_approvers, class_name: 'User', join_table: :approval_merge_request_rules_approved_approvers
   has_one :approval_merge_request_rule_source
@@ -72,6 +74,12 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
     if approvals_required < approval_project_rule.approvals_required
       errors.add(:approvals_required, :greater_than_or_equal_to, count: approval_project_rule.approvals_required)
+    end
+  end
+
+  def remove_all_rules_if_only_single_allowed
+    unless project.feature_available?(:multiple_approval_rules)
+      merge_request.approval_rules.regular.delete_all
     end
   end
 end

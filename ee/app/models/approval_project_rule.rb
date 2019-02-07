@@ -9,6 +9,8 @@ class ApprovalProjectRule < ApplicationRecord
   scope :regular, -> { all }
   scope :code_owner, -> { none }
 
+  after_commit :remove_all_rules_if_only_single_allowed, on: :destroy
+
   def regular
     true
   end
@@ -21,5 +23,13 @@ class ApprovalProjectRule < ApplicationRecord
 
   def source_rule
     nil
+  end
+
+  private
+
+  def remove_all_rules_if_only_single_allowed
+    unless project.feature_available?(:multiple_approval_rules)
+      project.approval_rules.regular.delete_all
+    end
   end
 end
