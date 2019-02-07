@@ -43,7 +43,7 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   end
 
   def create
-    @feature_flag = project.operations_feature_flags.create(create_params)
+    @feature_flag = EE::FeatureFlags::CreateService.new(current_user, project, create_params).execute
 
     if @feature_flag.persisted?
       respond_to do |format|
