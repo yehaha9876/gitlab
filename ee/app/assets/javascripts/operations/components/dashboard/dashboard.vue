@@ -108,7 +108,7 @@ export default {
           </a>
         </div>
       </div>
-      <skeleton />
+      <skeleton v-else />
     </div>
   </div>
 </template>

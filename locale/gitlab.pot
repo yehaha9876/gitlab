@@ -9897,6 +9897,9 @@ msgstr ""
 msgid "Trigger variables:"
 msgstr ""
 
+msgid "Triggerer"
+msgstr ""
+
 msgid "Triggers can force a specific branch or tag to get rebuilt with an API call.  These tokens will impersonate their associated user including their access to projects and their project permissions."
 msgstr ""
 

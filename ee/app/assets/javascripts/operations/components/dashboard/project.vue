@@ -131,10 +131,10 @@ export default {
         </div>
 
         <div class="col-sm-5 pl-0 text-right align-self-center d-none d-sm-block">
-          <div v-if="shouldShowTimeAgo" class="js-dashboard-project-time-ago text-secondary">
+          <div v-if="shouldShowTimeAgo" class="text-secondary">
             <icon name="clock" class="ops-dashboard-project-time-ago-icon align-text-bottom" />
 
-            <time ref="timeAgo">
+            <time ref="timeAgo" class="js-dashboard-project-time-ago">
               {{ timeFormated(finishedTime) }}
             </time>
             <gl-tooltip :target="() => $refs.timeAgo">
