@@ -64,8 +64,11 @@ export default {
     hasExtraDownstream() {
       return this.downstreamCount > this.shownDownstreamCount;
     },
+    /*
+      Returns a subset of the downstream pipelines, because we can only fit 5 of them
+      on a mobile screen before we have to truncate.
+    */
     shownDownstreamPipelines() {
-      // We can only fit 5 statuses in the pipeline section on mobile before we have to truncate
       return this.downstreamPipelines.slice(0, 5);
     },
     shownDownstreamCount() {
@@ -74,9 +77,12 @@ export default {
     downstreamCount() {
       return this.downstreamPipelines.length;
     },
+    /*
+      Returns the number of extra downstream status to be shown in the icon
+      The plus sign is only shown on single digits, otherwise the number is cut off
+    */
     extraDownstreamText() {
       const extra = this.downstreamCount - this.shownDownstreamCount;
-      // Only render a plus sign if extra is a single digit
       const plus = extra < 10 ? '+' : '';
       return `${plus}${extra}`;
     },

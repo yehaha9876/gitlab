@@ -54,8 +54,8 @@
   }
 
   &-pipeline {
-    border-radius: 20.5px;
-    height: 32px;
+    border-radius: $gl-padding;
+    height: $gl-padding-32;
 
     &-failed {
       background-color: $red-100;
