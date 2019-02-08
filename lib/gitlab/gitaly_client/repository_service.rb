@@ -26,6 +26,11 @@ module Gitlab
         GitalyClient.call(@storage, :repository_service, :cleanup, request, timeout: GitalyClient.fast_timeout)
       end
 
+      def pre_fetch(fork_repo)
+        request = Gitaly::PreFetchRequest.new(repository: @gitaly_repo, source_repository: fork_repo.gitaly_repository )
+        GitalyClient.call(@storage, :repository_service, :pre_fetch, request, timeout: GitalyClient.fast_timeout)
+      end
+
       def garbage_collect(create_bitmap)
         request = Gitaly::GarbageCollectRequest.new(repository: @gitaly_repo, create_bitmap: create_bitmap)
         GitalyClient.call(@storage, :repository_service, :garbage_collect, request)
