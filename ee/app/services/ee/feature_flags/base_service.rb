@@ -9,19 +9,43 @@ module EE
 
       protected
 
-      def log_audit_event(action, details)
-        details = {
-          action => @flag.name,
-          with_description: @flag.description,
+      def audit_event_target_details
+        {
           target_id: @flag.id,
           target_type: @flag.class.name,
           target_details: @flag.name
-        }.merge(details)
+        }
+      end
+
+      def log_audit_event(action, details)
+        details =
+          {
+            action => @flag.name
+          }.merge(audit_event_target_details)
+            .merge(details)
+
         ::AuditEventService.new(
           @current_user,
           @flag.project,
           details
         ).security_event
+      end
+
+      def log_changed_scopes(scopes)
+        scopes.each do |action, scope, value|
+          action = "#{action}_feature_flag_rule".to_sym
+          details =
+            {
+              action => scope,
+              and_set_it_as: value ? 'active' : 'inactive'
+            }.merge(audit_event_target_details)
+
+          ::AuditEventService.new(
+            @current_user,
+            @flag.project,
+            details
+          ).security_event
+        end
       end
     end
   end
