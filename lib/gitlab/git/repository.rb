@@ -872,6 +872,12 @@ module Gitlab
         end
       end
 
+      def pre_fetch(fork_repository)
+        wrapped_gitaly_errors do
+          gitaly_repository_client.pre_fetch(fork_repository)
+        end
+      end
+
       def gitaly_repository
         Gitlab::GitalyClient::Util.repository(@storage, @relative_path, @gl_repository, @gl_project_path)
       end

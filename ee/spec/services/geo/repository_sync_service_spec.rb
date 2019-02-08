@@ -3,6 +3,7 @@ require 'spec_helper'
 describe Geo::RepositorySyncService do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
+  include ProjectForksHelper
 
   set(:primary) { create(:geo_node, :primary) }
   set(:secondary) { create(:geo_node) }
@@ -98,6 +99,41 @@ describe Geo::RepositorySyncService do
 
         it 'calls create object pool' do
           expect( subject ).not_to receive(:create_object_pool)
+
+          subject.execute
+        end
+      end
+    end
+
+    describe 'smart fetch forks' do
+      let(:network) { create(:fork_network) }
+      let(:root_project) { network.root_project }
+      let(:project) { fork_project(root_project) }
+      let(:registry) { create(:geo_project_registry, project: project) }
+
+      context 'when fork has not been synced yet' do
+        before do
+          allow(subject).to receive(:fork_needs_sync?).and_return(true)
+        end
+
+        it 'marks registry as source fource missing' do
+          expect(subject).to receive(:mark_fork_source_missing!)
+          expect(subject).not_to receive(:pre_fetch)
+          expect(subject).not_to receive(:fetch_repository)
+
+          subject.execute
+        end
+      end
+
+      context 'fork has been sycned' do
+        before do
+          allow(subject).to receive(:fork_needs_sync?).and_return(false)
+        end
+
+        it 'pre fetches the repo' do
+          expect(subject).no_to receive(:mark_fork_source_missing!)
+          expect(subject).to receive(:pre_fetch)
+          expect(subject).to receive(:fetch_repository)
 
           subject.execute
         end
@@ -481,6 +517,92 @@ describe Geo::RepositorySyncService do
     it 'schedule GitGarbageCollectWorker for full repack' do
       Sidekiq::Testing.fake! do
         expect { subject.send(:schedule_repack) }.to change { GitGarbageCollectWorker.jobs.count }.by(1)
+      end
+    end
+  end
+
+  describe '#mark_no_object_pool!' do
+    it 'marks the registry as failed with no object pool' do
+      subject.send(:mark_no_object_pool!)
+
+      expect(subject.send(:registry).last_repository_successful_sync_at).to be_nil
+      expect(subject.send(:registry).last_repository_sync_failure).to eq('Error syncing repository: Object pool not found')
+    end
+  end
+
+  describe '#mark_fork_source_missing!' do
+    it 'marks the registry as failed with fork source missing' do
+      subject.send(:mark_fork_source_missing!)
+
+      expect(subject.send(:registry).last_repository_successful_sync_at).to be_nil
+      expect(subject.send(:registry).last_repository_sync_failure).to eq('Error syncing repository: Fork source not synced')
+    end
+  end
+
+  describe '#should_pre_fetch?' do
+    let(:network) { create(:fork_network) }
+    let(:root_project) { network.root_project }
+    let(:project) { fork_project(root_project) }
+    let(:pool_repository) { create(:pool_repository) }
+
+    subject { described_class.new(project) }
+
+    before do
+      allow(project).to receive(:has_pool_repository?).and_return(true)
+      allow(project).to receive(:pool_repository).and_return(pool_repository)
+    end
+
+    context 'when forked project has been synced' do
+      it 'returns true' do
+        expect(subject.send(:should_pre_fetch?)).to be true
+      end
+    end
+
+    context 'when project is not forked' do
+      before do
+        allow(project).to receive(:forked?).and_return(false)
+      end
+
+      it 'returns false' do
+        expect(subject.send(:should_pre_fetch?)).to be false
+      end
+    end
+
+    context 'when project does not have a pool repository' do
+      before do
+        allow(project).to receive(:has_pool_repository?).and_return(false)
+      end
+
+      it 'returns false' do
+        expect(subject.send(:should_pre_fetch?)).to be false
+      end
+    end
+
+    context 'when project is the fork source' do
+      subject { described_class.new(root_project) }
+
+      it 'returns false' do
+        expect(subject.send(:should_pre_fetch?)).to be false
+      end
+    end
+
+    context "when the repository already exists" do
+      before do
+        allow(repository).to receive(:exists?).and_return(true)
+      end
+
+      it 'returns false' do
+        expect(subject.send(:should_pre_fetch?)).to be false
+      end
+    end
+
+    context "when the project is the pool repository source" do
+      before do
+        allow(pool_repository.source_project).to receive(:id).and_return(project.id)
+      end
+
+      it 'returns false' do
+        expect(subject.send(:should_pre_fetch?)).to be false
       end
     end
   end

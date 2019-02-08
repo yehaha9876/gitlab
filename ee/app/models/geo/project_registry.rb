@@ -340,7 +340,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   end
 
   def never_successfully_synced_repository?
-    !last_repository_successful_sync_at.nil?
+    last_repository_successful_sync_at.nil?
   end
 
   private

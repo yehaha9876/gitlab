@@ -210,6 +210,10 @@ class Repository
     false
   end
 
+  def pre_fetch(fork_repository)
+    raw_repository.pre_fetch(fork_repository)
+  end
+
   def rm_branch(user, branch_name)
     before_remove_branch
 
