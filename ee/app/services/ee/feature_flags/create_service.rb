@@ -12,22 +12,8 @@ module EE
         @flag = @project.operations_feature_flags.create(@params)
         return @flag unless @flag.persisted?
 
-        log_audit_event
+        log_audit_event(:create_feature_flag, with_description: @flag.description)
         @flag
-      end
-
-      private
-
-      def log_audit_event
-        ::AuditEventService.new(
-          @current_user,
-          @flag.project,
-          create_feature_flag: @flag.name,
-          with_description: @flag.description,
-          target_id: @flag.id,
-          target_type: @flag.class.name,
-          target_details: @flag.name
-        ).security_event
       end
     end
   end
