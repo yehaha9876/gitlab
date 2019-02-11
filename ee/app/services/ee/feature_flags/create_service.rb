@@ -10,7 +10,7 @@ module EE
 
       def execute
         @flag = @project.operations_feature_flags.create(@params)
-        return @flag unless @flag.persisted?
+        return false, @flag unless @flag.persisted?
 
         log_audit_event(:create_feature_flag, with_description: @flag.description)
 
@@ -20,7 +20,7 @@ module EE
 
         log_changed_scopes(scopes)
 
-        @flag
+        [true, @flag]
       end
     end
   end

@@ -43,9 +43,9 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   end
 
   def create
-    @feature_flag = EE::FeatureFlags::CreateService.new(current_user, project, create_params).execute
+    success, @feature_flag = EE::FeatureFlags::CreateService.new(current_user, project, create_params).execute
 
-    if @feature_flag.persisted?
+    if success
       respond_to do |format|
         format.html { redirect_to_index(notice: 'Feature flag was successfully created.') }
         format.json { render_success_json }
