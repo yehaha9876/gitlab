@@ -140,7 +140,7 @@ describe GroupsController do
         end
 
         context 'with group view set as default' do
-          it 'should render the show template' do
+          it 'should render the expected template' do
             expect(subject).to render_template('groups/details') # 'show' action renders the 'details' action by default
           end
         end
@@ -161,11 +161,47 @@ describe GroupsController do
               expect(subject).not_to render_template('groups/security/dashboard/show')
             end
           end
+
+          context 'and the feature flag is disabled' do
+            before do
+              stub_feature_flags(group_overview_security_dashboard: false)
+            end
+
+            it 'should render the expected template' do
+              expect(subject).to render_template('groups/details')
+            end
+          end
         end
       end
 
       it_behaves_like 'ensures security dashboard permissions' do
         let(:user) { create(:user, group_view: :security_dashboard) } # not a member of a group
+      end
+
+      context 'when feature flag is disabled' do
+        before do
+          stub_feature_flags(group_overview_security_dashboard: false)
+        end
+
+        let(:user) { create(:user, group_view: :security_dashboard) } # not a member of a group
+
+        context 'when security dashboard feature is enabled' do
+          before do
+            stub_licensed_features(security_dashboard: true)
+          end
+
+          context 'when user is not allowed to access group security dashboard' do
+            it 'works because security dashboard is not rendered' do
+              expect(subject).to have_gitlab_http_status(200)
+            end
+          end
+        end
+
+        context 'when security dashboard feature is disabled' do
+          it 'works because security dashboard is not rendered' do
+            expect(subject).to have_gitlab_http_status(200)
+          end
+        end
       end
     end
   end
