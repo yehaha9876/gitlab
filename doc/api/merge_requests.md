@@ -309,6 +309,7 @@ Parameters:
 | `scope`             | string         | no       | Return merge requests for the given scope: `created_by_me`, `assigned_to_me` or `all`.<br>                                     |
 | `author_id`         | integer        | no       | Returns merge requests created by the given user `id` _([Introduced][ce-13060] in GitLab 9.5)_                                 |
 | `assignee_id`       | integer        | no       | Returns merge requests assigned to the given user `id`. `None` returns unassigned merge requests. `Any` returns merge requests with an assignee. _([Introduced][ce-13060] in GitLab 9.5)_ |
+| `approver_id`       | integer        | no       | Returns merge requests which have specified the user with the given `id` as an individual approver. `None` returns merge requests without approvers. `Any` returns merge requests with an approver. |
 | `my_reaction_emoji` | string         | no       | Return merge requests reacted by the authenticated user by the given `emoji`. `None` returns issues not given a reaction. `Any` returns issues given at least one reaction. _([Introduced][ce-14016] in GitLab 10.0)_ |
 | `source_branch`     | string         | no       | Return merge requests with the given source branch                                                                             |
 | `target_branch`     | string         | no       | Return merge requests with the given target branch                                                                             |

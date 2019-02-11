@@ -7,11 +7,13 @@ module EE
 
     override :filter_items
     def filter_items(items)
-      by_approvers(super(items))
+      items = super(items)
+
+      by_approvers(items)
     end
 
     def by_approvers(items)
-      ::EE::MergeRequests::ByApproversFinder
+      ::MergeRequests::ByApproversFinder
         .execute(items, params[:approver_usernames], params[:approver_id])
     end
 
@@ -23,6 +25,7 @@ module EE
         @scalar_params ||= super + [:approver_id]
       end
 
+      override :array_params
       def array_params
         @array_params ||= super.merge(approver_usernames: [])
       end

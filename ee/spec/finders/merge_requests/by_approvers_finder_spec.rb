@@ -1,18 +1,13 @@
 require 'spec_helper'
 
-describe EE::MergeRequests::ByApproversFinder do
+describe MergeRequests::ByApproversFinder do
   let!(:merge_request) { create(:merge_request) }
   let!(:merge_request_with_approver) { create(:merge_request_with_approver) }
 
   let(:first_user) { merge_request_with_approver.approvers.first.user }
+  let(:second_user) { create(:user) }
 
-  let!(:merge_request_with_two_approvers) do
-    create(:merge_request_with_approver).tap do |merge_request|
-      merge_request.approver_users << first_user
-    end
-  end
-
-  let(:second_user) { merge_request_with_two_approvers.approvers.first.user }
+  let!(:merge_request_with_two_approvers) { create(:merge_request, approver_users: [first_user, second_user]) }
 
   let(:id) { nil }
   let(:names) { nil }
@@ -20,7 +15,7 @@ describe EE::MergeRequests::ByApproversFinder do
   let(:merge_requests) { described_class.execute(MergeRequest.all, names, id) }
 
   context 'filter by no approvers' do
-    context 'via api' do
+    context 'using approver_id' do
       let(:id) { 'None' }
 
       it 'returns merge requests without approvers' do
@@ -28,7 +23,7 @@ describe EE::MergeRequests::ByApproversFinder do
       end
     end
 
-    context 'via ui' do
+    context 'using approver_names' do
       let(:names) { ['None'] }
 
       it 'returns merge requests without approvers' do
@@ -38,7 +33,7 @@ describe EE::MergeRequests::ByApproversFinder do
   end
 
   context 'filter by any approver' do
-    context 'via api' do
+    context 'using approver_id' do
       let(:id) { 'Any' }
 
       it 'returns only merge requests with approvers' do
@@ -46,7 +41,7 @@ describe EE::MergeRequests::ByApproversFinder do
       end
     end
 
-    context 'via ui' do
+    context 'using approver_names' do
       let(:names) { ['Any'] }
 
       it 'returns only merge requests with approvers' do
@@ -56,7 +51,7 @@ describe EE::MergeRequests::ByApproversFinder do
   end
 
   context 'filter by second approver' do
-    context 'via api' do
+    context 'using approver_id' do
       let(:id) { second_user.id }
 
       it 'returns only merge requests with the second approver' do
@@ -64,7 +59,7 @@ describe EE::MergeRequests::ByApproversFinder do
       end
     end
 
-    context 'via ui' do
+    context 'using approver_names' do
       let(:names) { [second_user.username] }
 
       it 'returns only merge requests with the second approver' do

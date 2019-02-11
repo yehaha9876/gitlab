@@ -13,7 +13,7 @@ module API
       params :optional_params_ee do
       end
 
-      params :optional_merge_requests_params do
+      params :optional_merge_requests_search_params do
       end
     end
 
@@ -118,7 +118,7 @@ module API
         optional :in, type: String, desc: '`title`, `description`, or a string joining them with comma'
         optional :wip, type: String, values: %w[yes no], desc: 'Search merge requests for WIP in the title'
 
-        use :optional_merge_requests_params
+        use :optional_merge_requests_search_params
         use :pagination
       end
     end

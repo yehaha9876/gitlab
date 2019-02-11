@@ -207,4 +207,4 @@ Approvers are suggested for merge requests based on the previous authors of the 
 To filter merge requests by an individual approver, you can type (or select from
 the dropdown) `approver` and select the user.
 
-![Filter WIP MRs](img/filter_approver_merge_requests.png)
+![Filter MRs by an approver](img/filter_approver_merge_requests.png)
