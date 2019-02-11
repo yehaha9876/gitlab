@@ -80,4 +80,31 @@ describe 'layouts/nav/sidebar/_group' do
       expect(rendered).not_to have_link 'Security Dashboard'
     end
   end
+
+  describe 'details link' do
+    before do
+      allow(controller).to receive(:controller_name).and_return('groups')
+      allow(controller).to receive(:action_name).and_return('show')
+    end
+
+    context 'when the group overview security dashboard feature is enabled' do
+      it 'is not active when the groups/show is current' do
+        render
+
+        expect(rendered).not_to have_selector('li.active > a > span', text: /Details/)
+      end
+    end
+
+    context 'when the group overview security dashboard feature is disabled' do
+      before do
+        stub_feature_flags(group_overview_security_dashboard: false)
+      end
+
+      it 'is active when the groups/show is current' do
+        render
+
+        expect(rendered).to have_selector('li.active > a > span', text: /Details/)
+      end
+    end
+  end
 end

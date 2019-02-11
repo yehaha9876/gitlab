@@ -1,0 +1,6 @@
+- details_nav_link_path = ['groups#details', 'groups#subgroups']
+- details_nav_link_path.unshift('groups#show') unless ::Feature.enabled?(:group_overview_security_dashboard)
+= group_view_nav_link(group_view: :details, path: details_nav_link_path, html_options: { class: 'home' }) do
+  = link_to details_group_path(@group), title: _('Group details') do
+    %span
+      = _('Details')

@@ -25,10 +25,8 @@
                 %strong.fly-out-top-item-name
                   = _('Overview')
             %li.divider.fly-out-top-item
-            = group_view_nav_link(group_view: :details, path: ['groups#details', 'groups#subgroups'], html_options: { class: 'home' }) do
-              = link_to details_group_path(@group), title: _('Group details') do
-                %span
-                  = _('Details')
+
+            = render 'groups/sidebar/details'
 
             - if group_sidebar_link?(:activity)
               = nav_link(path: 'groups#activity') do

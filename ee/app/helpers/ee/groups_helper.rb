@@ -26,6 +26,8 @@ module EE
 
     override :group_view_nav_link_active?
     def group_view_nav_link_active?(group_view)
+      return false unless ::Feature.enabled?(:group_overview_security_dashboard)
+
       current_user&.group_view == group_view.to_s &&
         controller.controller_name == 'groups' &&
         controller.action_name == 'show'

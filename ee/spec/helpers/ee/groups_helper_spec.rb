@@ -42,10 +42,22 @@ describe GroupsHelper do
       let(:group_view_link_option) { :security_dashboard }
 
       context 'current path is groups/show' do
-        it 'marks link as active' do
+        before do
           allow(controller).to receive(:action_name).and_return('show')
+        end
 
+        it 'marks link as active' do
           expect(subject).to eq(true)
+        end
+
+        context 'but feature flag is disabled' do
+          before do
+            stub_feature_flags(group_overview_security_dashboard: false)
+          end
+
+          it 'does not mark link as active' do
+            expect(subject).to eq(false)
+          end
         end
       end
 
