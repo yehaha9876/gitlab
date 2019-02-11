@@ -7,13 +7,13 @@
 module MergeRequests
   class ByApproversFinder
     def self.execute(items, usernames, id)
-      new(usernames.to_a, id).execute(items)
+      new(usernames, id).execute(items)
     end
 
     attr_reader :usernames, :id
 
     def initialize(usernames, id)
-      @usernames = usernames.map(&:to_s)
+      @usernames = usernames.to_a.map(&:to_s)
       @id = id
     end
 
