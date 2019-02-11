@@ -2,7 +2,7 @@
 
 module EE
   module FeatureFlags
-    class CreateService < BaseService
+    class CreateService < FeatureFlags::BaseService
       def initialize(current_user, project, params)
         super(current_user, project)
         @params = params
