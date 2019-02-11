@@ -1,8 +1,8 @@
 import createState from 'ee/security_dashboard/store/modules/vulnerabilities/state';
 import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/mutation_types';
 import mutations from 'ee/security_dashboard/store/modules/vulnerabilities/mutations';
-import mockData from './data/mock_data_vulnerabilities.json';
 import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
+import mockData from './data/mock_data_vulnerabilities.json';
 
 describe('vulnerabilities module mutations', () => {
   describe('SET_VULNERABILITIES_ENDPOINT', () => {

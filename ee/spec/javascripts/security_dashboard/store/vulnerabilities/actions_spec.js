@@ -2,6 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
+import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
 
 import initialState from 'ee/security_dashboard/store/modules/vulnerabilities/state';
 import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/mutation_types';
@@ -10,8 +11,6 @@ import * as actions from 'ee/security_dashboard/store/modules/vulnerabilities/ac
 import mockDataVulnerabilities from './data/mock_data_vulnerabilities.json';
 import mockDataVulnerabilitiesCount from './data/mock_data_vulnerabilities_count.json';
 import mockDataVulnerabilitiesHistory from './data/mock_data_vulnerabilities_history.json';
-
-import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
 
 describe('vulnerabilities count actions', () => {
   const data = mockDataVulnerabilitiesCount;
