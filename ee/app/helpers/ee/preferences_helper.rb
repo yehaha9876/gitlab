@@ -15,13 +15,19 @@ module EE
     def group_view_choices
       strong_memoize(:group_view_choices) do
         [[_('Details (default)'), :details]].tap do |choices|
-          choices << [_('Security dashboard'), :security_dashboard] if License.feature_available?(:security_dashboard)
+          choices << [_('Security dashboard'), :security_dashboard] if group_view_security_dashboard_enabled?
         end
       end
     end
 
     def group_overview_content_preference?
       group_view_choices.size > 1
+    end
+
+    private
+
+    def group_view_security_dashboard_enabled?
+      License.feature_available?(:security_dashboard) && ::Feature.enabled?(:group_overview_security_dashboard)
     end
   end
 end
