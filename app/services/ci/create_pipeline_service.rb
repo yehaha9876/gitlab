@@ -36,7 +36,7 @@ module Ci
         project: project,
         current_user: current_user,
         push_options: params[:push_options],
-        **extra_options(**options))
+        **extra_options(options))
 
       sequence = Gitlab::Ci::Pipeline::Chain::Sequence
         .new(pipeline, command, SEQUENCE)
@@ -108,7 +108,7 @@ module Ci
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
-    def extra_options
+    def extra_options(_options)
       {} # overriden in EE
     end
   end
