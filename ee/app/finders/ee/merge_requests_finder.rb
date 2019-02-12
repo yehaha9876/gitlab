@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EE
-  module MergeRequestFinder
+  module MergeRequestsFinder
     extend ActiveSupport::Concern
     extend ::Gitlab::Utils::Override
 
