@@ -48,27 +48,34 @@ module MergeRequests
     # rubocop: disable CodeReuse/ActiveRecord
     def without_approvers(items)
       items
-        .left_outer_joins(:approvers)
-        .where(approvers: { id: nil })
+        .left_outer_joins(:approval_rules)
+        .where(approval_merge_request_rules: { id: nil })
     end
 
     def with_any_approvers(items)
-      items.joins(:approvers).distinct
+      items.joins(:approval_rules).distinct
     end
 
     def find_approvers_by_names(items)
-      items
-        .joins(:approver_users)
-        .where(users: { username: usernames })
-        .group('merge_requests.id')
-        .having("COUNT(users.id) = ?", usernames.size)
-        .distinct
+      with_users_filtered_by_criteria(items) do |items_with_users|
+        items_with_users
+          .where(users: { username: usernames })
+          .group('merge_requests.id')
+          .having("COUNT(users.id) = ?", usernames.size)
+      end
     end
 
     def find_approvers_by_id(items)
-      items
-        .joins(:approver_users)
-        .where(users: { id: id })
+      with_users_filtered_by_criteria(items) do |items_with_users|
+        items_with_users.where(users: { id: id })
+      end
+    end
+
+    def with_users_filtered_by_criteria(items)
+      users = yield(items.joins(approval_rules: :users))
+      group_users = yield(items.joins(approval_rules: { groups: :users }))
+
+      items.select_from_union([users, group_users])
     end
     # rubocop: enable CodeReuse/ActiveRecord
   end
