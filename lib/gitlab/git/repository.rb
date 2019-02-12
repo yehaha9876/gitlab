@@ -90,7 +90,11 @@ module Gitlab
 
       # Default branch in the repository
       def root_ref
-        gitaly_ref_client.default_branch_name
+        if ENV['GITALY_ROOT_REF_ENABLED']
+          gitaly_ref_client.default_branch_name
+        else
+          discover_default_branch
+        end
       rescue GRPC::NotFound => e
         raise NoRepository.new(e.message)
       rescue GRPC::Unknown => e
@@ -242,6 +246,37 @@ module Gitlab
         wrapped_gitaly_errors do
           gitaly_ref_client.delete_refs(except_with_prefixes: prefixes)
         end
+      end
+
+      # Discovers the default branch based on the repository's available branches
+      #
+      # - If no branches are present, returns nil
+      # - If one branch is present, returns its name
+      # - If two or more branches are present, returns current HEAD or master or first branch
+      def discover_default_branch
+        names = branch_names
+
+        return if names.empty?
+
+        return names[0] if names.length == 1
+
+        if rugged_head
+          extracted_name = Ref.extract_branch_name(rugged_head.name)
+
+          return extracted_name if names.include?(extracted_name)
+        end
+
+        if names.include?('master')
+          'master'
+        else
+          names[0]
+        end
+      end
+
+      def rugged_head
+        rugged.head
+      rescue Rugged::ReferenceError
+        nil
       end
 
       def archive_metadata(ref, storage_path, project_path, format = "tar.gz", append_sha:)
