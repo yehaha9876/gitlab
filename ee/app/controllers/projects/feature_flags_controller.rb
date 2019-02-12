@@ -62,7 +62,8 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   end
 
   def update
-    if feature_flag.update(update_params)
+    success, @feature_flag = EE::FeatureFlags::UpdateService.new(current_user, feature_flag, update_params).execute
+    if success
       respond_to do |format|
         format.html { redirect_to_index(notice: 'Feature flag was successfully updated.') }
         format.json { render_success_json }

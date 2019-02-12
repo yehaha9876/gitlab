@@ -31,21 +31,17 @@ module EE
         ).security_event
       end
 
-      def log_changed_scopes(scopes)
-        scopes.each do |action, scope, value|
-          action = "#{action}_feature_flag_rule".to_sym
-          details =
-            {
-              action => scope,
-              and_set_it_as: value ? 'active' : 'inactive'
-            }.merge(audit_event_target_details)
+      def log_changed_scope(action, scope, active = nil)
+        action = "#{action}_feature_flag_rule".to_sym
+        details = { action => scope }
+        details[:and_set_it_as] = active ? 'active' : 'inactive' unless active.nil?
+        details.merge!(audit_event_target_details)
 
-          ::AuditEventService.new(
-            @current_user,
-            @flag.project,
-            details
-          ).security_event
-        end
+        ::AuditEventService.new(
+          @current_user,
+          @flag.project,
+          details
+        ).security_event
       end
     end
   end
