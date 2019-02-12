@@ -32,14 +32,14 @@ module EE
 
       def log_changed_scopes(scopes_before, scopes_after)
         (scopes_before.keys - scopes_after.keys).each do |destroyed_scope|
-          log_changed_scope(:deleted, destroyed_scope)
+          log_changed_scope(:delete, destroyed_scope)
         end
 
         scopes_after.each do |scope, active|
           if scopes_before[scope]
-            log_changed_scope(:updated, scope, active) if scopes_before[scope] != active
+            log_changed_scope(:update, scope, active) if scopes_before[scope] != active
           else
-            log_changed_scope(:created, scope, active)
+            log_changed_scope(:create, scope, active)
           end
         end
       end

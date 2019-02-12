@@ -15,7 +15,7 @@ module EE
         log_audit_event(:create_feature_flag, with_description: @flag.description)
 
         @flag.scopes.each do |scope|
-          log_changed_scope(:created, scope.environment_scope, scope.active)
+          log_changed_scope(:create, scope.environment_scope, scope.active)
         end
 
         [true, @flag]

@@ -17,7 +17,7 @@ module EE
         }
       end
 
-      def log_audit_event(action, details)
+      def log_audit_event(action, details = {})
         details =
           {
             action => @flag.name

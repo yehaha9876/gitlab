@@ -77,7 +77,8 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   end
 
   def destroy
-    if feature_flag.destroy
+    success, @feature_flag = EE::FeatureFlags::DestroyService.new(current_user, feature_flag).execute
+    if success
       respond_to do |format|
         format.html { redirect_to_index(notice: 'Feature flag was successfully removed.') }
         format.json { render_success_json }
