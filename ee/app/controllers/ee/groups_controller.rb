@@ -6,17 +6,7 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
-      include ::Groups::Security::DashboardPermissions
-
-      with_options only: :show, if: :security_dashboard_access_authorized? do
-        before_action :ensure_security_dashboard_feature_enabled
-      end
-
       delegate :default_view, :default_view_supports_request_format?, to: :presenter
-
-      def security_dashboard_access_authorized?
-        ::Feature.enabled?(:group_overview_security_dashboard) && current_user&.group_view_security_dashboard?
-      end
     end
 
     override :show

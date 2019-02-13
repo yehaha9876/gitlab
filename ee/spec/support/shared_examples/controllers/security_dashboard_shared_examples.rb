@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 shared_examples 'ensures security dashboard permissions' do
+  let(:http_status_when_security_dashboard_disabled) { 404 }
+
   context 'when security dashboard feature is enabled' do
     before do
       stub_licensed_features(security_dashboard: true)
@@ -20,6 +22,6 @@ shared_examples 'ensures security dashboard permissions' do
   end
 
   context 'when security dashboard feature is disabled' do
-    it { is_expected.to have_gitlab_http_status(404) }
+    it { is_expected.to have_gitlab_http_status(http_status_when_security_dashboard_disabled) }
   end
 end

@@ -176,6 +176,7 @@ describe GroupsController do
 
       it_behaves_like 'ensures security dashboard permissions' do
         let(:user) { create(:user, group_view: :security_dashboard) } # not a member of a group
+        let(:http_status_when_security_dashboard_disabled) { 200 }
       end
 
       context 'when feature flag is disabled' do
