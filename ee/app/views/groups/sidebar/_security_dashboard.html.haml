@@ -1,6 +1,6 @@
 -# have to query the License directly instead of using a helper method because this nav partial
 -# is used by ApplicationController directly in some cases (e.g. fixture helpers)
-- if License.feature_available?(:security_dashboard)
+- if @group.feature_available?(:security_dashboard)
   = group_view_nav_link(group_view: :security_dashboard, path: 'groups/security/dashboard#show') do
     = link_to group_security_dashboard_path(@group), title: _('Security Dashboard') do
       %span= _('Security Dashboard')

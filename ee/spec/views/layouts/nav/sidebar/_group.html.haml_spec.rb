@@ -2,8 +2,10 @@ require 'spec_helper'
 
 describe 'layouts/nav/sidebar/_group' do
   before do
-    assign(:group, create(:group))
+    assign(:group, group)
   end
+
+  let(:group) { create(:group) }
 
   describe 'contribution analytics tab' do
     it 'is not visible when there is no valid license and we dont show promotions' do
@@ -66,18 +68,29 @@ describe 'layouts/nav/sidebar/_group' do
   end
 
   describe 'security dashboard tab' do
-    it 'is visible when security dashboard feature is enabled' do
+    before do
       stub_licensed_features(security_dashboard: true)
-
-      render
-
-      expect(rendered).to have_link 'Security Dashboard'
+      enable_namespace_license_check!
     end
 
-    it 'is not visible when security dashboard feature is disabled' do
-      render
+    context 'when security dashboard feature is enabled' do
+      let(:group) { create(:group, plan: :gold_plan) }
 
-      expect(rendered).not_to have_link 'Security Dashboard'
+      it 'is visible' do
+        render
+
+        expect(rendered).to have_link 'Security Dashboard'
+      end
+    end
+
+    context 'when security dashboard feature is disabled' do
+      let(:group) { create(:group, plan: :bronze_plan) }
+
+      it 'is not visible' do
+        render
+
+        expect(rendered).not_to have_link 'Security Dashboard'
+      end
     end
   end
 
