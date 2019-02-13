@@ -30,7 +30,7 @@ describe 'Group overview', :js do
       create(:gitlab_subscription, hosted_plan: group.plan, namespace: group)
     end
 
-    let(:user) { super().tap { |u| u.update!(group_view: :security_dashboard) } }
+    let(:user) { create(:user, group_view: :security_dashboard) }
 
     context 'and Security Dashboard feature is available for a group' do
       let(:group) { create(:group, plan: :gold_plan) }
