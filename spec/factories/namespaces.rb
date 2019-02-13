@@ -38,7 +38,7 @@ FactoryBot.define do
       shared_runners_minutes_limit 500
     end
 
-    # EE-specific start
+    # EE-only
     transient do
       plan nil
     end
@@ -48,12 +48,5 @@ FactoryBot.define do
         namespace.plan = create(evaluator.plan)
       end
     end
-
-    after :create do |namespace, evaluator|
-      if evaluator.plan.present?
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: namespace.plan)
-      end
-    end
-    # EE-specific end
   end
 end

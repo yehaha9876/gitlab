@@ -71,6 +71,8 @@ describe 'layouts/nav/sidebar/_group' do
     before do
       stub_licensed_features(security_dashboard: true)
       enable_namespace_license_check!
+
+      create(:gitlab_subscription, hosted_plan: group.plan, namespace: group)
     end
 
     context 'when security dashboard feature is enabled' do
