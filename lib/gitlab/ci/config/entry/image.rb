@@ -20,14 +20,6 @@ module Gitlab
             validates :entrypoint, array_of_strings: true, allow_nil: true
           end
 
-          def hash?
-            @config.is_a?(Hash)
-          end
-
-          def string?
-            @config.is_a?(String)
-          end
-
           def name
             value[:name]
           end

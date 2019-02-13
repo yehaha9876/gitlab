@@ -9,6 +9,7 @@ module Gitlab
         #
         class Service < Image
           include ::Gitlab::Config::Entry::Validatable
+          include ::Gitlab::Config::Entry::Configurable
 
           ALLOWED_KEYS = %i[name entrypoint command alias ports].freeze
 
@@ -20,8 +21,12 @@ module Gitlab
             validates :entrypoint, array_of_strings: true, allow_nil: true
             validates :command, array_of_strings: true, allow_nil: true
             validates :alias, type: String, allow_nil: true
-            validates :ports, array_of_integers: true, allow_nil: true
           end
+
+          entry :ports, Entry::Ports,
+            description: 'Ports used to configure the proxy'
+
+          helpers :ports
 
           def alias
             value[:alias]
@@ -29,10 +34,6 @@ module Gitlab
 
           def command
             value[:command]
-          end
-
-          def ports
-            value[:ports]
           end
         end
       end

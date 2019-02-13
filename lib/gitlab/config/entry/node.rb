@@ -85,6 +85,18 @@ module Gitlab
           "#<#{self.class.name} #{unspecified}{#{key}: #{val.inspect}}>"
         end
 
+        def hash?
+          @config.is_a?(Hash)
+        end
+
+        def string?
+          @config.is_a?(String)
+        end
+
+        def integer?
+          @config.is_a?(Integer)
+        end
+
         def self.default(**)
         end
 
