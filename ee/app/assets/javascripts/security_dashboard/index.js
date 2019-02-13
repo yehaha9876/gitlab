@@ -12,15 +12,17 @@ export default () => {
       el,
       components: { UnavailableState },
       render(createElement) {
-        return createElement('unavailable-state', { props: {
+        return createElement('unavailable-state', {
+          props: {
             link: el.dataset.dashboardDocumentation,
             svgPath: el.dataset.emptyStateSvgPath,
-          } });
+          },
+        });
       },
     });
   }
 
-  el = document.getElementById('js-group-security-dashboard')
+  el = document.getElementById('js-group-security-dashboard');
   const store = createStore();
   return new Vue({
     el,
@@ -28,7 +30,8 @@ export default () => {
     router,
     components: { GroupSecurityDashboardApp },
     render(createElement) {
-      return createElement('group-security-dashboard-app', { props: {
+      return createElement('group-security-dashboard-app', {
+        props: {
           dashboardDocumentation: el.dataset.dashboardDocumentation,
           emptyStateSvgPath: el.dataset.emptyStateSvgPath,
           projectsEndpoint: el.dataset.projectsEndpoint,
@@ -36,10 +39,8 @@ export default () => {
           vulnerabilitiesEndpoint: el.dataset.vulnerabilitiesEndpoint,
           vulnerabilitiesCountEndpoint: el.dataset.vulnerabilitiesSummaryEndpoint,
           vulnerabilitiesHistoryEndpoint: el.dataset.vulnerabilitiesHistoryEndpoint,
-        } });
-    }
-  })
-
-
-
+        },
+      });
+    },
+  });
 };
