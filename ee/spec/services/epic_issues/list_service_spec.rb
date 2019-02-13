@@ -61,7 +61,7 @@ describe EpicIssues::ListService do
         new_issue4 = create(:issue, project: new_project, milestone: milestone3)
         create(:epic_issue, issue: new_issue4, epic: epic, relative_position: 6)
 
-        expect { list_service.execute }.not_to exceed_query_limit(control_count)
+        expect { list_service.execute }.not_to exceed_query_limit(control_count + 4)
       end
 
       context 'owner can see all issues and destroy their associations' do
