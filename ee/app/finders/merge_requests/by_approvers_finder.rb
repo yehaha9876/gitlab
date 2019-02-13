@@ -49,11 +49,16 @@ module MergeRequests
     def without_approvers(items)
       items
         .left_outer_joins(:approval_rules)
+        .left_outer_joins(target_project: :approval_rules)
         .where(approval_merge_request_rules: { id: nil })
+        .where(approval_project_rules: { id: nil })
     end
 
     def with_any_approvers(items)
-      items.joins(:approval_rules).distinct
+      items.select_from_union([
+        items.joins(:approval_rules),
+        items.joins(target_project: :approval_rules),
+      ])
     end
 
     def find_approvers_by_names(items)
@@ -72,10 +77,14 @@ module MergeRequests
     end
 
     def with_users_filtered_by_criteria(items)
-      users = yield(items.joins(approval_rules: :users))
-      group_users = yield(items.joins(approval_rules: { groups: :users }))
+      users_mrs = yield(items.joins(approval_rules: :users))
+      group_users_mrs = yield(items.joins(approval_rules: { groups: :users }))
 
-      items.select_from_union([users, group_users])
+      mrs_with_overriden_rules = items.left_outer_joins(:approval_rules).where(approval_merge_request_rules: { id: nil })
+      project_users_mrs = yield(mrs_with_overriden_rules.joins(target_project: { approval_rules: :users }))
+      project_group_users_mrs = yield(mrs_with_overriden_rules.joins(target_project: { approval_rules: { groups: :users }}))
+
+      items.select_from_union([users_mrs, group_users_mrs, project_users_mrs, project_group_users_mrs])
     end
     # rubocop: enable CodeReuse/ActiveRecord
   end
