@@ -36,10 +36,10 @@ module EE
         end
 
         scopes_after.each do |scope, active|
-          if !scopes_before[scope].nil?
-            log_changed_scope(:update, scope, active) if scopes_before[scope] != active
-          else
+          if scopes_before[scope].nil?
             log_changed_scope(:create, scope, active)
+          else
+            log_changed_scope(:update, scope, active) if scopes_before[scope] != active
           end
         end
       end
