@@ -36,6 +36,12 @@ module Gitlab
           def descendants
             @entries
           end
+
+          private
+
+          def unique_external_ports
+            binding.pry
+          end
         end
       end
     end
