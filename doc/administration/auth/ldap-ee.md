@@ -61,6 +61,9 @@ NOTE: **Note:**
 The LDAP sync process updates existing users while new users will
 be created on first sign in.
 
+NOTE: **Note:**
+Microsoft Active Directory Trusts are not supported [Active Directory Trusts](https://en.wikipedia.org/wiki/Active_Directory#Trusting)
+
 ## Group Sync
 
 If your LDAP supports the `memberof` property, GitLab will add the user to any
