@@ -61,6 +61,15 @@ export default {
     },
     // ee-only end
   },
+  computed: {
+    sortedEnvironments() {
+      return this.sortEnvironments(this.environments).map(env =>
+        this.shouldRenderFolderContent(env)
+          ? { ...env, children: this.sortEnvironments(env.children) }
+          : env,
+      );
+    },
+  },
   methods: {
     folderUrl(model) {
       return `${window.location.pathname}/folders/${model.folderName}`;
@@ -70,8 +79,8 @@ export default {
     },
     sortEnvironments(environments) {
       return chain(environments)
-        .sortBy(env => env.isFolder ? env.folderName : env.name)
-        .sortBy(env => env.last_deployment ? env.last_deployment.created_at : Math.Infinity)
+        .sortBy(env => (env.isFolder ? env.folderName : env.name))
+        .sortBy(env => (env.last_deployment ? env.last_deployment.created_at : Math.Infinity))
         .sortBy('isFolder')
         .value();
     },
@@ -102,7 +111,7 @@ export default {
         {{ s__('Environments|Updated') }}
       </div>
     </div>
-    <template v-for="(model, i) in environments" :model="model">
+    <template v-for="(model, i) in sortedEnvironments" :model="model">
       <div
         is="environment-item"
         :key="`environment-item-${i}`"
