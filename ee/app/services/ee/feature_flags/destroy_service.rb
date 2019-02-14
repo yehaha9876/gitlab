@@ -13,7 +13,7 @@ module EE
           success = @flag.destroy
           next false, @flag unless success
 
-          log_audit_event(:delete_feature_flag)
+          log_audit_event(:deleted_feature_flag)
           [true, @flag]
         end
       end
