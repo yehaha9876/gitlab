@@ -31,6 +31,10 @@ curl --data "value=100" --header "PRIVATE-TOKEN: <your_access_token>" https://gi
 
 A first iteration of a GraphQL API includes a query for: `project`. Within a project it is also possible to fetch a `mergeRequest` by IID.
 
+The following queries are available:
+
+  - [License](license.md)
+
 ## GraphiQL
 
 The API can be explored by using the GraphiQL IDE, it is available on your
