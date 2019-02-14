@@ -9,12 +9,12 @@ module EE
       end
 
       def execute
-        scopes_before = collect_scopes(@flag)
+        scopes_before = scopes_to_hash(@flag)
 
         success = @flag.update(@params)
         return false, @flag unless success
 
-        scopes_after = collect_scopes(@flag)
+        scopes_after = scopes_to_hashg(@flag)
         log_changed_scopes(scopes_before, scopes_after)
 
         [true, @flag]
@@ -22,7 +22,7 @@ module EE
 
       private
 
-      def collect_scopes(flag)
+      def scopes_to_hash(flag)
         result = {}
         flag.scopes.each do |scope|
           result[scope.environment_scope] = scope.active
