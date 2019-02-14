@@ -7,4 +7,5 @@ class WebIdeTerminalEntity < Grape::Entity
   expose :cancel_path
   expose :retry_path
   expose :terminal_path
+  expose :services
 end

@@ -28,6 +28,10 @@ class WebIdeTerminal
     terminal_project_job_path(project, build, format: :ws)
   end
 
+  def services
+    build.runner_session.try(:services) || []
+  end
+
   private
 
   def web_ide_terminal_route_generator(action)

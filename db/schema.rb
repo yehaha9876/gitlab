@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190131122559) do
+ActiveRecord::Schema.define(version: 20190214181305) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -541,6 +541,7 @@ ActiveRecord::Schema.define(version: 20190131122559) do
     t.string "url", null: false
     t.string "certificate"
     t.string "authorization"
+    t.jsonb "services"
     t.index ["build_id"], name: "index_ci_builds_runner_session_on_build_id", unique: true, using: :btree
   end
 
