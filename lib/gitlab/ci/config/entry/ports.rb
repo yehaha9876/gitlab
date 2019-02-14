@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Gitlab
-  module WebIde
+  module Ci
     class Config
       module Entry
         ##
@@ -35,12 +35,6 @@ module Gitlab
 
           def descendants
             @entries
-          end
-
-          private
-
-          def unique_external_ports
-            binding.pry
           end
         end
       end

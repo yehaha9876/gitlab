@@ -35,13 +35,13 @@ module Gitlab
           entry :image, ::Gitlab::Ci::Config::Entry::Image,
             description: 'Image that will be used to execute this job.'
 
-          entry :services, Entry::Services,
+          entry :services, ::Gitlab::Ci::Config::Entry::Services,
             description: 'Services that will be used to execute this job.'
 
           entry :variables, ::Gitlab::Ci::Config::Entry::Variables,
             description: 'Environment variables available for this job.'
 
-          entry :ports, Entry::Ports,
+          entry :ports, ::Gitlab::Ci::Config::Entry::Ports,
             description: 'Ports used expose the build'
 
           helpers :before_script, :script, :image, :variables, :services, :ports

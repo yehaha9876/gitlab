@@ -31,7 +31,7 @@ module Gitlab
             @command = image[:command]
             @entrypoint = image[:entrypoint]
             @name = image[:name]
-            @ports = image[:ports]
+            @ports = image[:ports].map { |port| Gitlab::Ci::Build::Port.new(port) }.select(&:valid?)
           end
         end
 

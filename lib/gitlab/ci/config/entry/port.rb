@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Gitlab
-  module WebIde
+  module Ci
     class Config
       module Entry
         ##
