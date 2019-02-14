@@ -4,43 +4,43 @@ import UnavailableState from './components/unavailable_state.vue';
 import createStore from './store';
 import router from './store/router';
 
-export default () => {
-  let el = document.getElementById('js-group-security-dashboard-unavailable');
+export default function() {
+  const emptyStateElement = document.getElementById('js-group-security-dashboard-unavailable');
 
-  if (el) {
+  if (emptyStateElement) {
     return new Vue({
-      el,
+      el: emptyStateElement,
       components: { UnavailableState },
       render(createElement) {
         return createElement('unavailable-state', {
           props: {
-            link: el.dataset.dashboardDocumentation,
-            svgPath: el.dataset.emptyStateSvgPath,
+            link: emptyStateElement.dataset.dashboardDocumentation,
+            svgPath: emptyStateElement.dataset.emptyStateSvgPath,
           },
         });
       },
     });
   }
 
-  el = document.getElementById('js-group-security-dashboard');
+  const dashboardElement = document.getElementById('js-group-security-dashboard');
   const store = createStore();
   return new Vue({
-    el,
+    el: dashboardElement,
     store,
     router,
     components: { GroupSecurityDashboardApp },
     render(createElement) {
       return createElement('group-security-dashboard-app', {
         props: {
-          dashboardDocumentation: el.dataset.dashboardDocumentation,
-          emptyStateSvgPath: el.dataset.emptyStateSvgPath,
-          projectsEndpoint: el.dataset.projectsEndpoint,
-          vulnerabilityFeedbackHelpPath: el.dataset.vulnerabilityFeedbackHelpPath,
-          vulnerabilitiesEndpoint: el.dataset.vulnerabilitiesEndpoint,
-          vulnerabilitiesCountEndpoint: el.dataset.vulnerabilitiesSummaryEndpoint,
-          vulnerabilitiesHistoryEndpoint: el.dataset.vulnerabilitiesHistoryEndpoint,
+          dashboardDocumentation: dashboardElement.dataset.dashboardDocumentation,
+          emptyStateSvgPath: dashboardElement.dataset.emptyStateSvgPath,
+          projectsEndpoint: dashboardElement.dataset.projectsEndpoint,
+          vulnerabilityFeedbackHelpPath: dashboardElement.dataset.vulnerabilityFeedbackHelpPath,
+          vulnerabilitiesEndpoint: dashboardElement.dataset.vulnerabilitiesEndpoint,
+          vulnerabilitiesCountEndpoint: dashboardElement.dataset.vulnerabilitiesSummaryEndpoint,
+          vulnerabilitiesHistoryEndpoint: dashboardElement.dataset.vulnerabilitiesHistoryEndpoint,
         },
       });
     },
   });
-};
+}

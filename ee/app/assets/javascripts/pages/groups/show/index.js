@@ -2,7 +2,10 @@ import initGroupDetails from '~/pages/groups/shared/group_details';
 import initSecurityDashboard from 'ee/security_dashboard/index';
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (document.querySelector('[id^=js-group-security-dashboard]')) {
+  if (
+    document.querySelector('#js-group-security-dashboard') ||
+    document.querySelector('#js-group-security-dashboard-unavailable')
+  ) {
     initSecurityDashboard();
   } else {
     initGroupDetails();
