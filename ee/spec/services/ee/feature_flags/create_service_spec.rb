@@ -27,6 +27,7 @@ describe EE::FeatureFlags::CreateService do
 
       it { expect(result).to eq(true) }
       it { expect(feature_flag).to be_valid }
+      it { expect { subject }.to change { Operations::FeatureFlag.count }.by(1) }
 
       it 'creates audit events' do
         subject
