@@ -80,6 +80,15 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     )
   end
 
+  def self.order_by_retry_at
+    order <<-EOF
+      LEAST(
+        COALESCE(project_registry.repository_retry_at, DATE '0001-01-01'),
+        COALESCE(project_registry.wiki_retry_at, DATE '0001-01-01')
+      ) ASC
+    EOF
+  end
+
   # Search for a list of projects associated with registries,
   # based on the query given in `query`.
   #

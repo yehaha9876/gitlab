@@ -206,7 +206,7 @@ module Geo
     def fdw_find_projects_updated_recently
       Geo::Fdw::Project.joins("INNER JOIN project_registry ON project_registry.project_id = #{fdw_project_table.name}.id")
           .merge(Geo::ProjectRegistry.dirty)
-          .merge(Geo::ProjectRegistry.retry_due)
+          .merge(Geo::ProjectRegistry.order_by_retry_at)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
@@ -268,7 +268,7 @@ module Geo
     # @return [ActiveRecord::Relation<Project>] list of projects updated recently
     # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_projects_updated_recently
-      registries = Geo::ProjectRegistry.dirty.retry_due.pluck(:project_id, :last_repository_synced_at)
+      registries = Geo::ProjectRegistry.dirty.order_by_retry_at.pluck(:project_id, :last_repository_synced_at)
       return Project.none if registries.empty?
 
       id_and_last_sync_values = registries.map do |id, last_repository_synced_at|
