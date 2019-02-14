@@ -85,5 +85,27 @@ describe EE::FeatureFlags::UpdateService do
         )
       end
     end
+
+    context 'when deleting scope' do
+      let!(:scope) do
+        feature_flag.scopes.create!(environment_scope: 'staging', active: true)
+      end
+      let(:params) do
+        {
+          scopes_attributes: [{ id: scope.id, '_destroy': true }]
+        }
+      end
+
+      include_examples 'successfully updates'
+      it { expect { subject }.to change { feature_flag.scopes.count }.by(-1) }
+      it { expect { subject }.to change { AuditEvent.count }.by(1) }
+
+      it 'creates audit event' do
+        subject
+        expect(AuditEvent.last.details).to(
+          include(deleted_feature_flag_rule: 'staging')
+        )
+      end
+    end
   end
 end
