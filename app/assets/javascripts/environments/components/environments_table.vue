@@ -2,6 +2,7 @@
 /**
  * Render environments table.
  */
+import { chain } from 'underscore';
 import { GlLoadingIcon } from '@gitlab/ui';
 import environmentItem from './environment_item.vue'; // eslint-disable-line import/order
 
@@ -66,6 +67,13 @@ export default {
     },
     shouldRenderFolderContent(env) {
       return env.isFolder && env.isOpen && env.children && env.children.length > 0;
+    },
+    sortEnvironments(environments) {
+      return chain(environments)
+        .sortBy(env => env.isFolder ? env.folderName : env.name)
+        .sortBy(env => env.last_deployment ? env.last_deployment.created_at : Math.Infinity)
+        .sortBy('isFolder')
+        .value();
     },
     // ee-only start
     shouldShowCanaryCallout(env) {
