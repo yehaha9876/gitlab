@@ -9,15 +9,17 @@ module EE
       end
 
       def execute
-        scopes_before = scopes_to_hash(@flag)
+        ActiveRecord::Base.transaction do
+          scopes_before = scopes_to_hash(@flag)
 
-        success = @flag.update(@params)
-        return false, @flag unless success
+          success = @flag.update(@params)
+          next false, @flag unless success
 
-        scopes_after = scopes_to_hashg(@flag)
-        log_changed_scopes(scopes_before, scopes_after)
+          scopes_after = scopes_to_hash(@flag)
+          log_changed_scopes(scopes_before, scopes_after)
 
-        [true, @flag]
+          [true, @flag]
+        end
       end
 
       private

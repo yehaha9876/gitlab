@@ -9,11 +9,13 @@ module EE
       end
 
       def execute
-        success = @flag.destroy
-        return false, @flag unless success
+        ActiveRecord::Base.transaction do
+          success = @flag.destroy
+          next false, @flag unless success
 
-        log_audit_event(:delete_feature_flag)
-        [true, @flag]
+          log_audit_event(:delete_feature_flag)
+          [true, @flag]
+        end
       end
     end
   end

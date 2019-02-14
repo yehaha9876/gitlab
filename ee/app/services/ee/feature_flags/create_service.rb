@@ -9,16 +9,17 @@ module EE
       end
 
       def execute
-        @flag = @project.operations_feature_flags.create(@params)
-        return false, @flag unless @flag.persisted?
+        ActiveRecord::Base.transaction do
+          @flag = @project.operations_feature_flags.create(@params)
+          next false, @flag unless @flag.persisted?
 
-        log_audit_event(:create_feature_flag, with_description: @flag.description)
+          log_audit_event(:create_feature_flag, with_description: @flag.description)
 
-        @flag.scopes.each do |scope|
-          log_changed_scope(:create, scope.environment_scope, scope.active)
+          @flag.scopes.each do |scope|
+            log_changed_scope(:create, scope.environment_scope, scope.active)
+          end
+          [true, @flag]
         end
-
-        [true, @flag]
       end
     end
   end
