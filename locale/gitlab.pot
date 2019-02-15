@@ -41,9 +41,6 @@ msgstr ""
 msgid " or <#issue id>"
 msgstr ""
 
-msgid "\"%{query}\" in projects"
-msgstr ""
-
 msgid "%d commit"
 msgid_plural "%d commits"
 msgstr[0] ""
@@ -8940,6 +8937,9 @@ msgstr ""
 msgid "Something went wrong, unable to remove project"
 msgstr ""
 
+msgid "Something went wrong, unable to search projects"
+msgstr ""
+
 msgid "Something went wrong. Please try again."
 msgstr ""
 
@@ -10610,9 +10610,6 @@ msgid "View deployment"
 msgstr ""
 
 msgid "View details: %{details_url}"
-msgstr ""
-
-msgid "View documentation"
 msgstr ""
 
 msgid "View eligible approvers"

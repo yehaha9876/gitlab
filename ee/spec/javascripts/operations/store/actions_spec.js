@@ -25,9 +25,9 @@ describe('actions', () => {
   });
 
   describe('addProjectsToDashboard', () => {
-    it('posts project token ids to project add endpoint', done => {
+    it('posts selected project ids to project add endpoint', done => {
       store.state.projectEndpoints.add = mockAddEndpoint;
-      store.state.projectTokens = mockProjects;
+      store.state.selectProjects = mockProjects;
 
       mockAxios.onPost(mockAddEndpoint).replyOnce(200, mockResponse);
 
@@ -60,33 +60,33 @@ describe('actions', () => {
     });
   });
 
-  describe('clearInputValue', () => {
-    it('sets inputValue to empty string', done => {
+  describe('toggleSelectedProjects', () => {
+    it(`adds a project to selectedProjects if it doesn't already exist in the list`, done => {
       testAction(
-        actions.clearInputValue,
-        null,
+        actions.toggleSelectedProject,
+        mockOneProject,
         store.state,
         [
           {
-            type: types.SET_INPUT_VALUE,
-            payload: '',
+            type: types.SET_SELECTED_PROJECTS,
+            payload: mockProjects,
           },
         ],
         [],
         done,
       );
     });
-  });
 
-  describe('clearProjectTokens', () => {
-    it('sets project tokens to an empty array', done => {
+    it(`removes a project from selectedProjects if it already exist in the list`, done => {
+      store.state.selectedProjects = mockProjects;
+
       testAction(
-        actions.clearProjectTokens,
-        null,
+        actions.toggleSelectedProject,
+        mockOneProject,
         store.state,
         [
           {
-            type: types.SET_PROJECT_TOKENS,
+            type: types.SET_SELECTED_PROJECTS,
             payload: [],
           },
         ],
@@ -94,21 +94,18 @@ describe('actions', () => {
         done,
       );
     });
-  });
 
-  describe('filterProjectTokensById', () => {
-    it('removes all project tokens except those with specified ids', done => {
-      store.state.projectTokens = mockProjects;
-      const ids = mockProjects.map(project => project.id);
+    it(`removes all instances of a project from selectedProjects if it exists multiple times in the list`, done => {
+      store.state.selectedProjects = [mockOneProject, mockOneProject, mockOneProject];
 
       testAction(
-        actions.filterProjectTokensById,
-        ids,
+        actions.toggleSelectedProject,
+        mockOneProject,
         store.state,
         [
           {
-            type: types.SET_PROJECT_TOKENS,
-            payload: mockProjects,
+            type: types.SET_SELECTED_PROJECTS,
+            payload: [],
           },
         ],
         [],
@@ -130,58 +127,7 @@ describe('actions', () => {
         [],
         [
           {
-            type: 'clearInputValue',
-          },
-          {
-            type: 'clearProjectTokens',
-          },
-          {
             type: 'fetchProjects',
-          },
-        ],
-        done,
-      );
-    });
-
-    it('removes projectTokens when user tries to add duplicates to dashboard', done => {
-      testAction(
-        actions.requestAddProjectsToDashboardSuccess,
-        {
-          added: [],
-          invalid: [],
-          duplicate: [1],
-        },
-        store.state,
-        [],
-        [
-          {
-            type: 'clearInputValue',
-          },
-          {
-            type: 'clearProjectTokens',
-          },
-        ],
-        done,
-      );
-    });
-
-    it('does not remove projectTokens when user adds invalid projects to dashbaord', done => {
-      testAction(
-        actions.requestAddProjectsToDashboardSuccess,
-        {
-          added: [],
-          invalid: [1],
-          duplicate: [],
-        },
-        store.state,
-        [],
-        [
-          {
-            type: 'clearInputValue',
-          },
-          {
-            type: 'filterProjectTokensById',
-            payload: [1],
           },
         ],
         done,
@@ -190,13 +136,15 @@ describe('actions', () => {
 
     const errorMessage =
       'The Operations Dashboard is available for public projects, and private projects in groups with a Gold plan.';
-    const addTokens = count => {
+    const selectProjects = count => {
+      const projectsToAdd = [];
       for (let i = 0; i < count; i += 1) {
-        store.dispatch('addProjectToken', {
+        projectsToAdd.push({
           id: i,
           name: 'mock-name',
         });
       }
+      store.dispatch('updateSelectedProjects', projectsToAdd);
     };
     const addInvalidProjects = invalid =>
       store.dispatch('requestAddProjectsToDashboardSuccess', {
@@ -207,7 +155,7 @@ describe('actions', () => {
 
     it('displays an error when user tries to add one invalid project to dashboard', () => {
       const spy = spyOnDependency(defaultActions, 'createFlash');
-      addTokens(1);
+      selectProjects(1);
       addInvalidProjects([0]);
 
       expect(spy).toHaveBeenCalledWith(`Unable to add mock-name. ${errorMessage}`);
@@ -215,7 +163,7 @@ describe('actions', () => {
 
     it('displays an error when user tries to add two invalid projects to dashboard', () => {
       const spy = spyOnDependency(defaultActions, 'createFlash');
-      addTokens(2);
+      selectProjects(2);
       addInvalidProjects([0, 1]);
 
       expect(spy).toHaveBeenCalledWith(`Unable to add mock-name and mock-name. ${errorMessage}`);
@@ -223,7 +171,7 @@ describe('actions', () => {
 
     it('displays an error when user tries to add more than two invalid projects to dashboard', () => {
       const spy = spyOnDependency(defaultActions, 'createFlash');
-      addTokens(3);
+      selectProjects(3);
       addInvalidProjects([0, 1, 2]);
 
       expect(spy).toHaveBeenCalledWith(
@@ -241,20 +189,16 @@ describe('actions', () => {
     });
   });
 
-  describe('addProjectToken', () => {
-    it('adds project token to state', done => {
+  describe('updateSelectedProjects', () => {
+    it(`updates the state's list of selected projects`, done => {
       testAction(
-        actions.addProjectToken,
-        mockOneProject,
+        actions.updateSelectedProjects,
+        mockProjects,
         null,
         [
           {
-            type: types.ADD_PROJECT_TOKEN,
-            payload: mockOneProject,
-          },
-          {
-            type: types.SET_INPUT_VALUE,
-            payload: '',
+            type: types.SET_SELECTED_PROJECTS,
+            payload: mockProjects,
           },
         ],
         [],
@@ -263,17 +207,21 @@ describe('actions', () => {
     });
   });
 
-  describe('clearProjectSearchResults', () => {
+  describe('clearSearchResults', () => {
     it('clears all project search results', done => {
       store.state.projectSearchResults = mockProjects;
 
       testAction(
-        actions.clearProjectSearchResults,
+        actions.clearSearchResults,
         null,
         store.state,
         [
           {
             type: types.SET_PROJECT_SEARCH_RESULTS,
+            payload: [],
+          },
+          {
+            type: types.SET_SELECTED_PROJECTS,
             payload: [],
           },
         ],
@@ -428,27 +376,6 @@ describe('actions', () => {
     });
   });
 
-  describe('removeProjectToken', () => {
-    it('removes project token', done => {
-      store.state.projectTokens = mockProjects;
-      const [{ id }] = store.state.projectTokens;
-
-      testAction(
-        actions.removeProjectTokenAt,
-        id,
-        store.state,
-        [
-          {
-            type: types.REMOVE_PROJECT_TOKEN_AT,
-            payload: 0,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('searchProjects', () => {
     const mockQuery = 'mock-query';
 
@@ -469,6 +396,14 @@ describe('actions', () => {
             payload: mockProjects,
           },
           {
+            type: types.SET_NO_RESULTS,
+            payload: false,
+          },
+          {
+            type: types.SET_SEARCH_ERROR,
+            payload: false,
+          },
+          {
             type: types.DECREMENT_PROJECT_SEARCH_COUNT,
             payload: 1,
           },
@@ -478,7 +413,7 @@ describe('actions', () => {
       );
     });
 
-    it('clears project search results on error', done => {
+    it('clears project search results on error and sets state.searchError = true', done => {
       mockAxios.onAny().replyOnce(500);
 
       testAction(
@@ -495,28 +430,16 @@ describe('actions', () => {
             payload: [],
           },
           {
+            type: types.SET_NO_RESULTS,
+            payload: false,
+          },
+          {
+            type: types.SET_SEARCH_ERROR,
+            payload: true,
+          },
+          {
             type: types.DECREMENT_PROJECT_SEARCH_COUNT,
             payload: 1,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setInputValue', () => {
-    it('sets input value', done => {
-      const mockValue = 'mock-value';
-
-      testAction(
-        actions.setInputValue,
-        mockValue,
-        null,
-        [
-          {
-            type: types.SET_INPUT_VALUE,
-            payload: mockValue,
           },
         ],
         [],

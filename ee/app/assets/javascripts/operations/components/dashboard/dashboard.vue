@@ -1,14 +1,19 @@
 <script>
+import _ from 'underscore';
 import { mapState, mapActions } from 'vuex';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlModal, GlLoadingIcon, GlModalDirective } from '@gitlab/ui';
+import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import DashboardProject from './project.vue';
-import ProjectSearch from './project_search.vue';
 
 export default {
   components: {
     DashboardProject,
-    ProjectSearch,
     GlLoadingIcon,
+    GlModal,
+    ProjectSelector,
+  },
+  directives: {
+    'gl-modal': GlModalDirective,
   },
   props: {
     addPath: {
@@ -28,10 +33,27 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      modalId: 'add-projects-modal',
+    };
+  },
   computed: {
-    ...mapState(['projects', 'projectTokens', 'isLoadingProjects']),
-    addIsDisabled() {
-      return !this.projectTokens.length;
+    ...mapState([
+      'projects',
+      'projectTokens',
+      'isLoadingProjects',
+      'selectedProjects',
+      'noResults',
+      'searchErrorMessage',
+      'projectSearchResults',
+      'searchCount',
+    ]),
+    isSearchingProjects() {
+      return this.searchCount > 0;
+    },
+    okDisabled() {
+      return _.isEmpty(this.selectedProjects);
     },
   },
   created() {
@@ -42,11 +64,30 @@ export default {
     this.fetchProjects();
   },
   methods: {
-    ...mapActions(['addProjectsToDashboard', 'fetchProjects', 'setProjectEndpoints']),
+    ...mapActions([
+      'searchProjects',
+      'addProjectsToDashboard',
+      'updateSelectedProjects',
+      'fetchProjects',
+      'setProjectEndpoints',
+      'clearSearchResults',
+      'toggleSelectedProject',
+    ]),
     addProjects() {
-      if (!this.addIsDisabled) {
-        this.addProjectsToDashboard();
-      }
+      this.addProjectsToDashboard();
+    },
+    onModalShown() {
+      this.clearSearchResults();
+      this.$refs.projectSelector.focusSearchInput();
+    },
+    onOk() {
+      this.addProjectsToDashboard();
+    },
+    searched(query) {
+      this.searchProjects(query);
+    },
+    projectClicked(project) {
+      this.toggleSelectedProject(project);
     },
   },
 };
@@ -54,23 +95,41 @@ export default {
 
 <template>
   <div class="operations-dashboard">
-    <div
-      class="page-title-holder flex-fill d-flex flex-column flex-md-row align-items-md-end align-items-stretch"
+    <gl-modal
+      :modal-id="modalId"
+      :title="s__('Add projects')"
+      :ok-title="s__('Add projects')"
+      :ok-disabled="okDisabled"
+      ok-variant="success"
+      @shown="onModalShown"
+      @ok="onOk"
     >
-      <div class="flex-fill append-right-20">
-        <h1 class="js-dashboard-title page-title text-nowrap">{{ __('Operations Dashboard') }}</h1>
-      </div>
-      <div class="d-flex flex-fill align-items-end append-bottom-default">
-        <project-search class="flex-grow-1" />
-        <button
-          :class="{ disabled: addIsDisabled }"
-          type="button"
-          class="js-add-projects-button btn btn-success prepend-left-8"
-          @click="addProjects"
-        >
-          {{ __('Add projects') }}
-        </button>
-      </div>
+      <project-selector
+        ref="projectSelector"
+        :project-search-results="projectSearchResults"
+        :selected-projects="selectedProjects"
+        :no-results="noResults && !searchErrorMessage"
+        @searched="searched"
+        @projectClicked="projectClicked"
+      />
+      <p v-if="searchErrorMessage" class="text-danger ml-2">
+        {{ __('Something went wrong, unable to search projects') }}
+      </p>
+      <gl-loading-icon v-if="isSearchingProjects" :size="2" class="py-2 px-4" />
+    </gl-modal>
+
+    <div class="page-title-holder flex-fill d-flex align-items-center">
+      <h1 class="js-dashboard-title page-title text-nowrap flex-fill">
+        {{ __('Operations Dashboard') }}
+      </h1>
+      <button
+        v-if="projects.length"
+        v-gl-modal="modalId"
+        type="button"
+        class="js-add-projects-button btn btn-success"
+      >
+        {{ __('Add projects') }}
+      </button>
     </div>
     <div class="prepend-top-default">
       <div v-if="projects.length" class="row m-0 prepend-top-default">
@@ -95,15 +154,19 @@ export default {
               s__(`OperationsDashboard|The operations dashboard provides a summary of each project's
               operational health, including pipeline and alert statuses.`)
             }}
+            <a :href="emptyDashboardHelpPath" class="js-documentation-link">
+              {{ __('More information') }}
+            </a>
           </span>
         </div>
         <div class="col-12">
-          <a
-            :href="emptyDashboardHelpPath"
-            class="js-documentation-link btn btn-primary prepend-top-default append-bottom-default"
+          <button
+            v-gl-modal="modalId"
+            type="button"
+            class="js-add-projects-button btn btn-success prepend-top-default append-bottom-default"
           >
-            {{ __('View documentation') }}
-          </a>
+            {{ __('Add projects') }}
+          </button>
         </div>
       </div>
       <gl-loading-icon v-else :size="2" class="prepend-top-20" />

@@ -5,31 +5,12 @@ import { mockProjectData } from '../mock_data';
 
 describe('mutations', () => {
   const projects = mockProjectData(1);
-  const [oneProject] = projects;
   const mockEndpoint = 'https://mock-endpoint';
   const mockSearches = new Array(5).fill(null);
   let localState;
 
   beforeEach(() => {
     localState = state();
-  });
-
-  describe('ADD_PROJECT_TOKEN', () => {
-    it('adds project token to projectTokens', () => {
-      mutations[types.ADD_PROJECT_TOKEN](localState, oneProject);
-
-      expect(localState.projectTokens[0]).toEqual(oneProject);
-    });
-  });
-
-  describe('INCREMENT_PROJECT_SEARCH_COUNT', () => {
-    it('adds search to searchCount', () => {
-      mockSearches.forEach(() => {
-        mutations[types.INCREMENT_PROJECT_SEARCH_COUNT](localState, 1);
-      });
-
-      expect(localState.searchCount).toBe(mockSearches.length);
-    });
   });
 
   describe('DECREMENT_PROJECT_SEARCH_COUNT', () => {
@@ -40,6 +21,16 @@ describe('mutations', () => {
       });
 
       expect(localState.searchCount).toBe(2);
+    });
+  });
+
+  describe('INCREMENT_PROJECT_SEARCH_COUNT', () => {
+    it('adds search to searchCount', () => {
+      mockSearches.forEach(() => {
+        mutations[types.INCREMENT_PROJECT_SEARCH_COUNT](localState, 1);
+      });
+
+      expect(localState.searchCount).toBe(mockSearches.length);
     });
   });
 
@@ -59,6 +50,14 @@ describe('mutations', () => {
     });
   });
 
+  describe('SET_SELECTED_PROJECTS', () => {
+    it('sets the list of selected projects', () => {
+      mutations[types.SET_SELECTED_PROJECTS](localState, projects);
+
+      expect(localState.selectedProjects).toBe(projects);
+    });
+  });
+
   describe('SET_PROJECT_SEARCH_RESULTS', () => {
     it('sets project search results', () => {
       mutations[types.SET_PROJECT_SEARCH_RESULTS](localState, projects);
@@ -75,12 +74,39 @@ describe('mutations', () => {
     });
   });
 
-  describe('REMOVE_PROJECT_TOKEN_AT', () => {
-    it('removes project token', () => {
-      localState.projectTokens = projects;
-      mutations[types.REMOVE_PROJECT_TOKEN_AT](localState, oneProject.id);
+  describe('SET_NO_RESULTS', () => {
+    it('sets the "no results" boolean', () => {
+      mutations[types.SET_NO_RESULTS](localState, true);
 
-      expect(localState.projectTokens.length).toBe(0);
+      expect(localState.noResults).toBe(true);
+
+      mutations[types.SET_NO_RESULTS](localState, false);
+
+      expect(localState.noResults).toBe(false);
+    });
+  });
+
+  describe('TOGGLE_IS_LOADING_PROJECTS', () => {
+    it('toggles the isLoadingProjects boolean', () => {
+      mutations[types.TOGGLE_IS_LOADING_PROJECTS](localState);
+
+      expect(localState.isLoadingProjects).toEqual(true);
+
+      mutations[types.TOGGLE_IS_LOADING_PROJECTS](localState);
+
+      expect(localState.isLoadingProjects).toEqual(false);
+    });
+  });
+
+  describe('SET_SEARCH_ERROR', () => {
+    it('sets the searchError boolean', () => {
+      mutations[types.SET_SEARCH_ERROR](localState, true);
+
+      expect(localState.searchError).toEqual(true);
+
+      mutations[types.SET_SEARCH_ERROR](localState, false);
+
+      expect(localState.searchError).toEqual(false);
     });
   });
 });

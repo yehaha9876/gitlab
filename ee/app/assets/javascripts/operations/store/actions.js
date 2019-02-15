@@ -3,36 +3,41 @@ import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { __, s__, n__, sprintf } from '~/locale';
 import * as types from './mutation_types';
+import _ from 'underscore';
 
 export const addProjectsToDashboard = ({ state, dispatch }) => {
   axios
     .post(state.projectEndpoints.add, {
-      project_ids: state.projectTokens.map(project => project.id),
+      project_ids: state.selectedProjects.map(project => project.id),
     })
     .then(response => dispatch('requestAddProjectsToDashboardSuccess', response.data))
     .catch(() => dispatch('requestAddProjectsToDashboardError'));
 };
 
-export const clearInputValue = ({ commit }) => {
-  commit(types.SET_INPUT_VALUE, '');
+export const toggleSelectedProject = ({ commit, state }, project) => {
+  const existingProjects = _.where(state.selectedProjects, { id: project.id });
+
+  if (_.isEmpty(existingProjects)) {
+    commit(types.SET_SELECTED_PROJECTS, state.selectedProjects.concat(project));
+  } else {
+    commit(types.SET_SELECTED_PROJECTS, _.without(state.selectedProjects, ...existingProjects));
+  }
 };
 
-export const clearProjectTokens = ({ commit }) => {
-  commit(types.SET_PROJECT_TOKENS, []);
+export const updateSelectedProjects = ({ commit }, projects) => {
+  commit(types.SET_SELECTED_PROJECTS, projects);
 };
 
-export const filterProjectTokensById = ({ commit, state }, ids) => {
-  const tokens = state.projectTokens.filter(token => ids.includes(token.id));
-  commit(types.SET_PROJECT_TOKENS, tokens);
+export const clearSearchResults = ({ commit }) => {
+  commit(types.SET_PROJECT_SEARCH_RESULTS, []);
+  commit(types.SET_SELECTED_PROJECTS, []);
 };
 
 export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) => {
   const { added, invalid } = data;
 
-  dispatch('clearInputValue');
-
   if (invalid.length) {
-    const projectNames = state.projectTokens.reduce((accumulator, project) => {
+    const projectNames = state.selectedProjects.reduce((accumulator, project) => {
       if (invalid.includes(project.id)) {
         accumulator.push(project.name);
       }
@@ -54,9 +59,6 @@ export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) 
         { invalidProjects },
       ),
     );
-    dispatch('filterProjectTokensById', invalid);
-  } else {
-    dispatch('clearProjectTokens');
   }
 
   if (added.length) {
@@ -67,18 +69,9 @@ export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) 
 export const requestAddProjectsToDashboardError = ({ state }) => {
   createFlash(
     sprintf(__('Something went wrong, unable to add %{project} to dashboard'), {
-      project: n__('project', 'projects', state.projectTokens.length),
+      project: n__('project', 'projects', state.selectedProjects.length),
     }),
   );
-};
-
-export const addProjectToken = ({ commit }, project) => {
-  commit(types.ADD_PROJECT_TOKEN, project);
-  commit(types.SET_INPUT_VALUE, '');
-};
-
-export const clearProjectSearchResults = ({ commit }) => {
-  commit(types.SET_PROJECT_SEARCH_RESULTS, []);
 };
 
 export const fetchProjects = ({ state, dispatch }) => {
@@ -119,25 +112,30 @@ export const requestRemoveProjectError = () => {
   createFlash(__('Something went wrong, unable to remove project'));
 };
 
-export const removeProjectTokenAt = ({ commit }, index) => {
-  commit(types.REMOVE_PROJECT_TOKEN_AT, index);
-};
-
 export const searchProjects = ({ commit }, query) => {
-  commit(types.INCREMENT_PROJECT_SEARCH_COUNT, 1);
+  if (!query) {
+    commit(types.SET_PROJECT_SEARCH_RESULTS, []);
+    commit(types.SET_NO_RESULTS, false);
+    commit(types.SET_SEARCH_ERROR, false);
+  } else {
+    commit(types.INCREMENT_PROJECT_SEARCH_COUNT, 1);
 
-  Api.projects(query, {})
-    .then(data => data)
-    .catch(() => [])
-    .then(results => {
-      commit(types.SET_PROJECT_SEARCH_RESULTS, results);
-      commit(types.DECREMENT_PROJECT_SEARCH_COUNT, 1);
-    })
-    .catch(() => {});
-};
+    Api.projects(query, {})
+      .then(results => {
+        commit(types.SET_PROJECT_SEARCH_RESULTS, results);
 
-export const setInputValue = ({ commit }, value) => {
-  commit(types.SET_INPUT_VALUE, value);
+        const noResults = results.length === 0 && query.length > 0;
+        commit(types.SET_NO_RESULTS, noResults);
+        commit(types.SET_SEARCH_ERROR, false);
+        commit(types.DECREMENT_PROJECT_SEARCH_COUNT, 1);
+      })
+      .catch(() => {
+        commit(types.SET_PROJECT_SEARCH_RESULTS, []);
+        commit(types.SET_NO_RESULTS, false);
+        commit(types.SET_SEARCH_ERROR, true);
+        commit(types.DECREMENT_PROJECT_SEARCH_COUNT, 1);
+      });
+  }
 };
 
 export const setProjectEndpoints = ({ commit }, endpoints) => {
