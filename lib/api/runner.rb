@@ -95,10 +95,6 @@ module API
           optional :url, type: String, desc: %q(Session's url)
           optional :certificate, type: String, desc: %q(Session's certificate)
           optional :authorization, type: String, desc: %q(Session's authorization)
-          optional :services, type: Array, desc: %q(Session's list of external services) do
-            requires :name, type: String, desc: %q(Session's external service name)
-            requires :port, type: Integer, desc: %q(Session's external service port)
-          end
         end
       end
       post '/request' do
