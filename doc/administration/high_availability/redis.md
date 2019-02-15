@@ -333,6 +333,10 @@ The prerequisites for a HA Redis setup are the following:
     # Port of master Redis server, uncomment to change to non default. Defaults
     # to `6379`.
     #redis['master_port'] = 6379
+
+    # Enable monitoring
+    node_exporter['listen_address'] = '0.0.0.0:9100'
+    redis_exporter['listen_address'] = '0.0.0.0:9121'
     ```
 
 1. To prevent reconfigure from running automatically on upgrade, run:

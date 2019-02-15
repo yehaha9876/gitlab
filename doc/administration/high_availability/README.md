@@ -43,6 +43,7 @@ complexity.
 - [Redis](redis.md) - Key/Value store (User sessions, cache, queue for Sidekiq)
   - Sentinel - Redis health check/failover manager
 - Gitaly - Provides high-level RPC access to Git repositories
+- [Prometheus Monitoring](monitoring.md) - Metrics-based monitoring and alerting.
 
 ## Scalable Architecture Examples
 
@@ -176,4 +177,5 @@ separately:
    1. [NFS Client and Host setup](nfs_host_client_setup.md)
 1. [Configure the GitLab application servers](gitlab.md)
 1. [Configure the load balancers](load_balancer.md)
+1. [Configure the monitoring](monitoring.md)
 

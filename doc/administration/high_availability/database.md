@@ -305,6 +305,11 @@ check the [Troubleshooting section](#troubleshooting) before proceeding.
     consul['configuration'] = {
       retry_join: %w(Y.Y.Y.Y consul1.gitlab.example.com Z.Z.Z.Z)
     }
+
+    # Enable monitoring:
+    node_exporter['listen_address'] = '0.0.0.0:9100'
+    postgres_exporter['listen_address'] = '0.0.0.0:9187'
+
     #
     # END user configuration
     ```
@@ -482,6 +487,11 @@ Check the [Troubleshooting section](#troubleshooting) before proceeding.
     consul['configuration'] = {
       retry_join: %w(Y.Y.Y.Y consul1.gitlab.example.com Z.Z.Z.Z)
     }
+
+    # Enable monitoring:
+    node_exporter['listen_address'] = '0.0.0.0:9100'
+    pgbouncer_exporter['listen_address'] = '0.0.0.0:9188'
+
     #
     # END user configuration
     ```
