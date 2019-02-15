@@ -1374,17 +1374,17 @@ module API
         expose :name, :script, :timeout, :when, :allow_failure
       end
 
-      class Image < Grape::Entity
-        expose :name, :entrypoint
-      end
-
       class Port < Grape::Entity
         expose :externalport, :internalport, :ssl
       end
 
+      class Image < Grape::Entity
+        expose :name, :entrypoint
+        expose :ports, using: Port
+      end
+
       class Service < Image
         expose :alias, :command
-        expose :ports, using: Port
       end
 
       class Artifacts < Grape::Entity

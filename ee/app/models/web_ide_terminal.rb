@@ -28,6 +28,10 @@ class WebIdeTerminal
     terminal_project_job_path(project, build, format: :ws)
   end
 
+  def proxy_path
+    web_ide_terminal_route_generator(:proxy)
+  end
+
   private
 
   def web_ide_terminal_route_generator(action)

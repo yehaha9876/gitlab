@@ -21,7 +21,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         member do
           post :cancel
           post :retry
-          match '/service/authorize', to: 'web_ide_services#service_authorize', constraints: { format: nil }, via: :all
+          match '/proxy/authorize', to: 'web_ide_services#proxy_authorize', constraints: { format: nil }, via: :all
+          match :proxy, constraints: { format: nil }, via: :all
           # get '/service/authorize', to: 'web_ide_terminals#service_authorize', constraints: { format: nil }
         end
 

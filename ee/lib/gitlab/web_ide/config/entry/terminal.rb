@@ -41,10 +41,7 @@ module Gitlab
           entry :variables, ::Gitlab::Ci::Config::Entry::Variables,
             description: 'Environment variables available for this job.'
 
-          entry :ports, ::Gitlab::Ci::Config::Entry::Ports,
-            description: 'Ports used expose the build'
-
-          helpers :before_script, :script, :image, :variables, :services, :ports
+          helpers :before_script, :script, :image, :variables, :services
 
           attributes :tags
 

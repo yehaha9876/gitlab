@@ -9,8 +9,9 @@ module Gitlab
         #
         class Image < ::Gitlab::Config::Entry::Node
           include ::Gitlab::Config::Entry::Validatable
+          include ::Gitlab::Config::Entry::Configurable
 
-          ALLOWED_KEYS = %i[name entrypoint].freeze
+          ALLOWED_KEYS = %i[name entrypoint ports].freeze
 
           validations do
             validates :config, hash_or_string: true
@@ -19,6 +20,11 @@ module Gitlab
             validates :name, type: String, presence: true
             validates :entrypoint, array_of_strings: true, allow_nil: true
           end
+
+          entry :ports, Entry::Ports,
+            description: 'Ports used expose the service'
+
+          helpers :ports
 
           def name
             value[:name]

@@ -6,15 +6,15 @@ class Projects::WebIdeServicesController < Projects::ApplicationController
   before_action :authenticate_user!
   before_action :build
   before_action :authorize_update_web_ide_terminal!
-  before_action :verify_api_request!, only: :service_authorize
+  before_action :verify_api_request!, only: :proxy_authorize
 
-  def service_authorize
-    set_workhorse_internal_api_content_type
-    render json: webide_service(build.service_specification(port: service_port, requested_url: params["requested_uri"]))
+  # NOOP
+  def proxy
   end
 
-  def service_port
-    SERVICE_PORT
+  def proxy_authorize
+    set_workhorse_internal_api_content_type
+    render json: webide_service(build.service_specification(port: SERVICE_PORT, requested_url: params["requested_uri"]))
   end
 
   private

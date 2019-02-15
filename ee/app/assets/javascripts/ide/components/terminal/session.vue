@@ -33,14 +33,14 @@ export default {
     test() {
       axios({
         method: $('#request_method').val(),
-        url: this.session.retryPath.replace("retry", "service"),
+        url: this.session.proxyPath,
         params: {
           requested_uri: $("input.requesteduri").val(),
         }
       });
     },
     testws() {
-      axios.get(this.session.retryPath.replace("retry", "serviceaws"))
+      axios.get(this.session.proxy.replace("retry", "serviceaws"))
       // new WebSocket($('#wssurl').val());
     }
   },

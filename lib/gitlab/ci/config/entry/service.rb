@@ -9,7 +9,6 @@ module Gitlab
         #
         class Service < Image
           include ::Gitlab::Config::Entry::Validatable
-          include ::Gitlab::Config::Entry::Configurable
 
           ALLOWED_KEYS = %i[name entrypoint command alias ports].freeze
 
@@ -22,11 +21,6 @@ module Gitlab
             validates :command, array_of_strings: true, allow_nil: true
             validates :alias, type: String, allow_nil: true
           end
-
-          entry :ports, Entry::Ports,
-            description: 'Ports used expose the service'
-
-          helpers :ports
 
           def alias
             value[:alias]
