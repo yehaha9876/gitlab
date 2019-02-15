@@ -2,8 +2,8 @@
 /**
  * Render environments table.
  */
-import { chain } from 'underscore';
 import { GlLoadingIcon } from '@gitlab/ui';
+import { chain } from 'underscore';
 import environmentItem from './environment_item.vue'; // eslint-disable-line import/order
 
 // ee-only start
@@ -78,10 +78,27 @@ export default {
       return env.isFolder && env.isOpen && env.children && env.children.length > 0;
     },
     sortEnvironments(environments) {
+      /*
+       * The sorting algorithm should sort in the following priorities:
+       *
+       * 1. folders first,
+       * 2. last updated descending,
+       * 3. by name ascending,
+       *
+       * the sorting algorithm must:
+       *
+       * 1. Sort by name ascending,
+       * 2. Reverse (sort by name descending),
+       * 3. Sort by last deployment ascending,
+       * 4. Reverse (last deployment descending, name ascending),
+       * 5. Put folders first.
+       */
       return chain(environments)
         .sortBy(env => (env.isFolder ? env.folderName : env.name))
-        .sortBy(env => (env.last_deployment ? env.last_deployment.created_at : Math.Infinity))
-        .sortBy('isFolder')
+        .reverse()
+        .sortBy(env => (env.last_deployment ? env.last_deployment.created_at : '0000'))
+        .reverse()
+        .sortBy(env => (env.isFolder ? -1 : 1))
         .value();
     },
     // ee-only start
