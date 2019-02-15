@@ -20,7 +20,7 @@ describe Projects::Prometheus::AlertsController do
     end
 
     it 'returns not_found' do
-      subject
+      make_request
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
@@ -30,30 +30,30 @@ describe Projects::Prometheus::AlertsController do
     set(:other) { create(:environment) }
 
     it "returns #{status}" do
-      subject(environment_id: other)
+      make_request(environment_id: other)
 
       expect(response).to have_gitlab_http_status(status)
     end
   end
 
   shared_examples 'project non-specific metric' do |status|
-    set(:other) { create(:prometheus_metric) }
+    set(:other) { create(:prometheus_alert) }
 
     it "returns #{status}" do
-      subject(id: other.id)
+      make_request(id: other.prometheus_metric_id)
 
       expect(response).to have_gitlab_http_status(status)
     end
   end
 
   describe 'GET #index' do
-    def subject(opts = {})
+    def make_request(opts = {})
       get :index, params: request_params(opts, environment_id: environment)
     end
 
     context 'when project has no prometheus alert' do
       it 'returns an empty response' do
-        subject
+        make_request
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_empty
@@ -74,7 +74,7 @@ describe Projects::Prometheus::AlertsController do
       end
 
       it 'contains prometheus alerts only for the production environment' do
-        subject(environment_id: production)
+        make_request(environment_id: production)
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response.count).to eq(2)
@@ -82,7 +82,7 @@ describe Projects::Prometheus::AlertsController do
       end
 
       it 'contains prometheus alerts only for the staging environment' do
-        subject(environment_id: staging)
+        make_request(environment_id: staging)
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response.count).to eq(1)
@@ -90,7 +90,7 @@ describe Projects::Prometheus::AlertsController do
       end
 
       it 'does not return prometheus alerts without environment' do
-        subject(environment_id: nil)
+        make_request(environment_id: nil)
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_empty
@@ -99,8 +99,12 @@ describe Projects::Prometheus::AlertsController do
       context 'with project non-specific environment' do
         let(:other) { create(:environment) }
 
+        before do
+          create(:prometheus_alert, project: other.project, environment: other)
+        end
+
         it 'does not return prometheus alerts' do
-          subject(environment_id: other)
+          make_request(environment_id: other)
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to be_empty
@@ -119,8 +123,9 @@ describe Projects::Prometheus::AlertsController do
              prometheus_metric: metric)
     end
 
-    def subject(opts = {})
-      get :show, params: request_params(opts,
+    def make_request(opts = {})
+      get :show, params: request_params(
+        opts,
         id: alert.prometheus_metric_id,
         environment_id: environment
       )
@@ -128,7 +133,7 @@ describe Projects::Prometheus::AlertsController do
 
     context 'when alert does not exist' do
       it 'returns not_found' do
-        subject(id: 0)
+        make_request(id: 0)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -147,7 +152,7 @@ describe Projects::Prometheus::AlertsController do
       end
 
       it 'renders the alert' do
-        subject
+        make_request
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to include(alert_params)
@@ -226,8 +231,9 @@ describe Projects::Prometheus::AlertsController do
       }
     end
 
-    def subject(opts = {})
-      post :create, params: request_params(opts,
+    def make_request(opts = {})
+      post :create, params: request_params(
+        opts,
         operator: '>',
         threshold: '1',
         environment_id: environment,
@@ -239,7 +245,7 @@ describe Projects::Prometheus::AlertsController do
       allow(::Clusters::Applications::ScheduleUpdateService)
         .to receive(:new).and_return(schedule_update_service)
 
-      subject
+      make_request
 
       expect(schedule_update_service).to have_received(:execute)
       expect(response).to have_gitlab_http_status(:ok)
@@ -247,7 +253,7 @@ describe Projects::Prometheus::AlertsController do
     end
 
     it 'returns no_content for an invalid metric' do
-      subject(prometheus_metric_id: 'invalid')
+      make_request(prometheus_metric_id: 'invalid')
 
       expect(response).to have_gitlab_http_status(:no_content)
     end
@@ -282,8 +288,9 @@ describe Projects::Prometheus::AlertsController do
         .to receive(:new).and_return(schedule_update_service)
     end
 
-    def subject(opts = {})
-      put :update, params: request_params(opts,
+    def make_request(opts = {})
+      put :update, params: request_params(
+        opts,
         id: alert.prometheus_metric_id,
         operator: '<',
         environment_id: alert.environment
@@ -291,9 +298,8 @@ describe Projects::Prometheus::AlertsController do
     end
 
     it 'updates an already existing prometheus alert' do
-      expect do
-        subject(operator: '<')
-      end.to change { alert.reload.operator }.to('lt')
+      expect { make_request(operator: '<') }
+        .to change { alert.reload.operator }.to('lt')
 
       expect(schedule_update_service).to have_received(:execute)
       expect(response).to have_gitlab_http_status(:ok)
@@ -317,17 +323,16 @@ describe Projects::Prometheus::AlertsController do
         .to receive(:new).and_return(schedule_update_service)
     end
 
-    def subject(opts = {})
-      delete :destroy, params: request_params(opts,
+    def make_request(opts = {})
+      delete :destroy, params: request_params(
+        opts,
         id: alert.prometheus_metric_id,
         environment_id: alert.environment
       )
     end
 
     it 'destroys the specified prometheus alert' do
-      expect do
-        subject
-      end.to change { PrometheusAlert.count }.from(1).to(0)
+      expect { make_request }.to change { PrometheusAlert.count }.by(-1)
 
       expect(schedule_update_service).to have_received(:execute)
     end
