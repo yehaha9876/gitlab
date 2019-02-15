@@ -23,6 +23,24 @@ describe EE::FeatureFlags::UpdateService do
       it { expect(returned_feature_flag).to be_valid }
     end
 
+    context 'when changing name' do
+      let(:params) { { name: 'new_name' } }
+      include_examples 'successfully updates'
+      it { expect { subject }.to change { AuditEvent.count }.by(1) }
+
+      it 'creates audit event' do
+        name_before = feature_flag.name
+        subject
+        expect(AuditEvent.last.details).to(
+          include(
+            update_feature_flag_name: feature_flag.name,
+            from: name_before,
+            to: 'new_name'
+          )
+        )
+      end
+    end
+
     context 'when add scope' do
       let(:params) do
         {

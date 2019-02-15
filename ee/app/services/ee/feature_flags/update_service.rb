@@ -15,6 +15,8 @@ module EE
           success = @flag.update(@params)
           next false, @flag unless success
 
+          log_changed_attributes(@flag)
+
           scopes_after = scopes_to_hash(@flag)
           log_changed_scopes(scopes_before, scopes_after)
 
@@ -42,6 +44,16 @@ module EE
             log_changed_scope(:created, scope, active)
           else
             log_changed_scope(:updated, scope, active) if scopes_before[scope] != active
+          end
+        end
+      end
+
+      LOGGED_ATTRIBUTES = [:name, :description].freeze
+
+      def log_changed_attributes(flag)
+        LOGGED_ATTRIBUTES.each do |attribute_name|
+          if (changes = flag.previous_changes[attribute_name])
+            log_audit_event("update_feature_flag_#{attribute_name}".to_sym, from: changes.first, to: changes.second)
           end
         end
       end
