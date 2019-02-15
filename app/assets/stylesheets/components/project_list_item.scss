@@ -1,0 +1,22 @@
+.project-list-item {
+  border: 0;
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .selected-icon {
+    top: 0;
+  }
+}
+
+// When housed inside a modal, the edge of each item
+// should extend to the edge of the modal.
+.modal-body {
+  .project-list-item {
+    border-radius: 0;
+    margin-left: -$gl-padding;
+    margin-right: -$gl-padding;
+  }
+}
