@@ -1214,7 +1214,7 @@ DEPENDENCIES
   version_sorter (~> 2.1.0)
   virtus (~> 1.0.1)
   vmstat (~> 2.3.0)
-  webmock (~> 3.5.0)
+  webmock (~> 3.5.1)
   webpack-rails (~> 0.9.10)
   wikicloth (= 0.8.1)
 
