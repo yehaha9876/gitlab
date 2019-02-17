@@ -34,6 +34,14 @@ describe Projects::Prometheus::AlertsController do
 
       expect(response).to have_gitlab_http_status(status)
     end
+
+    if status == :ok
+      it 'returns no prometheus alerts' do
+        make_request(environment_id: other)
+
+        expect(json_response).to be_empty
+      end
+    end
   end
 
   shared_examples 'project non-specific metric' do |status|
@@ -95,24 +103,10 @@ describe Projects::Prometheus::AlertsController do
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_empty
       end
-
-      context 'with project non-specific environment' do
-        let(:other) { create(:environment) }
-
-        before do
-          create(:prometheus_alert, project: other.project, environment: other)
-        end
-
-        it 'does not return prometheus alerts' do
-          make_request(environment_id: other)
-
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response).to be_empty
-        end
-      end
     end
 
     it_behaves_like 'unlicensed'
+    it_behaves_like 'project non-specific environment', :ok
   end
 
   describe 'GET #show' do
