@@ -105,8 +105,24 @@ module Gitlab
       def base_headers
         @base_headers ||= {
           'Geo-GL-Id' => gl_id,
-          'Authorization' => Gitlab::Geo::BaseRequest.new.authorization
+          'Authorization' => scoped_authorization
         }
+      end
+
+      def scoped_authorization
+        Gitlab::Geo::BaseRequest.new(scope: repository_scope).authorization
+      end
+
+      def repository_scope
+        ::Gitlab::Geo::JwtRequestDecoder.build_repository_scope(repository_type, gl_id)
+      end
+
+      def wiki?
+        primary_repo.end_with?('wiki.git')
+      end
+
+      def repository_type
+        wiki? ? 'wiki' : 'repository'
       end
 
       def get(url, headers)
