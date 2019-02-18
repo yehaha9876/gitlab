@@ -120,9 +120,11 @@ To specify a variable in a query, enclose it in curly braces with a leading perc
 
 ### Setting up alerts for Prometheus metrics **[ULTIMATE]**
 
+#### Managed Prometheus instances
+
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](#adding-additional-metrics), and 11.3 for [library metrics](prometheus_library/metrics.md).
 
-Alerts can be configured for [metricss](#adding-additional-metrics) directly in the performance dashboard.
+For Prometheus instances managed using auto configuration, alerts can be configured for [metrics](#adding-additional-metrics) directly in the performance dashboard.
 
 To set an alert, click on the alarm icon in the top right corner of the metric you want to create the alert for. A dropdown
 will appear, with options to set the threshold and operator. Click **Add** to save and activate the alert.
@@ -133,6 +135,12 @@ If the metric exceeds the threshold of the alert for over 5 minutes, an email
 will be sent to all [Maintainers and Owners](../../permissions.md#project-members-permissions) of the project.
 
 To remove the alert, click back on the alert icon for the desired metric, and click **Delete**.
+
+#### External Prometheus instances
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/9258) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.8.
+
+For manually configured Prometheus servers, a notify endpoint is provided to use with Prometheus webhooks. If you have manual configuration enabled, an Alerts section is added to the Prometheus Settings page. This contains the URL and Authorization Key, which can be copied to your Prometheus webhook config file. The Reset Key button will invalidate the key and generate a new one.
 
 ## Determining the performance impact of a merge
 
