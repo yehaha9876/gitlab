@@ -109,6 +109,7 @@ export default {
       :component="$options.componentNames.LicenseIssueBody"
       :class="reportSectionClass"
       :always-open="alwaysOpen"
+      :show-status-icons="canManageLicenses"
       class="license-report-widget mr-report"
     >
       <div v-if="showActionButtons" slot="actionButtons" class="append-right-default">

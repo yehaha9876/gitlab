@@ -73,6 +73,11 @@ export default {
       default: () => ({}),
       required: false,
     },
+    showStatusIcons: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
 
   data() {
@@ -166,6 +171,7 @@ export default {
           :resolved-issues="resolvedIssues"
           :neutral-issues="neutralIssues"
           :component="component"
+          :show-status-icons="showStatusIcons"
         />
       </slot>
     </div>
