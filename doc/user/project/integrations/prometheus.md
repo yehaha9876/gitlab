@@ -142,16 +142,18 @@ To remove the alert, click back on the alert icon for the desired metric, and cl
 
 For manually configured Prometheus servers, a notify endpoint is provided to use with Prometheus webhooks. If you have manual configuration enabled, an **Alerts** section is added to **Settings > Integrations > Prometheus**. This contains the *URL* and *Authorization Key*. The **Reset Key** button will invalidate the key and generate a new one.
 
-Copy the *URL* and *Authorization Key* into the [`webhook_configs`](https://prometheus.io/docs/alerting/configuration/#webhook_config) section your Prometheus Alertmanager configuration:
+![Prometheus service configuration of Alerts](img/prometheus_service_alerts.png)
+
+Copy the *URL* and *Authorization Key* into the [`webhook_configs`](https://prometheus.io/docs/alerting/configuration/#webhook_config) section of your Prometheus Alertmanager configuration:
 
 ```yaml
     receivers:
       name: gitlab
       webhook_configs:
       - http_config:
-          bearer_token: AUTHORIZATION_KEY
+          bearer_token: 9e1cbfcd546896a9ea8be557caf13a76
         send_resolved: true
-        url: URL
+        url: http://192.168.178.31:3001/root/manual_prometheus/prometheus/alerts/notify.json
       ...
 ```
 
