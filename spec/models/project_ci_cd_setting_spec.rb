@@ -3,6 +3,12 @@
 require 'spec_helper'
 
 describe ProjectCiCdSetting do
+  describe 'default_value_for' do
+    it 'has false by default' do
+      expect(described_class.new.merge_pipelines_enabled).to be_falsy
+    end
+  end
+
   describe '.available?' do
     before do
       described_class.reset_column_information

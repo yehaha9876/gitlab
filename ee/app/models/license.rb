@@ -75,6 +75,7 @@ class License < ActiveRecord::Base
     feature_flags
     batch_comments
     issues_analytics
+    merge_pipelines
   ].freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
