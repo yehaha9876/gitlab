@@ -196,7 +196,7 @@ describe('vulnerabilities module mutations', () => {
     let state;
 
     beforeEach(() => {
-      state =  createState()
+      state = createState();
     });
 
     it('should set the vulnerabilitiesHistoryDayRange to number of days', () => {

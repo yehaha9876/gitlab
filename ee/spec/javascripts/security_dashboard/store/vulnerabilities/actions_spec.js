@@ -710,7 +710,7 @@ describe('vulnerabilities history actions', () => {
   });
 
   describe('setVulnerabilitiesHistoryDayRange', () => {
-    it('should commit the correct day range', done => {
+    it('should commit the number of past days to show', done => {
       const state = initialState;
       const days = DAYS.THIRTY;
       testAction(
