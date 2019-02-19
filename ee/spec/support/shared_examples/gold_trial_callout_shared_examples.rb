@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-shared_examples 'gold trial callout' do
+shared_examples 'dashboard gold trial callout' do
   before do
     sign_in(user)
   end
@@ -53,6 +53,61 @@ shared_examples 'gold trial callout' do
 
       visit page_path
 
+      expect(page).not_to have_selector '.promotion-callout'
+    end
+  end
+end
+
+shared_examples 'billings gold trial callout' do
+  context 'on a free plan' do
+    let(:plan) { nil }
+
+    before do
+      allow_any_instance_of(EE::Namespace).to receive(:plan).and_return(plan)
+
+      visit page_path
+    end
+
+    it 'renders an undismissable gold trial callout' do
+      expect(page).to have_selector '.promotion-callout'
+      expect(page).not_to have_selector '.js-close'
+    end
+  end
+
+  context "on a plan that isn't gold", :js do
+    let(:plans) { { bronze: create(:bronze_plan), silver: create(:silver_plan) } }
+
+    where(case_names: ->(plan_type) {"like #{plan_type}"}, plan_type: [:bronze, :silver])
+
+    with_them do
+      let(:plan) { plans[plan_type] }
+
+      before do
+        allow_any_instance_of(EE::Namespace).to receive(:plan).and_return(plan)
+
+        visit page_path
+      end
+
+      it 'renders a dismissable gold trial callout' do
+        expect(page).to have_selector '.promotion-callout'
+
+        find('.js-close').click
+
+        expect(page).not_to have_selector '.promotion-callout'
+      end
+    end
+  end
+
+  context 'on a gold plan' do
+    set(:plan) { create(:gold_plan) }
+
+    before do
+      allow_any_instance_of(EE::Namespace).to receive(:plan).and_return(plan)
+
+      visit page_path
+    end
+
+    it "doesn't render a gold trial callout" do
       expect(page).not_to have_selector '.promotion-callout'
     end
   end
