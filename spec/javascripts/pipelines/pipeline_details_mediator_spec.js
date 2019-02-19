@@ -2,7 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import PipelineMediator from '~/pipelines/pipeline_details_mediator';
 
-describe('PipelineMdediator', () => {
+describe('PipelineMediator', () => {
   let mediator;
   let mock;
 

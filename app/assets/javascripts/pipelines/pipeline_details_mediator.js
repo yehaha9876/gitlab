@@ -3,7 +3,7 @@ import Flash from '../flash';
 import Poll from '../lib/utils/poll';
 import { __ } from '../locale';
 import PipelineService from '~/pipelines/services/pipeline_service';
-import PipelineStore from 'ee/pipelines/stores/pipeline_store'; // eslint-disable-line import/order
+import PipelineStore from '~/pipelines/stores/pipeline_store';
 
 export default class pipelinesMediator {
   constructor(options = {}) {
