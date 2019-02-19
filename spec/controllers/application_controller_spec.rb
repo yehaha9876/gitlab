@@ -461,7 +461,7 @@ describe ApplicationController do
     end
 
     it 'does log correlation id' do
-      Gitlab::CorrelationId.use_id('new-id') do
+      Labkit::Correlation::CorrelationId.use_id('new-id') do
         get :index
       end
 

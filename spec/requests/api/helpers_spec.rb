@@ -299,7 +299,7 @@ describe API::Helpers do
         correlation_id: 'new-correlation-id'
       }, extra: {})
 
-      Gitlab::CorrelationId.use_id('new-correlation-id') do
+      Labkit::Correlation::CorrelationId.use_id('new-correlation-id') do
         handle_api_exception(exception)
       end
     end
