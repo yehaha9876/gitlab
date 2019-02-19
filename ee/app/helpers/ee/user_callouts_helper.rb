@@ -2,35 +2,17 @@
 
 module EE
   module UserCalloutsHelper
-    GOLD_TRIAL = 'gold_trial'
+    include GoldTrialUserCalloutsHelper
+
     GEO_ENABLE_HASHED_STORAGE = 'geo_enable_hashed_storage'
     GEO_MIGRATE_HASHED_STORAGE = 'geo_migrate_hashed_storage'
     CANARY_DEPLOYMENT = 'canary_deployment'
-
-    def show_gold_trial?(user = current_user)
-      return false unless user
-      return false if user_dismissed?(GOLD_TRIAL)
-      return false unless show_gold_trial_suitable_env?
-
-      users_namespaces_clean?(user)
-    end
 
     def show_canary_deployment_callout?(project)
       !user_dismissed?(CANARY_DEPLOYMENT) &&
         show_promotions? &&
         # use :canary_deployments if we create a feature flag for it in the future
         !project.feature_available?(:deploy_board)
-    end
-
-    def show_gold_trial_suitable_env?
-      (::Gitlab.com? || Rails.env.development?) &&
-        !::Gitlab::Database.read_only?
-    end
-
-    def users_namespaces_clean?(user)
-      return false if user.any_namespace_with_gold?
-
-      !user.any_namespace_with_trial?
     end
 
     def render_enable_hashed_storage_warning

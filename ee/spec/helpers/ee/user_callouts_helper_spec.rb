@@ -15,13 +15,13 @@ describe EE::UserCalloutsHelper do
     end
 
     it 'returns true when all conditions are met' do
-      expect(helper.show_gold_trial?(user)).to be(true)
+      expect(helper.send(:show_gold_trial?, user)).to be(true)
     end
 
     it 'returns false when there is no user record' do
       allow(helper).to receive(:current_user).and_return(nil)
 
-      expect(helper.show_gold_trial?).to be(false)
+      expect(helper.send(:show_gold_trial?, nil)).to be(false)
     end
   end
 
