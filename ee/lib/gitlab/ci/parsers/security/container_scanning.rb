@@ -33,22 +33,23 @@ module Gitlab
               # We only report unapproved vulnerabilities
               next unless unapproved.include?(vulnerability['vulnerability'])
 
-              results.append(format_vulnerability(vulnerability))
+              results.append(format_vulnerability(vulnerability, data['image']))
             end
 
             results
           end
 
-          def format_vulnerability(vulnerability)
+          def format_vulnerability(vulnerability, image)
             {
               'category' => 'container_scanning',
-              'message' => name(vulnerability),
-              'description' => vulnerability['description'],
+              'message' => message(vulnerability),
+              'description' => description(vulnerability),
               'cve' => vulnerability['vulnerability'],
               'severity' => translate_severity(vulnerability['severity']),
               'solution' => solution(vulnerability),
               'confidence' => 'Medium',
               'location' => {
+                'image' => image,
                 'operating_system' => vulnerability["namespace"],
                 'dependency' => {
                   'package' => {
@@ -88,14 +89,31 @@ module Gitlab
           end
 
           def solution(vulnerability)
-            if vulnerability['fixedby'].present?
-              "Upgrade to version #{vulnerability['fixedby']}"
-            end
+            return if vulnerability['fixedby'].blank?
+
+            return "Upgrade to #{vulnerability['fixedby']}" if vulnerability['featurename'].blank?
+
+            return "Upgrade #{vulnerability['featurename']} to #{vulnerability['fixedby']}" if vulnerability['featureversion'].blank?
+
+            return "Upgrade #{vulnerability['featurename']} from #{vulnerability['featureversion']} to #{vulnerability['fixedby']}"
           end
 
-          def name(vulnerability)
-            # Name is package name and the CVE is is affected by.
-            "#{vulnerability['featurename']} - #{vulnerability['vulnerability']}"
+          def message(vulnerability)
+            return vulnerability['vulnerability'] if vulnerability['featurename'].blank?
+
+            "#{vulnerability['vulnerability']} in #{vulnerability['featurename']}"
+          end
+
+          def description(vulnerability)
+            return vulnerability['description'] unless vulnerability['description'].blank?
+
+            suffix = "is affected by #{vulnerability['vulnerability']}"
+
+            return "#{vulnerability['namespace']} #{suffix}" if vulnerability['featurename'].blank?
+
+            return "#{vulnerability['featurename']} #{suffix}" if vulnerability['featureversion'].blank?
+
+            "#{vulnerability['featurename']}:#{vulnerability['featureversion']} #{suffix}"
           end
 
           def generate_location_fingerprint(location)

@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Gitlab::Ci::Parsers::Security::ContainerScanning do
   let(:parser) { described_class.new }
 
-  let(:zap_vulnerabilities) do
+  let(:clair_vulnerabilities) do
     JSON.parse!(
       File.read(
         Rails.root.join('spec/fixtures/security-reports/master/gl-container-scanning-report.json')
@@ -40,13 +40,18 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
     it "generates expected metadata_version" do
       expect(report.occurrences.first[:metadata_version]).to eq('1.3')
     end
+
+    it "adds report image's name to raw_metadata" do
+      expect(JSON.parse(report.occurrences.first[:raw_metadata]).dig('location', 'image'))
+        .to eq('registry.gitlab.com/groulot/container-scanning-test/master:5f21de6956aee99ddb68ae49498662d9872f50ff')
+    end
   end
 
   describe '#format_vulnerability' do
     it 'format ZAP vulnerability into the 1.3 format' do
-      expect(parser.send(:format_vulnerability, zap_vulnerabilities[0])).to eq( {
+      expect(parser.send(:format_vulnerability, clair_vulnerabilities[0], 'image_name')).to eq( {
         'category' => 'container_scanning',
-        'message' => 'glibc - CVE-2017-18269',
+        'message' => 'CVE-2017-18269 in glibc',
         'confidence' => 'Medium',
         'cve' => 'CVE-2017-18269',
         'identifiers' => [
@@ -58,6 +63,7 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
           }
         ],
         'location' => {
+          'image' => 'image_name',
           'operating_system' => 'debian:9',
           'dependency' => {
             'package' => {
@@ -71,7 +77,7 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
         'priority' => 'Unknown',
         'scanner' => { 'id' => 'clair', 'name' => 'Clair' },
         'severity' => 'critical',
-        'solution' => 'Upgrade to version 2.24-11+deb9u4',
+        'solution' => 'Upgrade glibc from 2.24-11+deb9u3 to 2.24-11+deb9u4',
         'tool' => 'clair',
         'url' => 'https://security-tracker.debian.org/tracker/CVE-2017-18269'
       } )
@@ -109,16 +115,204 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
     end
   end
 
-  describe '#solution' do
-    context 'without a fixedby value' do
-      it 'returns nil' do
-        expect(parser.send(:solution, zap_vulnerabilities[1])).to be_nil
+  describe '#message' do
+    subject { parser.send(:message, input)}
+
+    context 'when there is a featurename' do
+      let(:input) do
+        {
+          "featurename" => "foo",
+          "featureversion" => "",
+          "vulnerability" => "CVE-2018-777",
+          "namespace" => "debian:9",
+          "description" => "CVE-2018-777 is affecting your system",
+          "link" => "https://security-tracker.debian.org/tracker/CVE-2018-777",
+          "severity" => "Unknown",
+          "fixedby" => "1.4"
+        }
+      end
+
+      it 'formats message correctly ' do
+        is_expected.to eq('CVE-2018-777 in foo')
       end
     end
 
-    context 'with a fixedby value' do
-      it 'returns a solution' do
-        expect(parser.send(:solution, zap_vulnerabilities[0])).to eq('Upgrade to version 2.24-11+deb9u4')
+    context 'when there is a no featurename' do
+      let(:input) do
+        {
+          "featurename" => "",
+          "featureversion" => "",
+          "vulnerability" => "CVE-2018-777",
+          "namespace" => "debian:9",
+          "description" => "CVE-2018-777 is affecting your system",
+          "link" => "https://security-tracker.debian.org/tracker/CVE-2018-777",
+          "severity" => "Unknown",
+          "fixedby" => "1.4"
+        }
+      end
+
+      it 'formats message correctly' do
+        is_expected.to eq('CVE-2018-777')
+      end
+    end
+  end
+
+  describe '#description' do
+    subject { parser.send(:description, input) }
+
+    context 'when there is a description' do
+      let(:input) do
+        {
+          "featurename" => "",
+          "featureversion" => "",
+          "vulnerability" => "CVE-2018-777",
+          "namespace" => "debian:9",
+          "description" => "SSE2-optimized memmove implementation problem.",
+          "link" => "https://security-tracker.debian.org/tracker/CVE-2018-777",
+          "severity" => "Unknown",
+          "fixedby" => "1.4"
+        }
+      end
+
+      it 'formats description correctly ' do
+        is_expected.to eq('SSE2-optimized memmove implementation problem.')
+      end
+    end
+
+    context 'when there is no description and no featurename' do
+      let(:input) do
+        {
+          "featurename" => "",
+          "featureversion" => "",
+          "vulnerability" => "CVE-2018-777",
+          "namespace" => "debian:9",
+          "description" => "",
+          "link" => "https://security-tracker.debian.org/tracker/CVE-2018-777",
+          "severity" => "Unknown",
+          "fixedby" => "1.4"
+        }
+      end
+
+      it 'formats description correctly ' do
+        is_expected.to eq('debian:9 is affected by CVE-2018-777')
+      end
+    end
+
+    context 'when there is no description and no featureversion but featurename is present' do
+      let(:input) do
+        {
+          "featurename" => "foo",
+          "featureversion" => "",
+          "vulnerability" => "CVE-2018-777",
+          "namespace" => "debian:9",
+          "description" => "",
+          "link" => "https://security-tracker.debian.org/tracker/CVE-2018-777",
+          "severity" => "Unknown",
+          "fixedby" => "1.4"
+        }
+      end
+
+      it 'formats description correctly ' do
+        is_expected.to eq('foo is affected by CVE-2018-777')
+      end
+    end
+
+    context 'when there is no description but featurename and featureversion are present' do
+      let(:input) do
+        {
+          "featurename" => "foo",
+          "featureversion" => "1.2.3",
+          "vulnerability" => "CVE-2018-777",
+          "namespace" => "debian:9",
+          "description" => "",
+          "link" => "https://security-tracker.debian.org/tracker/CVE-2018-777",
+          "severity" => "Unknown",
+          "fixedby" => "1.4"
+        }
+      end
+
+      it 'formats description correctly ' do
+        is_expected.to eq('foo:1.2.3 is affected by CVE-2018-777')
+      end
+    end
+  end
+
+  describe '#solution' do
+    subject { parser.send(:solution, input) }
+
+    context 'without a fixedby value' do
+      let(:input) do
+        {
+          "featurename" => "foo",
+          "featureversion" => "1.2.3",
+          "vulnerability" => "CVE-2018-777",
+          "namespace" => "debian:9",
+          "description" => "",
+          "link" => "https://security-tracker.debian.org/tracker/CVE-2018-777",
+          "severity" => "Unknown",
+          "fixedby" => ""
+        }
+      end
+
+      it 'returns nil' do
+        is_expected.to be_nil
+      end
+    end
+
+    context 'when there is a fixedby but no featurename' do
+      let(:input) do
+        {
+          "featurename" => "",
+          "featureversion" => "1.2.3",
+          "vulnerability" => "CVE-2018-777",
+          "namespace" => "debian:9",
+          "description" => "",
+          "link" => "https://security-tracker.debian.org/tracker/CVE-2018-777",
+          "severity" => "Unknown",
+          "fixedby" => "1.4"
+        }
+      end
+
+      it 'formats solution correctly ' do
+        is_expected.to eq('Upgrade to 1.4')
+      end
+    end
+
+    context 'when there is a fixedby, a featurename but no featureversion' do
+      let(:input) do
+        {
+          "featurename" => "foo",
+          "featureversion" => "",
+          "vulnerability" => "CVE-2018-777",
+          "namespace" => "debian:9",
+          "description" => "",
+          "link" => "https://security-tracker.debian.org/tracker/CVE-2018-777",
+          "severity" => "Unknown",
+          "fixedby" => "1.4"
+        }
+      end
+
+      it 'formats solution correctly ' do
+        is_expected.to eq('Upgrade foo to 1.4')
+      end
+    end
+
+    context 'when there is a fixedby, a featurename and a featureversion' do
+      let(:input) do
+        {
+          "featurename" => "foo",
+          "featureversion" => "1.2.3",
+          "vulnerability" => "CVE-2018-777",
+          "namespace" => "debian:9",
+          "description" => "",
+          "link" => "https://security-tracker.debian.org/tracker/CVE-2018-777",
+          "severity" => "Unknown",
+          "fixedby" => "1.4"
+        }
+      end
+
+      it 'formats solution correctly ' do
+        is_expected.to eq('Upgrade foo from 1.2.3 to 1.4')
       end
     end
   end
