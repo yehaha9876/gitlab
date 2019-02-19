@@ -140,7 +140,20 @@ To remove the alert, click back on the alert icon for the desired metric, and cl
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/9258) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.8.
 
-For manually configured Prometheus servers, a notify endpoint is provided to use with Prometheus webhooks. If you have manual configuration enabled, an **Alerts** section is added to **Settings > Integrations > Prometheus**. This contains the *URL* and *Authorization Key*, which can be copied to your Prometheus webhook config file. The **Reset Key** button will invalidate the key and generate a new one.
+For manually configured Prometheus servers, a notify endpoint is provided to use with Prometheus webhooks. If you have manual configuration enabled, an **Alerts** section is added to **Settings > Integrations > Prometheus**. This contains the *URL* and *Authorization Key*. The **Reset Key** button will invalidate the key and generate a new one.
+
+Copy the *URL* and *Authorization Key* into the [`webhook_configs`](https://prometheus.io/docs/alerting/configuration/#webhook_config) section your Prometheus Alertmanager configuration:
+
+```yaml
+    receivers:
+      name: gitlab
+      webhook_configs:
+      - http_config:
+          bearer_token: AUTHORIZATION_KEY
+        send_resolved: true
+        url: URL
+      ...
+```
 
 ## Determining the performance impact of a merge
 
