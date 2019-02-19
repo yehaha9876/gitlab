@@ -60,6 +60,11 @@ describe('vulnerabilities module getters', () => {
   describe('getFilteredVulnerabilitiesHistory', () => {
     let state;
 
+    const mockedGetters = () => {
+      const getVulnerabilityHistoryByName = name => getters.getVulnerabilityHistoryByName(state)(name);
+      return { getVulnerabilityHistoryByName };
+    }
+
     beforeEach(() => {
       state = createState();
       state.vulnerabilitiesHistory = mockHistoryData;
@@ -71,23 +76,23 @@ describe('vulnerabilities module getters', () => {
       jasmine.clock().uninstall();
     });
 
-    it('should filter the dataset for last 30 days', () => {
+    it('should filter the data to the last 30 days and days we have data for', () => {
       state.vulnerabilitiesHistoryDayRange = DAYS.THIRTY;
-      const filteredResults = getters.getFilteredVulnerabilitiesHistory(state)('critical');
+      const filteredResults = getters.getFilteredVulnerabilitiesHistory(state, mockedGetters())('critical');
 
       expect(filteredResults.length).toEqual(28);
     });
 
-    it('should filter the dataset for last 60 days', () => {
+    it('should filter the data to the last 60 days and days we have data for', () => {
       state.vulnerabilitiesHistoryDayRange = DAYS.SIXTY;
-      const filteredResults = getters.getFilteredVulnerabilitiesHistory(state)('critical');
+      const filteredResults = getters.getFilteredVulnerabilitiesHistory(state, mockedGetters())('critical');
 
       expect(filteredResults.length).toEqual(58);
     });
 
-    it('should filter the dataset for last 90 days', () => {
+    it('should filter the data to the last 90 days and days we have data for', () => {
       state.vulnerabilitiesHistoryDayRange = DAYS.NINETY;
-      const filteredResults = getters.getFilteredVulnerabilitiesHistory(state)('critical');
+      const filteredResults = getters.getFilteredVulnerabilitiesHistory(state, mockedGetters())('critical');
 
       expect(filteredResults.length).toEqual(88);
     });

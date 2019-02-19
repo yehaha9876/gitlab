@@ -1,5 +1,3 @@
-import _ from 'underscore';
-
 export const dashboardError = state =>
   state.errorLoadingVulnerabilities && state.errorLoadingVulnerabilitiesCount;
 export const dashboardListError = state =>
@@ -7,8 +5,10 @@ export const dashboardListError = state =>
 export const dashboardCountError = state =>
   !state.errorLoadingVulnerabilities && state.errorLoadingVulnerabilitiesCount;
 
-export const getFilteredVulnerabilitiesHistory = state => name => {
-  const history = state.vulnerabilitiesHistory[name.toLowerCase()];
+export const getVulnerabilityHistoryByName = state => name => state.vulnerabilitiesHistory[name.toLowerCase()]
+
+export const getFilteredVulnerabilitiesHistory = (state, getters) => name => {
+  const history = getters.getVulnerabilityHistoryByName(name);
   const days = state.vulnerabilitiesHistoryDayRange;
 
   if (!history) {
@@ -21,7 +21,7 @@ export const getFilteredVulnerabilitiesHistory = state => name => {
 
   startDate.setDate(currentDate.getDate() - days);
 
-  return _.filter(data, date => {
+  return data.filter(date => {
     const parsedDate = Date.parse(date[0]);
     return parsedDate > startDate;
   });

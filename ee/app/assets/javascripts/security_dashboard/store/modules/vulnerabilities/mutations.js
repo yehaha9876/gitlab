@@ -41,7 +41,7 @@ export default {
   },
   [types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, days) {
     state.vulnerabilitiesHistoryDayRange = days;
-    state.vulnerabilitiesHistoryShowSplitLine = !(days > DAYS.THIRTY);
+    state.vulnerabilitiesHistoryShowSplitLine = days <= DAYS.THIRTY;
 
     if (days <= DAYS.THIRTY) {
       state.vulnerabilitiesHistoryMaxDayInterval = 1;

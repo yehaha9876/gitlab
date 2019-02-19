@@ -193,36 +193,37 @@ describe('vulnerabilities module mutations', () => {
   });
 
   describe('SET_VULNERABILITIES_HISTORY_DAY_RANGE', () => {
+    let state;
+
+    beforeEach(() => {
+      state =  createState()
+    });
+
     it('should set the vulnerabilitiesHistoryDayRange to number of days', () => {
-      const state = createState();
       mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.THIRTY);
 
       expect(state.vulnerabilitiesHistoryDayRange).toEqual(DAYS.THIRTY);
     });
 
     it('should set the vulnerabilitiesHistoryShowSplitLine to true if 30 days or under', () => {
-      const state = createState();
       mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.THIRTY);
 
-      expect(state.vulnerabilitiesHistoryShowSplitLine).toBeTruthy();
+      expect(state.vulnerabilitiesHistoryShowSplitLine).toEqual(true);
     });
 
     it('should set the vulnerabilitiesHistoryShowSplitLine to false if 30 days or over', () => {
-      const state = createState();
       mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.SIXTY);
 
-      expect(state.vulnerabilitiesHistoryShowSplitLine).toBeFalsy();
+      expect(state.vulnerabilitiesHistoryShowSplitLine).toEqual(false);
     });
 
     it('should set the vulnerabilitiesHistoryMaxDayInterval to 1 if days are 30 and under', () => {
-      const state = createState();
       mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.THIRTY);
 
       expect(state.vulnerabilitiesHistoryMaxDayInterval).toEqual(1);
     });
 
     it('should set the vulnerabilitiesHistoryMaxDayInterval to 7 if between 30 and 60', () => {
-      const state = createState();
       const days = 45;
 
       mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, days);
@@ -231,7 +232,6 @@ describe('vulnerabilities module mutations', () => {
     });
 
     it('should set the vulnerabilitiesHistoryMaxDayInterval to 14 if over 60', () => {
-      const state = createState();
       mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.NINETY);
 
       expect(state.vulnerabilitiesHistoryMaxDayInterval).toEqual(14);
