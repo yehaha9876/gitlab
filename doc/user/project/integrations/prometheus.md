@@ -147,14 +147,14 @@ For manually configured Prometheus servers, a notify endpoint is provided to use
 Copy the *URL* and *Authorization Key* into the [`webhook_configs`](https://prometheus.io/docs/alerting/configuration/#webhook_config) section of your Prometheus Alertmanager configuration:
 
 ```yaml
-    receivers:
-      name: gitlab
-      webhook_configs:
-      - http_config:
-          bearer_token: 9e1cbfcd546896a9ea8be557caf13a76
-        send_resolved: true
-        url: http://192.168.178.31:3001/root/manual_prometheus/prometheus/alerts/notify.json
-      ...
+receivers:
+  name: gitlab
+  webhook_configs:
+  - http_config:
+      bearer_token: 9e1cbfcd546896a9ea8be557caf13a76
+    send_resolved: true
+    url: http://192.168.178.31:3001/root/manual_prometheus/prometheus/alerts/notify.json
+  ...
 ```
 
 ## Determining the performance impact of a merge
