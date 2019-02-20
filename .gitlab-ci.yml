@@ -306,6 +306,7 @@ stages:
   script:
     - ruby -r./scripts/ee_specific_check/ee_specific_check -e'EESpecificCheck.fetch_remote_ce_branch'
     - git checkout -f FETCH_HEAD
+    - sed -i "/gem 'grpc'/d" Gemfile
     - echo "gem 'grpc', '~> 1.18.0'" >> Gemfile
     - echo "gem 'google-protobuf', '~> 3.7.0.rc.2'" >> Gemfile
     - bundle update google-protobuf grpc
