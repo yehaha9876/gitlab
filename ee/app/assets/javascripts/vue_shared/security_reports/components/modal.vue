@@ -190,7 +190,7 @@ export default {
               >
                 {{ field.value }}
               </safe-link>
-              <span v-else> {{ field.value }} </span>
+              <span v-else :class="`vulnerability-modal-value-${key}`"> {{ field.value }} </span>
             </template>
           </div>
         </div>
@@ -259,3 +259,9 @@ export default {
     </div>
   </modal>
 </template>
+
+<style scoped>
+.vulnerability-modal-value-confidence {
+  text-transform: capitalize;
+}
+</style>
