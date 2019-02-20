@@ -6,6 +6,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import ExpandButton from '~/vue_shared/components/expand_button.vue';
 import SafeLink from 'ee/vue_shared/components/safe_link.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
+import SeverityBadge from './severity_badge.vue';
 
 export default {
   components: {
@@ -15,6 +16,7 @@ export default {
     LoadingButton,
     ExpandButton,
     Icon,
+    SeverityBadge,
   },
   props: {
     modal: {
@@ -92,6 +94,9 @@ export default {
     },
     hasLinks(field, key) {
       return key === 'links' && this.hasValue(field);
+    },
+    hasSeverity(field, key) {
+      return key === 'severity' && this.hasValue(field);
     },
   },
 };
@@ -172,6 +177,9 @@ export default {
                 </safe-link>
                 <span v-if="isLastValue(i, field.value)">,&nbsp;</span>
               </span>
+            </template>
+            <template v-else-if="hasSeverity(field, key)">
+              <severity-badge :severity="field.value" class="d-inline" />
             </template>
             <template v-else>
               <safe-link
