@@ -30,10 +30,10 @@ export default {
   },
   computed: {
     isApproved() {
-      return this.approvalsLeft <= 0;
+      return this.approved
     },
     message() {
-      if (this.approved) {
+      if (this.isApproved) {
         return APPROVED_MESSAGE;
       }
 
