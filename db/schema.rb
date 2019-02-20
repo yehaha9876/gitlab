@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190204115450) do
+ActiveRecord::Schema.define(version: 20190218144405) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1563,6 +1563,14 @@ ActiveRecord::Schema.define(version: 20190204115450) do
     t.index ["title"], name: "index_issues_on_title_trigram", using: :gin, opclasses: {"title"=>"gin_trgm_ops"}
     t.index ["updated_at"], name: "index_issues_on_updated_at", using: :btree
     t.index ["updated_by_id"], name: "index_issues_on_updated_by_id", where: "(updated_by_id IS NOT NULL)", using: :btree
+  end
+
+  create_table "jira_connect_installations", id: :bigserial, force: :cascade do |t|
+    t.string "client_key"
+    t.string "encrypted_shared_secret"
+    t.string "encrypted_shared_secret_iv"
+    t.string "base_url"
+    t.index ["client_key"], name: "index_jira_connect_installations_on_client_key", unique: true, using: :btree
   end
 
   create_table "keys", force: :cascade do |t|
